@@ -373,6 +373,10 @@ public class RetirementDefectionTracker {
 
             targets.put(person.getId(), targetNumber);
         }
+
+        // we trim personnel so that anyone who has an impossible to fail TN doesn't appear on the table
+        targets.entrySet().removeIf(entry -> entry.getValue().getValue() <= 2);
+
         return targets;
     }
 

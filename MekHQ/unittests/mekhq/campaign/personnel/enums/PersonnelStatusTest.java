@@ -345,16 +345,7 @@ public class PersonnelStatusTest {
     public void testGetImplementedStatuses() {
         final List<PersonnelStatus> implementedStatuses = PersonnelStatus.getImplementedStatuses();
         for (final PersonnelStatus personnelStatus : statuses) {
-            switch (personnelStatus) {
-                case POW:
-                case ON_LEAVE:
-                case AWOL:
-                    assertFalse(implementedStatuses.contains(personnelStatus));
-                    break;
-                default:
-                    assertTrue(implementedStatuses.contains(personnelStatus));
-                    break;
-            }
+            assertTrue(implementedStatuses.contains(personnelStatus));
         }
     }
 

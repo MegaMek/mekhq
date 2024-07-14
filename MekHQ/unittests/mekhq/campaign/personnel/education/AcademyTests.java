@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -62,7 +63,7 @@ class AcademyTests {
     void testAcademyCreationAllFields() {
         Academy academy = new Academy("MechWarrior", "MekWarrior Academy", "College", true,
                 false, true, "Top level MechWarrior Training", 20, true,
-                Arrays.asList("Sol", "Terra"), false, 3045,
+                Arrays.asList("Sol", "Terra"), false, false,3045,
                 3089, 3099, 2000, 365, 10,
                 EducationLevel.EARLY_CHILDHOOD, EducationLevel.DOCTORATE, 18, 35, Arrays.asList("MechWarrior", "Leadership"),
                 Arrays.asList("Combat", "Strategy"), Arrays.asList(3050, 3055), 5, 101);
@@ -131,13 +132,13 @@ class AcademyTests {
 
     @Test void testGetFactionDiscountAdjustedNotPresentInLocationSystems() {
         Academy academy = new Academy();
-        academy.setLocationSystems(Arrays.asList("Sol"));
+        academy.setLocationSystems(List.of("Sol"));
         academy.setFactionDiscount(10);
         Person person = Mockito.mock(Person.class);
         Campaign campaign = Mockito.mock(Campaign.class);
         PlanetarySystem system = Mockito.mock(PlanetarySystem.class);
         when(campaign.getSystemById("Sol")).thenReturn(system);
-        when(system.getFactions(Mockito.any())).thenReturn(Arrays.asList("Lyr"));
+        when(system.getFactions(Mockito.any())).thenReturn(List.of("Lyr"));
         when(person.getOriginFaction()).thenReturn(new Faction("FWL", ""));
         when(campaign.getFaction()).thenReturn(new Faction("FWL", ""));
         assertEquals(1.0, academy.getFactionDiscountAdjusted(campaign, person));

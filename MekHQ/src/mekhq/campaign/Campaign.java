@@ -132,8 +132,10 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
@@ -366,9 +368,9 @@ public class Campaign implements ITechManager {
     }
 
     public String getTitle() {
-        return getName() + " (" + getFaction().getFullName(getGameYear()) + ")" + " - "
+        return getName() + " (" + getFaction().getFullName(getGameYear()) + ')' + " - "
                 + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate())
-                + " (" + getEra() + ")";
+                + " (" + getEra() + ')';
     }
 
     public LocalDate getLocalDate() {
@@ -644,7 +646,7 @@ public class Campaign implements ITechManager {
                             .append(" until ")
                             .append(MekHQ.getMHQOptions().getDisplayFormattedDate(getShipSearchExpiration()));
                 } else {
-                    report.append(" <font color=" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + ">Could not determine ship type.</font>");
+                    report.append(" <font color=").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append(">Could not determine ship type.</font>");
                 }
             } else {
                 report.append("<br/>Ship search unsuccessful.");
@@ -897,7 +899,7 @@ public class Campaign implements ITechManager {
 
                     u.setTech(forceTech);
                 } else {
-                    String cantTech = forceTech.getFullName() + " cannot maintain " + u.getName() + "\n"
+                    String cantTech = forceTech.getFullName() + " cannot maintain " + u.getName() + '\n'
                             + "You will need to assign a tech manually.";
                     JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                 }
@@ -2438,7 +2440,7 @@ public class Campaign implements ITechManager {
                 break;
             }
 
-            String personTitle = person.getHyperlinkedFullTitle() + " ";
+            String personTitle = person.getHyperlinkedFullTitle() + ' ';
 
             for (PlanetarySystem system : systems) {
                 if (currentList.isEmpty()) {
@@ -2626,7 +2628,7 @@ public class Campaign implements ITechManager {
         String report = "";
 
         if (null != person) {
-            report += person.getHyperlinkedFullTitle() + " ";
+            report += person.getHyperlinkedFullTitle() + ' ';
         }
 
         TargetRoll target = getTargetForAcquisition(acquisition, person);
@@ -2654,7 +2656,7 @@ public class Campaign implements ITechManager {
 
         int roll = Compute.d6(2);
         report += "  needs " + target.getValueAsString();
-        report += " and rolls " + roll + ":";
+        report += " and rolls " + roll + ':';
         // Edge reroll, if applicable
         if (getCampaignOptions().isUseSupportEdge() && (roll < target.getValue()) && (person != null)
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
@@ -3041,7 +3043,7 @@ public class Campaign implements ITechManager {
             wrongType = " <b>Warning: wrong tech type for this repair.</b>";
         }
         report = report + ",  needs " + target.getValueAsString()
-                + " and rolls " + roll + ":";
+                + " and rolls " + roll + ':';
         int xpGained = 0;
         // if we fail and would break a part, here's a chance to use Edge for a reroll...
         if (getCampaignOptions().isUseSupportEdge()
@@ -3061,7 +3063,7 @@ public class Campaign implements ITechManager {
                 if (tech.isEngineer()) {
                     tech.setEdgeUsed(tech.getEdgeUsed() + 1);
                 }
-                report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ":";
+                report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ':';
             }
         }
 
@@ -3641,6 +3643,11 @@ public class Campaign implements ITechManager {
             processEducationNewDay();
         }
 
+        if ((campaignOptions.isEnableAutoAwards()) && (getLocalDate().getDayOfMonth() == 1)) {
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+            autoAwardsController.ManualController(this, false);
+        }
+
         resetAstechMinutes();
 
         processNewDayUnits();
@@ -3697,10 +3704,19 @@ public class Campaign implements ITechManager {
         // even if Fatigue is disabled, we still want to process recovery so fatigued personnel aren't frozen in that state
         Fatigue.processFatigueRecovery(this);
 
+        // we store this value, so it only needs to be checked once per day,
+        // otherwise we would need to check it once for each active person in the campaign
         if (campaignOptions.isUseFatigue()) {
-            // we store these values, so this only needs to be checked once per day,
-            // otherwise we would need to check it once for each active person in the campaign
-            fieldKitchenWithinCapacity = getActivePersonnel().size() <= Fatigue.checkFieldKitchenCapacity(this);
+            long validPersonnel;
+
+            if (campaignOptions.isUseFieldKitchenIgnoreNonCombatants()) {
+                validPersonnel = getActivePersonnel().stream()
+                        .filter(person -> person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat())
+                        .count();
+            } else {
+                validPersonnel = getActivePersonnel().size();
+            }
+            fieldKitchenWithinCapacity = validPersonnel <= Fatigue.checkFieldKitchenCapacity(this);
         } else {
             fieldKitchenWithinCapacity = false;
         }
@@ -4271,7 +4287,7 @@ public class Campaign implements ITechManager {
 
         finances.credit(type, getLocalDate(), quantity, description);
         String quantityString = quantity.toAmountAndSymbolString();
-        addReport("Funds added : " + quantityString + " (" + description + ")");
+        addReport("Funds added : " + quantityString + " (" + description + ')');
     }
 
     public void removeFunds(final TransactionType type, final Money quantity,
@@ -4282,7 +4298,7 @@ public class Campaign implements ITechManager {
 
         finances.debit(type, getLocalDate(), quantity, description);
         String quantityString = quantity.toAmountAndSymbolString();
-        addReport("Funds removed : " + quantityString + " (" + description + ")");
+        addReport("Funds removed : " + quantityString + " (" + description + ')');
     }
 
     public CampaignOptions getCampaignOptions() {
@@ -4315,7 +4331,7 @@ public class Campaign implements ITechManager {
         if (null != getStoryArc()) {
             return getStoryArc().getCurrentObjectives();
         }
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     public void writeToXML(final PrintWriter pw) {
@@ -4714,7 +4730,6 @@ public class Campaign implements ITechManager {
             final String localCurrent = current;
             Systems.getInstance().visitNearbySystems(Systems.getInstance().getSystemById(current), 30, p -> {
                 if (closed.contains(p.getId())) {
-                    return;
                 } else if (open.contains(p.getId())) {
                     // is the current G better than the existing G
                     if (currentG < scoreG.get(p.getId())) {
@@ -5464,7 +5479,7 @@ public class Campaign implements ITechManager {
             if (contract == null) {
                 LogManager.getLogger().error("AtB: used bonus part but no contract has bonus parts available.");
             } else {
-                addReport(resources.getString("bonusPartLog.text") + " " + targetWork.getAcquisitionPart().getPartName());
+                addReport(resources.getString("bonusPartLog.text") + ' ' + targetWork.getAcquisitionPart().getPartName());
                 contract.useBonusPart();
             }
         }
@@ -5489,7 +5504,7 @@ public class Campaign implements ITechManager {
         // if we have a contract and it has started
         if ((null != contract) && contract.isActiveOn(getLocalDate(), true)) {
             if (reportBuilder != null) {
-                reportBuilder.append(contract.getPartsAvailabilityLevel()).append(" (").append(contract.getType()).append(")");
+                reportBuilder.append(contract.getPartsAvailabilityLevel()).append(" (").append(contract.getType()).append(')');
             }
             return contract.getPartsAvailabilityLevel();
         }
@@ -5510,7 +5525,7 @@ public class Campaign implements ITechManager {
         if (reportBuilder != null) {
             reportBuilder.append(getUnitRatingMod()).append("(unit rating)");
             if (person != null) {
-                reportBuilder.append(modifier).append("(").append(person.getFullName()).append(", logistics admin)");
+                reportBuilder.append(modifier).append('(').append(person.getFullName()).append(", logistics admin)");
             } else {
                 reportBuilder.append(modifier).append("(no logistics admin)");
             }
@@ -5822,7 +5837,7 @@ public class Campaign implements ITechManager {
     }
 
     public boolean isCustom(Unit u) {
-        return customs.contains(u.getEntity().getChassis() + " "
+        return customs.contains(u.getEntity().getChassis() + ' '
                 + u.getEntity().getModel());
     }
 
@@ -5989,8 +6004,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (entity instanceof IBomber) {
-            IBomber bomber = (IBomber) entity;
+        if (entity instanceof IBomber bomber) {
             List<BombMounted> mountedBombs = bomber.getBombs();
             if (!mountedBombs.isEmpty()) {
                 // These should return an int[] filled with 0's
@@ -6011,11 +6025,9 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (entity instanceof Mech) {
-            Mech m = (Mech) entity;
+        if (entity instanceof Mech m) {
             m.setCoolingFlawActive(false);
-        } else if (entity instanceof Aero) {
-            Aero a = (Aero) entity;
+        } else if (entity instanceof Aero a) {
 
             if (a.isSpheroid()) {
                 entity.setMovementMode(EntityMovementMode.SPHEROID);
@@ -6025,8 +6037,7 @@ public class Campaign implements ITechManager {
             a.setAltitude(5);
             a.setCurrentVelocity(0);
             a.setNextVelocity(0);
-        } else if (entity instanceof Tank) {
-            Tank t = (Tank) entity;
+        } else if (entity instanceof Tank t) {
             t.unjamTurret(t.getLocTurret());
             t.unjamTurret(t.getLocTurret2());
             t.resetJammedWeapons();
@@ -6288,7 +6299,7 @@ public class Campaign implements ITechManager {
                 String[] network = new String[3];
                 network[0] = en.getC3UUIDAsString();
                 network[1] = "" + en.calculateFreeC3Nodes();
-                network[2] = "" + en.getShortName();
+                network[2] = en.getShortName();
                 if (!networkNames.contains(network[0])) {
                     networks.add(network);
                     networkNames.add(network[0]);
@@ -6317,7 +6328,7 @@ public class Campaign implements ITechManager {
                 String[] network = new String[3];
                 network[0] = en.getC3UUIDAsString();
                 network[1] = "" + en.calculateFreeC3MNodes();
-                network[2] = "" + en.getShortName();
+                network[2] = en.getShortName();
                 if (!networkNames.contains(network[0])) {
                     networks.add(network);
                     networkNames.add(network[0]);
@@ -6361,8 +6372,7 @@ public class Campaign implements ITechManager {
             return;
         }
         mission.setStatus(status);
-        if (mission instanceof Contract) {
-            Contract contract = (Contract) mission;
+        if (mission instanceof Contract contract) {
             Money remainingMoney = Money.zero();
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
@@ -6448,48 +6458,27 @@ public class Campaign implements ITechManager {
         }
         // now step forward through the calendar
         LocalDate arrivalDate = getLocalDate();
-        switch (getCampaignOptions().getUnitTransitTime()) {
-            case CampaignOptions.TRANSIT_UNIT_MONTH:
-                arrivalDate = arrivalDate.plusMonths(time);
-                break;
-            case CampaignOptions.TRANSIT_UNIT_WEEK:
-                arrivalDate = arrivalDate.plusWeeks(time);
-                break;
-            case CampaignOptions.TRANSIT_UNIT_DAY:
-            default:
-                arrivalDate = arrivalDate.plusDays(time);
-                break;
-        }
+        arrivalDate = switch (getCampaignOptions().getUnitTransitTime()) {
+            case CampaignOptions.TRANSIT_UNIT_MONTH -> arrivalDate.plusMonths(time);
+            case CampaignOptions.TRANSIT_UNIT_WEEK -> arrivalDate.plusWeeks(time);
+            default -> arrivalDate.plusDays(time);
+        };
 
         // now adjust for MoS and minimums
         int mosBonus = getCampaignOptions().getAcquireMosBonus() * mos;
-        switch (getCampaignOptions().getAcquireMosUnit()) {
-            case CampaignOptions.TRANSIT_UNIT_MONTH:
-                arrivalDate = arrivalDate.minusMonths(mosBonus);
-                break;
-            case CampaignOptions.TRANSIT_UNIT_WEEK:
-                arrivalDate = arrivalDate.minusWeeks(mosBonus);
-                break;
-            case CampaignOptions.TRANSIT_UNIT_DAY:
-            default:
-                arrivalDate = arrivalDate.minusDays(mosBonus);
-                break;
-        }
+        arrivalDate = switch (getCampaignOptions().getAcquireMosUnit()) {
+            case CampaignOptions.TRANSIT_UNIT_MONTH -> arrivalDate.minusMonths(mosBonus);
+            case CampaignOptions.TRANSIT_UNIT_WEEK -> arrivalDate.minusWeeks(mosBonus);
+            default -> arrivalDate.minusDays(mosBonus);
+        };
 
         // now establish minimum date and if this is before
         LocalDate minimumDate = getLocalDate();
-        switch (getCampaignOptions().getAcquireMinimumTimeUnit()) {
-            case CampaignOptions.TRANSIT_UNIT_MONTH:
-                minimumDate = minimumDate.plusMonths(getCampaignOptions().getAcquireMinimumTime());
-                break;
-            case CampaignOptions.TRANSIT_UNIT_WEEK:
-                minimumDate = minimumDate.plusWeeks(getCampaignOptions().getAcquireMinimumTime());
-                break;
-            case CampaignOptions.TRANSIT_UNIT_DAY:
-            default:
-                minimumDate = minimumDate.plusDays(getCampaignOptions().getAcquireMinimumTime());
-                break;
-        }
+        minimumDate = switch (getCampaignOptions().getAcquireMinimumTimeUnit()) {
+            case CampaignOptions.TRANSIT_UNIT_MONTH -> minimumDate.plusMonths(getCampaignOptions().getAcquireMinimumTime());
+            case CampaignOptions.TRANSIT_UNIT_WEEK -> minimumDate.plusWeeks(getCampaignOptions().getAcquireMinimumTime());
+            default -> minimumDate.plusDays(getCampaignOptions().getAcquireMinimumTime());
+        };
 
         if (arrivalDate.isBefore(minimumDate)) {
             return Math.toIntExact(ChronoUnit.DAYS.between(getLocalDate(), minimumDate));
@@ -6692,7 +6681,7 @@ public class Campaign implements ITechManager {
 
             int nDamage = 0;
             int nDestroy = 0;
-            for (Map.Entry<Part, Integer> p : partsToDamage.entrySet()) {
+            for (Entry<Part, Integer> p : partsToDamage.entrySet()) {
                 int damage = p.getValue();
                 if (damage > 3) {
                     nDestroy++;
@@ -6747,7 +6736,7 @@ public class Campaign implements ITechManager {
     }
 
     private String doMaintenanceOnUnitPart(Unit u, Part p, Map<Part, Integer> partsToDamage, boolean paidMaintenance) {
-        String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ")";
+        String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ')';
         if (!p.needsMaintenance()) {
             return null;
         }
@@ -6758,7 +6747,7 @@ public class Campaign implements ITechManager {
             target.addModifier(1, "did not pay for maintenance");
         }
 
-        partReport += ", TN " + target.getValue() + "[" + target.getDesc() + "]";
+        partReport += ", TN " + target.getValue() + '[' + target.getDesc() + ']';
         int roll = Compute.d6(2);
         int margin = roll - target.getValue();
         partReport += " rolled a " + roll + ", margin of " + margin;
@@ -6939,7 +6928,7 @@ public class Campaign implements ITechManager {
             /*
              * Switch all contracts to AtBContract's
              */
-            for (Map.Entry<Integer, Mission> me : missions.entrySet()) {
+            for (Entry<Integer, Mission> me : missions.entrySet()) {
                 Mission m = me.getValue();
                 if (m instanceof Contract && !(m instanceof AtBContract)) {
                     me.setValue(new AtBContract((Contract) m, this));
@@ -7049,53 +7038,56 @@ public class Campaign implements ITechManager {
             return -1;
         }
 
-        boolean triggerTurnoverPrompt = false;
-
+        boolean triggerTurnoverPrompt;
         switch (campaignOptions.getTurnoverFrequency()) {
-            case NEVER:
-                return -1;
             case WEEKLY:
                 triggerTurnoverPrompt = getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY);
                 break;
             case MONTHLY:
-                triggerTurnoverPrompt = getLocalDate().getDayOfMonth() == 1;
+                triggerTurnoverPrompt = getLocalDate().getDayOfMonth() == getLocalDate().lengthOfMonth();
+                break;
+            case QUARTERLY:
+                triggerTurnoverPrompt = (getLocalDate().getDayOfMonth() == getLocalDate().lengthOfMonth())
+                        && (List.of(Month.MARCH, Month.JUNE, Month.SEPTEMBER, Month.DECEMBER).contains(getLocalDate().getMonth()));
                 break;
             case ANNUALLY:
-                triggerTurnoverPrompt = getLocalDate().getDayOfYear() == 1;
+                triggerTurnoverPrompt = getLocalDate().getDayOfYear() == getLocalDate().lengthOfYear();
                 break;
+            default:
+                return -1;
         }
 
-        if (triggerTurnoverPrompt) {
-            String dialogTitle;
-            String dialogBody;
-
-            if (getRetirementDefectionTracker().getRetirees().isEmpty()) {
-                dialogTitle = resources.getString("turnoverRollRequired.text");
-                dialogBody = resources.getString("turnoverDialogDescription.text");
-            } else {
-                dialogTitle = resources.getString("turnoverFinalPayments.text");
-                dialogBody = resources.getString("turnoverPersonnelKilled.text");
-            }
-
-            Object[] options = {
-                    resources.getString("turnoverEmployeeTurnoverDialog.text"),
-                    resources.getString("turnoverAdvanceRegardless"),
-                    resources.getString("turnoverCancel.text")
-            };
-
-            return JOptionPane.showOptionDialog(
-                    null,
-                    dialogBody,
-                    dialogTitle,
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    options,
-                    options[0]
-            );
+        if (!triggerTurnoverPrompt) {
+            return -1;
         }
 
-        return -1;
+        String dialogTitle;
+        String dialogBody;
+
+        if (getRetirementDefectionTracker().getRetirees().isEmpty()) {
+            dialogTitle = resources.getString("turnoverRollRequired.text");
+            dialogBody = resources.getString("turnoverDialogDescription.text");
+        } else {
+            dialogTitle = resources.getString("turnoverFinalPayments.text");
+            dialogBody = resources.getString("turnoverPersonnelKilled.text");
+        }
+
+        Object[] options = {
+                resources.getString("turnoverEmployeeTurnoverDialog.text"),
+                resources.getString("turnoverAdvanceRegardless"),
+                resources.getString("turnoverCancel.text")
+        };
+
+        return JOptionPane.showOptionDialog(
+                null,
+                dialogBody,
+                dialogTitle,
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
     }
 
     public boolean checkScenariosDue() {

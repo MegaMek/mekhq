@@ -283,6 +283,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JLabel lblServiceContractModifier;
     private JSpinner spnServiceContractModifier;
     private JCheckBox chkPayBonusDefault;
+    private JLabel lblPayBonusDefaultThreshold;
+    private JSpinner spnPayBonusDefaultThreshold;
 
     // Modifiers
     private JPanel turnoverAndRetentionModifiersPanel = new JPanel();
@@ -299,6 +301,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel loyaltySubPanel = new JPanel();
     private JCheckBox chkUseHideLoyalty;
+    private JCheckBox chkUseLeadershipChangeRefresh;
 
     // Payout
     private JPanel turnoverAndRetentionPayoutPanel = new JPanel();
@@ -341,6 +344,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseInjuryFatigue;
     private JLabel lblFieldKitchenCapacity;
     private JSpinner spnFieldKitchenCapacity;
+    private JCheckBox chkFieldKitchenIgnoreNonCombatants;
     private JLabel lblFatigueLeaveThreshold;
     private JSpinner spnFatigueLeaveThreshold;
     //endregion Turnover and Retention Tab
@@ -452,12 +456,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseReeducationCamps;
     private JCheckBox chkEnableLocalAcademies;
     private JCheckBox chkEnablePrestigiousAcademies;
+    private JCheckBox chkEnableUnitEducation;
     private JCheckBox chkShowIneligibleAcademies;
     private JCheckBox chkEnableOverrideRequirements;
-    private JCheckBox chkEnableRandomXp;
     private JCheckBox chkEnableBonuses;
-    private JLabel lblRandomXpRate;
-    private JSpinner spnRandomXpRate;
+    private JLabel lblFacultyXpMultiplier;
+    private JSpinner spnFacultyXpMultiplier;
     private JLabel lblAdultDropoutChance;
     private JSpinner spnAdultDropoutChance;
     private JLabel lblChildrenDropoutChance;
@@ -1082,9 +1086,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(chkUseRandomUnitQualities, gridBagConstraints);
 
-        reverseQualityNames.addActionListener(evt -> {
-            recreateFinancesPanel(reverseQualityNames.isSelected());
-        });
+        reverseQualityNames.addActionListener(evt -> recreateFinancesPanel(reverseQualityNames.isSelected()));
 
         useUnofficialMaintenance = new JCheckBox(resources.getString("useUnofficialMaintenance.text"));
         useUnofficialMaintenance.setToolTipText(resources.getString("useUnofficialMaintenance.toolTipText"));
@@ -3593,6 +3595,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseInjuryFatigue = new JCheckBox(resources.getString("chkUseInjuryFatigue.text"));
         chkUseInjuryFatigue.setToolTipText(resources.getString("chkUseInjuryFatigue.toolTipText"));
         chkUseInjuryFatigue.setName("chkUseInjuryFatigue");
+        chkUseInjuryFatigue.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
         lblFieldKitchenCapacity = new JLabel(resources.getString("lblFieldKitchenCapacity.text"));
         lblFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
@@ -3603,6 +3606,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
         spnFieldKitchenCapacity.setName("spnFieldKitchenCapacity");
         spnFieldKitchenCapacity.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        chkFieldKitchenIgnoreNonCombatants = new JCheckBox(resources.getString("chkFieldKitchenIgnoreNonCombatants.text"));
+        chkFieldKitchenIgnoreNonCombatants.setToolTipText(resources.getString("chkFieldKitchenIgnoreNonCombatants.toolTipText"));
+        chkFieldKitchenIgnoreNonCombatants.setName("chkFieldKitchenIgnoreNonCombatants");
+        chkFieldKitchenIgnoreNonCombatants.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
         lblFatigueLeaveThreshold = new JLabel(resources.getString("lblFatigueLeaveThreshold.text"));
         lblFatigueLeaveThreshold.setToolTipText(resources.getString("lblFatigueLeaveThreshold.toolTipText"));
@@ -3633,6 +3641,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblFieldKitchenCapacity)
                                 .addComponent(spnFieldKitchenCapacity, Alignment.LEADING))
+                        .addComponent(chkFieldKitchenIgnoreNonCombatants)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblFatigueLeaveThreshold)
                                 .addComponent(spnFatigueLeaveThreshold, Alignment.LEADING))
@@ -3648,6 +3657,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFieldKitchenCapacity)
                                 .addComponent(spnFieldKitchenCapacity))
+                        .addComponent(chkFieldKitchenIgnoreNonCombatants)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFatigueLeaveThreshold)
                                 .addComponent(spnFatigueLeaveThreshold))
@@ -4249,6 +4259,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             boolean isUseLoyaltyModifiers = chkUseLoyaltyModifiers.isSelected();
             loyaltySubPanel.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
             chkUseHideLoyalty.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
+            chkUseLeadershipChangeRefresh.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
 
             boolean isUseServiceBonus = chkUsePayoutServiceBonus.isSelected();
             payoutServiceBonusSubPanel.setEnabled((isEnabled) && (isUseServiceBonus));
@@ -4431,6 +4442,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkPayBonusDefault.setToolTipText(resources.getString("chkPayBonusDefault.toolTipText"));
         chkPayBonusDefault.setName("chkPayBonusDefault");
         chkPayBonusDefault.setEnabled(isUseTurnover);
+        chkPayBonusDefault.addActionListener(evt -> {
+            boolean isEnabled = chkPayBonusDefault.isSelected();
+
+            lblPayBonusDefaultThreshold.setEnabled(isEnabled);
+            spnPayBonusDefaultThreshold.setEnabled(isEnabled);
+        });
+
+        lblPayBonusDefaultThreshold = new JLabel(resources.getString("lblPayBonusDefaultThreshold.text"));
+        lblPayBonusDefaultThreshold.setToolTipText(resources.getString("lblPayBonusDefaultThreshold.toolTipText"));
+        lblPayBonusDefaultThreshold.setName("lblPayBonusDefaultThreshold");
+        lblPayBonusDefaultThreshold.setEnabled((isUseTurnover) && (campaign.getCampaignOptions().isPayBonusDefault()));
+
+        spnPayBonusDefaultThreshold = new JSpinner(new SpinnerNumberModel(3, 0, 12, 1));
+        spnPayBonusDefaultThreshold.setToolTipText(resources.getString("lblPayBonusDefaultThreshold.toolTipText"));
+        spnPayBonusDefaultThreshold.setName("spnPayBonusDefaultThreshold");
+        spnPayBonusDefaultThreshold.setEnabled((isUseTurnover) && (campaign.getCampaignOptions().isPayBonusDefault()));
 
         turnoverAndRetentionSettingsPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionSettingsPanel.title")));
         turnoverAndRetentionSettingsPanel.setName("turnoverAndRetentionSettingsPanel");
@@ -4468,6 +4495,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblServiceContractModifier)
                                 .addComponent(spnServiceContractModifier, Alignment.LEADING))
                         .addComponent(chkPayBonusDefault)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblPayBonusDefaultThreshold)
+                                .addComponent(spnPayBonusDefaultThreshold, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -4497,6 +4527,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblServiceContractModifier)
                                 .addComponent(spnServiceContractModifier))
                         .addComponent(chkPayBonusDefault)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPayBonusDefaultThreshold)
+                                .addComponent(spnPayBonusDefaultThreshold))
         );
 
         return turnoverAndRetentionSettingsPanel;
@@ -4615,6 +4648,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseHideLoyalty.setName("chkUseHideLoyalty");
         chkUseHideLoyalty.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
 
+        chkUseLeadershipChangeRefresh = new JCheckBox(resources.getString("chkUseLeadershipChangeRefresh.text"));
+        chkUseLeadershipChangeRefresh.setToolTipText(resources.getString("chkUseLeadershipChangeRefresh.toolTipText"));
+        chkUseLeadershipChangeRefresh.setName("chkUseLeadershipChangeRefresh");
+        chkUseLeadershipChangeRefresh.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
+
         loyaltySubPanel.setBorder(BorderFactory.createTitledBorder(""));
         loyaltySubPanel.setName("loyaltySubPanel");
         loyaltySubPanel.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
@@ -4627,11 +4665,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseHideLoyalty)
+                        .addComponent(chkUseLeadershipChangeRefresh)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseHideLoyalty)
+                        .addComponent(chkUseLeadershipChangeRefresh)
         );
     }
 
@@ -6101,15 +6141,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             enableStandardSetsPanel.setEnabled(isEnabled);
             chkEnableLocalAcademies.setEnabled(isEnabled);
             chkEnablePrestigiousAcademies.setEnabled(isEnabled);
+            chkEnableUnitEducation.setEnabled(isEnabled);
 
             chkEnableOverrideRequirements.setEnabled(isEnabled);
             chkShowIneligibleAcademies.setEnabled(isEnabled);
 
             xpAndSkillBonusesPanel.setEnabled(isEnabled);
             chkEnableBonuses.setEnabled(isEnabled);
-            lblRandomXpRate.setEnabled(isEnabled);
-            spnRandomXpRate.setEnabled(isEnabled);
-            chkEnableRandomXp.setEnabled(isEnabled);
+            lblFacultyXpMultiplier.setEnabled(isEnabled);
+            spnFacultyXpMultiplier.setEnabled(isEnabled);
 
             dropoutChancePanel.setEnabled(isEnabled);
             lblAdultDropoutChance.setEnabled(isEnabled);
@@ -6196,10 +6236,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnablePrestigiousAcademies.setToolTipText(resources.getString("chkEnablePrestigiousAcademies.toolTip"));
         chkEnablePrestigiousAcademies.setName("chkEnablePrestigiousAcademies");
 
+        chkEnableUnitEducation = new JCheckBox(resources.getString("chkEnableUnitEducation.text"));
+        chkEnableUnitEducation.setToolTipText(resources.getString("chkEnableUnitEducation.toolTip"));
+        chkEnableUnitEducation.setName("chkEnableUnitEducation");
+
         // these prevent a really annoying bug where disabled options don't stay disabled when
         // reloading Campaign Options
         chkEnableLocalAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         chkEnablePrestigiousAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        chkEnableUnitEducation.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // creating the layout
         final JPanel panel = new JPanel();
@@ -6215,12 +6260,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkEnableLocalAcademies)
                         .addComponent(chkEnablePrestigiousAcademies)
+                        .addComponent(chkEnableUnitEducation)
         );
 
         layout.setHorizontalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkEnableLocalAcademies)
                         .addComponent(chkEnablePrestigiousAcademies)
+                        .addComponent(chkEnableUnitEducation)
         );
 
         return panel;
@@ -6231,33 +6278,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableBonuses.setToolTipText(resources.getString("chkEnableBonuses.toolTip"));
         chkEnableBonuses.setName("chkEnableBonuses");
 
-        lblRandomXpRate = new JLabel(resources.getString("lblRandomXpRate.text"));
-        lblRandomXpRate.setToolTipText(resources.getString("lblRandomXpRate.toolTip"));
-        lblRandomXpRate.setName("lblRandomXpRate");
-        spnRandomXpRate = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
-        spnRandomXpRate.setToolTipText(resources.getString("lblRandomXpRate.toolTip"));
-        spnRandomXpRate.setName("spnRandomXpRate");
+        lblFacultyXpMultiplier = new JLabel(resources.getString("lblFacultyXPMultiplier.text"));
+        lblFacultyXpMultiplier.setToolTipText(resources.getString("lblFacultyXPMultiplier.toolTip"));
+        lblFacultyXpMultiplier.setName("lblFacultyXpMultiplier");
 
-        chkEnableRandomXp = new JCheckBox(resources.getString("chkEnableRandomXp.text"));
-        chkEnableRandomXp.setToolTipText(resources.getString("chkEnableRandomXp.toolTip"));
-        chkEnableRandomXp.setName("chkEnableRandomXp");
-        chkEnableRandomXp.addActionListener(evt -> {
-            final boolean isEnabled = chkEnableRandomXp.isSelected();
+        spnFacultyXpMultiplier = new JSpinner(new SpinnerNumberModel(1.00, 0.00, 10.00, 0.01));
+        spnFacultyXpMultiplier.setToolTipText(resources.getString("lblFacultyXPMultiplier.toolTip"));
+        spnFacultyXpMultiplier.setName("spnFacultyXpMultiplier");
 
-            lblRandomXpRate.setEnabled(isEnabled);
-        });
-
-        // These prevent a really annoying bug where disabled options don't stay disabled when
-        // reloading Campaign Options
-        if ((campaign.getCampaignOptions().isEnableRandomXp()) && (campaign.getCampaignOptions().isUseEducationModule())) {
-            lblRandomXpRate.setEnabled(true);
-            spnRandomXpRate.setEnabled(true);
-        } else {
-            lblRandomXpRate.setEnabled(false);
-            spnRandomXpRate.setEnabled(false);
-        }
         chkEnableBonuses.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
-        chkEnableRandomXp.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // creating the layout
         final JPanel panel = new JPanel();
@@ -6272,19 +6301,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkEnableBonuses)
-                        .addComponent(chkEnableRandomXp)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblRandomXpRate)
-                                .addComponent(spnRandomXpRate, Alignment.LEADING))
+                                .addComponent(lblFacultyXpMultiplier)
+                                .addComponent(spnFacultyXpMultiplier, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkEnableBonuses)
-                        .addComponent(chkEnableRandomXp)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRandomXpRate)
-                                .addComponent(spnRandomXpRate))
+                                .addComponent(lblFacultyXpMultiplier)
+                                .addComponent(spnFacultyXpMultiplier))
         );
 
         return panel;
@@ -8025,6 +8052,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnServiceContractDuration.setValue(options.getServiceContractDuration());
         spnServiceContractModifier.setValue(options.getServiceContractModifier());
         chkPayBonusDefault.setSelected(options.isPayBonusDefault());
+        spnPayBonusDefaultThreshold.setValue(options.getPayBonusDefaultThreshold());
 
         // Modifiers
         chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
@@ -8038,6 +8066,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseFamilyModifiers.setSelected(options.isUseFamilyModifiers());
         chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
         chkUseHideLoyalty.setSelected(options.isUseHideLoyalty());
+        chkUseLeadershipChangeRefresh.setSelected(options.isUseLeadershipChangeRefresh());
 
         // Payouts
         spnPayoutRateOfficer.setValue(options.getPayoutRateOfficer());
@@ -8061,6 +8090,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnFatigueRate.setValue(options.getFatigueRate());
         chkUseInjuryFatigue.setVisible(options.isUseInjuryFatigue());
         spnFieldKitchenCapacity.setValue(options.getFieldKitchenCapacity());
+        chkFieldKitchenIgnoreNonCombatants.setSelected(options.isUseFieldKitchenIgnoreNonCombatants());
         spnFatigueLeaveThreshold.setValue(options.getFatigueLeaveThreshold());
         //endregion Turnover and Retention Tab
 
@@ -8160,10 +8190,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseReeducationCamps.setSelected(options.isUseReeducationCamps());
         chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
+        chkEnableUnitEducation.setSelected(options.isEnableUnitEducation());
         chkEnableOverrideRequirements.setSelected(options.isEnableOverrideRequirements());
         chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
-        chkEnableRandomXp.setSelected(options.isEnableRandomXp());
-        spnRandomXpRate.setValue(options.getRandomXpRate());
+        spnFacultyXpMultiplier.setValue(options.getFacultyXpRate());
         chkEnableBonuses.setSelected(options.isEnableBonuses());
         spnAdultDropoutChance.setValue(options.getAdultDropoutChance());
         spnChildrenDropoutChance.setValue(options.getChildrenDropoutChance());
@@ -8712,6 +8742,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setServiceContractDuration((Integer) spnServiceContractDuration.getValue());
             options.setServiceContractModifier((Integer) spnServiceContractModifier.getValue());
             options.setPayBonusDefault(chkPayBonusDefault.isSelected());
+            options.setPayBonusDefaultThreshold((Integer) spnPayBonusDefaultThreshold.getValue());
 
             // Modifiers
             options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
@@ -8725,6 +8756,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseFamilyModifiers(chkUseFamilyModifiers.isSelected());
             options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
             options.setUseHideLoyalty(chkUseHideLoyalty.isSelected());
+            options.setUseLeadershipChangeRefresh(chkUseLeadershipChangeRefresh.isSelected());
 
             // Payouts
             options.setPayoutRateOfficer((Integer) spnPayoutRateOfficer.getValue());
@@ -8748,6 +8780,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setFatigueRate((Integer) spnFatigueRate.getValue());
             options.setUseInjuryFatigue(chkUseInjuryFatigue.isSelected());
             options.setFieldKitchenCapacity((Integer) spnFieldKitchenCapacity.getValue());
+            options.setFieldKitchenIgnoreNonCombatants(chkFieldKitchenIgnoreNonCombatants.isSelected());
             options.setFatigueLeaveThreshold((Integer) spnFatigueLeaveThreshold.getValue());
             //endregion Turnover and Retention
 
@@ -8822,10 +8855,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseReeducationCamps(chkUseReeducationCamps.isSelected());
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
+            options.setEnableUnitEducation(chkEnableUnitEducation.isSelected());
             options.setEnableOverrideRequirements(chkEnableOverrideRequirements.isSelected());
             options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
-            options.setEnableRandomXp(chkEnableRandomXp.isSelected());
-            options.setRandomXpRate((Integer) spnRandomXpRate.getValue());
+            options.setFacultyXpRate((Double) spnFacultyXpMultiplier.getValue());
             options.setEnableBonuses(chkEnableBonuses.isSelected());
             options.setAdultDropoutChance((Integer) spnAdultDropoutChance.getValue());
             options.setChildrenDropoutChance((Integer) spnChildrenDropoutChance.getValue());
@@ -9397,8 +9430,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             super.addNotify();
             Component c = getParent();
             //  Keep scrolling of the row table in sync with the main table.
-            if (c instanceof JViewport) {
-                JViewport viewport = (JViewport) c;
+            if (c instanceof JViewport viewport) {
                 viewport.addChangeListener(this);
             }
         }

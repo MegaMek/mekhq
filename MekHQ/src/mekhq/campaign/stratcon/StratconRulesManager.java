@@ -543,7 +543,10 @@ public class StratconRulesManager {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
                 person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
-                Fatigue.processFatigueActions(campaign, person);
+
+                if (campaign.getCampaignOptions().isUseFatigue()) {
+                    Fatigue.processFatigueActions(campaign, person);
+                }
             }
         }
     }
@@ -698,11 +701,7 @@ public class StratconRulesManager {
         Unit commanderUnit = scenario.getLanceCommander(campaign).getUnit();
         Lance lance = campaign.getLances().get(commanderUnit.getForceId());
 
-        if ((lance != null) && lance.getRole().isDefence()) {
-            return true;
-        }
-
-        return false;
+        return (lance != null) && lance.getRole().isDefence();
     }
 
     /**

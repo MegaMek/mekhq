@@ -27,20 +27,16 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 import javax.swing.*;
 
 public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
-    private static boolean isPregnantCombatant (Campaign campaign) {
-        if (campaign.hasActiveContract()) {
-            for (Person p : campaign.getActivePersonnel()) {
-                if (p.isPregnant()) {
-                    if (p.hasCombatRole()) {
-                        if (p.getUnit() != null) {
-                            return true;
-                        }
-                    }
-                }
-            }
+    private static boolean isPregnantCombatant(Campaign campaign) {
+        if (campaign.getActiveMissions(false).isEmpty()) {
+            return false;
         }
-        return false;
+
+        return campaign.getActivePersonnel().stream()
+                .filter(Person::isPregnant)
+                .anyMatch(p -> ((p.getUnit() != null) && (p.getUnit().getForceId() != -1)));
     }
+
     //region Constructors
     public PregnantCombatantNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "PregnantCombatantNagDialog", "PregnantCombatantNagDialog.title",

@@ -696,7 +696,9 @@ public class RetirementDefectionDialog extends JDialog {
             }
         }
 
-        if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isMonthly()) {
+        if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isQuarterly()) {
+            retVal = retVal.dividedBy(3);
+        } else if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isMonthly()) {
             retVal = retVal.dividedBy(12);
         } else if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isWeekly()) {
             retVal = retVal.dividedBy(52);

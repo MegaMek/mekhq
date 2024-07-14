@@ -381,6 +381,12 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                                     ex.getCause().getMessage()),
                             resources.getString("DataLoadingDialog.NullEntityException.title"),
                             JOptionPane.ERROR_MESSAGE);
+                } else if (ex.getCause() instanceof NullPointerException) {
+                    JOptionPane.showMessageDialog(null,
+                            String.format(resources.getString("DataLoadingDialog.NullPointerException.text"),
+                                    ex.getCause().getMessage()),
+                            resources.getString("DataLoadingDialog.NullPointerException.title"),
+                            JOptionPane.ERROR_MESSAGE);
                 } else if (ex.getCause() instanceof OutOfMemoryError) {
                     JOptionPane.showMessageDialog(null,
                             resources.getString("DataLoadingDialog.OutOfMemoryError.text"),

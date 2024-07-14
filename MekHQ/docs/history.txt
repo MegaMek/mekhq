@@ -9,6 +9,36 @@ MEKHQ VERSION HISTORY:
 + PR #4355: Spelling, typos, grammar, etc
 + PR #4356: Move munition config out of MHQ, use MM autoconfig code
 + FIX #4326, #4325: Corrected Admin Negotiation Experience Level Campaign Setting & Experience Level Calculations
++ PR #4378: Update autoconfig calls to explicitly set ground/space state from scenario data, not game or map info
++ RFE #4316: Updated Scenario Modifier Tooltips in CampaignOptionsDialog Properties
++ RFE #4317: Added Education Level to Biographical Filter of Personnel Table
++ RFE #4319: Added Education Level to Company Generator
++ FIX #4329: Added Option to Include Non-Combatants in Field Kitchen Capacity Calculations
++ FIX #4357: Reworked Monthly XP in Education Module
++ RFE #4359: Added Ability to Manually Drop Personnel out of Active Education
++ RFE #4361: Updated & Corrected Prestigious Academy Information and Added Three New Types of Local Academy
++ FIX #4384: Refactored Faction Restriction Checks in Academy Class
++ PR #4385: Updated Logic for Identifying Pregnant Combatants
++ PR #4390: Added Quarterly Turnover Frequency Option
++ PR #4391: Added Campaign Option to Automate Retention Bonus Payments Based on a Threshold
++ PR #4391: Added Campaign Option to Automate Retention Bonus Payments Based on a Threshold
++ PR #4396: Changed some wording around to help avoid confusion about StratCon
++ FIX #4352: Null pointer exception advancing the day when custom academies are missing
++ PR #4375: Updated Documentation for Education Module
++ PR #4377: Expanded Manual Assignment of Personnel Statuses to Include PoW, On Leave, and AWOL Statuses
++ PR #4382: Added In-Unit Education to Education Module
++ PR #4388: Replaced CargoCapacityNagDialog functionality
++ PR #4392: Removed Personnel With Impossible-to-Fail TN from Turnover Table
++ PR #4393: Added the Automatic Release of the Commander Flag upon Commander Departure or Death, and Loyalty Reset upon Sudden Leadership Change
++ PR #4394: Updated Prisoner Defection Calculation to Optionally Include Loyalty
++ PR #4395: Added Execution and Jettison Options for Prisoners
++ PR #4398: Added the Ability to Ransom Friendly PoWs
++ PR #4400: Implemented the Capture of Missing Friendly Personnel During Scenario Resolution
++ PR #4402: Added a Dialog for Zero Award-Eligible Personnel
++ PR #4404: Added Automatic Running of autoAwards on 1st of Month & After Company Generator Runs
++ PR #4405: Corrected Missing Fatigue Option Check During Scenario Resolution & for StratCon Actions
++ PR #4407: Added Scenario Awards to Post-Scenario autoAward Checks
++ PR #4409: Refactored Kill Count and Personnel Filtering Methods
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update

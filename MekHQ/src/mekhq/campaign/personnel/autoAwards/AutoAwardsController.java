@@ -21,6 +21,7 @@
 package mekhq.campaign.personnel.autoAwards;
 
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.mission.AtBContract;
@@ -33,6 +34,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.AutoAwardsDialog;
 import org.apache.logging.log4j.LogManager;
 
+import javax.swing.*;
 import java.awt.Dialog.ModalityType;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,7 +61,7 @@ public class AutoAwardsController {
      *
      * @param c                    the campaign to be processed
      */
-    public void ManualController(Campaign c) {
+    public void ManualController(Campaign c, boolean isManualPrompt) {
         LogManager.getLogger().info("autoAwards (Manual) has started");
 
         campaign = c;
@@ -72,9 +74,17 @@ public class AutoAwardsController {
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, false, null);
+            ProcessAwards(personnel, false, null, isManualPrompt);
         } else {
             LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
+
+            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
+                    MekHQ.getMHQOptions().getLocale());
+
+            JOptionPane.showMessageDialog(null,
+                    resources.getString("txtNoneEligible.text"),
+                    resources.getString("AutoAwardsDialog.title"),
+                    JOptionPane.INFORMATION_MESSAGE);
         }
 
         LogManager.getLogger().info("autoAwards (Manual) has finished");
@@ -100,7 +110,7 @@ public class AutoAwardsController {
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, missionWasSuccessful, null);
+            ProcessAwards(personnel, missionWasSuccessful, null, false);
         } else {
             LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
@@ -152,6 +162,16 @@ public class AutoAwardsController {
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
+            }
+        }
+
+        // beginning the processing & filtering of scenario awards
+        if (!scenarioAwards.isEmpty()) {
+            processedData = ScenarioAwardsManager(new ArrayList<>(personnel.keySet()));
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
             }
         }
 
@@ -182,7 +202,7 @@ public class AutoAwardsController {
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, false, academyAttributes);
+            ProcessAwards(personnel, false, academyAttributes, false);
         } else {
             LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
@@ -194,42 +214,38 @@ public class AutoAwardsController {
      * Builds a list of personnel autoAwards should process
      */
     private List<UUID> getPersonnel() {
-        List<UUID> personnel = campaign.getActivePersonnel()
+        boolean issuePosthumous = campaign.getCampaignOptions().isIssuePosthumousAwards();
+
+        List<UUID> personnel = campaign.getPersonnel()
                 .stream()
+                .filter(person ->
+                        ((!person.getStatus().isDepartedUnit()) && (!person.getPrisonerStatus().isCurrentPrisoner()) && (!person.hasRole(PersonnelRole.DEPENDENT)))
+                                || ((issuePosthumous) && (person.getStatus().isDead()) && (filterOutPersonnel(person)))
+                )
                 .map(Person::getId)
                 .collect(Collectors.toList());
 
-        // if posthumous Awards are enabled, we add the relevant dead people
-        if (campaign.getCampaignOptions().isIssuePosthumousAwards()) {
-            List<UUID> deadPeople = campaign.getPersonnel()
-                    .stream().filter(person -> person.getStatus().isDead())
-                    .map(Person::getId)
-                    .collect(Collectors.toList());
+        LogManager.getLogger().debug("Personnel {}", personnel);
 
-            LogManager.getLogger().info("deadPeople {}", deadPeople);
-
-            if (!deadPeople.isEmpty()) {
-                personnel.addAll(deadPeople);
-            }
-        }
-
-        // Prisoners and Dependents are not eligible for Awards
-        if (!personnel.isEmpty()) {
-            removeDependentsAndPrisoners(personnel);
-        }
         return personnel;
     }
 
     /**
-     * Filters out anyone with the Prisoner status, or Dependent role
+     * Filters out personnel based on specific criteria.
      *
-     * @param personnel personnel to process
+     * @param person the person to be filtered
+     * @return true if the person should be filtered out, false otherwise
      */
-    private void removeDependentsAndPrisoners(List<UUID> personnel) {
-        if (!personnel.isEmpty()) {
-            personnel.removeIf(person -> (campaign.getPerson(person).hasRole(PersonnelRole.DEPENDENT))
-                    || (campaign.getPerson(person).getPrisonerStatus().isCurrentPrisoner()));
-        }
+    private boolean filterOutPersonnel(Person person) {
+        return !((person.getPrisonerStatus().isCurrentPrisoner()) || (person.hasRole(PersonnelRole.DEPENDENT)))
+                &&
+                !((person.getStatus().isRetired())
+                || (person.getStatus().isResigned())
+                || (person.getStatus().isSacked())
+                || (person.getStatus().isDeserted())
+                || (person.getStatus().isDefected())
+                || (person.getStatus().isMissing())
+                || (person.getStatus().isLeft()));
     }
 
     /**
@@ -514,8 +530,9 @@ public class AutoAwardsController {
      * @param personnel               the List of personnel to process awards for
      * @param missionWasSuccessful    true if the mission was successful, false otherwise
      * @param academyAttributes       a map of academy attributes, null if not processing graduation awards
+     * @param isManualPrompt          whether autoAwards was triggered manually
      */
-    private void ProcessAwards(List<UUID> personnel, Boolean missionWasSuccessful, @Nullable HashMap<UUID, List<Object>> academyAttributes) {
+    private void ProcessAwards(List<UUID> personnel, Boolean missionWasSuccessful, @Nullable HashMap<UUID, List<Object>> academyAttributes, boolean isManualPrompt) {
         Map<Integer, Map<Integer, List<Object>>> allAwardData = new HashMap<>();
         Map<Integer, List<Object>> processedData;
         int allAwardDataKey = 0;
@@ -626,6 +643,16 @@ public class AutoAwardsController {
             autoAwardsDialog.setVisible(true);
         } else {
             LogManager.getLogger().info("Zero personnel were found eligible for Awards");
+
+            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
+                    MekHQ.getMHQOptions().getLocale());
+
+            if (isManualPrompt) {
+                JOptionPane.showMessageDialog(null,
+                        resources.getString("txtNoneEligible.text"),
+                        resources.getString("AutoAwardsDialog.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
 
