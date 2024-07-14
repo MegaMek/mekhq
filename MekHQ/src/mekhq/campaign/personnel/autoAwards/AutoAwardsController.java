@@ -61,7 +61,7 @@ public class AutoAwardsController {
      *
      * @param c                    the campaign to be processed
      */
-    public void ManualController(Campaign c) {
+    public void ManualController(Campaign c, boolean isManualPrompt) {
         LogManager.getLogger().info("autoAwards (Manual) has started");
 
         campaign = c;
@@ -74,7 +74,7 @@ public class AutoAwardsController {
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, false, null, true);
+            ProcessAwards(personnel, false, null, isManualPrompt);
         } else {
             LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
 

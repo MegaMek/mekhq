@@ -1223,7 +1223,7 @@ public class CampaignGUI extends JPanel {
     public void showAwardEligibilityDialog() {
         AutoAwardsController autoAwardsController = new AutoAwardsController();
 
-        autoAwardsController.ManualController(getCampaign());
+        autoAwardsController.ManualController(getCampaign(), true);
     }
 
     private static void enableFullScreenMode(Window window) {
