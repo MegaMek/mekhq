@@ -297,40 +297,21 @@ public class KillAwards {
          * @return the formation depth or -1 if an invalid size is provided or if the formation kill awards are disabled
          */
         private static int getFormation(Campaign campaign, Award award){
-            int formationDepth;
-
-            switch (award.getSize().toLowerCase()) {
-                case "individual":
-                    formationDepth = 0;
-                    break;
-                case "lance":
-                    formationDepth = 1;
-                    break;
-                case "company":
-                    formationDepth = 2;
-                    break;
-                case "battalion":
-                    formationDepth = 3;
-                    break;
-                case "regiment":
-                    formationDepth = 4;
-                    break;
-                case "brigade":
-                    formationDepth = 5;
-                    break;
-                case "division":
-                    formationDepth = 6;
-                    break;
-                case "corps":
-                    formationDepth = 7;
-                    break;
-                case "army":
-                    formationDepth = 8;
-                    break;
-                default:
+            int formationDepth = switch (award.getSize().toLowerCase()) {
+                case "individual" -> 0;
+                case "lance" -> 1;
+                case "company" -> 2;
+                case "battalion" -> 3;
+                case "regiment" -> 4;
+                case "brigade" -> 5;
+                case "division" -> 6;
+                case "corps" -> 7;
+                case "army" -> 8;
+                default -> {
                     LogManager.getLogger().warn("Award {} from the {} set has invalid size value {}", award.getName(), award.getSet(), award.getSize());
-                    formationDepth = -1;
-            }
+                    yield -1;
+                }
+            };
 
             switch (formationDepth) {
                 case -1:
@@ -405,7 +386,7 @@ public class KillAwards {
          * @param commander the unit commander whose kills are being counted
          * @param filterOtherMissionKills true, if we should only count kills from the mission just completed
          */
-        private static int getIndividualKills(Campaign campaign, Mission mission, UUID commander, boolean filterOtherMissionKills){
+        private static int getIndividualKills(Campaign campaign, Mission mission, UUID commander, boolean filterOtherMissionKills) {
             List<Kill> allKills;
 
             try {
@@ -414,10 +395,14 @@ public class KillAwards {
                 return 0;
             }
 
+            long count = 0;
+
             if (filterOtherMissionKills) {
-                allKills.removeIf(kill -> kill.getMissionId() != mission.getId());
+                count = allKills.stream()
+                        .filter(kill -> kill.getMissionId() == mission.getId())
+                        .count();
             }
 
-            return allKills.size();
+            return (int) count;
         }
     }
