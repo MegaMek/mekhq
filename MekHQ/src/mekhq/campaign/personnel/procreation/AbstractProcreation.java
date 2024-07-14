@@ -30,7 +30,11 @@ import mekhq.campaign.ExtraData.StringKey;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.FamilialRelationshipType;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -348,6 +352,9 @@ public abstract class AbstractProcreation {
             } else if (campaign.getCampaignOptions().isAssignChildrenOfFoundersFounderTag()) {
                 baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
             }
+
+            // set education
+            baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
 
             // Recruit the baby
             campaign.recruitPerson(baby, prisonerStatus, true, true);

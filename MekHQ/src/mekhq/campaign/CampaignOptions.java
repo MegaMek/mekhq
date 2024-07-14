@@ -284,6 +284,7 @@ public class CampaignOptions {
     private int serviceContractDuration;
     private int serviceContractModifier;
     private boolean payBonusDefault;
+    private int payBonusDefaultThreshold;
 
     private boolean useCustomRetirementModifiers;
     private boolean useFatigueModifiers;
@@ -315,6 +316,7 @@ public class CampaignOptions {
     private int fatigueRate;
     private boolean useInjuryFatigue;
     private int fieldKitchenCapacity;
+    private boolean fieldKitchenIgnoreNonCombatants;
     private int fatigueLeaveThreshold;
 
     // Family
@@ -956,6 +958,7 @@ public class CampaignOptions {
         setServiceContractDuration(36);
         setServiceContractModifier(3);
         setPayBonusDefault(false);
+        setPayBonusDefaultThreshold(3);
 
         setUseCustomRetirementModifiers(true);
         setUseFatigueModifiers(true);
@@ -988,6 +991,7 @@ public class CampaignOptions {
         setFatigueRate(1);
         setUseInjuryFatigue(true);
         setFieldKitchenCapacity(150);
+        setFieldKitchenIgnoreNonCombatants(true);
         setFatigueLeaveThreshold(13);
         //endregion Turnover and Retention
 
@@ -1540,6 +1544,14 @@ public class CampaignOptions {
         this.fieldKitchenCapacity = fieldKitchenCapacity;
     }
 
+    public boolean isUseFieldKitchenIgnoreNonCombatants() {
+        return fieldKitchenIgnoreNonCombatants;
+    }
+
+    public void setFieldKitchenIgnoreNonCombatants (final boolean fieldKitchenIgnoreNonCombatants) {
+        this.fieldKitchenIgnoreNonCombatants = fieldKitchenIgnoreNonCombatants;
+    }
+
     public Integer getFatigueLeaveThreshold() {
         return fatigueLeaveThreshold;
     }
@@ -2080,6 +2092,14 @@ public class CampaignOptions {
 
     public void setPayBonusDefault(final boolean payBonusDefault) {
         this.payBonusDefault = payBonusDefault;
+    }
+
+    public int getPayBonusDefaultThreshold() {
+        return payBonusDefaultThreshold;
+    }
+
+    public void setPayBonusDefaultThreshold(final int payBonusDefaultThreshold) {
+        this.payBonusDefaultThreshold = payBonusDefaultThreshold;
     }
     //endregion Retirement
 
@@ -4584,6 +4604,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractDuration", getServiceContractDuration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractModifier", getServiceContractModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payBonusDefault", isPayBonusDefault());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payBonusDefaultThreshold", getPayBonusDefaultThreshold());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigueModifiers", isUseFatigueModifiers());
@@ -4616,6 +4637,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueRate", getFatigueRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInjuryFatigue", isUseInjuryFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenIgnoreNonCombatants", isUseFieldKitchenIgnoreNonCombatants());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLeaveThreshold", getFatigueLeaveThreshold());
         //endregion Retirement
 
@@ -5568,6 +5590,8 @@ public class CampaignOptions {
                     retVal.setServiceContractModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payBonusDefault")) {
                     retVal.setPayBonusDefault(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payBonusDefaultThreshold")) {
+                    retVal.setPayBonusDefaultThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
                     retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFatigueModifiers")) {
@@ -5620,6 +5644,8 @@ public class CampaignOptions {
                     retVal.setUseInjuryFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
                     retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenIgnoreNonCombatants")) {
+                    retVal.setFieldKitchenIgnoreNonCombatants(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {
                     retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 //endregion Turnover and Retention

@@ -93,6 +93,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RMV_AWARD = "RMV_AWARD";
     private static final String CMD_BEGIN_EDUCATION = "BEGIN_EDUCATION";
     private static final String CMD_COMPLETE_STAGE = "COMPLETE_STAGE";
+    private static final String CMD_DROP_OUT = "DROP_OUT";
 
     private static final String CMD_EDIT_SALARY = "SALARY";
     private static final String CMD_GIVE_PAYMENT = "GIVE_PAYMENT";
@@ -418,6 +419,25 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     AutoAwardsController autoAwardsController = new AutoAwardsController();
                     autoAwardsController.PostGraduationController(gui.getCampaign(), graduatingPersonnel, academyAttributesMap);
                 }
+                break;
+            }
+            case CMD_DROP_OUT: {
+                for (Person person : people) {
+                    Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                    EducationStage educationStage = person.getEduEducationStage();
+
+                    switch (educationStage) {
+                        case JOURNEY_TO_CAMPUS, JOURNEY_FROM_CAMPUS
+                                -> person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), PersonnelStatus.ACTIVE);
+                        case EDUCATION
+                                -> EducationController.processForcedDropOut(gui.getCampaign(), person, academy);
+                        default -> {}
+                    }
+
+                    MekHQ.triggerEvent(new PersonStatusChangedEvent(person));
+                }
+
                 break;
             }
             case CMD_IMPROVE: {
@@ -1337,7 +1357,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 gui.getCampaign(), gui.getCampaign().getLocalDate(), person,
                                 potentialSpouse, false))
                         .sorted(Comparator.comparing((Person p) -> p.getAge(today))
-                                .thenComparing(Person::getSurname)).collect(Collectors.toList());
+                                .thenComparing(Person::getSurname)).toList();
 
                 for (final Person potentialSpouse : personnel) {
                     final String status;
@@ -1417,9 +1437,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             for (Award award : awardsOfSet) {
                 if ("group".equalsIgnoreCase(award.getItem())) {
-                    awardGroups.add(award.getName());
-                    awardGroupDescriptions.add(award.getDescription());
-                } else if ("group".equalsIgnoreCase(award.getItem())) {
                     awardGroups.add(award.getName());
                     awardGroupDescriptions.add(award.getDescription());
                 }
@@ -1566,6 +1583,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                     academyMenu.add(setAcademyMenu);
                 }
+            }
+
+            if (StaticChecks.areAllStudents(selected)) {
+                JMenuItem completeStage = new JMenuItem(resources.getString("eduDropOut.text"));
+                completeStage.setToolTipText(resources.getString("eduDropOut.toolTip"));
+                completeStage.setActionCommand(makeCommand(CMD_DROP_OUT));
+                completeStage.addActionListener(this);
+                academyMenu.add(completeStage);
             }
 
             if ((StaticChecks.areAllStudents(selected)) && (campaign.isGM())) {

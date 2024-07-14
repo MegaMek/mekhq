@@ -283,6 +283,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JLabel lblServiceContractModifier;
     private JSpinner spnServiceContractModifier;
     private JCheckBox chkPayBonusDefault;
+    private JLabel lblPayBonusDefaultThreshold;
+    private JSpinner spnPayBonusDefaultThreshold;
 
     // Modifiers
     private JPanel turnoverAndRetentionModifiersPanel = new JPanel();
@@ -341,6 +343,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseInjuryFatigue;
     private JLabel lblFieldKitchenCapacity;
     private JSpinner spnFieldKitchenCapacity;
+    private JCheckBox chkFieldKitchenIgnoreNonCombatants;
     private JLabel lblFatigueLeaveThreshold;
     private JSpinner spnFatigueLeaveThreshold;
     //endregion Turnover and Retention Tab
@@ -3591,6 +3594,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseInjuryFatigue = new JCheckBox(resources.getString("chkUseInjuryFatigue.text"));
         chkUseInjuryFatigue.setToolTipText(resources.getString("chkUseInjuryFatigue.toolTipText"));
         chkUseInjuryFatigue.setName("chkUseInjuryFatigue");
+        chkUseInjuryFatigue.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
         lblFieldKitchenCapacity = new JLabel(resources.getString("lblFieldKitchenCapacity.text"));
         lblFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
@@ -3601,6 +3605,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
         spnFieldKitchenCapacity.setName("spnFieldKitchenCapacity");
         spnFieldKitchenCapacity.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        chkFieldKitchenIgnoreNonCombatants = new JCheckBox(resources.getString("chkFieldKitchenIgnoreNonCombatants.text"));
+        chkFieldKitchenIgnoreNonCombatants.setToolTipText(resources.getString("chkFieldKitchenIgnoreNonCombatants.toolTipText"));
+        chkFieldKitchenIgnoreNonCombatants.setName("chkFieldKitchenIgnoreNonCombatants");
+        chkFieldKitchenIgnoreNonCombatants.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
         lblFatigueLeaveThreshold = new JLabel(resources.getString("lblFatigueLeaveThreshold.text"));
         lblFatigueLeaveThreshold.setToolTipText(resources.getString("lblFatigueLeaveThreshold.toolTipText"));
@@ -3631,6 +3640,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblFieldKitchenCapacity)
                                 .addComponent(spnFieldKitchenCapacity, Alignment.LEADING))
+                        .addComponent(chkFieldKitchenIgnoreNonCombatants)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblFatigueLeaveThreshold)
                                 .addComponent(spnFatigueLeaveThreshold, Alignment.LEADING))
@@ -3646,6 +3656,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFieldKitchenCapacity)
                                 .addComponent(spnFieldKitchenCapacity))
+                        .addComponent(chkFieldKitchenIgnoreNonCombatants)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFatigueLeaveThreshold)
                                 .addComponent(spnFatigueLeaveThreshold))
@@ -4429,6 +4440,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkPayBonusDefault.setToolTipText(resources.getString("chkPayBonusDefault.toolTipText"));
         chkPayBonusDefault.setName("chkPayBonusDefault");
         chkPayBonusDefault.setEnabled(isUseTurnover);
+        chkPayBonusDefault.addActionListener(evt -> {
+            boolean isEnabled = chkPayBonusDefault.isSelected();
+
+            lblPayBonusDefaultThreshold.setEnabled(isEnabled);
+            spnPayBonusDefaultThreshold.setEnabled(isEnabled);
+        });
+
+        lblPayBonusDefaultThreshold = new JLabel(resources.getString("lblPayBonusDefaultThreshold.text"));
+        lblPayBonusDefaultThreshold.setToolTipText(resources.getString("lblPayBonusDefaultThreshold.toolTipText"));
+        lblPayBonusDefaultThreshold.setName("lblPayBonusDefaultThreshold");
+        lblPayBonusDefaultThreshold.setEnabled((isUseTurnover) && (campaign.getCampaignOptions().isPayBonusDefault()));
+
+        spnPayBonusDefaultThreshold = new JSpinner(new SpinnerNumberModel(3, 0, 12, 1));
+        spnPayBonusDefaultThreshold.setToolTipText(resources.getString("lblPayBonusDefaultThreshold.toolTipText"));
+        spnPayBonusDefaultThreshold.setName("spnPayBonusDefaultThreshold");
+        spnPayBonusDefaultThreshold.setEnabled((isUseTurnover) && (campaign.getCampaignOptions().isPayBonusDefault()));
 
         turnoverAndRetentionSettingsPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionSettingsPanel.title")));
         turnoverAndRetentionSettingsPanel.setName("turnoverAndRetentionSettingsPanel");
@@ -4466,6 +4493,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblServiceContractModifier)
                                 .addComponent(spnServiceContractModifier, Alignment.LEADING))
                         .addComponent(chkPayBonusDefault)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblPayBonusDefaultThreshold)
+                                .addComponent(spnPayBonusDefaultThreshold, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -4495,6 +4525,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblServiceContractModifier)
                                 .addComponent(spnServiceContractModifier))
                         .addComponent(chkPayBonusDefault)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPayBonusDefaultThreshold)
+                                .addComponent(spnPayBonusDefaultThreshold))
         );
 
         return turnoverAndRetentionSettingsPanel;
@@ -8010,6 +8043,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnServiceContractDuration.setValue(options.getServiceContractDuration());
         spnServiceContractModifier.setValue(options.getServiceContractModifier());
         chkPayBonusDefault.setSelected(options.isPayBonusDefault());
+        spnPayBonusDefaultThreshold.setValue(options.getPayBonusDefaultThreshold());
 
         // Modifiers
         chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
@@ -8046,6 +8080,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnFatigueRate.setValue(options.getFatigueRate());
         chkUseInjuryFatigue.setVisible(options.isUseInjuryFatigue());
         spnFieldKitchenCapacity.setValue(options.getFieldKitchenCapacity());
+        chkFieldKitchenIgnoreNonCombatants.setSelected(options.isUseFieldKitchenIgnoreNonCombatants());
         spnFatigueLeaveThreshold.setValue(options.getFatigueLeaveThreshold());
         //endregion Turnover and Retention Tab
 
@@ -8697,6 +8732,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setServiceContractDuration((Integer) spnServiceContractDuration.getValue());
             options.setServiceContractModifier((Integer) spnServiceContractModifier.getValue());
             options.setPayBonusDefault(chkPayBonusDefault.isSelected());
+            options.setPayBonusDefaultThreshold((Integer) spnPayBonusDefaultThreshold.getValue());
 
             // Modifiers
             options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
@@ -8733,6 +8769,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setFatigueRate((Integer) spnFatigueRate.getValue());
             options.setUseInjuryFatigue(chkUseInjuryFatigue.isSelected());
             options.setFieldKitchenCapacity((Integer) spnFieldKitchenCapacity.getValue());
+            options.setFieldKitchenIgnoreNonCombatants(chkFieldKitchenIgnoreNonCombatants.isSelected());
             options.setFatigueLeaveThreshold((Integer) spnFatigueLeaveThreshold.getValue());
             //endregion Turnover and Retention
 
