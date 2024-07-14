@@ -44,6 +44,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
@@ -290,7 +291,7 @@ public abstract class AbstractCompanyGenerator {
             // minus the one for taken by the company commander if they're already assigned
             sortedTrackers.addAll(initialTrackers.stream()
                     .sorted(personnelSorter)
-                    .collect(Collectors.toList())
+                    .toList()
                     .subList(0, determineNumberOfLances() - (getOptions().isAssignBestCompanyCommander() ? 1 : 0)));
 
             // Finally, remove the officers from the initial trackers
@@ -560,21 +561,11 @@ public abstract class AbstractCompanyGenerator {
             return;
         }
 
-        final int assistantRank;
-        switch (campaign.getRankSystem().getCode()) {
-            case "CCWH":
-            case "CLAN":
-                assistantRank = 0;
-                break;
-            case "CG":
-            case "WOBM":
-            case "MAF":
-                assistantRank = 4;
-                break;
-            default:
-                assistantRank = 2;
-                break;
-        }
+        final int assistantRank = switch (campaign.getRankSystem().getCode()) {
+            case "CCWH", "CLAN" -> 0;
+            case "CG", "WOBM", "MAF" -> 4;
+            default -> 2;
+        };
 
         for (int i = 0; i < campaign.getAstechNeed(); i++) {
             final Person astech = campaign.newPerson(PersonnelRole.ASTECH, getPersonnelGenerator());
@@ -612,6 +603,14 @@ public abstract class AbstractCompanyGenerator {
 
         // Now that they are recruited, we can simulate backwards a few years and generate marriages
         // and children
+        for (final CompanyGenerationPersonTracker tracker : trackers) {
+            if (tracker.getPerson().getExperienceLevel(campaign, false) > 0) {
+                tracker.getPerson().setEduHighestEducation(EducationLevel.COLLEGE);
+            } else {
+                tracker.getPerson().setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
+            }
+        }
+
         if (getOptions().isRunStartingSimulation()) {
             LocalDate date = campaign.getLocalDate().minusYears(getOptions().getSimulationDuration()).minusDays(1);
             while (date.isBefore(campaign.getLocalDate())) {
@@ -769,19 +768,16 @@ public abstract class AbstractCompanyGenerator {
      * @return the modifier value
      */
     private int getUnitGenerationParameterModifier(final CompanyGenerationPersonTracker tracker) {
-        switch (tracker.getPersonType()) {
-            case MECHWARRIOR_COMPANY_COMMANDER:
-                return 2;
-            case MECHWARRIOR_CAPTAIN:
-            case MECHWARRIOR_LIEUTENANT:
-                return 1;
-            case MECHWARRIOR:
-                return 0;
-            default:
+        return switch (tracker.getPersonType()) {
+            case MECHWARRIOR_COMPANY_COMMANDER -> 2;
+            case MECHWARRIOR_CAPTAIN, MECHWARRIOR_LIEUTENANT -> 1;
+            case MECHWARRIOR -> 0;
+            default -> {
                 // Shouldn't be hit, but a safety for attempting non-combat generation
-                LogManager.getLogger().error("Attempting to generate a unit for a " + tracker.getPersonType() + ", returning a -20 modifier");
-                return -20;
-        }
+                LogManager.getLogger().error("Attempting to generate a unit for a {}, returning a -20 modifier", tracker.getPersonType());
+                yield -20;
+            }
+        };
     }
 
     /**
@@ -1072,8 +1068,7 @@ public abstract class AbstractCompanyGenerator {
                     campaign.getName() + resources.getString("AbstractCompanyGenerator.CommandLance.text"),
                     background);
             if (getOptions().isGenerateForceIcons()
-                    && (commandLance.getForceIcon() instanceof LayeredForceIcon)) {
-                final LayeredForceIcon icon = (LayeredForceIcon) commandLance.getForceIcon();
+                    && (commandLance.getForceIcon() instanceof LayeredForceIcon icon)) {
                 icon.getPieces().putIfAbsent(LayeredForceIconLayer.ALPHANUMERIC, new ArrayList<>());
                 icon.getPieces().get(LayeredForceIconLayer.ALPHANUMERIC)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.ALPHANUMERIC,
@@ -1410,7 +1405,7 @@ public abstract class AbstractCompanyGenerator {
                 .flatMap(unit -> unit.getParts().stream())
                 .filter(part -> part instanceof AmmoBin)
                 .map(part -> (AmmoBin) part)
-                .collect(Collectors.toList());
+                .toList();
 
         final List<AmmoStorage> ammunition = new ArrayList<>();
         final boolean generateReloads = getOptions().getNumberReloadsPerWeapon() > 0;
@@ -1431,14 +1426,10 @@ public abstract class AbstractCompanyGenerator {
      * @return whether the ammo bin's ammo type is a machine gun type
      */
     private boolean ammoBinIsMachineGun(final AmmoBin ammoBin) {
-        switch (ammoBin.getType().getAmmoType()) {
-            case AmmoType.T_MG:
-            case AmmoType.T_MG_HEAVY:
-            case AmmoType.T_MG_LIGHT:
-                return true;
-            default:
-                return false;
-        }
+        return switch (ammoBin.getType().getAmmoType()) {
+            case AmmoType.T_MG, AmmoType.T_MG_HEAVY, AmmoType.T_MG_LIGHT -> true;
+            default -> false;
+        };
     }
     //endregion Spares
 
