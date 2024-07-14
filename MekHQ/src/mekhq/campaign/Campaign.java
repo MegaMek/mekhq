@@ -132,6 +132,7 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.Map.Entry;
@@ -7037,53 +7038,56 @@ public class Campaign implements ITechManager {
             return -1;
         }
 
-        boolean triggerTurnoverPrompt = false;
-
+        boolean triggerTurnoverPrompt;
         switch (campaignOptions.getTurnoverFrequency()) {
-            case NEVER:
-                return -1;
             case WEEKLY:
                 triggerTurnoverPrompt = getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY);
                 break;
             case MONTHLY:
-                triggerTurnoverPrompt = getLocalDate().getDayOfMonth() == 1;
+                triggerTurnoverPrompt = getLocalDate().getDayOfMonth() == getLocalDate().lengthOfMonth();
+                break;
+            case QUARTERLY:
+                triggerTurnoverPrompt = (getLocalDate().getDayOfMonth() == getLocalDate().lengthOfMonth())
+                        && (List.of(Month.MARCH, Month.JUNE, Month.SEPTEMBER, Month.DECEMBER).contains(getLocalDate().getMonth()));
                 break;
             case ANNUALLY:
-                triggerTurnoverPrompt = getLocalDate().getDayOfYear() == 1;
+                triggerTurnoverPrompt = getLocalDate().getDayOfYear() == getLocalDate().lengthOfYear();
                 break;
+            default:
+                return -1;
         }
 
-        if (triggerTurnoverPrompt) {
-            String dialogTitle;
-            String dialogBody;
-
-            if (getRetirementDefectionTracker().getRetirees().isEmpty()) {
-                dialogTitle = resources.getString("turnoverRollRequired.text");
-                dialogBody = resources.getString("turnoverDialogDescription.text");
-            } else {
-                dialogTitle = resources.getString("turnoverFinalPayments.text");
-                dialogBody = resources.getString("turnoverPersonnelKilled.text");
-            }
-
-            Object[] options = {
-                    resources.getString("turnoverEmployeeTurnoverDialog.text"),
-                    resources.getString("turnoverAdvanceRegardless"),
-                    resources.getString("turnoverCancel.text")
-            };
-
-            return JOptionPane.showOptionDialog(
-                    null,
-                    dialogBody,
-                    dialogTitle,
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    options,
-                    options[0]
-            );
+        if (!triggerTurnoverPrompt) {
+            return -1;
         }
 
-        return -1;
+        String dialogTitle;
+        String dialogBody;
+
+        if (getRetirementDefectionTracker().getRetirees().isEmpty()) {
+            dialogTitle = resources.getString("turnoverRollRequired.text");
+            dialogBody = resources.getString("turnoverDialogDescription.text");
+        } else {
+            dialogTitle = resources.getString("turnoverFinalPayments.text");
+            dialogBody = resources.getString("turnoverPersonnelKilled.text");
+        }
+
+        Object[] options = {
+                resources.getString("turnoverEmployeeTurnoverDialog.text"),
+                resources.getString("turnoverAdvanceRegardless"),
+                resources.getString("turnoverCancel.text")
+        };
+
+        return JOptionPane.showOptionDialog(
+                null,
+                dialogBody,
+                dialogTitle,
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
     }
 
     public boolean checkScenariosDue() {
