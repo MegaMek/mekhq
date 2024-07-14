@@ -284,6 +284,7 @@ public class CampaignOptions {
     private int serviceContractDuration;
     private int serviceContractModifier;
     private boolean payBonusDefault;
+    private int payBonusDefaultThreshold;
 
     private boolean useCustomRetirementModifiers;
     private boolean useFatigueModifiers;
@@ -315,6 +316,7 @@ public class CampaignOptions {
     private int fatigueRate;
     private boolean useInjuryFatigue;
     private int fieldKitchenCapacity;
+    private boolean fieldKitchenIgnoreNonCombatants;
     private int fatigueLeaveThreshold;
 
     // Family
@@ -381,8 +383,7 @@ public class CampaignOptions {
     private boolean enablePrestigiousAcademies;
     private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
-    private boolean enableRandomXp;
-    private Integer randomXpRate;
+    private Double facultyXpRate;
     private boolean enableBonuses;
     private Integer adultDropoutChance;
     private Integer childrenDropoutChance;
@@ -888,8 +889,7 @@ public class CampaignOptions {
         setEnablePrestigiousAcademies(true);
         setEnableOverrideRequirements(false);
         setEnableShowIneligibleAcademies(true);
-        setEnableRandomXp(true);
-        setRandomXpRate(1);
+        setFacultyXpRate(1.00);
         setEnableBonuses(true);
         setAdultDropoutChance(1000);
         setChildrenDropoutChance(10000);
@@ -956,6 +956,7 @@ public class CampaignOptions {
         setServiceContractDuration(36);
         setServiceContractModifier(3);
         setPayBonusDefault(false);
+        setPayBonusDefaultThreshold(3);
 
         setUseCustomRetirementModifiers(true);
         setUseFatigueModifiers(true);
@@ -988,6 +989,7 @@ public class CampaignOptions {
         setFatigueRate(1);
         setUseInjuryFatigue(true);
         setFieldKitchenCapacity(150);
+        setFieldKitchenIgnoreNonCombatants(true);
         setFatigueLeaveThreshold(13);
         //endregion Turnover and Retention
 
@@ -1540,6 +1542,14 @@ public class CampaignOptions {
         this.fieldKitchenCapacity = fieldKitchenCapacity;
     }
 
+    public boolean isUseFieldKitchenIgnoreNonCombatants() {
+        return fieldKitchenIgnoreNonCombatants;
+    }
+
+    public void setFieldKitchenIgnoreNonCombatants (final boolean fieldKitchenIgnoreNonCombatants) {
+        this.fieldKitchenIgnoreNonCombatants = fieldKitchenIgnoreNonCombatants;
+    }
+
     public Integer getFatigueLeaveThreshold() {
         return fatigueLeaveThreshold;
     }
@@ -2080,6 +2090,14 @@ public class CampaignOptions {
 
     public void setPayBonusDefault(final boolean payBonusDefault) {
         this.payBonusDefault = payBonusDefault;
+    }
+
+    public int getPayBonusDefaultThreshold() {
+        return payBonusDefaultThreshold;
+    }
+
+    public void setPayBonusDefaultThreshold(final int payBonusDefaultThreshold) {
+        this.payBonusDefaultThreshold = payBonusDefaultThreshold;
     }
     //endregion Retirement
 
@@ -2730,20 +2748,12 @@ public class CampaignOptions {
         this.enableShowIneligibleAcademies = enableShowIneligibleAcademies;
     }
 
-    public boolean isEnableRandomXp() {
-        return enableRandomXp;
+    public Double getFacultyXpRate() {
+        return facultyXpRate;
     }
 
-    public void setEnableRandomXp(boolean enableRandomXp) {
-        this.enableRandomXp = enableRandomXp;
-    }
-
-    public Integer getRandomXpRate() {
-        return randomXpRate;
-    }
-
-    public void setRandomXpRate(Integer randomXpRate) {
-        this.randomXpRate = randomXpRate;
+    public void setFacultyXpRate(Double facultyXpRate) {
+        this.facultyXpRate = facultyXpRate;
     }
 
     public boolean isEnableBonuses() {
@@ -4584,6 +4594,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractDuration", getServiceContractDuration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractModifier", getServiceContractModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payBonusDefault", isPayBonusDefault());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payBonusDefaultThreshold", getPayBonusDefaultThreshold());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigueModifiers", isUseFatigueModifiers());
@@ -4616,6 +4627,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueRate", getFatigueRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInjuryFatigue", isUseInjuryFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenIgnoreNonCombatants", isUseFieldKitchenIgnoreNonCombatants());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLeaveThreshold", getFatigueLeaveThreshold());
         //endregion Retirement
 
@@ -4696,8 +4708,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableOverrideRequirements", isEnableOverrideRequirements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRandomXp", isEnableRandomXp());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomXpRate", getRandomXpRate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "facultyXpRate", getFacultyXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableBonuses", isEnableBonuses());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adultDropoutChance", getAdultDropoutChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childrenDropoutChance", getChildrenDropoutChance());
@@ -5449,10 +5460,8 @@ public class CampaignOptions {
                     retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
                     retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableRandomXp")) {
-                    retVal.setEnableRandomXp(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomXpRate")) {
-                    retVal.setRandomXpRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("facultyXpRate")) {
+                    retVal.setFacultyXpRate(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableBonuses")) {
                     retVal.setEnableBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("adultDropoutChance")) {
@@ -5568,6 +5577,8 @@ public class CampaignOptions {
                     retVal.setServiceContractModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payBonusDefault")) {
                     retVal.setPayBonusDefault(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payBonusDefaultThreshold")) {
+                    retVal.setPayBonusDefaultThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
                     retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFatigueModifiers")) {
@@ -5620,6 +5631,8 @@ public class CampaignOptions {
                     retVal.setUseInjuryFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
                     retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenIgnoreNonCombatants")) {
+                    retVal.setFieldKitchenIgnoreNonCombatants(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {
                     retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 //endregion Turnover and Retention

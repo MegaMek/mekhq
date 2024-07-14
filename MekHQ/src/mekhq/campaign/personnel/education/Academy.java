@@ -30,10 +30,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationLevel.Adapter;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.*;
 
 import java.util.*;
 
@@ -88,7 +85,7 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "durationDays")
     // this number is chosen so that PrepSchools still experience dropouts
     // otherwise 300/year
-    private Integer durationDays = 10;
+    private Integer durationDays = 11;
 
     @XmlElement(name = "facultySkill")
     private Integer facultySkill = 7;
@@ -726,29 +723,23 @@ public class Academy implements Comparable<Academy> {
         }
 
         Faction originFaction = person.getOriginFaction();
+        Faction campaignFaction = campaign.getFaction();
+        FactionHints hints = RandomFactionGenerator.getInstance().getFactionHints();
 
         for (String shortName : factions) {
-             Faction faction = Factions.getInstance().getFaction(shortName);
+            Faction faction = Factions.getInstance().getFaction(shortName);
 
-             if (isFactionRestricted) {
-                 if (Objects.equals(originFaction, faction)) {
-                     return faction.getShortName();
-                 }
+            if (isFactionRestricted) {
+                if (faction.equals(originFaction) || faction.equals(campaignFaction)) {
+                    return faction.getShortName();
+                }
+                continue;
+            }
 
-                 if (Objects.equals(campaign.getFaction(), faction)) {
-                     return faction.getShortName();
-                 }
-
-                 return null;
-             }
-
-             if (!RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(originFaction, faction, campaign.getLocalDate())) {
-                 return faction.getShortName();
-             }
-
-             if (!RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(), faction, campaign.getLocalDate())) {
-                 return faction.getShortName();
-             }
+            if (!hints.isAtWarWith(originFaction, faction, campaign.getLocalDate())
+                    || !hints.isAtWarWith(campaignFaction, faction, campaign.getLocalDate())) {
+                return faction.getShortName();
+            }
         }
 
         return null;
@@ -965,73 +956,40 @@ public class Academy implements Comparable<Academy> {
      * @throws IllegalStateException if the skill string is unexpected or invalid
      */
     static String skillParser(String skill) {
-        switch (skill.toLowerCase().trim()) {
-            case "piloting/mech":
-                return SkillType.S_PILOT_MECH;
-            case "gunnery/mech":
-                return SkillType.S_GUN_MECH;
-            case "piloting/aerospace":
-                return SkillType.S_PILOT_AERO;
-            case "gunnery/aerospace":
-                return SkillType.S_GUN_AERO;
-            case "piloting/ground vehicle":
-                return SkillType.S_PILOT_GVEE;
-            case "piloting/vtol":
-                return SkillType.S_PILOT_VTOL;
-            case "piloting/naval":
-                return SkillType.S_PILOT_NVEE;
-            case "gunnery/vehicle":
-                return SkillType.S_GUN_VEE;
-            case "piloting/aircraft":
-                return SkillType.S_PILOT_JET;
-            case "gunnery/aircraft":
-                return SkillType.S_GUN_JET;
-            case "piloting/spacecraft":
-                return SkillType.S_PILOT_SPACE;
-            case "gunnery/spacecraft":
-                return SkillType.S_GUN_SPACE;
-            case "artillery":
-                return SkillType.S_ARTILLERY;
-            case "gunnery/battlesuit":
-                return SkillType.S_GUN_BA;
-            case "gunnery/protomech":
-                return SkillType.S_GUN_PROTO;
-            case "small arms":
-                return SkillType.S_SMALL_ARMS;
-            case "anti-mech":
-                return SkillType.S_ANTI_MECH;
-            case "tech/mech":
-                return SkillType.S_TECH_MECH;
-            case "tech/mechanic":
-                return SkillType.S_TECH_MECHANIC;
-            case "tech/aero":
-                return SkillType.S_TECH_AERO;
-            case "tech/ba":
-                return SkillType.S_TECH_BA;
-            case "tech/vessel":
-                return SkillType.S_TECH_VESSEL;
-            case "astech":
-                return SkillType.S_ASTECH;
-            case "doctor":
-                return SkillType.S_DOCTOR;
-            case "medtech":
-                return SkillType.S_MEDTECH;
-            case "hyperspace navigation":
-                return SkillType.S_NAV;
-            case "administration":
-                return SkillType.S_ADMIN;
-            case "tactics":
-                return SkillType.S_TACTICS;
-            case "strategy":
-                return SkillType.S_STRATEGY;
-            case "negotiation":
-                return SkillType.S_NEG;
-            case "leadership":
-                return SkillType.S_LEADER;
-            case "scrounge":
-                return SkillType.S_SCROUNGE;
-            default:
-                throw new IllegalStateException("Unexpected skill in skillParser(): " + skill);
-        }
+        return switch (skill.toLowerCase().trim()) {
+            case "piloting/mech" -> SkillType.S_PILOT_MECH;
+            case "gunnery/mech" -> SkillType.S_GUN_MECH;
+            case "piloting/aerospace" -> SkillType.S_PILOT_AERO;
+            case "gunnery/aerospace" -> SkillType.S_GUN_AERO;
+            case "piloting/ground vehicle" -> SkillType.S_PILOT_GVEE;
+            case "piloting/vtol" -> SkillType.S_PILOT_VTOL;
+            case "piloting/naval" -> SkillType.S_PILOT_NVEE;
+            case "gunnery/vehicle" -> SkillType.S_GUN_VEE;
+            case "piloting/aircraft" -> SkillType.S_PILOT_JET;
+            case "gunnery/aircraft" -> SkillType.S_GUN_JET;
+            case "piloting/spacecraft" -> SkillType.S_PILOT_SPACE;
+            case "gunnery/spacecraft" -> SkillType.S_GUN_SPACE;
+            case "artillery" -> SkillType.S_ARTILLERY;
+            case "gunnery/battlesuit" -> SkillType.S_GUN_BA;
+            case "gunnery/protomech" -> SkillType.S_GUN_PROTO;
+            case "small arms" -> SkillType.S_SMALL_ARMS;
+            case "anti-mech" -> SkillType.S_ANTI_MECH;
+            case "tech/mech" -> SkillType.S_TECH_MECH;
+            case "tech/mechanic" -> SkillType.S_TECH_MECHANIC;
+            case "tech/aero" -> SkillType.S_TECH_AERO;
+            case "tech/ba" -> SkillType.S_TECH_BA;
+            case "tech/vessel" -> SkillType.S_TECH_VESSEL;
+            case "astech" -> SkillType.S_ASTECH;
+            case "doctor" -> SkillType.S_DOCTOR;
+            case "medtech" -> SkillType.S_MEDTECH;
+            case "hyperspace navigation" -> SkillType.S_NAV;
+            case "administration" -> SkillType.S_ADMIN;
+            case "tactics" -> SkillType.S_TACTICS;
+            case "strategy" -> SkillType.S_STRATEGY;
+            case "negotiation" -> SkillType.S_NEG;
+            case "leadership" -> SkillType.S_LEADER;
+            case "scrounge" -> SkillType.S_SCROUNGE;
+            default -> throw new IllegalStateException("Unexpected skill in skillParser(): " + skill);
+        };
     }
 }

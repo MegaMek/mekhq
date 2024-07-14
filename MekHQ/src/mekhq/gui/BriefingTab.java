@@ -713,12 +713,13 @@ public final class BriefingTab extends CampaignGuiTab {
 
         if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
             ((AtBScenario) scenario).refresh(getCampaign());
+
+            // Autoconfigure munitions for all non-player forces once more, using finalized forces
+            if (getCampaign().getCampaignOptions().isAutoconfigMunitions()) {
+                autoconfigureBotMunitions(((AtBScenario) scenario), chosen);
+            }
         }
 
-        // Autoconfigure munitions for all non-player forces once more, using finalized forces
-        if (getCampaign().getCampaignOptions().isAutoconfigMunitions()) {
-            autoconfigureBotMunitions(scenario, chosen);
-        }
 
         if (!chosen.isEmpty()) {
             // Ensure that the MegaMek year GameOption matches the campaign year
@@ -733,8 +734,11 @@ public final class BriefingTab extends CampaignGuiTab {
      * @param scenario
      * @param chosen
      */
-    private void autoconfigureBotMunitions(Scenario scenario, List<Unit> chosen) {
+    private void autoconfigureBotMunitions(AtBScenario scenario, List<Unit> chosen) {
         Game cGame = getCampaign().getGame();
+        boolean groundMap = scenario.getBoardType() == AtBScenario.T_GROUND;
+        boolean spaceMap = scenario.getBoardType() == AtBScenario.T_SPACE;
+
         ArrayList<String> allyFactionCodes = new ArrayList<>();
         String opforFactionCode = "IS";
         String allyFaction = "IS";
@@ -791,6 +795,8 @@ public final class BriefingTab extends CampaignGuiTab {
                     ((isPirate) ? TeamLoadoutGenerator.UNSET_FILL_RATIO : 1.0f)
             );
             rp.isPirate = isPirate;
+            rp.groundMap = groundMap;
+            rp.spaceEnvironment = spaceMap;
             MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, entityList, "");
             tlg.reconfigureEntities(entityList, opforFactionCode, mt, rp);
         }
