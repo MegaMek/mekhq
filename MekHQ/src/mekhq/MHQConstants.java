@@ -18,10 +18,10 @@
  */
 package mekhq;
 
+import megamek.SuiteConstants;
+
 import java.time.LocalDate;
 import java.time.Month;
-
-import megamek.SuiteConstants;
 
 /**
  * These are constants that hold across MekHQ.
@@ -113,8 +113,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String HEALED_INJURIES_BACKGROUND = "healedInjuriesBackground";
     public static final String PREGNANT_FOREGROUND = "pregnantForeground";
     public static final String PREGNANT_BACKGROUND = "pregnantBackground";
-    public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
-    public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
     public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
