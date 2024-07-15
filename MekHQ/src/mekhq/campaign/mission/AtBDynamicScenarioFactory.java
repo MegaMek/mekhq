@@ -665,7 +665,9 @@ public class AtBDynamicScenarioFactory {
                             cGame,
                             cGame.getOptions(),
                             arrayGeneratedLance,
-                            factionCode, new ArrayList<>(), new ArrayList<>(),
+                            factionCode,
+                            new ArrayList<>(),
+                            new ArrayList<>(),
                             ownerBaseQuality,
                             ((isPirate) ? TeamLoadoutGenerator.UNSET_FILL_RATIO : 1.0f)
                     );
