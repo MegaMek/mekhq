@@ -558,7 +558,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         if (!forceRoleStrings.isEmpty()) {
             roleString = forceRoleStrings.get(Compute.randomInt(forceRoleStrings.size()));
         }
-        Collection<MissionRole> roleSet = new HashSet<>();
+        Collection<MissionRole> roleSet;
         roleSet = Arrays.stream(roleString.split(",")).map(MissionRole::parseRole).filter(Objects::nonNull).collect(Collectors.toSet());
         return roleSet;
     }

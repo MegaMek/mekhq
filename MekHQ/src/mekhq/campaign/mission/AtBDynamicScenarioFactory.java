@@ -659,15 +659,13 @@ public class AtBDynamicScenarioFactory {
                     // Configure *all* generated units with appropriate munitions (for BV calcs)
                     Game cGame = campaign.getGame();
                     TeamLoadoutGenerator tlg = new TeamLoadoutGenerator(cGame);
-                    ArrayList<Entity> arrayGeneratedLance = new ArrayList<Entity>(generatedLance);
+                    ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(generatedLance);
                     // bin fill ratio will be adjusted by the loadout generator based on piracy and quality
                     ReconfigurationParameters rp = TeamLoadoutGenerator.generateParameters(
                             cGame,
                             cGame.getOptions(),
                             arrayGeneratedLance,
-                            factionCode,
-                            new ArrayList<Entity>(),
-                            new ArrayList<String>(),
+                            factionCode, new ArrayList<>(), new ArrayList<>(),
                             ownerBaseQuality,
                             ((isPirate) ? TeamLoadoutGenerator.UNSET_FILL_RATIO : 1.0f)
                     );
@@ -747,7 +745,7 @@ public class AtBDynamicScenarioFactory {
         if (!transportedEntities.isEmpty())
         {
             // Transported units need to filter out battle armor before applying armor changes
-            for (Entity curPlatoon : transportedEntities.stream().filter(i -> i.getUnitType() == UnitType.INFANTRY).collect(Collectors.toList())) {
+            for (Entity curPlatoon : transportedEntities.stream().filter(i -> i.getUnitType() == UnitType.INFANTRY).toList()) {
                 changeInfantryKit((Infantry) curPlatoon,
                         isLowPressure,
                         isTainted,
@@ -1007,7 +1005,7 @@ public class AtBDynamicScenarioFactory {
             // try to filter on temp
             allowedTerrain.addAll(allowedFacility);
             allowedTemplate.retainAll(allowedTerrain);
-            allowedTemplate = allowedTemplate.size() > 0 ? allowedTemplate : scenario.getTemplate().mapParameters.allowedTerrainTypes;
+            allowedTemplate = !allowedTemplate.isEmpty() ? allowedTemplate : scenario.getTemplate().mapParameters.allowedTerrainTypes;
 
             int terrainIndex = Compute.randomInt(allowedTemplate.size());
             scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
@@ -2898,17 +2896,14 @@ public class AtBDynamicScenarioFactory {
      * @return Opposite edge, as defined in Board.java
      */
     public static int getOppositeEdge(int edge) {
-        switch (edge) {
-            case Board.START_EDGE:
-                return Board.START_CENTER;
-            case Board.START_CENTER:
-                return Board.START_EDGE;
-            case Board.START_ANY:
-                return Board.START_ANY;
-            default:
+        return switch (edge) {
+            case Board.START_EDGE -> Board.START_CENTER;
+            case Board.START_CENTER -> Board.START_EDGE;
+            case Board.START_ANY -> Board.START_ANY;
+            default ->
                 // directional edges start at 1
-                return ((edge + 3) % 8) + 1;
-        }
+                    ((edge + 3) % 8) + 1;
+        };
     }
 
     /**

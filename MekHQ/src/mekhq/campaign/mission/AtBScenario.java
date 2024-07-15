@@ -59,7 +59,6 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Neoancient
@@ -328,7 +327,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setTerrain() {
         Map<String, MapTypeList> mapTypes = SB.getBiomeMapTypes();
-        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
+        List<String> keys = mapTypes.keySet().stream().sorted().toList();
         setTerrainType(keys.get(Compute.randomInt(keys.size())));
     }
 
@@ -738,9 +737,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             /* Must set per-entity start pos for units after start of scenarios. Reinforcements
              * arrive from the enemy home edge, which is not necessarily the start pos. */
             final int enemyDir = enemyHome;
-            reinforcements.stream().filter(Objects::nonNull).forEach(en -> {
-                en.setStartingPos(enemyDir);
-            });
+            reinforcements.stream().filter(Objects::nonNull).forEach(en -> en.setStartingPos(enemyDir));
 
             if (campaign.getCampaignOptions().isAllowOpForLocalUnits()) {
                 reinforcements.addAll(AtBDynamicScenarioFactory.fillTransports(this, reinforcements,
@@ -1937,7 +1934,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public int getNumPlayerMinefields(int minefieldType) {
-        return numPlayerMinefields.containsKey(minefieldType) ? numPlayerMinefields.get(minefieldType) : 0;
+        return numPlayerMinefields.getOrDefault(minefieldType, 0);
     }
 
     public void setNumPlayerMinefields(int minefieldType, int numPlayerMinefields) {
