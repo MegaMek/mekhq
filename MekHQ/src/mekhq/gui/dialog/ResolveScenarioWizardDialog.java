@@ -512,7 +512,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                     wasCaptured = true;
                 } else {
                     for (int n = 0; n < status.getHits() + 1; n++) {
-                        if (Utilities.dice(1, 6) == 1) {
+                        if (Utilities.dice(1, 6) == 6) {
                             wasCaptured = true;
                             break;
                         }
@@ -1607,7 +1607,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 }
 
                 sb.append(objectiveProcessor.processObjective(objective, qualifyingUnitCount, override, tracker, true));
-                sb.append("\n");
+                sb.append('\n');
             }
 
             txtReport.setText(sb.toString());
@@ -1620,11 +1620,11 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for (int i = 0; i < pstatuses.size(); i++) {
             PersonStatus status = pstatuses.get(i);
             if (hitSliders.get(i).getValue() >= 6 || kiaBtns.get(i).isSelected()) {
-                kiaNames.append(status.getName()).append("\n");
+                kiaNames.append(status.getName()).append('\n');
             } else if (miaBtns.get(i).isSelected()) {
-                missingNames.append(status.getName()).append("\n");
+                missingNames.append(status.getName()).append('\n');
             } else {
-                recoverNames.append(status.getName()).append("\n");
+                recoverNames.append(status.getName()).append('\n');
             }
         }
         txtRecoveredPilots.setText(recoverNames.toString());
@@ -1637,9 +1637,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for (int i = 0; i < chksTotaled.size(); i++) {
             String name = ustatuses.get(i).getName();
             if (chksTotaled.get(i).isSelected()) {
-                missUnits.append(name).append("\n");
+                missUnits.append(name).append('\n');
             } else {
-                recoverUnits.append(name).append("\n");
+                recoverUnits.append(name).append('\n');
             }
         }
         txtRecoveredUnits.setText(recoverUnits.toString());
@@ -1650,7 +1650,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for (int i = 0; i < salvageBoxes.size(); i++) {
             JCheckBox box = salvageBoxes.get(i);
             if (box.isSelected()) {
-                salvageUnits.append(salvageables.get(i).getName()).append("\n");
+                salvageUnits.append(salvageables.get(i).getName()).append('\n');
             }
         }
         txtSalvage.setText(salvageUnits.toString());
@@ -1660,7 +1660,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for (int i = 0; i < lootBoxes.size(); i++) {
             JCheckBox box = lootBoxes.get(i);
             if (box.isSelected()) {
-                claimed.append(loots.get(i).getShortDescription()).append("\n");
+                claimed.append(loots.get(i).getShortDescription()).append('\n');
             }
         }
         txtRewards.setText(claimed.toString());
