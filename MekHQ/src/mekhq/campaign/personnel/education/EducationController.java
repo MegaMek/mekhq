@@ -993,19 +993,11 @@ public class EducationController {
      * @param isGraduating A boolean value indicating whether the person is graduating from the academy or not.
      */
     private static void improveSkills(Campaign campaign, Person person, Academy academy, Boolean isGraduating) {
-        String[] curriculum = academy.getCurriculums().get(person.getEduCourseIndex()).split(",");
-
-        curriculum = Arrays.stream(curriculum)
+        String[] curriculum = Arrays.stream(academy.getCurriculums().get(person.getEduCourseIndex()).split(","))
                 .map(String::trim)
                 .toArray(String[]::new);
 
-        int educationLevel = academy.getEducationLevel(person) + academy.getBaseAcademicSkillLevel();
-
-        if (educationLevel > 10) {
-            educationLevel = 10;
-        } else if (educationLevel < 0) {
-            educationLevel = 0;
-        }
+        int educationLevel = Math.min(Math.max(academy.getEducationLevel(person) + academy.getBaseAcademicSkillLevel(), 0), 5);
 
         if (!isGraduating) {
             educationLevel--;
@@ -1016,32 +1008,53 @@ public class EducationController {
         }
 
         for (String skill : curriculum) {
+            LogManager.getLogger().info(skill);
+            LogManager.getLogger().info(educationLevel);
+
             if (skill.equalsIgnoreCase("none")) {
                 return;
-            } else if (skill.equalsIgnoreCase("xp")) {
-                person.awardXP(campaign, educationLevel * campaign.getCampaignOptions().getCurriculumXpRate());
-            } else {
-                String skillParsed = Academy.skillParser(skill);
-                int bonus;
-
-                if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() < educationLevel)) {
-                    bonus = person.getSkill(skillParsed).getBonus();
-
-                    int skillLevel = 0;
-                    while (person.getSkill(skillParsed).getExperienceLevel() < (educationLevel + bonus)) {
-                        person.addSkill(skillParsed, skillLevel, bonus);
-                        skillLevel++;
-                    }
-                } else if (!person.hasSkill(skillParsed)) {
-                    int skillLevel = 0;
-                    person.addSkill(skillParsed, skillLevel, 0);
-
-                    while (person.getSkill(skillParsed).getExperienceLevel() < educationLevel) {
-                        person.addSkill(skillParsed, skillLevel, 0);
-                        skillLevel++;
-                    }
-                }
             }
+
+            if (skill.equalsIgnoreCase("xp")) {
+                person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
+            } else {
+                updateSkill(person, educationLevel, skill);
+            }
+        }
+    }
+
+    /**
+     * Updates the skill level of a person
+     *
+     * @param person         the person whose skill level should be updated
+     * @param educationLevel the new education level for the skill
+     * @param skill          the skill to be updated
+     */
+    private static void updateSkill(Person person, int educationLevel, String skill) {
+        String skillParsed = Academy.skillParser(skill);
+
+        if (person.hasSkill(skillParsed)) {
+            int bonus = person.getSkill(skillParsed).getBonus();
+            adjustSkillLevel(person, skillParsed, educationLevel, bonus);
+        } else {
+            person.addSkill(skillParsed, 0, 0);
+            adjustSkillLevel(person, skillParsed, educationLevel, 0);
+        }
+    }
+
+    /**
+     * Adjusts the skill level of a person until the target level is reached.
+     *
+     * @param person        The person whose skill level needs adjustment.
+     * @param skillParsed   The name of the skill to adjust.
+     * @param targetLevel   The desired target level of the skill.
+     * @param bonus         The bonus to apply when increasing the skill level.
+     */
+    private static void adjustSkillLevel(Person person, String skillParsed, int targetLevel, int bonus) {
+        int skillLevel = 0;
+
+        while (person.getSkill(skillParsed).getExperienceLevel() < targetLevel) {
+            person.addSkill(skillParsed, skillLevel++, bonus);
         }
     }
 
