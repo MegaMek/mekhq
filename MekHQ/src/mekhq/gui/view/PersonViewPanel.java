@@ -345,8 +345,14 @@ public class PersonViewPanel extends JScrollablePanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
+                int numAwards = person.getAwardController().getNumberOfAwards(award);
+                int tierSize = campaign.getCampaignOptions().getAwardTierSize();
+
+                int divisionResult = numAwards / tierSize;
+                int addition = (tierSize == 1) ? 0 : 1;
+
                 int awardTierCount = MathUtility.clamp(
-                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
+                        divisionResult + addition,
                         1,
                         award.getNumberOfRibbonFiles()
                 );
@@ -400,8 +406,14 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image medal;
             try {
+                int numAwards = person.getAwardController().getNumberOfAwards(award);
+                int tierSize = campaign.getCampaignOptions().getAwardTierSize();
+
+                int divisionResult = numAwards / tierSize;
+                int addition = (tierSize == 1) ? 0 : 1;
+
                 int awardTierCount = MathUtility.clamp(
-                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
+                        divisionResult + addition,
                         1,
                         award.getNumberOfMedalFiles()
                 );
@@ -452,8 +464,14 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image miscAward;
             try {
+                int numAwards = person.getAwardController().getNumberOfAwards(award);
+                int tierSize = campaign.getCampaignOptions().getAwardTierSize();
+
+                int divisionResult = numAwards / tierSize;
+                int addition = (tierSize == 1) ? 0 : 1;
+
                 int awardTierCount = MathUtility.clamp(
-                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
+                        divisionResult + addition,
                         1,
                         award.getNumberOfMiscFiles()
                 );
