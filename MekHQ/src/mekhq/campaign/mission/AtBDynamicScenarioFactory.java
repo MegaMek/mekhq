@@ -448,6 +448,7 @@ public class AtBDynamicScenarioFactory {
             allowsTanks = false;
             isLowGravity = true;
         }
+
         // Required roles for units in this force. Because these can vary by unit type,
         // each unit type tracks them separately.
         Map<Integer, Collection<MissionRole>> requiredRoles = new HashMap<>();
