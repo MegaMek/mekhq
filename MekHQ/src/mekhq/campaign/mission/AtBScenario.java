@@ -26,12 +26,11 @@ import megamek.client.generator.TeamLoadoutGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.EntityWeightClass;
-import megamek.common.enums.*;
-import megamek.common.planetaryconditions.*;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.Atmosphere;
+import megamek.common.planetaryconditions.*;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -47,6 +46,7 @@ import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratcon.StratconBiomeManifest.MapTypeList;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.utilities.MHQXMLUtility;
@@ -327,7 +327,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setTerrain() {
-        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
+        Map<String, MapTypeList> mapTypes = SB.getBiomeMapTypes();
         List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
         setTerrainType(keys.get(Compute.randomInt(keys.size())));
     }
@@ -444,8 +444,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (terrainType.equals("Space")) {
             setMap("Space");
         } else {
-            Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
-            StratconBiomeManifest.MapTypeList value = mapTypes.get(terrainType);
+            Map<String, MapTypeList> mapTypes = SB.getBiomeMapTypes();
+            MapTypeList value = mapTypes.get(terrainType);
             if (value != null) {
                 List<String> mapTypeList = value.mapTypes;
                 setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
@@ -746,7 +746,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 reinforcements.addAll(AtBDynamicScenarioFactory.fillTransports(this, reinforcements,
                         getContract(campaign).getEnemyCode(),
                         getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                        campaign));
+                        null, true, campaign));
 
             }
 
@@ -783,7 +783,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 alliesPlayer.stream().filter(Objects::nonNull).forEach(entity -> {
                     int speed = entity.getWalkMP();
                     if (entity.getJumpMP() > 0) {
-                        if (entity instanceof megamek.common.Infantry) {
+                        if (entity instanceof Infantry) {
                             speed = entity.getJumpMP();
                         } else {
                             speed++;
@@ -794,7 +794,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 allyEntities.stream().filter(Objects::nonNull).forEach(entity -> {
                     int speed = entity.getWalkMP();
                     if (entity.getJumpMP() > 0) {
-                        if (entity instanceof megamek.common.Infantry) {
+                        if (entity instanceof Infantry) {
                             speed = entity.getJumpMP();
                         } else {
                             speed++;
@@ -913,7 +913,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (campaign.getCampaignOptions().isAllowOpForLocalUnits()) {
             list.addAll(AtBDynamicScenarioFactory.fillTransports(this, list,
                     getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                    getContract(campaign).getEnemyQuality(), campaign));
+                    getContract(campaign).getEnemyQuality(), null, true, campaign));
         }
     }
 
@@ -941,17 +941,27 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
-     * @param faction The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill The {@link SkillLevel} that represents the skill level of the overall force.
-     * @param quality The equipment rating of the force.
-     * @param unitType The UnitTableData constant for the type of unit to generate.
-     * @param weightClass The weight class of the unit to generate
-     * @param campaign The current campaign
-     * @return A new Entity with crew.
+     * @param faction      The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill        The {@link SkillLevel} of the overall force.
+     * @param quality      The equipment rating of the force.
+     * @param unitType     The {@link UnitType} constant of the type of unit to generate.
+     * @param weightClass  The {@link EntityWeightClass} constant of the unit to generate.
+     * @param campaign     The current campaign
+     * @return             A randomly selected Entity from the parameters specified, with crew. May return null.
      */
-    protected @Nullable Entity getEntity(String faction, SkillLevel skill, int quality,
-                                         int unitType, int weightClass, Campaign campaign) {
-        return AtBDynamicScenarioFactory.getEntity(faction, skill, quality, unitType, weightClass, false, campaign);
+    protected @Nullable Entity getEntity (String faction,
+                                          SkillLevel skill,
+                                          int quality,
+                                          int unitType,
+                                          int weightClass,
+                                          Campaign campaign) {
+        return AtBDynamicScenarioFactory.getEntity(faction,
+                skill,
+                quality,
+                unitType,
+                weightClass,
+                null,
+                campaign);
     }
 
     /**
