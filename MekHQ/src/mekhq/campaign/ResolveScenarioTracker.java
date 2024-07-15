@@ -1045,6 +1045,7 @@ public class ResolveScenarioTracker {
                         status.setHits(hits);
                     }
                 }
+                status.setPickedUp(pickedUp);
                 status.setCaptured(Utilities.isLikelyCapture(en) || pickedUp);
                 status.setXP(campaign.getCampaignOptions().getScenarioXP());
                 oppositionPersonnel.put(p.getId(), status);
