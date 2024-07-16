@@ -70,6 +70,10 @@ public class MiscAwards {
                     if (CeremonialDuty(campaign, award, person, mission)) {
                         eligibleAwards.add(award);
                     }
+                case "prisonerofwar":
+                    if (prisonerOfWar(campaign, award, person)) {
+                        eligibleAwards.add(award);
+                    }
                 default:
             }
         }
@@ -195,6 +199,22 @@ public class MiscAwards {
                 }
             }
         }
+        return false;
+    }
+
+    /**
+     * Checks if a person is a prisoner of war in a given campaign and is eligible to receive an award.
+     *
+     * @param campaign the campaign in which the person is participating
+     * @param award the award to be given
+     * @param person the unique identifier of the person to check
+     * @return true if the person is a prisoner of war and is eligible to receive the award, false otherwise
+     */
+    private static boolean prisonerOfWar(Campaign campaign, Award award, UUID person) {
+        if (award.canBeAwarded(campaign.getPerson(person))) {
+            return campaign.getPerson(person).getStatus().isPoW();
+        }
+
         return false;
     }
 }
