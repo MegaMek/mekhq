@@ -345,17 +345,8 @@ public class PersonViewPanel extends JScrollablePanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
-                int numAwards = person.getAwardController().getNumberOfAwards(award);
-                int tierSize = campaign.getCampaignOptions().getAwardTierSize();
-
-                int divisionResult = numAwards / tierSize;
-                int addition = (tierSize == 1) ? 0 : 1;
-
-                int awardTierCount = MathUtility.clamp(
-                        divisionResult + addition,
-                        1,
-                        award.getNumberOfRibbonFiles()
-                );
+                int maximumTiers = award.getNumberOfRibbonFiles();
+                int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String ribbonFileName = award.getRibbonFileName(awardTierCount);
 
@@ -389,6 +380,20 @@ public class PersonViewPanel extends JScrollablePanel {
         return boxRibbons;
     }
 
+    private int getAwardTierCount(Award award, int maximumTiers) {
+        int numAwards = person.getAwardController().getNumberOfAwards(award);
+        int tierSize = campaign.getCampaignOptions().getAwardTierSize();
+
+        int divisionResult = numAwards / tierSize;
+        int addition = (tierSize == 1) ? 0 : 1;
+
+        int awardTierCount = MathUtility.clamp(
+                divisionResult + addition,
+                1, maximumTiers
+        );
+        return awardTierCount;
+    }
+
     /**
      * Draws the medals above the personal log.
      */
@@ -406,17 +411,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image medal;
             try {
-                int numAwards = person.getAwardController().getNumberOfAwards(award);
-                int tierSize = campaign.getCampaignOptions().getAwardTierSize();
-
-                int divisionResult = numAwards / tierSize;
-                int addition = (tierSize == 1) ? 0 : 1;
-
-                int awardTierCount = MathUtility.clamp(
-                        divisionResult + addition,
-                        1,
-                        award.getNumberOfMedalFiles()
-                );
+                int maximumTiers = award.getNumberOfRibbonFiles();
+                int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String medalFileName = award.getMedalFileName(awardTierCount);
 
@@ -464,17 +460,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image miscAward;
             try {
-                int numAwards = person.getAwardController().getNumberOfAwards(award);
-                int tierSize = campaign.getCampaignOptions().getAwardTierSize();
-
-                int divisionResult = numAwards / tierSize;
-                int addition = (tierSize == 1) ? 0 : 1;
-
-                int awardTierCount = MathUtility.clamp(
-                        divisionResult + addition,
-                        1,
-                        award.getNumberOfMiscFiles()
-                );
+                int maximumTiers = award.getNumberOfRibbonFiles();
+                int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String miscFileName = award.getMiscFileName(awardTierCount);
 
