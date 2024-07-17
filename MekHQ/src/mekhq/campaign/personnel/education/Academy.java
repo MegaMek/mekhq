@@ -926,6 +926,7 @@ public class Academy implements Comparable<Academy> {
                     .append("</b> ").append(' ').append(String.format(resources.getString("durationAge.text"), ageMax)).append("<br>");
         } else {
             tooltip.append("<b>").append(resources.getString("duration.text")).append("</b> ");
+
             tooltip.append(durationDays).append(' ').append(resources.getString("durationDays.text")).append("<br>");
         }
 
@@ -935,11 +936,7 @@ public class Academy implements Comparable<Academy> {
 
             tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
 
-            if ((distance / 7) < 1) {
-                tooltip.append(distance).append(' ').append(resources.getString("durationDays.text"));
-            } else {
-                tooltip.append(distance / 7).append(' ').append(resources.getString("durationWeeks.text"));
-            }
+            tooltip.append(distance).append(' ').append(resources.getString("durationDays.text"));
 
             tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
         }
