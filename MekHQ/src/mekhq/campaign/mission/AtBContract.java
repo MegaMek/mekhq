@@ -332,11 +332,11 @@ public class AtBContract extends Contract {
         // Enemy type: Pirates: -2
         // Rebels/Mercs/Minor factions: -1
         // Clans: +2
-        if (enemyCode.equals("PIR")) {
+        if (Factions.getInstance().getFaction(enemyCode).isPirate()) {
             mod -= 2;
-        } else if (enemyCode.equals("REB") ||
+        } else if (Factions.getInstance().getFaction(enemyCode).isRebel() ||
                 isMinorPower(enemyCode) ||
-                enemyCode.equals("MERC")) {
+                Factions.getInstance().getFaction(enemyCode).isMercenary()) {
             mod -= 1;
         } else if (Factions.getInstance().getFaction(enemyCode).isClan()) {
             mod += 2;
