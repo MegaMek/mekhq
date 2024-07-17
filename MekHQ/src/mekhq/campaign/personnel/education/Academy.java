@@ -926,11 +926,8 @@ public class Academy implements Comparable<Academy> {
                     .append("</b> ").append(' ').append(String.format(resources.getString("durationAge.text"), ageMax)).append("<br>");
         } else {
             tooltip.append("<b>").append(resources.getString("duration.text")).append("</b> ");
-            if ((durationDays / 7) < 1) {
-                tooltip.append(durationDays).append(' ').append(resources.getString("durationDays.text")).append("<br>");
-            } else {
-                tooltip.append(durationDays / 7).append(' ').append(resources.getString("durationWeeks.text")).append("<br>");
-            }
+
+            tooltip.append(durationDays).append(' ').append(resources.getString("durationDays.text")).append("<br>");
         }
 
         // we need to do a little extra work to get travel time, to cover academies with multiple campuses
@@ -939,11 +936,7 @@ public class Academy implements Comparable<Academy> {
 
             tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
 
-            if ((distance / 7) < 1) {
-                tooltip.append(distance).append(' ').append(resources.getString("durationDays.text"));
-            } else {
-                tooltip.append(distance / 7).append(' ').append(resources.getString("durationWeeks.text"));
-            }
+            tooltip.append(distance).append(' ').append(resources.getString("durationDays.text"));
 
             tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
         }
