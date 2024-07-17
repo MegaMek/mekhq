@@ -39,6 +39,10 @@ MEKHQ VERSION HISTORY:
 + PR #4405: Corrected Missing Fatigue Option Check During Scenario Resolution & for StratCon Actions
 + PR #4407: Added Scenario Awards to Post-Scenario autoAward Checks
 + PR #4409: Refactored Kill Count and Personnel Filtering Methods
++ PR #4418: Added SuperStucco's Basic Force Generator Role Functionality to Scenario Random Unit Generation
++ PR #4411: Education tool tip no longer references "weeks" to avoid confusion
++ PR #4414: Detailed medical system properly marked as unofficial
++ PR #4419: Multiple typo fixes in news and "canned" campaigns
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
