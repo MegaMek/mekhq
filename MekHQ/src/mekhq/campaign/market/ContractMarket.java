@@ -206,7 +206,7 @@ public class ContractMarket {
                 numContracts--;
             }
 
-            if (campaign.getFactionCode().equals("MERC") || campaign.getFactionCode().equals("PIR")) {
+            if (campaign.getFaction().isMercenary() || campaign.getFaction().isPirate()) {
                 if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentSystem().getId(), campaign.getLocalDate())) {
                     numContracts++;
                     /* Though the rules do not state these modifiers are mutually exclusive, the fact that the
@@ -281,7 +281,7 @@ public class ContractMarket {
      * the indicated number of retries, this will return null.
      */
     private @Nullable AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
-        if (campaign.getFactionCode().equals("MERC")) {
+        if (campaign.getFaction().isMercenary()) {
             if (null == campaign.getRetainerEmployerCode()) {
                 int retries = MAXIMUM_GENERATION_RETRIES;
                 AtBContract retVal = null;
@@ -296,7 +296,7 @@ public class ContractMarket {
                 return generateAtBContract(campaign, campaign.getRetainerEmployerCode(), unitRatingMod);
             }
         } else {
-            return generateAtBContract(campaign, campaign.getFactionCode(), unitRatingMod);
+            return generateAtBContract(campaign, campaign.getFaction().getShortName(), unitRatingMod);
         }
     }
 
@@ -318,16 +318,16 @@ public class ContractMarket {
         contract.setId(lastId);
         contractIds.put(lastId, contract);
 
-        if (employer.equals("MERC")) {
+        if (Factions.getInstance().getFaction(employer).isMercenary()) {
             contract.setMercSubcontract(true);
             for (int attempts = 0; attempts < MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER; ++attempts) {
                 employer = RandomFactionGenerator.getInstance().getEmployer();
-                if ((employer != null) && !employer.equals("MERC")) {
+                if ((employer != null) && !Factions.getInstance().getFaction(employer).isMercenary()) {
                     break;
                 }
             }
 
-            if ((employer == null) || employer.equals("MERC")) {
+            if ((employer == null) || Factions.getInstance().getFaction(employer).isMercenary()) {
                 LogManager.getLogger().warn("Could not generate an AtB Contract because we could not find a non-MERC employer!");
                 return null;
             }
@@ -345,7 +345,7 @@ public class ContractMarket {
                     contract.getContractType().isGarrisonType()));
         }
 
-        if (contract.getContractType().isGarrisonDuty() && contract.getEnemyCode().equals("REB")) {
+        if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
             contract.setContractType(AtBContractType.RIOT_DUTY);
         }
 
@@ -366,7 +366,7 @@ public class ContractMarket {
         // FIXME : Windchild : I don't work properly
         boolean isAttacker = !contract.getContractType().isGarrisonType()
                 || (contract.getContractType().isReliefDuty() && (Compute.d6() < 4))
-                || contract.getEnemyCode().equals("REB");
+                || contract.getEnemy().isRebel();
         if (isAttacker) {
             contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode()));
         } else {
@@ -431,7 +431,7 @@ public class ContractMarket {
             contract.setEnemyCode(RandomFactionGenerator.getInstance().getEnemy(contract.getEmployerCode(),
                     contract.getContractType().isGarrisonType()));
         }
-        if (contract.getContractType().isGarrisonDuty() && contract.getEnemyCode().equals("REB")) {
+        if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
             contract.setContractType(AtBContractType.RIOT_DUTY);
         }
 
@@ -470,7 +470,7 @@ public class ContractMarket {
         // FIXME : Windchild : I don't work properly
         boolean isAttacker = !contract.getContractType().isGarrisonType()
                 || (contract.getContractType().isReliefDuty() && (Compute.d6() < 4))
-                || contract.getEnemyCode().equals("REB");
+                || contract.getEnemy().isRebel();
         contract.setSystemId(parent.getSystemId());
         setAllyRating(contract, isAttacker, campaign.getGameYear());
         setEnemyRating(contract, isAttacker, campaign.getGameYear());
@@ -673,7 +673,7 @@ public class ContractMarket {
         int adminLogisticsExp = (adminLogistics == null) ? SkillType.EXP_ULTRA_GREEN : adminLogistics.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 
         /* Treat government units like merc units that have a retainer contract */
-        if ((!campaign.getFactionCode().equals("MERC") && !campaign.getFactionCode().equals("PIR"))
+        if ((!campaign.getFaction().isMercenary() && !campaign.getFaction().isPirate())
                 || (null != campaign.getRetainerEmployerCode())) {
             for (int i = 0; i < CLAUSE_NUM; i++) {
                 mods.mods[i]++;
@@ -681,7 +681,7 @@ public class ContractMarket {
         }
 
         if (campaign.getCampaignOptions().isMercSizeLimited() &&
-                campaign.getFactionCode().equals("MERC")) {
+                campaign.getFaction().isMercenary()) {
             int max = (unitRatingMod + 1) * 12;
             int numMods = (AtBContract.getEffectiveNumUnits(campaign) - max) / 2;
             while (numMods > 0) {
@@ -741,7 +741,7 @@ public class ContractMarket {
         if (AtBContract.isMinorPower(contract.getEmployerCode())) {
             mods.mods[CLAUSE_SALVAGE] += -2;
         }
-        if (contract.getEmployerCode().equals("MERC")) {
+        if (contract.getEmployerFaction().isMercenary()) {
             mods.mods[CLAUSE_COMMAND] += -1;
             mods.mods[CLAUSE_SALVAGE] += 2;
             mods.mods[CLAUSE_SUPPORT] += 1;
@@ -754,7 +754,7 @@ public class ContractMarket {
             mods.mods[CLAUSE_TRANSPORT] += 0;
         }
 
-        if (campaign.getFactionCode().equals("MERC")) {
+        if (campaign.getFaction().isMercenary()) {
             rollCommandClause(contract, mods.mods[CLAUSE_COMMAND]);
         } else {
             contract.setCommandRights(ContractCommandRights.INTEGRATED);
