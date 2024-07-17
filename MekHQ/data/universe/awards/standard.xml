@@ -24,17 +24,6 @@
         <item>Ignore</item>
     </award>
     <award>
-        <name>Prisoner of War</name>
-        <description>Taken prisoner during combat.</description>
-        <group>Manual Awards</group>
-        <medal>POWM.png</medal>
-        <ribbon>3-01-1-PrisonerOfWar.png</ribbon>
-        <xp>1</xp>
-        <edge>1</edge>
-        <stackable>true</stackable>
-        <item>Ignore</item>
-    </award>
-    <award>
         <name>Support Person Of The Year</name>
         <description>Awarded to the most outstanding non-combat member of the year.</description>
         <group>Manual Awards</group>
@@ -132,9 +121,21 @@
         <item>Time</item>
     </award>
     <award>
+        <name>Prisoner of War</name>
+        <description>Taken prisoner during combat.</description>
+        <group>Manual Awards</group>
+        <medal>POWM.png</medal>
+        <ribbon>3-01-1-PrisonerOfWar.png</ribbon>
+        <xp>1</xp>
+        <edge>1</edge>
+        <stackable>true</stackable>
+        <item>Misc</item>
+        <range>Prisoner of War</range>
+    </award>
+    <award>
         <name>Medal of Honor</name>
         <description>Distinguished oneself conspicuously by gallantry and intrepidity at the risk of life above and beyond the call of duty.</description>
-        <group>Manual Awards</group>
+        <group>Personal Awards</group>
         <medal>MedalOfHonorM.png</medal>
         <ribbon>1-01-1-MedalOfHonor.png</ribbon>
         <xp>10</xp>
@@ -276,7 +277,7 @@
     <award>
         <name>Ceremonial Duty</name>
         <description>Served as honor guard.</description>
-        <group>Manual Awards</group>
+        <group>Mission Awards</group>
         <ribbon>4-05-1-CeremonialDuty.png</ribbon>
         <xp>1</xp>
         <item>Ceremonial Duty</item>
