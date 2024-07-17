@@ -230,15 +230,15 @@ public class Person {
     // initializes the AtB ransom values
     static {
         MECHWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_NONE, Money.of(0)); // no official AtB rules for really inexperienced scrubs, but...
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_NONE, Money.of(2500)); // no official AtB rules for really inexperienced scrubs, but...
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, Money.of(5000)); // no official AtB rules for really inexperienced scrubs, but...
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, Money.of(10000));
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(25000));
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(75000));
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(150000));
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(50000));
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(100000));
 
         OTHER_RANSOM_VALUES = new HashMap<>();
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_NONE, Money.of(0));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_NONE, Money.of(1250));
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, Money.of(2500));
         OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, Money.of(5000));
         OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(10000));
