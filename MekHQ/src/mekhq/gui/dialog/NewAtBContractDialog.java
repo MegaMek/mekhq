@@ -35,6 +35,7 @@ import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.utilities.JSuggestField;
@@ -472,7 +473,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         AtBContract contract = (AtBContract) this.contract;
         HashSet<String> systems = new HashSet<>();
         if (!contract.getContractType().isGarrisonType()
-                || getCurrentEnemyCode().equals("REB") || getCurrentEnemyCode().equals("PIR")) {
+                || Factions.getInstance().getFaction(getCurrentEnemyCode()).isRebelOrPirate()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance().
                     getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
                 systems.add(p.getName(campaign.getLocalDate()));
@@ -480,7 +481,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         }
 
         if ((contract.getContractType().isGarrisonType() || contract.getContractType().isReliefDuty())
-                && !contract.getEnemyCode().equals("REB")) {
+                && !contract.getEnemy().isRebel()) {
             for (PlanetarySystem p : RandomFactionGenerator.getInstance().
                     getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
                 systems.add(p.getName(campaign.getLocalDate()));

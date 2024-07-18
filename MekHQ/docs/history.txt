@@ -43,6 +43,13 @@ MEKHQ VERSION HISTORY:
 + PR #4411: Education tool tip no longer references "weeks" to avoid confusion
 + PR #4414: Detailed medical system properly marked as unofficial
 + PR #4419: Multiple typo fixes in news and "canned" campaigns
++ PR #4413: Decoupled Prisoner Capture & Defection from AtB, Updated Mechanics, & Added Supporting Documentation
++ PR #4415: Refactored Award Tier Count Calculation in PersonViewPanel
++ PR #4416: Refactored Skill Improvement Logic in EducationController
++ PR #4422: Expanded autoAwards Coverage to Include 'Prisoner of War'
++ PR #4423: Fixed additional typos and spelling errors
++ FIX #4425: Right-clicking on any person in Personnel tab causes NPE error
++ PR #4426: Updated static faction references with appropriate isX() call
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update

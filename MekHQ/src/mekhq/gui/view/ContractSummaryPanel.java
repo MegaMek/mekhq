@@ -475,8 +475,8 @@ public class ContractSummaryPanel extends JPanel {
     private boolean hasCommandRerolls() {
         // Only allow command clause rerolls for mercenaries and pirates; house units are always integrated
         return allowRerolls
-                && (campaign.getFactionCode().equals("MERC")
-                    || campaign.getFactionCode().equals("PIR"))
+                && (campaign.getFaction().isMercenary()
+                    || campaign.getFaction().isPirate())
                 && (campaign.getContractMarket().getRerollsUsed(contract,
                     ContractMarket.CLAUSE_COMMAND) < cmdRerolls);
     }
