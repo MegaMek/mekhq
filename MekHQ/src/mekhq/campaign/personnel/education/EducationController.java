@@ -503,6 +503,10 @@ public class EducationController {
      * @param resources       The resource bundle used for localized strings.
      */
     private static void processNewYearChecks(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
+        if (academy.isHomeSchool()) {
+            return;
+        }
+
         // It's unlikely we'll ever get canonical destruction or closure dates for all the academies,
         // so no need to check these more than once a year
         if (campaign.getLocalDate().getDayOfYear() == 1) {
