@@ -1007,9 +1007,17 @@ public class Person {
 
         if (status.isDead()) {
             setDateOfDeath(today);
-            // Remember to tell the spouse
-            if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse().getStatus().isDeadOrMIA()) {
+
+            if (genealogy.hasSpouse() && !genealogy.getSpouse().getStatus().isDead()) {
                 campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), getGenealogy().getSpouse());
+            }
+
+            if (genealogy.hasChildren()) {
+                for (Person child : genealogy.getChildren()) {
+                    if ((!child.getGenealogy().hasLivingParents()) && (!child.getStatus().isDead())) {
+                        ServiceLogger.orphaned(child, campaign.getLocalDate());
+                    }
+                }
             }
 
             refreshLoyalty(campaign);

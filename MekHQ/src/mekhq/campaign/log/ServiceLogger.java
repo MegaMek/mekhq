@@ -36,7 +36,7 @@ import java.util.ResourceBundle;
  * @author Miguel Azevedo
  */
 public class ServiceLogger {
-    private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
+    private static final ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
             MekHQ.getMHQOptions().getLocale());
 
     public static void retireDueToWounds(Person person, LocalDate date) {
@@ -249,9 +249,13 @@ public class ServiceLogger {
         }
     }
 
-    public static void oprhaned(Person person, LocalDate date) {
-        String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
-
-        person.addLogEntry(new ServiceLogEntry(date, message));
+    /**
+     * Adds a log entry to the specified {@link Person} when they become orphaned by the death of both parents.
+     *
+     * @param person The person who is becoming orphaned.
+     * @param date The date on which the person is becoming orphaned.
+     */
+    public static void orphaned(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("orphaned.text")));
     }
 }

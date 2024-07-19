@@ -772,7 +772,7 @@ public class Campaign implements ITechManager {
                                 child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
                             } else if (!child.getGenealogy().hasLivingParents()) {
                                 addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("orphaned.text"));
-                                ServiceLogger.oprhaned(person, getLocalDate());
+                                ServiceLogger.orphaned(person, getLocalDate());
                             }
                         }
                     }
