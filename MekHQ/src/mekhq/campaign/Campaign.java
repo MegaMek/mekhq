@@ -798,6 +798,7 @@ public class Campaign implements ITechManager {
                                 addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("orphaned.text"));
 
                                 turnoverRetirementInformation.add(child.getHyperlinkedFullTitle() + ' ' + resources.getString("orphaned.text"));
+                                ServiceLogger.orphaned(person, getLocalDate());
                             }
                         }
                     }
