@@ -42,6 +42,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
+import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
@@ -1008,14 +1009,27 @@ public class Person {
         if (status.isDead()) {
             setDateOfDeath(today);
 
-            if (genealogy.hasSpouse() && !genealogy.getSpouse().getStatus().isDead()) {
+            if ((genealogy.hasSpouse()) && (!genealogy.getSpouse().getStatus().isDead())) {
                 campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), getGenealogy().getSpouse());
             }
 
+            // log death across genealogy
             if (genealogy.hasChildren()) {
                 for (Person child : genealogy.getChildren()) {
-                    if ((!child.getGenealogy().hasLivingParents()) && (!child.getStatus().isDead())) {
-                        ServiceLogger.orphaned(child, campaign.getLocalDate());
+                    if (!child.getStatus().isDead()) {
+                        if (!child.getGenealogy().hasLivingParents()) {
+                            ServiceLogger.orphaned(child, campaign.getLocalDate());
+                        } else if (child.getGenealogy().hasLivingParents()) {
+                            PersonalLogger.RelativeHasDied(child, this, resources.getString("relationParent.text"), campaign.getLocalDate());
+                        }
+                    }
+                }
+            }
+
+            if (genealogy.hasLivingParents()) {
+                for (Person parent : genealogy.getParents()) {
+                    if (!parent.getStatus().isDead()) {
+                        PersonalLogger.RelativeHasDied(parent, this, resources.getString("relationChild.text"), campaign.getLocalDate());
                     }
                 }
             }
