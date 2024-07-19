@@ -334,7 +334,7 @@ public class Person {
         recruitment = null;
         lastRankChangeDate = null;
         retirement = null;
-        loyalty = 0;
+        loyalty = 9;
         fatigue = 0;
         isRecoveringFromFatigue = false;
         skills = new Skills();
