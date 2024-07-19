@@ -1042,11 +1042,11 @@ public class Person {
                             if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
                                 child.performRandomizedLoyaltyChange(campaign, isChild(campaign.getLocalDate()), true);
                             }
-                        } else if (child.getGenealogy().hasLivingParents()) {
+                        } else if ((child.getGenealogy().hasLivingParents()) && (child.isChild(campaign.getLocalDate()))) {
                             PersonalLogger.RelativeHasDied(child, this, resources.getString("relationParent.text"), campaign.getLocalDate());
 
                             if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                                child.performRandomizedLoyaltyChange(campaign, isChild(campaign.getLocalDate()), true);
+                                child.performRandomizedLoyaltyChange(campaign, false, true);
                             }
                         }
                     }
