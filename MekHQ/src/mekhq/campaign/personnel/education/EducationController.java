@@ -800,6 +800,8 @@ public class EducationController {
 
             person.setEduEducationStage(EducationStage.GRADUATING);
 
+            person.changeLoyalty(academy.getDurationDays() / 300);
+
             return true;
         }
 
@@ -832,6 +834,8 @@ public class EducationController {
 
             person.setEduEducationStage(EducationStage.GRADUATING);
 
+            person.changeLoyalty(academy.getDurationDays() / 300);
+
             return true;
         }
 
@@ -860,6 +864,8 @@ public class EducationController {
         }
 
         person.setEduEducationStage(EducationStage.GRADUATING);
+
+        person.changeLoyalty(academy.getDurationDays() / 300);
 
         return true;
     }

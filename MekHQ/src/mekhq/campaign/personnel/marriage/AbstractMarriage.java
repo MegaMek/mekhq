@@ -208,6 +208,12 @@ public abstract class AbstractMarriage {
         campaign.addReport(String.format(resources.getString("marriage.report"), origin.getHyperlinkedName(),
                 spouse.getHyperlinkedName()));
 
+        // Process the loyalty change
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            origin.performRandomizedLoyaltyChange(campaign, false, true);
+            spouse.performRandomizedLoyaltyChange(campaign, false, true);
+        }
+
         // And finally we trigger person changed events
         MekHQ.triggerEvent(new PersonChangedEvent(origin));
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));

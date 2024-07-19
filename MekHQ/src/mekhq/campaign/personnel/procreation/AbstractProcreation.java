@@ -356,9 +356,19 @@ public abstract class AbstractProcreation {
             // set education
             baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
 
+            // set loyalty
+            baby.setLoyalty(Compute.d6(4, 3));
+
             // Recruit the baby
             campaign.recruitPerson(baby, prisonerStatus, true, true);
         }
+
+        // adjust parents' loyalty
+        if (father != null) {
+            father.performRandomizedLoyaltyChange(campaign, false, true);
+        }
+
+        mother.performRandomizedLoyaltyChange(campaign, false, true);
 
         // Cleanup Data
         removePregnancy(mother);
