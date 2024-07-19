@@ -33,7 +33,6 @@ import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 /**
  * AbstractMarriage is the baseline class for marriage in MekHQ. It holds all the common logic for
@@ -265,7 +264,7 @@ public abstract class AbstractMarriage {
         final Gender gender = sameSex ? person.getGender() : (person.getGender().isMale() ? Gender.FEMALE : Gender.MALE);
         final List<Person> potentials = campaign.getActivePersonnel().stream()
                 .filter(potentialSpouse -> isPotentialRandomSpouse(campaign, today, person, potentialSpouse, gender))
-                .collect(Collectors.toList());
+                .toList();
         if (!potentials.isEmpty()) {
             marry(campaign, today, person, potentials.get(Compute.randomInt(potentials.size())),
                     MergingSurnameStyle.WEIGHTED);
