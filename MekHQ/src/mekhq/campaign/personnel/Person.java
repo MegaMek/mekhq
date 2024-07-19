@@ -980,8 +980,6 @@ public class Person {
                     setRetirement(today);
                 }
 
-                refreshLoyalty(campaign);
-
                 break;
             case DEFECTED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
@@ -989,8 +987,6 @@ public class Person {
                 if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
                     setRetirement(today);
                 }
-
-                refreshLoyalty(campaign);
 
                 break;
             case SACKED:
@@ -1001,8 +997,6 @@ public class Person {
                     setRetirement(today);
                 }
 
-                refreshLoyalty(campaign);
-
                 break;
             case LEFT:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
@@ -1011,8 +1005,6 @@ public class Person {
                 if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
                     setRetirement(today);
                 }
-
-                refreshLoyalty(campaign);
 
                 break;
             case PREGNANCY_COMPLICATIONS:
@@ -1031,8 +1023,6 @@ public class Person {
 
         if (status.isDead()) {
             setDateOfDeath(today);
-
-            refreshLoyalty(campaign);
 
             if ((genealogy.hasSpouse()) && (!genealogy.getSpouse().getStatus().isDead())) {
                 if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
@@ -1095,6 +1085,12 @@ public class Person {
 
         // release the commander flag.
         if ((isCommander()) && (status.isDepartedUnit())) {
+            if ((!status.isResigned()) && (!status.isRetired())) {
+                if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+                    massChangeLoyalty(campaign);
+                }
+            }
+
             setCommander(false);
         }
 
@@ -1114,25 +1110,21 @@ public class Person {
     }
 
     /**
-     * If the current character is the campaign commander,
-     * and the campaign options allow sudden leadership change to adjust loyalty,
-     * adjust loyalty across the entire unit.
+     * If the current character is the campaign commander, adjust loyalty across the entire unit.
      * @param campaign The current campaign
      */
-    private void refreshLoyalty(Campaign campaign) {
+    private void massChangeLoyalty(Campaign campaign) {
         if (isCommander()) {
-            if (campaign.getCampaignOptions().isUseLeadershipChangeRefresh()) {
-                for (Person person : campaign.getPersonnel()) {
-                    if (person.getStatus().isDepartedUnit()) {
-                        continue;
-                    }
-
-                    if (person.getPrisonerStatus().isCurrentPrisoner()) {
-                        continue;
-                    }
-
-                    person.performRandomizedLoyaltyChange(campaign, false, false);
+            for (Person person : campaign.getPersonnel()) {
+                if (person.getStatus().isDepartedUnit()) {
+                    continue;
                 }
+
+                if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                    continue;
+                }
+
+                person.performRandomizedLoyaltyChange(campaign, false, false);
             }
         }
 
