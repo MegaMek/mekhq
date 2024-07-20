@@ -24,63 +24,78 @@ import java.util.ResourceBundle;
 
 public enum Aggression {
     //region Enum Declarations
-    NONE("Personality.NONE.text", "Personality.NONE.description"),
-    AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.description"),
-    ASSERTIVE("Aggression.ASSERTIVE.text", "Aggression.ASSERTIVE.description"),
-    BELLIGERENT("Aggression.BELLIGERENT.text", "Aggression.BELLIGERENT.description"),
-    // Major Trait
-    BLOODTHIRSTY("Aggression.BLOODTHIRSTY.text", "Aggression.BLOODTHIRSTY.description"),
-    BOLD("Aggression.BOLD.text", "Aggression.BOLD.description"),
-    BRASH("Aggression.BRASH.text", "Aggression.BRASH.description"),
-    CONFIDENT("Aggression.CONFIDENT.text", "Aggression.CONFIDENT.description"),
-    COURAGEOUS("Aggression.COURAGEOUS.text", "Aggression.COURAGEOUS.description"),
-    DARING("Aggression.DARING.text", "Aggression.DARING.description"),
-    DECISIVE("Aggression.DECISIVE.text", "Aggression.DECISIVE.description"),
-    DETERMINED("Aggression.DETERMINED.text", "Aggression.DETERMINED.description"),
-    // Major Trait
-    DIPLOMATIC("Aggression.DIPLOMATIC.text", "Aggression.DIPLOMATIC.description"),
-    DOMINEERING("Aggression.DOMINEERING.text", "Aggression.DOMINEERING.description"),
-    FEARLESS("Aggression.FEARLESS.text", "Aggression.FEARLESS.description"),
-    HOSTILE("Aggression.HOSTILE.text", "Aggression.HOSTILE.description"),
-    HOT_HEADED("Aggression.HOT_HEADED.text", "Aggression.HOT_HEADED.description"),
-    IMPETUOUS("Aggression.IMPETUOUS.text", "Aggression.IMPETUOUS.description"),
-    IMPULSIVE("Aggression.IMPULSIVE.text", "Aggression.IMPULSIVE.description"),
-    INFLEXIBLE("Aggression.INFLEXIBLE.text", "Aggression.INFLEXIBLE.description"),
-    INTREPID("Aggression.INTREPID.text", "Aggression.INTREPID.description"),
-    // Major Trait
-    MURDEROUS("Aggression.MURDEROUS.text", "Aggression.MURDEROUS.description"),
-    OVERBEARING("Aggression.OVERBEARING.text", "Aggression.OVERBEARING.description"),
-    // Major Trait
-    PACIFISTIC("Aggression.PACIFISTIC.text", "Aggression.PACIFISTIC.description"),
-    RECKLESS("Aggression.RECKLESS.text", "Aggression.RECKLESS.description"),
-    RESOLUTE("Aggression.RESOLUTE.text", "Aggression.RESOLUTE.description"),
-    // Major Trait
-    SADISTIC("Aggression.SADISTIC.text", "Aggression.SADISTIC.description"),
-    // Major Trait
-    SAVAGE("Aggression.SAVAGE.text", "Aggression.SAVAGE.description"),
-    STUBBORN("Aggression.STUBBORN.text", "Aggression.STUBBORN.description"),
-    TENACIOUS("Aggression.TENACIOUS.text", "Aggression.TENACIOUS.description"),
-    VIGILANT("Aggression.VIGILANT.text", "Aggression.VIGILANT.description");
+    NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
+    AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.description", false, false),
+    ASSERTIVE("Aggression.ASSERTIVE.text", "Aggression.ASSERTIVE.description", false, false),
+    BELLIGERENT("Aggression.BELLIGERENT.text", "Aggression.BELLIGERENT.description", false, false),
+    BLOODTHIRSTY("Aggression.BLOODTHIRSTY.text", "Aggression.BLOODTHIRSTY.description", false, true),
+    BOLD("Aggression.BOLD.text", "Aggression.BOLD.description", true, false),
+    BRASH("Aggression.BRASH.text", "Aggression.BRASH.description", false, false),
+    CONFIDENT("Aggression.CONFIDENT.text", "Aggression.CONFIDENT.description", true, false),
+    COURAGEOUS("Aggression.COURAGEOUS.text", "Aggression.COURAGEOUS.description", true, false),
+    DARING("Aggression.DARING.text", "Aggression.DARING.description", true, false),
+    DECISIVE("Aggression.DECISIVE.text", "Aggression.DECISIVE.description", true, false),
+    DETERMINED("Aggression.DETERMINED.text", "Aggression.DETERMINED.description", true, false),
+    DIPLOMATIC("Aggression.DIPLOMATIC.text", "Aggression.DIPLOMATIC.description", true, true),
+    DOMINEERING("Aggression.DOMINEERING.text", "Aggression.DOMINEERING.description", false, false),
+    FEARLESS("Aggression.FEARLESS.text", "Aggression.FEARLESS.description", true, false),
+    HOSTILE("Aggression.HOSTILE.text", "Aggression.HOSTILE.description", false, false),
+    HOT_HEADED("Aggression.HOT_HEADED.text", "Aggression.HOT_HEADED.description", false, false),
+    IMPETUOUS("Aggression.IMPETUOUS.text", "Aggression.IMPETUOUS.description", false, false),
+    IMPULSIVE("Aggression.IMPULSIVE.text", "Aggression.IMPULSIVE.description", false, false),
+    INFLEXIBLE("Aggression.INFLEXIBLE.text", "Aggression.INFLEXIBLE.description", false, false),
+    INTREPID("Aggression.INTREPID.text", "Aggression.INTREPID.description", true, false),
+    MURDEROUS("Aggression.MURDEROUS.text", "Aggression.MURDEROUS.description", false, true),
+    OVERBEARING("Aggression.OVERBEARING.text", "Aggression.OVERBEARING.description", false, false),
+    PACIFISTIC("Aggression.PACIFISTIC.text", "Aggression.PACIFISTIC.description", true, true),
+    RECKLESS("Aggression.RECKLESS.text", "Aggression.RECKLESS.description", false, false),
+    RESOLUTE("Aggression.RESOLUTE.text", "Aggression.RESOLUTE.description", true, false),
+    SADISTIC("Aggression.SADISTIC.text", "Aggression.SADISTIC.description", false, true),
+    SAVAGE("Aggression.SAVAGE.text", "Aggression.SAVAGE.description", false, true),
+    STUBBORN("Aggression.STUBBORN.text", "Aggression.STUBBORN.description", false, false),
+    TENACIOUS("Aggression.TENACIOUS.text", "Aggression.TENACIOUS.description", true, false),
+    VIGILANT("Aggression.VIGILANT.text", "Aggression.VIGILANT.description", true, false);
 
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
     private final String description;
+    private final boolean isPositive;
+    private final boolean isMajor;
     //endregion Variable Declarations
 
     //region Constructors
-    Aggression(final String name, final String description) {
+    Aggression(final String name, final String description, boolean isPositive, boolean isMajor) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.description = resources.getString(description);
+        this.isPositive = isPositive;
+        this.isMajor = isMajor;
     }
     //endregion Constructors
 
     //region Getters
+    @SuppressWarnings(value = "unused")
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * @return {@code true} if the personality trait is considered positive, {@code false} otherwise.
+     */
+    @SuppressWarnings(value = "unused")
+    public boolean isTraitPositive() {
+        return isPositive;
+    }
+
+    /**
+     * @return {@code true} if the personality trait is considered a major trait, {@code false} otherwise.
+     */
+    @SuppressWarnings(value = "unused")
+    public boolean isTraitMajor() {
+        return isMajor;
     }
     //endregion Getters
 

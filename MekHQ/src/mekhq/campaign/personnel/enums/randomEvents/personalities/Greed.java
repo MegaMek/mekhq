@@ -24,62 +24,77 @@ import java.util.ResourceBundle;
 
 public enum Greed {
     //region Enum Declarations
-    NONE("Personality.NONE.text", "Personality.NONE.description"),
-    ASTUTE("Greed.ASTUTE.text", "Greed.ASTUTE.description"),
-    ADEPT("Greed.ADEPT.text", "Greed.ADEPT.description"),
-    AVARICIOUS("Greed.AVARICIOUS.text", "Greed.AVARICIOUS.description"),
-    // Major Trait
-    CORRUPT("Greed.CORRUPT.text", "Greed.CORRUPT.description"),
-    DYNAMIC("Greed.DYNAMIC.text", "Greed.DYNAMIC.description"),
-    EAGER("Greed.EAGER.text", "Greed.EAGER.description"),
-    // Major Trait
-    ENTERPRISING("Greed.ENTERPRISING.text", "Greed.ENTERPRISING.description"),
-    EXPLOITATIVE("Greed.EXPLOITATIVE.text", "Greed.EXPLOITATIVE.description"),
-    FRAUDULENT("Greed.FRAUDULENT.text", "Greed.FRAUDULENT.description"),
-    GENEROUS("Greed.GENEROUS.text", "Greed.GENEROUS.description"),
-    GREEDY("Greed.GREEDY.text", "Greed.GREEDY.description"),
-    HOARDING("Greed.HOARDING.text", "Greed.HOARDING.description"),
-    INSATIABLE("Greed.INSATIABLE.text", "Greed.INSATIABLE.description"),
-    INSIGHTFUL("Greed.INSIGHTFUL.text", "Greed.INSIGHTFUL.description"),
-    // Major Trait
-    INTUITIVE("Greed.INTUITIVE.text", "Greed.INTUITIVE.description"),
-    JUDICIOUS("Greed.JUDICIOUS.text", "Greed.JUDICIOUS.description"),
-    LUSTFUL("Greed.LUSTFUL.text", "Greed.LUSTFUL.description"),
-    MERCENARY("Greed.MERCENARY.text", "Greed.MERCENARY.description"),
-    // Major Trait
-    METICULOUS("Greed.METICULOUS.text", "Greed.METICULOUS.description"),
-    // Major Trait
-    NEFARIOUS("Greed.NEFARIOUS.text", "Greed.NEFARIOUS.description"),
-    OVERREACHING("Greed.OVERREACHING.text", "Greed.OVERREACHING.description"),
-    PROFITABLE("Greed.PROFITABLE.text", "Greed.PROFITABLE.description"),
-    SAVVY("Greed.SAVVY.text", "Greed.SAVVY.description"),
-    SELF_SERVING("Greed.SELF_SERVING.text", "Greed.SELF_SERVING.description"),
-    SHAMELESS("Greed.SHAMELESS.text", "Greed.SHAMELESS.description"),
-    SHREWD("Greed.SHREWD.text", "Greed.SHREWD.description"),
-    TACTICAL("Greed.TACTICAL.text", "Greed.TACTICAL.description"),
-    // Major Trait
-    THIEF("Greed.THIEF.text", "Greed.THIEF.description"),
-    UNPRINCIPLED("Greed.UNPRINCIPLED.text", "Greed.UNPRINCIPLED.description"),
-    VORACIOUS("Greed.VORACIOUS.text", "Greed.VORACIOUS.description");
+    NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
+    ASTUTE("Greed.ASTUTE.text", "Greed.ASTUTE.description", true, false),
+    ADEPT("Greed.ADEPT.text", "Greed.ADEPT.description", true, false),
+    AVARICIOUS("Greed.AVARICIOUS.text", "Greed.AVARICIOUS.description", false, false),
+    CORRUPT("Greed.CORRUPT.text", "Greed.CORRUPT.description", false, true),
+    DYNAMIC("Greed.DYNAMIC.text", "Greed.DYNAMIC.description", true, false),
+    EAGER("Greed.EAGER.text", "Greed.EAGER.description", true, false),
+    ENTERPRISING("Greed.ENTERPRISING.text", "Greed.ENTERPRISING.description", true, true),
+    EXPLOITATIVE("Greed.EXPLOITATIVE.text", "Greed.EXPLOITATIVE.description", false, false),
+    FRAUDULENT("Greed.FRAUDULENT.text", "Greed.FRAUDULENT.description", false, false),
+    GENEROUS("Greed.GENEROUS.text", "Greed.GENEROUS.description", true, false),
+    GREEDY("Greed.GREEDY.text", "Greed.GREEDY.description", false, false),
+    HOARDING("Greed.HOARDING.text", "Greed.HOARDING.description", false, false),
+    INSATIABLE("Greed.INSATIABLE.text", "Greed.INSATIABLE.description", false, false),
+    INSIGHTFUL("Greed.INSIGHTFUL.text", "Greed.INSIGHTFUL.description", true, false),
+    INTUITIVE("Greed.INTUITIVE.text", "Greed.INTUITIVE.description", true, true),
+    JUDICIOUS("Greed.JUDICIOUS.text", "Greed.JUDICIOUS.description", true, false),
+    LUSTFUL("Greed.LUSTFUL.text", "Greed.LUSTFUL.description", false, false),
+    MERCENARY("Greed.MERCENARY.text", "Greed.MERCENARY.description", false, false),
+    METICULOUS("Greed.METICULOUS.text", "Greed.METICULOUS.description", true, true),
+    NEFARIOUS("Greed.NEFARIOUS.text", "Greed.NEFARIOUS.description", false, true),
+    OVERREACHING("Greed.OVERREACHING.text", "Greed.OVERREACHING.description", false, false),
+    PROFITABLE("Greed.PROFITABLE.text", "Greed.PROFITABLE.description", true, false),
+    SAVVY("Greed.SAVVY.text", "Greed.SAVVY.description", true, false),
+    SELF_SERVING("Greed.SELF_SERVING.text", "Greed.SELF_SERVING.description", false, false),
+    SHAMELESS("Greed.SHAMELESS.text", "Greed.SHAMELESS.description", false, false),
+    SHREWD("Greed.SHREWD.text", "Greed.SHREWD.description", true, false),
+    TACTICAL("Greed.TACTICAL.text", "Greed.TACTICAL.description", true, false),
+    THIEF("Greed.THIEF.text", "Greed.THIEF.description", false, true),
+    UNPRINCIPLED("Greed.UNPRINCIPLED.text", "Greed.UNPRINCIPLED.description", false, false),
+    VORACIOUS("Greed.VORACIOUS.text", "Greed.VORACIOUS.description", true, false);
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
     private final String description;
+    private final boolean isPositive;
+    private final boolean isMajor;
     //endregion Variable Declarations
 
     //region Constructors
-    Greed(final String name, final String description) {
+    Greed(final String name, final String description, boolean isPositive, boolean isMajor) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.description = resources.getString(description);
+        this.isPositive = isPositive;
+        this.isMajor = isMajor;
     }
     //endregion Constructors
 
     //region Getters
+    @SuppressWarnings(value = "unused")
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * @return {@code true} if the personality trait is considered positive, {@code false} otherwise.
+     */
+    @SuppressWarnings(value = "unused")
+    public boolean isTraitPositive() {
+        return isPositive;
+    }
+
+    /**
+     * @return {@code true} if the personality trait is considered a major trait, {@code false} otherwise.
+     */
+    @SuppressWarnings(value = "unused")
+    public boolean isTraitMajor() {
+        return isMajor;
     }
     //endregion Getters
 
