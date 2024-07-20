@@ -25,13 +25,42 @@ import java.util.ResourceBundle;
 public enum Aggression {
     //region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description"),
-    PEACEFUL("Aggression.PEACEFUL.text", "Aggression.PEACEFUL.description"),
-    PROFESSIONAL("Aggression.PROFESSIONAL.text", "Aggression.PROFESSIONAL.description"),
-    STUBBORN("Aggression.STUBBORN.text", "Aggression.STUBBORN.description"),
-    AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.description"),
-    BRUTAL("Aggression.BRUTAL.text", "Aggression.BRUTAL.description"),
+    // Major Trait
     BLOODTHIRSTY("Aggression.BLOODTHIRSTY.text", "Aggression.BLOODTHIRSTY.description"),
-    MURDEROUS("Aggression.MURDEROUS.text", "Aggression.MURDEROUS.description");
+    BOLD("Aggression.BOLD.text", "Aggression.BOLD.description"),
+    AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.description"),
+    ASSERTIVE("Aggression.ASSERTIVE.text", "Aggression.ASSERTIVE.description"),
+    BELLIGERENT("Aggression.BELLIGERENT.text", "Aggression.BELLIGERENT.description"),
+    BRASH("Aggression.BRASH.text", "Aggression.BRASH.description"),
+    CONFIDENT("Aggression.CONFIDENT.text", "Aggression.CONFIDENT.description"),
+    COURAGEOUS("Aggression.COURAGEOUS.text", "Aggression.COURAGEOUS.description"),
+    DARING("Aggression.DARING.text", "Aggression.DARING.description"),
+    DECISIVE("Aggression.DECISIVE.text", "Aggression.DECISIVE.description"),
+    DETERMINED("Aggression.DETERMINED.text", "Aggression.DETERMINED.description"),
+    // Major Trait
+    DIPLOMATIC("Aggression.DIPLOMATIC.text", "Aggression.DIPLOMATIC.description"),
+    DOMINEERING("Aggression.DOMINEERING.text", "Aggression.DOMINEERING.description"),
+    FEARLESS("Aggression.FEARLESS.text", "Aggression.FEARLESS.description"),
+    HOSTILE("Aggression.HOSTILE.text", "Aggression.HOSTILE.description"),
+    HOT_HEADED("Aggression.HOT_HEADED.text", "Aggression.HOT_HEADED.description"),
+    IMPETUOUS("Aggression.IMPETUOUS.text", "Aggression.IMPETUOUS.description"),
+    IMPULSIVE("Aggression.IMPULSIVE.text", "Aggression.IMPULSIVE.description"),
+    INFLEXIBLE("Aggression.INFLEXIBLE.text", "Aggression.INFLEXIBLE.description"),
+    INTREPID("Aggression.INTREPID.text", "Aggression.INTREPID.description"),
+    MURDEROUS("Aggression.MURDEROUS.text", "Aggression.MURDEROUS.description"),
+    OVERBEARING("Aggression.OVERBEARING.text", "Aggression.OVERBEARING.description"),
+    // Major Trait
+    PACIFISTIC("Aggression.PACIFISTIC.text", "Aggression.PACIFISTIC.description"),
+    RECKLESS("Aggression.RECKLESS.text", "Aggression.RECKLESS.description"),
+    RESOLUTE("Aggression.RESOLUTE.text", "Aggression.RESOLUTE.description"),
+    // Major Trait
+    SADISTIC("Aggression.SADISTIC.text", "Aggression.SADISTIC.description"),
+    // Major Trait
+    SAVAGE("Aggression.SAVAGE.text", "Aggression.SAVAGE.description"),
+    STUBBORN("Aggression.STUBBORN.text", "Aggression.STUBBORN.description"),
+    TENACIOUS("Aggression.TENACIOUS.text", "Aggression.TENACIOUS.description"),
+    VIGILANT("Aggression.VIGILANT.text", "Aggression.VIGILANT.description");
+
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -59,32 +88,124 @@ public enum Aggression {
         return this == NONE;
     }
 
-    public boolean isPeaceful() {
-        return this == PEACEFUL;
+    public boolean isBloodthirsty() {
+        return this == BLOODTHIRSTY;
     }
 
-    public boolean isProfessional() {
-        return this == PROFESSIONAL;
+    public boolean isBold() {
+        return this == BOLD;
     }
 
     public boolean isAggressive() {
         return this == AGGRESSIVE;
     }
 
-    public boolean isStubborn() {
-        return this == STUBBORN;
+    public boolean isAssertive() {
+        return this == ASSERTIVE;
     }
 
-    public boolean isBrutal() {
-        return this == BRUTAL;
+    public boolean isBelligerent() {
+        return this == BELLIGERENT;
     }
 
-    public boolean isBloodthirsty() {
-        return this == BLOODTHIRSTY;
+    public boolean isBrash() {
+        return this == BRASH;
+    }
+
+    public boolean isConfident() {
+        return this == CONFIDENT;
+    }
+
+    public boolean isCourageous() {
+        return this == COURAGEOUS;
+    }
+
+    public boolean isDaring() {
+        return this == DARING;
+    }
+
+    public boolean isDecisive() {
+        return this == DECISIVE;
+    }
+
+    public boolean isDetermined() {
+        return this == DETERMINED;
+    }
+
+    public boolean isDiplomatic() {
+        return this == DIPLOMATIC;
+    }
+
+    public boolean isDomineering() {
+        return this == DOMINEERING;
+    }
+
+    public boolean isFearless() {
+        return this == FEARLESS;
+    }
+
+    public boolean isHostile() {
+        return this == HOSTILE;
+    }
+
+    public boolean isHotHeaded() {
+        return this == HOT_HEADED;
+    }
+
+    public boolean isImpetuous() {
+        return this == IMPETUOUS;
+    }
+
+    public boolean isImpulsive() {
+        return this == IMPULSIVE;
+    }
+
+    public boolean isInflexible() {
+        return this == INFLEXIBLE;
+    }
+
+    public boolean isIntrepid() {
+        return this == INTREPID;
     }
 
     public boolean isMurderous() {
         return this == MURDEROUS;
+    }
+
+    public boolean isOverbearing() {
+        return this == OVERBEARING;
+    }
+
+    public boolean isPacifistic() {
+        return this == PACIFISTIC;
+    }
+
+    public boolean isReckless() {
+        return this == RECKLESS;
+    }
+
+    public boolean isResolute() {
+        return this == RESOLUTE;
+    }
+
+    public boolean isSadistic() {
+        return this == SADISTIC;
+    }
+
+    public boolean isSavage() {
+        return this == SAVAGE;
+    }
+
+    public boolean isStubborn() {
+        return this == STUBBORN;
+    }
+
+    public boolean isTenacious() {
+        return this == TENACIOUS;
+    }
+
+    public boolean isVigilant() {
+        return this == VIGILANT;
     }
     //endregion Boolean Comparison Methods
 
@@ -100,13 +221,36 @@ public enum Aggression {
     public static Aggression parseFromString(final String aggression) {
         return switch (aggression.toLowerCase()) {
             case "0", "none" -> NONE;
-            case "1", "peaceful" -> PEACEFUL;
-            case "2", "professional" -> PROFESSIONAL;
-            case "3", "stubborn" -> STUBBORN;
-            case "4", "aggressive" -> AGGRESSIVE;
-            case "5", "brutal" -> BRUTAL;
-            case "6", "bloodthirsty" -> BLOODTHIRSTY;
-            case "7", "murderous" -> MURDEROUS;
+            case "1", "bloodthirsty" -> BLOODTHIRSTY;
+            case "2", "bold" -> BOLD;
+            case "3", "aggressive" -> AGGRESSIVE;
+            case "4", "assertive" -> ASSERTIVE;
+            case "5", "belligerent" -> BELLIGERENT;
+            case "6", "brash" -> BRASH;
+            case "7", "confident" -> CONFIDENT;
+            case "8", "courageous" -> COURAGEOUS;
+            case "9", "daring" -> DARING;
+            case "10", "decisive" -> DECISIVE;
+            case "11", "determined" -> DETERMINED;
+            case "12", "diplomatic" -> DIPLOMATIC;
+            case "13", "domineering" -> DOMINEERING;
+            case "14", "fearless" -> FEARLESS;
+            case "15", "hostile" -> HOSTILE;
+            case "16", "hot-headed" -> HOT_HEADED;
+            case "17", "impetuous" -> IMPETUOUS;
+            case "18", "impulsive" -> IMPULSIVE;
+            case "19", "inflexible" -> INFLEXIBLE;
+            case "20", "intrepid" -> INTREPID;
+            case "21", "murderous" -> MURDEROUS;
+            case "22", "overbearing" -> OVERBEARING;
+            case "23", "pacifistic" -> PACIFISTIC;
+            case "24", "reckless" -> RECKLESS;
+            case "25", "resolute" -> RESOLUTE;
+            case "26", "sadistic" -> SADISTIC;
+            case "27", "savage" -> SAVAGE;
+            case "28", "stubborn" -> STUBBORN;
+            case "29", "tenacious" -> TENACIOUS;
+            case "30", "vigilant" -> VIGILANT;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Aggression.java/parseFromString: "
                             + aggression);
@@ -123,13 +267,36 @@ public enum Aggression {
     public static Aggression parseFromInt(final int aggression) {
         return switch (aggression) {
             case 0 -> NONE;
-            case 1 -> PEACEFUL;
-            case 2 -> PROFESSIONAL;
-            case 3 -> STUBBORN;
-            case 4 -> AGGRESSIVE;
-            case 5 -> BRUTAL;
-            case 6 -> BLOODTHIRSTY;
-            case 7 -> MURDEROUS;
+            case 1 -> BLOODTHIRSTY;
+            case 2 -> BOLD;
+            case 3 -> AGGRESSIVE;
+            case 4 -> ASSERTIVE;
+            case 5 -> BELLIGERENT;
+            case 6 -> BRASH;
+            case 7 -> CONFIDENT;
+            case 8 -> COURAGEOUS;
+            case 9 -> DARING;
+            case 10 -> DECISIVE;
+            case 11 -> DETERMINED;
+            case 12 -> DIPLOMATIC;
+            case 13 -> DOMINEERING;
+            case 14 -> FEARLESS;
+            case 15 -> HOSTILE;
+            case 16 -> HOT_HEADED;
+            case 17 -> IMPETUOUS;
+            case 18 -> IMPULSIVE;
+            case 19 -> INFLEXIBLE;
+            case 20 -> INTREPID;
+            case 21 -> MURDEROUS;
+            case 22 -> OVERBEARING;
+            case 23 -> PACIFISTIC;
+            case 24 -> RECKLESS;
+            case 25 -> RESOLUTE;
+            case 26 -> SADISTIC;
+            case 27 -> SAVAGE;
+            case 28 -> STUBBORN;
+            case 29 -> TENACIOUS;
+            case 30 -> VIGILANT;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Aggression.java/parseFromInt: "
                             + aggression);
@@ -145,13 +312,36 @@ public enum Aggression {
     public static int parseToInt(final Aggression aggression) {
         return switch (aggression) {
             case NONE -> 0;
-            case PEACEFUL -> 1;
-            case PROFESSIONAL -> 2;
-            case STUBBORN -> 3;
-            case AGGRESSIVE -> 4;
-            case BRUTAL -> 5;
-            case BLOODTHIRSTY -> 6;
-            case MURDEROUS -> 7;
+            case BLOODTHIRSTY -> 1;
+            case BOLD -> 2;
+            case AGGRESSIVE -> 3;
+            case ASSERTIVE -> 4;
+            case BELLIGERENT -> 5;
+            case BRASH -> 6;
+            case CONFIDENT -> 7;
+            case COURAGEOUS -> 8;
+            case DARING -> 9;
+            case DECISIVE -> 10;
+            case DETERMINED -> 11;
+            case DIPLOMATIC -> 12;
+            case DOMINEERING -> 13;
+            case FEARLESS -> 14;
+            case HOSTILE -> 15;
+            case HOT_HEADED -> 16;
+            case IMPETUOUS -> 17;
+            case IMPULSIVE -> 18;
+            case INFLEXIBLE -> 19;
+            case INTREPID -> 20;
+            case MURDEROUS -> 21;
+            case OVERBEARING -> 22;
+            case PACIFISTIC -> 23;
+            case RECKLESS -> 24;
+            case RESOLUTE -> 25;
+            case SADISTIC -> 26;
+            case SAVAGE -> 27;
+            case STUBBORN -> 28;
+            case TENACIOUS -> 29;
+            case VIGILANT -> 30;
         };
     }
     @Override
