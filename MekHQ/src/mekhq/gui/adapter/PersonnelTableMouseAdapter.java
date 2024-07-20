@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.randomEvents.personality.PersonalityController;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -135,6 +136,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
     private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE";
     private static final String CMD_LOYALTY = "LOYALTY";
+    private static final String CMD_PERSONALITY = "PERSONALITY";
 
     private static final String CMD_IMPRISON = "IMPRISON";
     private static final String CMD_FREE = "FREE";
@@ -1088,6 +1090,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_LOYALTY: {
                 for (Person person : people) {
                     person.setLoyalty(Compute.d6(3));
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_PERSONALITY: {
+                for (Person person : people) {
+                    PersonalityController.generatePersonality(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -2686,6 +2695,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (gui.getCampaign().getCampaignOptions().isUseLoyaltyModifiers()) {
                 menuItem = new JMenuItem(resources.getString("regenerateLoyalty.text"));
                 menuItem.setActionCommand(CMD_LOYALTY);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+            }
+
+            if (gui.getCampaign().getCampaignOptions().isUseRandomPersonalities()) {
+                menuItem = new JMenuItem(resources.getString("regeneratePersonality.text"));
+                menuItem.setActionCommand(CMD_PERSONALITY);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
             }
