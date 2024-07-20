@@ -1433,13 +1433,18 @@ public class AtBDynamicScenarioFactory {
         // Strip roles that are not infantry or battle armor, and remove the artillery role
         Map<Integer, Collection<MissionRole>> transportedRoles = new HashMap<>();
 
-        transportedRoles.put(UnitType.INFANTRY, requiredRoles.containsKey(UnitType.INFANTRY) ?
-                new ArrayList<>(requiredRoles.get(UnitType.INFANTRY)) : new ArrayList<>());
-        transportedRoles.get(UnitType.INFANTRY).remove((MissionRole.ARTILLERY));
+        if (requiredRoles != null) {
 
-        transportedRoles.put(UnitType.BATTLE_ARMOR, requiredRoles.containsKey(UnitType.BATTLE_ARMOR) ?
-                new ArrayList<>(requiredRoles.get(UnitType.BATTLE_ARMOR)) : new ArrayList<>());
-        transportedRoles.get(UnitType.BATTLE_ARMOR).remove((MissionRole.ARTILLERY));
+            transportedRoles.put(UnitType.INFANTRY, requiredRoles.containsKey(UnitType.INFANTRY) ?
+                    new ArrayList<>(requiredRoles.get(UnitType.INFANTRY)) :
+                    new ArrayList<>());
+            transportedRoles.get(UnitType.INFANTRY).remove((MissionRole.ARTILLERY));
+
+            transportedRoles.put(UnitType.BATTLE_ARMOR, requiredRoles.containsKey(UnitType.BATTLE_ARMOR) ?
+                    new ArrayList<>(requiredRoles.get(UnitType.BATTLE_ARMOR)) :
+                    new ArrayList<>());
+            transportedRoles.get(UnitType.BATTLE_ARMOR).remove((MissionRole.ARTILLERY));
+        }
 
         List<Entity> transportedUnits = new ArrayList<>();
 
