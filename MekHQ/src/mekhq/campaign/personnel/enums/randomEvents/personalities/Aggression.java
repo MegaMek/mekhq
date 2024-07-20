@@ -85,126 +85,157 @@ public enum Aggression {
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @SuppressWarnings(value = "unused")
     public boolean isNone() {
         return this == NONE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isBloodthirsty() {
         return this == BLOODTHIRSTY;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isBold() {
         return this == BOLD;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isAggressive() {
         return this == AGGRESSIVE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isAssertive() {
         return this == ASSERTIVE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isBelligerent() {
         return this == BELLIGERENT;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isBrash() {
         return this == BRASH;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isConfident() {
         return this == CONFIDENT;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isCourageous() {
         return this == COURAGEOUS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isDaring() {
         return this == DARING;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isDecisive() {
         return this == DECISIVE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isDetermined() {
         return this == DETERMINED;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isDiplomatic() {
         return this == DIPLOMATIC;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isDomineering() {
         return this == DOMINEERING;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isFearless() {
         return this == FEARLESS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isHostile() {
         return this == HOSTILE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isHotHeaded() {
         return this == HOT_HEADED;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isImpetuous() {
         return this == IMPETUOUS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isImpulsive() {
         return this == IMPULSIVE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isInflexible() {
         return this == INFLEXIBLE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isIntrepid() {
         return this == INTREPID;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isMurderous() {
         return this == MURDEROUS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isOverbearing() {
         return this == OVERBEARING;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isPacifistic() {
         return this == PACIFISTIC;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isReckless() {
         return this == RECKLESS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isResolute() {
         return this == RESOLUTE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isSadistic() {
         return this == SADISTIC;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isSavage() {
         return this == SAVAGE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isStubborn() {
         return this == STUBBORN;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isTenacious() {
         return this == TENACIOUS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isVigilant() {
         return this == VIGILANT;
     }
@@ -219,6 +250,8 @@ public enum Aggression {
      * @return the Aggression enum that corresponds to the given string
      * @throws IllegalStateException if the given string does not match any valid Aggression
      */
+
+    @SuppressWarnings(value = "unused")
     public static Aggression parseFromString(final String aggression) {
         return switch (aggression.toLowerCase()) {
             case "0", "none" -> NONE;
@@ -265,6 +298,8 @@ public enum Aggression {
      * @return the corresponding Aggression enum value
      * @throws IllegalStateException if the integer value does not correspond to any valid Aggression enum value
      */
+
+    @SuppressWarnings(value = "unused")
     public static Aggression parseFromInt(final int aggression) {
         return switch (aggression) {
             case 0 -> NONE;
@@ -310,6 +345,8 @@ public enum Aggression {
      * @param aggression the Aggression enum value to be parsed
      * @return the integer value representing the parsed Aggression
      */
+
+    @SuppressWarnings(value = "unused")
     public static int parseToInt(final Aggression aggression) {
         return switch (aggression) {
             case NONE -> 0;
