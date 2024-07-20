@@ -13,7 +13,7 @@ import static mekhq.campaign.personnel.enums.randomEvents.personalities.Greed.*;
 import static mekhq.campaign.personnel.enums.randomEvents.personalities.Social.*;
 
 public class PersonalityController {
-    public void generatePersonality(Person person) {
+    public static void generatePersonality(Person person) {
         // first we wipe any pre-existing personality traits
         person.setAggression(Aggression.NONE);
         person.setAmbition(Ambition.NONE);
@@ -55,7 +55,7 @@ public class PersonalityController {
      * @param secondTableRoll the second table roll used to determine the text for the biography's second part
      * @throws IllegalStateException if an unexpected value is rolled for firstTableRoll or secondTableRoll
      */
-    private void writeBiography(Person person, int firstTableRoll, int secondTableRoll) {
+    private static void writeBiography(Person person, int firstTableRoll, int secondTableRoll) {
         StringBuilder biography = new StringBuilder();
 
         switch (firstTableRoll) {
@@ -89,7 +89,7 @@ public class PersonalityController {
      * @param traitRoll the roll used to generate the value of the personality trait
      * @throws IllegalStateException if an unexpected value is rolled for tableRoll parameter
      */
-    private void setPersonalityTraits(Person person, int tableRoll, int traitRoll) {
+    private static void setPersonalityTraits(Person person, int tableRoll, int traitRoll) {
         switch (tableRoll) {
             case 0 -> person.setAggression(generateAggression(traitRoll));
             case 1 -> person.setAmbition(generateAmbition(traitRoll));
@@ -108,7 +108,7 @@ public class PersonalityController {
      * @return the generated Aggression enum value
      * @throws IllegalStateException if an unexpected value is rolled
      */
-    private Aggression generateAggression(int roll) {
+    private static Aggression generateAggression(int roll) {
         return switch (roll) {
             case 0, 1, 2 -> PEACEFUL;
             case 3, 4, 5 -> PROFESSIONAL;
@@ -130,7 +130,7 @@ public class PersonalityController {
      * @return the generated Ambition enum value
      * @throws IllegalStateException if an unexpected value is rolled
      */
-    private Ambition generateAmbition(int roll) {
+    private static Ambition generateAmbition(int roll) {
         return switch (roll) {
             case 0, 1, 2 -> UNAMBITIOUS;
             case 3, 4, 5 -> DRIVEN;
@@ -152,7 +152,7 @@ public class PersonalityController {
      * @return the generated Greed enum value
      * @throws IllegalStateException if an unexpected value is rolled
      */
-    private Greed generateGreed(int roll) {
+    private static Greed generateGreed(int roll) {
         return switch (roll) {
             case 0, 1, 2 -> GENEROUS;
             case 3, 4, 5 -> FRUGAL;
@@ -174,7 +174,7 @@ public class PersonalityController {
      * @return the generated Social enum value
      * @throws IllegalStateException if an unexpected value is rolled
      */
-    private Social generateSocial(int roll) {
+    private static Social generateSocial(int roll) {
         return switch (roll) {
             case 0, 1, 2 -> RECLUSIVE;
             case 3, 4, 5 -> RESILIENT;
