@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
@@ -37,6 +38,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.Greed;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.Social;
+import mekhq.campaign.personnel.randomEvents.personality.PersonalityController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
@@ -112,6 +118,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JComboBox<String> choiceUnitTech;
     private JCheckBox chkFounder;
     private JComboBox<Unit> choiceOriginalUnit;
+
+    // random personality
+    private MMComboBox<Aggression> comboAggression;
+    private MMComboBox<Ambition> comboAmbition;
+    private MMComboBox<Greed> comboGreed;
+    private MMComboBox<Social> comboSocial;
 
     private Campaign campaign;
 
@@ -355,8 +367,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                                                           final boolean isSelected,
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Faction) {
-                    Faction faction = (Faction) value;
+                if (value instanceof Faction faction) {
                     setText(String.format("%s [%s]",
                             faction.getFullName(campaign.getGameYear()),
                             faction.getShortName()));
@@ -412,8 +423,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-                if (value instanceof PlanetarySystem) {
-                    PlanetarySystem system = (PlanetarySystem) value;
+                if (value instanceof PlanetarySystem system) {
                     setText(system.getName(campaign.getLocalDate()));
                 }
 
@@ -472,8 +482,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-                if (value instanceof Planet) {
-                    Planet planet = (Planet) value;
+                if (value instanceof Planet planet) {
                     setText(planet.getName(campaign.getLocalDate()));
                 }
 
@@ -836,6 +845,91 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         y++;
 
+        //region random personality
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            JLabel labelAggression = new JLabel();
+            labelAggression.setText("Aggression:");
+            labelAggression.setName("labelAggression");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelAggression, gridBagConstraints);
+
+            comboAggression = new MMComboBox<>("comboAggression", Aggression.values());
+            comboAggression.setSelectedItem(person.getAggression());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboAggression, gridBagConstraints);
+
+            JLabel labelAmbition = new JLabel();
+            labelAmbition.setText("Ambition:");
+            labelAmbition.setName("labelAmbition");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelAmbition, gridBagConstraints);
+
+            comboAmbition = new MMComboBox<>("comboAmbition", Ambition.values());
+            comboAmbition.setSelectedItem(person.getAmbition());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboAmbition, gridBagConstraints);
+
+            JLabel labelGreed = new JLabel();
+            labelGreed.setText("Greed:");
+            labelGreed.setName("labelGreed");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelGreed, gridBagConstraints);
+
+            comboGreed = new MMComboBox<>("comboGreed", Greed.values());
+            comboGreed.setSelectedItem(person.getGreed());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboGreed, gridBagConstraints);
+
+            JLabel labelSocial = new JLabel();
+            labelSocial.setText("Social:");
+            labelSocial.setName("labelSocial");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelSocial, gridBagConstraints);
+
+            comboSocial = new MMComboBox<>("comboSocial", Social.values());
+            comboSocial.setSelectedItem(person.getSocial());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboSocial, gridBagConstraints);
+        }
+
+        y++;
+
         txtBio = new MarkdownEditorPanel("Biography");
         txtBio.setText(person.getBiography());
         gridBagConstraints = new GridBagConstraints();
@@ -1053,21 +1147,27 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
         person.setClanPersonnel(chkClan.isSelected());
 
-        try {
-            person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch (NumberFormatException ignored) {}
+        if (campaign.getCampaignOptions().isUseToughness()) {
+            try {
+                person.setToughness(Integer.parseInt(textToughness.getText()));
+            } catch (NumberFormatException ignored) {}
+        }
 
-        try {
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
-        } catch (NumberFormatException ignored) {}
+        }
 
-        try {
-            person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
-        } catch (NumberFormatException ignored) {}
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            try {
+                person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
+            } catch (NumberFormatException ignored) {}
+        }
 
-        try {
-            person.setFatigue(Integer.parseInt(textFatigue.getText()));
-        } catch (NumberFormatException ignored) {}
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            try {
+                person.setFatigue(Integer.parseInt(textFatigue.getText()));
+            } catch (NumberFormatException ignored) {}
+        }
 
         if (null == choiceOriginalUnit.getSelectedItem()) {
             person.setOriginalUnit(null);
@@ -1078,6 +1178,15 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
 
         person.setFounder(chkFounder.isSelected());
+
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            person.setAggression(comboAggression.getSelectedItem());
+            person.setAmbition(comboAmbition.getSelectedItem());
+            person.setGreed(comboGreed.getSelectedItem());
+            person.setSocial(comboSocial.getSelectedItem());
+            PersonalityController.writeDescription(person);
+        }
+
         setSkills();
         setOptions();
         setVisible(false);
