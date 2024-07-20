@@ -25,12 +25,12 @@ import java.util.ResourceBundle;
 public enum Aggression {
     //region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description"),
-    // Major Trait
-    BLOODTHIRSTY("Aggression.BLOODTHIRSTY.text", "Aggression.BLOODTHIRSTY.description"),
-    BOLD("Aggression.BOLD.text", "Aggression.BOLD.description"),
     AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.description"),
     ASSERTIVE("Aggression.ASSERTIVE.text", "Aggression.ASSERTIVE.description"),
     BELLIGERENT("Aggression.BELLIGERENT.text", "Aggression.BELLIGERENT.description"),
+    // Major Trait
+    BLOODTHIRSTY("Aggression.BLOODTHIRSTY.text", "Aggression.BLOODTHIRSTY.description"),
+    BOLD("Aggression.BOLD.text", "Aggression.BOLD.description"),
     BRASH("Aggression.BRASH.text", "Aggression.BRASH.description"),
     CONFIDENT("Aggression.CONFIDENT.text", "Aggression.CONFIDENT.description"),
     COURAGEOUS("Aggression.COURAGEOUS.text", "Aggression.COURAGEOUS.description"),
