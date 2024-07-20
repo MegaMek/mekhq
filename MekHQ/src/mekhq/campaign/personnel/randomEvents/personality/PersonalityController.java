@@ -2,6 +2,7 @@ package mekhq.campaign.personnel.randomEvents.personality;
 
 import megamek.common.Compute;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression;
 import mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition;
 import mekhq.campaign.personnel.enums.randomEvents.personalities.Greed;
@@ -58,22 +59,33 @@ public class PersonalityController {
     private static void writeBiography(Person person, int firstTableRoll, int secondTableRoll) {
         StringBuilder biography = new StringBuilder();
 
+        String firstName = person.getFirstName();
+        String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(person.getGender());
+
         switch (firstTableRoll) {
-            case 0 -> biography.append(String.format(person.getAggression().getDescription(), person.getFirstName()));
-            case 1 -> biography.append(String.format(person.getAmbition().getDescription(), person.getFirstName()));
-            case 2 -> biography.append(String.format(person.getGreed().getDescription(), person.getFirstName()));
-            case 3 -> biography.append(String.format(person.getSocial().getDescription(), person.getFirstName()));
+            case 0 -> biography.append(String.format(person.getAggression().getDescription(),
+                    firstName));
+            case 1 -> biography.append(String.format(person.getAmbition().getDescription(),
+                    firstName));
+            case 2 -> biography.append(String.format(person.getGreed().getDescription(),
+                    firstName));
+            case 3 -> biography.append(String.format(person.getSocial().getDescription(),
+                    firstName));
             default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/writeBiography/first instance: "
                     + firstTableRoll);
         }
 
-        biography.append(". ");
+        biography.append(' ');
 
         switch (secondTableRoll) {
-            case 0 -> biography.append(String.format(person.getAggression().getDescription(), person.getGender()));
-            case 1 -> biography.append(String.format(person.getAmbition().getDescription(), person.getGender()));
-            case 2 -> biography.append(String.format(person.getGreed().getDescription(), person.getGender()));
-            case 3 -> biography.append(String.format(person.getSocial().getDescription(), person.getGender()));
+            case 0 -> biography.append(String.format(person.getAggression().getDescription(),
+                    pronoun));
+            case 1 -> biography.append(String.format(person.getAmbition().getDescription(),
+                    pronoun));
+            case 2 -> biography.append(String.format(person.getGreed().getDescription(),
+                    pronoun));
+            case 3 -> biography.append(String.format(person.getSocial().getDescription(),
+                    pronoun));
             default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/writeBiography/second instance: "
                     + firstTableRoll);
         }

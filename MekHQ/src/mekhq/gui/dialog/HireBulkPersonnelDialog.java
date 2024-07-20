@@ -29,11 +29,14 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.randomEvents.personality.PersonalityController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -144,8 +147,8 @@ public class HireBulkPersonnelDialog extends JDialog {
         int sn_min = 1;
         SpinnerNumberModel sn = new SpinnerNumberModel(1, sn_min, CampaignGUI.MAX_QUANTITY_SPINNER, 1);
         spnNumber = new JSpinner(sn);
-        spnNumber.setEditor(new JSpinner.NumberEditor(spnNumber,"#")); //prevent digit grouping, e.g. 1,000
-        jtf = ((JSpinner.DefaultEditor) spnNumber.getEditor()).getTextField();
+        spnNumber.setEditor(new NumberEditor(spnNumber,"#")); //prevent digit grouping, e.g. 1,000
+        jtf = ((DefaultEditor) spnNumber.getEditor()).getTextField();
         jtf.addKeyListener(new KeyListener() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -213,8 +216,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             getContentPane().add(ageRangePanel, gridBagConstraints);
 
             minAge = new JSpinner(new SpinnerNumberModel(19, 0, 99, 1));
-            ((JSpinner.DefaultEditor) minAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
-            ((JSpinner.DefaultEditor) minAge.getEditor()).getTextField().setColumns(3);
+            ((DefaultEditor) minAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
+            ((DefaultEditor) minAge.getEditor()).getTextField().setColumns(3);
             minAge.setEnabled(false);
             minAge.addChangeListener(e -> {
                 minAgeVal = (Integer) minAge.getModel().getValue();
@@ -227,8 +230,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             ageRangePanel.add(new JLabel(resourceMap.getString("lblAgeRangeSeparator.text")), newConstraints(1, 0));
 
             maxAge = new JSpinner(new SpinnerNumberModel(99, 0, 99, 1));
-            ((JSpinner.DefaultEditor) maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
-            ((JSpinner.DefaultEditor) maxAge.getEditor()).getTextField().setColumns(3);
+            ((DefaultEditor) maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
+            ((DefaultEditor) maxAge.getEditor()).getTextField().setColumns(3);
             maxAge.setEnabled(false);
             maxAge.addChangeListener(e -> {
                 maxAgeVal = (Integer) maxAge.getModel().getValue();
@@ -359,11 +362,13 @@ public class HireBulkPersonnelDialog extends JDialog {
             }
 
             // set education based on age
-            if (age <= 16) {
+            if (age < 16) {
                 person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
             } else {
                 person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
             }
+
+            PersonalityController.generatePersonality(person);
 
             if (!campaign.recruitPerson(person, isGmHire)) {
                 number = 0;
