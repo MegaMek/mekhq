@@ -24,33 +24,33 @@ import java.util.ResourceBundle;
 
 public enum Social {
     //region Enum Declarations
-    NONE("Personality.NONE.text", "Personality.NONE.toolTipText"),
-    RECLUSIVE("Social.RECLUSIVE.text", "Social.RECLUSIVE.toolTipText"),
-    RESILIENT("Social.RESILIENT.text", "Social.RESILIENT.toolTipText"),
-    TEMPERATE("Social.TEMPERATE.text", "Social.TEMPERATE.toolTipText"),
-    WISE("Social.WISE.text", "Social.WISE.toolTipText"),
-    LOVING("Social.LOVING.text", "Social.LOVING.toolTipText"),
-    IMPARTIAL("Social.IMPARTIAL.text", "Social.IMPARTIAL.toolTipText"),
-    HONORABLE("Social.HONORABLE.text", "Social.HONORABLE.toolTipText");
+    NONE("Personality.NONE.text", "Personality.NONE.description"),
+    RECLUSIVE("Social.RECLUSIVE.text", "Social.RECLUSIVE.description"),
+    RESILIENT("Social.RESILIENT.text", "Social.RESILIENT.description"),
+    TEMPERATE("Social.TEMPERATE.text", "Social.TEMPERATE.description"),
+    WISE("Social.WISE.text", "Social.WISE.description"),
+    LOVING("Social.LOVING.text", "Social.LOVING.description"),
+    IMPARTIAL("Social.IMPARTIAL.text", "Social.IMPARTIAL.description"),
+    HONORABLE("Social.HONORABLE.text", "Social.HONORABLE.description");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
-    private final String toolTipText;
+    private final String description;
     //endregion Variable Declarations
 
     //region Constructors
-    Social(final String name, final String toolTipText) {
+    Social(final String name, final String description) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
+        this.description = resources.getString(description);
     }
     //endregion Constructors
 
     //region Getters
-    public String getToolTipText() {
-        return toolTipText;
+    public String getDescription() {
+        return description;
     }
     //endregion Getters
 

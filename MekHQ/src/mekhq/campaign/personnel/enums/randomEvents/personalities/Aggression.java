@@ -24,33 +24,33 @@ import java.util.ResourceBundle;
 
 public enum Aggression {
     //region Enum Declarations
-    NONE("Personality.NONE.text", "Personality.NONE.toolTipText"),
-    PEACEFUL("Aggression.PEACEFUL.text", "Aggression.PEACEFUL.toolTipText"),
-    PROFESSIONAL("Aggression.PROFESSIONAL.text", "Aggression.PROFESSIONAL.toolTipText"),
-    STUBBORN("Aggression.STUBBORN.text", "Aggression.STUBBORN.toolTipText"),
-    AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.toolTipText"),
-    BRUTAL("Aggression.BRUTAL.text", "Aggression.BRUTAL.toolTipText"),
-    BLOODTHIRSTY("Aggression.BLOODTHIRSTY.text", "Aggression.BLOODTHIRSTY.toolTipText"),
-    MURDEROUS("Aggression.MURDEROUS.text", "Aggression.MURDEROUS.toolTipText");
+    NONE("Personality.NONE.text", "Personality.NONE.description"),
+    PEACEFUL("Aggression.PEACEFUL.text", "Aggression.PEACEFUL.description"),
+    PROFESSIONAL("Aggression.PROFESSIONAL.text", "Aggression.PROFESSIONAL.description"),
+    STUBBORN("Aggression.STUBBORN.text", "Aggression.STUBBORN.description"),
+    AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.description"),
+    BRUTAL("Aggression.BRUTAL.text", "Aggression.BRUTAL.description"),
+    BLOODTHIRSTY("Aggression.BLOODTHIRSTY.text", "Aggression.BLOODTHIRSTY.description"),
+    MURDEROUS("Aggression.MURDEROUS.text", "Aggression.MURDEROUS.description");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
-    private final String toolTipText;
+    private final String description;
     //endregion Variable Declarations
 
     //region Constructors
-    Aggression(final String name, final String toolTipText) {
+    Aggression(final String name, final String description) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
+        this.description = resources.getString(description);
     }
     //endregion Constructors
 
     //region Getters
-    public String getToolTipText() {
-        return toolTipText;
+    public String getDescription() {
+        return description;
     }
     //endregion Getters
 

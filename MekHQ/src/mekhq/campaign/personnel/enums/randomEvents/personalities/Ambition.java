@@ -24,33 +24,33 @@ import java.util.ResourceBundle;
 
 public enum Ambition {
     //region Enum Declarations
-    NONE("Personality.NONE.text", "Personality.NONE.toolTipText"),
-    UNAMBITIOUS("Ambition.UNAMBITIOUS.text", "Ambition.UNAMBITIOUS.toolTipText"),
-    DRIVEN("Ambition.DRIVEN.text", "Ambition.DRIVEN.toolTipText"),
-    ASSERTIVE("Ambition.ASSERTIVE.text", "Ambition.ASSERTIVE.toolTipText"),
-    ARROGANT("Ambition.ARROGANT.text", "Ambition.ARROGANT.toolTipText"),
-    CONTROLLING("Ambition.CONTROLLING.text", "Ambition.CONTROLLING.toolTipText"),
-    RUTHLESS("Ambition.RUTHLESS.text", "Ambition.RUTHLESS.toolTipText"),
-    DECEITFUL("Ambition.DECEITFUL.text", "Ambition.DECEITFUL.toolTipText");
+    NONE("Personality.NONE.text", "Personality.NONE.description"),
+    UNAMBITIOUS("Ambition.UNAMBITIOUS.text", "Ambition.UNAMBITIOUS.description"),
+    DRIVEN("Ambition.DRIVEN.text", "Ambition.DRIVEN.description"),
+    ASSERTIVE("Ambition.ASSERTIVE.text", "Ambition.ASSERTIVE.description"),
+    ARROGANT("Ambition.ARROGANT.text", "Ambition.ARROGANT.description"),
+    CONTROLLING("Ambition.CONTROLLING.text", "Ambition.CONTROLLING.description"),
+    RUTHLESS("Ambition.RUTHLESS.text", "Ambition.RUTHLESS.description"),
+    DECEITFUL("Ambition.DECEITFUL.text", "Ambition.DECEITFUL.description");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
-    private final String toolTipText;
+    private final String description;
     //endregion Variable Declarations
 
     //region Constructors
-    Ambition(final String name, final String toolTipText) {
+    Ambition(final String name, final String description) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
+        this.description = resources.getString(description);
     }
     //endregion Constructors
 
     //region Getters
-    public String getToolTipText() {
-        return toolTipText;
+    public String getDescription() {
+        return description;
     }
     //endregion Getters
 

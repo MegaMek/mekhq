@@ -24,33 +24,33 @@ import java.util.ResourceBundle;
 
 public enum Greed {
     //region Enum Declarations
-    NONE("Personality.NONE.text", "Personality.NONE.toolTipText"),
-    GENEROUS("Greed.GENEROUS.text", "Greed.GENEROUS.toolTipText"),
-    FRUGAL("Greed.FRUGAL.text", "Greed.FRUGAL.toolTipText"),
-    GREEDY("Greed.GREEDY.text", "Greed.GREEDY.toolTipText"),
-    SELFISH("Greed.SELFISH.text", "Greed.SELFISH.toolTipText"),
-    INSATIABLE("Greed.INSATIABLE.text", "Greed.INSATIABLE.toolTipText"),
-    LUSTFUL("Greed.LUSTFUL.text", "Greed.LUSTFUL.toolTipText"),
-    THIEF("Greed.THIEF.text", "Greed.THIEF.toolTipText");
+    NONE("Personality.NONE.text", "Personality.NONE.description"),
+    GENEROUS("Greed.GENEROUS.text", "Greed.GENEROUS.description"),
+    FRUGAL("Greed.FRUGAL.text", "Greed.FRUGAL.description"),
+    GREEDY("Greed.GREEDY.text", "Greed.GREEDY.description"),
+    SELFISH("Greed.SELFISH.text", "Greed.SELFISH.description"),
+    INSATIABLE("Greed.INSATIABLE.text", "Greed.INSATIABLE.description"),
+    LUSTFUL("Greed.LUSTFUL.text", "Greed.LUSTFUL.description"),
+    THIEF("Greed.THIEF.text", "Greed.THIEF.description");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
-    private final String toolTipText;
+    private final String description;
     //endregion Variable Declarations
 
     //region Constructors
-    Greed(final String name, final String toolTipText) {
+    Greed(final String name, final String description) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
+        this.description = resources.getString(description);
     }
     //endregion Constructors
 
     //region Getters
-    public String getToolTipText() {
-        return toolTipText;
+    public String getDescription() {
+        return description;
     }
     //endregion Getters
 
