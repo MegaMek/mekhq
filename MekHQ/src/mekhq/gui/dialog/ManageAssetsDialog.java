@@ -163,14 +163,15 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void deleteAsset() {
-        campaign.getFinances().getAssets().remove(assetTable.getSelectedRow());
         MekHQ.triggerEvent(new AssetRemovedEvent(assetModel.getAssetAt(assetTable.getSelectedRow())));
+        campaign.getFinances().getAssets().remove(assetTable.getSelectedRow());
         refreshTable();
     }
 
     private void refreshTable() {
         int selectedRow = assetTable.getSelectedRow();
         assetModel.setData(campaign.getFinances().getAssets());
+
         if (selectedRow != -1) {
             if (assetTable.getRowCount() > 0) {
                 if (assetTable.getRowCount() == selectedRow) {
@@ -277,8 +278,8 @@ public class ManageAssetsDialog extends JDialog {
             }
         }
 
-        public AssetTableModel.Renderer getRenderer() {
-            return new AssetTableModel.Renderer();
+        public Renderer getRenderer() {
+            return new Renderer();
         }
 
         public class Renderer extends DefaultTableCellRenderer {
