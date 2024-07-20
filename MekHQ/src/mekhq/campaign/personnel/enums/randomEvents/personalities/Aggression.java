@@ -27,8 +27,8 @@ public enum Aggression {
     NONE("Personality.NONE.text", "Personality.NONE.toolTipText"),
     PEACEFUL("Aggression.PEACEFUL.text", "Aggression.PEACEFUL.toolTipText"),
     PROFESSIONAL("Aggression.PROFESSIONAL.text", "Aggression.PROFESSIONAL.toolTipText"),
-    AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.toolTipText"),
     STUBBORN("Aggression.STUBBORN.text", "Aggression.STUBBORN.toolTipText"),
+    AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.toolTipText"),
     BRUTAL("Aggression.BRUTAL.text", "Aggression.BRUTAL.toolTipText"),
     BLOODTHIRSTY("Aggression.BLOODTHIRSTY.text", "Aggression.BLOODTHIRSTY.toolTipText"),
     MURDEROUS("Aggression.MURDEROUS.text", "Aggression.MURDEROUS.toolTipText");
@@ -102,8 +102,8 @@ public enum Aggression {
             case "0", "none" -> NONE;
             case "1", "peaceful" -> PEACEFUL;
             case "2", "professional" -> PROFESSIONAL;
-            case "3", "aggressive" -> AGGRESSIVE;
-            case "4", "stubborn" -> STUBBORN;
+            case "3", "stubborn" -> STUBBORN;
+            case "4", "aggressive" -> AGGRESSIVE;
             case "5", "brutal" -> BRUTAL;
             case "6", "bloodthirsty" -> BLOODTHIRSTY;
             case "7", "murderous" -> MURDEROUS;
@@ -125,8 +125,8 @@ public enum Aggression {
             case 0 -> NONE;
             case 1 -> PEACEFUL;
             case 2 -> PROFESSIONAL;
-            case 3 -> AGGRESSIVE;
-            case 4 -> STUBBORN;
+            case 3 -> STUBBORN;
+            case 4 -> AGGRESSIVE;
             case 5 -> BRUTAL;
             case 6 -> BLOODTHIRSTY;
             case 7 -> MURDEROUS;
@@ -147,8 +147,8 @@ public enum Aggression {
             case NONE -> 0;
             case PEACEFUL -> 1;
             case PROFESSIONAL -> 2;
-            case AGGRESSIVE -> 3;
-            case STUBBORN -> 4;
+            case STUBBORN -> 3;
+            case AGGRESSIVE -> 4;
             case BRUTAL -> 5;
             case BLOODTHIRSTY -> 6;
             case MURDEROUS -> 7;
