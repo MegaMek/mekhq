@@ -48,6 +48,10 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.Greed;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.Social;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -208,6 +212,13 @@ public class Person {
     private int eduDaysOfTravel;
     //endregion Education
 
+    //region Personality
+    private Aggression aggression;
+    private Ambition ambition;
+    private Greed greed;
+    private Social social;
+    //endregion Personality
+
     //region Flags
     private boolean clanPersonnel;
     private boolean commander;
@@ -358,6 +369,10 @@ public class Person {
         eduAcademySet = null;
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
+        aggression = Aggression.NONE;
+        ambition = Ambition.NONE;
+        greed = Greed.NONE;
+        social = Social.NONE;
 
         //region Flags
         setClanPersonnel(originFaction.isClan());
@@ -1482,6 +1497,38 @@ public class Person {
         return eduAcademySet;
     }
 
+    public Aggression getAggression() {
+        return aggression;
+    }
+
+    public void setAggression(final Aggression aggression) {
+        this.aggression = aggression;
+    }
+
+    public Ambition getAmbition() {
+        return ambition;
+    }
+
+    public void setAmbition(final Ambition ambition) {
+        this.ambition = ambition;
+    }
+
+    public Greed getGreed() {
+        return greed;
+    }
+
+    public void setGreed(final Greed greed) {
+        this.greed = greed;
+    }
+
+    public Social getSocial() {
+        return social;
+    }
+
+    public void setSocial(final Social social) {
+        this.social = social;
+    }
+
     //region Flags
     public boolean isClanPersonnel() {
         return clanPersonnel;
@@ -1811,6 +1858,22 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEducationTime", eduEducationTime);
             }
 
+            if (aggression != Aggression.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aggression", aggression.toString());
+            }
+
+            if (ambition != Ambition.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ambition", ambition.toString());
+            }
+
+            if (greed != Greed.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "greed", greed.toString());
+            }
+
+            if (social != Social.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.toString());
+            }
+
             //region Flags
             // Always save whether they are clan personnel or not
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
@@ -2137,6 +2200,14 @@ public class Person {
                     retVal.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationTime")) {
                     retVal.eduEducationTime = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("aggression")) {
+                    retVal.aggression = Aggression.parseFromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("ambition")) {
+                    retVal.ambition = Ambition.parseFromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("greed")) {
+                    retVal.greed = Greed.parseFromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
+                    retVal.social = Social.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
                         || wn2.getNodeName().equalsIgnoreCase("clan")) { // Legacy - 0.49.9 removal
                     retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
