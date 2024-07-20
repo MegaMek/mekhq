@@ -217,6 +217,7 @@ public class Person {
     private Ambition ambition;
     private Greed greed;
     private Social social;
+    private String personalityDescription;
     //endregion Personality
 
     //region Flags
@@ -373,6 +374,7 @@ public class Person {
         ambition = Ambition.NONE;
         greed = Greed.NONE;
         social = Social.NONE;
+        personalityDescription = "";
 
         //region Flags
         setClanPersonnel(originFaction.isClan());
@@ -1529,6 +1531,14 @@ public class Person {
         this.social = social;
     }
 
+    public String getPersonalityDescription() {
+        return personalityDescription;
+    }
+
+    public void setPersonalityDescription(final String personalityDescription) {
+        this.personalityDescription = personalityDescription;
+    }
+
     //region Flags
     public boolean isClanPersonnel() {
         return clanPersonnel;
@@ -1874,6 +1884,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.toString());
             }
 
+            if (!StringUtility.isNullOrBlank(personalityDescription)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
+            }
+
             //region Flags
             // Always save whether they are clan personnel or not
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
@@ -2208,6 +2222,8 @@ public class Person {
                     retVal.greed = Greed.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
                     retVal.social = Social.parseFromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
+                    retVal.personalityDescription = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
                         || wn2.getNodeName().equalsIgnoreCase("clan")) { // Legacy - 0.49.9 removal
                     retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
