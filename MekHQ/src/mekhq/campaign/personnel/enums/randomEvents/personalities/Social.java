@@ -25,13 +25,42 @@ import java.util.ResourceBundle;
 public enum Social {
     //region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description"),
-    RECLUSIVE("Social.RECLUSIVE.text", "Social.RECLUSIVE.description"),
-    RESILIENT("Social.RESILIENT.text", "Social.RESILIENT.description"),
-    TEMPERATE("Social.TEMPERATE.text", "Social.TEMPERATE.description"),
-    WISE("Social.WISE.text", "Social.WISE.description"),
-    LOVING("Social.LOVING.text", "Social.LOVING.description"),
-    IMPARTIAL("Social.IMPARTIAL.text", "Social.IMPARTIAL.description"),
-    HONORABLE("Social.HONORABLE.text", "Social.HONORABLE.description");
+    // Major Trait
+    ALTRUISTIC("Social.ALTRUISTIC.text", "Social.ALTRUISTIC.description"),
+    APATHETIC("Social.APATHETIC.text", "Social.APATHETIC.description"),
+    AUTHENTIC("Social.AUTHENTIC.text", "Social.AUTHENTIC.description"),
+    BLUNT("Social.BLUNT.text", "Social.BLUNT.description"),
+    CALLOUS("Social.CALLOUS.text", "Social.CALLOUS.description"),
+    // Major Trait
+    COMPASSIONATE("Social.COMPASSIONATE.text", "Social.COMPASSIONATE.description"),
+    CONDESCENDING("Social.CONDESCENDING.text", "Social.CONDESCENDING.description"),
+    CONSIDERATE("Social.CONSIDERATE.text", "Social.CONSIDERATE.description"),
+    DISINGENUOUS("Social.DISINGENUOUS.text", "Social.DISINGENUOUS.description"),
+    DISMISSIVE("Social.DISMISSIVE.text", "Social.DISMISSIVE.description"),
+    ENCOURAGING("Social.ENCOURAGING.text", "Social.ENCOURAGING.description"),
+    ERRATIC("Social.ERRATIC.text", "Social.ERRATIC.description"),
+    EMPATHETIC("Social.EMPATHETIC.text", "Social.EMPATHETIC.description"),
+    FRIENDLY("Social.FRIENDLY.text", "Social.FRIENDLY.description"),
+    // Major Trait
+    GREGARIOUS("Social.GREGARIOUS.text", "Social.GREGARIOUS.description"),
+    INSPIRING("Social.INSPIRING.text", "Social.INSPIRING.description"),
+    INDIFFERENT("Social.INDIFFERENT.text", "Social.INDIFFERENT.description"),
+    INTROVERTED("Social.INTROVERTED.text", "Social.INTROVERTED.description"),
+    IRRITABLE("Social.IRRITABLE.text", "Social.IRRITABLE.description"),
+    // Major Trait
+    NARCISSISTIC("Social.NARCISSISTIC.text", "Social.NARCISSISTIC.description"),
+    NEGLECTFUL("Social.NEGLECTFUL.text", "Social.NEGLECTFUL.description"),
+    // Major Trait
+    POMPOUS("Social.POMPOUS.text", "Social.POMPOUS.description"),
+    PETTY("Social.PETTY.text", "Social.PETTY.description"),
+    PERSUASIVE("Social.PERSUASIVE.text", "Social.PERSUASIVE.description"),
+    RECEPTIVE("Social.RECEPTIVE.text", "Social.RECEPTIVE.description"),
+    // Major Trait
+    SCHEMING("Social.SCHEMING.text", "Social.SCHEMING.description"),
+    SINCERE("Social.SINCERE.text", "Social.SINCERE.description"),
+    SUPPORTIVE("Social.SUPPORTIVE.text", "Social.SUPPORTIVE.description"),
+    TACTFUL("Social.TACTFUL.text", "Social.TACTFUL.description"),
+    UNTRUSTWORTHY("Social.UNTRUSTWORTHY.text", "Social.UNTRUSTWORTHY.description");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -55,36 +84,159 @@ public enum Social {
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @SuppressWarnings(value = "unused")
     public boolean isNone() {
         return this == NONE;
     }
 
-    public boolean isReclusive() {
-        return this == RECLUSIVE;
+    @SuppressWarnings(value = "unused")
+    public boolean isAltruistic() {
+        return this == ALTRUISTIC;
     }
 
-    public boolean isResilient() {
-        return this == RESILIENT;
+    @SuppressWarnings(value = "unused")
+    public boolean isApathetic() {
+        return this == APATHETIC;
     }
 
-    public boolean isTemperate() {
-        return this == TEMPERATE;
+    @SuppressWarnings(value = "unused")
+    public boolean isAuthentic() {
+        return this == AUTHENTIC;
     }
 
-    public boolean isWise() {
-        return this == WISE;
+    @SuppressWarnings(value = "unused")
+    public boolean isBlunt() {
+        return this == BLUNT;
     }
 
-    public boolean isLoving() {
-        return this == LOVING;
+    @SuppressWarnings(value = "unused")
+    public boolean isCallous() {
+        return this == CALLOUS;
     }
 
-    public boolean isImpartial() {
-        return this == IMPARTIAL;
+    @SuppressWarnings(value = "unused")
+    public boolean isCompassionate() {
+        return this == COMPASSIONATE;
     }
 
-    public boolean isHonorable() {
-        return this == HONORABLE;
+    @SuppressWarnings(value = "unused")
+    public boolean isCondescending() {
+        return this == CONDESCENDING;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isConsiderate() {
+        return this == CONSIDERATE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isDisingenuous() {
+        return this == DISINGENUOUS;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isDismissive() {
+        return this == DISMISSIVE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isEncouraging() {
+        return this == ENCOURAGING;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isErratic() {
+        return this == ERRATIC;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isEmpathetic() {
+        return this == EMPATHETIC;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isFriendly() {
+        return this == FRIENDLY;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isGregarious() {
+        return this == GREGARIOUS;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isInspiring() {
+        return this == INSPIRING;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isIndifferent() {
+        return this == INDIFFERENT;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isIntroverted() {
+        return this == INTROVERTED;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isIrritable() {
+        return this == IRRITABLE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isNarcissistic() {
+        return this == NARCISSISTIC;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isNeglectful() {
+        return this == NEGLECTFUL;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isPompous() {
+        return this == POMPOUS;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isPetty() {
+        return this == PETTY;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isPersuasive() {
+        return this == PERSUASIVE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isReceptive() {
+        return this == RECEPTIVE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isScheming() {
+        return this == SCHEMING;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isSincere() {
+        return this == SINCERE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isSupportive() {
+        return this == SUPPORTIVE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isTactful() {
+        return this == TACTFUL;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isUntrustworthy() {
+        return this == UNTRUSTWORTHY;
     }
     //endregion Boolean Comparison Methods
 
@@ -97,16 +249,40 @@ public enum Social {
      * @return the Social enum that corresponds to the given string
      * @throws IllegalStateException if the given string does not match any valid Social
      */
+    @SuppressWarnings(value = "unused")
     public static Social parseFromString(final String social) {
         return switch (social.toLowerCase()) {
             case "0", "none" -> NONE;
-            case "1", "reclusive" -> RECLUSIVE;
-            case "2", "resilient" -> RESILIENT;
-            case "3", "temperate" -> TEMPERATE;
-            case "4", "wise" -> WISE;
-            case "5", "loving" -> LOVING;
-            case "6", "impartial" -> IMPARTIAL;
-            case "7", "honorable" -> HONORABLE;
+            case "1", "astute" -> ALTRUISTIC;
+            case "2", "adept" -> APATHETIC;
+            case "3", "avaricious" -> AUTHENTIC;
+            case "4", "corrupt" -> BLUNT;
+            case "5", "dynamic" -> CALLOUS;
+            case "6", "eager" -> COMPASSIONATE;
+            case "7", "enterprising" -> CONDESCENDING;
+            case "8", "exploitative" -> CONSIDERATE;
+            case "9", "fraudulent" -> DISINGENUOUS;
+            case "10", "generous" -> DISMISSIVE;
+            case "11", "greedy" -> ENCOURAGING;
+            case "12", "hoarding" -> ERRATIC;
+            case "13", "insatiable" -> EMPATHETIC;
+            case "14", "insightful" -> FRIENDLY;
+            case "15", "intuitive" -> GREGARIOUS;
+            case "16", "judicious" -> INSPIRING;
+            case "17", "lustful" -> INDIFFERENT;
+            case "18", "mercenary" -> INTROVERTED;
+            case "19", "meticulous" -> IRRITABLE;
+            case "20", "nefarious" -> NARCISSISTIC;
+            case "21", "overreaching" -> NEGLECTFUL;
+            case "22", "profitable" -> POMPOUS;
+            case "23", "savvy" -> PETTY;
+            case "24", "self-serving" -> PERSUASIVE;
+            case "25", "shameless" -> RECEPTIVE;
+            case "26", "shrewd" -> SCHEMING;
+            case "27", "tactical" -> SINCERE;
+            case "28", "thief" -> SUPPORTIVE;
+            case "29", "unprincipled" -> TACTFUL;
+            case "30", "voracious" -> UNTRUSTWORTHY;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromString: "
                             + social);
@@ -120,16 +296,40 @@ public enum Social {
      * @return the corresponding Social enum value
      * @throws IllegalStateException if the integer value does not correspond to any valid Social enum value
      */
+    @SuppressWarnings(value = "unused")
     public static Social parseFromInt(final int social) {
         return switch (social) {
             case 0 -> NONE;
-            case 1 -> RECLUSIVE;
-            case 2 -> RESILIENT;
-            case 3 -> TEMPERATE;
-            case 4 -> WISE;
-            case 5 -> LOVING;
-            case 6 -> IMPARTIAL;
-            case 7 -> HONORABLE;
+            case 1 -> ALTRUISTIC;
+            case 2 -> APATHETIC;
+            case 3 -> AUTHENTIC;
+            case 4 -> BLUNT;
+            case 5 -> CALLOUS;
+            case 6 -> COMPASSIONATE;
+            case 7 -> CONDESCENDING;
+            case 8 -> CONSIDERATE;
+            case 9 -> DISINGENUOUS;
+            case 10 -> DISMISSIVE;
+            case 11 -> ENCOURAGING;
+            case 12 -> ERRATIC;
+            case 13 -> EMPATHETIC;
+            case 14 -> FRIENDLY;
+            case 15 -> GREGARIOUS;
+            case 16 -> INSPIRING;
+            case 17 -> INDIFFERENT;
+            case 18 -> INTROVERTED;
+            case 19 -> IRRITABLE;
+            case 20 -> NARCISSISTIC;
+            case 21 -> NEGLECTFUL;
+            case 22 -> POMPOUS;
+            case 23 -> PETTY;
+            case 24 -> PERSUASIVE;
+            case 25 -> RECEPTIVE;
+            case 26 -> SCHEMING;
+            case 27 -> SINCERE;
+            case 28 -> SUPPORTIVE;
+            case 29 -> TACTFUL;
+            case 30 -> UNTRUSTWORTHY;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromInt: "
                             + social);
@@ -142,16 +342,40 @@ public enum Social {
      * @param social the Social enum value to be parsed
      * @return the integer value representing the parsed Social
      */
+    @SuppressWarnings(value = "unused")
     public static int parseToInt(final Social social) {
         return switch (social) {
             case NONE -> 0;
-            case RECLUSIVE -> 1;
-            case RESILIENT -> 2;
-            case TEMPERATE -> 3;
-            case WISE -> 4;
-            case LOVING -> 5;
-            case IMPARTIAL -> 6;
-            case HONORABLE -> 7;
+            case ALTRUISTIC -> 1;
+            case APATHETIC -> 2;
+            case AUTHENTIC -> 3;
+            case BLUNT -> 4;
+            case CALLOUS -> 5;
+            case COMPASSIONATE -> 6;
+            case CONDESCENDING -> 7;
+            case CONSIDERATE -> 8;
+            case DISINGENUOUS -> 9;
+            case DISMISSIVE -> 10;
+            case ENCOURAGING -> 11;
+            case ERRATIC -> 12;
+            case EMPATHETIC -> 13;
+            case FRIENDLY -> 14;
+            case GREGARIOUS -> 15;
+            case INSPIRING -> 16;
+            case INDIFFERENT -> 17;
+            case INTROVERTED -> 18;
+            case IRRITABLE -> 19;
+            case NARCISSISTIC -> 20;
+            case NEGLECTFUL -> 21;
+            case POMPOUS -> 22;
+            case PETTY -> 23;
+            case PERSUASIVE -> 24;
+            case RECEPTIVE -> 25;
+            case SCHEMING -> 26;
+            case SINCERE -> 27;
+            case SUPPORTIVE -> 28;
+            case TACTFUL -> 29;
+            case UNTRUSTWORTHY -> 30;
         };
     }
 
