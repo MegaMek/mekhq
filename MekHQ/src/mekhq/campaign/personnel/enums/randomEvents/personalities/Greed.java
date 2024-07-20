@@ -25,13 +25,42 @@ import java.util.ResourceBundle;
 public enum Greed {
     //region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description"),
+    ASTUTE("Greed.ASTUTE.text", "Greed.ASTUTE.description"),
+    ADEPT("Greed.ADEPT.text", "Greed.ADEPT.description"),
+    AVARICIOUS("Greed.AVARICIOUS.text", "Greed.AVARICIOUS.description"),
+    // Major Trait
+    CORRUPT("Greed.CORRUPT.text", "Greed.CORRUPT.description"),
+    DYNAMIC("Greed.DYNAMIC.text", "Greed.DYNAMIC.description"),
+    EAGER("Greed.EAGER.text", "Greed.EAGER.description"),
+    // Major Trait
+    ENTERPRISING("Greed.ENTERPRISING.text", "Greed.ENTERPRISING.description"),
+    EXPLOITATIVE("Greed.EXPLOITATIVE.text", "Greed.EXPLOITATIVE.description"),
+    FRAUDULENT("Greed.FRAUDULENT.text", "Greed.FRAUDULENT.description"),
     GENEROUS("Greed.GENEROUS.text", "Greed.GENEROUS.description"),
-    FRUGAL("Greed.FRUGAL.text", "Greed.FRUGAL.description"),
     GREEDY("Greed.GREEDY.text", "Greed.GREEDY.description"),
-    SELFISH("Greed.SELFISH.text", "Greed.SELFISH.description"),
+    HOARDING("Greed.HOARDING.text", "Greed.HOARDING.description"),
     INSATIABLE("Greed.INSATIABLE.text", "Greed.INSATIABLE.description"),
+    INSIGHTFUL("Greed.INSIGHTFUL.text", "Greed.INSIGHTFUL.description"),
+    // Major Trait
+    INTUITIVE("Greed.INTUITIVE.text", "Greed.INTUITIVE.description"),
+    JUDICIOUS("Greed.JUDICIOUS.text", "Greed.JUDICIOUS.description"),
     LUSTFUL("Greed.LUSTFUL.text", "Greed.LUSTFUL.description"),
-    THIEF("Greed.THIEF.text", "Greed.THIEF.description");
+    MERCENARY("Greed.MERCENARY.text", "Greed.MERCENARY.description"),
+    // Major Trait
+    METICULOUS("Greed.METICULOUS.text", "Greed.METICULOUS.description"),
+    // Major Trait
+    NEFARIOUS("Greed.NEFARIOUS.text", "Greed.NEFARIOUS.description"),
+    OVERREACHING("Greed.OVERREACHING.text", "Greed.OVERREACHING.description"),
+    PROFITABLE("Greed.PROFITABLE.text", "Greed.PROFITABLE.description"),
+    SAVVY("Greed.SAVVY.text", "Greed.SAVVY.description"),
+    SELF_SERVING("Greed.SELF_SERVING.text", "Greed.SELF_SERVING.description"),
+    SHAMELESS("Greed.SHAMELESS.text", "Greed.SHAMELESS.description"),
+    SHREWD("Greed.SHREWD.text", "Greed.SHREWD.description"),
+    TACTICAL("Greed.TACTICAL.text", "Greed.TACTICAL.description"),
+    // Major Trait
+    THIEF("Greed.THIEF.text", "Greed.THIEF.description"),
+    UNPRINCIPLED("Greed.UNPRINCIPLED.text", "Greed.UNPRINCIPLED.description"),
+    VORACIOUS("Greed.VORACIOUS.text", "Greed.VORACIOUS.description");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -55,36 +84,159 @@ public enum Greed {
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @SuppressWarnings(value = "unused")
     public boolean isNone() {
         return this == NONE;
     }
 
+    @SuppressWarnings(value = "unused")
+    public boolean isAstute() {
+        return this == ASTUTE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isAdept() {
+        return this == ADEPT;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isAvaricious() {
+        return this == AVARICIOUS;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isCorrupt() {
+        return this == CORRUPT;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isDynamic() {
+        return this == DYNAMIC;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isEager() {
+        return this == EAGER;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isEnterprising() {
+        return this == ENTERPRISING;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isExploitative() {
+        return this == EXPLOITATIVE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isFraudulent() {
+        return this == FRAUDULENT;
+    }
+
+    @SuppressWarnings(value = "unused")
     public boolean isGenerous() {
         return this == GENEROUS;
     }
 
-    public boolean isFrugal() {
-        return this == FRUGAL;
-    }
-
+    @SuppressWarnings(value = "unused")
     public boolean isGreedy() {
         return this == GREEDY;
     }
 
-    public boolean isSelfish() {
-        return this == SELFISH;
+    @SuppressWarnings(value = "unused")
+    public boolean isHoarding() {
+        return this == HOARDING;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isInsatiable() {
         return this == INSATIABLE;
     }
 
+    @SuppressWarnings(value = "unused")
+    public boolean isInsightful() {
+        return this == INSIGHTFUL;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isIntuitive() {
+        return this == INTUITIVE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isJudicious() {
+        return this == JUDICIOUS;
+    }
+
+    @SuppressWarnings(value = "unused")
     public boolean isLustful() {
         return this == LUSTFUL;
     }
 
+    @SuppressWarnings(value = "unused")
+    public boolean isMercenary() {
+        return this == MERCENARY;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isMeticulous() {
+        return this == METICULOUS;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isNefarious() {
+        return this == NEFARIOUS;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isOverreaching() {
+        return this == OVERREACHING;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isProfitable() {
+        return this == PROFITABLE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isSavvy() {
+        return this == SAVVY;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isSelfServing() {
+        return this == SELF_SERVING;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isShameless() {
+        return this == SHAMELESS;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isShrewd() {
+        return this == SHREWD;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isTactical() {
+        return this == TACTICAL;
+    }
+
+    @SuppressWarnings(value = "unused")
     public boolean isThief() {
         return this == THIEF;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isUnprincipled() {
+        return this == UNPRINCIPLED;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isVoracious() {
+        return this == VORACIOUS;
     }
     //endregion Boolean Comparison Methods
 
@@ -97,16 +249,40 @@ public enum Greed {
      * @return the Greed enum that corresponds to the given string
      * @throws IllegalStateException if the given string does not match any valid Greed
      */
+    @SuppressWarnings(value = "unused")
     public static Greed parseFromString(final String greed) {
         return switch (greed.toLowerCase()) {
             case "0", "none" -> NONE;
-            case "1", "generous" -> GENEROUS;
-            case "2", "frugal" -> FRUGAL;
-            case "3", "greedy" -> GREEDY;
-            case "4", "selfish" -> SELFISH;
-            case "5", "insatiable" -> INSATIABLE;
-            case "6", "lustful" -> LUSTFUL;
-            case "7", "thief" -> THIEF;
+            case "1", "astute" -> ASTUTE;
+            case "2", "adept" -> ADEPT;
+            case "3", "avaricious" -> AVARICIOUS;
+            case "4", "corrupt" -> CORRUPT;
+            case "5", "dynamic" -> DYNAMIC;
+            case "6", "eager" -> EAGER;
+            case "7", "enterprising" -> ENTERPRISING;
+            case "8", "exploitative" -> EXPLOITATIVE;
+            case "9", "fraudulent" -> FRAUDULENT;
+            case "10", "generous" -> GENEROUS;
+            case "11", "greedy" -> GREEDY;
+            case "12", "hoarding" -> HOARDING;
+            case "13", "insatiable" -> INSATIABLE;
+            case "14", "insightful" -> INSIGHTFUL;
+            case "15", "intuitive" -> INTUITIVE;
+            case "16", "judicious" -> JUDICIOUS;
+            case "17", "lustful" -> LUSTFUL;
+            case "18", "mercenary" -> MERCENARY;
+            case "19", "meticulous" -> METICULOUS;
+            case "20", "nefarious" -> NEFARIOUS;
+            case "21", "overreaching" -> OVERREACHING;
+            case "22", "profitable" -> PROFITABLE;
+            case "23", "savvy" -> SAVVY;
+            case "24", "self-serving" -> SELF_SERVING;
+            case "25", "shameless" -> SHAMELESS;
+            case "26", "shrewd" -> SHREWD;
+            case "27", "tactical" -> TACTICAL;
+            case "28", "thief" -> THIEF;
+            case "29", "unprincipled" -> UNPRINCIPLED;
+            case "30", "voracious" -> VORACIOUS;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Greed.java/parseFromString: "
                             + greed);
@@ -120,16 +296,40 @@ public enum Greed {
      * @return the corresponding Greed enum value
      * @throws IllegalStateException if the integer value does not correspond to any valid Greed enum value
      */
+    @SuppressWarnings(value = "unused")
     public static Greed parseFromInt(final int greed) {
         return switch (greed) {
             case 0 -> NONE;
-            case 1 -> GENEROUS;
-            case 2 -> FRUGAL;
-            case 3 -> GREEDY;
-            case 4 -> SELFISH;
-            case 5 -> INSATIABLE;
-            case 6 -> LUSTFUL;
-            case 7 -> THIEF;
+            case 1 -> ASTUTE;
+            case 2 -> ADEPT;
+            case 3 -> AVARICIOUS;
+            case 4 -> CORRUPT;
+            case 5 -> DYNAMIC;
+            case 6 -> EAGER;
+            case 7 -> ENTERPRISING;
+            case 8 -> EXPLOITATIVE;
+            case 9 -> FRAUDULENT;
+            case 10 -> GENEROUS;
+            case 11 -> GREEDY;
+            case 12 -> HOARDING;
+            case 13 -> INSATIABLE;
+            case 14 -> INSIGHTFUL;
+            case 15 -> INTUITIVE;
+            case 16 -> JUDICIOUS;
+            case 17 -> LUSTFUL;
+            case 18 -> MERCENARY;
+            case 19 -> METICULOUS;
+            case 20 -> NEFARIOUS;
+            case 21 -> OVERREACHING;
+            case 22 -> PROFITABLE;
+            case 23 -> SAVVY;
+            case 24 -> SELF_SERVING;
+            case 25 -> SHAMELESS;
+            case 26 -> SHREWD;
+            case 27 -> TACTICAL;
+            case 28 -> THIEF;
+            case 29 -> UNPRINCIPLED;
+            case 30 -> VORACIOUS;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Greed.java/parseFromInt: "
                             + greed);
@@ -142,16 +342,40 @@ public enum Greed {
      * @param greed the Greed enum value to be parsed
      * @return the integer value representing the parsed Greed
      */
+    @SuppressWarnings(value = "unused")
     public static int parseToInt(final Greed greed) {
         return switch (greed) {
             case NONE -> 0;
-            case GENEROUS -> 1;
-            case FRUGAL -> 2;
-            case GREEDY -> 3;
-            case SELFISH -> 4;
-            case INSATIABLE -> 5;
-            case LUSTFUL -> 6;
-            case THIEF -> 7;
+            case ASTUTE -> 1;
+            case ADEPT -> 2;
+            case AVARICIOUS -> 3;
+            case CORRUPT -> 4;
+            case DYNAMIC -> 5;
+            case EAGER -> 6;
+            case ENTERPRISING -> 7;
+            case EXPLOITATIVE -> 8;
+            case FRAUDULENT -> 9;
+            case GENEROUS -> 10;
+            case GREEDY -> 11;
+            case HOARDING -> 12;
+            case INSATIABLE -> 13;
+            case INSIGHTFUL -> 14;
+            case INTUITIVE -> 15;
+            case JUDICIOUS -> 16;
+            case LUSTFUL -> 17;
+            case MERCENARY -> 18;
+            case METICULOUS -> 19;
+            case NEFARIOUS -> 20;
+            case OVERREACHING -> 21;
+            case PROFITABLE -> 22;
+            case SAVVY -> 23;
+            case SELF_SERVING -> 24;
+            case SHAMELESS -> 25;
+            case SHREWD -> 26;
+            case TACTICAL -> 27;
+            case THIEF -> 28;
+            case UNPRINCIPLED -> 29;
+            case VORACIOUS -> 30;
         };
     }
 
