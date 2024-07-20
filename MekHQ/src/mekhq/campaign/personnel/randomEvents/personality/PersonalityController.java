@@ -21,21 +21,64 @@ public class PersonalityController {
         person.setSocial(Social.NONE);
 
         // next we roll to determine which tables we're rolling on
-        // then we roll to determine what we get on that table
+        // then we roll to determine what traits we get on those tables
         int firstTableRoll = Compute.randomInt(4);
         int firstTraitRoll = Compute.randomInt(13);
 
         int secondTableRoll = Compute.randomInt(4);
         int secondTraitRoll = Compute.randomInt(13);
 
+        // characters cannot have two personality traits from the same table,
+        // so we re-roll until we get different tables
+        while (firstTableRoll == secondTableRoll) {
+            secondTableRoll = Compute.randomInt(4);
+        }
+
         // characters cannot have two major personality traits, so we re-roll until we get a general trait
         while ((firstTraitRoll > 8) && (secondTraitRoll > 8)) {
             secondTraitRoll = Compute.randomInt(13);
         }
 
-        // finally set the new traits
+        // next set the new traits
         setPersonalityTraits(person, firstTableRoll, firstTraitRoll);
         setPersonalityTraits(person, secondTableRoll, secondTraitRoll);
+
+        // finally, write the biography
+        writeBiography(person, firstTableRoll, secondTableRoll);
+    }
+
+    /**
+     * Sets the biography of a person based on their personality traits.
+     *
+     * @param person         the person whose biography will be set
+     * @param firstTableRoll the first table roll used to determine the text for the biography's first part
+     * @param secondTableRoll the second table roll used to determine the text for the biography's second part
+     * @throws IllegalStateException if an unexpected value is rolled for firstTableRoll or secondTableRoll
+     */
+    private void writeBiography(Person person, int firstTableRoll, int secondTableRoll) {
+        StringBuilder biography = new StringBuilder();
+
+        switch (firstTableRoll) {
+            case 0 -> biography.append(String.format(person.getAggression().getDescription(), person.getFirstName()));
+            case 1 -> biography.append(String.format(person.getAmbition().getDescription(), person.getFirstName()));
+            case 2 -> biography.append(String.format(person.getGreed().getDescription(), person.getFirstName()));
+            case 3 -> biography.append(String.format(person.getSocial().getDescription(), person.getFirstName()));
+            default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/writeBiography/first instance: "
+                    + firstTableRoll);
+        }
+
+        biography.append(". ");
+
+        switch (secondTableRoll) {
+            case 0 -> biography.append(String.format(person.getAggression().getDescription(), person.getGender()));
+            case 1 -> biography.append(String.format(person.getAmbition().getDescription(), person.getGender()));
+            case 2 -> biography.append(String.format(person.getGreed().getDescription(), person.getGender()));
+            case 3 -> biography.append(String.format(person.getSocial().getDescription(), person.getGender()));
+            default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/writeBiography/second instance: "
+                    + firstTableRoll);
+        }
+
+        person.setBiography(biography.toString());
     }
 
     /**
