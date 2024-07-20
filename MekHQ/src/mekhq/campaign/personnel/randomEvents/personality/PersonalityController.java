@@ -8,6 +8,10 @@ import mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition;
 import mekhq.campaign.personnel.enums.randomEvents.personalities.Greed;
 import mekhq.campaign.personnel.enums.randomEvents.personalities.Social;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import static mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression.*;
 import static mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition.*;
 import static mekhq.campaign.personnel.enums.randomEvents.personalities.Greed.*;
@@ -44,53 +48,70 @@ public class PersonalityController {
         setPersonalityTraits(person, firstTableRoll, firstTraitRoll);
         setPersonalityTraits(person, secondTableRoll, secondTraitRoll);
 
-        // finally, write the biography
-        writeBiography(person, firstTableRoll, secondTableRoll);
+        // finally, write the description
+        writeDescription(person);
     }
 
     /**
-     * Sets the biography of a person based on their personality traits.
+     * Sets the personality description of a person based on their personality traits.
      *
-     * @param person         the person whose biography will be set
-     * @param firstTableRoll the first table roll used to determine the text for the biography's first part
-     * @param secondTableRoll the second table roll used to determine the text for the biography's second part
-     * @throws IllegalStateException if an unexpected value is rolled for firstTableRoll or secondTableRoll
+     * @param person         the person whose personality description will be set
      */
-    private static void writeBiography(Person person, int firstTableRoll, int secondTableRoll) {
-        StringBuilder biography = new StringBuilder();
+    public static void writeDescription(Person person) {
+        // first we gather the personality trait descriptions and place them in a list
+        List<String> traitDescriptions = getTraitDescriptions(person);
+
+        // we shuffle the order so the elements are not always printed in the same order
+        Collections.shuffle(traitDescriptions);
+
+        // next we build a string that contains all the descriptions
+        StringBuilder personalityDescription = new StringBuilder();
 
         String firstName = person.getFirstName();
         String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(person.getGender());
 
-        switch (firstTableRoll) {
-            case 0 -> biography.append(String.format(person.getAggression().getDescription(),
-                    firstName));
-            case 1 -> biography.append(String.format(person.getAmbition().getDescription(),
-                    firstName));
-            case 2 -> biography.append(String.format(person.getGreed().getDescription(),
-                    firstName));
-            case 3 -> biography.append(String.format(person.getSocial().getDescription(),
-                    firstName));
-            default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/writeBiography/first instance: "
-                    + firstTableRoll);
+        for (int index = 0; index < traitDescriptions.size(); index++) {
+            String forward = pronoun;
+
+            if (index == 0) {
+                forward = firstName;
+            } else {
+                personalityDescription.append(' ');
+            }
+
+            personalityDescription.append(String.format(traitDescriptions.get(index), forward));
         }
 
-        biography.append(' ');
+        // finally we set the description in place
+        person.setPersonalityDescription(personalityDescription.toString());
+    }
 
-        switch (secondTableRoll) {
-            case 0 -> biography.append(String.format(person.getAggression().getDescription(),
-                    pronoun));
-            case 1 -> biography.append(String.format(person.getAmbition().getDescription(),
-                    pronoun));
-            case 2 -> biography.append(String.format(person.getGreed().getDescription(),
-                    pronoun));
-            case 3 -> biography.append(String.format(person.getSocial().getDescription(),
-                    pronoun));
-            default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/writeBiography/second instance: "
-                    + firstTableRoll);
+    /**
+     * Returns a list of trait descriptions for a given person.
+     *
+     * @param person the person for whom to retrieve the trait descriptions
+     * @return a list of trait descriptions for the person
+     */
+    private static List<String> getTraitDescriptions(Person person) {
+        List<String> traitDescriptions = new ArrayList<>();
+
+        if (!person.getAggression().isNone()) {
+            traitDescriptions.add(person.getAggression().getDescription());
         }
 
-        person.setBiography(biography.toString());
+        if (!person.getAmbition().isNone()) {
+            traitDescriptions.add(person.getAmbition().getDescription());
+        }
+
+        if (!person.getGreed().isNone()) {
+            traitDescriptions.add(person.getGreed().getDescription());
+        }
+
+        if (!person.getSocial().isNone()) {
+            traitDescriptions.add(person.getSocial().getDescription());
+        }
+
+        return traitDescriptions;
     }
 
     /**
