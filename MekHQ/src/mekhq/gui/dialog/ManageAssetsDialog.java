@@ -209,18 +209,13 @@ public class ManageAssetsDialog extends JDialog {
 
         @Override
         public String getColumnName(int column) {
-            switch (column) {
-                case COL_NAME:
-                    return "Name";
-                case COL_VALUE:
-                    return "Value";
-                case COL_SCHEDULE:
-                    return "Pay Frequency";
-                case COL_INCOME:
-                    return "Income";
-                default:
-                    return "?";
-            }
+            return switch (column) {
+                case COL_NAME -> "Name";
+                case COL_VALUE -> "Value";
+                case COL_SCHEDULE -> "Pay Frequency";
+                case COL_INCOME -> "Income";
+                default -> "?";
+            };
         }
 
         @Override
@@ -256,26 +251,18 @@ public class ManageAssetsDialog extends JDialog {
         }
 
         public int getColumnWidth(int c) {
-            switch (c) {
-                default:
-                    return 10;
-            }
+            return 10;
         }
 
         public int getAlignment(int col) {
-            switch (col) {
-                case COL_NAME:
-                    return SwingConstants.LEFT;
-                default:
-                    return SwingConstants.RIGHT;
+            if (col == COL_NAME) {
+                return SwingConstants.LEFT;
             }
+            return SwingConstants.RIGHT;
         }
 
         public String getTooltip(int row, int col) {
-            switch (col) {
-                default:
-                    return null;
-            }
+            return null;
         }
 
         public Renderer getRenderer() {
