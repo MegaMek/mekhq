@@ -47,6 +47,7 @@ public enum Aggression {
     IMPULSIVE("Aggression.IMPULSIVE.text", "Aggression.IMPULSIVE.description"),
     INFLEXIBLE("Aggression.INFLEXIBLE.text", "Aggression.INFLEXIBLE.description"),
     INTREPID("Aggression.INTREPID.text", "Aggression.INTREPID.description"),
+    // Major Trait
     MURDEROUS("Aggression.MURDEROUS.text", "Aggression.MURDEROUS.description"),
     OVERBEARING("Aggression.OVERBEARING.text", "Aggression.OVERBEARING.description"),
     // Major Trait
