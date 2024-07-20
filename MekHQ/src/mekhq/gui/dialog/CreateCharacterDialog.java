@@ -60,7 +60,6 @@ import java.time.Period;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 /**
  * This dialog is used to create a character in story arcs from a pool of XP
@@ -865,9 +864,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         JPanel buttonPanel = new JPanel(new BorderLayout());
 
         doneButton = new JButton("Done");
-        doneButton.addActionListener(e -> {
-            done();
-        });
+        doneButton.addActionListener(e -> done());
         buttonPanel.add(doneButton, BorderLayout.LINE_END);
 
         return buttonPanel;
@@ -883,7 +880,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         int year = campaign.getGameYear();
         List<Faction> orderedFactions = Factions.getInstance().getFactions().stream()
                 .sorted((a, b) -> a.getFullName(year).compareToIgnoreCase(b.getFullName(year)))
-                .collect(Collectors.toList());
+                .toList();
 
         DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<>();
         for (Faction faction : orderedFactions) {
@@ -917,7 +914,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
                 .sorted(Comparator.comparing(a -> a.getName(campaign.getLocalDate())))
-                .collect(Collectors.toList());
+                .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
@@ -930,7 +927,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
                 .filter(a -> a.getFactionSet(person.getBirthday()).contains(faction))
                 .sorted(Comparator.comparing(a -> a.getName(person.getBirthday())))
-                .collect(Collectors.toList());
+                .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
@@ -1075,13 +1072,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             }
         }
         IOption option;
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            option = comp.getOption();
-            if ((comp.getValue().equals("None"))) {
+        for (final DialogOptionComponent newVar : optionComps) {
+            option = newVar.getOption();
+            if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
-                person.getOptions().getOption(option.getName()).setValue(comp.getValue());
+                person.getOptions().getOption(option.getName()).setValue(newVar.getValue());
             }
         }
     }
@@ -1197,14 +1193,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private void setOptions() {
         IOption option;
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            option = comp.getOption();
-            if ((comp.getValue().equals("None"))) {
+        for (final DialogOptionComponent newVar : optionComps) {
+            option = newVar.getOption();
+            if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
                 person.getOptions().getOption(option.getName())
-                        .setValue(comp.getValue());
+                        .setValue(newVar.getValue());
             }
         }
     }
@@ -1223,10 +1218,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
 
         //now figure out SPA costs
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            if (!comp.isDefaultValue()) {
-                SpecialAbility spa = SpecialAbility.getOption(comp.getOption().getName());
+        for (final DialogOptionComponent newVar : optionComps) {
+            if (!newVar.isDefaultValue()) {
+                SpecialAbility spa = SpecialAbility.getOption(newVar.getOption().getName());
                 totalCost = totalCost + spa.getCost();
             }
         }
