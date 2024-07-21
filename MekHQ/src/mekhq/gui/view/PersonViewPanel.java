@@ -202,9 +202,7 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
             txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getPersonalityDescription()));
-            txtDesc.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")),
-                    BorderFactory.createEmptyBorder(0, 2, 2, 2)));
+            txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
