@@ -48,10 +48,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Greed;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Social;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -217,6 +214,7 @@ public class Person {
     private Ambition ambition;
     private Greed greed;
     private Social social;
+    private PersonalityQuirk personalityQuirk;
     private String personalityDescription;
     //endregion Personality
 
@@ -374,6 +372,7 @@ public class Person {
         ambition = Ambition.NONE;
         greed = Greed.NONE;
         social = Social.NONE;
+        personalityQuirk = PersonalityQuirk.NONE;
         personalityDescription = "";
 
         //region Flags
@@ -1531,6 +1530,14 @@ public class Person {
         this.social = social;
     }
 
+    public PersonalityQuirk getPersonalityQuirk() {
+        return personalityQuirk;
+    }
+
+    public void setPersonalityQuirk(final PersonalityQuirk personalityQuirk) {
+        this.personalityQuirk = personalityQuirk;
+    }
+
     public String getPersonalityDescription() {
         return personalityDescription;
     }
@@ -1884,6 +1891,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "social", social.toString());
             }
 
+            if (personalityQuirk != PersonalityQuirk.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.toString());
+            }
+
             if (!StringUtility.isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
             }
@@ -2222,6 +2233,8 @@ public class Person {
                     retVal.greed = Greed.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("social")) {
                     retVal.social = Social.parseFromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
+                    retVal.personalityQuirk = PersonalityQuirk.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
                     retVal.personalityDescription = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
