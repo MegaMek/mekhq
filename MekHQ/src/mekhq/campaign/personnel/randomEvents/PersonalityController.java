@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.randomEvents.personality;
+package mekhq.campaign.personnel.randomEvents;
 
 import megamek.common.Compute;
 import mekhq.campaign.personnel.Person;
@@ -120,7 +120,8 @@ public class PersonalityController {
         Collections.shuffle(traitDescriptions);
 
         // next we build a string that contains all the descriptions
-        StringBuilder personalityDescription = new StringBuilder();
+        // these CSS tags are needed to avoid overspilling on the AtB Personnel Market
+        StringBuilder personalityDescription = new StringBuilder("<html><span style='display: inline-block; width: 200px;'>");
 
         String firstName = person.getFirstName();
         String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(person.getGender());
@@ -142,6 +143,9 @@ public class PersonalityController {
             personalityDescription.append(' ');
             personalityDescription.append(String.format(person.getPersonalityQuirk().getDescription(), firstName));
         }
+
+        // close off the CSS tags
+        personalityDescription.append("</span></html>");
 
         // finally we set the description in place
         person.setPersonalityDescription(personalityDescription.toString());

@@ -35,7 +35,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.personnel.randomEvents.personality.PersonalityController;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;

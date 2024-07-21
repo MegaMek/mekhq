@@ -39,7 +39,7 @@ import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
-import mekhq.campaign.personnel.randomEvents.personality.PersonalityController;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
