@@ -38,10 +38,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Greed;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Social;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
 import mekhq.campaign.personnel.randomEvents.personality.PersonalityController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -123,6 +120,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private MMComboBox<Ambition> comboAmbition;
     private MMComboBox<Greed> comboGreed;
     private MMComboBox<Social> comboSocial;
+    private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
 
     private Campaign campaign;
 
@@ -925,6 +923,26 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             panDemog.add(comboSocial, gridBagConstraints);
+
+            JLabel labelPersonalityQuirk = new JLabel();
+            labelPersonalityQuirk.setText("Quirk:");
+            labelPersonalityQuirk.setName("labelPersonalityQuirk");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelPersonalityQuirk, gridBagConstraints);
+
+            comboPersonalityQuirk = new MMComboBox<>("comboPersonalityQuirk", PersonalityQuirk.values());
+            comboPersonalityQuirk.setSelectedItem(person.getPersonalityQuirk());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboPersonalityQuirk, gridBagConstraints);
         }
 
         y++;
@@ -1183,6 +1201,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setAmbition(comboAmbition.getSelectedItem());
             person.setGreed(comboGreed.getSelectedItem());
             person.setSocial(comboSocial.getSelectedItem());
+            person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             PersonalityController.writeDescription(person);
         }
 
