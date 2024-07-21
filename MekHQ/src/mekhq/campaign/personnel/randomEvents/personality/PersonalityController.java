@@ -32,6 +32,8 @@ public class PersonalityController {
         int secondTableRoll = Compute.randomInt(4);
         int secondTraitRoll = Compute.randomInt(25);
 
+        int majorTraitRoll = Compute.d6(1);
+
         // characters cannot have two personality traits from the same table,
         // so we re-roll until we get different tables
         while (firstTableRoll == secondTableRoll) {
@@ -45,13 +47,13 @@ public class PersonalityController {
 
         // next set the new traits
         if (firstTraitRoll == 24) {
-            setMajorPersonalityTrait(person, firstTraitRoll, secondTraitRoll);
+            setMajorPersonalityTrait(person, firstTableRoll, majorTraitRoll);
         } else {
             setPersonalityTrait(person, firstTableRoll, firstTraitRoll);
         }
 
         if (secondTraitRoll == 24) {
-            setMajorPersonalityTrait(person, secondTableRoll, secondTraitRoll);
+            setMajorPersonalityTrait(person, secondTableRoll, majorTraitRoll);
         } else {
             setPersonalityTrait(person, secondTableRoll, secondTraitRoll);
         }
