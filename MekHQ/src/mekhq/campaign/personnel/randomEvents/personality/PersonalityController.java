@@ -3,14 +3,12 @@ package mekhq.campaign.personnel.randomEvents.personality;
 import megamek.common.Compute;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Greed;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Social;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import static mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression.*;
 import static mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition.*;
@@ -24,6 +22,7 @@ public class PersonalityController {
         person.setAmbition(Ambition.NONE);
         person.setGreed(Greed.NONE);
         person.setSocial(Social.NONE);
+        person.setPersonalityQuirk(PersonalityQuirk.NONE);
 
         // next we roll to determine which tables we're rolling on
         // then we roll to determine what traits we get on those tables
@@ -55,6 +54,13 @@ public class PersonalityController {
             setMajorPersonalityTrait(person, secondTableRoll, secondTraitRoll);
         } else {
             setPersonalityTrait(person, secondTableRoll, secondTraitRoll);
+        }
+
+
+        // we only want 1in20 persons to have a quirk,
+        // as these helps reduce repetitiveness and keeps them unique
+        if (Compute.randomInt(20) == 0) {
+            person.setPersonalityQuirk(generatePersonalityQuirk());
         }
 
         // finally, write the description
@@ -127,6 +133,12 @@ public class PersonalityController {
             }
 
             personalityDescription.append(String.format(traitDescriptions.get(index), forward));
+        }
+
+        // if the individual has a personality quirk, we add that last
+        if (person.getPersonalityQuirk() != PersonalityQuirk.NONE) {
+            personalityDescription.append(' ');
+            personalityDescription.append(String.format(person.getPersonalityQuirk().getDescription(), firstName));
         }
 
         // finally we set the description in place
@@ -396,6 +408,23 @@ public class PersonalityController {
             default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/generateSocialMajorTrait: "
                     + roll);
         };
+    }
+
+    /**
+     * @return a random personality quirk for a person.
+     */
+    private static PersonalityQuirk generatePersonalityQuirk() {
+        Random random = new Random();
+        PersonalityQuirk[] values = PersonalityQuirk.values();
+
+        PersonalityQuirk randomQuirk = PersonalityQuirk.NONE;
+
+        // we want to keep re-rolling until we hit a quirk that isn't 'NONE'
+        while (randomQuirk == PersonalityQuirk.NONE) {
+            randomQuirk = values[random.nextInt(values.length)];
+        }
+
+        return randomQuirk;
     }
 
 }
