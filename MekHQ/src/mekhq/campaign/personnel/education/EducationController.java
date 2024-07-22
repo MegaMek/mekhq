@@ -21,6 +21,7 @@ package mekhq.campaign.personnel.education;
 import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
@@ -61,10 +62,10 @@ public class EducationController {
             return;
         }
 
+        // pay tuition
         double tuition = academy.getTuitionAdjusted(person) * academy.getFactionDiscountAdjusted(campaign, person);
 
         if (tuition > 0) {
-            // check there is enough money in the campaign & if so, make a debit
             if (campaign.getFinances().getBalance().isLessThan(Money.of(tuition))) {
                 campaign.addReport(String.format(resources.getString("insufficientFunds.text"),
                         person.getHyperlinkedFullTitle()));
@@ -78,15 +79,15 @@ public class EducationController {
             }
         }
 
-        // with the checks done, and tuition paid, we can enroll Person
-        person.setEduCourseIndex(courseIndex);
-
+        // with tuition paid, we can enroll/re-enroll Person
         if (isReEnrollment) {
             reEnrollPerson(campaign, person, academy);
         } else {
+            person.setEduCourseIndex(courseIndex);
             enrollPerson(campaign, person, academy, campus, faction, courseIndex);
         }
 
+        // notify the user
         if (academy.isHomeSchool()) {
             campaign.addReport(String.format(resources.getString("homeSchool.text"),
                     person.getFullName()));
@@ -174,7 +175,7 @@ public class EducationController {
         person.setEduEducationTime(academy.getDurationDays());
 
         if (!academy.isHomeSchool()) {
-            if (academy.isLocal()) {
+            if ((academy.isLocal()) || (!person.getEduEducationStage().isJourneyFromCampus())) {
                 person.setEduJourneyTime(2);
                 person.setEduAcademySystem(campaign.getCurrentSystem().getId());
             } else {
@@ -188,6 +189,7 @@ public class EducationController {
         // we have this all the way at the bottom as a bit of insurance.
         // when troubleshooting, if the log isn't getting entered, we know something went wrong when enrolling.
         ServiceLogger.eduReEnrolled(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
     /**
