@@ -837,14 +837,14 @@ public class Utilities {
      * @return the age of the character calculated based on the provided expLevel and clan.
      */
     public static int getAgeByExpLevel(int expLevel, boolean clan) {
-        int baseAge = 16;
+        int baseAge = 18;
 
         int nDice = switch (expLevel) {
             case SkillType.EXP_NONE -> 7;
             case SkillType.EXP_GREEN -> 1;
             case SkillType.EXP_REGULAR -> 2;
-            case SkillType.EXP_VETERAN -> 3;
-            case SkillType.EXP_ELITE -> 4;
+            case SkillType.EXP_VETERAN -> 4;
+            case SkillType.EXP_ELITE -> 8;
             default -> 0;
         };
 
@@ -866,8 +866,6 @@ public class Utilities {
 
         if (expLevel == SkillType.EXP_NONE) {
             age -= baseAge; // only use the result of the dice roll
-        } else if (expLevel == SkillType.EXP_ULTRA_GREEN) {
-            age = baseAge + (Compute.d6(1) / 2) - 1; // we still want a little variety here
         }
 
         return age;
