@@ -89,6 +89,7 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -2460,6 +2461,13 @@ public class CampaignGUI extends JPanel {
         if (new InsufficientMedicsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
+        }
+
+        if (getCampaign().getLocalDate().equals(getCampaign().getLocalDate().with(TemporalAdjusters.lastDayOfMonth()))) {
+            if (new UnableToAffordExpensesNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
+                return;
+            }
         }
 
         if (getCampaign().getCampaignOptions().isUseAtB()) {
