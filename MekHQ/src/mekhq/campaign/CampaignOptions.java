@@ -231,7 +231,6 @@ public class CampaignOptions {
 
     // Dependent
     private boolean useRandomDependentAddition;
-    private boolean useAssignRecruitRank;
     private boolean useRandomDependentRemoval;
 
     // Salary
@@ -737,7 +736,6 @@ public class CampaignOptions {
 
         // Dependent
         setUseRandomDependentAddition(false);
-        setUseAssignRecruitRank(false);
         setUseRandomDependentRemoval(false);
 
         // Salary
@@ -2155,15 +2153,7 @@ public class CampaignOptions {
     }
     //endregion anniversaries
 
-    //region Dependent
-    public boolean isUseAssignRecruitRank() {
-        return useAssignRecruitRank;
-    }
-
-    public void setUseAssignRecruitRank(final boolean useAssignRecruitRank) {
-        this.useAssignRecruitRank = useAssignRecruitRank;
-    }
-
+    //region Dependents
     public boolean isUseRandomDependentAddition() {
         return useRandomDependentAddition;
     }
@@ -4554,7 +4544,6 @@ public class CampaignOptions {
 
         //region Dependent
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentAddition", isUseRandomDependentAddition());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAssignRecruitRank", isUseAssignRecruitRank());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentRemoval", isUseRandomDependentRemoval());
         //endregion Dependent
 
@@ -5236,8 +5225,6 @@ public class CampaignOptions {
                     //region Dependent
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDependentAddition")) {
                     retVal.setUseRandomDependentAddition(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAssignRecruitRank")) {
-                    retVal.setUseAssignRecruitRank(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDependentRemoval")) {
                     retVal.setUseRandomDependentRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Dependent

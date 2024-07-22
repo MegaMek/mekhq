@@ -245,7 +245,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // Dependent
     private JCheckBox chkUseRandomDependentAddition;
-    private JCheckBox chkUseAssignRecruitRank;
     private JCheckBox chkUseRandomDependentRemoval;
 
     // Salary
@@ -5082,10 +5081,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomDependentAddition.setToolTipText(resources.getString("chkUseRandomDependentAddition.toolTipText"));
         chkUseRandomDependentAddition.setName("chkUseRandomDependentAddition");
 
-        chkUseAssignRecruitRank = new JCheckBox(resources.getString("chkUseAssignRecruitRank.text"));
-        chkUseAssignRecruitRank.setToolTipText(resources.getString("chkUseAssignRecruitRank.toolTipText"));
-        chkUseAssignRecruitRank.setName("chkUseAssignRecruitRank");
-
         chkUseRandomDependentRemoval = new JCheckBox(resources.getString("chkUseRandomDependentRemoval.text"));
         chkUseRandomDependentRemoval.setToolTipText(resources.getString("chkUseRandomDependentRemoval.toolTipText"));
         chkUseRandomDependentRemoval.setName("chkUseRandomDependentRemoval");
@@ -5104,14 +5099,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseRandomDependentAddition)
-                        .addComponent(chkUseAssignRecruitRank)
                         .addComponent(chkUseRandomDependentRemoval)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseRandomDependentAddition)
-                        .addComponent(chkUseAssignRecruitRank)
                         .addComponent(chkUseRandomDependentRemoval)
         );
 
@@ -7933,7 +7926,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Dependent
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
-        chkUseAssignRecruitRank.setSelected(options.isUseAssignRecruitRank());
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
 
         // Salary
@@ -8644,7 +8636,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Dependent
             options.setUseRandomDependentAddition(chkUseRandomDependentAddition.isSelected());
-            options.setUseAssignRecruitRank(chkUseAssignRecruitRank.isSelected());
             options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 
             // Salary
