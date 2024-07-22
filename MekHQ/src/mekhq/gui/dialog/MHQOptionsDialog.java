@@ -159,6 +159,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionUnresolvedStratConContactsNag;
     private JCheckBox optionOutstandingScenariosNag;
     private JCheckBox optionInvalidFactionNag;
+    private JCheckBox optionUnableToAffordJumpNag;
     //endregion Nag Tab
 
     //region Miscellaneous
@@ -915,6 +916,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionInvalidFactionNag.setToolTipText(resources.getString("optionInvalidFactionNag.toolTipText"));
         optionInvalidFactionNag.setName("optionInvalidFactionNag");
 
+        optionUnableToAffordJumpNag = new JCheckBox(resources.getString("optionUnableToAffordJumpNag.text"));
+        optionUnableToAffordJumpNag.setToolTipText(resources.getString("optionUnableToAffordJumpNag.toolTipText"));
+        optionUnableToAffordJumpNag.setName("optionUnableToAffordJumpNag");
+
         // Layout the UI
         final JPanel panel = new JPanel();
         panel.setName("nagPanel");
@@ -938,6 +943,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionUnresolvedStratConContactsNag)
                         .addComponent(optionOutstandingScenariosNag)
                         .addComponent(optionInvalidFactionNag)
+                        .addComponent(optionUnableToAffordJumpNag)
         );
 
         layout.setHorizontalGroup(
@@ -955,6 +961,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionUnresolvedStratConContactsNag)
                         .addComponent(optionOutstandingScenariosNag)
                         .addComponent(optionInvalidFactionNag)
+                        .addComponent(optionUnableToAffordJumpNag)
         );
 
         return panel;
@@ -1215,6 +1222,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INVALID_FACTION, optionInvalidFactionNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP, optionUnableToAffordJumpNag.isSelected());
 
         PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
         PreferenceManager.getInstance().save();
@@ -1330,6 +1338,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
         optionInvalidFactionNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INVALID_FACTION));
+        optionUnableToAffordJumpNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP));
 
         txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
