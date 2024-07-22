@@ -27,8 +27,10 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.GunEmplacement;
+import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
@@ -511,12 +513,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 if (status.wasPickedUp()) {
                     wasCaptured = true;
                 } else {
-                    for (int n = 0; n < status.getHits() + 1; n++) {
-                        if (Utilities.dice(1, 6) == 6) {
-                            wasCaptured = true;
-                            break;
-                        }
-                    }
+                    wasCaptured = rollForCapture(tracker.getCampaign(), status);
                 }
                 prisonerCapturedCheck.setSelected(wasCaptured);
             }
@@ -1050,6 +1047,28 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pack();
     }
 
+    /**
+     * Rolls the dice to determine if the opposition personnel is captured.
+     *
+     * @param status The opposition personnel status object.
+     * @return True if the opposition personnel was captured, false otherwise.
+     */
+    private static boolean rollForCapture(Campaign campaign, OppositionPersonnelStatus status) {
+        int target = 6;
+
+        if (campaign.getGameOptions().booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE)) {
+            target = 5;
+        }
+
+        for (int n = 0; n < status.getHits() + 1; n++) {
+            if (Utilities.dice(1, 6) == target) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void generateObjectiveStatusPanel() {
         pnlObjectiveStatus = new JPanel();
         if (usePanel(OBJECTIVEPANEL)) {
@@ -1403,27 +1422,18 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     private boolean usePanel(String panelName) {
-        switch (panelName) {
-            case UNITSPANEL:
-                return !tracker.getUnitsStatus().keySet().isEmpty();
-            case OBJECTIVEPANEL:
-                return tracker.getScenario().hasObjectives();
-            case PILOTPANEL:
-                return !tracker.getPeopleStatus().keySet().isEmpty();
-            case PRISONERPANEL:
-                return !tracker.getOppositionPersonnel().keySet().isEmpty();
-            case SALVAGEPANEL:
-                return !tracker.getPotentialSalvage().isEmpty()
-                        && (!(tracker.getMission() instanceof Contract) || ((Contract) tracker.getMission()).canSalvage());
-            case KILLPANEL:
-                return !tracker.getKillCredits().isEmpty();
-            case REWARDPANEL:
-                return !loots.isEmpty();
-            case PREVIEWPANEL:
-                return true;
-            default:
-                return false;
-        }
+        return switch (panelName) {
+            case UNITSPANEL -> !tracker.getUnitsStatus().keySet().isEmpty();
+            case OBJECTIVEPANEL -> tracker.getScenario().hasObjectives();
+            case PILOTPANEL -> !tracker.getPeopleStatus().keySet().isEmpty();
+            case PRISONERPANEL -> !tracker.getOppositionPersonnel().keySet().isEmpty();
+            case SALVAGEPANEL ->
+                    !tracker.getPotentialSalvage().isEmpty() && (!(tracker.getMission() instanceof Contract) || ((Contract) tracker.getMission()).canSalvage());
+            case KILLPANEL -> !tracker.getKillCredits().isEmpty();
+            case REWARDPANEL -> !loots.isEmpty();
+            case PREVIEWPANEL -> true;
+            default -> false;
+        };
     }
 
     /**
