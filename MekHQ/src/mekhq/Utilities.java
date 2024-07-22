@@ -19,27 +19,6 @@
  */
 package mekhq;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.function.Consumer;
-
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
 import io.sentry.Sentry;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
@@ -62,6 +41,22 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 public class Utilities {
     private Utilities() {
@@ -834,27 +829,30 @@ public class Utilities {
         return Compute.randomInt(100) <= prob;
     }
 
+    /**
+     * Calculates the age of a character based on their experience level and clan status.
+     *
+     * @param expLevel the experience level of the character represented by an integer value.
+     * @param clan     a boolean value indicating whether the character is a clan character.
+     * @return the age of the character calculated based on the provided expLevel and clan.
+     */
     public static int getAgeByExpLevel(int expLevel, boolean clan) {
-        int baseAge = 19;
-        int nDice = 1;
-        switch (expLevel) {
-            case SkillType.EXP_REGULAR:
-                nDice = 2;
-                break;
-            case SkillType.EXP_VETERAN:
-                nDice = 3;
-                break;
-            case SkillType.EXP_ELITE:
-                nDice = 4;
-                break;
-            default:
-                break;
-        }
+        int baseAge = 16;
+
+        int nDice = switch (expLevel) {
+            case SkillType.EXP_NONE -> 7;
+            case SkillType.EXP_GREEN -> 1;
+            case SkillType.EXP_REGULAR -> 2;
+            case SkillType.EXP_VETERAN -> 3;
+            case SkillType.EXP_ELITE -> 4;
+            default -> 0;
+        };
 
         int age = baseAge;
-        while (nDice > 0) {
-            int roll = Compute.d6();
-            // reroll all sixes once
+
+        for (int i = 0; i < nDice; i++) {
+            int roll = Compute.d6(1);
+
             if (roll == 6) {
                 roll += (Compute.d6() - 1);
             }
@@ -862,9 +860,16 @@ public class Utilities {
             if (clan) {
                 roll = (int) Math.ceil(roll / 2.0);
             }
+
             age += roll;
-            nDice--;
         }
+
+        if (expLevel == SkillType.EXP_NONE) {
+            age -= baseAge; // only use the result of the dice roll
+        } else if (expLevel == SkillType.EXP_ULTRA_GREEN) {
+            age = baseAge + (Compute.d6(1) / 2) - 1; // we still want a little variety here
+        }
+
         return age;
     }
 
@@ -1059,21 +1064,21 @@ public class Utilities {
     public static Map<String, Integer> sortMapByValue(Map<String, Integer> unsortMap, boolean highFirst) {
 
         // Convert Map to List
-        List<Map.Entry<String, Integer>> list = new LinkedList<>(unsortMap.entrySet());
+        List<Entry<String, Integer>> list = new LinkedList<>(unsortMap.entrySet());
 
         // Sort list with comparator, to compare the Map values
-        list.sort(Map.Entry.comparingByValue());
+        list.sort(Entry.comparingByValue());
 
         // Convert sorted map back to a Map
         Map<String, Integer> sortedMap = new LinkedHashMap<>();
         if (highFirst) {
-            ListIterator<Map.Entry<String, Integer>> li = list.listIterator(list.size());
+            ListIterator<Entry<String, Integer>> li = list.listIterator(list.size());
             while (li.hasPrevious()) {
-                Map.Entry<String, Integer> entry = li.previous();
+                Entry<String, Integer> entry = li.previous();
                 sortedMap.put(entry.getKey(), entry.getValue());
             }
         } else {
-            for (Map.Entry<String, Integer> entry : list) {
+            for (Entry<String, Integer> entry : list) {
                 sortedMap.put(entry.getKey(), entry.getValue());
             }
         }
@@ -1350,7 +1355,7 @@ public class Utilities {
 
         // I need to change the new entity to the one from the mtf file now, so that
         // equipment numbers will match
-        MechSummary summary = cacheInstance.getMech(newE.getFullChassis() + " " + newE.getModel());
+        MechSummary summary = cacheInstance.getMech(newE.getFullChassis() + ' ' + newE.getModel());
 
         if (null == summary) {
             // Attempt to deal with new naming convention directly
@@ -1392,7 +1397,7 @@ public class Utilities {
      * @return A character string
      */
     public static String getDeploymentString(Player player) {
-        StringBuilder result = new StringBuilder("");
+        StringBuilder result = new StringBuilder();
 
         if (player.getStartingPos() >= 0
                 && player.getStartingPos() <= IStartingPositions.START_LOCATION_NAMES.length) {
@@ -1405,7 +1410,7 @@ public class Utilities {
             int SEx = player.getStartingAnySEx() + 1;
             int SEy = player.getStartingAnySEy() + 1;
             if ((NWx + NWy + SEx + SEy) > 0) {
-                result.append(" (" + NWx + ", " + NWy + ")-(" + SEx + ", " + SEy + ")");
+                result.append(" (" + NWx + ", " + NWy + ")-(" + SEx + ", " + SEy + ')');
             }
         }
         int so = player.getStartOffset();
