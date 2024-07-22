@@ -197,6 +197,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseTactics;
     private JCheckBox chkUseInitiativeBonus;
     private JCheckBox chkUseToughness;
+    private JCheckBox chkUseRandomToughness;
     private JCheckBox chkUseArtillery;
     private JCheckBox chkUseAbilities;
     private JCheckBox chkUseEdge;
@@ -3445,6 +3446,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseToughness.setToolTipText(resources.getString("chkUseToughness.toolTipText"));
         chkUseToughness.setName("chkUseToughness");
 
+        chkUseRandomToughness = new JCheckBox(resources.getString("chkUseRandomToughness.text"));
+        chkUseRandomToughness.setToolTipText(resources.getString("chkUseRandomToughness.toolTipText"));
+        chkUseRandomToughness.setName("chkUseRandomToughness");
+
         chkUseArtillery = new JCheckBox(resources.getString("chkUseArtillery.text"));
         chkUseArtillery.setToolTipText(resources.getString("chkUseArtillery.toolTipText"));
         chkUseArtillery.setName("chkUseArtillery");
@@ -3485,6 +3490,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseTactics)
                         .addComponent(chkUseInitiativeBonus)
                         .addComponent(chkUseToughness)
+                        .addComponent(chkUseRandomToughness)
                         .addComponent(chkUseArtillery)
                         .addComponent(chkUseAbilities)
                         .addComponent(chkUseEdge)
@@ -3498,6 +3504,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseTactics)
                         .addComponent(chkUseInitiativeBonus)
                         .addComponent(chkUseToughness)
+                        .addComponent(chkUseRandomToughness)
                         .addComponent(chkUseArtillery)
                         .addComponent(chkUseAbilities)
                         .addComponent(chkUseEdge)
@@ -7951,6 +7958,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseTactics.setSelected(options.isUseTactics());
         chkUseInitiativeBonus.setSelected(options.isUseInitiativeBonus());
         chkUseToughness.setSelected(options.isUseToughness());
+        chkUseRandomToughness.setSelected(options.isUseRandomToughness());
         chkUseArtillery.setSelected(options.isUseArtillery());
         chkUseAbilities.setSelected(options.isUseAbilities());
         if (chkUseEdge.isSelected() != options.isUseEdge()) {
@@ -8642,6 +8650,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseInitiativeBonus(chkUseInitiativeBonus.isSelected());
             campaign.getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).setValue(chkUseInitiativeBonus.isSelected());
             options.setUseToughness(chkUseToughness.isSelected());
+            options.setUseRandomToughness(chkUseRandomToughness.isSelected());
             campaign.getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).setValue(chkUseToughness.isSelected());
             options.setUseArtillery(chkUseArtillery.isSelected());
             campaign.getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).setValue(chkUseArtillery.isSelected());

@@ -184,6 +184,7 @@ public class CampaignOptions {
     private boolean useTactics;
     private boolean useInitiativeBonus;
     private boolean useToughness;
+    private boolean useRandomToughness;
     private boolean useArtillery;
     private boolean useAbilities;
     private boolean useEdge;
@@ -691,6 +692,7 @@ public class CampaignOptions {
         setUseTactics(false);
         setUseInitiativeBonus(false);
         setUseToughness(false);
+        setUseRandomToughness(false);
         setUseArtillery(false);
         setUseAbilities(false);
         setUseEdge(false);
@@ -1402,6 +1404,14 @@ public class CampaignOptions {
 
     public void setUseToughness(final boolean useToughness) {
         this.useToughness = useToughness;
+    }
+
+    public boolean isUseRandomToughness() {
+        return useRandomToughness;
+    }
+
+    public void setUseRandomToughness(final boolean useRandomToughness) {
+        this.useRandomToughness = useRandomToughness;
     }
 
     public boolean isUseArtillery() {
@@ -4512,6 +4522,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTactics", isUseTactics());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInitiativeBonus", isUseInitiativeBonus());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useToughness", isUseToughness());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomToughness", isUseRandomToughness());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useArtillery", isUseArtillery());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAbilities", isUseAbilities());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", isUseEdge());
@@ -5149,6 +5160,8 @@ public class CampaignOptions {
                     retVal.setUseInitiativeBonus(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
                     retVal.setUseToughness(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomToughness")) {
+                    retVal.setUseRandomToughness(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
                     retVal.setUseArtillery(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAbilities")) {
