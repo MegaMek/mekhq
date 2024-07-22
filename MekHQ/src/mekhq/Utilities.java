@@ -907,28 +907,15 @@ public class Utilities {
     }
 
     public static int getSimpleTechLevel(int level) {
-        switch (level) {
-            case TechConstants.T_IS_TW_NON_BOX:
-            case TechConstants.T_CLAN_TW:
-            case TechConstants.T_IS_TW_ALL:
-            case TechConstants.T_TW_ALL:
-                return CampaignOptions.TECH_STANDARD;
-            case TechConstants.T_IS_ADVANCED:
-            case TechConstants.T_CLAN_ADVANCED:
-                return CampaignOptions.TECH_ADVANCED;
-            case TechConstants.T_IS_EXPERIMENTAL:
-            case TechConstants.T_CLAN_EXPERIMENTAL:
-                return CampaignOptions.TECH_EXPERIMENTAL;
-            case TechConstants.T_IS_UNOFFICIAL:
-            case TechConstants.T_CLAN_UNOFFICIAL:
-                return CampaignOptions.TECH_UNOFFICIAL;
-            case TechConstants.T_TECH_UNKNOWN:
-                return CampaignOptions.TECH_UNKNOWN;
-            case TechConstants.T_ALLOWED_ALL:
-            case TechConstants.T_INTRO_BOXSET:
-            default:
-                return CampaignOptions.TECH_INTRO;
-        }
+        return switch (level) {
+            case TechConstants.T_IS_TW_NON_BOX, TechConstants.T_CLAN_TW, TechConstants.T_IS_TW_ALL, TechConstants.T_TW_ALL ->
+                    CampaignOptions.TECH_STANDARD;
+            case TechConstants.T_IS_ADVANCED, TechConstants.T_CLAN_ADVANCED -> CampaignOptions.TECH_ADVANCED;
+            case TechConstants.T_IS_EXPERIMENTAL, TechConstants.T_CLAN_EXPERIMENTAL -> CampaignOptions.TECH_EXPERIMENTAL;
+            case TechConstants.T_IS_UNOFFICIAL, TechConstants.T_CLAN_UNOFFICIAL -> CampaignOptions.TECH_UNOFFICIAL;
+            case TechConstants.T_TECH_UNKNOWN -> CampaignOptions.TECH_UNKNOWN;
+            default -> CampaignOptions.TECH_INTRO;
+        };
     }
 
     /**
@@ -1410,14 +1397,14 @@ public class Utilities {
             int SEx = player.getStartingAnySEx() + 1;
             int SEy = player.getStartingAnySEy() + 1;
             if ((NWx + NWy + SEx + SEy) > 0) {
-                result.append(" (" + NWx + ", " + NWy + ")-(" + SEx + ", " + SEy + ')');
+                result.append(" (").append(NWx).append(", ").append(NWy).append(")-(").append(SEx).append(", ").append(SEy).append(')');
             }
         }
         int so = player.getStartOffset();
         int sw = player.getStartWidth();
         if ((so != 0) || (sw != 3)) {
-            result.append(", " + so);
-            result.append(", " + sw);
+            result.append(", ").append(so);
+            result.append(", ").append(sw);
         }
 
         return result.toString();
