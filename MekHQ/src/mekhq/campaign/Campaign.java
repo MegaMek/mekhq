@@ -3643,17 +3643,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Returns the lower value between two random integers generated between 0 and 99 (inclusive).
-     *
-     * @return the lower random integer value
-     */
-    private int getLowerRandomInt() {
-        int roll = Compute.randomInt(100);
-        int secondRoll = Compute.randomInt(100);
-        return Math.min(roll, secondRoll);
-    }
-
-    /**
      * This method processes the random dependents for a campaign. It shuffles the active dependents list and performs
      * actions based on the campaign options and unit rating modifiers.
      *
@@ -3676,12 +3665,10 @@ public class Campaign implements ITechManager {
         int dependentCapacity = (int) (getActivePersonnel().size() * 0.2);
         int dependentCount = dependents.size();
 
+        // roll for random removal
         if (getCampaignOptions().isUseRandomDependentRemoval()) {
             for (Person dependent : dependents) {
-                // personnel meeting these requirements are not eligible for random removal
-                if (dependent.getGenealogy().hasNonAdultChildren(getLocalDate())
-                        || dependent.getGenealogy().hasSpouse()
-                        || dependent.isChild(getLocalDate())) {
+                if (!isRemovalEligible(dependent)) {
                     continue;
                 }
 
@@ -3697,27 +3684,49 @@ public class Campaign implements ITechManager {
             }
         }
 
+        // then roll for random addition
         if ((getCampaignOptions().isUseRandomDependentAddition()) && (dependentCount < dependentCapacity)) {
             int availableCapacity = dependentCapacity - dependentCount;
-            int runningCount = dependentCount;
+            int rollCount = (int) Math.max(1, availableCapacity * 0.2);
 
-            if (availableCapacity > 0) {
-                for (int i = 0; i < (dependentCapacity - dependentCount); i++) {
-                    int lowerRoll = (runningCount <= (dependentCapacity / 2)) ? getLowerRandomInt() : Compute.randomInt(100);
+            for (int i = 0; i < rollCount; i++) {
+                int lowerRoll = (dependentCount <= (dependentCapacity / 2)) ? getLowerRandomInt() : Compute.randomInt(100);
 
-                    if (lowerRoll <= (getUnitRatingMod() * 2)) {
-                        final Person dependent = newDependent(false);
+                if (lowerRoll <= (getUnitRatingMod() * 2)) {
+                    final Person dependent = newDependent(false);
 
-                        recruitPerson(dependent, PrisonerStatus.FREE, true, false);
+                    recruitPerson(dependent, PrisonerStatus.FREE, true, false);
 
-                        addReport(String.format(resources.getString("dependentJoinsForce.text"),
-                                dependent.getFullTitle()));
+                    addReport(String.format(resources.getString("dependentJoinsForce.text"),
+                            dependent.getFullTitle()));
 
-                        runningCount++;
-                    }
+                    dependentCount++;
                 }
             }
         }
+    }
+
+    /**
+     * Returns the lower value between two random integers generated between 0 and 99 (inclusive).
+     *
+     * @return the lower random integer value
+     */
+    private int getLowerRandomInt() {
+        int roll = Compute.randomInt(100);
+        int secondRoll = Compute.randomInt(100);
+        return Math.min(roll, secondRoll);
+    }
+
+    /**
+     * Checks if a dependent is eligible for removal.
+     *
+     * @param dependent the person to check
+     * @return {@code true} if the person is eligible for removal, {@code false} otherwise
+     */
+    private boolean isRemovalEligible(Person dependent) {
+        return !(dependent.getGenealogy().hasNonAdultChildren(getLocalDate())
+                || dependent.getGenealogy().hasSpouse()
+                || dependent.isChild(getLocalDate()));
     }
 
     /**
