@@ -26,7 +26,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.AmmoType.Munitions;
 import megamek.common.annotations.Nullable;
@@ -1328,16 +1327,16 @@ public class Campaign implements ITechManager {
     public Person newDependent(boolean baby) {
         Person person;
 
-        if (!baby && getCampaignOptions().getRandomOriginOptions().isRandomizeDependentOrigin()) {
-            person = newPerson(PersonnelRole.DEPENDENT);
-        } else {
+        if ((!baby) && (getCampaignOptions().getRandomOriginOptions().isRandomizeDependentOrigin())) {
             person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE,
                     new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions()),
                     new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions()),
                     Gender.RANDOMIZE);
+        } else {
+            person = newPerson(PersonnelRole.DEPENDENT);
         }
 
-        if (person.getAge(getLocalDate()) <= 16) {
+        if (person.getAge(getLocalDate()) < 16) {
             person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
         } else {
             person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
@@ -1716,6 +1715,17 @@ public class Campaign implements ITechManager {
     public List<Person> getActivePersonnel() {
         return getPersonnel().stream()
                 .filter(p -> p.getStatus().isActive())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Provides a filtered list of personnel including only active Dependents.
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getActiveDependents() {
+        return getPersonnel().stream()
+                .filter(person -> person.getPrimaryRole().isDependent())
+                .filter(person -> person.getStatus().isActive())
                 .collect(Collectors.toList());
     }
 
@@ -3307,45 +3317,6 @@ public class Campaign implements ITechManager {
                     .forEach(this::awardTrainingXP);
         }
 
-        // Add or remove dependents - only if one of the two options makes this possible is enabled
-        if ((getLocalDate().getDayOfYear() == 1)
-                && getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
-                && (getCampaignOptions().isUseRandomDependentRemoval() || getCampaignOptions().isUseRandomDependentAddition())) {
-            int numPersonnel = 0;
-            List<Person> dependents = new ArrayList<>();
-            for (Person p : getActivePersonnel()) {
-                numPersonnel++;
-                if (p.getPrimaryRole().isDependent() && p.getGenealogy().isEmpty()) {
-                    dependents.add(p);
-                }
-            }
-
-            final int roll = MathUtility.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
-
-            int change = numPersonnel * (roll - 5) / 100;
-            if (change < 0) {
-                if (getCampaignOptions().isUseRandomDependentRemoval()) {
-                    while ((change < 0) && !dependents.isEmpty()) {
-                        final Person person = ObjectUtility.getRandomItem(dependents);
-                        addReport(String.format(resources.getString("dependentLeavesForce.text"),
-                                person.getFullTitle()));
-                        removePerson(person, false);
-                        dependents.remove(person);
-                        change++;
-                    }
-                }
-            } else {
-                if (getCampaignOptions().isUseRandomDependentAddition()) {
-                    for (int i = 0; i < change; i++) {
-                        final Person person = newDependent(false);
-                        recruitPerson(person, PrisonerStatus.FREE, true, false);
-                        addReport(String.format(resources.getString("dependentJoinsForce.text"),
-                                person.getFullTitle()));
-                    }
-                }
-            }
-        }
-
         if (getLocalDate().getDayOfMonth() == 1) {
             /*
              * First of the month; roll Morale.
@@ -3652,6 +3623,10 @@ public class Campaign implements ITechManager {
             autoAwardsController.ManualController(this, false);
         }
 
+        if (getLocalDate().getDayOfMonth() == 1) {
+            processRandomDependents();
+        }
+
         resetAstechMinutes();
 
         processNewDayUnits();
@@ -3665,6 +3640,69 @@ public class Campaign implements ITechManager {
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * Returns the lower value between two random integers generated between 0 and 99 (inclusive).
+     *
+     * @return the lower random integer value
+     */
+    private int getLowerRandomInt() {
+        int roll = Compute.randomInt(100);
+        int secondRoll = Compute.randomInt(100);
+        return Math.min(roll, secondRoll);
+    }
+
+    /**
+     * This method processes the random dependents for a campaign. It shuffles the active dependents list and performs
+     * actions based on the campaign options and unit rating modifiers.
+     *
+     * First, it determines the dependent capacity based on 20% of the active personnel count. Then, it calculates
+     * the number of dependents currently in the list.
+     *
+     * If the campaign options allow random dependent removal, it iterates over each dependent and determines if they
+     * should leave the force based on a lower roll value. If the roll value is less than or equal to 4 minus the unit
+     * rating modifier, the dependent is removed from the force.
+     *
+     * If the campaign options allow random dependent addition and the number of dependents is less than the dependent
+     * capacity, it iterates a number of times equal to the difference between the dependent capacity and the number of
+     * dependents. It determines if a lower roll value is less than or equal to the unit rating modifier multiplied by 2.
+     * If true, it recruits a new dependent and adds a report indicating the dependent has joined the force.
+     */
+    private void processRandomDependents() {
+        List<Person> dependents = getActiveDependents();
+        Collections.shuffle(dependents);
+
+        int dependantCapacity = (int) (getActivePersonnel().size() * 0.2);
+        int dependantCount = dependents.size();
+
+        if (getCampaignOptions().isUseRandomDependentRemoval()) {
+            for (Person dependent : dependents) {
+                int lowerRoll = (dependents.size() > dependantCapacity) ? getLowerRandomInt() : Compute.randomInt(100);
+
+                if (lowerRoll <= 4 - getUnitRatingMod()) {
+                    addReport(String.format(resources.getString("dependentLeavesForce.text"),
+                            dependent.getFullTitle()));
+
+                    removePerson(dependent, false);
+                    dependantCount--;
+                }
+            }
+        }
+
+        if (getCampaignOptions().isUseRandomDependentAddition() && dependantCount < dependantCapacity) {
+            for (int i = 0; i < (dependantCapacity - dependantCount); i++) {
+                int lowerRoll = (dependantCount <= (dependantCapacity / 2)) ? getLowerRandomInt() : Compute.randomInt(100);
+
+                if (lowerRoll <= (getUnitRatingMod() * 2)) {
+                    final Person dependent = newDependent(false);
+                    recruitPerson(dependent, PrisonerStatus.FREE, true, false);
+
+                    addReport(String.format(resources.getString("dependentJoinsForce.text"),
+                            dependent.getFullTitle()));
+                }
+            }
+        }
     }
 
     /**
