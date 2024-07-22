@@ -3623,7 +3623,7 @@ public class Campaign implements ITechManager {
             autoAwardsController.ManualController(this, false);
         }
 
-        if (getLocalDate().getDayOfMonth() == 1) {
+        if ((getLocalDate().getDayOfMonth() == 1)) {
             processRandomDependents();
         }
 
@@ -3671,7 +3671,7 @@ public class Campaign implements ITechManager {
                 .filter(person -> !person.isChild(currentDate))
                 .toList();
 
-        int dependentCapacity = (int) (activeNonDependents.size() * 0.2);
+        int dependentCapacity = (int) Math.max(1, (activeNonDependents.size() * 0.05));
         int dependentCount = dependents.size();
 
         // roll for random removal
@@ -3707,7 +3707,7 @@ public class Campaign implements ITechManager {
                     recruitPerson(dependent, PrisonerStatus.FREE, true, false);
 
                     addReport(String.format(resources.getString("dependentJoinsForce.text"),
-                            dependent.getFullTitle()));
+                            dependent.getHyperlinkedFullTitle()));
 
                     dependentCount++;
                 }
