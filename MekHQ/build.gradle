@@ -36,19 +36,6 @@ sourceSets {
 }
 
 ext {
-    mmJvmOptions = [
-        '-Xmx2048m',
-        '--add-opens',
-        'java.base/java.util=ALL-UNNAMED',
-        '--add-opens',
-        'java.base/java.util.concurrent=ALL-UNNAMED',
-        '-Dsun.awt.disablegrab=true'
-    ]
-    mmlJvmOptions = ['-Xmx2048m']
-    l4jJvmOptions = [
-        '-Xmx4096m',
-        '-Dsun.awt.disablegrab=true'
-    ]
     mhqJvmOptions = [
         '-Xmx4096m',
         '--add-opens',
@@ -145,7 +132,7 @@ task generateDynamicFiles() {
         new File("${projectDir}/docs/mhq-revision.txt").text = versionDetails().gitHashFull
         new File("${projectDir}/MekHQ.l4j.ini").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
-${project.ext.l4jJvmOptions.join('\n')}
+${project.ext.mhqJvmOptions.join('\n')}
 """
     }
 }
@@ -336,7 +323,7 @@ launch4j {
     copyright = '2024 MegaMek Development Team.'
     trademarks = 'MechWarrior, BattleMech, `Mech and Aerotech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
     companyName = "MegaMek Development Team"
-    jvmOptions = project.ext.l4jJvmOptions
+    jvmOptions = project.ext.mhqJvmOptions
     jreMinVersion = '17'
     dontWrapJar = true
     messagesJreVersionError = 'We require a Java Runtime of version 17 or higher installed. https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
