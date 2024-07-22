@@ -780,12 +780,11 @@ public enum PersonnelTableModelColumn {
                 default -> false;
             };
             case DATES -> switch (this) {
-                case RANK, FIRST_NAME, LAST_NAME, BIRTHDAY, DEATH_DATE -> true;
+                case RANK, FIRST_NAME, LAST_NAME, BIRTHDAY, DEATH_DATE, RETIREMENT_DATE -> true;
                 case RECRUITMENT_DATE -> campaign.getCampaignOptions().isUseTimeInService();
                 case LAST_RANK_CHANGE_DATE -> campaign.getCampaignOptions().isUseTimeInRank();
                 case DUE_DATE ->
                         campaign.getCampaignOptions().isUseManualProcreation() || !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
-                case RETIREMENT_DATE -> campaign.getCampaignOptions().isUseRetirementDateTracking();
                 default -> false;
             };
             case FLAGS -> switch (this) {

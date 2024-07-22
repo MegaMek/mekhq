@@ -259,7 +259,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     //region Turnover and Retention Tab
     // Header Options
-    private JCheckBox chkUseRetirementDateTracking;
     private JCheckBox chkUseRandomRetirement;
 
     // Settings
@@ -4215,10 +4214,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createTurnoverAndRetentionHeaderPanel() {
-        chkUseRetirementDateTracking = new JCheckBox(resources.getString("chkUseRetirementDateTracking.text"));
-        chkUseRetirementDateTracking.setToolTipText(resources.getString("chkUseRetirementDateTracking.toolTipText"));
-        chkUseRetirementDateTracking.setName("chkUseRetirementDateTracking");
-
         chkUseRandomRetirement = new JCheckBox(resources.getString("chkUseRandomRetirement.text"));
         chkUseRandomRetirement.setToolTipText(resources.getString("chkUseRandomRetirement.toolTipText"));
         chkUseRandomRetirement.setName("chkUseRandomRetirement");
@@ -4290,13 +4285,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chkUseRetirementDateTracking)
                         .addComponent(chkUseRandomRetirement)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(chkUseRetirementDateTracking)
                         .addComponent(chkUseRandomRetirement)
         );
 
@@ -8035,7 +8028,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         //region Turnover and Retention Tab
         // Header
-        chkUseRetirementDateTracking.setSelected(options.isUseRetirementDateTracking());
         chkUseRandomRetirement.setSelected(options.isUseRandomRetirement());
 
         // Settings
@@ -8726,7 +8718,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             //region Turnover and Retention
             // Header
-            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
             options.setUseRandomRetirement(chkUseRandomRetirement.isSelected());
 
             // Settings
@@ -9125,7 +9116,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
                 } catch (Exception ex) {
-                    LogManager.getLogger().error("unreadable value in skill cost table for " + SkillType.skillList[i]);
+                    LogManager.getLogger().error("unreadable value in skill cost table for {}", SkillType.skillList[i]);
                 }
             }
         }

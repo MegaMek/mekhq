@@ -268,7 +268,6 @@ public class CampaignOptions {
     private RandomOriginOptions randomOriginOptions;
 
     // Retirement
-    private boolean useRetirementDateTracking;
     private boolean useRandomRetirement;
 
     private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
@@ -945,7 +944,6 @@ public class CampaignOptions {
 
         //region Turnover and Retention
         // Retirement
-        setUseRetirementDateTracking(false);
         setUseRandomRetirement(false);
         setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.FIXED);
         setTurnoverDifficulty(SkillLevel.REGULAR);
@@ -1810,20 +1808,6 @@ public class CampaignOptions {
     //endregion Personnel Randomization
 
     //region Retirement
-    /**
-     * @return whether to track retirement dates
-     */
-    public boolean isUseRetirementDateTracking() {
-        return useRetirementDateTracking;
-    }
-
-    /**
-     * @param useRetirementDateTracking the new value for whether to track retirement dates
-     */
-    public void setUseRetirementDateTracking(final boolean useRetirementDateTracking) {
-        this.useRetirementDateTracking = useRetirementDateTracking;
-    }
-
     public boolean isUseRandomRetirement() {
         return useRandomRetirement;
     }
@@ -4599,7 +4583,6 @@ public class CampaignOptions {
         //endregion Personnel Randomization
 
         //region Retirement
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", isUseRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverTargetNumberMethod", getTurnoverTargetNumberMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverDifficulty", getTurnoverDifficulty().name());
@@ -5571,8 +5554,6 @@ public class CampaignOptions {
 
                     //region Finances Tab
                 //region Turnover and Retention
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
-                    retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverTargetNumberMethod")) {

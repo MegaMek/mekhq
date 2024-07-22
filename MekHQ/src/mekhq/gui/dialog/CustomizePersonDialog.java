@@ -355,8 +355,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                                                           final boolean isSelected,
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Faction) {
-                    Faction faction = (Faction) value;
+                if (value instanceof Faction faction) {
                     setText(String.format("%s [%s]",
                             faction.getFullName(campaign.getGameYear()),
                             faction.getShortName()));
@@ -412,8 +411,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-                if (value instanceof PlanetarySystem) {
-                    PlanetarySystem system = (PlanetarySystem) value;
+                if (value instanceof PlanetarySystem system) {
                     setText(system.getName(campaign.getLocalDate()));
                 }
 
@@ -472,8 +470,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-                if (value instanceof Planet) {
-                    Planet planet = (Planet) value;
+                if (value instanceof Planet planet) {
                     setText(planet.getName(campaign.getLocalDate()));
                 }
 
@@ -607,7 +604,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        if (campaign.getCampaignOptions().isUseRetirementDateTracking() && (retirement != null)) {
+        if (retirement != null) {
             JLabel lblRetirement = new JLabel(resourceMap.getString("lblRetirement.text"));
             lblRetirement.setName("lblRetirement");
             gridBagConstraints = new GridBagConstraints();

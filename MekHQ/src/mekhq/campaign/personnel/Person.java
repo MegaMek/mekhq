@@ -959,24 +959,22 @@ public class Person {
             case RETIRED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.retired(this, today);
-                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
-                    setRetirement(today);
-                }
+
+                setRetirement(today);
+
                 break;
             case RESIGNED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.resigned(this, today);
-                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
-                    setRetirement(today);
-                }
+
+                setRetirement(today);
+
                 break;
             case DESERTED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.deserted(this, today);
 
-                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
-                    setRetirement(today);
-                }
+                setRetirement(today);
 
                 refreshLoyalty(campaign);
 
@@ -984,9 +982,8 @@ public class Person {
             case DEFECTED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.defected(this, today);
-                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
-                    setRetirement(today);
-                }
+
+                setRetirement(today);
 
                 refreshLoyalty(campaign);
 

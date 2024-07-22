@@ -1428,7 +1428,6 @@ public class CampaignGUI extends JPanel {
         final RandomDivorceMethod randomDivorceMethod = oldOptions.getRandomDivorceMethod();
         final RandomMarriageMethod randomMarriageMethod = oldOptions.getRandomMarriageMethod();
         final RandomProcreationMethod randomProcreationMethod = oldOptions.getRandomProcreationMethod();
-        final boolean retirementDateTracking = oldOptions.isUseRetirementDateTracking();
         final CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), getCampaign(), false);
         cod.setVisible(true);
 
@@ -1532,16 +1531,6 @@ public class CampaignGUI extends JPanel {
         if (!newOptions.isUseManualProcreation() && newOptions.getRandomProcreationMethod().isNone()) {
             getCampaign().getPersonnel().parallelStream().filter(Person::isPregnant)
                     .forEach(person -> getCampaign().getProcreation().removePregnancy(person));
-        }
-
-        if (retirementDateTracking != newOptions.isUseRetirementDateTracking()) {
-            if (newOptions.isUseRetirementDateTracking()) {
-                getCampaign().initRetirementDateTracking();
-            } else {
-                for (Person person : getCampaign().getPersonnel()) {
-                    person.setRetirement(null);
-                }
-            }
         }
 
         miPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
