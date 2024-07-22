@@ -3623,7 +3623,7 @@ public class Campaign implements ITechManager {
             autoAwardsController.ManualController(this, false);
         }
 
-        if ((getLocalDate().getDayOfMonth() == 1)) {
+        if ((getLocation().isOnPlanet()) && (getLocalDate().getDayOfMonth() == 1)) {
             processRandomDependents();
         }
 
