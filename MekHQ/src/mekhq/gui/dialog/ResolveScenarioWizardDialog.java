@@ -1061,7 +1061,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         for (int n = 0; n < status.getHits() + 1; n++) {
-            if (Utilities.dice(1, 6) == target) {
+            if (Utilities.dice(1, 6) >= target) {
                 return true;
             }
         }
