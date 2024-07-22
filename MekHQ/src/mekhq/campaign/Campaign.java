@@ -3197,6 +3197,10 @@ public class Campaign implements ITechManager {
                 continue;
             }
 
+            if (getLocalDate().equals(contract.getStartDate())) {
+                getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation(getUnitRatingMod())));
+            }
+
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
                 int deficit = getDeploymentDeficit(contract);
                 if (deficit > 0) {
