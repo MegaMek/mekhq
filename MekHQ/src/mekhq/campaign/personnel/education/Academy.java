@@ -976,7 +976,7 @@ public class Academy implements Comparable<Academy> {
      * @return the corresponding skill code as a string
      * @throws IllegalStateException if the skill string is unexpected or invalid
      */
-    static String skillParser(String skill) {
+    public static String skillParser(String skill) {
         return switch (skill.toLowerCase().trim()) {
             case "piloting/mech" -> SkillType.S_PILOT_MECH;
             case "gunnery/mech" -> SkillType.S_GUN_MECH;

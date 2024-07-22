@@ -48,8 +48,10 @@ public class EducationController {
      * @param courseIndex The index of the course in the academy.
      * @param campus The campus location (can be null if the academy is local).
      * @param faction The faction of the person.
+     * @param isReEnrollment Whether the person is being re-enrolled.
      */
-    public static void beginEducation(Campaign campaign, Person person, String academySet, String academyNameInSet, int courseIndex, String campus, String faction) {
+    public static void performEducationPreEnrollmentActions(Campaign campaign, Person person, String academySet, String academyNameInSet, int courseIndex,
+                                                            String campus, String faction, boolean isReEnrollment) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
         Academy academy = getAcademy(academySet, academyNameInSet);
@@ -79,7 +81,11 @@ public class EducationController {
         // with the checks done, and tuition paid, we can enroll Person
         person.setEduCourseIndex(courseIndex);
 
-        enrollPerson(campaign, person, academy, campus, faction, courseIndex);
+        if (isReEnrollment) {
+            reEnrollPerson(campaign, person, academy);
+        } else {
+            enrollPerson(campaign, person, academy, campus, faction, courseIndex);
+        }
 
         if (academy.isHomeSchool()) {
             campaign.addReport(String.format(resources.getString("homeSchool.text"),
@@ -147,6 +153,41 @@ public class EducationController {
         // we have this all the way at the bottom as a bit of insurance.
         // when troubleshooting, if the log isn't getting entered, we know something went wrong when enrolling.
         ServiceLogger.eduEnrolled(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
+    }
+
+
+    /**
+     * Re-enrolls a person into a campaign and updates their education information.
+     *
+     * @param campaign    The campaign in which the person is to be re-enrolled.
+     * @param person      The person to be re-enrolled.
+     * @param academy     The academy or school that the person is being enrolled into.
+     */
+    public static void reEnrollPerson(Campaign campaign, Person person, Academy academy) {
+        if (academy.isHomeSchool()) {
+            // if the student is being homeschooled, we skip the journey to the 'academy'
+            person.setEduEducationStage(EducationStage.EDUCATION);
+        } else {
+            person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
+        }
+
+        person.setEduEducationTime(academy.getDurationDays());
+
+        if (!academy.isHomeSchool()) {
+            if (academy.isLocal()) {
+                person.setEduJourneyTime(2);
+                person.setEduAcademySystem(campaign.getCurrentSystem().getId());
+            } else {
+                person.setEduJourneyTime(Math.max(2, person.getEduDaysOfTravel()));
+            }
+        }
+
+        // reset days of travel
+        person.setEduDaysOfTravel(0);
+
+        // we have this all the way at the bottom as a bit of insurance.
+        // when troubleshooting, if the log isn't getting entered, we know something went wrong when enrolling.
+        ServiceLogger.eduReEnrolled(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
     }
 
     /**
