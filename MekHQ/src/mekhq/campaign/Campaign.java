@@ -3673,33 +3673,48 @@ public class Campaign implements ITechManager {
         List<Person> dependents = getActiveDependents();
         Collections.shuffle(dependents);
 
-        int dependantCapacity = (int) (getActivePersonnel().size() * 0.2);
-        int dependantCount = dependents.size();
+        int dependentCapacity = (int) (getActivePersonnel().size() * 0.2);
+        int dependentCount = dependents.size();
 
         if (getCampaignOptions().isUseRandomDependentRemoval()) {
             for (Person dependent : dependents) {
-                int lowerRoll = (dependents.size() > dependantCapacity) ? getLowerRandomInt() : Compute.randomInt(100);
+                // personnel meeting these requirements are not eligible for random removal
+                if (dependent.getGenealogy().hasNonAdultChildren(getLocalDate())
+                        || dependent.getGenealogy().hasSpouse()
+                        || dependent.isChild(getLocalDate())) {
+                    continue;
+                }
+
+                int lowerRoll = (dependents.size() > dependentCapacity) ? getLowerRandomInt() : Compute.randomInt(100);
 
                 if (lowerRoll <= 4 - getUnitRatingMod()) {
                     addReport(String.format(resources.getString("dependentLeavesForce.text"),
                             dependent.getFullTitle()));
 
                     removePerson(dependent, false);
-                    dependantCount--;
+                    dependentCount--;
                 }
             }
         }
 
-        if (getCampaignOptions().isUseRandomDependentAddition() && dependantCount < dependantCapacity) {
-            for (int i = 0; i < (dependantCapacity - dependantCount); i++) {
-                int lowerRoll = (dependantCount <= (dependantCapacity / 2)) ? getLowerRandomInt() : Compute.randomInt(100);
+        if ((getCampaignOptions().isUseRandomDependentAddition()) && (dependentCount < dependentCapacity)) {
+            int availableCapacity = dependentCapacity - dependentCount;
+            int runningCount = dependentCount;
 
-                if (lowerRoll <= (getUnitRatingMod() * 2)) {
-                    final Person dependent = newDependent(false);
-                    recruitPerson(dependent, PrisonerStatus.FREE, true, false);
+            if (availableCapacity > 0) {
+                for (int i = 0; i < (dependentCapacity - dependentCount); i++) {
+                    int lowerRoll = (runningCount <= (dependentCapacity / 2)) ? getLowerRandomInt() : Compute.randomInt(100);
 
-                    addReport(String.format(resources.getString("dependentJoinsForce.text"),
-                            dependent.getFullTitle()));
+                    if (lowerRoll <= (getUnitRatingMod() * 2)) {
+                        final Person dependent = newDependent(false);
+
+                        recruitPerson(dependent, PrisonerStatus.FREE, true, false);
+
+                        addReport(String.format(resources.getString("dependentJoinsForce.text"),
+                                dependent.getFullTitle()));
+
+                        runningCount++;
+                    }
                 }
             }
         }
