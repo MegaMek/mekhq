@@ -3662,13 +3662,22 @@ public class Campaign implements ITechManager {
         List<Person> dependents = getActiveDependents();
         Collections.shuffle(dependents);
 
-        int dependentCapacity = (int) (getActivePersonnel().size() * 0.2);
+        // we use this value a lot, so might as well store it for easier retrieval
+        LocalDate currentDate = getLocalDate();
+
+        // we don't want to include Dependents or children when determining capacity
+        List<Person> activeNonDependents = getActivePersonnel().stream()
+                .filter(person -> !person.getPrimaryRole().isDependent())
+                .filter(person -> !person.isChild(currentDate))
+                .toList();
+
+        int dependentCapacity = (int) (activeNonDependents.size() * 0.2);
         int dependentCount = dependents.size();
 
         // roll for random removal
         if (getCampaignOptions().isUseRandomDependentRemoval()) {
             for (Person dependent : dependents) {
-                if (!isRemovalEligible(dependent)) {
+                if (!isRemovalEligible(dependent, currentDate)) {
                     continue;
                 }
 
@@ -3721,12 +3730,13 @@ public class Campaign implements ITechManager {
      * Checks if a dependent is eligible for removal.
      *
      * @param dependent the person to check
+     * @param currentDate the current date
      * @return {@code true} if the person is eligible for removal, {@code false} otherwise
      */
-    private boolean isRemovalEligible(Person dependent) {
-        return !(dependent.getGenealogy().hasNonAdultChildren(getLocalDate())
+    private boolean isRemovalEligible(Person dependent, LocalDate currentDate) {
+        return !(dependent.getGenealogy().hasNonAdultChildren(currentDate)
                 || dependent.getGenealogy().hasSpouse()
-                || dependent.isChild(getLocalDate()));
+                || dependent.isChild(currentDate));
     }
 
     /**
