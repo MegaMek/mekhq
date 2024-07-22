@@ -659,6 +659,19 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         gui.getCampaign().removePerson(person);
                     }
                 }
+
+                if (gui.getCampaign().getCampaignOptions().isUseLoyaltyModifiers()) {
+                    int executionRolls = (int) Math.floor(people.length / 20.0);
+
+                    if (executionRolls > 0) {
+                        for (int i = 0; i < executionRolls; i++) {
+                            processExecutionLoyaltyChange(false);
+                        }
+
+                        gui.getCampaign().addReport(resources.getString("executeLoyaltyChange.text"));
+                    }
+                }
+
                 break;
             }
             case CMD_JETTISON: {
@@ -672,6 +685,19 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         gui.getCampaign().removePerson(person);
                     }
                 }
+
+                if (gui.getCampaign().getCampaignOptions().isUseLoyaltyModifiers()) {
+                    int executionRolls = (int) Math.floor(people.length / 20.0);
+
+                    if (executionRolls > 0) {
+                        for (int i = 0; i < executionRolls; i++) {
+                            processExecutionLoyaltyChange(true);
+                        }
+
+                        gui.getCampaign().addReport(resources.getString("jettisonLoyaltyChange.text"));
+                    }
+                }
+
                 break;
             }
             case CMD_RECRUIT: {
@@ -1176,6 +1202,29 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             default: {
                 break;
+            }
+        }
+    }
+
+    /**
+     * This method processes loyalty changes prompted by the execution of prisoners.
+     *
+     * @param isMajor a boolean indicating whether the loyalty change is a major change
+     */
+    private void processExecutionLoyaltyChange(boolean isMajor) {
+        LocalDate currentDate = gui.getCampaign().getLocalDate();
+
+        for (Person person : gui.getCampaign().getPersonnel()) {
+            if (!person.getStatus().isDepartedUnit()) {
+                if (!person.isCommander()) {
+                    if (!person.isChild(currentDate)) {
+                        if (person.getPrisonerStatus().isFreeOrBondsman()) {
+                            person.performForcedDirectionLoyaltyChange(gui.getCampaign(), Compute.d6(1) != 1, isMajor, false);
+                        } else {
+                            person.performForcedDirectionLoyaltyChange(gui.getCampaign(), false, isMajor, false);
+                        }
+                    }
+                }
             }
         }
     }
