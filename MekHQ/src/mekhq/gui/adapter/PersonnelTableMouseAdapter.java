@@ -1711,7 +1711,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     if (improvementPossible > 0) {
                                         reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
                                         reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
-                                        reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT));
+                                        reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT,
+                                                academy.getSet(),
+                                                academy.getName(),
+                                                String.valueOf(person.getEduCourseIndex()),
+                                                person.getEduAcademySystem(),
+                                                person.getEduAcademyFaction()));
                                         reEnroll.addActionListener(this);
                                     } else {
                                         reEnroll = new JMenuItem(resources.getString("eduReEnrollImpossible.text"));
