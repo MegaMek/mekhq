@@ -58,7 +58,6 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -929,7 +928,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         int year = campaign.getGameYear();
         List<Faction> orderedFactions = Factions.getInstance().getFactions().stream()
                 .sorted((a, b) -> a.getFullName(year).compareToIgnoreCase(b.getFullName(year)))
-                .collect(Collectors.toList());
+                .toList();
 
         DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<>();
         for (Faction faction : orderedFactions) {
@@ -961,7 +960,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
                 .sorted(Comparator.comparing(a -> a.getName(campaign.getLocalDate())))
-                .collect(Collectors.toList());
+                .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
@@ -974,7 +973,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
                 .filter(a -> a.getFactionSet(person.getBirthday()).contains(faction))
                 .sorted(Comparator.comparing(a -> a.getName(person.getBirthday())))
-                .collect(Collectors.toList());
+                .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
@@ -1198,13 +1197,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
         }
         IOption option;
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            option = comp.getOption();
-            if ((comp.getValue().equals("None"))) {
+        for (final DialogOptionComponent newVar : optionComps) {
+            option = newVar.getOption();
+            if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
-                person.getOptions().getOption(option.getName()).setValue(comp.getValue());
+                person.getOptions().getOption(option.getName()).setValue(newVar.getValue());
             }
         }
     }
@@ -1323,14 +1321,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void setOptions() {
         IOption option;
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            option = comp.getOption();
-            if ((comp.getValue().equals("None"))) {
+        for (final DialogOptionComponent newVar : optionComps) {
+            option = newVar.getOption();
+            if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
                 person.getOptions().getOption(option.getName())
-                        .setValue(comp.getValue());
+                        .setValue(newVar.getValue());
             }
         }
     }
@@ -1405,7 +1402,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void backgroundChanged() {
         final Phenotype newPhenotype = (Phenotype) choicePhenotype.getSelectedItem();
-        if (chkClan.isSelected() || newPhenotype.isNone()) {
+        if (chkClan.isSelected() || Objects.requireNonNull(newPhenotype).isNone()) {
             if ((newPhenotype != null) && (newPhenotype != selectedPhenotype)) {
                 switch (selectedPhenotype) {
                     case MECHWARRIOR:

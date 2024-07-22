@@ -1138,7 +1138,7 @@ public class CampaignGUI extends JPanel {
         if (standardTabs.containsKey(tabType)) {
             final CampaignGuiTab tab = standardTabs.get(tabType);
             IntStream.range(0, tabMain.getTabCount())
-                    .filter(ii -> tabMain.getComponentAt(ii) == tab)
+                    .filter(ii -> Objects.equals(tabMain.getComponentAt(ii), tab))
                     .findFirst()
                     .ifPresent(ii -> tabMain.setSelectedIndex(ii));
         }
@@ -1378,17 +1378,17 @@ public class CampaignGUI extends JPanel {
             pw.flush();
             // delete the backup file because we didn't need it
             if (backupFile.exists() && !backupFile.delete()) {
-                LogManager.getLogger().error("Backup file deletion failure. This means that the backup file of "
-                        + backupFile.getPath() + " will be retained instead of being properly deleted.");
+                LogManager.getLogger().error("Backup file deletion failure. This means that the backup file of {} will be retained instead of being properly deleted.",
+                        backupFile.getPath());
             }
-            LogManager.getLogger().info("Campaign saved to " + file);
+            LogManager.getLogger().info("Campaign saved to {}", file);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
-            JOptionPane.showMessageDialog(frame,
-                    "Oh no! The program was unable to correctly save your game. We know this\n"
-                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                            + "mekhq.log file from this game so we can prevent this from happening in\n"
-                            + "the future.", "Could not save game",
+            JOptionPane.showMessageDialog(frame, """
+                            Oh no! The program was unable to correctly save your game. We know this
+                            is annoying and apologize. Please help us out and submit a bug with the
+                            mekhq.log file from this game so we can prevent this from happening in
+                            the future.""", "Could not save game",
                     JOptionPane.ERROR_MESSAGE);
 
             // restore the backup file
@@ -1396,8 +1396,8 @@ public class CampaignGUI extends JPanel {
                 if (backupFile.exists()) {
                     Utilities.copyfile(backupFile, file);
                     if (!backupFile.delete()) {
-                        LogManager.getLogger().error("Backup file deletion failure after restoring the original file. This means that the backup file of "
-                                + backupFile.getPath() + " will be retained instead of being properly deleted.");
+                        LogManager.getLogger().error("Backup file deletion failure after restoring the original file. This means that the backup file of {} will be retained instead of being properly deleted.",
+                                backupFile.getPath());
                     }
                 }
             } else {
@@ -1944,14 +1944,16 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                    LogManager.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
+                    LogManager.getLogger().error("Unknown node type not loaded in Personnel nodes: {}",
+                            wn2.getNodeName());
                     continue;
                 }
 
                 Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
                 if ((p != null) && (getCampaign().getPerson(p.getId()) != null)) {
-                    LogManager.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: "
-                            + p.getFullName() + ", Id " + p.getId() + ')');
+                    LogManager.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: {}, Id {})",
+                            p.getFullName(),
+                            p.getId());
                     p = null;
                 }
 
@@ -2055,14 +2057,14 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            LogManager.getLogger().info("Personnel saved to " + file);
+            LogManager.getLogger().info("Personnel saved to {}", file);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
-            JOptionPane.showMessageDialog(getFrame(),
-                    "Oh no! The program was unable to correctly export your personnel. We know this\n"
-                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                            + "mekhq.log file from this game so we can prevent this from happening in\n"
-                            + "the future.",
+            JOptionPane.showMessageDialog(getFrame(), """
+                            Oh no! The program was unable to correctly export your personnel. We know this
+                            is annoying and apologize. Please help us out and submit a bug with the
+                            mekhq.log file from this game so we can prevent this from happening in
+                            the future.""",
                     "Could not export personnel", JOptionPane.ERROR_MESSAGE);
             // restore the backup file
             file.delete();
@@ -2121,7 +2123,8 @@ public class CampaignGUI extends JPanel {
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                LogManager.getLogger().error("Unknown node type not loaded in Parts nodes: " + wn2.getNodeName());
+                LogManager.getLogger().error("Unknown node type not loaded in Parts nodes: {}",
+                        wn2.getNodeName());
                 continue;
             }
 
@@ -2200,14 +2203,14 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            LogManager.getLogger().info("Parts saved to " + file);
+            LogManager.getLogger().info("Parts saved to {}", file);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
-            JOptionPane.showMessageDialog(getFrame(),
-                    "Oh no! The program was unable to correctly export your parts. We know this\n"
-                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                            + "mekhq.log file from this game so we can prevent this from happening in\n"
-                            + "the future.", "Could not export parts", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getFrame(), """
+                    Oh no! The program was unable to correctly export your parts. We know this
+                    is annoying and apologize. Please help us out and submit a bug with the
+                    mekhq.log file from this game so we can prevent this from happening in
+                    the future.""", "Could not export parts", JOptionPane.ERROR_MESSAGE);
             // restore the backup file
             file.delete();
             if (backupFile.exists()) {
