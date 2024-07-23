@@ -365,6 +365,20 @@ task assembleDist(overwrite: true) {
     dependsOn distTar
 }
 
+tasks.register("buildAllPackages", Copy) {
+    dependsOn gradle.includedBuild('megamek').task(':megamek:assembleDist')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:assembleDist')
+    dependsOn assembleDist
+
+    into layout.buildDirectory.dir("distributions")
+    from("${mmDir}/megamek/build/distributions") {
+        include "*.tar.gz"
+    }
+    from("${mmlDir}/megameklab/build/distributions") {
+        include "*.tar.gz"
+    }
+}
+
 test {
     useJUnitPlatform()
     // report is always generated after tests run
