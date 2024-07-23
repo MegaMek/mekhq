@@ -50,6 +50,9 @@ MEKHQ VERSION HISTORY:
 + PR #4423: Fixed additional typos and spelling errors
 + FIX #4425: Right-clicking on any person in Personnel tab causes NPE error
 + PR #4426: Updated static faction references with appropriate isX() call
++ FIX #4429: Added Null protection when generating forces from fixed scenarios like Base Defense
++ FIX #4434: Added processNewYearChecks Skip for Homeschool Academies
++ FIX #4456: Added Nag for Inability to Afford Next Jump
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update

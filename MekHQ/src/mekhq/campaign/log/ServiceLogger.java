@@ -158,6 +158,14 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("defected.text")));
     }
 
+    public static void sacked(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("sacked.text")));
+    }
+
+    public static void left(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("left.text")));
+    }
+
     public static void promotedTo(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("promotedTo.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, person.getRankName())));
