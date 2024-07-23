@@ -1062,7 +1062,7 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3080</constructionYear>
-        <destructionYear>3071</destructionYear>
+        <destructionYear>9999</destructionYear>
         <tuition>5250</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
@@ -4231,14 +4231,14 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>NAIS College of Military Science (3079)</name>
+        <name>NAIS College of Military Science [3079]</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Founded in 2614, the New Avalon Military Academy emerged to train officers for the Armed Forces of the Federated Suns after the Albion Military Academy became exclusive to the Star League Defense Force. NAMA swiftly rivaled AMA in training quality, emphasizing political loyalty to the First Prince. Despite challenges, NAIS persists in producing top MechWarriors and officers, with graduates often joining mercenary units or returning to their home nations.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Avalon</locationSystem>
-        <constructionYear>2614</constructionYear>
+        <constructionYear>3079</constructionYear>
         <tuition>11977</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>

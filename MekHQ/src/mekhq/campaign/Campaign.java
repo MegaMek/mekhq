@@ -57,6 +57,7 @@ import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
@@ -798,6 +799,7 @@ public class Campaign implements ITechManager {
                                 addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("orphaned.text"));
 
                                 turnoverRetirementInformation.add(child.getHyperlinkedFullTitle() + ' ' + resources.getString("orphaned.text"));
+                                ServiceLogger.orphaned(person, getLocalDate());
                             }
                         }
                     }

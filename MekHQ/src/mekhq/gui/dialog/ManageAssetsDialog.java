@@ -163,14 +163,15 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void deleteAsset() {
-        campaign.getFinances().getAssets().remove(assetTable.getSelectedRow());
         MekHQ.triggerEvent(new AssetRemovedEvent(assetModel.getAssetAt(assetTable.getSelectedRow())));
+        campaign.getFinances().getAssets().remove(assetTable.getSelectedRow());
         refreshTable();
     }
 
     private void refreshTable() {
         int selectedRow = assetTable.getSelectedRow();
         assetModel.setData(campaign.getFinances().getAssets());
+
         if (selectedRow != -1) {
             if (assetTable.getRowCount() > 0) {
                 if (assetTable.getRowCount() == selectedRow) {
@@ -208,18 +209,13 @@ public class ManageAssetsDialog extends JDialog {
 
         @Override
         public String getColumnName(int column) {
-            switch (column) {
-                case COL_NAME:
-                    return "Name";
-                case COL_VALUE:
-                    return "Value";
-                case COL_SCHEDULE:
-                    return "Pay Frequency";
-                case COL_INCOME:
-                    return "Income";
-                default:
-                    return "?";
-            }
+            return switch (column) {
+                case COL_NAME -> "Name";
+                case COL_VALUE -> "Value";
+                case COL_SCHEDULE -> "Pay Frequency";
+                case COL_INCOME -> "Income";
+                default -> "?";
+            };
         }
 
         @Override
@@ -255,30 +251,22 @@ public class ManageAssetsDialog extends JDialog {
         }
 
         public int getColumnWidth(int c) {
-            switch (c) {
-                default:
-                    return 10;
-            }
+            return 10;
         }
 
         public int getAlignment(int col) {
-            switch (col) {
-                case COL_NAME:
-                    return SwingConstants.LEFT;
-                default:
-                    return SwingConstants.RIGHT;
+            if (col == COL_NAME) {
+                return SwingConstants.LEFT;
             }
+            return SwingConstants.RIGHT;
         }
 
         public String getTooltip(int row, int col) {
-            switch (col) {
-                default:
-                    return null;
-            }
+            return null;
         }
 
-        public AssetTableModel.Renderer getRenderer() {
-            return new AssetTableModel.Renderer();
+        public Renderer getRenderer() {
+            return new Renderer();
         }
 
         public class Renderer extends DefaultTableCellRenderer {

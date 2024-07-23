@@ -297,7 +297,6 @@ public class CampaignOptions {
     private boolean useFamilyModifiers;
     private boolean useLoyaltyModifiers;
     private boolean useHideLoyalty;
-    private boolean useLeadershipChangeRefresh;
 
     private int payoutRateOfficer;
     private int payoutRateEnlisted;
@@ -973,7 +972,6 @@ public class CampaignOptions {
 
         setUseLoyaltyModifiers(true);
         setUseHideLoyalty(false);
-        setUseLeadershipChangeRefresh(true);
 
         setPayoutRateOfficer(3);
         setPayoutRateEnlisted(3);
@@ -1894,14 +1892,6 @@ public class CampaignOptions {
 
     public void setUseHideLoyalty(final boolean useHideLoyalty) {
         this.useHideLoyalty = useHideLoyalty;
-    }
-
-    public boolean isUseLeadershipChangeRefresh() {
-        return useLeadershipChangeRefresh;
-    }
-
-    public void setUseLeadershipChangeRefresh(final boolean useLeadershipChangeRefresh) {
-        this.useLeadershipChangeRefresh = useLeadershipChangeRefresh;
     }
 
     public boolean isUseRandomFounderTurnover() {
@@ -4628,7 +4618,6 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoyaltyModifiers", isUseLoyaltyModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useHideLoyalty", isUseHideLoyalty());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadershipChangeRefresh", isUseLeadershipChangeRefresh());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateOfficer", getPayoutRateOfficer());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateEnlisted", getPayoutRateEnlisted());
@@ -5625,8 +5614,6 @@ public class CampaignOptions {
                     retVal.setUseLoyaltyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useHideLoyalty")) {
                     retVal.setUseHideLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useLeadershipChangeRefresh")) {
-                    retVal.setUseLeadershipChangeRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateOfficer")) {
                     retVal.setPayoutRateOfficer(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateEnlisted")) {
