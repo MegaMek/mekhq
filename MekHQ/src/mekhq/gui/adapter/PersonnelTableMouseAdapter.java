@@ -77,6 +77,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
@@ -91,7 +92,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_SECONDARY_DESIGNATOR = "DESIG_SEC";
     private static final String CMD_ADD_AWARD = "ADD_AWARD";
     private static final String CMD_RMV_AWARD = "RMV_AWARD";
-    private static final String CMD_BEGIN_EDUCATION = "BEGIN_EDUCATION";
+    private static final String CMD_BEGIN_EDUCATION_ENROLLMENT = "BEGIN_EDUCATION_ENROLLMENT";
+    private static final String CMD_BEGIN_EDUCATION_RE_ENROLLMENT = "BEGIN_EDUCATION_RE_ENROLLMENT";
     private static final String CMD_COMPLETE_STAGE = "COMPLETE_STAGE";
     private static final String CMD_DROP_OUT = "DROP_OUT";
 
@@ -372,9 +374,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_BEGIN_EDUCATION: {
+            case CMD_BEGIN_EDUCATION_ENROLLMENT: {
                 for (Person person : people) {
-                    EducationController.beginEducation(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5]);
+                    EducationController.performEducationPreEnrollmentActions(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5], false);
+                }
+                break;
+            }
+            case CMD_BEGIN_EDUCATION_RE_ENROLLMENT: {
+                for (Person person : people) {
+                    EducationController.performEducationPreEnrollmentActions(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5], true);
                 }
                 break;
             }
@@ -1713,6 +1721,74 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 academyMenu.add(completeStage);
             }
 
+            if ((oneSelected) && (StaticChecks.areAllStudents(selected))) {
+                Academy academy = EducationController.getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                // this pile of if-statements just checks that the individual is eligible for re-enrollment
+                // has the person finished their education, but not yet returned to the unit?
+                if ((!person.getEduEducationStage().isJourneyToCampus()) && (!person.getEduEducationStage().isEducation())) {
+                    // is the academy still standing?
+                    if ((campaign.getGameYear() < academy.getDestructionYear()) && (campaign.getGameYear() < academy.getClosureYear())) {
+                        // if the academy is local, is the system still populated?
+                        if ((!academy.isLocal()) || (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) > 0)) {
+                            // is the person still within the correct age band?
+                            if ((person.getAge(campaign.getLocalDate()) < academy.getAgeMax()) && (person.getAge(campaign.getLocalDate()) >= academy.getAgeMin())) {
+                                // has the person been edited at some point and is no longer qualified?
+                                if (academy.isQualified(person)) {
+                                    // here we check that the person will benefit from re-enrollment
+                                    int improvementPossible = 0;
+
+                                    if (academy.getFilteredFaction(campaign, person, List.of(person.getEduAcademyFaction())) != null) {
+                                        int educationLevel = academy.getEducationLevel(person);
+
+                                        String[] skills = academy.getCurriculums().get(person.getEduCourseIndex()).split(",");
+
+                                        skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
+
+                                        for (String skill : skills) {
+                                            if (skill.equalsIgnoreCase("none")) {
+                                                continue;
+                                            }
+
+                                            if (skill.equalsIgnoreCase("xp")) {
+                                                if (EducationLevel.parseToInt(person.getEduHighestEducation()) < educationLevel) {
+                                                    improvementPossible++;
+                                                }
+                                            } else {
+                                                String skillParsed = skillParser(skill);
+
+                                                if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() < educationLevel)) {
+                                                    improvementPossible++;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    JMenuItem reEnroll;
+
+                                    if (improvementPossible > 0) {
+                                        reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
+                                        reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
+                                        reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT,
+                                                academy.getSet(),
+                                                academy.getName(),
+                                                String.valueOf(person.getEduCourseIndex()),
+                                                person.getEduAcademySystem(),
+                                                person.getEduAcademyFaction()));
+                                        reEnroll.addActionListener(this);
+                                    } else {
+                                        reEnroll = new JMenuItem(resources.getString("eduReEnrollImpossible.text"));
+                                        reEnroll.setToolTipText(resources.getString("eduReEnrollImpossible.toolTip"));
+                                    }
+
+                                    academyMenu.add(reEnroll);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if ((StaticChecks.areAllStudents(selected)) && (campaign.isGM())) {
                 JMenuItem completeStage = new JMenuItem(resources.getString("eduCompleteStage.text"));
                 completeStage.setToolTipText(resources.getString("eduCompleteStage.toolTip"));
@@ -3045,10 +3121,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     if ((academy.isLocal()) || (academy.isHomeSchool())) {
                         courses.setToolTipText(academy.getTooltip(campaign, personnel, courseIndex, campaign.getCurrentSystem()));
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campaign.getCurrentSystem().getId(), faction));
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campaign.getCurrentSystem().getId(), faction));
                     } else {
                         courses.setToolTipText(academy.getTooltip(campaign, personnel, courseIndex, campaign.getSystemById(campus)));
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campus, faction));
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campus, faction));
                     }
                     courses.addActionListener(this);
                     academyOption.add(courses);

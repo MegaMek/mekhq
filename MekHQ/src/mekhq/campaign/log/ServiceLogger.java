@@ -90,6 +90,10 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduEnrolled.text"), institution, course)));
     }
 
+    public static void eduReEnrolled(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduReEnrolled.text"), institution, course)));
+    }
+
     public static void eduGraduated(Person person, LocalDate date, String institution, String course) {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduated.text"), institution, course)));
     }
