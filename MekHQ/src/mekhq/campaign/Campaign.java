@@ -3659,8 +3659,53 @@ public class Campaign implements ITechManager {
         // check for anything in finances
         getFinances().newDay(this, yesterday, getLocalDate());
 
+        // process removal of old personnel data on the last day of each month
+        if ((campaignOptions.isUsePersonnelRemoval())
+                && (getLocalDate().getMonth().length(false) == getLocalDate().getDayOfMonth())) {
+            processPersonnelRemoval();
+        }
+
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * This method iterates through the list of personnel and deletes the records of those who have
+     * departed the unit and who match additional checks.
+     */
+    public void processPersonnelRemoval() {
+        getPersonnel().stream()
+                .filter(p -> p.getStatus().isDepartedUnit())
+                .forEach(person -> {
+                    PersonnelStatus status = person.getStatus();
+                    if (shouldRemovePerson(person, status)) {
+                        removePerson(person, false);
+                    }
+                });
+
+        addReport(resources.getString("personnelRemoval.text"));
+    }
+
+    /**
+     * Determines whether a person's records should be removed from the campaign based on their status and retirement month.
+     *
+     * @param person The individual being checked.
+     * @param status The personnel status of the individual.
+     * @return true if the person should be removed, false otherwise.
+     */
+    private boolean shouldRemovePerson(Person person, PersonnelStatus status) {
+        int retirementMonthValue = Optional.ofNullable(person.getRetirement())
+                .map(LocalDate::getMonthValue)
+                .orElse(Integer.MAX_VALUE);
+
+        // return true if the individual has left the campaign for over a month
+        // *AND*
+        // is dead (and we're not exempting the cemetery) *OR* is retired (and we're not exempting retirees)
+        return (retirementMonthValue < (getLocalDate().getMonthValue() + 1)) &&
+                (
+                        ((status.isDead()) && (!campaignOptions.isUseRemovalExemptCemetery()))
+                                || ((status.isRetired()) && (!campaignOptions.isUseRemovalExemptRetirees()))
+                );
     }
 
     /**
