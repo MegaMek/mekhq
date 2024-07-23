@@ -234,6 +234,11 @@ public class CampaignOptions {
     private boolean useRandomDependentAddition;
     private boolean useRandomDependentRemoval;
 
+    // Personnel Removal
+    private boolean usePersonnelRemoval;
+    private boolean useRemovalExemptCemetery;
+    private boolean useRemovalExemptRetirees;
+
     // Salary
     private boolean disableSecondaryRoleSalary;
     private double salaryAntiMekMultiplier;
@@ -738,6 +743,11 @@ public class CampaignOptions {
         setRandomDependentMethod(RandomDependentMethod.NONE);
         setUseRandomDependentAddition(true);
         setUseRandomDependentRemoval(true);
+
+        // Personnel Removal
+        setUsePersonnelRemoval(false);
+        setUseRemovalExemptCemetery(false);
+        setUseRemovalExemptRetirees(false);
 
         // Salary
         setDisableSecondaryRoleSalary(false);
@@ -2164,6 +2174,32 @@ public class CampaignOptions {
         this.useRandomDependentRemoval = useRandomDependentRemoval;
     }
     //endregion Dependent
+
+    //region Personnel Removal
+    public boolean isUsePersonnelRemoval() {
+        return usePersonnelRemoval;
+    }
+
+    public void setUsePersonnelRemoval(final boolean usePersonnelRemoval) {
+        this.usePersonnelRemoval = usePersonnelRemoval;
+    }
+
+    public boolean isUseRemovalExemptCemetery() {
+        return useRemovalExemptCemetery;
+    }
+
+    public void setUseRemovalExemptCemetery(final boolean useRemovalExemptCemetery) {
+        this.useRemovalExemptCemetery = useRemovalExemptCemetery;
+    }
+
+    public boolean isUseRemovalExemptRetirees() {
+        return useRemovalExemptRetirees;
+    }
+
+    public void setUseRemovalExemptRetirees(final boolean useRemovalExemptRetirees) {
+        this.useRemovalExemptRetirees = useRemovalExemptRetirees;
+    }
+    //endregion Personnel Removal
 
     //region Salary
     public boolean isDisableSecondaryRoleSalary() {
@@ -4542,6 +4578,12 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentRemoval", isUseRandomDependentRemoval());
         //endregion Dependent
 
+        //region Personnel Removal
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePersonnelRemoval", isUsePersonnelRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRemovalExemptCemetery", isUseRemovalExemptCemetery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRemovalExemptRetirees", isUseRemovalExemptRetirees());
+        //endregion Personnel Removal
+
         //region Salary
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disableSecondaryRoleSalary", isDisableSecondaryRoleSalary());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
@@ -5224,6 +5266,15 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDependentRemoval")) {
                     retVal.setUseRandomDependentRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Dependent
+
+                    //region Personnel Removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePersonnelRemoval")) {
+                    retVal.setUsePersonnelRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRemovalExemptCemetery")) {
+                    retVal.setUseRemovalExemptCemetery(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRemovalExemptRetirees")) {
+                    retVal.setUseRemovalExemptRetirees(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    //endregion Personnel Removal
 
                     //region Salary
                 } else if (wn2.getNodeName().equalsIgnoreCase("disableSecondaryRoleSalary")) {
