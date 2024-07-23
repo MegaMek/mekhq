@@ -42,6 +42,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
+import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
@@ -72,6 +73,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -342,7 +344,7 @@ public class Person {
         recruitment = null;
         lastRankChangeDate = null;
         retirement = null;
-        loyalty = 0;
+        loyalty = 9;
         fatigue = 0;
         isRecoveringFromFatigue = false;
         skills = new Skills();
@@ -994,8 +996,6 @@ public class Person {
                     setRetirement(today);
                 }
 
-                refreshLoyalty(campaign);
-
                 break;
             case DEFECTED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
@@ -1004,7 +1004,23 @@ public class Person {
                     setRetirement(today);
                 }
 
-                refreshLoyalty(campaign);
+                break;
+            case SACKED:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.sacked(this, today);
+
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
+                    setRetirement(today);
+                }
+
+                break;
+            case LEFT:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.left(this, today);
+
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
+                    setRetirement(today);
+                }
 
                 break;
             case PREGNANCY_COMPLICATIONS:
@@ -1023,12 +1039,47 @@ public class Person {
 
         if (status.isDead()) {
             setDateOfDeath(today);
-            // Remember to tell the spouse
-            if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse().getStatus().isDeadOrMIA()) {
+
+            if ((genealogy.hasSpouse()) && (!genealogy.getSpouse().getStatus().isDead())) {
+                if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+                    performRandomizedLoyaltyChange(campaign, isPregnant(), true);
+                }
+
                 campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), getGenealogy().getSpouse());
             }
 
-            refreshLoyalty(campaign);
+            // log death across genealogy
+            if (genealogy.hasChildren()) {
+                for (Person child : genealogy.getChildren()) {
+                    if (!child.getStatus().isDead()) {
+                        if (!child.getGenealogy().hasLivingParents()) {
+                            ServiceLogger.orphaned(child, campaign.getLocalDate());
+
+                            if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+                                child.performRandomizedLoyaltyChange(campaign, isChild(campaign.getLocalDate()), true);
+                            }
+                        } else if ((child.getGenealogy().hasLivingParents()) && (child.isChild(campaign.getLocalDate()))) {
+                            PersonalLogger.RelativeHasDied(child, this, resources.getString("relationParent.text"), campaign.getLocalDate());
+
+                            if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+                                child.performRandomizedLoyaltyChange(campaign, false, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (genealogy.hasLivingParents()) {
+                for (Person parent : genealogy.getParents()) {
+                    if (!parent.getStatus().isDead()) {
+                        PersonalLogger.RelativeHasDied(parent, this, resources.getString("relationChild.text"), campaign.getLocalDate());
+
+                        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+                                parent.performRandomizedLoyaltyChange(campaign, true, true);
+                        }
+                    }
+                }
+            }
         }
 
         if (status.isActive()) {
@@ -1050,6 +1101,12 @@ public class Person {
 
         // release the commander flag.
         if ((isCommander()) && (status.isDepartedUnit())) {
+            if ((!status.isResigned()) && (!status.isRetired())) {
+                if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+                    massChangeLoyalty(campaign);
+                }
+            }
+
             setCommander(false);
         }
 
@@ -1068,19 +1125,102 @@ public class Person {
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }
 
-    private void refreshLoyalty(Campaign campaign) {
+    /**
+     * If the current character is the campaign commander, adjust loyalty across the entire unit.
+     * @param campaign The current campaign
+     */
+    private void massChangeLoyalty(Campaign campaign) {
         if (isCommander()) {
-            if (campaign.getCampaignOptions().isUseLeadershipChangeRefresh()) {
-                for (Person person : campaign.getPersonnel()) {
-                    if (person.getStatus().isDepartedUnit()) {
-                        continue;
-                    }
-                    if (person.getPrisonerStatus().isCurrentPrisoner()) {
-                        continue;
-                    }
-                    person.setLoyalty(Compute.d6(3));
+            for (Person person : campaign.getPersonnel()) {
+                if (person.getStatus().isDepartedUnit()) {
+                    continue;
                 }
+
+                if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                    continue;
+                }
+
+                person.performRandomizedLoyaltyChange(campaign, false, false);
             }
+        }
+
+        campaign.addReport(resources.getString("loyaltyChangeGroup.text"));
+    }
+
+    /**
+     * Performs an randomized loyalty change for an individual
+     *
+     * @param campaign The current campaign
+     * @param isMajor Flag to indicate if the loyalty change is major.
+     * @param isVerbose Flag to indicate if the change should be individually posted to the campaign report.
+     */
+    public void performRandomizedLoyaltyChange(Campaign campaign, boolean isMajor, boolean isVerbose) {
+        int originalLoyalty = loyalty;
+
+        Consumer<Integer> applyLoyaltyChange = (roll) -> {
+            switch (roll) {
+                case 1, 2, 3 -> changeLoyalty(-3);
+                case 4 -> changeLoyalty(-2);
+                case 5, 6 -> changeLoyalty(-1);
+                case 15, 16 -> changeLoyalty(1);
+                case 17 -> changeLoyalty(2);
+                case 18 -> changeLoyalty(3);
+                default -> {}
+            }
+        };
+
+        int roll = Compute.d6(3);
+        int secondRoll = Compute.d6(3);
+
+        // if this is a major change, we use whichever result is furthest from the midpoint (9)
+        if (isMajor) {
+            roll = Math.abs(roll - 9) > Math.abs(secondRoll - 9) ? roll : secondRoll;
+        }
+
+        applyLoyaltyChange.accept(roll);
+
+        if ((isVerbose) && (originalLoyalty != loyalty)) {
+            if (originalLoyalty > loyalty) {
+                campaign.addReport(String.format(resources.getString("loyaltyChangePositive.text"), getHyperlinkedFullTitle()));
+            } else {
+                campaign.addReport(String.format(resources.getString("loyaltyChangeNegative.text"), getHyperlinkedFullTitle()));
+            }
+        }
+    }
+
+    /**
+     * Performs a loyalty change where the results will always be neutral or positive, or neutral or negative.
+     *
+     * @param campaign the current campaign
+     * @param isPositive a boolean indicating whether the loyalty change should be positive or negative
+     * @param isMajor a boolean indicating whether a major loyalty change should be performed in addition to the initial change
+     * @param isVerbose a boolean indicating whether the method should generate a report if the loyalty has changed
+     */
+    public void performForcedDirectionLoyaltyChange(Campaign campaign, boolean isPositive, boolean isMajor, boolean isVerbose) {
+        int originalLoyalty = loyalty;
+
+        Consumer<Integer> applyLoyaltyChange = (roll) -> {
+            int changeValue = switch(roll) {
+                case 1, 2, 3, 18 -> 3;
+                case 4, 17 -> 2;
+                case 5, 6, 15, 16 -> 1;
+                default -> 0;
+            };
+
+            if(changeValue > 0) {
+                changeLoyalty(isPositive ? changeValue : -changeValue);
+            }
+        };
+
+        applyLoyaltyChange.accept(Compute.d6(3));
+
+        if (isMajor) {
+            applyLoyaltyChange.accept(Compute.d6(3));
+        }
+
+        if (isVerbose && (originalLoyalty != loyalty)) {
+            String messageKey = originalLoyalty > loyalty ? "loyaltyChangePositive.text" : "loyaltyChangeNegative.text";
+            campaign.addReport(String.format(resources.getString(messageKey), getHyperlinkedFullTitle()));
         }
     }
 
@@ -1248,6 +1388,16 @@ public class Person {
 
     public void setLoyalty(int loyalty) {
         this.loyalty = loyalty;
+    }
+
+    /**
+     * Changes the loyalty value for the current person by the specified amount.
+     * Positive values increase loyalty, while negative values decrease loyalty.
+     *
+     * @param change The amount to change the loyalty value by.
+     */
+    public void changeLoyalty(int change) {
+        this.loyalty += change;
     }
 
     /**

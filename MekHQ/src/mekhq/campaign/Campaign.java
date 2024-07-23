@@ -241,6 +241,7 @@ public class Campaign implements ITechManager {
     private transient AbstractProcreation procreation;
 
     private RetirementDefectionTracker retirementDefectionTracker;
+    private List<String> turnoverRetirementInformation;
 
     private AtBConfiguration atbConfig; //AtB
     private AtBEventProcessor atbEventProcessor; //AtB
@@ -304,6 +305,7 @@ public class Campaign implements ITechManager {
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
+        turnoverRetirementInformation = new ArrayList<>();
         atbConfig = null;
         autosaveService = new AutosaveService();
         hasActiveContract = false;
@@ -500,6 +502,14 @@ public class Campaign implements ITechManager {
 
     public RetirementDefectionTracker getRetirementDefectionTracker() {
         return retirementDefectionTracker;
+    }
+
+    public List<String> getTurnoverRetirementInformation() {
+        return turnoverRetirementInformation;
+    }
+
+    public void setTurnoverRetirementInformation(final List<String> turnoverRetirementInformation) {
+        this.turnoverRetirementInformation = turnoverRetirementInformation;
     }
 
     /**
@@ -708,6 +718,8 @@ public class Campaign implements ITechManager {
      * @return False if there were payments AND they were unable to be processed, true otherwise.
      */
     public boolean applyRetirement(Money totalPayout, Map<UUID, UUID> unitAssignments) {
+        turnoverRetirementInformation.clear();
+
         if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
             if (getFinances().debit(TransactionType.PAYOUT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
@@ -721,20 +733,24 @@ public class Campaign implements ITechManager {
                                 int roll = Compute.randomInt(20);
 
                                 if (roll == 0) {
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+                                    person.changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
                                 }
                             } else {
-                                getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                                person.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                             }
                         } else if (person.getAge(getLocalDate()) >= 50) {
-                            getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         } else {
-                            getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                         }
                     }
 
+                    if (!person.getStatus().isActive()) {
+                        turnoverRetirementInformation.add(String.format(person.getStatus().getReportText(), person.getHyperlinkedFullTitle()));
+                    }
+
                     if (wasSacked) {
-                        getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
+                        person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
                     }
 
                     // civilian spouses follow their partner in departing
@@ -743,13 +759,18 @@ public class Campaign implements ITechManager {
                     if ((spouse != null) && (spouse.getPrimaryRole().isCivilian())) {
                         addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
                         spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+
+                        turnoverRetirementInformation.add(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
                     }
 
                     // non-civilian spouses may divorce the remaining partner
                     if ((person.getAge(getLocalDate()) >= 50) && (!campaignOptions.getRandomDivorceMethod().isNone())) {
                         if ((spouse != null) && (spouse.isDivorceable()) && (!spouse.getPrimaryRole().isCivilian())) {
-                            if ((person.getStatus().isDefected()) || (Compute.randomInt(20) == 0)) {
+                            if ((person.getStatus().isDefected()) || (Compute.randomInt(6) == 0)) {
                                 getDivorce().divorce(this, getLocalDate(), person, SplittingSurnameStyle.WEIGHTED);
+
+                                turnoverRetirementInformation.add(String.format(resources.getString("divorce.text"),
+                                        person.getHyperlinkedFullTitle(), spouse.getHyperlinkedFullTitle()));
                             }
                         }
                     }
@@ -765,15 +786,21 @@ public class Campaign implements ITechManager {
                             if ((hasRemainingParent) && (Compute.randomInt(2) == 0)) {
                                     addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
                                     child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+
+                                turnoverRetirementInformation.add(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
                             }
 
                             // if there is no remaining parent, the child will always depart, unless the parents are dead
                             if ((!hasRemainingParent) && (child.getGenealogy().hasLivingParents())) {
                                 addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
                                 child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+
+                                turnoverRetirementInformation.add(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
                             } else if (!child.getGenealogy().hasLivingParents()) {
                                 addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("orphaned.text"));
-                                ServiceLogger.oprhaned(person, getLocalDate());
+
+                                turnoverRetirementInformation.add(child.getHyperlinkedFullTitle() + ' ' + resources.getString("orphaned.text"));
+                                ServiceLogger.orphaned(person, getLocalDate());
                             }
                         }
                     }
@@ -792,6 +819,8 @@ public class Campaign implements ITechManager {
 
         return true;
     }
+
+
 
     public CampaignSummary getCampaignSummary() {
         return campaignSummary;
@@ -3665,6 +3694,15 @@ public class Campaign implements ITechManager {
         getFinances().newDay(this, yesterday, getLocalDate());
 
         MekHQ.triggerEvent(new NewDayEvent(this));
+
+        // this duplicates any turnover information so that it is still available on the new day.
+        // otherwise, it's only available if the user inspects history records
+        if (!turnoverRetirementInformation.isEmpty()) {
+            for (String entry : turnoverRetirementInformation) {
+                addReport(entry);
+            }
+        }
+
         return true;
     }
 

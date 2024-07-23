@@ -651,29 +651,25 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EXECUTE: {
-                String title = (people.length == 1) ? people[0].getFullTitle()
-                        : String.format(resources.getString("numPrisoners.text"), people.length);
-                if (0 == JOptionPane.showConfirmDialog(null,
-                        String.format(resources.getString("confirmExecute.format"), title),
-                        resources.getString("executeQ.text"),
-                        JOptionPane.YES_NO_OPTION)) {
-                    for (Person person : people) {
-                        gui.getCampaign().removePerson(person);
-                    }
-                }
+                processExecutionsOrJettisonCommands(
+                        people,
+                        "confirmExecute.format",
+                        "executeQ.text",
+                        "executeLoyaltyChange.text",
+                        false
+                );
+
                 break;
             }
             case CMD_JETTISON: {
-                String title = (people.length == 1) ? people[0].getFullTitle()
-                        : String.format(resources.getString("numPrisoners.text"), people.length);
-                if (0 == JOptionPane.showConfirmDialog(null,
-                        String.format(resources.getString("confirmJettison.format"), title),
-                        resources.getString("jettisonQ.text"),
-                        JOptionPane.YES_NO_OPTION)) {
-                    for (Person person : people) {
-                        gui.getCampaign().removePerson(person);
-                    }
-                }
+                processExecutionsOrJettisonCommands(
+                        people,
+                        "confirmJettison.format",
+                        "jettisonQ.text",
+                        "jettisonLoyaltyChange.text",
+                        true
+                );
+
                 break;
             }
             case CMD_RECRUIT: {
@@ -1185,6 +1181,68 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             default: {
                 break;
+            }
+        }
+    }
+
+    /**
+     * This method processes the execution or jettison commands for a given set of prisoners.
+     *
+     * @param prisoners                 an array of Person objects representing the prisoners being executed
+     * @param message                   the message prompting the user to decide whether to perform the executions
+     * @param title                     the title of the dialog box
+     * @param loyaltyChangeText         string representing the resource for the loyalty change text
+     * @param isMajor                   whether the resulting loyalty change is classified as a major event
+     */
+    private void processExecutionsOrJettisonCommands(Person[] prisoners, String message, String title,
+                                                     String loyaltyChangeText, boolean isMajor) {
+
+        int executionRolls = (int) Math.floor((double) prisoners.length / 20);
+
+        String label;
+
+        if (prisoners.length == 1) {
+            label = prisoners[0].getFullTitle();
+        } else {
+            label = String.format(resources.getString("numPrisoners.text"), prisoners.length);
+        }
+
+        if (0 == JOptionPane.showConfirmDialog(null,
+                String.format(resources.getString(message), title, executionRolls),
+                resources.getString(label),
+                JOptionPane.YES_NO_OPTION)) {
+            for (Person prisoner : prisoners) {
+                gui.getCampaign().removePerson(prisoner);
+            }
+        }
+
+        if (gui.getCampaign().getCampaignOptions().isUseLoyaltyModifiers()) {
+            for (int i = 0; i < executionRolls; i++) {
+                processExecutionLoyaltyChange(isMajor);
+            }
+            gui.getCampaign().addReport(resources.getString(loyaltyChangeText));
+        }
+    }
+
+    /**
+     * This method processes loyalty changes prompted by the execution of prisoners.
+     *
+     * @param isMajor a boolean indicating whether the loyalty change is a major change
+     */
+    private void processExecutionLoyaltyChange(boolean isMajor) {
+        LocalDate currentDate = gui.getCampaign().getLocalDate();
+
+        for (Person person : gui.getCampaign().getPersonnel()) {
+            if (!person.getStatus().isDepartedUnit()) {
+                if (!person.isCommander()) {
+                    if (!person.isChild(currentDate)) {
+                        if (person.getPrisonerStatus().isFreeOrBondsman()) {
+                            person.performForcedDirectionLoyaltyChange(gui.getCampaign(), Compute.d6(1) >= 3, isMajor, false);
+                        } else {
+                            person.performForcedDirectionLoyaltyChange(gui.getCampaign(), false, isMajor, false);
+                        }
+                    }
+                }
             }
         }
     }
