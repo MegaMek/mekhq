@@ -127,7 +127,7 @@ public class PersonalityController {
 
         String firstName = person.getFirstName();
         String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(person.getGender());
-        String forward = pronoun;
+        String forward;
 
         for (int index = 0; index < traitDescriptions.size(); index++) {
             forward = pronoun;
