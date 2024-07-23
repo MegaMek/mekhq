@@ -67,6 +67,7 @@ import java.awt.*;
 import java.io.File;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 
@@ -345,7 +346,11 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void completeMission() {
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMHQOptions().getLocale());
+
         final Mission mission = comboMission.getSelectedItem();
+
         if (mission == null) {
             return;
         } else if (mission.hasPendingScenarios()) {
@@ -367,6 +372,37 @@ public final class BriefingTab extends CampaignGuiTab {
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             if (((AtBContract) mission).contractExtended(getCampaign())) {
                 return;
+            }
+        }
+
+        if (getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()) {
+            List<Person> people = getCampaign().getCurrentPrisoners();
+
+            if (!people.isEmpty()) {
+                Money total = Money.zero();
+                total = total.plus(people.stream()
+                        .map(person -> person.getRansomValue(getCampaign()))
+                        .collect(Collectors.toList()));
+
+                int optionSelected = JOptionPane.showConfirmDialog(
+                        null,
+                        String.format(resources.getString("ransomQ.format"),
+                                people.size(),
+                                total.toAmountAndSymbolString()),
+                        resources.getString("ransom.text"),
+                        JOptionPane.YES_NO_CANCEL_OPTION);
+
+                if (optionSelected == JOptionPane.YES_OPTION) {
+                    getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
+                            people.size(),
+                            total.toAmountAndSymbolString()));
+                    getCampaign().addFunds(TransactionType.RANSOM, total, resources.getString("ransom.text"));
+                    for (Person person : people) {
+                        getCampaign().removePerson(person, false);
+                    }
+                } else if (optionSelected == JOptionPane.CANCEL_OPTION) {
+                    return;
+                }
             }
         }
 
