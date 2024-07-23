@@ -2028,7 +2028,7 @@ public class ResolveScenarioTracker {
             String status = Unit.getDamageStateName(entity.getDamageLevel(false));
             if (!Unit.isRepairable(entity)) {
                 color = "rgb(190, 150, 55)";
-                status = "Salvage";
+                status = "Irreparable";
             } else if (!Unit.isFunctional(entity)) {
                 color = "rgb(205, 92, 92)";
                 status = "Inoperable";
