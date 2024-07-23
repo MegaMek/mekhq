@@ -307,10 +307,6 @@ public class CampaignGUI extends JPanel {
         frame.getContentPane().add(this, BorderLayout.CENTER);
         frame.validate();
 
-        if (isMacOSX()) {
-            enableFullScreenMode(frame);
-        }
-
         frame.setVisible(true);
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -1267,20 +1263,6 @@ public class CampaignGUI extends JPanel {
         AutoAwardsController autoAwardsController = new AutoAwardsController();
 
         autoAwardsController.ManualController(getCampaign(), true);
-    }
-
-    private static void enableFullScreenMode(Window window) {
-        try {
-            GraphicsEnvironment.getLocalGraphicsEnvironment()
-                    .getDefaultScreenDevice()
-                    .setFullScreenWindow(window);
-        } catch (Exception t) {
-            LogManager.getLogger().error("Full screen mode is not supported", t);
-        }
-    }
-
-    private static boolean isMacOSX() {
-        return System.getProperty("os.name").contains("Mac OS X");
     }
 
     private void changeTheme(ActionEvent evt) {
