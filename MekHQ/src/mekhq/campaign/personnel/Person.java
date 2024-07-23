@@ -991,6 +991,28 @@ public class Person {
                 refreshLoyalty(campaign);
 
                 break;
+            case SACKED:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.sacked(this, today);
+
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
+                    setRetirement(today);
+                }
+
+                refreshLoyalty(campaign);
+
+                break;
+            case LEFT:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.left(this, today);
+
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
+                    setRetirement(today);
+                }
+
+                refreshLoyalty(campaign);
+
+                break;
             case PREGNANCY_COMPLICATIONS:
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 // purposeful fall through
