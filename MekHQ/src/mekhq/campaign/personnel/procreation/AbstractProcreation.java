@@ -35,6 +35,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -358,6 +359,9 @@ public abstract class AbstractProcreation {
 
             // set loyalty
             baby.setLoyalty(Compute.d6(4, 3));
+
+            // set baby's personality
+            PersonalityController.generatePersonality(baby);
 
             // Recruit the baby
             campaign.recruitPerson(baby, prisonerStatus, true, true);

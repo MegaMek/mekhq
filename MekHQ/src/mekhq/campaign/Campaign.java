@@ -91,6 +91,7 @@ import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -1366,11 +1367,13 @@ public class Campaign implements ITechManager {
                     Gender.RANDOMIZE);
         }
 
-        if (person.getAge(getLocalDate()) <= 16) {
+        if (person.getAge(getLocalDate()) < 16) {
             person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
         } else {
             person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
         }
+
+        PersonalityController.generatePersonality(person);
 
         return person;
     }
@@ -1467,6 +1470,8 @@ public class Campaign implements ITechManager {
         if (person.getAge(getLocalDate()) >= 16) {
             person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
         }
+
+        PersonalityController.generatePersonality(person);
 
         return person;
     }

@@ -266,6 +266,7 @@ public class CampaignOptions {
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
     private RandomOriginOptions randomOriginOptions;
+    private boolean useRandomPersonalities;
 
     // Retirement
     private boolean useRetirementDateTracking;
@@ -808,6 +809,7 @@ public class CampaignOptions {
         // Personnel Randomization
         setUseDylansRandomXP(false);
         setRandomOriginOptions(new RandomOriginOptions(true));
+        setUseRandomPersonalities(false);
 
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
@@ -1804,6 +1806,14 @@ public class CampaignOptions {
 
     public void setRandomOriginOptions(final RandomOriginOptions randomOriginOptions) {
         this.randomOriginOptions = randomOriginOptions;
+    }
+
+    public boolean isUseRandomPersonalities() {
+        return useRandomPersonalities;
+    }
+
+    public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
+        this.useRandomPersonalities = useRandomPersonalities;
     }
     //endregion Personnel Randomization
 
@@ -4586,6 +4596,7 @@ public class CampaignOptions {
         //region Personnel Randomization
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
         getRandomOriginOptions().writeToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
         //endregion Personnel Randomization
 
         //region Retirement
@@ -5316,6 +5327,8 @@ public class CampaignOptions {
                         continue;
                     }
                     retVal.setRandomOriginOptions(randomOriginOptions);
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalities")) {
+                    retVal.setUseRandomPersonalities(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Personnel Randomization
 
                     //region Family

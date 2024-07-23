@@ -194,6 +194,26 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
+        if ((!person.getPersonalityDescription().isBlank())
+                && (campaign.getCampaignOptions().isUseRandomPersonalities())
+                && (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the descriptions won't fit
+            JTextPane txtDesc = new JTextPane();
+            txtDesc.setName("personalityDescription");
+            txtDesc.setEditable(false);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getPersonalityDescription()));
+            txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(txtDesc, gridBagConstraints);
+            gridy++;
+        }
+
         if (!person.getBiography().isBlank()) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setName("txtDesc");
