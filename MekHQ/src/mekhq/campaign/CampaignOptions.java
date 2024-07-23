@@ -266,6 +266,7 @@ public class CampaignOptions {
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
     private RandomOriginOptions randomOriginOptions;
+    private boolean useRandomPersonalities;
 
     // Retirement
     private boolean useRetirementDateTracking;
@@ -297,7 +298,6 @@ public class CampaignOptions {
     private boolean useFamilyModifiers;
     private boolean useLoyaltyModifiers;
     private boolean useHideLoyalty;
-    private boolean useLeadershipChangeRefresh;
 
     private int payoutRateOfficer;
     private int payoutRateEnlisted;
@@ -809,6 +809,7 @@ public class CampaignOptions {
         // Personnel Randomization
         setUseDylansRandomXP(false);
         setRandomOriginOptions(new RandomOriginOptions(true));
+        setUseRandomPersonalities(false);
 
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
@@ -973,7 +974,6 @@ public class CampaignOptions {
 
         setUseLoyaltyModifiers(true);
         setUseHideLoyalty(false);
-        setUseLeadershipChangeRefresh(true);
 
         setPayoutRateOfficer(3);
         setPayoutRateEnlisted(3);
@@ -1807,6 +1807,14 @@ public class CampaignOptions {
     public void setRandomOriginOptions(final RandomOriginOptions randomOriginOptions) {
         this.randomOriginOptions = randomOriginOptions;
     }
+
+    public boolean isUseRandomPersonalities() {
+        return useRandomPersonalities;
+    }
+
+    public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
+        this.useRandomPersonalities = useRandomPersonalities;
+    }
     //endregion Personnel Randomization
 
     //region Retirement
@@ -1894,14 +1902,6 @@ public class CampaignOptions {
 
     public void setUseHideLoyalty(final boolean useHideLoyalty) {
         this.useHideLoyalty = useHideLoyalty;
-    }
-
-    public boolean isUseLeadershipChangeRefresh() {
-        return useLeadershipChangeRefresh;
-    }
-
-    public void setUseLeadershipChangeRefresh(final boolean useLeadershipChangeRefresh) {
-        this.useLeadershipChangeRefresh = useLeadershipChangeRefresh;
     }
 
     public boolean isUseRandomFounderTurnover() {
@@ -4596,6 +4596,7 @@ public class CampaignOptions {
         //region Personnel Randomization
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
         getRandomOriginOptions().writeToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
         //endregion Personnel Randomization
 
         //region Retirement
@@ -4628,7 +4629,6 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoyaltyModifiers", isUseLoyaltyModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useHideLoyalty", isUseHideLoyalty());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadershipChangeRefresh", isUseLeadershipChangeRefresh());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateOfficer", getPayoutRateOfficer());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateEnlisted", getPayoutRateEnlisted());
@@ -5327,6 +5327,8 @@ public class CampaignOptions {
                         continue;
                     }
                     retVal.setRandomOriginOptions(randomOriginOptions);
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalities")) {
+                    retVal.setUseRandomPersonalities(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Personnel Randomization
 
                     //region Family
@@ -5625,8 +5627,6 @@ public class CampaignOptions {
                     retVal.setUseLoyaltyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useHideLoyalty")) {
                     retVal.setUseHideLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useLeadershipChangeRefresh")) {
-                    retVal.setUseLeadershipChangeRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateOfficer")) {
                     retVal.setPayoutRateOfficer(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateEnlisted")) {

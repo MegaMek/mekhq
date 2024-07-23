@@ -62,3 +62,9 @@
 /settings_local.gradle
 /*.sav.gz
 .DS_Store
+
+MegaMek.l4j.ini
+MegaMekLab.l4j.ini
+MekHQ.l4j.ini
+
+mhq-revision.txt

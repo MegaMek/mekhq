@@ -194,6 +194,26 @@ public class PersonViewPanel extends JScrollablePanel {
             }
         }
 
+        if ((!person.getPersonalityDescription().isBlank())
+                && (campaign.getCampaignOptions().isUseRandomPersonalities())
+                && (!person.isChild(campaign.getLocalDate()))) { // we don't display for children, as most of the descriptions won't fit
+            JTextPane txtDesc = new JTextPane();
+            txtDesc.setName("personalityDescription");
+            txtDesc.setEditable(false);
+            txtDesc.setContentType("text/html");
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getPersonalityDescription()));
+            txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridy;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(txtDesc, gridBagConstraints);
+            gridy++;
+        }
+
         if (!person.getBiography().isBlank()) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setName("txtDesc");
@@ -380,6 +400,13 @@ public class PersonViewPanel extends JScrollablePanel {
         return boxRibbons;
     }
 
+    /**
+     * Returns the number of image tiers for an award based on the maximum number of tiers and the number of awards received.
+     *
+     * @param award The award for which to calculate the number of tiers.
+     * @param maximumTiers The maximum number of tiers allowed for the award.
+     * @return The number of tiers for the award. The value is clamped between 1 and the maximum number of tiers.
+     */
     private int getAwardTierCount(Award award, int maximumTiers) {
         int numAwards = person.getAwardController().getNumberOfAwards(award);
         int tierSize = campaign.getCampaignOptions().getAwardTierSize();
@@ -387,11 +414,10 @@ public class PersonViewPanel extends JScrollablePanel {
         int divisionResult = numAwards / tierSize;
         int addition = (tierSize == 1) ? 0 : 1;
 
-        int awardTierCount = MathUtility.clamp(
+        return MathUtility.clamp(
                 divisionResult + addition,
                 1, maximumTiers
         );
-        return awardTierCount;
     }
 
     /**
@@ -404,14 +430,14 @@ public class PersonViewPanel extends JScrollablePanel {
                 .getAwards()
                 .stream().filter(a -> a.getNumberOfMedalFiles() > 0)
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
 
         for (Award award : awards) {
             JLabel medalLabel = new JLabel();
 
             Image medal;
             try {
-                int maximumTiers = award.getNumberOfRibbonFiles();
+                int maximumTiers = award.getNumberOfMedalFiles();
                 int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String medalFileName = award.getMedalFileName(awardTierCount);
@@ -460,7 +486,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image miscAward;
             try {
-                int maximumTiers = award.getNumberOfRibbonFiles();
+                int maximumTiers = award.getNumberOfMiscFiles();
                 int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String miscFileName = award.getMiscFileName(awardTierCount);

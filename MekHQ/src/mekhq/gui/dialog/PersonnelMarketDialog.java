@@ -48,6 +48,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.*;
 
@@ -125,6 +127,13 @@ public class PersonnelMarketDialog extends JDialog {
         setTitle("Personnel Market");
         setName("Form");
         getContentPane().setLayout(new BorderLayout());
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeOrCancelActionPerformed();
+            }
+        });
 
         panelFilterBtns.setLayout(new GridBagLayout());
 
@@ -235,7 +244,7 @@ public class PersonnelMarketDialog extends JDialog {
             }
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {
-                sortKeys.add(new RowSorter.SortKey(column.ordinal(), sortOrder));
+                sortKeys.add(new SortKey(column.ordinal(), sortOrder));
             }
         }
         sorter.setSortKeys(sortKeys);
@@ -413,11 +422,19 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {
+        LogManager.getLogger().info("btnClose");
+        closeOrCancelActionPerformed();
+    }
+
+    private void closeOrCancelActionPerformed() {
         selectedPerson = null;
+
         personnelMarket.setPaidRecruitment(radioPaidRecruitment.isSelected());
+
         if (radioPaidRecruitment.isSelected()) {
             personnelMarket.setPaidRecruitRole((PersonnelRole) comboRecruitRole.getSelectedItem());
         }
+
         setVisible(false);
     }
 

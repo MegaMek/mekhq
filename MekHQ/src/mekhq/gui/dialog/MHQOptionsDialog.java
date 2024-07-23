@@ -109,8 +109,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private ColourSelectorButton optionHealedInjuriesBackground;
     private ColourSelectorButton optionPregnantForeground;
     private ColourSelectorButton optionPregnantBackground;
-    private ColourSelectorButton optionPaidRetirementForeground;
-    private ColourSelectorButton optionPaidRetirementBackground;
     private ColourSelectorButton optionStratConHexCoordForeground;
     private ColourSelectorButton optionFontColorNegative;
     private ColourSelectorButton optionFontColorWarning;
@@ -486,10 +484,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         optionPregnantBackground = new ColourSelectorButton(resources.getString("optionPregnantBackground.text"));
 
-        optionPaidRetirementForeground = new ColourSelectorButton(resources.getString("optionPaidRetirementForeground.text"));
-
-        optionPaidRetirementBackground = new ColourSelectorButton(resources.getString("optionPaidRetirementBackground.text"));
-
         optionStratConHexCoordForeground = new ColourSelectorButton(resources.getString("optionStratConHexCoordForeground.text"));
 
         optionFontColorNegative = new ColourSelectorButton(resources.getString("optionFontColorNegative.text"));
@@ -556,9 +550,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(optionPregnantForeground)
                                 .addComponent(optionPregnantBackground, Alignment.TRAILING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(optionPaidRetirementForeground)
-                                .addComponent(optionPaidRetirementBackground, Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionStratConHexCoordForeground))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionFontColorNegative)
@@ -614,9 +605,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionPregnantForeground)
                                 .addComponent(optionPregnantBackground))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(optionPaidRetirementForeground)
-                                .addComponent(optionPaidRetirementBackground))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionStratConHexCoordForeground))
                         .addGroup(layout.createSequentialGroup()

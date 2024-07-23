@@ -25,9 +25,9 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
+import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 
 import java.time.LocalDate;
@@ -197,10 +197,18 @@ public abstract class AbstractDivorce {
             reason = FormerSpouseReason.DIVORCE;
 
             PersonalLogger.divorcedFrom(origin, spouse, today);
-            PersonalLogger.divorcedFrom(spouse, origin, today);
 
-            campaign.addReport(String.format(resources.getString("divorce.report"),
-                    origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
+            if (origin.getStatus().isDead()) {
+                PersonalLogger.widowedBy(spouse, origin, today);
+
+                campaign.addReport(String.format(resources.getString("widowed.report"),
+                        origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
+            } else {
+                PersonalLogger.divorcedFrom(spouse, origin, today);
+
+                campaign.addReport(String.format(resources.getString("divorce.report"),
+                        origin.getHyperlinkedName(), spouse.getHyperlinkedName()));
+            }
 
             spouse.setMaidenName(null);
             origin.setMaidenName(null);
