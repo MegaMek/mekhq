@@ -1025,10 +1025,6 @@ public class Person {
             setDateOfDeath(today);
 
             if ((genealogy.hasSpouse()) && (!genealogy.getSpouse().getStatus().isDead())) {
-                if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                    performRandomizedLoyaltyChange(campaign, isPregnant(), true);
-                }
-
                 campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), getGenealogy().getSpouse());
             }
 
@@ -1038,16 +1034,8 @@ public class Person {
                     if (!child.getStatus().isDead()) {
                         if (!child.getGenealogy().hasLivingParents()) {
                             ServiceLogger.orphaned(child, campaign.getLocalDate());
-
-                            if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                                child.performRandomizedLoyaltyChange(campaign, isChild(campaign.getLocalDate()), true);
-                            }
-                        } else if ((child.getGenealogy().hasLivingParents()) && (child.isChild(campaign.getLocalDate()))) {
+                        } else if (child.getGenealogy().hasLivingParents()) {
                             PersonalLogger.RelativeHasDied(child, this, resources.getString("relationParent.text"), campaign.getLocalDate());
-
-                            if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                                child.performRandomizedLoyaltyChange(campaign, false, true);
-                            }
                         }
                     }
                 }
@@ -1057,10 +1045,6 @@ public class Person {
                 for (Person parent : genealogy.getParents()) {
                     if (!parent.getStatus().isDead()) {
                         PersonalLogger.RelativeHasDied(parent, this, resources.getString("relationChild.text"), campaign.getLocalDate());
-
-                        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                                parent.performRandomizedLoyaltyChange(campaign, true, true);
-                        }
                     }
                 }
             }
