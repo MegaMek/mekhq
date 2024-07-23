@@ -77,6 +77,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
@@ -91,7 +92,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_SECONDARY_DESIGNATOR = "DESIG_SEC";
     private static final String CMD_ADD_AWARD = "ADD_AWARD";
     private static final String CMD_RMV_AWARD = "RMV_AWARD";
-    private static final String CMD_BEGIN_EDUCATION = "BEGIN_EDUCATION";
+    private static final String CMD_BEGIN_EDUCATION_ENROLLMENT = "BEGIN_EDUCATION_ENROLLMENT";
+    private static final String CMD_BEGIN_EDUCATION_RE_ENROLLMENT = "BEGIN_EDUCATION_RE_ENROLLMENT";
     private static final String CMD_COMPLETE_STAGE = "COMPLETE_STAGE";
     private static final String CMD_DROP_OUT = "DROP_OUT";
 
@@ -372,9 +374,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_BEGIN_EDUCATION: {
+            case CMD_BEGIN_EDUCATION_ENROLLMENT: {
                 for (Person person : people) {
-                    EducationController.beginEducation(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5]);
+                    EducationController.performEducationPreEnrollmentActions(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5], false);
+                }
+                break;
+            }
+            case CMD_BEGIN_EDUCATION_RE_ENROLLMENT: {
+                for (Person person : people) {
+                    EducationController.performEducationPreEnrollmentActions(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5], true);
                 }
                 break;
             }
@@ -649,29 +657,25 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EXECUTE: {
-                String title = (people.length == 1) ? people[0].getFullTitle()
-                        : String.format(resources.getString("numPrisoners.text"), people.length);
-                if (0 == JOptionPane.showConfirmDialog(null,
-                        String.format(resources.getString("confirmExecute.format"), title),
-                        resources.getString("executeQ.text"),
-                        JOptionPane.YES_NO_OPTION)) {
-                    for (Person person : people) {
-                        gui.getCampaign().removePerson(person);
-                    }
-                }
+                processExecutionsOrJettisonCommands(
+                        people,
+                        "confirmExecute.format",
+                        "executeQ.text",
+                        "executeLoyaltyChange.text",
+                        false
+                );
+
                 break;
             }
             case CMD_JETTISON: {
-                String title = (people.length == 1) ? people[0].getFullTitle()
-                        : String.format(resources.getString("numPrisoners.text"), people.length);
-                if (0 == JOptionPane.showConfirmDialog(null,
-                        String.format(resources.getString("confirmJettison.format"), title),
-                        resources.getString("jettisonQ.text"),
-                        JOptionPane.YES_NO_OPTION)) {
-                    for (Person person : people) {
-                        gui.getCampaign().removePerson(person);
-                    }
-                }
+                processExecutionsOrJettisonCommands(
+                        people,
+                        "confirmJettison.format",
+                        "jettisonQ.text",
+                        "jettisonLoyaltyChange.text",
+                        true
+                );
+
                 break;
             }
             case CMD_RECRUIT: {
@@ -1180,6 +1184,68 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
     }
 
+    /**
+     * This method processes the execution or jettison commands for a given set of prisoners.
+     *
+     * @param prisoners                 an array of Person objects representing the prisoners being executed
+     * @param message                   the message prompting the user to decide whether to perform the executions
+     * @param title                     the title of the dialog box
+     * @param loyaltyChangeText         string representing the resource for the loyalty change text
+     * @param isMajor                   whether the resulting loyalty change is classified as a major event
+     */
+    private void processExecutionsOrJettisonCommands(Person[] prisoners, String message, String title,
+                                                     String loyaltyChangeText, boolean isMajor) {
+
+        int executionRolls = (int) Math.floor((double) prisoners.length / 20);
+
+        String label;
+
+        if (prisoners.length == 1) {
+            label = prisoners[0].getFullTitle();
+        } else {
+            label = String.format(resources.getString("numPrisoners.text"), prisoners.length);
+        }
+
+        if (0 == JOptionPane.showConfirmDialog(null,
+                String.format(resources.getString(message), title, executionRolls),
+                resources.getString(label),
+                JOptionPane.YES_NO_OPTION)) {
+            for (Person prisoner : prisoners) {
+                gui.getCampaign().removePerson(prisoner);
+            }
+        }
+
+        if (gui.getCampaign().getCampaignOptions().isUseLoyaltyModifiers()) {
+            for (int i = 0; i < executionRolls; i++) {
+                processExecutionLoyaltyChange(isMajor);
+            }
+            gui.getCampaign().addReport(resources.getString(loyaltyChangeText));
+        }
+    }
+
+    /**
+     * This method processes loyalty changes prompted by the execution of prisoners.
+     *
+     * @param isMajor a boolean indicating whether the loyalty change is a major change
+     */
+    private void processExecutionLoyaltyChange(boolean isMajor) {
+        LocalDate currentDate = gui.getCampaign().getLocalDate();
+
+        for (Person person : gui.getCampaign().getPersonnel()) {
+            if (!person.getStatus().isDepartedUnit()) {
+                if (!person.isCommander()) {
+                    if (!person.isChild(currentDate)) {
+                        if (person.getPrisonerStatus().isFreeOrBondsman()) {
+                            person.performForcedDirectionLoyaltyChange(gui.getCampaign(), Compute.d6(1) >= 3, isMajor, false);
+                        } else {
+                            person.performForcedDirectionLoyaltyChange(gui.getCampaign(), false, isMajor, false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void loadGMToolsForPerson(Person person) {
         GMToolsDialog gmToolsDialog = new GMToolsDialog(gui.getFrame(), gui, person);
         gmToolsDialog.setVisible(true);
@@ -1653,6 +1719,74 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 completeStage.setActionCommand(makeCommand(CMD_DROP_OUT));
                 completeStage.addActionListener(this);
                 academyMenu.add(completeStage);
+            }
+
+            if ((oneSelected) && (StaticChecks.areAllStudents(selected))) {
+                Academy academy = EducationController.getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                // this pile of if-statements just checks that the individual is eligible for re-enrollment
+                // has the person finished their education, but not yet returned to the unit?
+                if ((!person.getEduEducationStage().isJourneyToCampus()) && (!person.getEduEducationStage().isEducation())) {
+                    // is the academy still standing?
+                    if ((campaign.getGameYear() < academy.getDestructionYear()) && (campaign.getGameYear() < academy.getClosureYear())) {
+                        // if the academy is local, is the system still populated?
+                        if ((!academy.isLocal()) || (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) > 0)) {
+                            // is the person still within the correct age band?
+                            if ((person.getAge(campaign.getLocalDate()) < academy.getAgeMax()) && (person.getAge(campaign.getLocalDate()) >= academy.getAgeMin())) {
+                                // has the person been edited at some point and is no longer qualified?
+                                if (academy.isQualified(person)) {
+                                    // here we check that the person will benefit from re-enrollment
+                                    int improvementPossible = 0;
+
+                                    if (academy.getFilteredFaction(campaign, person, List.of(person.getEduAcademyFaction())) != null) {
+                                        int educationLevel = academy.getEducationLevel(person);
+
+                                        String[] skills = academy.getCurriculums().get(person.getEduCourseIndex()).split(",");
+
+                                        skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
+
+                                        for (String skill : skills) {
+                                            if (skill.equalsIgnoreCase("none")) {
+                                                continue;
+                                            }
+
+                                            if (skill.equalsIgnoreCase("xp")) {
+                                                if (EducationLevel.parseToInt(person.getEduHighestEducation()) < educationLevel) {
+                                                    improvementPossible++;
+                                                }
+                                            } else {
+                                                String skillParsed = skillParser(skill);
+
+                                                if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() < educationLevel)) {
+                                                    improvementPossible++;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    JMenuItem reEnroll;
+
+                                    if (improvementPossible > 0) {
+                                        reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
+                                        reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
+                                        reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT,
+                                                academy.getSet(),
+                                                academy.getName(),
+                                                String.valueOf(person.getEduCourseIndex()),
+                                                person.getEduAcademySystem(),
+                                                person.getEduAcademyFaction()));
+                                        reEnroll.addActionListener(this);
+                                    } else {
+                                        reEnroll = new JMenuItem(resources.getString("eduReEnrollImpossible.text"));
+                                        reEnroll.setToolTipText(resources.getString("eduReEnrollImpossible.toolTip"));
+                                    }
+
+                                    academyMenu.add(reEnroll);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             if ((StaticChecks.areAllStudents(selected)) && (campaign.isGM())) {
@@ -2987,10 +3121,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     if ((academy.isLocal()) || (academy.isHomeSchool())) {
                         courses.setToolTipText(academy.getTooltip(campaign, personnel, courseIndex, campaign.getCurrentSystem()));
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campaign.getCurrentSystem().getId(), faction));
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campaign.getCurrentSystem().getId(), faction));
                     } else {
                         courses.setToolTipText(academy.getTooltip(campaign, personnel, courseIndex, campaign.getSystemById(campus)));
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campus, faction));
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campus, faction));
                     }
                     courses.addActionListener(this);
                     academyOption.add(courses);
