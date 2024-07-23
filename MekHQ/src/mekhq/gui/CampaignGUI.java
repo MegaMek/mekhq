@@ -124,6 +124,26 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.xml.parsers.DocumentBuilder;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.List;
+import java.util.*;
+import java.util.stream.IntStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * The application's main frame.
@@ -1784,30 +1804,27 @@ public class CampaignGUI extends JPanel {
     protected void exportPlanets(FileType format, String dialogTitle, String filename) {
         // TODO: Fix this
         /*
-         * GUI.fileDialogSave(
-         * frame,
-         * dialogTitle,
-         * format,
-         * MekHQ.getPlanetsDirectory().getValue(),
-         * "planets." + format.getRecommendedExtension())
-         * .ifPresent(f -> {
-         * MekHQ.getPlanetsDirectory().setValue(f.getParent());
-         * File file = checkFileEnding(f, format.getRecommendedExtension());
-         * checkToBackupFile(file, file.getPath());
-         * String report = Planets.getInstance().exportPlanets(file.getPath(),
-         * format.getRecommendedExtension());
-         * JOptionPane.showMessageDialog(mainPanel, report);
-         * });
-         *
-         * GUI.fileDialogSave(frame, dialogTitle, new File(".", "planets." +
-         * format.getRecommendedExtension()), format).ifPresent(f -> {
-         * File file = checkFileEnding(f, format.getRecommendedExtension());
-         * checkToBackupFile(file, file.getPath());
-         * String report = Planets.getInstance().exportPlanets(file.getPath(),
-         * format.getRecommendedExtension());
-         * JOptionPane.showMessageDialog(mainPanel, report);
-         * });
-         */
+        GUI.fileDialogSave(
+                frame,
+                dialogTitle,
+                format,
+                MekHQ.getPlanetsDirectory().getValue(),
+                "planets." + format.getRecommendedExtension())
+                .ifPresent(f -> {
+                    MekHQ.getPlanetsDirectory().setValue(f.getParent());
+                    File file = checkFileEnding(f, format.getRecommendedExtension());
+                    checkToBackupFile(file, file.getPath());
+                    String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
+                    JOptionPane.showMessageDialog(mainPanel, report);
+                });
+
+        GUI.fileDialogSave(frame, dialogTitle, new File(".", "planets." + format.getRecommendedExtension()), format).ifPresent(f -> {
+            File file = checkFileEnding(f, format.getRecommendedExtension());
+            checkToBackupFile(file, file.getPath());
+            String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
+            JOptionPane.showMessageDialog(mainPanel, report);
+        });
+        */
     }
 
     /**
@@ -2519,6 +2536,13 @@ public class CampaignGUI extends JPanel {
         if (new InsufficientMedicsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
+        }
+
+        if (getCampaign().getLocalDate().equals(getCampaign().getLocalDate().with(TemporalAdjusters.lastDayOfMonth()))) {
+            if (new UnableToAffordExpensesNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+                evt.cancel();
+                return;
+            }
         }
 
         if (getCampaign().getCampaignOptions().isUseAtB()) {
