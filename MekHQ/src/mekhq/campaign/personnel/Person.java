@@ -1048,8 +1048,6 @@ public class Person {
                     }
                 }
             }
-
-            refreshLoyalty(campaign);
         }
 
         if (status.isActive()) {
