@@ -3731,6 +3731,7 @@ public class Campaign implements ITechManager {
                 .filter(p -> p.getStatus().isDepartedUnit())
                 .forEach(person -> {
                     PersonnelStatus status = person.getStatus();
+
                     if (shouldRemovePerson(person, status)) {
                         removePerson(person, false);
                     }
@@ -3747,9 +3748,14 @@ public class Campaign implements ITechManager {
      * @return true if the person should be removed, false otherwise.
      */
     private boolean shouldRemovePerson(Person person, PersonnelStatus status) {
-        int retirementMonthValue = Optional.ofNullable(person.getRetirement())
-                .map(LocalDate::getMonthValue)
-                .orElse(Integer.MAX_VALUE);
+        int retirementMonthValue;
+
+        if (person.getRetirement() != null) {
+            retirementMonthValue = person.getRetirement().getMonthValue();
+        } else {
+            person.setRetirement(getLocalDate());
+            return false;
+        }
 
         // return true if the individual has left the campaign for over a month
         // *AND*
@@ -6991,28 +6997,6 @@ public class Campaign implements ITechManager {
 
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 p.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
-            }
-        }
-    }
-
-    public void initRetirementDateTracking() {
-        for (Person person : getPersonnel()) {
-            if (person.getStatus().isRetired()) {
-                LocalDate retired = null;
-                LocalDate lastLoggedDate = null;
-                for (LogEntry entry : person.getPersonnelLog()) {
-                    lastLoggedDate = entry.getDate();
-                    if (entry.getDesc().startsWith("Retired")) {
-                        retired = entry.getDate();
-                    }
-                }
-
-                if (retired == null) {
-                    retired = lastLoggedDate;
-                }
-
-                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
-                person.setRetirement((retired != null) ? retired : getLocalDate().minusYears(1));
             }
         }
     }
