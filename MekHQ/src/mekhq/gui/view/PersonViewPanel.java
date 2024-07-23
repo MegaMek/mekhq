@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 
 /**
@@ -201,7 +202,7 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setName("personalityDescription");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
-            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getPersonalityDescription()));
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(wordWrap(person.getPersonalityDescription(), 200)));
             txtDesc.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlPersonality.title")));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -219,7 +220,7 @@ public class PersonViewPanel extends JScrollablePanel {
             txtDesc.setName("txtDesc");
             txtDesc.setEditable(false);
             txtDesc.setContentType("text/html");
-            txtDesc.setText(MarkdownRenderer.getRenderedHtml(person.getBiography()));
+            txtDesc.setText(MarkdownRenderer.getRenderedHtml(wordWrap(person.getBiography(), 200)));
             txtDesc.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlDescription.title")),
                     BorderFactory.createEmptyBorder(0, 2, 2, 2)));

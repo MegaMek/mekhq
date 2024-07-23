@@ -121,7 +121,7 @@ public class PersonalityController {
 
         // next we build a string that contains all the descriptions
         // these CSS tags are needed to avoid overspilling on the AtB Personnel Market
-        StringBuilder personalityDescription = new StringBuilder("<html><span style='display: inline-block; width: 200px;'>");
+        StringBuilder personalityDescription = new StringBuilder();
 
         String firstName = person.getFirstName();
         String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(person.getGender());
@@ -143,9 +143,6 @@ public class PersonalityController {
             personalityDescription.append(' ');
             personalityDescription.append(String.format(person.getPersonalityQuirk().getDescription(), firstName));
         }
-
-        // close off the CSS tags
-        personalityDescription.append("</span></html>");
 
         // finally we set the description in place
         person.setPersonalityDescription(personalityDescription.toString());
