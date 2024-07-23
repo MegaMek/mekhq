@@ -1006,18 +1006,14 @@ public class Person {
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.sacked(this, today);
 
-                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
-                    setRetirement(today);
-                }
+                setRetirement(today);
 
                 break;
             case LEFT:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.left(this, today);
 
-                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
-                    setRetirement(today);
-                }
+                setRetirement(today);
 
                 break;
             case PREGNANCY_COMPLICATIONS:
