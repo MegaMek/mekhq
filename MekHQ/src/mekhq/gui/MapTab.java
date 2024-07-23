@@ -184,7 +184,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMap.repaint();
     }
 
-    protected void refreshSystemView() {
+    private void refreshSystemView() {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
@@ -202,7 +202,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         }
     }
 
-    protected void refreshPlanetView() {
+    private void refreshPlanetView() {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
