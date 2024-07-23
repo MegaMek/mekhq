@@ -121,6 +121,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private MMComboBox<Greed> comboGreed;
     private MMComboBox<Social> comboSocial;
     private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
+    private MMComboBox<Intelligence> comboIntelligence;
 
     private Campaign campaign;
 
@@ -943,6 +944,26 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             panDemog.add(comboPersonalityQuirk, gridBagConstraints);
+
+            JLabel labelIntelligence = new JLabel();
+            labelIntelligence.setText("Intelligence:");
+            labelIntelligence.setName("labelIntelligence");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(labelIntelligence, gridBagConstraints);
+
+            comboIntelligence = new MMComboBox<>("comboIntelligence", Intelligence.values());
+            comboIntelligence.setSelectedItem(person.getIntelligence());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(comboIntelligence, gridBagConstraints);
         }
 
         y++;
@@ -1202,6 +1223,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setGreed(comboGreed.getSelectedItem());
             person.setSocial(comboSocial.getSelectedItem());
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
+            person.setIntelligence(comboIntelligence.getSelectedItem());
             PersonalityController.writeDescription(person);
         }
 
