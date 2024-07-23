@@ -28,8 +28,8 @@ import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.EntitySavingException;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
@@ -42,12 +42,12 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.*;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.model.UnitTableModel;
@@ -297,7 +297,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 if (!unit.isDeployed()) {
                     if (0 == JOptionPane.showConfirmDialog(null,
                             "Do you really want to disband this unit "
-                                    + unit.getName() + "?",
+                                    + unit.getName() + '?',
                             "Disband Unit?", JOptionPane.YES_NO_OPTION)) {
                         Vector<Part> parts = new Vector<>(unit.getParts());
                         for (Part p : parts) {
@@ -639,7 +639,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 if (allSameSite && unit.getSite() == i) {
                     cbMenuItem.setSelected(true);
                 } else {
-                    cbMenuItem.setActionCommand(COMMAND_CHANGE_SITE + ":" + i);
+                    cbMenuItem.setActionCommand(COMMAND_CHANGE_SITE + ':' + i);
                     cbMenuItem.addActionListener(this);
                 }
                 menu.add(cbMenuItem);
@@ -709,7 +709,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem.setEnabled(allUnitsAreRepairable);
                 menu.add(cbMenuItem);
 
-                cbMenuItem = new JCheckBoxMenuItem("Salvage");
+                cbMenuItem = new JCheckBoxMenuItem("Strip");
                 cbMenuItem.setSelected(areAllSalvageFlagged);
                 cbMenuItem.setActionCommand(COMMAND_SALVAGE);
                 cbMenuItem.addActionListener(this);
@@ -756,7 +756,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                         maintenanceMultiplierItem.setSelected(true);
                     }
 
-                    maintenanceMultiplierItem.setActionCommand(COMMAND_CHANGE_MAINT_MULTI + ":" + x);
+                    maintenanceMultiplierItem.setActionCommand(COMMAND_CHANGE_MAINT_MULTI + ':' + x);
                     maintenanceMultiplierItem.addActionListener(this);
                     menuItem.add(maintenanceMultiplierItem);
                 }
@@ -992,7 +992,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
     private void addCustomUnitTag(Unit... units) {
         String sCustomsDirCampaign = MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH
-                + gui.getCampaign().getName() + "/";
+                + gui.getCampaign().getName() + '/';
         File customsDir = new File(MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
@@ -1005,13 +1005,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         File customsDirCampaign = new File(sCustomsDirCampaign);
         if (!customsDirCampaign.exists()) {
             if (!customsDir.mkdir()) {
-                LogManager.getLogger().error("Unable to create directory " + sCustomsDirCampaign
-                        + "to hold custom units, cannot assign custom unit tag");
+                LogManager.getLogger().error("Unable to create directory {} to hold custom units, cannot assign custom unit tag", sCustomsDirCampaign);
                 return;
             }
         }
         for (Unit unit : units) {
-            String fileName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
+            String fileName = unit.getEntity().getChassis() + ' ' + unit.getEntity().getModel();
             if (unit.getEntity() instanceof Mech) {
                 // if this file already exists then don't overwrite
                 // it or we will end up with a bunch of copies
@@ -1047,11 +1046,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     BLKFile.encode(fileNameCampaign, unit.getEntity());
                 }
                 catch (EntitySavingException e) {
-                    LogManager.getLogger().error("Error encoding unit " + unit.getName(), e);
+                    LogManager.getLogger().error("Error encoding unit {}", unit.getName(), e);
                     return;
                 }
             }
-            gui.getCampaign().addCustom(unit.getEntity().getChassis() + " "
+            gui.getCampaign().addCustom(unit.getEntity().getChassis() + ' '
                     + unit.getEntity().getModel());
         }
         MechSummaryCache.getInstance().loadMechData();

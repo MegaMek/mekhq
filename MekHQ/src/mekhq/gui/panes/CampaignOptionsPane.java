@@ -306,7 +306,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel loyaltySubPanel = new JPanel();
     private JCheckBox chkUseHideLoyalty;
-    private JCheckBox chkUseLeadershipChangeRefresh;
 
     // Payout
     private JPanel turnoverAndRetentionPayoutPanel = new JPanel();
@@ -358,6 +357,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // Personnel Randomization
     private JCheckBox chkUseDylansRandomXP;
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
+    private JCheckBox chkUseRandomPersonalities;
 
     // Marriage
     private JCheckBox chkUseManualMarriages;
@@ -4267,7 +4267,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             boolean isUseLoyaltyModifiers = chkUseLoyaltyModifiers.isSelected();
             loyaltySubPanel.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
             chkUseHideLoyalty.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
-            chkUseLeadershipChangeRefresh.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
 
             boolean isUseServiceBonus = chkUsePayoutServiceBonus.isSelected();
             payoutServiceBonusSubPanel.setEnabled((isEnabled) && (isUseServiceBonus));
@@ -4654,11 +4653,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseHideLoyalty.setName("chkUseHideLoyalty");
         chkUseHideLoyalty.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
 
-        chkUseLeadershipChangeRefresh = new JCheckBox(resources.getString("chkUseLeadershipChangeRefresh.text"));
-        chkUseLeadershipChangeRefresh.setToolTipText(resources.getString("chkUseLeadershipChangeRefresh.toolTipText"));
-        chkUseLeadershipChangeRefresh.setName("chkUseLeadershipChangeRefresh");
-        chkUseLeadershipChangeRefresh.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
-
         loyaltySubPanel.setBorder(BorderFactory.createTitledBorder(""));
         loyaltySubPanel.setName("loyaltySubPanel");
         loyaltySubPanel.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
@@ -4671,13 +4665,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseHideLoyalty)
-                        .addComponent(chkUseLeadershipChangeRefresh)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseHideLoyalty)
-                        .addComponent(chkUseLeadershipChangeRefresh)
         );
     }
 
@@ -4979,6 +4971,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         randomOriginOptionsPanel = new RandomOriginOptionsPanel(getFrame(), campaign, comboFaction);
 
+        chkUseRandomPersonalities = new JCheckBox(resources.getString("chkUseRandomPersonalities.text"));
+        chkUseRandomPersonalities.setToolTipText(resources.getString("chkUseRandomPersonalities.toolTipText"));
+        chkUseRandomPersonalities.setName("chkUseRandomPersonalities");
+
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("personnelRandomizationPanel.title")));
@@ -4993,12 +4989,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createSequentialGroup()
                         .addComponent(chkUseDylansRandomXP)
                         .addComponent(randomOriginOptionsPanel)
+                        .addComponent(chkUseRandomPersonalities)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseDylansRandomXP)
                         .addComponent(randomOriginOptionsPanel)
+                        .addComponent(chkUseRandomPersonalities)
         );
 
         return panel;
@@ -8159,7 +8157,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseFamilyModifiers.setSelected(options.isUseFamilyModifiers());
         chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
         chkUseHideLoyalty.setSelected(options.isUseHideLoyalty());
-        chkUseLeadershipChangeRefresh.setSelected(options.isUseLeadershipChangeRefresh());
 
         // Payouts
         spnPayoutRateOfficer.setValue(options.getPayoutRateOfficer());
@@ -8191,6 +8188,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Personnel Randomization
         chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
         randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
+        chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
 
         // Family
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
@@ -8853,7 +8851,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseFamilyModifiers(chkUseFamilyModifiers.isSelected());
             options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
             options.setUseHideLoyalty(chkUseHideLoyalty.isSelected());
-            options.setUseLeadershipChangeRefresh(chkUseLeadershipChangeRefresh.isSelected());
 
             // Payouts
             options.setPayoutRateOfficer((Integer) spnPayoutRateOfficer.getValue());
@@ -8885,6 +8882,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Personnel Randomization
             options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
             options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
+            options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
 
             // Family
             options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
