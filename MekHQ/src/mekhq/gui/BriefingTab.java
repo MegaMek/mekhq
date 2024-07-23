@@ -67,6 +67,7 @@ import java.awt.*;
 import java.io.File;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 
@@ -345,7 +346,11 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void completeMission() {
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMHQOptions().getLocale());
+
         final Mission mission = comboMission.getSelectedItem();
+
         if (mission == null) {
             return;
         } else if (mission.hasPendingScenarios()) {
@@ -370,8 +375,61 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaign().getCampaignOptions().isUseRandomRetirement()
-                && getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
+        getCampaign().completeMission(mission, status);
+        MekHQ.triggerEvent(new MissionCompletedEvent(mission));
+
+        // resolve friendly PoW ransoming
+        // this needs to be before turnover and autoAwards so friendly PoWs can be factored into those events
+        if (getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()) {
+            List<Person> alliedPoWs = getCampaign().getFriendlyPrisoners();
+
+            if (!alliedPoWs.isEmpty()) {
+                Money total = alliedPoWs.stream()
+                        .map(person -> person.getRansomValue(getCampaign()))
+                        .reduce(Money.zero(), Money::plus);
+
+                String message;
+                int dialogOption;
+
+                if (getCampaign().getFunds().isLessThan(total)) {
+                    message = String.format(resources.getString("unableToRansom.format"), alliedPoWs.size(), total.toAmountAndSymbolString());
+                    dialogOption = JOptionPane.OK_CANCEL_OPTION;
+                } else {
+                    message = String.format(resources.getString("ransomFriendlyQ.format"), alliedPoWs.size(), total.toAmountAndSymbolString());
+                    dialogOption = JOptionPane.YES_NO_CANCEL_OPTION;
+                }
+
+                int optionSelected = JOptionPane.showConfirmDialog(
+                        null,
+                        message,
+                        resources.getString("ransom.text"),
+                        dialogOption
+                );
+
+                if (optionSelected != JOptionPane.OK_OPTION && getCampaign().getFunds().isLessThan(total)) {
+                    return;
+                }
+
+                switch (optionSelected) {
+                    case JOptionPane.YES_OPTION -> {
+                        getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
+                                alliedPoWs.size(), total.toAmountAndSymbolString()));
+                        getCampaign().removeFunds(TransactionType.RANSOM, total, resources.getString("ransom.text"));
+                        alliedPoWs.forEach(ally -> ally.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.ACTIVE));
+                    }
+
+                    case JOptionPane.NO_OPTION, JOptionPane.CANCEL_OPTION -> {}
+
+                    default -> {
+                        return;
+                    }
+                }
+            }
+        }
+
+        // resolve turnover
+        if ((getCampaign().getCampaignOptions().isUseRandomRetirement())
+                && (getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement())) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(), mission, true);
             rdd.setLocation(rdd.getLocation().x, 0);
             rdd.setVisible(true);
@@ -403,20 +461,79 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        getCampaign().completeMission(mission, status);
-        MekHQ.triggerEvent(new MissionCompletedEvent(mission));
-
+        // resolve bonus parts exchange
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             ((AtBContract) mission).checkForFollowup(getCampaign());
             bonusPartExchange((AtBContract) mission);
         }
 
+        // prompt autoAwards ceremony
         if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
 
             // for the purposes of Mission Accomplished awards, we do not count partial Successes as Success
             autoAwardsController.PostMissionController(getCampaign(), mission,
                     Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
+        }
+
+        // prompt enemy prisoner ransom & freeing
+        // this should always be placed after autoAwards, so that prisoners are not factored into autoAwards
+        if (getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()) {
+            List<Person> prisoners = getCampaign().getCurrentPrisoners();
+
+            if (!prisoners.isEmpty()) {
+                Money total = Money.zero();
+                total = total.plus(prisoners.stream()
+                        .map(person -> person.getRansomValue(getCampaign()))
+                        .collect(Collectors.toList()));
+
+                int optionSelected = JOptionPane.showConfirmDialog(
+                        null,
+                        String.format(resources.getString("ransomQ.format"),
+                                prisoners.size(),
+                                total.toAmountAndSymbolString()),
+                        resources.getString("ransom.text"),
+                        JOptionPane.YES_NO_CANCEL_OPTION);
+
+                switch (optionSelected) {
+                    case JOptionPane.YES_OPTION -> {
+                        getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
+                                prisoners.size(),
+                                total.toAmountAndSymbolString()));
+                        getCampaign().addFunds(TransactionType.RANSOM,
+                                total,
+                                resources.getString("ransom.text"));
+                        prisoners.forEach(prisoner -> getCampaign().removePerson(prisoner, false));
+                    }
+                    case JOptionPane.NO_OPTION -> {}
+                    default -> {
+                        return;
+                    }
+                }
+            }
+        }
+
+        List<Person> prisoners = getCampaign().getCurrentPrisoners();
+
+        if (!prisoners.isEmpty()) {
+            String title = (prisoners.size() == 1) ? prisoners.get(0).getFullTitle()
+                    : String.format(resources.getString("numPrisoners.text"), prisoners.size());
+            int option = JOptionPane.showConfirmDialog(null,
+                    String.format(resources.getString("confirmFree.format"), title),
+                    resources.getString("freeQ.text"),
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+
+            switch (option) {
+                case JOptionPane.YES_OPTION -> {
+                    for (Person prisoner : prisoners) {
+                        getCampaign().removePerson(prisoner);
+                    }
+                }
+                case JOptionPane.NO_OPTION -> {}
+                default -> {
+                    return;
+                }
+            }
         }
 
         final List<Mission> missions = getCampaign().getSortedMissions();

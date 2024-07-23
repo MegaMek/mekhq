@@ -732,7 +732,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
-                        String.format(resources.getString("ransomQ.format"), people.length, total.toAmountAndSymbolString()),
+                        String.format(resources.getString("ransomFriendlyQ.format"), people.length, total.toAmountAndSymbolString()),
                         resources.getString("ransom.text"),
                         JOptionPane.YES_NO_OPTION)) {
                     gui.getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
