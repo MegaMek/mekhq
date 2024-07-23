@@ -29,6 +29,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.Intelligence;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
@@ -851,6 +852,10 @@ public class EducationController {
             }
         }
 
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            graduationRoll += Intelligence.parseToInt(person.getIntelligence()) - 12;
+        }
+
         // qualification failed
         if (graduationRoll < 5) {
             if (academy.isHomeSchool()) {
@@ -891,7 +896,7 @@ public class EducationController {
             return false;
         }
 
-        if (graduationRoll == 99) {
+        if (graduationRoll >= 99) {
             if (Compute.d6(1) > 5) {
                 if (academy.isHomeSchool()) {
                     String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
@@ -1079,6 +1084,10 @@ public class EducationController {
             if (secondRoll < graduationRoll) {
                 graduationRoll = secondRoll;
             }
+        }
+
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            graduationRoll += Intelligence.parseToInt(person.getIntelligence()) - 12;
         }
 
         if (graduationRoll < 30) {
