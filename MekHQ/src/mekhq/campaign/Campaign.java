@@ -1730,6 +1730,16 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Provides a filtered list of personnel including only friendly PoWs.
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getFriendlyPrisoners() {
+        return getPersonnel().stream()
+                .filter(p -> p.getStatus().isPoW())
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Provides a filtered list of personnel including only Persons with the AWOL status.
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
