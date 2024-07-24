@@ -22,6 +22,7 @@ package mekhq.campaign.rating;
 
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
@@ -128,33 +129,46 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     protected abstract SkillLevel getExperienceLevelName(BigDecimal experience);
 
+    /**
+     * @return The combat record value calculated based on the amount of SUCCESS, PARTIAL, FAILED, and BREACH Missions.
+     */
     @Override
     public int getCombatRecordValue() {
-        setSuccessCount(0);
-        setPartialCount(0);
-        setFailCount(0);
-        setBreachCount(0);
+        int successCount = 0;
+        int partialCount = 0;
+        int failCount = 0;
+        int breachCount = 0;
+
         for (Mission m : getCampaign().getCompletedMissions()) {
             switch (m.getStatus()) {
-                case SUCCESS:
-                    setSuccessCount(getSuccessCount() + 1);
-                    break;
-                case PARTIAL:
-                    setPartialCount(getPartialCount() + 1);
-                    break;
-                case FAILED:
-                    setFailCount(getFailCount() + 1);
-                    break;
-                case BREACH:
-                    setBreachCount(getBreachCount() + 1);
-                    break;
-                default:
-                    break;
+                case SUCCESS -> successCount++;
+                case PARTIAL -> partialCount++;
+                case FAILED -> failCount++;
+                case BREACH -> breachCount++;
+                default -> {}
             }
         }
 
-        /* getPartialCount() x 0 is still 0, not needed to calculate final score. */
-        return (getSuccessCount() * 5) - (getFailCount() * 10) - (getBreachCount() * 25);
+        setSuccessCount(successCount);
+        setFailCount(failCount);
+        setPartialCount(partialCount);
+        setBreachCount(breachCount);
+
+        int successValue = successCount * 5;
+        int failValue = failCount * 10;
+        int breachValue = breachCount * 25;
+
+        MMLogger.create().info("Found {} Successes (+{}), {} Failures (-{}), {} Breaches (-{}), ignoring {} Partials",
+                successCount, successValue,
+                failCount, failValue,
+                breachCount, breachValue,
+                partialCount);
+
+        int combatRecordTotal = successValue - failValue - breachValue;
+
+        MMLogger.create().info("Combat Record Total: {}", combatRecordTotal);
+
+        return combatRecordTotal;
     }
 
     /**
@@ -359,7 +373,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     @Override
     public String getUnitRating() {
         int score = calculateUnitRatingScore();
-        return getUnitRatingName(getUnitRating(score)) + " (" + score + ")";
+        return getUnitRatingName(getUnitRating(score)) + " (" + score + ')';
     }
 
     @Override
@@ -879,11 +893,12 @@ public abstract class AbstractUnitRating implements IUnitRating {
         if (u.isMothballed()) {
             return;
         }
-        LogManager.getLogger().debug("Adding " + u.getName() + " to unit counts.");
+
+        LogManager.getLogger().debug("Adding {} to unit counts.", u.getName());
 
         Entity e = u.getEntity();
         if (null == e) {
-            LogManager.getLogger().debug("Unit " + u.getName() + " is not an Entity.  Skipping.");
+            LogManager.getLogger().debug("Unit {} is not an Entity.  Skipping.", u.getName());
             return;
         }
 

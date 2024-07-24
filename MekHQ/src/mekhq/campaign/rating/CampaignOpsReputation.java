@@ -23,6 +23,7 @@ package mekhq.campaign.rating;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -97,6 +98,19 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return aeroTechTeamsNeeded;
     }
 
+    /**
+     * This method counts the units in the campaign's hangar and updates various counts and lists.
+     * It resets the total skill levels to zero before counting the units.
+     * It updates the unit counts for each non-mothballed and present unit.
+     * If an active commander exists for a unit, it adds the commander to the commander list.
+     * It updates the bay count for each entity and checks the unit type to update the total skill levels.
+     * For unit types SPACE_STATION, NAVAL, and DROPSHIP, if the unit's full crew size is less than the active crew size,
+     * it adds the unit to the list of crafts without crew.
+     * For unit types WARSHIP and JUMPSHIP, it updates the docking collar count and checks the crew size to add the unit
+     * to the list of crafts without crew if the full crew size is less than the active crew size.
+     * For units of type FixedWingSupport, if the full crew size is less than the active crew size,
+     * it adds the unit to the list of crafts without crew.
+     */
     private void countUnits() {
         // Reset counts
         setTotalSkillLevels(BigDecimal.ZERO);
@@ -392,21 +406,58 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     protected int calculateUnitRatingScore() {
-        // derive the campaign's average experience value,
+        MMLogger.create().info("Starting to calculate Unit Rating Score");
+
+        // Step One: derive the campaign's average experience value,
         // based on the experience levels of combat personnel
+        MMLogger.create().info("Evaluating Average Experience Rating");
         int totalScore = getExperienceValue();
+        MMLogger.create().info("Running Total: {}", totalScore);
 
-        // derive the commander's value based on skills, personality characteristics, and (eventually) AToW traits
+        // Step Two: derive the commander's value based on skills, personality characteristics, and (eventually) AToW traits
+        MMLogger.create().info("Evaluating Command Rating");
         totalScore += getCommanderValue();
+        MMLogger.create().info("Running Total: {}", totalScore);
 
-
+        // Step Three: derive the combat record value from success/failed/breached Missions
+        MMLogger.create().info("Evaluating Combat Record");
         totalScore += getCombatRecordValue();
+        MMLogger.create().info("Running Total: {}", totalScore);
+
+        // Step Four:
+        MMLogger.create().info("Evaluating Transportation Rating");
         totalScore += getTransportValue();
+        MMLogger.create().info("Running Total: {}", totalScore);
+
+        // Step Five:
+        MMLogger.create().info("Evaluating Support Rating");
         totalScore += getSupportValue();
+        MMLogger.create().info("Running Total: {}", totalScore);
+
+        // Step Six:
+        MMLogger.create().info("Evaluating Financial Rating");
         totalScore += getFinancialValue();
+        MMLogger.create().info("Running Total: {}", totalScore);
+
+        // Step Seven:
+        MMLogger.create().info("Evaluating Crimes");
         totalScore += getCrimesPenalty();
+        MMLogger.create().info("Running Total: {}", totalScore);
+
+        // Step Eight: Derive any final modifiers.
+        // Currently, this is just a modifier for being idle,
+        // but more may be added later by CGL
+        MMLogger.create().info("Evaluating Other Modifiers");
         totalScore += getIdleTimeModifier();
-        totalScore += getCampaign().getCampaignOptions().getManualUnitRatingModifier();
+        MMLogger.create().info("Running Total: {}", totalScore);
+
+        // Step Nine: add the manual modifier set in campaign options
+        int manualModifier = getCampaign().getCampaignOptions().getManualUnitRatingModifier();
+        totalScore += manualModifier;
+        MMLogger.create().info("Applying Manual Modifier: {}", manualModifier);
+
+        // Finish Up
+        MMLogger.create().info("Grand Total: {}", totalScore);
 
         return totalScore;
     }
@@ -439,18 +490,38 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     /**
-     * @return the campaign's experience value based on the average experience across combat personnel
+     * Retrieves the experience value based on the average experience level of combat personnel in the campaign.
+     *
+     * @return The experience value as an integer.
+     * @throws IllegalArgumentException If an invalid experience level is provided
      */
     @Override
     public int getExperienceValue() {
-        SkillLevel experienceLevelEnum = getExperienceLevelName(calcAverageExperience());
+        BigDecimal averageExperience = calcAverageExperience();
+        MMLogger.create().info("Average Experience Value: {}", averageExperience);
 
-        return switch (experienceLevelEnum) {
-            case NONE, ULTRA_GREEN, GREEN -> 5;
-            case REGULAR -> 10;
-            case VETERAN -> 20;
-            case ELITE, HEROIC, LEGENDARY -> 40;
-        };
+        SkillLevel experienceLevelEnum = getExperienceLevelName(averageExperience);
+
+        switch (experienceLevelEnum) {
+            case NONE, ULTRA_GREEN, GREEN -> {
+                MMLogger.create().info("Experience name: {} (+5)", experienceLevelEnum.toString());
+                return 5;
+            }
+            case REGULAR -> {
+                MMLogger.create().info("Experience name: {} (+10)", experienceLevelEnum.toString());
+                return 10;
+            }
+            case VETERAN -> {
+                MMLogger.create().info("Experience name: {} (+20)", experienceLevelEnum.toString());
+                return 20;
+            }
+            case ELITE, HEROIC, LEGENDARY -> {
+                MMLogger.create().info("Experience name: {} (+40)", experienceLevelEnum.toString());
+                return 40;
+            }
+            default -> throw new IllegalArgumentException("Unexpected value in mekhq/campaign/rating/CampaignOpsReputation.java/getExperienceValue: "
+                    + experienceLevelEnum);
+        }
     }
 
     /**
@@ -461,17 +532,25 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         Person commander = getCommander();
 
         if (commander == null) {
+            MMLogger.create().info("No commander found. Skipping.");
+
             return 0;
         }
+
+        MMLogger.create().info("Gathering commander value for {}", commander.getFullTitle());
 
         int score = getCommanderSkillLevelWithBonus(SkillType.S_LEADER);
         score += getCommanderSkillLevelWithBonus(SkillType.S_TACTICS);
         score += getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY);
         score += getCommanderSkillLevelWithBonus(SkillType.S_NEG);
 
+        MMLogger.create().info("Skills valued at: {}", score);
+
         // TODO make this a campaign option
         if (getCampaign().getCampaignOptions().isUseRandomPersonalities()) {
             int personalityScore = getPersonalityScore(commander);
+
+            MMLogger.create().info("Personality valued at: {}", personalityScore);
 
             score += personalityScore;
         }
@@ -482,9 +561,13 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // ToDo                             Combat Paralysis,
         // ToDo                             Unlucky & Low CHA.
 
-        int commanderValue = score;
+        MMLogger.create().info("AToW Traits are not currently tracked: Skipping");
 
-        return Math.max(commanderValue, 1);
+        int commanderValue = Math.max(1, score);
+
+        MMLogger.create().info("Total Commander Value: {}", commanderValue);
+
+        return commanderValue;
     }
 
     /**
