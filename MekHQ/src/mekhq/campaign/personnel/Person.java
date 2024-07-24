@@ -217,6 +217,7 @@ public class Person {
     private Greed greed;
     private Social social;
     private PersonalityQuirk personalityQuirk;
+    private Intelligence intelligence;
     private String personalityDescription;
     //endregion Personality
 
@@ -375,6 +376,7 @@ public class Person {
         greed = Greed.NONE;
         social = Social.NONE;
         personalityQuirk = PersonalityQuirk.NONE;
+        intelligence = Intelligence.AVERAGE;
         personalityDescription = "";
 
         //region Flags
@@ -1665,6 +1667,14 @@ public class Person {
         this.personalityQuirk = personalityQuirk;
     }
 
+    public Intelligence getIntelligence() {
+        return intelligence;
+    }
+
+    public void setIntelligence(final Intelligence intelligence) {
+        this.intelligence = intelligence;
+    }
+
     public String getPersonalityDescription() {
         return personalityDescription;
     }
@@ -2022,6 +2032,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityQuirk", personalityQuirk.toString());
             }
 
+            if (intelligence != Intelligence.AVERAGE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intelligence", intelligence.toString());
+            }
+
             if (!StringUtility.isNullOrBlank(personalityDescription)) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personalityDescription", personalityDescription);
             }
@@ -2362,6 +2376,8 @@ public class Person {
                     retVal.social = Social.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityQuirk")) {
                     retVal.personalityQuirk = PersonalityQuirk.parseFromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("intelligence")) {
+                    retVal.intelligence = Intelligence.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
                     retVal.personalityDescription = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")

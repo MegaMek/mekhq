@@ -13,6 +13,7 @@ import java.util.Random;
 import static mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression.*;
 import static mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition.*;
 import static mekhq.campaign.personnel.enums.randomEvents.personalities.Greed.*;
+import static mekhq.campaign.personnel.enums.randomEvents.personalities.Intelligence.*;
 import static mekhq.campaign.personnel.enums.randomEvents.personalities.Social.*;
 
 public class PersonalityController {
@@ -58,12 +59,13 @@ public class PersonalityController {
             setPersonalityTrait(person, secondTableRoll, secondTraitRoll);
         }
 
-
         // we only want 1in20 persons to have a quirk,
         // as these helps reduce repetitiveness and keeps them unique
         if (Compute.randomInt(20) == 0) {
             person.setPersonalityQuirk(generatePersonalityQuirk());
         }
+
+        person.setIntelligence(generateIntelligence(Compute.randomInt(1000)));
 
         // finally, write the description
         writeDescription(person);
@@ -125,9 +127,10 @@ public class PersonalityController {
 
         String firstName = person.getFirstName();
         String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(person.getGender());
+        String forward;
 
         for (int index = 0; index < traitDescriptions.size(); index++) {
-            String forward = pronoun;
+            forward = pronoun;
 
             if (index == 0) {
                 forward = firstName;
@@ -138,10 +141,20 @@ public class PersonalityController {
             personalityDescription.append(String.format(traitDescriptions.get(index), forward));
         }
 
-        // if the individual has a personality quirk, we add that last
+        forward = firstName;
+
+        // if the individual has a personality quirk, we add that next
         if (person.getPersonalityQuirk() != PersonalityQuirk.NONE) {
             personalityDescription.append(' ');
             personalityDescription.append(String.format(person.getPersonalityQuirk().getDescription(), firstName));
+
+            forward = pronoun;
+        }
+
+        // if the individual has intelligence other than average, add that last
+        if (person.getIntelligence() != AVERAGE) {
+            personalityDescription.append(' ');
+            personalityDescription.append(String.format(person.getIntelligence().getDescription(), forward));
         }
 
         // close off the CSS tags
@@ -433,4 +446,64 @@ public class PersonalityController {
         return randomQuirk;
     }
 
+    /**
+     * Generates an Intelligence enum value based on a random roll.
+     *
+     * @param roll the random roll used to determine the Intelligence enum value
+     * @return the generated Intelligence enum value
+     * @throws IllegalStateException if an unexpected value is rolled
+     */
+    private static Intelligence generateIntelligence(int roll) {
+        if (roll < 5) {
+            return BRAIN_DEAD;
+        } else if (roll < 14) {
+            return UNINTELLIGENT;
+        } else if (roll < 29) {
+            return FEEBLE_MINDED;
+        } else if (roll < 49) {
+            return SIMPLE;
+        } else if (roll < 79) {
+            return SLOW;
+        } else if (roll < 119) {
+            return UNINSPIRED;
+        } else if (roll < 159) {
+            return DULL;
+        } else if (roll < 199) {
+            return DIMWITTED;
+        } else if (roll < 239) {
+            return OBTUSE;
+        } else if (roll < 269) {
+            return BELOW_AVERAGE;
+        } else if (roll < 309) {
+            return UNDER_PERFORMING;
+        } else if (roll < 375) {
+            return LIMITED_INSIGHT;
+        } else if (roll < 625) {
+            return AVERAGE;
+        } else if (roll < 691) {
+            return ABOVE_AVERAGE;
+        } else if (roll < 731) {
+            return STUDIOUS;
+        } else if (roll < 771) {
+            return DISCERNING;
+        } else if (roll < 811) {
+            return SHARP;
+        } else if (roll < 851) {
+            return QUICK_WITTED;
+        } else if (roll < 891) {
+            return PERCEPTIVE;
+        } else if (roll < 921) {
+            return BRIGHT;
+        } else if (roll < 951) {
+            return CLEVER;
+        } else if (roll < 971) {
+            return INTELLECTUAL;
+        } else if (roll < 986) {
+            return BRILLIANT;
+        } else if (roll < 995) {
+            return EXCEPTIONAL;
+        } else {
+            return GENIUS;
+        }
+    }
 }
