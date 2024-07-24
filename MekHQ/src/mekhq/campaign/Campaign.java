@@ -3703,6 +3703,12 @@ public class Campaign implements ITechManager {
         // check for anything in finances
         getFinances().newDay(this, yesterday, getLocalDate());
 
+        // process removal of old personnel data on the last day of each month
+        if ((campaignOptions.isUsePersonnelRemoval())
+                && (getLocalDate().getMonth().length(false) == getLocalDate().getDayOfMonth())) {
+            processPersonnelRemoval();
+        }
+
         MekHQ.triggerEvent(new NewDayEvent(this));
 
         // this duplicates any turnover information so that it is still available on the new day.
@@ -3714,6 +3720,51 @@ public class Campaign implements ITechManager {
         }
 
         return true;
+    }
+
+    /**
+     * This method iterates through the list of personnel and deletes the records of those who have
+     * departed the unit and who match additional checks.
+     */
+    public void processPersonnelRemoval() {
+        getPersonnel().stream()
+                .filter(p -> p.getStatus().isDepartedUnit())
+                .forEach(person -> {
+                    PersonnelStatus status = person.getStatus();
+
+                    if (shouldRemovePerson(person, status)) {
+                        removePerson(person, false);
+                    }
+                });
+
+        addReport(resources.getString("personnelRemoval.text"));
+    }
+
+    /**
+     * Determines whether a person's records should be removed from the campaign based on their status and retirement month.
+     *
+     * @param person The individual being checked.
+     * @param status The personnel status of the individual.
+     * @return true if the person should be removed, false otherwise.
+     */
+    private boolean shouldRemovePerson(Person person, PersonnelStatus status) {
+        int retirementMonthValue;
+
+        if (person.getRetirement() != null) {
+            retirementMonthValue = person.getRetirement().getMonthValue();
+        } else {
+            person.setRetirement(getLocalDate());
+            return false;
+        }
+
+        // return true if the individual has left the campaign for over a month
+        // *AND*
+        // is dead (and we're not exempting the cemetery) *OR* is retired (and we're not exempting retirees)
+        return (retirementMonthValue < (getLocalDate().getMonthValue() + 1)) &&
+                (
+                        ((status.isDead()) && (!campaignOptions.isUseRemovalExemptCemetery()))
+                                || ((status.isRetired()) && (!campaignOptions.isUseRemovalExemptRetirees()))
+                );
     }
 
     /**
@@ -6946,28 +6997,6 @@ public class Campaign implements ITechManager {
 
                 // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 p.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
-            }
-        }
-    }
-
-    public void initRetirementDateTracking() {
-        for (Person person : getPersonnel()) {
-            if (person.getStatus().isRetired()) {
-                LocalDate retired = null;
-                LocalDate lastLoggedDate = null;
-                for (LogEntry entry : person.getPersonnelLog()) {
-                    lastLoggedDate = entry.getDate();
-                    if (entry.getDesc().startsWith("Retired")) {
-                        retired = entry.getDate();
-                    }
-                }
-
-                if (retired == null) {
-                    retired = lastLoggedDate;
-                }
-
-                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
-                person.setRetirement((retired != null) ? retired : getLocalDate().minusYears(1));
             }
         }
     }

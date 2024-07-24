@@ -613,7 +613,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        if (campaign.getCampaignOptions().isUseRetirementDateTracking() && (retirement != null)) {
+        if (retirement != null) {
             JLabel lblRetirement = new JLabel(resourceMap.getString("lblRetirement.text"));
             lblRetirement.setName("lblRetirement");
             gridBagConstraints = new GridBagConstraints();

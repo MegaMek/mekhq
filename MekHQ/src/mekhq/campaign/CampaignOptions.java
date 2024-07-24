@@ -235,6 +235,11 @@ public class CampaignOptions {
     private boolean useRandomDependentAddition;
     private boolean useRandomDependentRemoval;
 
+    // Personnel Removal
+    private boolean usePersonnelRemoval;
+    private boolean useRemovalExemptCemetery;
+    private boolean useRemovalExemptRetirees;
+
     // Salary
     private boolean disableSecondaryRoleSalary;
     private double salaryAntiMekMultiplier;
@@ -270,7 +275,6 @@ public class CampaignOptions {
     private boolean useRandomPersonalities;
 
     // Retirement
-    private boolean useRetirementDateTracking;
     private boolean useRandomRetirement;
 
     private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
@@ -742,6 +746,11 @@ public class CampaignOptions {
         setUseRandomDependentAddition(true);
         setUseRandomDependentRemoval(true);
 
+        // Personnel Removal
+        setUsePersonnelRemoval(false);
+        setUseRemovalExemptCemetery(false);
+        setUseRemovalExemptRetirees(false);
+
         // Salary
         setDisableSecondaryRoleSalary(false);
         setSalaryAntiMekMultiplier(1.5);
@@ -948,7 +957,6 @@ public class CampaignOptions {
 
         //region Turnover and Retention
         // Retirement
-        setUseRetirementDateTracking(false);
         setUseRandomRetirement(false);
         setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.FIXED);
         setTurnoverDifficulty(SkillLevel.REGULAR);
@@ -1828,20 +1836,6 @@ public class CampaignOptions {
     //endregion Personnel Randomization
 
     //region Retirement
-    /**
-     * @return whether to track retirement dates
-     */
-    public boolean isUseRetirementDateTracking() {
-        return useRetirementDateTracking;
-    }
-
-    /**
-     * @param useRetirementDateTracking the new value for whether to track retirement dates
-     */
-    public void setUseRetirementDateTracking(final boolean useRetirementDateTracking) {
-        this.useRetirementDateTracking = useRetirementDateTracking;
-    }
-
     public boolean isUseRandomRetirement() {
         return useRandomRetirement;
     }
@@ -2190,6 +2184,32 @@ public class CampaignOptions {
         this.useRandomDependentRemoval = useRandomDependentRemoval;
     }
     //endregion Dependent
+
+    //region Personnel Removal
+    public boolean isUsePersonnelRemoval() {
+        return usePersonnelRemoval;
+    }
+
+    public void setUsePersonnelRemoval(final boolean usePersonnelRemoval) {
+        this.usePersonnelRemoval = usePersonnelRemoval;
+    }
+
+    public boolean isUseRemovalExemptCemetery() {
+        return useRemovalExemptCemetery;
+    }
+
+    public void setUseRemovalExemptCemetery(final boolean useRemovalExemptCemetery) {
+        this.useRemovalExemptCemetery = useRemovalExemptCemetery;
+    }
+
+    public boolean isUseRemovalExemptRetirees() {
+        return useRemovalExemptRetirees;
+    }
+
+    public void setUseRemovalExemptRetirees(final boolean useRemovalExemptRetirees) {
+        this.useRemovalExemptRetirees = useRemovalExemptRetirees;
+    }
+    //endregion Personnel Removal
 
     //region Salary
     public boolean isDisableSecondaryRoleSalary() {
@@ -4569,6 +4589,12 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentRemoval", isUseRandomDependentRemoval());
         //endregion Dependent
 
+        //region Personnel Removal
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePersonnelRemoval", isUsePersonnelRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRemovalExemptCemetery", isUseRemovalExemptCemetery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRemovalExemptRetirees", isUseRemovalExemptRetirees());
+        //endregion Personnel Removal
+
         //region Salary
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disableSecondaryRoleSalary", isDisableSecondaryRoleSalary());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
@@ -4611,7 +4637,6 @@ public class CampaignOptions {
         //endregion Personnel Randomization
 
         //region Retirement
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", isUseRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverTargetNumberMethod", getTurnoverTargetNumberMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverDifficulty", getTurnoverDifficulty().name());
@@ -5255,6 +5280,15 @@ public class CampaignOptions {
                     retVal.setUseRandomDependentRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Dependent
 
+                    //region Personnel Removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePersonnelRemoval")) {
+                    retVal.setUsePersonnelRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRemovalExemptCemetery")) {
+                    retVal.setUseRemovalExemptCemetery(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRemovalExemptRetirees")) {
+                    retVal.setUseRemovalExemptRetirees(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    //endregion Personnel Removal
+
                     //region Salary
                 } else if (wn2.getNodeName().equalsIgnoreCase("disableSecondaryRoleSalary")) {
                     retVal.setDisableSecondaryRoleSalary(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -5586,8 +5620,6 @@ public class CampaignOptions {
 
                     //region Finances Tab
                 //region Turnover and Retention
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
-                    retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverTargetNumberMethod")) {
