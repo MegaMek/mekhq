@@ -69,6 +69,12 @@ MEKHQ VERSION HISTORY:
 + PR #4464: Minor Education Module Data Fixes
 + PR #4465: Updated Salvage Terminology
 + PR #4469: Added Prisoner Ransom & Free Prompts to Mission Completion
++ PR #4466: Added Option to Grant Random Toughness when Using Toughness
++ PR #4468: Implemented Monthly Personnel Data Cleanup
++ PR #4472: Expanded Random Personalities to Include Intelligence, Incorporated Character Intelligence into Education Module
++ FIX #4474: Infantry personalty description is too wide
++ PR #4476: Removed Loyalty Change Event for Executing Prisoners
++ PR #4477: Marked 'FM: Mercenaries (rev)' Unit Rating Method as Deprecated
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
