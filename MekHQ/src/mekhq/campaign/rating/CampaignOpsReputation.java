@@ -308,15 +308,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                 RoundingMode.HALF_DOWN);
     }
 
-    /**
-     * @return the count of combat personnel
-     */
-    private int getCombatPersonnelCount() {
-        return (int) getCampaign().getActivePersonnel().stream()
-                .filter(person -> (person.getPrimaryRole().isCombat()) || (person.getSecondaryRole().isCombat()))
-                .count();
-    }
-
     private void calcNeededTechs() {
         int protoTeamCount = BigDecimal.valueOf(getProtoCount())
                                        .divide(BigDecimal.valueOf(5), 0,
@@ -422,22 +413,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public SkillLevel getAverageExperience() {
-        if (!hasUnits()) {
-            return SkillLevel.NONE;
-        }
-
-        switch (getExperienceValue()) {
-            case 5:
-                return SkillLevel.GREEN;
-            case 10:
-                return SkillLevel.REGULAR;
-            case 20:
-                return SkillLevel.VETERAN;
-            case 40:
-                return SkillLevel.ELITE;
-            default:
-                return SkillLevel.NONE;
-        }
+        return getExperienceLevelName(calcAverageExperience());
     }
 
     /**
@@ -662,7 +638,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     int calcTechSupportValue() {
         int totalValue = 0;
         setTotalTechTeams(0);
-        int astechTeams;
         setMechTechTeams(0);
         setAeroTechTeams(0);
         setMechanicTeams(0);
@@ -670,7 +645,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         setGeneralTechTeams(0);
 
         // How many astech teams do we have?
-        astechTeams = getCampaign().getNumberAstechs() / 6;
+        int astechTeams = getCampaign().getNumberAstechs() / 6;
 
         for (Person tech : getCampaign().getTechs()) {
             // If we're out of astech teams, the rest of the techs are
@@ -898,7 +873,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                                               getAdminsNeeded(),
                                               getTotalAdmins()));
         out.append("\n    Large Craft Crew:");
-        if (getCraftWithoutCrew().size() < 1) {
+        if (getCraftWithoutCrew().isEmpty()) {
             out.append("\n        All fully crewed.");
         } else {
             for (String s : getCraftWithoutCrew()) {
@@ -956,19 +931,20 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public String getHelpText() {
-        return "Method: Campaign Ops\n" +
-               "An attempt to match the Campaign Ops method for calculating " +
-               "the Reputation as closely as possible.\n" +
-               "Known differences include the following:\n" +
-               "+ Command: Does not incorporate any positive or negative " +
-               "traits from AToW or BRPG3." +
-               "+ Transportation: Transportation needs of Support Personnel " +
-               "are not accounted for as MHQ does not " +
-               "track Bay Personnel or Passenger Quarters.\n" +
-               "+ Criminal Activity: MHQ does not currently track criminal " +
-               "activity." +
-               "+ Inactivity: MHQ does not track end dates for missions/" +
-               "contracts.";
+        return """
+                Method: Campaign Ops
+                An attempt to match the Campaign Ops method for calculating \
+                the Reputation as closely as possible.
+                Known differences include the following:
+                + Command: Does not incorporate any positive or negative \
+                traits from AToW or BRPG3.\
+                + Transportation: Transportation needs of Support Personnel \
+                are not accounted for as MHQ does not \
+                track Bay Personnel or Passenger Quarters.
+                + Criminal Activity: MHQ does not currently track criminal \
+                activity.\
+                + Inactivity: MHQ does not track end dates for missions/\
+                contracts.""";
     }
 
     private void setNonAdminPersonnelCount(int nonAdminPersonnelCount) {
