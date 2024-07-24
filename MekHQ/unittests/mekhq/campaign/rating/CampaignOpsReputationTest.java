@@ -294,7 +294,7 @@ public class CampaignOpsReputationTest {
     public void testCalculateSupportNeeds() {
         // Test the example company.
         BigDecimal expectedTotalSkill = new BigDecimal("144.00");
-        BigDecimal expectedAverageSkill = new BigDecimal("0");
+        BigDecimal expectedAverageSkill = new BigDecimal("9.00");
         spyReputation.initValues();
         assertEquals(4, spyReputation.getMechCount());
         assertEquals(2, spyReputation.getFighterCount());
@@ -311,7 +311,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
         assertEquals(10, spyReputation.getAdminsNeeded());
         assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
-        assertEquals(40, spyReputation.getExperienceValue());
+        assertEquals(10, spyReputation.getExperienceValue());
 
         // Add a couple of mothballed units.
         unitList.add(mockMechMothballed);
@@ -332,7 +332,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
         assertEquals(10, spyReputation.getAdminsNeeded());
         assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
-        assertEquals(40, spyReputation.getExperienceValue());
+        assertEquals(10, spyReputation.getExperienceValue());
 
         // Test a brand new campaign.
         buildFreshCampaign();
@@ -352,7 +352,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
         assertEquals(0, spyReputation.getAdminsNeeded());
         assertEquals(BigDecimal.ZERO, spyReputation.calcAverageExperience());
-        assertEquals(40, spyReputation.getExperienceValue());
+        assertEquals(0, spyReputation.getExperienceValue());
     }
 
     private void buildFreshCampaign() {
@@ -455,23 +455,23 @@ public class CampaignOpsReputationTest {
     @Test
     public void testCalculateUnitRatingScore() {
         spyReputation.initValues();
-        assertEquals(53, spyReputation.calculateUnitRatingScore());
+        assertEquals(23, spyReputation.calculateUnitRatingScore());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        assertEquals(40, spyReputation.calculateUnitRatingScore());
+        assertEquals(0, spyReputation.calculateUnitRatingScore());
     }
 
     @Test
     public void testGetReputationModifier() {
         spyReputation.initValues();
-        assertEquals(5, spyReputation.getModifier());
+        assertEquals(2, spyReputation.getModifier());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        assertEquals(4, spyReputation.getModifier());
+        assertEquals(0, spyReputation.getModifier());
     }
 
     @Test

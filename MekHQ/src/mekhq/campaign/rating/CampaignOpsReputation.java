@@ -482,18 +482,13 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         }
         BigDecimal averageExp = calcAverageExperience();
         SkillLevel level = getExperienceLevelName(averageExp);
-        switch (level) {
-            case NONE:
-                return 0;
-            case GREEN:
-                return 5;
-            case REGULAR:
-                return 10;
-            case VETERAN:
-                return 20;
-            default:
-                return 40;
-        }
+        return switch (level) {
+            case NONE -> 0;
+            case GREEN -> 5;
+            case REGULAR -> 10;
+            case VETERAN -> 20;
+            default -> 40;
+        };
     }
 
     /**
@@ -509,21 +504,14 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             return 0;
         }
 
-        logger.info("Gathering commander value for {}", commander.getFullTitle());
-
         int score = getCommanderSkillLevelWithBonus(SkillType.S_LEADER);
         score += getCommanderSkillLevelWithBonus(SkillType.S_TACTICS);
         score += getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY);
         score += getCommanderSkillLevelWithBonus(SkillType.S_NEG);
 
-        logger.info("Skills valued at: {}", score);
-
         // TODO make this a campaign option
         if (getCampaign().getCampaignOptions().isUseRandomPersonalities()) {
             int personalityScore = getPersonalityScore(commander);
-
-            logger.info("Personality valued at: {}", personalityScore);
-
             score += personalityScore;
         }
 
@@ -535,11 +523,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         logger.info("AToW Traits are not currently tracked: Skipping");
 
-        int commanderValue = Math.max(1, score);
-
-        logger.info("Total Commander Value: {}", commanderValue);
-
-        return commanderValue;
+        return Math.max(1, score);
     }
 
     /**
@@ -558,28 +542,24 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         int personalityScore = 0;
         if (!intelligence.isAverage()) {
             personalityScore = (Intelligence.parseToInt(intelligence) - 12) / 4;
-
-            logger.info("{}: {}", commander.getIntelligence().toString(), personalityScore);
         }
 
         // while this uses a lot of repetitions, we can't simplify it further as each characteristic is a different Enum type.
         if (!aggression.isNone()) {
-            personalityScore += getPersonalityModifier(aggression.toString(), aggression.isTraitMajor(), aggression.isTraitPositive());
+            personalityScore += getPersonalityModifier(aggression.isTraitMajor(), aggression.isTraitPositive());
         }
 
         if (!ambition.isNone()) {
-            personalityScore += getPersonalityModifier(ambition.toString(), ambition.isTraitMajor(), ambition.isTraitPositive());
+            personalityScore += getPersonalityModifier(ambition.isTraitMajor(), ambition.isTraitPositive());
         }
 
         if (!greed.isNone()) {
-            personalityScore += getPersonalityModifier(greed.toString(), greed.isTraitMajor(), greed.isTraitPositive());
+            personalityScore += getPersonalityModifier(greed.isTraitMajor(), greed.isTraitPositive());
         }
 
         if (!social.isNone()) {
-            personalityScore += getPersonalityModifier(social.toString(), social.isTraitMajor(), social.isTraitPositive());
+            personalityScore += getPersonalityModifier(social.isTraitMajor(), social.isTraitPositive());
         }
-
-        logger.info("Personality Score: {}", personalityScore);
 
         return personalityScore;
     }
@@ -587,19 +567,16 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     /**
      * Calculates the personality modifier based on the given parameters.
      *
-     * @param characteristicName the name of the characteristic being checked
      * @param isMajor            a boolean indicating if the trait is major
      * @param isPositive         a boolean indicating if the trait is positive
      * @return the personality modifier as an integer
      */
-    private static int getPersonalityModifier(String characteristicName, boolean isMajor, boolean isPositive) {
+    private static int getPersonalityModifier(boolean isMajor, boolean isPositive) {
         int modifier = 1;
 
         if (isMajor) {
             modifier ++;
         }
-
-        logger.info("{}: {}", characteristicName, isPositive ? modifier : -modifier);
 
         return isPositive ? modifier : -modifier;
     }
@@ -667,16 +644,12 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         //Find the percentage of units that are transported.
         if (tci.hasDoubleCapacity()) {
-            logger.info("Found Double Transport Capacity (+10)");
             totalValue += 10;
         } else if (tci.hasExcessCapacity()) {
-            logger.info("Found Excess Transport Capacity (+5)");
             totalValue += 5;
         } else if (tci.hasSufficientCapacity()) {
-            logger.info("Found Sufficient Transport Capacity (+0)");
             totalValue += 0;
         } else {
-            logger.info("Found Insufficient Transport Capacity (-5)");
             totalValue -= 5;
         }
 
@@ -684,21 +657,17 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         int supportPersonnelCount = getSupportPersonnelCount(false);
         int personnelTransportCapacity = getPersonnelTransportCapacity();
 
-        logger.info("Personnel Transport Capacity: {}", personnelTransportCapacity);
-
         if (personnelTransportCapacity >= supportPersonnelCount) {
-            logger.info("Sufficient Transport Capacity found for Non-Combatants (+3)");
+            totalValue += 3;
         } else if (tci.hasAtLeastSufficientCapacity()) {
-            logger.info("Insufficient Transport Capacity found for Non-Combatants (-3)");
+            totalValue -= 3;
         }
 
         if (getDropShipCount() < 1) {
-            logger.info("No DropShip Owned (-5)");
             totalValue -= 5;
         }
 
         if (getJumpShipCount() > 0) {
-            logger.info("Found JumpShip (+10)");
             totalValue += 10;
         }
 
@@ -707,18 +676,12 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
             if (getCampaign().getLocalDate().isAfter(LocalDate.of(2800, 1, 1))) {
                 totalValue += 5;
-                logger.info("Found WarShip (+15)");
-            } else {
-                logger.info("Found WarShip (+10)");
             }
         }
 
         if ((getDropShipCount() > 0) && (getDockingCollarCount() >= getDropShipCount())) {
-            logger.info("Found Sufficient Docking Collars (+5)");
             totalValue += 5;
         }
-
-        logger.info("Finished calculating transport value: {}", totalValue);
 
         return totalValue;
     }
@@ -745,8 +708,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                 }
             }
         }
-
-        logger.info("Support Personnel Count: {}", count);
 
         return count;
     }
@@ -820,17 +781,13 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         }
 
         if (techShortage) {
-            logger.info("Insufficient Tech Support (-5)");
             totalValue -= 5;
         } else {
             if (getSupportPercent().compareTo(BigDecimal.valueOf(200)) > 0) {
-                logger.info("Exceeding tech support requirement by 201%+ (+15)");
                 totalValue += 15;
             } else if (getSupportPercent().compareTo(BigDecimal.valueOf(175)) > 0) {
-                logger.info("Exceeding tech support requirement by 176-200%+ (+10)");
                 totalValue += 10;
             } else if (getSupportPercent().compareTo(BigDecimal.valueOf(149)) > 0) {
-                logger.info("Exceeding tech support requirement by up to 150-175%+ (+5)");
                 totalValue += 5;
             }
         }
@@ -863,13 +820,11 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                     || (unit.getEntity() instanceof Warship)
                     || (unit.getEntity() instanceof Dropship)) {
                 if (!unit.isFullyCrewed()) {
-                    logger.info("Found vessel that is not fully crewed (-5)");
                     return -5;
                 }
             }
         }
 
-        logger.info("All vessels are fully crewed");
         return 0;
     }
 
@@ -881,7 +836,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         value += calcLargeCraftSupportValue();
 
-        logger.info("Support Rating: {}", value);
         return value;
     }
 
@@ -893,13 +847,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public int getFinancialValue() {
-        if (getCampaign().getFinances().isInDebt()) {
-            logger.info("Financial Rating (in debt): -10");
-            return -10;
-        } else {
-            logger.info("Financial Rating (not in debt): +0");
-            return 0;
-        }
+        return getCampaign().getFinances().isInDebt() ? -10 : 0;
     }
 
     // ToDo: MekHQ doesn't currently support recording crimes.
@@ -920,14 +868,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
             int inactiveYears = period.getYears();
 
-            if (inactiveYears > 0) {
-                int penalty = inactiveYears * 5;
-                logger.info("Campaign has been inactive for {} years (-{})", inactiveYears, penalty);
-                return penalty;
-            } else {
-                logger.info("Campaign has not been inactive for more than a year (+0)");
-                return 0;
-            }
+            return inactiveYears > 0 ? inactiveYears * 5 : 0;
         }
 
         return 0;

@@ -22,13 +22,11 @@ package mekhq.campaign.rating;
 
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -99,8 +97,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     private static boolean initialized = false;
 
-    private static final MMLogger logger = MMLogger.create(AbstractUnitRating.class);
-
     /**
      * Default constructor.
      *
@@ -161,17 +157,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         int failValue = failCount * 10;
         int breachValue = breachCount * 25;
 
-        logger.info("Found {} Successes (+{}), {} Failures (-{}), {} Breaches (-{}), ignoring {} Partials",
-                successCount, successValue,
-                failCount, failValue,
-                breachCount, breachValue,
-                partialCount);
-
-        int combatRecordTotal = successValue - failValue - breachValue;
-
-        logger.info("Combat Record Total: {}", combatRecordTotal);
-
-        return combatRecordTotal;
+        return successValue - failValue - breachValue;
     }
 
     /**
@@ -906,28 +892,17 @@ public abstract class AbstractUnitRating implements IUnitRating {
             return;
         }
 
-        LogManager.getLogger().debug("Adding {} to unit counts.", u.getName());
-
         Entity e = u.getEntity();
         if (null == e) {
-            LogManager.getLogger().debug("Unit {} is not an Entity.  Skipping.", u.getName());
             return;
         }
 
         int unitType = e.getUnitType();
-        LogManager.getLogger().debug("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
         // TODO : Add Airship when MegaMek supports it.
         switch (unitType) {
-            case UnitType.MEK:
-                incrementMechCount();
-                break;
-            case UnitType.PROTOMEK:
-                incrementProtoCount();
-                break;
-            case UnitType.GUN_EMPLACEMENT:
-            case UnitType.VTOL:
-            case UnitType.TANK:
-                LogManager.getLogger().debug("Unit " + u.getName() + " weight is " + e.getWeight());
+            case UnitType.MEK -> incrementMechCount();
+            case UnitType.PROTOMEK -> incrementProtoCount();
+            case UnitType.GUN_EMPLACEMENT, UnitType.VTOL, UnitType.TANK -> {
                 if (e.getWeight() <= 50f) {
                     incrementLightVeeCount();
                 } else if (e.getWeight() <= 100f) {
@@ -935,33 +910,22 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 } else {
                     incrementSuperHeavyVeeCount();
                 }
-                break;
-            case UnitType.DROPSHIP:
-                incrementDropShipCount();
-                break;
-            case UnitType.SMALL_CRAFT:
-                incrementSmallCraftCount();
-                break;
-            case UnitType.WARSHIP:
-                incrementWarShipCount();
-                break;
-            case UnitType.JUMPSHIP:
-                incrementJumpShipCount();
-                break;
-            case UnitType.AEROSPACEFIGHTER:
-            case UnitType.CONV_FIGHTER:
-                incrementFighterCount();
-                break;
-            case UnitType.BATTLE_ARMOR:
+            }
+            case UnitType.DROPSHIP -> incrementDropShipCount();
+            case UnitType.SMALL_CRAFT -> incrementSmallCraftCount();
+            case UnitType.WARSHIP -> incrementWarShipCount();
+            case UnitType.JUMPSHIP -> incrementJumpShipCount();
+            case UnitType.AEROSPACEFIGHTER, UnitType.CONV_FIGHTER -> incrementFighterCount();
+            case UnitType.BATTLE_ARMOR -> {
                 incrementNumberBaSquads();
                 incrementBattleArmorCount(((BattleArmor) e).getSquadSize());
-                break;
-            case UnitType.INFANTRY:
+            }
+            case UnitType.INFANTRY -> {
                 Infantry i = (Infantry) e;
-
                 incrementInfantryCount(i.getSquadSize() * i.getSquadCount());
                 incrementInfantryUnitCount();
-                break;
+            }
+            default -> {}
         }
     }
 }
