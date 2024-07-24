@@ -61,7 +61,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     private final List<String> craftWithoutCrew = new ArrayList<>();
     private int technicians = 0;
 
-    private static final MMLogger logger = MMLogger.create(AbstractUnitRating.class);
+    private static final MMLogger logger = MMLogger.create(CampaignOpsReputation.class);
 
     public CampaignOpsReputation(Campaign campaign) {
         super(campaign);
@@ -661,7 +661,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             logger.info("Found Sufficient Transport Capacity (+0)");
             totalValue += 0;
         } else {
-            logger.info("Found Insufficient Transport Capacity (+0)");
+            logger.info("Found Insufficient Transport Capacity (-5)");
             totalValue -= 5;
         }
 
@@ -903,8 +903,9 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         out.append('\n').append(String.format(TEMPLATE, "Tactics:",
                                                 getCommanderSkillLevelWithBonus(SkillType.S_TACTICS)));
 
-        if (getCampaign().getCampaignOptions().isUseRandomPersonalities()) {
-            out.append('\n').append(String.format(TEMPLATE, "Personality:", getPersonalityScore(getCommander())));
+        if ((getCampaign().getCampaignOptions().isUseRandomPersonalities()) && (getCommander() != null)) {
+            out.append('\n').append(String.format(TEMPLATE, "Personality:",
+                    getCommander() != null ? getPersonalityScore(getCommander()) : 0));
         }
 
         return out.toString();
