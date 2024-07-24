@@ -84,6 +84,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int superHeavyVeeBayCount = 0;
     private int baBayCount = 0;
     private int infantryBayCount = 0;
+    private int personnelTransportCapacity = 0;
     private int dockingCollarCount = 0;
     private boolean warShipWithDocsOwner = false;
     private boolean warShipOwner = false;
@@ -493,30 +494,38 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * @param e is the unit that may or may not contain bays that need to be included in the count
      */
     void updateBayCount(Entity e) {
+        int bayPersonnelCapacity = 0;
+
         if (((e instanceof Jumpship) || (e instanceof Dropship)) && !(e instanceof SpaceStation)) {
-            for (Bay bay : e.getTransportBays()) {
-                if (bay instanceof MechBay) {
-                    setMechBayCount(getMechBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof ASFBay) {
-                    setFighterBayCount(getFighterBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof SmallCraftBay) {
-                    setSmallCraftBayCount(getSmallCraftBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof ProtomechBay) {
-                    setProtoBayCount(getProtoBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof SuperHeavyVehicleBay) {
-                    setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof HeavyVehicleBay) {
-                    setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof LightVehicleBay) {
-                    setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
-                }  else if (bay instanceof BattleArmorBay) {
-                    setBaBayCount(getBaBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof InfantryBay) {
+            bayPersonnelCapacity += e.getBayPersonnel();
+
+            for (Transporter transporter : e.getTransports()) {
+                if (transporter instanceof MechBay) {
+                    setMechBayCount(getMechBayCount() + (int) ((MechBay) transporter).getCapacity());
+                } else if (transporter instanceof ASFBay) {
+                    setFighterBayCount(getFighterBayCount() + (int) ((ASFBay) transporter).getCapacity());
+                } else if (transporter instanceof SmallCraftBay) {
+                    setSmallCraftBayCount(getSmallCraftBayCount() + (int) ((SmallCraftBay) transporter).getCapacity());
+                } else if (transporter instanceof ProtomechBay) {
+                    setProtoBayCount(getProtoBayCount() + (int) ((ProtomechBay) transporter).getCapacity());
+                } else if (transporter instanceof SuperHeavyVehicleBay) {
+                    setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) ((SuperHeavyVehicleBay) transporter).getCapacity());
+                } else if (transporter instanceof HeavyVehicleBay) {
+                    setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) ((HeavyVehicleBay) transporter).getCapacity());
+                } else if (transporter instanceof LightVehicleBay) {
+                    setLightVeeBayCount(getLightVeeBayCount() + (int) ((LightVehicleBay) transporter).getCapacity());
+                }  else if (transporter instanceof BattleArmorBay) {
+                    setBaBayCount(getBaBayCount() + (int) ((BattleArmorBay) transporter).getCapacity());
+                } else if (transporter instanceof InfantryBay) {
                     setInfantryBayCount(getInfantryBayCount() + (int)
-                            Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
+                            Math.floor(((InfantryBay) transporter).getCapacity() / ((InfantryBay) transporter).getPlatoonType().getWeight()));
+                } else if ((transporter instanceof Bay) && (((Bay) transporter).isQuarters())) {
+                    bayPersonnelCapacity += (int) ((Bay) transporter).getCapacity();
                 }
             }
         }
+
+        setPersonnelTransportCapacity(bayPersonnelCapacity);
     }
 
     void updateDockingCollarCount(Jumpship jumpShip) {
@@ -816,6 +825,14 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     protected void setInfantryBayCount(int infantryBayCount) {
         this.infantryBayCount = infantryBayCount;
+    }
+
+    int getPersonnelTransportCapacity() {
+        return personnelTransportCapacity;
+    }
+
+    protected void setPersonnelTransportCapacity(int personnelTransportCapacity) {
+        this.personnelTransportCapacity = personnelTransportCapacity;
     }
 
     int getDockingCollarCount() {

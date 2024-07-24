@@ -636,37 +636,88 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         //Find the percentage of units that are transported.
         if (tci.hasDoubleCapacity()) {
+            MMLogger.create().info("Found Double Transport Capacity (+10)");
             totalValue += 10;
         } else if (tci.hasExcessCapacity()) {
+            MMLogger.create().info("Found Excess Transport Capacity (+5)");
             totalValue += 5;
         } else if (tci.hasSufficientCapacity()) {
+            MMLogger.create().info("Found Sufficient Transport Capacity (+0)");
             totalValue += 0;
         } else {
+            MMLogger.create().info("Found Insufficient Transport Capacity (+0)");
             totalValue -= 5;
+        }
+
+        // next, calculate whether there is enough transport for support personnel
+        int supportPersonnelCount = getSupportPersonnelCount(false);
+        int personnelTransportCapacity = getPersonnelTransportCapacity();
+
+        MMLogger.create().info("Personnel Transport Capacity: {}", personnelTransportCapacity);
+
+        if (personnelTransportCapacity >= supportPersonnelCount) {
+            MMLogger.create().info("Sufficient Transport Capacity found for Non-Combatants (+3)");
+        } else if (tci.hasAtLeastSufficientCapacity()) {
+            MMLogger.create().info("Insufficient Transport Capacity found for Non-Combatants (-3)");
         }
 
         if (getDropShipCount() < 1) {
+            MMLogger.create().info("No DropShip Owned (-5)");
             totalValue -= 5;
         }
 
-        // TODO: Calculate transport needs and capacity for support personnel.
-        // According to Campaign Ops, this will require tracking bay personnel
-        // & passenger quarters.
-
         if (getJumpShipCount() > 0) {
+            MMLogger.create().info("Found JumpShip (+10)");
             totalValue += 10;
         }
+
         if (getWarShipCount() > 0) {
             totalValue += 10;
+
             if (getCampaign().getLocalDate().isAfter(LocalDate.of(2800, 1, 1))) {
                 totalValue += 5;
+                MMLogger.create().info("Found WarShip (+15)");
+            } else {
+                MMLogger.create().info("Found WarShip (+10)");
             }
         }
+
         if ((getDropShipCount() > 0) && (getDockingCollarCount() >= getDropShipCount())) {
+            MMLogger.create().info("Found Sufficient Docking Collars (+5)");
             totalValue += 5;
         }
 
+        MMLogger.create().info("Finished calculating transport value: {}", totalValue);
+
         return totalValue;
+    }
+
+    /**
+     * Retrieves the count of support personnel in the campaign.
+     *
+     * @param excludeCivilians a boolean indicating whether to exclude civilian personnel from the count
+     * @return the count of support personnel as an integer
+     */
+    public int getSupportPersonnelCount(boolean excludeCivilians) {
+        int count = 0;
+
+        for (Person person : getCampaign().getPersonnel()) {
+            if ((!person.getStatus().isDepartedUnit()) && (!person.getStatus().isAbsent())) {
+                // we're treating combat personnel without a unit as being non-combat personnel for transport requirements
+                if (person.getUnit() == null) {
+                    count++;
+                    continue;
+                }
+
+                if ((person.getPrimaryRole().isSupport(excludeCivilians)) && (person.getSecondaryRole().isSupport(excludeCivilians))) {
+                    count++;
+                }
+            }
+        }
+
+        MMLogger.create().info("Support Personnel Count: {}", count);
+
+        return count;
     }
 
     int calcTechSupportValue() {
@@ -836,6 +887,10 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         out.append('\n').append(String.format(TEMPLATE, "Tactics:",
                                                 getCommanderSkillLevelWithBonus(SkillType.S_TACTICS)));
 
+        if (getCampaign().getCampaignOptions().isUseRandomPersonalities()) {
+            out.append('\n').append(String.format(TEMPLATE, "Personality:", getPersonalityScore(getCommander())));
+        }
+
         return out.toString();
     }
 
@@ -862,10 +917,18 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         int excessHeavyVeeBays = Math.max(heavyVeeBayCount - getHeavyVeeCount(), 0);
         int excessSmallCraftBays = Math.max(smallCraftBayCount - getSmallCraftCount(), 0);
 
-        String out = String.format("%-" + HEADER_LENGTH + "s %3d", "Transportation:", getTransportValue()) + '\n' + String.format(TEMPLATE, "BattleMech Bays:", getMechCount(), getMechBayCount()) + '\n' + String.format(TEMPLATE, "Fighter Bays:", getFighterCount(), getFighterBayCount()) +
-                     " (plus " + excessSmallCraftBays + " excess Small Craft)" + '\n' + String.format(TEMPLATE, "Small Craft Bays:", getSmallCraftCount(), smallCraftBayCount) + '\n' + String.format(TEMPLATE, "ProtoMech Bays:", getProtoCount(), getProtoBayCount()) + '\n' + String.format(TEMPLATE, "Super Heavy Vehicle Bays:", getSuperHeavyVeeCount(), superHeavyVeeBayCount) + '\n' + String.format(TEMPLATE, "Heavy Vehicle Bays:", getHeavyVeeCount(), heavyVeeBayCount) +
-                     " (plus " + excessSuperHeavyVeeBays + " excess Super Heavy)" + '\n' + String.format(TEMPLATE, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()) +
-                     " (plus " + excessHeavyVeeBays + " excess Heavy and " + excessSuperHeavyVeeBays + " excess Super Heavy)" + '\n' + String.format(TEMPLATE, "Battle Armor Bays:", getBattleArmorCount() / 5, getBaBayCount()) + '\n' + String.format(TEMPLATE, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount()) + '\n' + String.format(TEMPLATE, "Docking Collars:", getDropShipCount(), getDockingCollarCount());
+        String out = String.format("%-" + HEADER_LENGTH + "s %3d", "Transportation:", getTransportValue())
+                + '\n' + String.format(TEMPLATE, "BattleMech Bays:", getMechCount(), getMechBayCount())
+                + '\n' + String.format(TEMPLATE, "Fighter Bays:", getFighterCount(), getFighterBayCount()) + " (plus " + excessSmallCraftBays + " excess Small Craft)"
+                + '\n' + String.format(TEMPLATE, "Small Craft Bays:", getSmallCraftCount(), smallCraftBayCount)
+                + '\n' + String.format(TEMPLATE, "ProtoMech Bays:", getProtoCount(), getProtoBayCount())
+                + '\n' + String.format(TEMPLATE, "Super Heavy Vehicle Bays:", getSuperHeavyVeeCount(), superHeavyVeeBayCount)
+                + '\n' + String.format(TEMPLATE, "Heavy Vehicle Bays:", getHeavyVeeCount(), heavyVeeBayCount) + " (plus " + excessSuperHeavyVeeBays + " excess Super Heavy)"
+                + '\n' + String.format(TEMPLATE, "Light Vehicle Bays:", getLightVeeCount(), getLightVeeBayCount()) + " (plus " + excessHeavyVeeBays + " excess Heavy and " + excessSuperHeavyVeeBays + " excess Super Heavy)"
+                + '\n' + String.format(TEMPLATE, "Battle Armor Bays:", getBattleArmorCount() / 5, getBaBayCount())
+                + '\n' + String.format(TEMPLATE, "Infantry Bays:", calcInfantryPlatoons(), getInfantryBayCount())
+                + '\n' + String.format(TEMPLATE, "Docking Collars:", getDropShipCount(), getDockingCollarCount())
+                + '\n' + String.format(TEMPLATE, "Passenger Capacity:", getSupportPersonnelCount(false), getPersonnelTransportCapacity());
 
         final String TEMPLATE_2 = "    %-" + CATEGORY_LENGTH + "s %3s";
         out += '\n' + String.format(TEMPLATE_2, "Has JumpShips?", getJumpShipCount() > 0 ? "Yes" : "No");
@@ -1085,6 +1148,10 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         public boolean hasDoubleCapacity() {
             return doubleCapacity;
+        }
+
+        public boolean hasAtLeastSufficientCapacity() {
+            return (sufficientCapacity || excessCapacity || doubleCapacity);
         }
 
         /**
