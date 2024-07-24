@@ -61,6 +61,8 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     private final List<String> craftWithoutCrew = new ArrayList<>();
     private int technicians = 0;
 
+    private static final MMLogger logger = MMLogger.create(AbstractUnitRating.class);
+
     public CampaignOpsReputation(Campaign campaign) {
         super(campaign);
     }
@@ -131,7 +133,11 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             }
 
             Entity entity = u.getEntity();
-            updateBayCount(entity);
+
+            if (u.isFullyCrewed()) {
+                updateBayCount(entity);
+            }
+
             int unitType = entity.getUnitType();
             if (UnitType.INFANTRY == unitType ||
                 UnitType.BATTLE_ARMOR == unitType) {
@@ -142,21 +148,20 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
             // todo: Add Mobile Structure when MegaMek supports it.
             switch (unitType) {
-                case UnitType.SPACE_STATION:
-                case UnitType.NAVAL:
-                case UnitType.DROPSHIP:
+                case UnitType.SPACE_STATION, UnitType.NAVAL, UnitType.DROPSHIP -> {
                     if (u.getFullCrewSize() < u.getActiveCrew().size()) {
                         addCraftWithoutCrew(u);
                     }
-                    break;
-                case UnitType.WARSHIP:
-                case UnitType.JUMPSHIP:
+                }
+                case UnitType.WARSHIP, UnitType.JUMPSHIP -> {
                     updateDockingCollarCount((Jumpship) entity);
                     if (u.getFullCrewSize() < u.getActiveCrew().size()) {
                         addCraftWithoutCrew(u);
                     }
-                    break;
+                }
+                default -> {}
             }
+
             // UnitType doesn't include FixedWingSupport.
             if (entity instanceof FixedWingSupport) {
                 if (u.getFullCrewSize() < u.getActiveCrew().size()) {
@@ -358,58 +363,58 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     protected int calculateUnitRatingScore() {
-        MMLogger.create().info("Starting to calculate Unit Rating Score");
+        logger.info("Starting to calculate Unit Rating Score");
 
         // Step One: derive the campaign's average experience value,
         // based on the experience levels of combat personnel
-        MMLogger.create().info("Evaluating Average Experience Rating");
+        logger.info("Evaluating Average Experience Rating");
         int totalScore = getExperienceValue();
-        MMLogger.create().info("Running Total: {}", totalScore);
+        logger.info("Running Total: {}", totalScore);
 
         // Step Two: derive the commander's value based on skills, personality characteristics, and (eventually) AToW traits
-        MMLogger.create().info("Evaluating Command Rating");
+        logger.info("Evaluating Command Rating");
         totalScore += getCommanderValue();
-        MMLogger.create().info("Running Total: {}", totalScore);
+        logger.info("Running Total: {}", totalScore);
 
         // Step Three: derive the combat record value from success/failed/breached Missions
-        MMLogger.create().info("Evaluating Combat Record");
+        logger.info("Evaluating Combat Record");
         totalScore += getCombatRecordValue();
-        MMLogger.create().info("Running Total: {}", totalScore);
+        logger.info("Running Total: {}", totalScore);
 
         // Step Four:
-        MMLogger.create().info("Evaluating Transportation Rating");
+        logger.info("Evaluating Transportation Rating");
         totalScore += getTransportValue();
-        MMLogger.create().info("Running Total: {}", totalScore);
+        logger.info("Running Total: {}", totalScore);
 
         // Step Five:
-        MMLogger.create().info("Evaluating Support Rating");
+        logger.info("Evaluating Support Rating");
         totalScore += getSupportValue();
-        MMLogger.create().info("Running Total: {}", totalScore);
+        logger.info("Running Total: {}", totalScore);
 
         // Step Six:
-        MMLogger.create().info("Evaluating Financial Rating");
+        logger.info("Evaluating Financial Rating");
         totalScore += getFinancialValue();
-        MMLogger.create().info("Running Total: {}", totalScore);
+        logger.info("Running Total: {}", totalScore);
 
         // Step Seven:
-        MMLogger.create().info("Evaluating Crimes");
+        logger.info("Evaluating Crimes");
         totalScore += getCrimesPenalty();
-        MMLogger.create().info("Running Total: {}", totalScore);
+        logger.info("Running Total: {}", totalScore);
 
         // Step Eight: Derive any final modifiers.
         // Currently, this is just a modifier for being idle,
         // but more may be added later by CGL
-        MMLogger.create().info("Evaluating Other Modifiers");
+        logger.info("Evaluating Other Modifiers");
         totalScore += getIdleTimeModifier();
-        MMLogger.create().info("Running Total: {}", totalScore);
+        logger.info("Running Total: {}", totalScore);
 
         // Step Nine: add the manual modifier set in campaign options
         int manualModifier = getCampaign().getCampaignOptions().getManualUnitRatingModifier();
         totalScore += manualModifier;
-        MMLogger.create().info("Applying Manual Modifier: {}", manualModifier);
+        logger.info("Applying Manual Modifier: {}", manualModifier);
 
         // Finish Up
-        MMLogger.create().info("Grand Total: {}", totalScore);
+        logger.info("Grand Total: {}", totalScore);
 
         return totalScore;
     }
@@ -450,25 +455,25 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     @Override
     public int getExperienceValue() {
         BigDecimal averageExperience = calcAverageExperience();
-        MMLogger.create().info("Average Experience Value: {}", averageExperience);
+        logger.info("Average Experience Value: {}", averageExperience);
 
         SkillLevel experienceLevelEnum = getExperienceLevelName(averageExperience);
 
         switch (experienceLevelEnum) {
             case NONE, ULTRA_GREEN, GREEN -> {
-                MMLogger.create().info("Experience name: {} (+5)", experienceLevelEnum.toString());
+                logger.info("Experience name: {} (+5)", experienceLevelEnum.toString());
                 return 5;
             }
             case REGULAR -> {
-                MMLogger.create().info("Experience name: {} (+10)", experienceLevelEnum.toString());
+                logger.info("Experience name: {} (+10)", experienceLevelEnum.toString());
                 return 10;
             }
             case VETERAN -> {
-                MMLogger.create().info("Experience name: {} (+20)", experienceLevelEnum.toString());
+                logger.info("Experience name: {} (+20)", experienceLevelEnum.toString());
                 return 20;
             }
             case ELITE, HEROIC, LEGENDARY -> {
-                MMLogger.create().info("Experience name: {} (+40)", experienceLevelEnum.toString());
+                logger.info("Experience name: {} (+40)", experienceLevelEnum.toString());
                 return 40;
             }
             default -> throw new IllegalArgumentException("Unexpected value in mekhq/campaign/rating/CampaignOpsReputation.java/getExperienceValue: "
@@ -484,25 +489,25 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         Person commander = getCommander();
 
         if (commander == null) {
-            MMLogger.create().info("No commander found. Skipping.");
+            logger.info("No commander found. Skipping.");
 
             return 0;
         }
 
-        MMLogger.create().info("Gathering commander value for {}", commander.getFullTitle());
+        logger.info("Gathering commander value for {}", commander.getFullTitle());
 
         int score = getCommanderSkillLevelWithBonus(SkillType.S_LEADER);
         score += getCommanderSkillLevelWithBonus(SkillType.S_TACTICS);
         score += getCommanderSkillLevelWithBonus(SkillType.S_STRATEGY);
         score += getCommanderSkillLevelWithBonus(SkillType.S_NEG);
 
-        MMLogger.create().info("Skills valued at: {}", score);
+        logger.info("Skills valued at: {}", score);
 
         // TODO make this a campaign option
         if (getCampaign().getCampaignOptions().isUseRandomPersonalities()) {
             int personalityScore = getPersonalityScore(commander);
 
-            MMLogger.create().info("Personality valued at: {}", personalityScore);
+            logger.info("Personality valued at: {}", personalityScore);
 
             score += personalityScore;
         }
@@ -513,11 +518,11 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // ToDo                             Combat Paralysis,
         // ToDo                             Unlucky & Low CHA.
 
-        MMLogger.create().info("AToW Traits are not currently tracked: Skipping");
+        logger.info("AToW Traits are not currently tracked: Skipping");
 
         int commanderValue = Math.max(1, score);
 
-        MMLogger.create().info("Total Commander Value: {}", commanderValue);
+        logger.info("Total Commander Value: {}", commanderValue);
 
         return commanderValue;
     }
@@ -533,25 +538,33 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         Ambition ambition = commander.getAmbition();
         Greed greed = commander.getGreed();
         Social social = commander.getSocial();
+        Intelligence intelligence = commander.getIntelligence();
 
-        int personalityScore = (Intelligence.parseToInt(commander.getIntelligence()) - 12) / 4;
+        int personalityScore = 0;
+        if (!intelligence.isAverage()) {
+            personalityScore = (Intelligence.parseToInt(intelligence) - 12) / 4;
+
+            logger.info("{}: {}", commander.getIntelligence().toString(), personalityScore);
+        }
 
         // while this uses a lot of repetitions, we can't simplify it further as each characteristic is a different Enum type.
         if (!aggression.isNone()) {
-            personalityScore += getPersonalityModifier(aggression.isTraitMajor(), aggression.isTraitPositive());
+            personalityScore += getPersonalityModifier(aggression.toString(), aggression.isTraitMajor(), aggression.isTraitPositive());
         }
 
         if (!ambition.isNone()) {
-            personalityScore += getPersonalityModifier(ambition.isTraitMajor(), ambition.isTraitPositive());
+            personalityScore += getPersonalityModifier(ambition.toString(), ambition.isTraitMajor(), ambition.isTraitPositive());
         }
 
         if (!greed.isNone()) {
-            personalityScore += getPersonalityModifier(greed.isTraitMajor(), greed.isTraitPositive());
+            personalityScore += getPersonalityModifier(greed.toString(), greed.isTraitMajor(), greed.isTraitPositive());
         }
 
         if (!social.isNone()) {
-            personalityScore += getPersonalityModifier(social.isTraitMajor(), social.isTraitPositive());
+            personalityScore += getPersonalityModifier(social.toString(), social.isTraitMajor(), social.isTraitPositive());
         }
+
+        logger.info("Personality Score: {}", personalityScore);
 
         return personalityScore;
     }
@@ -559,16 +572,19 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     /**
      * Calculates the personality modifier based on the given parameters.
      *
-     * @param isMajor    a boolean indicating if the trait is major
-     * @param isPositive a boolean indicating if the trait is positive
+     * @param characteristicName the name of the characteristic being checked
+     * @param isMajor            a boolean indicating if the trait is major
+     * @param isPositive         a boolean indicating if the trait is positive
      * @return the personality modifier as an integer
      */
-    private static int getPersonalityModifier(boolean isMajor, boolean isPositive) {
+    private static int getPersonalityModifier(String characteristicName, boolean isMajor, boolean isPositive) {
         int modifier = 1;
 
         if (isMajor) {
             modifier ++;
         }
+
+        logger.info("{}: {}", characteristicName, isPositive ? modifier : -modifier);
 
         return isPositive ? modifier : -modifier;
     }
@@ -636,16 +652,16 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         //Find the percentage of units that are transported.
         if (tci.hasDoubleCapacity()) {
-            MMLogger.create().info("Found Double Transport Capacity (+10)");
+            logger.info("Found Double Transport Capacity (+10)");
             totalValue += 10;
         } else if (tci.hasExcessCapacity()) {
-            MMLogger.create().info("Found Excess Transport Capacity (+5)");
+            logger.info("Found Excess Transport Capacity (+5)");
             totalValue += 5;
         } else if (tci.hasSufficientCapacity()) {
-            MMLogger.create().info("Found Sufficient Transport Capacity (+0)");
+            logger.info("Found Sufficient Transport Capacity (+0)");
             totalValue += 0;
         } else {
-            MMLogger.create().info("Found Insufficient Transport Capacity (+0)");
+            logger.info("Found Insufficient Transport Capacity (+0)");
             totalValue -= 5;
         }
 
@@ -653,21 +669,21 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         int supportPersonnelCount = getSupportPersonnelCount(false);
         int personnelTransportCapacity = getPersonnelTransportCapacity();
 
-        MMLogger.create().info("Personnel Transport Capacity: {}", personnelTransportCapacity);
+        logger.info("Personnel Transport Capacity: {}", personnelTransportCapacity);
 
         if (personnelTransportCapacity >= supportPersonnelCount) {
-            MMLogger.create().info("Sufficient Transport Capacity found for Non-Combatants (+3)");
+            logger.info("Sufficient Transport Capacity found for Non-Combatants (+3)");
         } else if (tci.hasAtLeastSufficientCapacity()) {
-            MMLogger.create().info("Insufficient Transport Capacity found for Non-Combatants (-3)");
+            logger.info("Insufficient Transport Capacity found for Non-Combatants (-3)");
         }
 
         if (getDropShipCount() < 1) {
-            MMLogger.create().info("No DropShip Owned (-5)");
+            logger.info("No DropShip Owned (-5)");
             totalValue -= 5;
         }
 
         if (getJumpShipCount() > 0) {
-            MMLogger.create().info("Found JumpShip (+10)");
+            logger.info("Found JumpShip (+10)");
             totalValue += 10;
         }
 
@@ -676,18 +692,18 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
             if (getCampaign().getLocalDate().isAfter(LocalDate.of(2800, 1, 1))) {
                 totalValue += 5;
-                MMLogger.create().info("Found WarShip (+15)");
+                logger.info("Found WarShip (+15)");
             } else {
-                MMLogger.create().info("Found WarShip (+10)");
+                logger.info("Found WarShip (+10)");
             }
         }
 
         if ((getDropShipCount() > 0) && (getDockingCollarCount() >= getDropShipCount())) {
-            MMLogger.create().info("Found Sufficient Docking Collars (+5)");
+            logger.info("Found Sufficient Docking Collars (+5)");
             totalValue += 5;
         }
 
-        MMLogger.create().info("Finished calculating transport value: {}", totalValue);
+        logger.info("Finished calculating transport value: {}", totalValue);
 
         return totalValue;
     }
@@ -715,7 +731,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             }
         }
 
-        MMLogger.create().info("Support Personnel Count: {}", count);
+        logger.info("Support Personnel Count: {}", count);
 
         return count;
     }
@@ -1035,9 +1051,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                 Known differences include the following:
                 + Command: Does not incorporate any positive or negative \
                 traits from AToW or BRPG3.\
-                + Transportation: Transportation needs of Support Personnel \
-                are not accounted for as MHQ does not \
-                track Bay Personnel or Passenger Quarters.
                 + Criminal Activity: MHQ does not currently track criminal \
                 activity.\
                 + Inactivity: MHQ does not track end dates for missions/\

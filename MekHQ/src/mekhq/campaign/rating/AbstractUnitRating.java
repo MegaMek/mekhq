@@ -99,6 +99,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     private static boolean initialized = false;
 
+    private static final MMLogger logger = MMLogger.create(AbstractUnitRating.class);
+
     /**
      * Default constructor.
      *
@@ -159,7 +161,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         int failValue = failCount * 10;
         int breachValue = breachCount * 25;
 
-        MMLogger.create().info("Found {} Successes (+{}), {} Failures (-{}), {} Breaches (-{}), ignoring {} Partials",
+        logger.info("Found {} Successes (+{}), {} Failures (-{}), {} Breaches (-{}), ignoring {} Partials",
                 successCount, successValue,
                 failCount, failValue,
                 breachCount, breachValue,
@@ -167,7 +169,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
         int combatRecordTotal = successValue - failValue - breachValue;
 
-        MMLogger.create().info("Combat Record Total: {}", combatRecordTotal);
+        logger.info("Combat Record Total: {}", combatRecordTotal);
 
         return combatRecordTotal;
     }

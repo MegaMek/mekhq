@@ -71,6 +71,7 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -473,7 +474,7 @@ public class Unit implements ITechnology {
             // unless they are grounded spheroid dropships or jumpships
             boolean hasNoWalkMP = en.getWalkMP() <= 0;
             boolean isJumpship = en instanceof Jumpship;
-            boolean isGroundedSpheroid = (en instanceof Dropship) && ((Dropship) en).isSpheroid() && en.getAltitude() == 0;
+            boolean isGroundedSpheroid = (en instanceof Dropship) && en.isSpheroid() && en.getAltitude() == 0;
             if (hasNoWalkMP && !isJumpship && !isGroundedSpheroid) {
                 return false;
             }
@@ -690,22 +691,19 @@ public class Unit implements ITechnology {
             //check per location really, since armor can be used anywhere. So stop after we reach
             //the first Armor needing replacement
             //TODO: we need to adjust for patchwork armor, which can have different armor types by location
-            if (!armorFound && part instanceof Armor) {
-                Armor a = (Armor) part;
+            if (!armorFound && part instanceof Armor a) {
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
                 }
             }
-            if (!armorFound && part instanceof ProtomekArmor) {
-                ProtomekArmor a = (ProtomekArmor) part;
+            if (!armorFound && part instanceof ProtomekArmor a) {
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
                 }
             }
-            if (!armorFound && part instanceof BaArmor) {
-                BaArmor a = (BaArmor) part;
+            if (!armorFound && part instanceof BaArmor a) {
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
@@ -786,8 +784,8 @@ public class Unit implements ITechnology {
 
     public String getPilotDesc() {
         if (hasPilot()) {
-            return entity.getCrew().getName() + " "
-                    + entity.getCrew().getGunnery() + "/"
+            return entity.getCrew().getName() + ' '
+                    + entity.getCrew().getGunnery() + '/'
                     + entity.getCrew().getPiloting();
         }
         return "NO PILOT";
@@ -1145,8 +1143,7 @@ public class Unit implements ITechnology {
                 partsValue = partsValue.plus(200000.0);
             }
             // Jump sail and KF drive support systems
-            if ((entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
-                Jumpship js = (Jumpship) entity;
+            if ((entity instanceof Jumpship js) && !(entity instanceof SpaceStation)) {
                 Money driveCost = Money.zero();
                 // sail
                 driveCost = driveCost.plus(50000.0 * (30.0 + (js.getWeight() / 7500.0)));
@@ -1716,7 +1713,7 @@ public class Unit implements ITechnology {
                 tonnage = 25;
             }
         } else if (entity instanceof Dropship) {
-            if (((Aero) entity).isSpheroid()) {
+            if (entity.isSpheroid()) {
                 multiplier = 28;
             } else {
                 multiplier = 36;
@@ -2399,10 +2396,10 @@ public class Unit implements ITechnology {
                 int loc = -1;
                 if (part instanceof MekActuator) {
                     type = ((MekActuator) part).getType();
-                    loc = ((MekActuator) part).getLocation();
+                    loc = part.getLocation();
                 } else {
                     type = ((MissingMekActuator) part).getType();
-                    loc = ((MissingMekActuator) part).getLocation();
+                    loc = part.getLocation();
                 }
                 if (type == Mech.ACTUATOR_UPPER_ARM) {
                     if (loc == Mech.LOC_RARM) {
@@ -3639,7 +3636,7 @@ public class Unit implements ITechnology {
                         Collectors.collectingAndThen(
                             Collectors.groupingBy(IOption::getValue, Collectors.counting()),
                             m -> m.entrySet().stream().filter(e -> (cyberOptionNames.contains(e.getKey()) ? e.getValue() >= crewSize : e.getValue() > crewSize / 2))
-                                .max(Map.Entry.comparingByValue()).map(Map.Entry::getKey)
+                                .max(Entry.comparingByValue()).map(Entry::getKey)
                         )
                     ));
 
@@ -3882,11 +3879,7 @@ public class Unit implements ITechnology {
                 entity.getCrew().setMissing(true, 0);
                 return;
             }
-            if (nDrivers == 0) {
-                ((Tank) entity).setDriverHit(true);
-            } else {
-                ((Tank) entity).setDriverHit(false);
-            }
+            ((Tank) entity).setDriverHit(nDrivers == 0);
         } else if (entity instanceof Infantry) {
             if (nDrivers == 0 && nGunners == 0) {
                 //nobody is healthy
@@ -4156,6 +4149,10 @@ public class Unit implements ITechnology {
 
     public int getTotalDriverNeeds() {
         return Compute.getTotalDriverNeeds(entity);
+    }
+
+    public boolean isFullyCrewed() {
+        return entity.getCrew().getCurrentSize() == getFullCrewSize();
     }
 
     /**
