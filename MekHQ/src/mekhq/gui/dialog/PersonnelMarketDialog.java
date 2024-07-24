@@ -254,9 +254,9 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.setShowGrid(false);
         scrollTablePersonnel.setViewportView(tablePersonnel);
 
-        scrollPersonnelView.setMinimumSize(new Dimension(500, 600));
-        scrollPersonnelView.setPreferredSize(new Dimension(500, 600));
-        scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPersonnelView.setMinimumSize(new Dimension(200, 600));
+        scrollPersonnelView.setPreferredSize(new Dimension(200, 600));
+        scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPersonnelView.setViewportView(null);
 
         panelMain.setLayout(new BorderLayout());
@@ -508,7 +508,9 @@ public class PersonnelMarketDialog extends JDialog {
                  name = "Pilot";
              }
              tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, hqView));
-             MechViewPanel mvp = new MechViewPanel();
+             MechViewPanel mvp = new MechViewPanel(200, 400, true);
+             tabUnit.setMinimumSize(new Dimension(200, 400));
+             tabUnit.setPreferredSize(new Dimension(200, 400));
              mvp.setMech(en, true);
              tabUnit.add("Unit", mvp);
              scrollPersonnelView.setViewportView(tabUnit);
