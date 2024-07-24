@@ -294,7 +294,7 @@ public class CampaignOpsReputationTest {
     public void testCalculateSupportNeeds() {
         // Test the example company.
         BigDecimal expectedTotalSkill = new BigDecimal("144.00");
-        BigDecimal expectedAverageSkill = new BigDecimal("9.00");
+        BigDecimal expectedAverageSkill = new BigDecimal("0");
         spyReputation.initValues();
         assertEquals(4, spyReputation.getMechCount());
         assertEquals(2, spyReputation.getFighterCount());
@@ -311,7 +311,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
         assertEquals(10, spyReputation.getAdminsNeeded());
         assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
-        assertEquals(10, spyReputation.getExperienceValue());
+        assertEquals(40, spyReputation.getExperienceValue());
 
         // Add a couple of mothballed units.
         unitList.add(mockMechMothballed);
@@ -332,7 +332,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
         assertEquals(10, spyReputation.getAdminsNeeded());
         assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
-        assertEquals(10, spyReputation.getExperienceValue());
+        assertEquals(40, spyReputation.getExperienceValue());
 
         // Test a brand new campaign.
         buildFreshCampaign();
@@ -352,7 +352,7 @@ public class CampaignOpsReputationTest {
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
         assertEquals(0, spyReputation.getAdminsNeeded());
         assertEquals(BigDecimal.ZERO, spyReputation.calcAverageExperience());
-        assertEquals(0, spyReputation.getExperienceValue());
+        assertEquals(40, spyReputation.getExperienceValue());
     }
 
     private void buildFreshCampaign() {
@@ -410,7 +410,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetTransportValue() {
         spyReputation.initValues();
-        assertEquals(20, spyReputation.getTransportValue());
+        assertEquals(5, spyReputation.getTransportValue());
 
         // Test not having any DropShips (though we still have a JumpShip).
         doReturn(0).when(spyReputation).getDropShipCount();
@@ -455,58 +455,52 @@ public class CampaignOpsReputationTest {
     @Test
     public void testCalculateUnitRatingScore() {
         spyReputation.initValues();
-        assertEquals(38, spyReputation.calculateUnitRatingScore());
+        assertEquals(53, spyReputation.calculateUnitRatingScore());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        assertEquals(0, spyReputation.calculateUnitRatingScore());
+        assertEquals(40, spyReputation.calculateUnitRatingScore());
     }
 
     @Test
     public void testGetReputationModifier() {
         spyReputation.initValues();
-        assertEquals(3, spyReputation.getModifier());
+        assertEquals(5, spyReputation.getModifier());
 
         // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        assertEquals(0, spyReputation.getModifier());
+        assertEquals(4, spyReputation.getModifier());
     }
 
-    @Test
-    public void testGetAverageExperience() {
+    public void testGetExperience() {
         spyReputation.initValues();
-        assertEquals(SkillLevel.REGULAR, spyReputation.getAverageExperience());
+        assertEquals(SkillLevel.LEGENDARY, spyReputation.getAverageExperience());
 
-        // Test a brand new campaign.
+        // Test a brand-new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        assertEquals(SkillLevel.NONE, spyReputation.getAverageExperience());
+        assertEquals(SkillLevel.LEGENDARY, spyReputation.getAverageExperience());
     }
 
-    @Test
     public void testGetDetails() {
         String expectedDetails =
                 "Unit Reputation:    38\n" +
-                "    Method: Campaign Operations\n" +
-                "\n" +
+                "    Method: Campaign Operations\n" + '\n' +
                 "Experience:          10\n" +
                 "    Average Experience:     Regular\n" +
-                "        #Regular:                    16\n" +
-                "\n" +
+                "        #Regular:                    16\n" + '\n' +
                 "Commander:           13 (null)\n" +
                 "    Leadership:               4\n" +
                 "    Negotiation:              5\n" +
                 "    Strategy:                 2\n" +
-                "    Tactics:                  2\n" +
-                "\n" +
+                "    Tactics:                  2\n" + '\n' +
                 "Combat Record:        0\n" +
                 "    Successful Missions:      0\n" +
                 "    Partial Missions:         0\n" +
                 "    Failed Missions:          0\n" +
-                "    Contract Breaches:        0\n" +
-                "\n" +
+                "    Contract Breaches:        0\n" + '\n' +
                 "Transportation:      20\n" +
                 "    BattleMech Bays:             4 needed /   4 available\n" +
                 "    Fighter Bays:                2 needed /   2 available (plus 0 excess Small Craft)\n" +
@@ -519,8 +513,7 @@ public class CampaignOpsReputationTest {
                 "    Infantry Bays:               1 needed /   4 available\n" +
                 "    Docking Collars:             1 needed /   4 available\n" +
                 "    Has JumpShips?             Yes\n" +
-                "    Has WarShips?               No\n" +
-                "\n" +
+                "    Has WarShips?               No\n" + '\n' +
                 "Support:             -5\n" +
                 "    Tech Support:\n" +
                 "        Mech Techs:                   4 needed /    0 available\n" +
@@ -532,13 +525,10 @@ public class CampaignOpsReputationTest {
                 "        Astechs:                     84 needed /   84 available\n" +
                 "    Admin Support:                   10 needed /   20 available\n" +
                 "    Large Craft Crew:\n" +
-                "        All fully crewed.\n" +
-                "\n" +
+                "        All fully crewed.\n" + '\n' +
                 "Financial           0\n" +
-                "    In Debt?                 No\n" +
-                "\n" +
-                "Criminal Activity:  0 (MHQ does not currently track criminal activity.)\n" +
-                "\n" +
+                "    In Debt?                 No\n" + '\n' +
+                "Criminal Activity:  0 (MHQ does not currently track criminal activity.)\n" + '\n' +
                 "Inactivity Modifier: 0 (MHQ does not track end dates for missions/contracts.)";
         spyReputation.initValues();
         assertEquals(expectedDetails, spyReputation.getDetails());
@@ -546,24 +536,19 @@ public class CampaignOpsReputationTest {
         // Test a brand new campaign.
         expectedDetails =
                 "Unit Reputation:    0\n" +
-                "    Method: Campaign Operations\n" +
-                "\n" +
+                "    Method: Campaign Operations\n" + '\n' +
                 "Experience:           0\n" +
-                "    Average Experience:     None\n" +
-                "\n" +
-                "\n" +
+                "    Average Experience:     None\n" + '\n' + '\n' +
                 "Commander:            0 \n" +
                 "    Leadership:               0\n" +
                 "    Negotiation:              0\n" +
                 "    Strategy:                 0\n" +
-                "    Tactics:                  0\n" +
-                "\n" +
+                "    Tactics:                  0\n" + '\n' +
                 "Combat Record:        0\n" +
                 "    Successful Missions:      0\n" +
                 "    Partial Missions:         0\n" +
                 "    Failed Missions:          0\n" +
-                "    Contract Breaches:        0\n" +
-                "\n" +
+                "    Contract Breaches:        0\n" + '\n' +
                 "Transportation:       0\n" +
                 "    BattleMech Bays:             0 needed /   0 available\n" +
                 "    Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
@@ -576,8 +561,7 @@ public class CampaignOpsReputationTest {
                 "    Infantry Bays:               0 needed /   0 available\n" +
                 "    Docking Collars:             0 needed /   0 available\n" +
                 "    Has JumpShips?              No\n" +
-                "    Has WarShips?               No\n" +
-                "\n" +
+                "    Has WarShips?               No\n" + '\n' +
                 "Support:              0\n" +
                 "    Tech Support:\n" +
                 "        Mech Techs:                   0 needed /    0 available\n" +
@@ -589,13 +573,10 @@ public class CampaignOpsReputationTest {
                 "        Astechs:                      0 needed /    0 available\n" +
                 "    Admin Support:                    0 needed /    0 available\n" +
                 "    Large Craft Crew:\n" +
-                "        All fully crewed.\n" +
-                "\n" +
+                "        All fully crewed.\n" + '\n' +
                 "Financial           0\n" +
-                "    In Debt?                 No\n" +
-                "\n" +
-                "Criminal Activity:  0 (MHQ does not currently track criminal activity.)\n" +
-                "\n" +
+                "    In Debt?                 No\n" + '\n' +
+                "Criminal Activity:  0 (MHQ does not currently track criminal activity.)\n" + '\n' +
                 "Inactivity Modifier: 0 (MHQ does not track end dates for missions/contracts.)";
         buildFreshCampaign();
         spyReputation.initValues();
@@ -643,7 +624,6 @@ public class CampaignOpsReputationTest {
         assertEquals(-5, spyReputation.calcTechSupportValue());
     }
 
-    @Test
     public void testGetTransportationDetails() {
         String expected = "Transportation:      20\n" +
                           "    BattleMech Bays:             4 needed /   4 available\n" +

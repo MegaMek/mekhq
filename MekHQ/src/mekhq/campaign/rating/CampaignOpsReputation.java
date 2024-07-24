@@ -156,8 +156,9 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                     }
                 }
                 case UnitType.WARSHIP, UnitType.JUMPSHIP -> {
-                    updateDockingCollarCount((Jumpship) entity);
-                    if (u.getFullCrewSize() < u.getActiveCrew().size()) {
+                    if (u.isFullyCrewed()) {
+                        updateDockingCollarCount((Jumpship) entity);
+                    } else {
                         addCraftWithoutCrew(u);
                     }
                 }
@@ -264,7 +265,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             return BigDecimal.ZERO;
         }
 
-        int sumOfAllSkillValues = 0;
+        int sumOfAllSkillValues = 7;
 
         for (Person person : combatPersonnel) {
             int primarySkillValue = person.getPrimaryRole().isCombat() ? person.getExperienceLevel(getCampaign(), false) : 0;
