@@ -352,22 +352,15 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     @Override
     public String getUnitRatingName(int rating) {
-        switch (rating) {
-            case DRAGOON_F:
-                return "F";
-            case DRAGOON_D:
-                return "D";
-            case DRAGOON_C:
-                return "C";
-            case DRAGOON_B:
-                return "B";
-            case DRAGOON_A:
-                return "A";
-            case DRAGOON_ASTAR:
-                return "A*";
-            default:
-                return "Unrated";
-        }
+        return switch (rating) {
+            case DRAGOON_F -> "F";
+            case DRAGOON_D -> "D";
+            case DRAGOON_C -> "C";
+            case DRAGOON_B -> "B";
+            case DRAGOON_A -> "A";
+            case DRAGOON_ASTAR -> "A*";
+            default -> "Unrated";
+        };
     }
 
     @Override

@@ -244,54 +244,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return totalCombatUnits;
     }
 
-    private int getTotalForceUnits() {
-        int totalGround = 0;
-        int totalAero = 0;
-        int totalInfantry = 0;
-        int totalBattleArmor = 0;
-
-        // Count total units for transport
-        getTotalCombatUnits();
-
-        for (Unit u : getCampaign().getHangar().getUnits()) {
-            if (u == null) {
-                continue;
-            }
-            if (u.isMothballed() || !u.hasPilot()) {
-                continue;
-            }
-
-            if ((u.getEntity().getEntityType() &
-                 Entity.ETYPE_WARSHIP) == Entity.ETYPE_WARSHIP) {
-                totalAero++;
-            } else if ((u.getEntity().getEntityType() &
-                        Entity.ETYPE_JUMPSHIP) == Entity.ETYPE_JUMPSHIP) {
-                //noinspection UnnecessaryContinue
-                continue;
-            } else if ((u.getEntity().getEntityType() &
-                        Entity.ETYPE_AEROSPACEFIGHTER) == Entity.ETYPE_AEROSPACEFIGHTER) {
-                totalAero++;
-            } else if ((u.getEntity().getEntityType() &
-                        Entity.ETYPE_DROPSHIP) == Entity.ETYPE_DROPSHIP) {
-                totalAero++;
-            } else if (((u.getEntity().getEntityType() &
-                         Entity.ETYPE_MECH) == Entity.ETYPE_MECH)
-                       || ((u.getEntity().getEntityType() &
-                            Entity.ETYPE_TANK) == Entity.ETYPE_TANK)) {
-                totalGround++;
-            } else if ((u.getEntity().getEntityType() &
-                        Entity.ETYPE_BATTLEARMOR) == Entity.ETYPE_BATTLEARMOR) {
-                totalBattleArmor++;
-            } else if ((u.getEntity().getEntityType() &
-                        Entity.ETYPE_INFANTRY) == Entity.ETYPE_INFANTRY) {
-                totalInfantry++;
-            }
-
-        }
-
-        return totalGround + totalAero + totalInfantry + totalBattleArmor;
-    }
-
     /**
      * Calculates the average experience level of combat personnel in the campaign.
      *
@@ -668,14 +620,13 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         // Assume you have 2 heavy vehicle bays, and 4 light vehicle bays, and are trying to store 1 heavy and 5 light vehicles
         // You have 1 more light vehicle than light vehicle bays to store them in, so you check how many free heavy vehicle bays
         // there are. Finding 1, you can store the light vehicle there, and it doesn't count as having excess
-        int superHeavyVeeBaysFilledByLighterVees, heavyVeeBaysFilledByLights, smallCraftBaysFilledByFighters;
         int excessHeavyVees = Math.max(getHeavyVeeCount() - getHeavyVeeBayCount(), 0);
         int excessLightVees = Math.max(getLightVeeCount() - getLightVeeBayCount(), 0);
         int excessFighters = Math.max(getFighterCount() - getFighterBayCount(), 0);
 
-        superHeavyVeeBaysFilledByLighterVees = Math.min(excessHeavyVees + excessLightVees, excessSuperHeavyVeeBays);
-        heavyVeeBaysFilledByLights = Math.min(excessLightVees, excessHeavyVeeBays);
-        smallCraftBaysFilledByFighters = Math.min(excessFighters, excessSmallCraftBays);
+        int superHeavyVeeBaysFilledByLighterVees = Math.min(excessHeavyVees + excessLightVees, excessSuperHeavyVeeBays);
+        int heavyVeeBaysFilledByLights = Math.min(excessLightVees, excessHeavyVeeBays);
+        int smallCraftBaysFilledByFighters = Math.min(excessFighters, excessSmallCraftBays);
 
         tci.updateCapacityIndicators(getSuperHeavyVeeBayCount() - superHeavyVeeBaysFilledByLighterVees, getSuperHeavyVeeCount());
         tci.updateCapacityIndicators(getHeavyVeeBayCount() + excessSuperHeavyVeeBays - heavyVeeBaysFilledByLights, getHeavyVeeCount());
