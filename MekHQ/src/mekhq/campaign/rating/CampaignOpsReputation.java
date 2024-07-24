@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.rating;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -102,19 +101,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return aeroTechTeamsNeeded;
     }
 
-    /**
-     * This method counts the units in the campaign's hangar and updates various counts and lists.
-     * It resets the total skill levels to zero before counting the units.
-     * It updates the unit counts for each non-mothballed and present unit.
-     * If an active commander exists for a unit, it adds the commander to the commander list.
-     * It updates the bay count for each entity and checks the unit type to update the total skill levels.
-     * For unit types SPACE_STATION, NAVAL, and DROPSHIP, if the unit's full crew size is less than the active crew size,
-     * it adds the unit to the list of crafts without crew.
-     * For unit types WARSHIP and JUMPSHIP, it updates the docking collar count and checks the crew size to add the unit
-     * to the list of crafts without crew if the full crew size is less than the active crew size.
-     * For units of type FixedWingSupport, if the full crew size is less than the active crew size,
-     * it adds the unit to the list of crafts without crew.
-     */
     private void countUnits() {
         // Reset counts
         setTotalSkillLevels(BigDecimal.ZERO);
@@ -252,34 +238,64 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return totalCombatUnits;
     }
 
-    /**
-     * Calculates the average experience level of combat personnel in the campaign.
-     *
-     * @return the average experience level as a BigDecimal
-     */
+    private int getTotalForceUnits() {
+        int totalGround = 0;
+        int totalAero = 0;
+        int totalInfantry = 0;
+        int totalBattleArmor = 0;
+
+        // Count total units for transport
+        getTotalCombatUnits();
+
+        for (Unit u : getCampaign().getHangar().getUnits()) {
+            if (u == null) {
+                continue;
+            }
+            if (u.isMothballed() || !u.hasPilot()) {
+                continue;
+            }
+
+            if ((u.getEntity().getEntityType() &
+                 Entity.ETYPE_WARSHIP) == Entity.ETYPE_WARSHIP) {
+                totalAero++;
+            } else if ((u.getEntity().getEntityType() &
+                        Entity.ETYPE_JUMPSHIP) == Entity.ETYPE_JUMPSHIP) {
+                //noinspection UnnecessaryContinue
+                continue;
+            } else if ((u.getEntity().getEntityType() &
+                        Entity.ETYPE_AEROSPACEFIGHTER) == Entity.ETYPE_AEROSPACEFIGHTER) {
+                totalAero++;
+            } else if ((u.getEntity().getEntityType() &
+                        Entity.ETYPE_DROPSHIP) == Entity.ETYPE_DROPSHIP) {
+                totalAero++;
+            } else if (((u.getEntity().getEntityType() &
+                         Entity.ETYPE_MECH) == Entity.ETYPE_MECH)
+                       || ((u.getEntity().getEntityType() &
+                            Entity.ETYPE_TANK) == Entity.ETYPE_TANK)) {
+                totalGround++;
+            } else if ((u.getEntity().getEntityType() &
+                        Entity.ETYPE_BATTLEARMOR) == Entity.ETYPE_BATTLEARMOR) {
+                totalBattleArmor++;
+            } else if ((u.getEntity().getEntityType() &
+                        Entity.ETYPE_INFANTRY) == Entity.ETYPE_INFANTRY) {
+                totalInfantry++;
+            }
+
+        }
+
+        return totalGround + totalAero + totalInfantry + totalBattleArmor;
+    }
+
     @Override
     protected BigDecimal calcAverageExperience() {
-        List<Person> combatPersonnel = getCampaign().getActiveCombatPersonnel();
+        int totalCombatUnits = getTotalForceUnits();
 
-        if (combatPersonnel.isEmpty()) {
+        if (totalCombatUnits == 0) {
             return BigDecimal.ZERO;
         }
 
-        int sumOfAllSkillValues = 7;
-
-        for (Person person : combatPersonnel) {
-            int primarySkillValue = person.getPrimaryRole().isCombat() ? person.getExperienceLevel(getCampaign(), false) : 0;
-            int secondarySkillValue = person.getSecondaryRole().isCombat() ? person.getExperienceLevel(getCampaign(), true) : 0;
-
-            int totalSkillValue = secondarySkillValue > 0 ? (primarySkillValue + secondarySkillValue) / 2 : primarySkillValue;
-
-            sumOfAllSkillValues += totalSkillValue;
-        }
-
-        return getTotalSkillLevels().divide(
-                BigDecimal.valueOf(sumOfAllSkillValues),
-                combatPersonnel.size(),
-                RoundingMode.HALF_DOWN);
+        return getTotalSkillLevels().divide(BigDecimal.valueOf(totalCombatUnits),
+                                            2,RoundingMode.HALF_DOWN);
     }
 
     private void calcNeededTechs() {
@@ -434,18 +450,23 @@ public class CampaignOpsReputation extends AbstractUnitRating {
      */
     @Override
     protected SkillLevel getExperienceLevelName(BigDecimal experience) {
-        int averageExperienceScore = MathUtility.clamp(experience.intValue(), 0, 7);
+        if (!hasUnits()) {
+            return SkillLevel.NONE;
+        }
 
-        return switch (averageExperienceScore) {
-            case 7 -> SkillLevel.NONE;
-            case 6 -> SkillLevel.ULTRA_GREEN;
-            case 5 -> SkillLevel.GREEN;
-            case 4 -> SkillLevel.REGULAR;
-            case 3 -> SkillLevel.VETERAN;
-            case 2 -> SkillLevel.ELITE;
-            case 1 -> SkillLevel.HEROIC;
-            default -> SkillLevel.LEGENDARY;
-        };
+        final BigDecimal eliteThreshold = new BigDecimal("5.00");
+        final BigDecimal vetThreshold = new BigDecimal("7.00");
+        final BigDecimal regThreshold = new BigDecimal("9.00");
+
+        if (experience.compareTo(regThreshold) > 0) {
+            return SkillLevel.GREEN;
+        } else if (experience.compareTo(vetThreshold) > 0) {
+            return SkillLevel.REGULAR;
+        } else if (experience.compareTo(eliteThreshold) > 0) {
+            return SkillLevel.VETERAN;
+        } else {
+            return SkillLevel.ELITE;
+        }
     }
 
     /**
@@ -456,30 +477,22 @@ public class CampaignOpsReputation extends AbstractUnitRating {
      */
     @Override
     public int getExperienceValue() {
-        BigDecimal averageExperience = calcAverageExperience();
-        logger.info("Average Experience Value: {}", averageExperience);
-
-        SkillLevel experienceLevelEnum = getExperienceLevelName(averageExperience);
-
-        switch (experienceLevelEnum) {
-            case NONE, ULTRA_GREEN, GREEN -> {
-                logger.info("Experience name: {} (+5)", experienceLevelEnum.toString());
+        if (!hasUnits()) {
+            return 0;
+        }
+        BigDecimal averageExp = calcAverageExperience();
+        SkillLevel level = getExperienceLevelName(averageExp);
+        switch (level) {
+            case NONE:
+                return 0;
+            case GREEN:
                 return 5;
-            }
-            case REGULAR -> {
-                logger.info("Experience name: {} (+10)", experienceLevelEnum.toString());
+            case REGULAR:
                 return 10;
-            }
-            case VETERAN -> {
-                logger.info("Experience name: {} (+20)", experienceLevelEnum.toString());
+            case VETERAN:
                 return 20;
-            }
-            case ELITE, HEROIC, LEGENDARY -> {
-                logger.info("Experience name: {} (+40)", experienceLevelEnum.toString());
+            default:
                 return 40;
-            }
-            default -> throw new IllegalArgumentException("Unexpected value in mekhq/campaign/rating/CampaignOpsReputation.java/getExperienceValue: "
-                    + experienceLevelEnum);
         }
     }
 
@@ -1133,9 +1146,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                 + Command: Does not incorporate any positive or negative \
                 traits from AToW or BRPG3.\
                 + Criminal Activity: MHQ does not currently track criminal \
-                activity.\
-                + Inactivity: MHQ does not track end dates for missions/\
-                contracts.""";
+                activity.""";
     }
 
     private void setNonAdminPersonnelCount(int nonAdminPersonnelCount) {

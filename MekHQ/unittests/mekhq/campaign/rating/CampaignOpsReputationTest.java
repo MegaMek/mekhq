@@ -474,14 +474,15 @@ public class CampaignOpsReputationTest {
         assertEquals(4, spyReputation.getModifier());
     }
 
-    public void testGetExperience() {
+    @Test
+    public void testGetAverageExperience() {
         spyReputation.initValues();
-        assertEquals(SkillLevel.LEGENDARY, spyReputation.getAverageExperience());
+        assertEquals(SkillLevel.REGULAR, spyReputation.getAverageExperience());
 
-        // Test a brand-new campaign.
+        // Test a brand new campaign.
         buildFreshCampaign();
         spyReputation.initValues();
-        assertEquals(SkillLevel.LEGENDARY, spyReputation.getAverageExperience());
+        assertEquals(SkillLevel.NONE, spyReputation.getAverageExperience());
     }
 
     public void testGetDetails() {
