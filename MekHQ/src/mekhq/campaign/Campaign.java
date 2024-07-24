@@ -2163,13 +2163,9 @@ public class Campaign implements ITechManager {
     }
 
     public List<Person> getAdmins() {
-        List<Person> admins = new ArrayList<>();
-        for (Person p : getActivePersonnel()) {
-            if (p.isAdministrator()) {
-                admins.add(p);
-            }
-        }
-        return admins;
+        return getActivePersonnel().stream()
+                .filter(Person::isAdministrator)
+                .collect(Collectors.toList());
     }
 
     public boolean isWorkingOnRefit(Person p) {
@@ -2181,13 +2177,9 @@ public class Campaign implements ITechManager {
     }
 
     public List<Person> getDoctors() {
-        List<Person> docs = new ArrayList<>();
-        for (Person p : getActivePersonnel()) {
-            if (p.isDoctor()) {
-                docs.add(p);
-            }
-        }
-        return docs;
+        return getActivePersonnel().stream()
+                .filter(Person::isDoctor)
+                .collect(Collectors.toList());
     }
 
     public int getPatientsFor(Person doctor) {

@@ -25,6 +25,7 @@ import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
@@ -33,6 +34,7 @@ import mekhq.campaign.unit.Unit;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -306,11 +308,12 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         // We count all active personnel in the force provided they are not:
         // 1) A Dependent
-        // 2) Administrative Personnel: Administrator, doctor, or medic (as per CO (3rd Printing) pg. 21)
+        // 2) Administrative Personnel: Administrator, or Doctor
         // 3) A Prisoner
         for (Person p : getCampaign().getActivePersonnel()) {
-            if (p.getPrimaryRole().isDependent() || p.isAdministrator() || p.isDoctor()
-                    || p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic()
+            if (p.getPrimaryRole().isDependent()
+                    || p.isAdministrator()
+                    || p.isDoctor()
                     || !p.getPrisonerStatus().isFree()) {
                 continue;
             }
@@ -321,6 +324,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
             setNonAdminPersonnelCount(getNonAdminPersonnelCount() + 1);
         }
+
         setNonAdminPersonnelCount(getNonAdminPersonnelCount() + getCampaign().getAstechPool());
     }
 
@@ -335,9 +339,6 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             setAdminsNeeded((int) Math.ceil(calculatedAdmin / 2d));
         }
     }
-
-    // todo Combat Personnel (up to 1/4 total) may be assigned double-duty and count as 1/3 of a tech.
-    // todo Combat Personnel (up to 1/4 total) may be assigned double-duty and count as 1/3 of an admin.
 
     @Override
     protected void initValues() {
@@ -805,15 +806,17 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         }
 
         if (techShortage) {
+            logger.info("Insufficient Tech Support (-5)");
             totalValue -= 5;
         } else {
             if (getSupportPercent().compareTo(BigDecimal.valueOf(200)) > 0) {
+                logger.info("Exceeding tech support requirement by 201%+ (+15)");
                 totalValue += 15;
-            } else if (getSupportPercent().compareTo(BigDecimal.valueOf(175)) >
-                       0) {
+            } else if (getSupportPercent().compareTo(BigDecimal.valueOf(175)) > 0) {
+                logger.info("Exceeding tech support requirement by 176-200%+ (+10)");
                 totalValue += 10;
-            } else if (getSupportPercent().compareTo(BigDecimal.valueOf(149)) >
-                       0) {
+            } else if (getSupportPercent().compareTo(BigDecimal.valueOf(149)) > 0) {
+                logger.info("Exceeding tech support requirement by up to 150-175%+ (+5)");
                 totalValue += 5;
             }
         }
@@ -822,27 +825,49 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private int calcAdminSupportValue() {
-        return (getAdminsNeeded() > getTotalAdmins()) ? -5 : 0;
+        int adminsRequired = getAdminsNeeded();
+        int totalAdmins = getTotalAdmins();
+        boolean hasInsufficientSupport = adminsRequired > totalAdmins;
+
+        logger.info("Admins: {}/{} ({}) [{} combat personnel pulling double duty]",
+                totalAdmins,
+                adminsRequired,
+                (hasInsufficientSupport ? "-5" : "+0"),
+                (int) Math.ceil((double) getCampaign().getActiveCombatPersonnel().size() / 4));
+
+        return hasInsufficientSupport ? -5 : 0;
     }
 
     private int calcLargeCraftSupportValue() {
-        Unit unit = getCampaign().getHangar().findUnit(u -> {
-            if (u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
-                return u.getActiveCrew().size() < u.getFullCrewSize();
+        for (Unit unit : getCampaign().getUnits()) {
+            if (unit.isMothballed()) {
+                continue;
             }
-            return false;
-        });
 
-        // if we found a unit we have a crew shortage
-        // on at least one vessel in our fleet
-        return (unit != null) ? -5 : 0;
+            if ((unit.getEntity() instanceof SmallCraft)
+                    || (unit.getEntity() instanceof Jumpship)
+                    || (unit.getEntity() instanceof Warship)
+                    || (unit.getEntity() instanceof Dropship)) {
+                if (!unit.isFullyCrewed()) {
+                    logger.info("Found vessel that is not fully crewed (-5)");
+                    return -5;
+                }
+            }
+        }
+
+        logger.info("All vessels are fully crewed");
+        return 0;
     }
 
     @Override
     public int getSupportValue() {
         int value = calcTechSupportValue();
+
         value += calcAdminSupportValue();
+
         value += calcLargeCraftSupportValue();
+
+        logger.info("Support Rating: {}", value);
         return value;
     }
 
@@ -854,7 +879,13 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     @Override
     public int getFinancialValue() {
-        return getCampaign().getFinances().isInDebt() ? -10 : 0;
+        if (getCampaign().getFinances().isInDebt()) {
+            logger.info("Financial Rating (in debt): -10");
+            return -10;
+        } else {
+            logger.info("Financial Rating (not in debt): +0");
+            return 0;
+        }
     }
 
     // ToDo: MekHQ doesn't currently support recording crimes.
@@ -862,9 +893,54 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return 0;
     }
 
-    // ToDo MekHQ doesn't current apply completion dates to missions.
     private int getIdleTimeModifier() {
+        if (getCampaign().getCampaignOptions().isUseAtB()) {
+            if (getCampaign().hasActiveContract()) {
+                return 0;
+            }
+
+            LocalDate newestEndDate = getNewestEndDate();
+            LocalDate currentDate = getCampaign().getLocalDate();
+
+            Period period = Period.between(currentDate, newestEndDate);
+
+            int inactiveYears = period.getYears();
+
+            if (inactiveYears > 0) {
+                int penalty = inactiveYears * 5;
+                logger.info("Campaign has been inactive for {} years (-{})", inactiveYears, penalty);
+                return penalty;
+            } else {
+                logger.info("Campaign has not been inactive for more than a year (+0)");
+                return 0;
+            }
+        }
+
         return 0;
+    }
+
+    private LocalDate getNewestEndDate() {
+        LocalDate newestEndDate = null;
+
+        for (AtBContract contract : getCampaign().getAtBContracts()) {
+            // CamOps explicitly calls out Garrison type contracts as not counting towards activity
+            if (contract.getContractType().isGarrisonType()) {
+                continue;
+            }
+
+            LocalDate endDate = contract.getEndingDate();
+
+            if ((newestEndDate == null) || (endDate.isAfter(newestEndDate))) {
+                newestEndDate = contract.getEndingDate();
+            }
+        }
+
+        // if this is still null, it means no valid contract was found, so we use the campaign start date
+        if (newestEndDate == null) {
+            newestEndDate = getCampaign().getCampaignStartDate();
+        }
+
+        return newestEndDate;
     }
 
     @Override
@@ -999,10 +1075,14 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private int getTotalAdmins() {
-        // Admins, Doctors, and Medics all fall under the Administrators based on my read of
-        // CO (3rd Printing) pg. 21
-        return getCampaign().getAdmins().size() + getCampaign().getDoctors().size()
-                + getCampaign().getNumberMedics();
+        // CamOps states that combat personnel can pull double-duty as admin personnel.
+        // As there is no downside to doing this, we assume it's always being done.
+        int combatAdmins = (int) Math.ceil((double) getCampaign().getActiveCombatPersonnel().size() / 4);
+
+        // Doctors also fall under the Administrators category
+        return getCampaign().getAdmins().size()
+                + getCampaign().getDoctors().size()
+                + (combatAdmins / (getCampaign().hasActiveContract() ? 2 : 3));
     }
 
     @Override
@@ -1037,8 +1117,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
           .append(" (MHQ does not currently track criminal activity.)");
 
         sb.append("\n\n")
-          .append(String.format(TEMPLATE, "Inactivity Modifier:", 0))
-          .append(" (MHQ does not track end dates for missions/contracts.)");
+          .append(String.format(TEMPLATE, "Inactivity Modifier:", getIdleTimeModifier()));
 
         return new String(sb);
     }
