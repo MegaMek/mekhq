@@ -1684,8 +1684,7 @@ public class Campaign implements ITechManager {
             // Higher rated units are more likely to have Bloodnamed
             if (getCampaignOptions().getUnitRatingMethod().isEnabled()) {
                 IUnitRating rating = getUnitRating();
-                bloodnameTarget += IUnitRating.DRAGOON_C - (getCampaignOptions().getUnitRatingMethod().equals(
-                        UnitRatingMethod.FLD_MAN_MERCS_REV)
+                bloodnameTarget += IUnitRating.DRAGOON_C - (getCampaignOptions().getUnitRatingMethod().isFMMR()
                         ? rating.getUnitRatingAsInteger() : rating.getModifier());
             }
 
