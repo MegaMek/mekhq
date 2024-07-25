@@ -456,7 +456,7 @@ public class PersonalityController {
         } else if (roll < 14) {
             return UNINTELLIGENT;
         } else if (roll < 29) {
-            return FEEBLE_MINDED;
+            return FOOLISH;
         } else if (roll < 49) {
             return SIMPLE;
         } else if (roll < 79) {

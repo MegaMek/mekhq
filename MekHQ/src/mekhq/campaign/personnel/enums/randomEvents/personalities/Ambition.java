@@ -351,49 +351,6 @@ public enum Ambition {
         };
     }
 
-    /**
-     * Parses the given Ambition enum value to an integer.
-     *
-     * @param ambition the Ambition enum value to be parsed
-     * @return the integer value representing the parsed Ambition
-     */
-    @SuppressWarnings(value = "unused")
-    public static int parseToInt(final Ambition ambition) {
-        return switch (ambition) {
-            case NONE -> 0;
-            case AMBITIOUS -> 1;
-            case ARROGANT -> 2;
-            case ASPIRING -> 3;
-            case CALCULATING -> 4;
-            case CONNIVING -> 5;
-            case CONTROLLING -> 6;
-            case CUTTHROAT -> 7;
-            case DISHONEST -> 8;
-            case DILIGENT -> 9;
-            case DRIVEN -> 10;
-            case ENERGETIC -> 11;
-            case EXCESSIVE -> 12;
-            case FOCUSED -> 13;
-            case GOAL_ORIENTED -> 14;
-            case INNOVATIVE -> 15;
-            case MANIPULATIVE -> 16;
-            case MOTIVATED -> 17;
-            case OPPORTUNISTIC -> 18;
-            case OVERCONFIDENT -> 19;
-            case PERSISTENT -> 20;
-            case PROACTIVE -> 21;
-            case RESILIENT -> 22;
-            case RESOURCEFUL -> 23;
-            case RUTHLESS -> 24;
-            case SELFISH -> 25;
-            case STRATEGIC -> 26;
-            case TYRANNICAL -> 27;
-            case UNAMBITIOUS -> 28;
-            case UNSCRUPULOUS -> 29;
-            case VISIONARY -> 30;
-        };
-    }
-
     @Override
     public String toString() {
         return name;

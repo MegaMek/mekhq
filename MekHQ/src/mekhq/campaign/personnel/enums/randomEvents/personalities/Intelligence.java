@@ -26,7 +26,7 @@ public enum Intelligence {
     //region Enum Declarations
     BRAIN_DEAD("Intelligence.BRAIN_DEAD.text", "Intelligence.BRAIN_DEAD.description"),
     UNINTELLIGENT("Intelligence.UNINTELLIGENT.text", "Intelligence.UNINTELLIGENT.description"),
-    FEEBLE_MINDED("Intelligence.FEEBLE_MINDED.text", "Intelligence.FEEBLE_MINDED.description"),
+    FOOLISH("Intelligence.FOOLISH.text", "Intelligence.FOOLISH.description"),
     SIMPLE("Intelligence.SIMPLE.text", "Intelligence.SIMPLE.description"),
     SLOW("Intelligence.SLOW.text", "Intelligence.SLOW.description"),
     UNINSPIRED("Intelligence.UNINSPIRED.text", "Intelligence.UNINSPIRED.description"),
@@ -83,7 +83,7 @@ public enum Intelligence {
     }
     @SuppressWarnings(value = "unused")
     public boolean isFeebleMinded() {
-        return this == FEEBLE_MINDED;
+        return this == FOOLISH;
     }
     @SuppressWarnings(value = "unused")
     public boolean isSimple() {
@@ -189,9 +189,9 @@ public enum Intelligence {
         return switch (quirk) {
             case "0", "Brain Dead" -> BRAIN_DEAD;
             case "1", "Unintelligent" -> UNINTELLIGENT;
-            case "2", "Feeble Minded" -> FEEBLE_MINDED;
+            case "2", "Feeble Minded", "Foolish" -> FOOLISH;
             case "3", "Simple" -> SIMPLE;
-            case "4", "Slow to Comprehend" -> SLOW;
+            case "4", "Slow to Comprehend", "Slow" -> SLOW;
             case "5", "Uninspired" -> UNINSPIRED;
             case "6", "Dull" -> DULL;
             case "7", "Dimwitted" -> DIMWITTED;
@@ -229,7 +229,7 @@ public enum Intelligence {
         return switch (intelligence) {
             case BRAIN_DEAD -> 0;
             case UNINTELLIGENT -> 1;
-            case FEEBLE_MINDED -> 2;
+            case FOOLISH -> 2;
             case SIMPLE -> 3;
             case SLOW -> 4;
             case UNINSPIRED -> 5;

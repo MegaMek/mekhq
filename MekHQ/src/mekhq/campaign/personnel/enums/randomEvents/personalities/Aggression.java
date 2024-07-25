@@ -354,49 +354,6 @@ public enum Aggression {
         };
     }
 
-    /**
-     * Parses the given Aggression enum value to an integer.
-     *
-     * @param aggression the Aggression enum value to be parsed
-     * @return the integer value representing the parsed Aggression
-     */
-
-    @SuppressWarnings(value = "unused")
-    public static int parseToInt(final Aggression aggression) {
-        return switch (aggression) {
-            case NONE -> 0;
-            case BLOODTHIRSTY -> 1;
-            case BOLD -> 2;
-            case AGGRESSIVE -> 3;
-            case ASSERTIVE -> 4;
-            case BELLIGERENT -> 5;
-            case BRASH -> 6;
-            case CONFIDENT -> 7;
-            case COURAGEOUS -> 8;
-            case DARING -> 9;
-            case DECISIVE -> 10;
-            case DETERMINED -> 11;
-            case DIPLOMATIC -> 12;
-            case DOMINEERING -> 13;
-            case FEARLESS -> 14;
-            case HOSTILE -> 15;
-            case HOT_HEADED -> 16;
-            case IMPETUOUS -> 17;
-            case IMPULSIVE -> 18;
-            case INFLEXIBLE -> 19;
-            case INTREPID -> 20;
-            case MURDEROUS -> 21;
-            case OVERBEARING -> 22;
-            case PACIFISTIC -> 23;
-            case RECKLESS -> 24;
-            case RESOLUTE -> 25;
-            case SADISTIC -> 26;
-            case SAVAGE -> 27;
-            case STUBBORN -> 28;
-            case TENACIOUS -> 29;
-            case VIGILANT -> 30;
-        };
-    }
     @Override
     public String toString() {
         return name;
