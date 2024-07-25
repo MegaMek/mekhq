@@ -1753,13 +1753,14 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Provides a filtered list of personnel including only active Persons with a combat role.
+     * Provides a filtered list of personnel including only active Persons with both combat roles.
      * @return a {@link Person} <code>List</code> containing all active personnel
      */
     public List<Person> getActiveCombatPersonnel() {
         return getPersonnel().stream()
                 .filter(person -> person.getStatus().isActive())
-                .filter(person -> (person.getPrimaryRole().isCombat()) || (person.getSecondaryRole().isCombat()))
+                .filter(person -> (person.getPrimaryRole().isCombat()) && (person.getSecondaryRole().isCombat()))
+                .filter(person -> (person.getSecondaryRole().isCombat()) || (person.getSecondaryRole().isNone()))
                 .toList();
     }
 
