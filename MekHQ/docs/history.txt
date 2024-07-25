@@ -75,6 +75,7 @@ MEKHQ VERSION HISTORY:
 + FIX #4474: Infantry personalty description is too wide
 + PR #4476: Removed Loyalty Change Event for Executing Prisoners
 + PR #4477: Marked 'FM: Mercenaries (rev)' Unit Rating Method as Deprecated
++ FIXED #4481: Significant amount of company mysteriously vanished
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
