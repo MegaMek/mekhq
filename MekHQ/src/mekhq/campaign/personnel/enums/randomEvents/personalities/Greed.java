@@ -351,49 +351,6 @@ public enum Greed {
         };
     }
 
-    /**
-     * Parses the given Greed enum value to an integer.
-     *
-     * @param greed the Greed enum value to be parsed
-     * @return the integer value representing the parsed Greed
-     */
-    @SuppressWarnings(value = "unused")
-    public static int parseToInt(final Greed greed) {
-        return switch (greed) {
-            case NONE -> 0;
-            case ASTUTE -> 1;
-            case ADEPT -> 2;
-            case AVARICIOUS -> 3;
-            case CORRUPT -> 4;
-            case DYNAMIC -> 5;
-            case EAGER -> 6;
-            case ENTERPRISING -> 7;
-            case EXPLOITATIVE -> 8;
-            case FRAUDULENT -> 9;
-            case GENEROUS -> 10;
-            case GREEDY -> 11;
-            case HOARDING -> 12;
-            case INSATIABLE -> 13;
-            case INSIGHTFUL -> 14;
-            case INTUITIVE -> 15;
-            case JUDICIOUS -> 16;
-            case LUSTFUL -> 17;
-            case MERCENARY -> 18;
-            case METICULOUS -> 19;
-            case NEFARIOUS -> 20;
-            case OVERREACHING -> 21;
-            case PROFITABLE -> 22;
-            case SAVVY -> 23;
-            case SELF_SERVING -> 24;
-            case SHAMELESS -> 25;
-            case SHREWD -> 26;
-            case TACTICAL -> 27;
-            case THIEF -> 28;
-            case UNPRINCIPLED -> 29;
-            case VORACIOUS -> 30;
-        };
-    }
-
     @Override
     public String toString() {
         return name;
