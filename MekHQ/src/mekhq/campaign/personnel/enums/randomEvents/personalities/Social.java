@@ -66,7 +66,7 @@ public enum Social {
 
     //region Constructors
     Social(final String name, final String description, boolean isPositive, boolean isMajor) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.description = resources.getString(description);
@@ -258,7 +258,7 @@ public enum Social {
     //region File I/O
     /**
      * Parses a given string and returns the corresponding Social enum.
-     * Accepts either the ENUM ordinal value, or its name
+     * Accepts either the ENUM ordinal value or its name
      *
      * @param social the string to be parsed
      * @return the Social enum that corresponds to the given string
