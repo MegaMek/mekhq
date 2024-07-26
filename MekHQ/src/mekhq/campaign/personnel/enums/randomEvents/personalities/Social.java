@@ -266,38 +266,40 @@ public enum Social {
      */
     @SuppressWarnings(value = "unused")
     public static Social parseFromString(final String social) {
-        return switch (social.toLowerCase()) {
-            case "0", "none" -> NONE;
-            case "1", "altruistic" -> ALTRUISTIC;
-            case "2", "apathetic" -> APATHETIC;
-            case "3", "authentic" -> AUTHENTIC;
-            case "4", "blunt" -> BLUNT;
-            case "5", "callous" -> CALLOUS;
-            case "6", "compassionate" -> COMPASSIONATE;
-            case "7", "condescending" -> CONDESCENDING;
-            case "8", "considerate" -> CONSIDERATE;
-            case "9", "disingenuous" -> DISINGENUOUS;
-            case "10", "dismissive" -> DISMISSIVE;
-            case "11", "encouraging" -> ENCOURAGING;
-            case "12", "erratic" -> ERRATIC;
-            case "13", "empathetic" -> EMPATHETIC;
-            case "14", "friendly" -> FRIENDLY;
-            case "15", "gregarious" -> GREGARIOUS;
-            case "16", "inspiring" -> INSPIRING;
-            case "17", "indifferent" -> INDIFFERENT;
-            case "18", "introverted" -> INTROVERTED;
-            case "19", "irritable" -> IRRITABLE;
-            case "20", "narcissistic" -> NARCISSISTIC;
-            case "21", "neglectful" -> NEGLECTFUL;
-            case "22", "pompous" -> POMPOUS;
-            case "23", "petty" -> PETTY;
-            case "24", "persuasive" -> PERSUASIVE;
-            case "25", "receptive" -> RECEPTIVE;
-            case "26", "scheming" -> SCHEMING;
-            case "27", "sincere" -> SINCERE;
-            case "28", "supportive" -> SUPPORTIVE;
-            case "29", "tactful" -> TACTFUL;
-            case "30", "untrustworthy" -> UNTRUSTWORTHY;
+        return switch (social) {
+            case "0", "None" -> NONE;
+            // Minor Characteristics
+            case "1", "Apathetic" -> APATHETIC;
+            case "2", "Authentic" -> AUTHENTIC;
+            case "3", "Blunt" -> BLUNT;
+            case "4", "Callous" -> CALLOUS;
+            case "5", "Condescending" -> CONDESCENDING;
+            case "6", "Considerate" -> CONSIDERATE;
+            case "7", "Disingenuous" -> DISINGENUOUS;
+            case "8", "Dismissive" -> DISMISSIVE;
+            case "9", "Encouraging" -> ENCOURAGING;
+            case "10", "Erratic" -> ERRATIC;
+            case "11", "Empathetic" -> EMPATHETIC;
+            case "12", "Friendly" -> FRIENDLY;
+            case "13", "Inspiring" -> INSPIRING;
+            case "14", "Indifferent" -> INDIFFERENT;
+            case "15", "Introverted" -> INTROVERTED;
+            case "16", "Irritable" -> IRRITABLE;
+            case "17", "Neglectful" -> NEGLECTFUL;
+            case "18", "Petty" -> PETTY;
+            case "19", "Persuasive" -> PERSUASIVE;
+            case "20", "Receptive" -> RECEPTIVE;
+            case "21", "Sincere" -> SINCERE;
+            case "22", "Supportive" -> SUPPORTIVE;
+            case "23", "Tactful" -> TACTFUL;
+            case "24", "Untrustworthy" -> UNTRUSTWORTHY;
+            // Major Characteristics
+            case "25", "Altruistic" -> ALTRUISTIC;
+            case "26", "Compassionate" -> COMPASSIONATE;
+            case "27", "Gregarious" -> GREGARIOUS;
+            case "28", "Narcissistic" -> NARCISSISTIC;
+            case "29", "Pompous" -> POMPOUS;
+            case "30", "Scheming" -> SCHEMING;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromString: "
                             + social);
@@ -315,36 +317,38 @@ public enum Social {
     public static Social parseFromInt(final int social) {
         return switch (social) {
             case 0 -> NONE;
-            case 1 -> ALTRUISTIC;
-            case 2 -> APATHETIC;
-            case 3 -> AUTHENTIC;
-            case 4 -> BLUNT;
-            case 5 -> CALLOUS;
-            case 6 -> COMPASSIONATE;
-            case 7 -> CONDESCENDING;
-            case 8 -> CONSIDERATE;
-            case 9 -> DISINGENUOUS;
-            case 10 -> DISMISSIVE;
-            case 11 -> ENCOURAGING;
-            case 12 -> ERRATIC;
-            case 13 -> EMPATHETIC;
-            case 14 -> FRIENDLY;
-            case 15 -> GREGARIOUS;
-            case 16 -> INSPIRING;
-            case 17 -> INDIFFERENT;
-            case 18 -> INTROVERTED;
-            case 19 -> IRRITABLE;
-            case 20 -> NARCISSISTIC;
-            case 21 -> NEGLECTFUL;
-            case 22 -> POMPOUS;
-            case 23 -> PETTY;
-            case 24 -> PERSUASIVE;
-            case 25 -> RECEPTIVE;
-            case 26 -> SCHEMING;
-            case 27 -> SINCERE;
-            case 28 -> SUPPORTIVE;
-            case 29 -> TACTFUL;
-            case 30 -> UNTRUSTWORTHY;
+            // Minor Characteristics
+            case 1 -> APATHETIC;
+            case 2 -> AUTHENTIC;
+            case 3 -> BLUNT;
+            case 4 -> CALLOUS;
+            case 5 -> CONDESCENDING;
+            case 6 -> CONSIDERATE;
+            case 7 -> DISINGENUOUS;
+            case 8 -> DISMISSIVE;
+            case 9 -> ENCOURAGING;
+            case 10 -> ERRATIC;
+            case 11 -> EMPATHETIC;
+            case 12 -> FRIENDLY;
+            case 13 -> INSPIRING;
+            case 14 -> INDIFFERENT;
+            case 15 -> INTROVERTED;
+            case 16 -> IRRITABLE;
+            case 17 -> NEGLECTFUL;
+            case 18 -> PETTY;
+            case 19 -> PERSUASIVE;
+            case 20 -> RECEPTIVE;
+            case 21 -> SINCERE;
+            case 22 -> SUPPORTIVE;
+            case 23 -> TACTFUL;
+            case 24 -> UNTRUSTWORTHY;
+            // Major Characteristics
+            case 25 -> ALTRUISTIC;
+            case 26 -> COMPASSIONATE;
+            case 27 -> GREGARIOUS;
+            case 28 -> NARCISSISTIC;
+            case 29 -> POMPOUS;
+            case 30 -> SCHEMING;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromInt: "
                             + social);
