@@ -184,6 +184,7 @@ public class CampaignOptions {
     private boolean useTactics;
     private boolean useInitiativeBonus;
     private boolean useToughness;
+    private boolean useRandomToughness;
     private boolean useArtillery;
     private boolean useAbilities;
     private boolean useEdge;
@@ -233,6 +234,11 @@ public class CampaignOptions {
     private boolean useRandomDependentAddition;
     private boolean useRandomDependentRemoval;
 
+    // Personnel Removal
+    private boolean usePersonnelRemoval;
+    private boolean useRemovalExemptCemetery;
+    private boolean useRemovalExemptRetirees;
+
     // Salary
     private boolean disableSecondaryRoleSalary;
     private double salaryAntiMekMultiplier;
@@ -265,9 +271,9 @@ public class CampaignOptions {
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
     private RandomOriginOptions randomOriginOptions;
+    private boolean useRandomPersonalities;
 
     // Retirement
-    private boolean useRetirementDateTracking;
     private boolean useRandomRetirement;
 
     private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
@@ -296,7 +302,6 @@ public class CampaignOptions {
     private boolean useFamilyModifiers;
     private boolean useLoyaltyModifiers;
     private boolean useHideLoyalty;
-    private boolean useLeadershipChangeRefresh;
 
     private int payoutRateOfficer;
     private int payoutRateEnlisted;
@@ -689,6 +694,7 @@ public class CampaignOptions {
         setUseTactics(false);
         setUseInitiativeBonus(false);
         setUseToughness(false);
+        setUseRandomToughness(false);
         setUseArtillery(false);
         setUseAbilities(false);
         setUseEdge(false);
@@ -737,6 +743,11 @@ public class CampaignOptions {
         // Dependent
         setUseRandomDependentAddition(false);
         setUseRandomDependentRemoval(false);
+
+        // Personnel Removal
+        setUsePersonnelRemoval(false);
+        setUseRemovalExemptCemetery(false);
+        setUseRemovalExemptRetirees(false);
 
         // Salary
         setDisableSecondaryRoleSalary(false);
@@ -807,6 +818,7 @@ public class CampaignOptions {
         // Personnel Randomization
         setUseDylansRandomXP(false);
         setRandomOriginOptions(new RandomOriginOptions(true));
+        setUseRandomPersonalities(false);
 
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
@@ -943,7 +955,6 @@ public class CampaignOptions {
 
         //region Turnover and Retention
         // Retirement
-        setUseRetirementDateTracking(false);
         setUseRandomRetirement(false);
         setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.FIXED);
         setTurnoverDifficulty(SkillLevel.REGULAR);
@@ -971,7 +982,6 @@ public class CampaignOptions {
 
         setUseLoyaltyModifiers(true);
         setUseHideLoyalty(false);
-        setUseLeadershipChangeRefresh(true);
 
         setPayoutRateOfficer(3);
         setPayoutRateEnlisted(3);
@@ -1400,6 +1410,14 @@ public class CampaignOptions {
         this.useToughness = useToughness;
     }
 
+    public boolean isUseRandomToughness() {
+        return useRandomToughness;
+    }
+
+    public void setUseRandomToughness(final boolean useRandomToughness) {
+        this.useRandomToughness = useRandomToughness;
+    }
+
     public boolean isUseArtillery() {
         return useArtillery;
     }
@@ -1805,23 +1823,17 @@ public class CampaignOptions {
     public void setRandomOriginOptions(final RandomOriginOptions randomOriginOptions) {
         this.randomOriginOptions = randomOriginOptions;
     }
+
+    public boolean isUseRandomPersonalities() {
+        return useRandomPersonalities;
+    }
+
+    public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
+        this.useRandomPersonalities = useRandomPersonalities;
+    }
     //endregion Personnel Randomization
 
     //region Retirement
-    /**
-     * @return whether to track retirement dates
-     */
-    public boolean isUseRetirementDateTracking() {
-        return useRetirementDateTracking;
-    }
-
-    /**
-     * @param useRetirementDateTracking the new value for whether to track retirement dates
-     */
-    public void setUseRetirementDateTracking(final boolean useRetirementDateTracking) {
-        this.useRetirementDateTracking = useRetirementDateTracking;
-    }
-
     public boolean isUseRandomRetirement() {
         return useRandomRetirement;
     }
@@ -1892,14 +1904,6 @@ public class CampaignOptions {
 
     public void setUseHideLoyalty(final boolean useHideLoyalty) {
         this.useHideLoyalty = useHideLoyalty;
-    }
-
-    public boolean isUseLeadershipChangeRefresh() {
-        return useLeadershipChangeRefresh;
-    }
-
-    public void setUseLeadershipChangeRefresh(final boolean useLeadershipChangeRefresh) {
-        this.useLeadershipChangeRefresh = useLeadershipChangeRefresh;
     }
 
     public boolean isUseRandomFounderTurnover() {
@@ -2170,6 +2174,32 @@ public class CampaignOptions {
         this.useRandomDependentRemoval = useRandomDependentRemoval;
     }
     //endregion Dependent
+
+    //region Personnel Removal
+    public boolean isUsePersonnelRemoval() {
+        return usePersonnelRemoval;
+    }
+
+    public void setUsePersonnelRemoval(final boolean usePersonnelRemoval) {
+        this.usePersonnelRemoval = usePersonnelRemoval;
+    }
+
+    public boolean isUseRemovalExemptCemetery() {
+        return useRemovalExemptCemetery;
+    }
+
+    public void setUseRemovalExemptCemetery(final boolean useRemovalExemptCemetery) {
+        this.useRemovalExemptCemetery = useRemovalExemptCemetery;
+    }
+
+    public boolean isUseRemovalExemptRetirees() {
+        return useRemovalExemptRetirees;
+    }
+
+    public void setUseRemovalExemptRetirees(final boolean useRemovalExemptRetirees) {
+        this.useRemovalExemptRetirees = useRemovalExemptRetirees;
+    }
+    //endregion Personnel Removal
 
     //region Salary
     public boolean isDisableSecondaryRoleSalary() {
@@ -4492,6 +4522,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTactics", isUseTactics());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInitiativeBonus", isUseInitiativeBonus());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useToughness", isUseToughness());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomToughness", isUseRandomToughness());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useArtillery", isUseArtillery());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAbilities", isUseAbilities());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", isUseEdge());
@@ -4547,6 +4578,12 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentRemoval", isUseRandomDependentRemoval());
         //endregion Dependent
 
+        //region Personnel Removal
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePersonnelRemoval", isUsePersonnelRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRemovalExemptCemetery", isUseRemovalExemptCemetery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRemovalExemptRetirees", isUseRemovalExemptRetirees());
+        //endregion Personnel Removal
+
         //region Salary
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disableSecondaryRoleSalary", isDisableSecondaryRoleSalary());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
@@ -4585,10 +4622,10 @@ public class CampaignOptions {
         //region Personnel Randomization
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
         getRandomOriginOptions().writeToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
         //endregion Personnel Randomization
 
         //region Retirement
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", isUseRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverTargetNumberMethod", getTurnoverTargetNumberMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverDifficulty", getTurnoverDifficulty().name());
@@ -4617,7 +4654,6 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoyaltyModifiers", isUseLoyaltyModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useHideLoyalty", isUseHideLoyalty());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadershipChangeRefresh", isUseLeadershipChangeRefresh());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateOfficer", getPayoutRateOfficer());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateEnlisted", getPayoutRateEnlisted());
@@ -5127,6 +5163,8 @@ public class CampaignOptions {
                     retVal.setUseInitiativeBonus(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
                     retVal.setUseToughness(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomToughness")) {
+                    retVal.setUseRandomToughness(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
                     retVal.setUseArtillery(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAbilities")) {
@@ -5229,6 +5267,15 @@ public class CampaignOptions {
                     retVal.setUseRandomDependentRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Dependent
 
+                    //region Personnel Removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePersonnelRemoval")) {
+                    retVal.setUsePersonnelRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRemovalExemptCemetery")) {
+                    retVal.setUseRemovalExemptCemetery(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRemovalExemptRetirees")) {
+                    retVal.setUseRemovalExemptRetirees(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    //endregion Personnel Removal
+
                     //region Salary
                 } else if (wn2.getNodeName().equalsIgnoreCase("disableSecondaryRoleSalary")) {
                     retVal.setDisableSecondaryRoleSalary(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -5314,6 +5361,8 @@ public class CampaignOptions {
                         continue;
                     }
                     retVal.setRandomOriginOptions(randomOriginOptions);
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalities")) {
+                    retVal.setUseRandomPersonalities(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Personnel Randomization
 
                     //region Family
@@ -5558,8 +5607,6 @@ public class CampaignOptions {
 
                     //region Finances Tab
                 //region Turnover and Retention
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
-                    retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverTargetNumberMethod")) {
@@ -5612,8 +5659,6 @@ public class CampaignOptions {
                     retVal.setUseLoyaltyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useHideLoyalty")) {
                     retVal.setUseHideLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useLeadershipChangeRefresh")) {
-                    retVal.setUseLeadershipChangeRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateOfficer")) {
                     retVal.setPayoutRateOfficer(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateEnlisted")) {

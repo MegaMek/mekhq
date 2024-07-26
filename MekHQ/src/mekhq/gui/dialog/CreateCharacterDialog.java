@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -38,6 +39,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
@@ -54,7 +57,6 @@ import java.time.Period;
 import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 /**
  * This dialog is used to create a character in story arcs from a pool of XP
@@ -95,8 +97,14 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JPanel panOptions;
     private JTextField textToughness;
     private JComboBox<EducationLevel> textEducationLevel;
-    private JTextField textFatigue;
     private JTextField textLoyalty;
+
+    private MMComboBox<Aggression> comboAggression;
+    private MMComboBox<Ambition> comboAmbition;
+    private MMComboBox<Greed> comboGreed;
+    private MMComboBox<Social> comboSocial;
+    private MMComboBox<PersonalityQuirk> comboPersonalityQuirk;
+    private MMComboBox<Intelligence> comboIntelligence;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -192,8 +200,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textToughness = new JTextField();
         JLabel lblToughness = new JLabel();
         textEducationLevel = new JComboBox<>();
-        textFatigue = new JTextField();
-        JLabel lblFatigue = new JLabel();
         textLoyalty = new JTextField();
         JLabel lblLoyalty = new JLabel();
         JLabel lblEducationLevel = new JLabel();
@@ -376,8 +382,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                                                           final boolean isSelected,
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Faction) {
-                    Faction faction = (Faction)value;
+                if (value instanceof Faction faction) {
                     setText(String.format("%s [%s]",
                             faction.getFullName(campaign.getGameYear()),
                             faction.getShortName()));
@@ -434,8 +439,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-                if (value instanceof PlanetarySystem) {
-                    PlanetarySystem system = (PlanetarySystem) value;
+                if (value instanceof PlanetarySystem system) {
                     setText(system.getName(campaign.getLocalDate()));
                 }
 
@@ -494,8 +498,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                                                           final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-                if (value instanceof Planet) {
-                    Planet planet = (Planet) value;
+                if (value instanceof Planet planet) {
                     setText(planet.getName(campaign.getLocalDate()));
                 }
 
@@ -660,29 +663,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
-        lblFatigue.setName("lblFatigue");
-
-        textFatigue.setText(Integer.toString(person.getFatigue()));
-        textFatigue.setName("textFatigue");
-
-        if (campaign.getCampaignOptions().isUseFatigue()) {
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            demogPanel.add(lblFatigue, gridBagConstraints);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            demogPanel.add(textFatigue, gridBagConstraints);
-
-            y++;
-        }
-
         lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
         lblLoyalty.setName("lblLoyalty");
 
@@ -706,6 +686,131 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
             y++;
         }
+
+        //region random personality
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            JLabel labelAggression = new JLabel();
+            labelAggression.setText("Aggression:");
+            labelAggression.setName("labelAggression");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelAggression, gridBagConstraints);
+
+            comboAggression = new MMComboBox<>("comboAggression", Aggression.values());
+            comboAggression.setSelectedItem(person.getAggression());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboAggression, gridBagConstraints);
+
+            JLabel labelAmbition = new JLabel();
+            labelAmbition.setText("Ambition:");
+            labelAmbition.setName("labelAmbition");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelAmbition, gridBagConstraints);
+
+            comboAmbition = new MMComboBox<>("comboAmbition", Ambition.values());
+            comboAmbition.setSelectedItem(person.getAmbition());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboAmbition, gridBagConstraints);
+
+            JLabel labelGreed = new JLabel();
+            labelGreed.setText("Greed:");
+            labelGreed.setName("labelGreed");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelGreed, gridBagConstraints);
+
+            comboGreed = new MMComboBox<>("comboGreed", Greed.values());
+            comboGreed.setSelectedItem(person.getGreed());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboGreed, gridBagConstraints);
+
+            JLabel labelSocial = new JLabel();
+            labelSocial.setText("Social:");
+            labelSocial.setName("labelSocial");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelSocial, gridBagConstraints);
+
+            comboSocial = new MMComboBox<>("comboSocial", Social.values());
+            comboSocial.setSelectedItem(person.getSocial());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboSocial, gridBagConstraints);
+
+            JLabel labelPersonalityQuirk = new JLabel();
+            labelPersonalityQuirk.setText("Quirk:");
+            labelPersonalityQuirk.setName("labelPersonalityQuirk");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelPersonalityQuirk, gridBagConstraints);
+
+            comboPersonalityQuirk = new MMComboBox<>("comboPersonalityQuirk", PersonalityQuirk.values());
+            comboPersonalityQuirk.setSelectedItem(person.getPersonalityQuirk());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboPersonalityQuirk, gridBagConstraints);
+
+            JLabel labelIntelligence = new JLabel();
+            labelIntelligence.setText("Intelligence:");
+            labelIntelligence.setName("labelIntelligence");
+
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(labelIntelligence, gridBagConstraints);
+
+            comboIntelligence = new MMComboBox<>("comboIntelligence", Intelligence.values());
+            comboIntelligence.setSelectedItem(person.getIntelligence());
+
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(comboIntelligence, gridBagConstraints);
+        }
+
+        y++;
 
         txtBio = new MarkdownEditorPanel("Biography");
         txtBio.setText(person.getBiography());
@@ -798,9 +903,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         JPanel buttonPanel = new JPanel(new BorderLayout());
 
         doneButton = new JButton("Done");
-        doneButton.addActionListener(e -> {
-            done();
-        });
+        doneButton.addActionListener(e -> done());
         buttonPanel.add(doneButton, BorderLayout.LINE_END);
 
         return buttonPanel;
@@ -816,7 +919,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         int year = campaign.getGameYear();
         List<Faction> orderedFactions = Factions.getInstance().getFactions().stream()
                 .sorted((a, b) -> a.getFullName(year).compareToIgnoreCase(b.getFullName(year)))
-                .collect(Collectors.toList());
+                .toList();
 
         DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<>();
         for (Faction faction : orderedFactions) {
@@ -850,7 +953,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
                 .sorted(Comparator.comparing(a -> a.getName(campaign.getLocalDate())))
-                .collect(Collectors.toList());
+                .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
@@ -863,7 +966,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
                 .filter(a -> a.getFactionSet(person.getBirthday()).contains(faction))
                 .sorted(Comparator.comparing(a -> a.getName(person.getBirthday())))
-                .collect(Collectors.toList());
+                .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
         }
@@ -1008,13 +1111,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             }
         }
         IOption option;
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            option = comp.getOption();
-            if ((comp.getValue().equals("None"))) {
+        for (final DialogOptionComponent newVar : optionComps) {
+            option = newVar.getOption();
+            if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
-                person.getOptions().getOption(option.getName()).setValue(comp.getValue());
+                person.getOptions().getOption(option.getName()).setValue(newVar.getValue());
             }
         }
     }
@@ -1130,14 +1232,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private void setOptions() {
         IOption option;
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            option = comp.getOption();
-            if ((comp.getValue().equals("None"))) {
+        for (final DialogOptionComponent newVar : optionComps) {
+            option = newVar.getOption();
+            if ((newVar.getValue().equals("None"))) {
                 person.getOptions().getOption(option.getName()).setValue("None");
             } else {
                 person.getOptions().getOption(option.getName())
-                        .setValue(comp.getValue());
+                        .setValue(newVar.getValue());
             }
         }
     }
@@ -1156,10 +1257,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
 
         //now figure out SPA costs
-        for (final Object newVar : optionComps) {
-            DialogOptionComponent comp = (DialogOptionComponent) newVar;
-            if (!comp.isDefaultValue()) {
-                SpecialAbility spa = SpecialAbility.getOption(comp.getOption().getName());
+        for (final DialogOptionComponent newVar : optionComps) {
+            if (!newVar.isDefaultValue()) {
+                SpecialAbility spa = SpecialAbility.getOption(newVar.getOption().getName());
                 totalCost = totalCost + spa.getCost();
             }
         }
@@ -1367,21 +1467,33 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         }
         person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
         person.setClanPersonnel(chkClan.isSelected());
-        try {
-            person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch (NumberFormatException ignored) { }
 
-        try {
-            person.setFatigue(Integer.parseInt(textFatigue.getText()));
-        } catch (NumberFormatException ignored) { }
+        if (campaign.getCampaignOptions().isUseToughness()) {
+            try {
+                person.setToughness(Integer.parseInt(textToughness.getText()));
+            } catch (NumberFormatException ignored) {}
+        }
 
-        try {
-            person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
-        } catch (NumberFormatException ignored) { }
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            try {
+                person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
+            } catch (NumberFormatException ignored) {}
+        }
 
-        try {
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
-        } catch (NumberFormatException ignored) {}
+        }
+
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            person.setAggression(comboAggression.getSelectedItem());
+            person.setAmbition(comboAmbition.getSelectedItem());
+            person.setGreed(comboGreed.getSelectedItem());
+            person.setSocial(comboSocial.getSelectedItem());
+            person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
+            person.setIntelligence(comboIntelligence.getSelectedItem());
+            PersonalityController.writeDescription(person);
+        }
+
         person.setPortrait(portrait);
         int xpSpent = xpPool - getSkillXpSpent();
         if (xpSpent > 0) {

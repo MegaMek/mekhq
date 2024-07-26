@@ -22,6 +22,7 @@ import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -103,6 +104,9 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         campaign.checkBloodnameAdd(person, false);
 
         person.setDaysToWaitForHealing(campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+
+        // generate background
+        BackgroundsController.generateBackground(campaign, person);
 
         return person;
     }

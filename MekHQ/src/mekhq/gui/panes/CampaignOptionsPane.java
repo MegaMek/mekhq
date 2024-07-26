@@ -197,6 +197,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseTactics;
     private JCheckBox chkUseInitiativeBonus;
     private JCheckBox chkUseToughness;
+    private JCheckBox chkUseRandomToughness;
     private JCheckBox chkUseArtillery;
     private JCheckBox chkUseAbilities;
     private JCheckBox chkUseEdge;
@@ -247,6 +248,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseRandomDependentAddition;
     private JCheckBox chkUseRandomDependentRemoval;
 
+    // Personel Removal
+    private JPanel personnelRemovalSubPanel = new JPanel();
+    private JCheckBox chkUsePersonnelRemoval;
+    private JCheckBox chkUseRemovalExemptCemetery;
+    private JCheckBox chkUseRemovalExemptRetirees;
+
     // Salary
     private JCheckBox chkDisableSecondaryRoleSalary;
     private JSpinner spnAntiMekSalary;
@@ -257,7 +264,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     //region Turnover and Retention Tab
     // Header Options
-    private JCheckBox chkUseRetirementDateTracking;
     private JCheckBox chkUseRandomRetirement;
 
     // Settings
@@ -299,7 +305,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel loyaltySubPanel = new JPanel();
     private JCheckBox chkUseHideLoyalty;
-    private JCheckBox chkUseLeadershipChangeRefresh;
 
     // Payout
     private JPanel turnoverAndRetentionPayoutPanel = new JPanel();
@@ -351,6 +356,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // Personnel Randomization
     private JCheckBox chkUseDylansRandomXP;
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
+    private JCheckBox chkUseRandomPersonalities;
 
     // Marriage
     private JCheckBox chkUseManualMarriages;
@@ -3322,6 +3328,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
+        personnelPanel.add(createPersonnelRemovalPanel(), gbc);
+
+        //
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
         personnelPanel.add(createSalaryPanel(), gbc);
 
         final JScrollPane scrollPersonnel = new JScrollPane(personnelPanel);
@@ -3435,6 +3448,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseToughness.setToolTipText(resources.getString("chkUseToughness.toolTipText"));
         chkUseToughness.setName("chkUseToughness");
 
+        chkUseRandomToughness = new JCheckBox(resources.getString("chkUseRandomToughness.text"));
+        chkUseRandomToughness.setToolTipText(resources.getString("chkUseRandomToughness.toolTipText"));
+        chkUseRandomToughness.setName("chkUseRandomToughness");
+
         chkUseArtillery = new JCheckBox(resources.getString("chkUseArtillery.text"));
         chkUseArtillery.setToolTipText(resources.getString("chkUseArtillery.toolTipText"));
         chkUseArtillery.setName("chkUseArtillery");
@@ -3475,6 +3492,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseTactics)
                         .addComponent(chkUseInitiativeBonus)
                         .addComponent(chkUseToughness)
+                        .addComponent(chkUseRandomToughness)
                         .addComponent(chkUseArtillery)
                         .addComponent(chkUseAbilities)
                         .addComponent(chkUseEdge)
@@ -3488,6 +3506,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseTactics)
                         .addComponent(chkUseInitiativeBonus)
                         .addComponent(chkUseToughness)
+                        .addComponent(chkUseRandomToughness)
                         .addComponent(chkUseArtillery)
                         .addComponent(chkUseAbilities)
                         .addComponent(chkUseEdge)
@@ -4206,10 +4225,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createTurnoverAndRetentionHeaderPanel() {
-        chkUseRetirementDateTracking = new JCheckBox(resources.getString("chkUseRetirementDateTracking.text"));
-        chkUseRetirementDateTracking.setToolTipText(resources.getString("chkUseRetirementDateTracking.toolTipText"));
-        chkUseRetirementDateTracking.setName("chkUseRetirementDateTracking");
-
         chkUseRandomRetirement = new JCheckBox(resources.getString("chkUseRandomRetirement.text"));
         chkUseRandomRetirement.setToolTipText(resources.getString("chkUseRandomRetirement.toolTipText"));
         chkUseRandomRetirement.setName("chkUseRandomRetirement");
@@ -4250,7 +4265,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             boolean isUseLoyaltyModifiers = chkUseLoyaltyModifiers.isSelected();
             loyaltySubPanel.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
             chkUseHideLoyalty.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
-            chkUseLeadershipChangeRefresh.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
 
             boolean isUseServiceBonus = chkUsePayoutServiceBonus.isSelected();
             payoutServiceBonusSubPanel.setEnabled((isEnabled) && (isUseServiceBonus));
@@ -4281,13 +4295,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chkUseRetirementDateTracking)
                         .addComponent(chkUseRandomRetirement)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(chkUseRetirementDateTracking)
                         .addComponent(chkUseRandomRetirement)
         );
 
@@ -4639,11 +4651,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseHideLoyalty.setName("chkUseHideLoyalty");
         chkUseHideLoyalty.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
 
-        chkUseLeadershipChangeRefresh = new JCheckBox(resources.getString("chkUseLeadershipChangeRefresh.text"));
-        chkUseLeadershipChangeRefresh.setToolTipText(resources.getString("chkUseLeadershipChangeRefresh.toolTipText"));
-        chkUseLeadershipChangeRefresh.setName("chkUseLeadershipChangeRefresh");
-        chkUseLeadershipChangeRefresh.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
-
         loyaltySubPanel.setBorder(BorderFactory.createTitledBorder(""));
         loyaltySubPanel.setName("loyaltySubPanel");
         loyaltySubPanel.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
@@ -4656,13 +4663,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseHideLoyalty)
-                        .addComponent(chkUseLeadershipChangeRefresh)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseHideLoyalty)
-                        .addComponent(chkUseLeadershipChangeRefresh)
         );
     }
 
@@ -4964,6 +4969,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         randomOriginOptionsPanel = new RandomOriginOptionsPanel(getFrame(), campaign, comboFaction);
 
+        chkUseRandomPersonalities = new JCheckBox(resources.getString("chkUseRandomPersonalities.text"));
+        chkUseRandomPersonalities.setToolTipText(resources.getString("chkUseRandomPersonalities.toolTipText"));
+        chkUseRandomPersonalities.setName("chkUseRandomPersonalities");
+
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("personnelRandomizationPanel.title")));
@@ -4978,12 +4987,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createSequentialGroup()
                         .addComponent(chkUseDylansRandomXP)
                         .addComponent(randomOriginOptionsPanel)
+                        .addComponent(chkUseRandomPersonalities)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseDylansRandomXP)
                         .addComponent(randomOriginOptionsPanel)
+                        .addComponent(chkUseRandomPersonalities)
         );
 
         return panel;
@@ -5106,6 +5117,89 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseRandomDependentAddition)
                         .addComponent(chkUseRandomDependentRemoval)
+        );
+
+        return panel;
+    }
+
+    private JPanel createPersonnelRemovalPanel() {
+        // Create Panel Components
+        chkUsePersonnelRemoval = new JCheckBox(resources.getString("chkUsePersonnelRemoval.text"));
+        chkUsePersonnelRemoval.setToolTipText(resources.getString("chkUsePersonnelRemoval.toolTipText"));
+        chkUsePersonnelRemoval.setName("chkUsePersonnelRemoval");
+        chkUsePersonnelRemoval.addActionListener(evt -> {
+            final boolean isEnabled = chkUsePersonnelRemoval.isSelected();
+
+            for (Component component : personnelRemovalSubPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            personnelRemovalSubPanel.setEnabled(isEnabled);
+        });
+
+        personnelRemovalSubPanel = createPersonnelRemovalSubPanel();
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("personnelRemovalPanel.title")));
+        panel.setToolTipText(resources.getString("personnelRemovalPanel.toolTipText"));
+        panel.setName("personnelRemovalPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUsePersonnelRemoval)
+                        .addComponent(personnelRemovalSubPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUsePersonnelRemoval)
+                        .addComponent(personnelRemovalSubPanel)
+        );
+
+        return panel;
+    }
+
+    private JPanel createPersonnelRemovalSubPanel() {
+        boolean isEnabled = campaign.getCampaignOptions().isUsePersonnelRemoval();
+
+        // Create Panel Components
+        chkUseRemovalExemptCemetery = new JCheckBox(resources.getString("chkUseRemovalExemptCemetery.text"));
+        chkUseRemovalExemptCemetery.setToolTipText(resources.getString("chkUseRemovalExemptCemetery.toolTipText"));
+        chkUseRemovalExemptCemetery.setName("chkUseRemovalExemptCemetery");
+        chkUseRemovalExemptCemetery.setEnabled(isEnabled);
+
+        chkUseRemovalExemptRetirees = new JCheckBox(resources.getString("chkUseRemovalExemptRetirees.text"));
+        chkUseRemovalExemptRetirees.setToolTipText(resources.getString("chkUseRemovalExemptRetirees.toolTipText"));
+        chkUseRemovalExemptRetirees.setName("chkUseRemovalExemptRetirees");
+        chkUseRemovalExemptRetirees.setEnabled(isEnabled);
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(""));
+        panel.setToolTipText(resources.getString("personnelRemovalPanel.toolTipText"));
+        panel.setName("personnelRemovalPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseRemovalExemptCemetery)
+                        .addComponent(chkUseRemovalExemptRetirees)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseRemovalExemptCemetery)
+                        .addComponent(chkUseRemovalExemptRetirees)
         );
 
         return panel;
@@ -7873,6 +7967,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseTactics.setSelected(options.isUseTactics());
         chkUseInitiativeBonus.setSelected(options.isUseInitiativeBonus());
         chkUseToughness.setSelected(options.isUseToughness());
+        chkUseRandomToughness.setSelected(options.isUseRandomToughness());
         chkUseArtillery.setSelected(options.isUseArtillery());
         chkUseAbilities.setSelected(options.isUseAbilities());
         if (chkUseEdge.isSelected() != options.isUseEdge()) {
@@ -7928,6 +8023,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
 
+        // Personnel Removal
+        chkUsePersonnelRemoval.setSelected(options.isUsePersonnelRemoval());
+        chkUseRemovalExemptCemetery.setSelected(options.isUseRemovalExemptCemetery());
+        chkUseRemovalExemptRetirees.setSelected(options.isUseRemovalExemptRetirees());
+
         // Salary
         chkDisableSecondaryRoleSalary.setSelected(options.isDisableSecondaryRoleSalary());
         spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
@@ -7963,7 +8063,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         //region Turnover and Retention Tab
         // Header
-        chkUseRetirementDateTracking.setSelected(options.isUseRetirementDateTracking());
         chkUseRandomRetirement.setSelected(options.isUseRandomRetirement());
 
         // Settings
@@ -7994,7 +8093,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseFamilyModifiers.setSelected(options.isUseFamilyModifiers());
         chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
         chkUseHideLoyalty.setSelected(options.isUseHideLoyalty());
-        chkUseLeadershipChangeRefresh.setSelected(options.isUseLeadershipChangeRefresh());
 
         // Payouts
         spnPayoutRateOfficer.setValue(options.getPayoutRateOfficer());
@@ -8026,6 +8124,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Personnel Randomization
         chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
         randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
+        chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
 
         // Family
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
@@ -8562,6 +8661,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseInitiativeBonus(chkUseInitiativeBonus.isSelected());
             campaign.getGameOptions().getOption(OptionsConstants.RPG_INDIVIDUAL_INITIATIVE).setValue(chkUseInitiativeBonus.isSelected());
             options.setUseToughness(chkUseToughness.isSelected());
+            options.setUseRandomToughness(chkUseRandomToughness.isSelected());
             campaign.getGameOptions().getOption(OptionsConstants.RPG_TOUGHNESS).setValue(chkUseToughness.isSelected());
             options.setUseArtillery(chkUseArtillery.isSelected());
             campaign.getGameOptions().getOption(OptionsConstants.RPG_ARTILLERY_SKILL).setValue(chkUseArtillery.isSelected());
@@ -8638,6 +8738,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseRandomDependentAddition(chkUseRandomDependentAddition.isSelected());
             options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 
+            // Personnel Removal
+            options.setUsePersonnelRemoval(chkUsePersonnelRemoval.isSelected());
+            options.setUseRemovalExemptCemetery(chkUseRemovalExemptCemetery.isSelected());
+            options.setUseRemovalExemptRetirees(chkUseRemovalExemptRetirees.isSelected());
+
             // Salary
             options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
             options.setSalaryAntiMekMultiplier((Double) spnAntiMekSalary.getValue());
@@ -8653,7 +8758,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             //region Turnover and Retention
             // Header
-            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
             options.setUseRandomRetirement(chkUseRandomRetirement.isSelected());
 
             // Settings
@@ -8683,7 +8787,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseFamilyModifiers(chkUseFamilyModifiers.isSelected());
             options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
             options.setUseHideLoyalty(chkUseHideLoyalty.isSelected());
-            options.setUseLeadershipChangeRefresh(chkUseLeadershipChangeRefresh.isSelected());
 
             // Payouts
             options.setPayoutRateOfficer((Integer) spnPayoutRateOfficer.getValue());
@@ -8715,6 +8818,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Personnel Randomization
             options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
             options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
+            options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
 
             // Family
             options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());

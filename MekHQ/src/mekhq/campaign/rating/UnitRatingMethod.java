@@ -69,15 +69,10 @@ public enum UnitRatingMethod {
 
         }
 
-        switch (text) {
-            case "Campaign Ops":
-            case "Taharqa":
-            case "Interstellar Ops":
-                return CAMPAIGN_OPS;
-            case "FM: Mercenaries (rev)":
-            default:
-                return FLD_MAN_MERCS_REV;
-        }
+        return switch (text) {
+            case "Campaign Ops", "Taharqa", "Interstellar Ops" -> CAMPAIGN_OPS;
+            default -> FLD_MAN_MERCS_REV;
+        };
     }
     //endregion File IO
 

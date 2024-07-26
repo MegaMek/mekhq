@@ -197,6 +197,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The value of the "set" property.
      */
+    @SuppressWarnings(value = "unused")
     public String getSet() {
         return set;
     }
@@ -206,6 +207,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param set the value to be assigned to the set variable
      */
+    @SuppressWarnings(value = "unused")
     public void setSet(String set) {
         this.set = set;
     }
@@ -215,6 +217,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the name of the academy
      */
+    @SuppressWarnings(value = "unused")
     public String getName() {
         return name;
     }
@@ -225,6 +228,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param name the new name to be set
      */
+    @SuppressWarnings(value = "unused")
     public void setName(final String name) {
         this.name = name;
     }
@@ -234,6 +238,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The type of academy.
      */
+    @SuppressWarnings(value = "unused")
     public AcademyType getType() {
         return AcademyType.parseFromString(type);
     }
@@ -243,6 +248,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param type the type to be set.
      */
+    @SuppressWarnings(value = "unused")
     public void setType(final String type) {
         this.type = type;
     }
@@ -252,6 +258,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return {@code true} if the academy is a military academy, {@code false} otherwise.
      */
+    @SuppressWarnings(value = "unused")
     public Boolean isMilitary() {
         return isMilitary;
     }
@@ -261,6 +268,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param isMilitary true if the academy is military, false otherwise.
      */
+    @SuppressWarnings(value = "unused")
     public void setIsMilitary(final boolean isMilitary) {
         this.isMilitary = isMilitary;
     }
@@ -270,6 +278,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return true, if the academy is a reeducation camp; otherwise, false.
      */
+    @SuppressWarnings(value = "unused")
     public boolean isReeducationCamp() {
         return isReeducationCamp;
     }
@@ -279,6 +288,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param isReeducationCamp the new value for the isReeducationCamp property
      */
+    @SuppressWarnings(value = "unused")
     public void setIsReeducationCamp(final boolean isReeducationCamp) {
         this.isReeducationCamp = isReeducationCamp;
     }
@@ -288,6 +298,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return {@code true} if the academy is a Prep School, {@code false} otherwise.
      */
+    @SuppressWarnings(value = "unused")
     public Boolean isPrepSchool() {
         return isPrepSchool;
     }
@@ -297,6 +308,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param isPrepSchool true if the academy is a prep school, false otherwise.
      */
+    @SuppressWarnings(value = "unused")
     public void setIsPrepSchool(final boolean isPrepSchool) {
         this.isPrepSchool = isPrepSchool;
     }
@@ -306,6 +318,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return {@code true} if the academy is a local academy, {@code false} otherwise.
      */
+    @SuppressWarnings(value = "unused")
     public Boolean isLocal() {
         return isLocal;
     }
@@ -315,6 +328,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param isLocal true if the academy is local, false otherwise.
      */
+    @SuppressWarnings(value = "unused")
     public void setIsLocal(final boolean isLocal) {
         this.isLocal = isLocal;
     }
@@ -322,6 +336,7 @@ public class Academy implements Comparable<Academy> {
     /**
      * @return {@code true} if the academy is a home school, {@code false} otherwise.
      */
+    @SuppressWarnings(value = "unused")
     public Boolean isHomeSchool() {
         return isHomeSchool;
     }
@@ -331,6 +346,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param isHomeSchool true if the academy is a home school, false otherwise.
      */
+    @SuppressWarnings(value = "unused")
     public void setIsHomeSchool(final boolean isHomeSchool) {
         this.isHomeSchool = isHomeSchool;
     }
@@ -340,6 +356,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The description of the academy.
      */
+    @SuppressWarnings(value = "unused")
     public String getDescription() {
         return description;
     }
@@ -349,6 +366,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param description the new description for the academy
      */
+    @SuppressWarnings(value = "unused")
     public void setDescription(final String description) {
         this.description = description;
     }
@@ -358,6 +376,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The list of location systems as a List of String.
      */
+    @SuppressWarnings(value = "unused")
     public List<String> getLocationSystems() {
         return locationSystems;
     }
@@ -367,6 +386,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param locationSystems the list of location systems to be set
      */
+    @SuppressWarnings(value = "unused")
     public void setLocationSystems(final List<String> locationSystems) {
         this.locationSystems = locationSystems;
     }
@@ -376,6 +396,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the academy's construction year as an Integer value.
      */
+    @SuppressWarnings(value = "unused")
     public Integer getConstructionYear() {
         return constructionYear;
     }
@@ -385,6 +406,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param constructionYear the construction year to be set
      */
+    @SuppressWarnings(value = "unused")
     public void setConstructionYear(final Integer constructionYear) {
         this.constructionYear = constructionYear;
     }
@@ -394,6 +416,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The academy's destruction year, represented as an Integer.
      */
+    @SuppressWarnings(value = "unused")
     public Integer getDestructionYear() {
         return destructionYear;
     }
@@ -403,6 +426,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param destructionYear the destruction year to be set
      */
+    @SuppressWarnings(value = "unused")
     public void setDestructionYear(final Integer destructionYear) {
         this.destructionYear = destructionYear;
     }
@@ -412,6 +436,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The closure year as an Integer.
      */
+    @SuppressWarnings(value = "unused")
     public Integer getClosureYear() {
         return closureYear;
     }
@@ -421,6 +446,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param closureYear the closure year to be set
      */
+    @SuppressWarnings(value = "unused")
     public void setClosureYear(final Integer closureYear) {
         this.closureYear = closureYear;
     }
@@ -430,6 +456,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the minimum age allowed as an Integer.
      */
+    @SuppressWarnings(value = "unused")
     public Integer getAgeMin() {
         return ageMin;
     }
@@ -439,6 +466,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param ageMin the minimum age to set
      */
+    @SuppressWarnings(value = "unused")
     public void setAgeMin(final Integer ageMin) {
         this.ageMin = ageMin;
     }
@@ -448,6 +476,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the maximum age allowed as an Integer.
      */
+    @SuppressWarnings(value = "unused")
     public Integer getAgeMax() {
         return ageMax;
     }
@@ -457,6 +486,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param ageMax the maximum age to be set
      */
+    @SuppressWarnings(value = "unused")
     public void setAgeMax(final Integer ageMax) {
         this.ageMax = ageMax;
     }
@@ -466,6 +496,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the academy's tuition value as an Integer.
      */
+    @SuppressWarnings(value = "unused")
     public Integer getTuition() {
         return tuition;
     }
@@ -475,6 +506,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param tuition the new tuition value to be set
      */
+    @SuppressWarnings(value = "unused")
     public void setTuition(final Integer tuition) {
         this.tuition = tuition;
     }
@@ -484,6 +516,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The course duration in days as an Integer.
      */
+    @SuppressWarnings(value = "unused")
     public Integer getDurationDays() {
         return durationDays;
     }
@@ -493,6 +526,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param durationDays the duration in days to set
      */
+    @SuppressWarnings(value = "unused")
     public void setDurationDays(final Integer durationDays) {
         this.durationDays = durationDays;
     }
@@ -502,6 +536,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The academy's discount value for the faction.
      */
+    @SuppressWarnings(value = "unused")
     public Integer getFactionDiscount() {
         return factionDiscount;
     }
@@ -511,6 +546,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param factionDiscount the faction discount to set
      */
+    @SuppressWarnings(value = "unused")
     public void setFactionDiscount(final Integer factionDiscount) {
         this.factionDiscount = factionDiscount;
     }
@@ -520,6 +556,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return true if the academy is faction restricted, otherwise false.
      */
+    @SuppressWarnings(value = "unused")
     public Boolean isFactionRestricted() {
         return isFactionRestricted;
     }
@@ -529,6 +566,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param isFactionRestricted true if the academy is faction restricted, false otherwise
      */
+    @SuppressWarnings(value = "unused")
     public void setIsFactionRestricted(final Boolean isFactionRestricted) {
         this.isFactionRestricted = isFactionRestricted;
     }
@@ -538,6 +576,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The faculty skill level as an Integer.
      */
+    @SuppressWarnings(value = "unused")
     public Integer getFacultySkill() {
         return facultySkill;
     }
@@ -547,6 +586,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param facultySkill the skill level of the faculty to be set
      */
+    @SuppressWarnings(value = "unused")
     public void setFacultySkill(final Integer facultySkill) {
         this.facultySkill = facultySkill;
     }
@@ -556,6 +596,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The minimum academic tier value as an Integer.
      */
+    @SuppressWarnings(value = "unused")
     public EducationLevel getEducationLevelMin() {
         return educationLevelMin;
     }
@@ -565,6 +606,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param educationLevelMin the minimum education level required, as an Integer
      */
+    @SuppressWarnings(value = "unused")
     public void setEducationLevelMin(final EducationLevel educationLevelMin) {
         this.educationLevelMin = educationLevelMin;
     }
@@ -574,6 +616,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The maximum academic tier value as an Integer
      */
+    @SuppressWarnings(value = "unused")
     public EducationLevel getEducationLevelMax() {
         return educationLevelMax;
     }
@@ -583,6 +626,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param educationLevelMax the maximum education level to be set
      */
+    @SuppressWarnings(value = "unused")
     public void setEducationLevelMax(final EducationLevel educationLevelMax) {
         this.educationLevelMax = educationLevelMax;
     }
@@ -592,6 +636,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the list of qualification names.
      */
+    @SuppressWarnings(value = "unused")
     public List<String> getQualifications() {
         return qualifications;
     }
@@ -601,6 +646,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param qualifications a list of strings representing the qualifications to set
      */
+    @SuppressWarnings(value = "unused")
     public void setQualifications(final List<String> qualifications) {
         this.qualifications = qualifications;
     }
@@ -610,6 +656,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The skills improved by this academy as a String.
      */
+    @SuppressWarnings(value = "unused")
     public List<String> getCurriculums() {
         return curriculums;
     }
@@ -619,6 +666,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param curriculums The list of curriculums to be set.
      */
+    @SuppressWarnings(value = "unused")
     public void setCurriculums(final List<String> curriculums) {
         this.curriculums = curriculums;
     }
@@ -628,6 +676,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The skills improved by this academy as a String.
      */
+    @SuppressWarnings(value = "unused")
     public List<Integer> getQualificationStartYears() {
         return qualificationStartYears;
     }
@@ -637,6 +686,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param qualificationStartYears the list of qualification start years to be set
      */
+    @SuppressWarnings(value = "unused")
     public void setQualificationStartYears(List<Integer> qualificationStartYears) {
         this.qualificationStartYears = qualificationStartYears;
     }
@@ -646,6 +696,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the base skill level granted by this academy as an Integer
      */
+    @SuppressWarnings(value = "unused")
     public Integer getBaseAcademicSkillLevel() {
         return baseAcademicSkillLevel;
     }
@@ -655,6 +706,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param baseAcademicSkillLevel the new base academic skill level
      */
+    @SuppressWarnings(value = "unused")
     public void setBaseAcademicSkillLevel(final Integer baseAcademicSkillLevel) {
         this.baseAcademicSkillLevel = baseAcademicSkillLevel;
     }
@@ -664,6 +716,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the ID of the academy
      */
+    @SuppressWarnings(value = "unused")
     public Integer getId() {
         return id;
     }
@@ -673,6 +726,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param id The id to be set.
      */
+    @SuppressWarnings(value = "unused")
     public void setId(Integer id) {
         this.id = id;
     }
@@ -976,7 +1030,7 @@ public class Academy implements Comparable<Academy> {
      * @return the corresponding skill code as a string
      * @throws IllegalStateException if the skill string is unexpected or invalid
      */
-    static String skillParser(String skill) {
+    public static String skillParser(String skill) {
         return switch (skill.toLowerCase().trim()) {
             case "piloting/mech" -> SkillType.S_PILOT_MECH;
             case "gunnery/mech" -> SkillType.S_GUN_MECH;

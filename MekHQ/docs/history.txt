@@ -52,7 +52,30 @@ MEKHQ VERSION HISTORY:
 + PR #4426: Updated static faction references with appropriate isX() call
 + FIX #4429: Added Null protection when generating forces from fixed scenarios like Base Defense
 + FIX #4434: Added processNewYearChecks Skip for Homeschool Academies
++ FIX #4335: paid recruitment doesnt turn off
 + FIX #4456: Added Nag for Inability to Afford Next Jump
++ FIX #4437: Null pointer exception while removing an asset
++ PR #4439: Added Missing Status Log Messages & Stored Turnover Information Across New Day Events
++ PR #4440: Updated Divorce and Death Handling
++ PR #4441: Implemented Incremental Loyalty Changes
++ PR #4446: Added Random Personality Functionality
++ FIX #4447: All non-KIA enemy personnel default marked as captured
++ FIX #4448: Custom award set not displaying medals
++ PR #4452: Improved Education Module Messaging
++ PR #4455: Added Re-Enrollment Functionality to Education System
++ PR #4457: Removed Paid Retirement Color Options
++ PR #4459: Added 'Unable to Afford Expenses' Nag Dialog
++ PR #4462: Automated Unit Site Location Change when Entering Transit and Arrival States
++ PR #4464: Minor Education Module Data Fixes
++ PR #4465: Updated Salvage Terminology
++ PR #4469: Added Prisoner Ransom & Free Prompts to Mission Completion
++ PR #4466: Added Option to Grant Random Toughness when Using Toughness
++ PR #4468: Implemented Monthly Personnel Data Cleanup
++ PR #4472: Expanded Random Personalities to Include Intelligence, Incorporated Character Intelligence into Education Module
++ FIX #4474: Infantry personalty description is too wide
++ PR #4476: Removed Loyalty Change Event for Executing Prisoners
++ PR #4477: Marked 'FM: Mercenaries (rev)' Unit Rating Method as Deprecated
++ FIXED #4481: Significant amount of company mysteriously vanished
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update

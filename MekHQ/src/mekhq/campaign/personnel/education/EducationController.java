@@ -21,6 +21,7 @@ package mekhq.campaign.personnel.education;
 import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
@@ -28,6 +29,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.Intelligence;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
@@ -48,8 +50,10 @@ public class EducationController {
      * @param courseIndex The index of the course in the academy.
      * @param campus The campus location (can be null if the academy is local).
      * @param faction The faction of the person.
+     * @param isReEnrollment Whether the person is being re-enrolled.
      */
-    public static void beginEducation(Campaign campaign, Person person, String academySet, String academyNameInSet, int courseIndex, String campus, String faction) {
+    public static void performEducationPreEnrollmentActions(Campaign campaign, Person person, String academySet, String academyNameInSet, int courseIndex,
+                                                            String campus, String faction, boolean isReEnrollment) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
         Academy academy = getAcademy(academySet, academyNameInSet);
@@ -59,34 +63,41 @@ public class EducationController {
             return;
         }
 
+        // pay tuition
         double tuition = academy.getTuitionAdjusted(person) * academy.getFactionDiscountAdjusted(campaign, person);
 
         if (tuition > 0) {
-            // check there is enough money in the campaign & if so, make a debit
             if (campaign.getFinances().getBalance().isLessThan(Money.of(tuition))) {
-                campaign.addReport(String.format(resources.getString("insufficientFunds.text"),
-                        person.getHyperlinkedFullTitle()));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                        + String.format(resources.getString("insufficientFunds.text"), person.getHyperlinkedFullTitle())
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
                 return;
             } else {
                 campaign.getFinances().debit(TransactionType.EDUCATION,
                         campaign.getLocalDate(),
                         Money.of(tuition),
                         String.format(resources.getString("payment.text"),
-                                person.getFullName()));
+                                person.getHyperlinkedFullTitle()));
             }
         }
 
-        // with the checks done, and tuition paid, we can enroll Person
-        person.setEduCourseIndex(courseIndex);
+        // with tuition paid, we can enroll/re-enroll Person
+        if (isReEnrollment) {
+            reEnrollPerson(campaign, person, academy);
+        } else {
+            person.setEduCourseIndex(courseIndex);
+            enrollPerson(campaign, person, academy, campus, faction, courseIndex);
+        }
 
-        enrollPerson(campaign, person, academy, campus, faction, courseIndex);
-
+        // notify the user
         if (academy.isHomeSchool()) {
             campaign.addReport(String.format(resources.getString("homeSchool.text"),
-                    person.getFullName()));
+                    person.getHyperlinkedFullTitle()));
         } else {
             campaign.addReport(String.format(resources.getString("offToSchool.text"),
-                    person.getFullName(),
+                    person.getHyperlinkedFullTitle(),
                     person.getEduAcademyName(),
                     person.getEduJourneyTime()));
         }
@@ -147,6 +158,42 @@ public class EducationController {
         // we have this all the way at the bottom as a bit of insurance.
         // when troubleshooting, if the log isn't getting entered, we know something went wrong when enrolling.
         ServiceLogger.eduEnrolled(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
+    }
+
+
+    /**
+     * Re-enrolls a person into a campaign and updates their education information.
+     *
+     * @param campaign    The campaign in which the person is to be re-enrolled.
+     * @param person      The person to be re-enrolled.
+     * @param academy     The academy or school that the person is being enrolled into.
+     */
+    public static void reEnrollPerson(Campaign campaign, Person person, Academy academy) {
+        if (academy.isHomeSchool()) {
+            // if the student is being homeschooled, we skip the journey to the 'academy'
+            person.setEduEducationStage(EducationStage.EDUCATION);
+        } else {
+            person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
+        }
+
+        person.setEduEducationTime(academy.getDurationDays());
+
+        if (!academy.isHomeSchool()) {
+            if ((academy.isLocal()) || (!person.getEduEducationStage().isJourneyFromCampus())) {
+                person.setEduJourneyTime(2);
+                person.setEduAcademySystem(campaign.getCurrentSystem().getId());
+            } else {
+                person.setEduJourneyTime(Math.max(2, person.getEduDaysOfTravel()));
+            }
+        }
+
+        // reset days of travel
+        person.setEduDaysOfTravel(0);
+
+        // we have this all the way at the bottom as a bit of insurance.
+        // when troubleshooting, if the log isn't getting entered, we know something went wrong when enrolling.
+        ServiceLogger.eduReEnrolled(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
     /**
@@ -312,7 +359,7 @@ public class EducationController {
 
         // has Person just arrived?
         if (person.getEduDaysOfTravel() >= person.getEduJourneyTime()) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("arrived.text"));
+            campaign.addReport(String.format(resources.getString("arrived.text"), person.getHyperlinkedFullTitle()));
             person.setEduEducationStage(EducationStage.EDUCATION);
         }
     }
@@ -413,8 +460,7 @@ public class EducationController {
 
         int travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
 
-        campaign.addReport(person.getHyperlinkedName() + ' '
-                + String.format(resources.getString("returningFromSchool.text"), travelTime));
+        campaign.addReport(String.format(resources.getString("returningFromSchool.text"), person.getHyperlinkedFullTitle(), travelTime));
 
         person.setEduJourneyTime(travelTime);
         person.setEduDaysOfTravel(0);
@@ -550,29 +596,42 @@ public class EducationController {
             if (roll == 0) {
                 if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
                     if (Compute.d6(2) >= 5) {
-                        roll = Compute.d6(3);
-
-                        campaign.addReport(person.getHyperlinkedName() + ' '
-                                + String.format(resources.getString("eventTrainingAccident.text"), roll));
-
-                        if (!academy.isPrepSchool()) {
-                            person.setEduEducationTime(person.getEduEducationTime() + roll);
-                        }
+                        processTrainingInjury(campaign, academy, person, resources);
                     } else {
-                        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventTrainingAccidentKilled.text"));
+                        String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                + String.format(resources.getString("eventTrainingAccidentKilled.text"), person.getHyperlinkedFullTitle())
+                                + "</span>";
+
+                        campaign.addReport(reportMessage);
+
                         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
                     }
                 } else {
-                    roll = Compute.d6(3);
-
-                    campaign.addReport(person.getHyperlinkedName() + ' '
-                            + String.format(resources.getString("eventTrainingAccident.text"), roll));
-
-                    if (!academy.isPrepSchool()) {
-                        person.setEduEducationTime(person.getEduEducationTime() + roll);
-                    }
+                    processTrainingInjury(campaign, academy, person, resources);
                 }
             }
+        }
+    }
+
+    /**
+     * Processes a training injury for a student
+     *
+     * @param campaign   the campaign in which the training injury occurred
+     * @param academy    the academy where the person is training
+     * @param person     the person who suffered the training injury
+     * @param resources  the ResourceBundle for localized strings
+     */
+    private static void processTrainingInjury(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
+        int roll = Compute.d6(3);
+
+        String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                + String.format(resources.getString("eventTrainingAccident.text"), person.getHyperlinkedFullTitle(), roll)
+                + "</span>";
+
+        campaign.addReport(reportMessage);
+
+        if (!academy.isPrepSchool()) {
+            person.setEduEducationTime(person.getEduEducationTime() + roll);
         }
     }
 
@@ -618,9 +677,17 @@ public class EducationController {
                         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
                     } else {
                         if (academy.isHomeSchool()) {
-                            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutHomeSchooled.text"));
+                            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                    + String.format(resources.getString("dropOutHomeSchooled.text"), person.getHyperlinkedFullTitle())
+                                    + "</span>";
+
+                            campaign.addReport(reportMessage);
                         } else {
-                            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
+                            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                    + String.format(resources.getString("dropOut.text"), person.getHyperlinkedFullTitle())
+                                    + "</span>";
+
+                            campaign.addReport(reportMessage);
                         }
 
                         ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
@@ -628,14 +695,21 @@ public class EducationController {
                         addFacultyXp(campaign, person, academy, 0);
                     }
                 } else {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                            + String.format(resources.getString("dropOutRejected.text"), person.getHyperlinkedFullTitle())
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
                 }
 
                 return true;
             } else if ((roll < (diceSize / 20)) && (!academy.isPrepSchool())) {
                 // might as well scare the player
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                        + String.format(resources.getString("dropOutRejected.text"), person.getHyperlinkedFullTitle())
+                        + "</span>";
 
+                campaign.addReport(reportMessage);
                 return true;
             }
         }
@@ -652,7 +726,12 @@ public class EducationController {
     public static void processForcedDropOut(Campaign campaign, Person person, Academy academy) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
-        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
+        String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                + String.format(resources.getString("dropOut.text"), person.getHyperlinkedFullTitle())
+                + "</span>";
+
+        campaign.addReport(reportMessage);
+
         ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
         person.setEduEducationStage(EducationStage.DROPPING_OUT);
 
@@ -670,7 +749,12 @@ public class EducationController {
      */
     private static boolean checkForAcademyFactionConflict(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (academy.isFactionConflict(campaign, person)) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWarExpelled.text"));
+            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                    + String.format(resources.getString("eventWarExpelled.text"), person.getHyperlinkedFullTitle())
+                    + "</span>";
+
+            campaign.addReport(reportMessage);
+
             person.setEduEducationStage(EducationStage.DROPPING_OUT);
 
             return true;
@@ -688,7 +772,11 @@ public class EducationController {
      */
     private static void checkForAcademyClosure(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (campaign.getLocalDate().getYear() >= academy.getClosureYear()) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventClosure.text"));
+            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                    + String.format(resources.getString("eventClosure.text"), person.getHyperlinkedFullTitle())
+                    + "</span>";
+
+            campaign.addReport(reportMessage);
             person.setEduEducationStage(EducationStage.DROPPING_OUT);
         }
     }
@@ -708,14 +796,29 @@ public class EducationController {
                 || (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0)) {
             if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
                 if (Compute.d6(2) >= 5) {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                            + String.format(resources.getString("eventDestruction.text"), person.getHyperlinkedFullTitle())
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
+
                     person.setEduEducationStage(EducationStage.DROPPING_OUT);
                 } else {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestructionKilled.text"));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                            + String.format(resources.getString("eventDestructionKilled.text"), person.getHyperlinkedFullTitle())
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
+
                     person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
                 }
             } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                        + String.format(resources.getString("eventDestruction.text"), person.getHyperlinkedFullTitle())
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
+
                 person.setEduEducationStage(EducationStage.DROPPING_OUT);
             }
             return true;
@@ -749,12 +852,24 @@ public class EducationController {
             }
         }
 
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            graduationRoll += Intelligence.parseToInt(person.getIntelligence()) - 12;
+        }
+
         // qualification failed
         if (graduationRoll < 5) {
             if (academy.isHomeSchool()) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedFailedHomeSchooled.text"));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                        + String.format(resources.getString("graduatedFailedHomeSchooled.text"), person.getHyperlinkedFullTitle())
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
             } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedFailed.text"));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                        + String.format(resources.getString("graduatedFailed.text"), person.getHyperlinkedFullTitle())
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
             }
 
             ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
@@ -770,26 +885,45 @@ public class EducationController {
         // class resits required
         if (graduationRoll < 20) {
             roll = Compute.d6(3);
-            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedClassNeeded.text"), roll));
+            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                    + String.format(resources.getString("graduatedClassNeeded.text"), person.getHyperlinkedFullTitle(), roll)
+                    + "</span>";
+
+            campaign.addReport(reportMessage);
 
             person.setEduEducationTime(roll);
 
             return false;
         }
 
-        if (graduationRoll == 99) {
+        if (graduationRoll >= 99) {
             if (Compute.d6(1) > 5) {
                 if (academy.isHomeSchool()) {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                            + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
                 } else {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTop.text"),
-                            ' ' + resources.getString(graduationEventPicker())));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                            + String.format(resources.getString("graduatedTop.text"), person.getHyperlinkedFullTitle(), ' ' + resources.getString(graduationEventPicker()))
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
                 }
             } else {
                 if (academy.isHomeSchool()) {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                            + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
                 } else {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTop.text"), ""));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                            + String.format(resources.getString("graduatedTop.text"), person.getHyperlinkedFullTitle(), "")
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
                 }
             }
 
@@ -804,6 +938,8 @@ public class EducationController {
 
             person.setEduEducationStage(EducationStage.GRADUATING);
 
+            person.changeLoyalty(academy.getDurationDays() / 300);
+
             return true;
         }
 
@@ -812,16 +948,31 @@ public class EducationController {
             if (Compute.d6(1) > 5) {
 
                 if (academy.isHomeSchool()) {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                            + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
                 } else {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedHonors.text"),
-                            ' ' + resources.getString(graduationEventPicker())));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                            + String.format(resources.getString("graduatedHonors.text"), person.getHyperlinkedFullTitle(), ' ' + resources.getString(graduationEventPicker()))
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
                 }
             } else {
                 if (academy.isHomeSchool()) {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                            + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
                 } else {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedHonors.text"), ""));
+                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                            + String.format(resources.getString("graduatedHonors.text"), person.getHyperlinkedFullTitle(), "")
+                            + "</span>";
+
+                    campaign.addReport(reportMessage);
                 }
             }
 
@@ -836,22 +987,39 @@ public class EducationController {
 
             person.setEduEducationStage(EducationStage.GRADUATING);
 
+            person.changeLoyalty(academy.getDurationDays() / 300);
+
             return true;
         }
 
         // default graduation
         if (Compute.d6(1) > 5) {
             if (academy.isHomeSchool()) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
             } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"),
-                        ' ' + resources.getString(graduationEventPicker())));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + String.format(resources.getString("graduated.text"), person.getHyperlinkedFullTitle(), ' ' + resources.getString(graduationEventPicker()))
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
             }
         } else {
             if (academy.isHomeSchool()) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
             } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"), ""));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + String.format(resources.getString("graduated.text"), person.getHyperlinkedFullTitle(), "")
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
             }
         }
 
@@ -865,6 +1033,8 @@ public class EducationController {
 
         person.setEduEducationStage(EducationStage.GRADUATING);
 
+        person.changeLoyalty(academy.getDurationDays() / 300);
+
         return true;
     }
 
@@ -877,12 +1047,20 @@ public class EducationController {
      */
     private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         if (person.getEduHighestEducation().isPostGraduate()) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedMasters.text"));
+            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                    + String.format(resources.getString("graduatedMasters.text"), person.getHyperlinkedFullTitle(), academy.getQualifications().get(person.getEduCourseIndex()))
+                    + "</span>";
+
+            campaign.addReport(reportMessage);
 
             ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
 
         } else if (person.getEduHighestEducation().isDoctorate()) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedDoctorate.text"));
+            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                    + String.format(resources.getString("graduatedDoctorate.text"), person.getHyperlinkedFullTitle(), academy.getQualifications().get(person.getEduCourseIndex()))
+                    + "</span>";
+
+            campaign.addReport(reportMessage);
 
             ServiceLogger.eduGraduatedDoctorate(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
 
@@ -908,17 +1086,37 @@ public class EducationController {
             }
         }
 
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            graduationRoll += Intelligence.parseToInt(person.getIntelligence()) - 12;
+        }
+
         if (graduationRoll < 30) {
             if (academy.isHomeSchool()) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedBarelyHomeSchooled.text"), person.getEduAcademyName()));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + String.format(resources.getString("graduatedBarelyHomeSchooled.text"), person.getHyperlinkedFullTitle())
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
             } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedBarely.text"), person.getEduAcademyName()));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + String.format(resources.getString("graduatedBarely.text"), person.getHyperlinkedFullTitle(), person.getEduAcademyName())
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
             }
         } else {
             if (academy.isHomeSchool()) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
             } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedChild.text"), person.getEduAcademyName()));
+                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + String.format(resources.getString("graduatedChild.text"), person.getHyperlinkedFullTitle(), person.getEduAcademyName())
+                        + "</span>";
+
+                campaign.addReport(reportMessage);
             }
         }
 
