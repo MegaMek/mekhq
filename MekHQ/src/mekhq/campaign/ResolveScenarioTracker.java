@@ -482,9 +482,7 @@ public class ResolveScenarioTracker {
                         PersonStatus status = peopleStatus.get(p.getId());
                         if (null == status) {
                             //this shouldn't happen so report
-                            LogManager.getLogger().error(
-                                    "A null person status was found for person id " + p.getId().toString()
-                                    + " when trying to assign kills");
+                            LogManager.getLogger().error("A null person status was found for person id {} when trying to assign kills", p.getId().toString());
                             continue;
                         }
                         status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getLocalDate(),
@@ -526,7 +524,7 @@ public class ResolveScenarioTracker {
                 }
                 // check for an ejected entity and if we find one then assign it instead to switch vees
                 // over to infantry checks for casualties
-                Entity ejected = ejections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
+                Infantry ejected = ejections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
                 // determine total casualties for infantry and large craft
                 int casualties = 0;
                 int casualtiesAssigned = 0;
@@ -534,7 +532,7 @@ public class ResolveScenarioTracker {
                 if (en instanceof Infantry) {
                     infantry = (Infantry) en;
                 } else if (ejected != null) {
-                    infantry = (Infantry) ejected;
+                    infantry = ejected;
                 }
                 if (infantry != null) {
                     infantry.applyDamage();
@@ -694,7 +692,7 @@ public class ResolveScenarioTracker {
                 Entity e = entities.get(UUID.fromString(id));
                 // Invalid entity?
                 if (e == null) {
-                    LogManager.getLogger().error("Null entity reference in:" + aero.getDisplayName() + "getEscapeCraft()");
+                    LogManager.getLogger().error("Null entity reference in:{}getEscapeCraft()", aero.getDisplayName());
                     continue;
                 }
                 // If the escape craft was destroyed in combat, skip it
@@ -889,11 +887,6 @@ public class ResolveScenarioTracker {
             boolean pickedUp = en instanceof MechWarrior
                     && !((MechWarrior) en).getPickedUpByExternalIdAsString().equals("-1")
                     && null != unitsStatus.get(UUID.fromString(((MechWarrior) en).getPickedUpByExternalIdAsString()));
-            // If this option is turned on and the player controls the battlefield,
-            // assume that all ejected warriors have been picked up
-            if (campaign.getGameOptions().booleanOption(OptionsConstants.ADVGRNDMOV_EJECTED_PILOTS_FLEE)) {
-                pickedUp = true;
-            }
             // if the crew ejected from this unit, then skip it because we should find them elsewhere
             // if they are alive
             if (!(en instanceof EjectedCrew)
@@ -1045,8 +1038,10 @@ public class ResolveScenarioTracker {
                         status.setHits(hits);
                     }
                 }
+
                 status.setPickedUp(pickedUp);
-                status.setCaptured(Utilities.isLikelyCapture(en) || pickedUp);
+
+                status.setCaptured((Utilities.isLikelyCapture(en)) || (pickedUp));
                 status.setXP(campaign.getCampaignOptions().getScenarioXP());
                 oppositionPersonnel.put(p.getId(), status);
             }
@@ -2033,7 +2028,7 @@ public class ResolveScenarioTracker {
             String status = Unit.getDamageStateName(entity.getDamageLevel(false));
             if (!Unit.isRepairable(entity)) {
                 color = "rgb(190, 150, 55)";
-                status = "Salvage";
+                status = "Irreparable";
             } else if (!Unit.isFunctional(entity)) {
                 color = "rgb(205, 92, 92)";
                 status = "Inoperable";

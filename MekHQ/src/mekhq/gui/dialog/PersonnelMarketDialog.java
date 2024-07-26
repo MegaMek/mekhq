@@ -48,6 +48,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.*;
 
@@ -125,6 +127,13 @@ public class PersonnelMarketDialog extends JDialog {
         setTitle("Personnel Market");
         setName("Form");
         getContentPane().setLayout(new BorderLayout());
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeOrCancelActionPerformed();
+            }
+        });
 
         panelFilterBtns.setLayout(new GridBagLayout());
 
@@ -235,7 +244,7 @@ public class PersonnelMarketDialog extends JDialog {
             }
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {
-                sortKeys.add(new RowSorter.SortKey(column.ordinal(), sortOrder));
+                sortKeys.add(new SortKey(column.ordinal(), sortOrder));
             }
         }
         sorter.setSortKeys(sortKeys);
@@ -245,9 +254,9 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.setShowGrid(false);
         scrollTablePersonnel.setViewportView(tablePersonnel);
 
-        scrollPersonnelView.setMinimumSize(new Dimension(500, 600));
-        scrollPersonnelView.setPreferredSize(new Dimension(500, 600));
-        scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPersonnelView.setMinimumSize(new Dimension(200, 600));
+        scrollPersonnelView.setPreferredSize(new Dimension(200, 600));
+        scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPersonnelView.setViewportView(null);
 
         panelMain.setLayout(new BorderLayout());
@@ -413,11 +422,19 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {
+        LogManager.getLogger().info("btnClose");
+        closeOrCancelActionPerformed();
+    }
+
+    private void closeOrCancelActionPerformed() {
         selectedPerson = null;
+
         personnelMarket.setPaidRecruitment(radioPaidRecruitment.isSelected());
+
         if (radioPaidRecruitment.isSelected()) {
             personnelMarket.setPaidRecruitRole((PersonnelRole) comboRecruitRole.getSelectedItem());
         }
+
         setVisible(false);
     }
 
@@ -491,7 +508,9 @@ public class PersonnelMarketDialog extends JDialog {
                  name = "Pilot";
              }
              tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, hqView));
-             MechViewPanel mvp = new MechViewPanel();
+             MechViewPanel mvp = new MechViewPanel(200, 400, true);
+             tabUnit.setMinimumSize(new Dimension(200, 400));
+             tabUnit.setPreferredSize(new Dimension(200, 400));
              mvp.setMech(en, true);
              tabUnit.add("Unit", mvp);
              scrollPersonnelView.setViewportView(tabUnit);

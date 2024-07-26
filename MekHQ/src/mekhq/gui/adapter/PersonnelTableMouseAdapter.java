@@ -48,6 +48,7 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -77,6 +78,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
@@ -91,7 +93,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_SECONDARY_DESIGNATOR = "DESIG_SEC";
     private static final String CMD_ADD_AWARD = "ADD_AWARD";
     private static final String CMD_RMV_AWARD = "RMV_AWARD";
-    private static final String CMD_BEGIN_EDUCATION = "BEGIN_EDUCATION";
+    private static final String CMD_BEGIN_EDUCATION_ENROLLMENT = "BEGIN_EDUCATION_ENROLLMENT";
+    private static final String CMD_BEGIN_EDUCATION_RE_ENROLLMENT = "BEGIN_EDUCATION_RE_ENROLLMENT";
     private static final String CMD_COMPLETE_STAGE = "COMPLETE_STAGE";
     private static final String CMD_DROP_OUT = "DROP_OUT";
 
@@ -135,6 +138,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
     private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE";
     private static final String CMD_LOYALTY = "LOYALTY";
+    private static final String CMD_PERSONALITY = "PERSONALITY";
 
     private static final String CMD_IMPRISON = "IMPRISON";
     private static final String CMD_FREE = "FREE";
@@ -372,9 +376,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_BEGIN_EDUCATION: {
+            case CMD_BEGIN_EDUCATION_ENROLLMENT: {
                 for (Person person : people) {
-                    EducationController.beginEducation(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5]);
+                    EducationController.performEducationPreEnrollmentActions(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5], false);
+                }
+                break;
+            }
+            case CMD_BEGIN_EDUCATION_RE_ENROLLMENT: {
+                for (Person person : people) {
+                    EducationController.performEducationPreEnrollmentActions(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5], true);
                 }
                 break;
             }
@@ -636,42 +646,30 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_FREE: {
-                String title = (people.length == 1) ? people[0].getFullTitle()
-                        : String.format(resources.getString("numPrisoners.text"), people.length);
-                if (0 == JOptionPane.showConfirmDialog(null,
-                        String.format(resources.getString("confirmFree.format"), title),
-                        resources.getString("freeQ.text"),
-                        JOptionPane.YES_NO_OPTION)) {
-                    for (Person person : people) {
-                        gui.getCampaign().removePerson(person);
-                    }
-                }
+                processPrisonerResolutionCommand(
+                        people,
+                        "confirmFree.format",
+                        "freeQ.text"
+                );
+
                 break;
             }
             case CMD_EXECUTE: {
-                String title = (people.length == 1) ? people[0].getFullTitle()
-                        : String.format(resources.getString("numPrisoners.text"), people.length);
-                if (0 == JOptionPane.showConfirmDialog(null,
-                        String.format(resources.getString("confirmExecute.format"), title),
-                        resources.getString("executeQ.text"),
-                        JOptionPane.YES_NO_OPTION)) {
-                    for (Person person : people) {
-                        gui.getCampaign().removePerson(person);
-                    }
-                }
+                processPrisonerResolutionCommand(
+                        people,
+                        "confirmExecute.format",
+                        "executeQ.text"
+                );
+
                 break;
             }
             case CMD_JETTISON: {
-                String title = (people.length == 1) ? people[0].getFullTitle()
-                        : String.format(resources.getString("numPrisoners.text"), people.length);
-                if (0 == JOptionPane.showConfirmDialog(null,
-                        String.format(resources.getString("confirmJettison.format"), title),
-                        resources.getString("jettisonQ.text"),
-                        JOptionPane.YES_NO_OPTION)) {
-                    for (Person person : people) {
-                        gui.getCampaign().removePerson(person);
-                    }
-                }
+                processPrisonerResolutionCommand(
+                        people,
+                        "confirmJettison.format",
+                        "jettisonQ.text"
+                );
+
                 break;
             }
             case CMD_RECRUIT: {
@@ -726,7 +724,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
-                        String.format(resources.getString("ransomQ.format"), people.length, total.toAmountAndSymbolString()),
+                        String.format(resources.getString("ransomFriendlyQ.format"), people.length, total.toAmountAndSymbolString()),
                         resources.getString("ransom.text"),
                         JOptionPane.YES_NO_OPTION)) {
                     gui.getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
@@ -1092,6 +1090,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
+            case CMD_PERSONALITY: {
+                for (Person person : people) {
+                    PersonalityController.generatePersonality(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
 
             //region Randomization Menu
             case CMD_RANDOM_NAME: {
@@ -1176,6 +1181,34 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             default: {
                 break;
+            }
+        }
+    }
+
+    /**
+     * This method processes a prisoner resolution command.
+     *
+     * @param prisoners          an array of Person objects representing the prisoners
+     * @param message            a String representing the message to display in the dialog
+     * @param title              a String representing the title of the dialog
+     */
+    private void processPrisonerResolutionCommand(Person[] prisoners, String message, String title) {
+        int executionRolls = (int) Math.floor((double) prisoners.length / 20);
+
+        String label;
+
+        if (prisoners.length == 1) {
+            label = prisoners[0].getFullTitle();
+        } else {
+            label = String.format(resources.getString("numPrisoners.text"), prisoners.length);
+        }
+
+        if (0 == JOptionPane.showConfirmDialog(null,
+                String.format(resources.getString(message), title, executionRolls),
+                resources.getString(label),
+                JOptionPane.YES_NO_OPTION)) {
+            for (Person prisoner : prisoners) {
+                gui.getCampaign().removePerson(prisoner);
             }
         }
     }
@@ -1653,6 +1686,74 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 completeStage.setActionCommand(makeCommand(CMD_DROP_OUT));
                 completeStage.addActionListener(this);
                 academyMenu.add(completeStage);
+            }
+
+            if ((oneSelected) && (StaticChecks.areAllStudents(selected))) {
+                Academy academy = EducationController.getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                // this pile of if-statements just checks that the individual is eligible for re-enrollment
+                // has the person finished their education, but not yet returned to the unit?
+                if ((!person.getEduEducationStage().isJourneyToCampus()) && (!person.getEduEducationStage().isEducation())) {
+                    // is the academy still standing?
+                    if ((campaign.getGameYear() < academy.getDestructionYear()) && (campaign.getGameYear() < academy.getClosureYear())) {
+                        // if the academy is local, is the system still populated?
+                        if ((!academy.isLocal()) || (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) > 0)) {
+                            // is the person still within the correct age band?
+                            if ((person.getAge(campaign.getLocalDate()) < academy.getAgeMax()) && (person.getAge(campaign.getLocalDate()) >= academy.getAgeMin())) {
+                                // has the person been edited at some point and is no longer qualified?
+                                if (academy.isQualified(person)) {
+                                    // here we check that the person will benefit from re-enrollment
+                                    int improvementPossible = 0;
+
+                                    if (academy.getFilteredFaction(campaign, person, List.of(person.getEduAcademyFaction())) != null) {
+                                        int educationLevel = academy.getEducationLevel(person);
+
+                                        String[] skills = academy.getCurriculums().get(person.getEduCourseIndex()).split(",");
+
+                                        skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
+
+                                        for (String skill : skills) {
+                                            if (skill.equalsIgnoreCase("none")) {
+                                                continue;
+                                            }
+
+                                            if (skill.equalsIgnoreCase("xp")) {
+                                                if (EducationLevel.parseToInt(person.getEduHighestEducation()) < educationLevel) {
+                                                    improvementPossible++;
+                                                }
+                                            } else {
+                                                String skillParsed = skillParser(skill);
+
+                                                if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() < educationLevel)) {
+                                                    improvementPossible++;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    JMenuItem reEnroll;
+
+                                    if (improvementPossible > 0) {
+                                        reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
+                                        reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
+                                        reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT,
+                                                academy.getSet(),
+                                                academy.getName(),
+                                                String.valueOf(person.getEduCourseIndex()),
+                                                person.getEduAcademySystem(),
+                                                person.getEduAcademyFaction()));
+                                        reEnroll.addActionListener(this);
+                                    } else {
+                                        reEnroll = new JMenuItem(resources.getString("eduReEnrollImpossible.text"));
+                                        reEnroll.setToolTipText(resources.getString("eduReEnrollImpossible.toolTip"));
+                                    }
+
+                                    academyMenu.add(reEnroll);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             if ((StaticChecks.areAllStudents(selected)) && (campaign.isGM())) {
@@ -2690,6 +2791,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menu.add(menuItem);
             }
 
+            if (gui.getCampaign().getCampaignOptions().isUseRandomPersonalities()) {
+                menuItem = new JMenuItem(resources.getString("regeneratePersonality.text"));
+                menuItem.setActionCommand(CMD_PERSONALITY);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+            }
+
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         }
         //endregion GM Menu
@@ -2987,10 +3095,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     if ((academy.isLocal()) || (academy.isHomeSchool())) {
                         courses.setToolTipText(academy.getTooltip(campaign, personnel, courseIndex, campaign.getCurrentSystem()));
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campaign.getCurrentSystem().getId(), faction));
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campaign.getCurrentSystem().getId(), faction));
                     } else {
                         courses.setToolTipText(academy.getTooltip(campaign, personnel, courseIndex, campaign.getSystemById(campus)));
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campus, faction));
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_ENROLLMENT, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campus, faction));
                     }
                     courses.addActionListener(this);
                     academyOption.add(courses);
