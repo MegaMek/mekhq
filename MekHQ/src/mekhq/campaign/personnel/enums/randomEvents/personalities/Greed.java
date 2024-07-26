@@ -266,38 +266,40 @@ public enum Greed {
      */
     @SuppressWarnings(value = "unused")
     public static Greed parseFromString(final String greed) {
-        return switch (greed.toLowerCase()) {
-            case "0", "none" -> NONE;
-            case "1", "astute" -> ASTUTE;
-            case "2", "adept" -> ADEPT;
-            case "3", "avaricious" -> AVARICIOUS;
-            case "4", "corrupt" -> CORRUPT;
-            case "5", "dynamic" -> DYNAMIC;
-            case "6", "eager" -> EAGER;
-            case "7", "enterprising" -> ENTERPRISING;
-            case "8", "exploitative" -> EXPLOITATIVE;
-            case "9", "fraudulent" -> FRAUDULENT;
-            case "10", "generous" -> GENEROUS;
-            case "11", "greedy" -> GREEDY;
-            case "12", "hoarding" -> HOARDING;
-            case "13", "insatiable" -> INSATIABLE;
-            case "14", "insightful" -> INSIGHTFUL;
-            case "15", "intuitive" -> INTUITIVE;
-            case "16", "judicious" -> JUDICIOUS;
-            case "17", "lustful" -> LUSTFUL;
-            case "18", "mercenary" -> MERCENARY;
-            case "19", "meticulous" -> METICULOUS;
-            case "20", "nefarious" -> NEFARIOUS;
-            case "21", "overreaching" -> OVERREACHING;
-            case "22", "profitable" -> PROFITABLE;
-            case "23", "savvy" -> SAVVY;
-            case "24", "self-serving" -> SELF_SERVING;
-            case "25", "shameless" -> SHAMELESS;
-            case "26", "shrewd" -> SHREWD;
-            case "27", "tactical" -> TACTICAL;
-            case "28", "thief" -> THIEF;
-            case "29", "unprincipled" -> UNPRINCIPLED;
-            case "30", "voracious" -> VORACIOUS;
+        return switch (greed) {
+            case "0", "None" -> NONE;
+            // Minor Characteristics
+            case "1", "Astute" -> ASTUTE;
+            case "2", "Adept" -> ADEPT;
+            case "3", "Avaricious" -> AVARICIOUS;
+            case "4", "Dynamic" -> DYNAMIC;
+            case "5", "Eager" -> EAGER;
+            case "6", "Exploitative" -> EXPLOITATIVE;
+            case "7", "Fraudulent" -> FRAUDULENT;
+            case "8", "Generous" -> GENEROUS;
+            case "9", "Greedy" -> GREEDY;
+            case "10", "Hoarding" -> HOARDING;
+            case "11", "Insatiable" -> INSATIABLE;
+            case "12", "Insightful" -> INSIGHTFUL;
+            case "13", "Judicious" -> JUDICIOUS;
+            case "14", "Lustful" -> LUSTFUL;
+            case "15", "Mercenary" -> MERCENARY;
+            case "16", "Overreaching" -> OVERREACHING;
+            case "17", "Profitable" -> PROFITABLE;
+            case "18", "Savvy" -> SAVVY;
+            case "19", "Self-Serving" -> SELF_SERVING;
+            case "20", "Shameless" -> SHAMELESS;
+            case "21", "Shrewd" -> SHREWD;
+            case "22", "Tactical" -> TACTICAL;
+            case "23", "Unprincipled" -> UNPRINCIPLED;
+            case "24", "Voracious" -> VORACIOUS;
+            // Major Characteristics
+            case "25", "Corrupt" -> CORRUPT;
+            case "26", "Enterprising" -> ENTERPRISING;
+            case "27", "Intuitive" -> INTUITIVE;
+            case "28", "Meticulous" -> METICULOUS;
+            case "29", "Nefarious" -> NEFARIOUS;
+            case "30", "Thief" -> THIEF;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Greed.java/parseFromString: "
                             + greed);
@@ -315,36 +317,38 @@ public enum Greed {
     public static Greed parseFromInt(final int greed) {
         return switch (greed) {
             case 0 -> NONE;
+            // Minor Characteristics
             case 1 -> ASTUTE;
             case 2 -> ADEPT;
             case 3 -> AVARICIOUS;
-            case 4 -> CORRUPT;
-            case 5 -> DYNAMIC;
-            case 6 -> EAGER;
-            case 7 -> ENTERPRISING;
-            case 8 -> EXPLOITATIVE;
-            case 9 -> FRAUDULENT;
-            case 10 -> GENEROUS;
-            case 11 -> GREEDY;
-            case 12 -> HOARDING;
-            case 13 -> INSATIABLE;
-            case 14 -> INSIGHTFUL;
-            case 15 -> INTUITIVE;
-            case 16 -> JUDICIOUS;
-            case 17 -> LUSTFUL;
-            case 18 -> MERCENARY;
-            case 19 -> METICULOUS;
-            case 20 -> NEFARIOUS;
-            case 21 -> OVERREACHING;
-            case 22 -> PROFITABLE;
-            case 23 -> SAVVY;
-            case 24 -> SELF_SERVING;
-            case 25 -> SHAMELESS;
-            case 26 -> SHREWD;
-            case 27 -> TACTICAL;
-            case 28 -> THIEF;
-            case 29 -> UNPRINCIPLED;
-            case 30 -> VORACIOUS;
+            case 4 -> DYNAMIC;
+            case 5 -> EAGER;
+            case 6 -> EXPLOITATIVE;
+            case 7 -> FRAUDULENT;
+            case 8 -> GENEROUS;
+            case 9 -> GREEDY;
+            case 10 -> HOARDING;
+            case 11 -> INSATIABLE;
+            case 12 -> INSIGHTFUL;
+            case 13 -> JUDICIOUS;
+            case 14 -> LUSTFUL;
+            case 15 -> MERCENARY;
+            case 16 -> OVERREACHING;
+            case 17 -> PROFITABLE;
+            case 18 -> SAVVY;
+            case 19 -> SELF_SERVING;
+            case 20 -> SHAMELESS;
+            case 21 -> SHREWD;
+            case 22 -> TACTICAL;
+            case 23 -> UNPRINCIPLED;
+            case 24 -> VORACIOUS;
+            // Major Characteristics
+            case 25 -> CORRUPT;
+            case 26 -> ENTERPRISING;
+            case 27 -> INTUITIVE;
+            case 28 -> METICULOUS;
+            case 29 -> NEFARIOUS;
+            case 30 -> THIEF;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Greed.java/parseFromInt: "
                             + greed);
