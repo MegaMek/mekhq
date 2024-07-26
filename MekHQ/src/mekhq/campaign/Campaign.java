@@ -3241,6 +3241,10 @@ public class Campaign implements ITechManager {
                 continue;
             }
 
+            if (getLocalDate().equals(contract.getStartDate())) {
+                getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation(getUnitRatingMod())));
+            }
+
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
                 int deficit = getDeploymentDeficit(contract);
                 if (deficit > 0) {
@@ -3621,6 +3625,9 @@ public class Campaign implements ITechManager {
      * @return <code>true</code> if the new day arrived
      */
     public boolean newDay() {
+        // clear previous retirement information
+        turnoverRetirementInformation.clear();
+
         // Refill Automated Pools, if the options are selected
         if (MekHQ.getMHQOptions().getNewDayAstechPoolFill() && requiresAdditionalAstechs()) {
             fillAstechPool();
@@ -5051,7 +5058,7 @@ public class Campaign implements ITechManager {
         // Unions
         if (noMech > 0) {
             leasedAverageMechDropships = noMech / (double) averageDropshipMechCapacity;
-            noMech -= leasedAverageMechDropships * averageDropshipMechCapacity;
+            noMech -= (int) (leasedAverageMechDropships * averageDropshipMechCapacity);
             mechCollars += (int) Math.ceil(leasedAverageMechDropships);
 
             // If we can fit in a smaller DropShip, lease one of those instead.
@@ -5074,7 +5081,7 @@ public class Campaign implements ITechManager {
 
             if (noASF > 0) {
                 leasedAverageASFDropships = noASF / (double) averageDropshipASFCapacity;
-                noASF -= leasedAverageASFDropships * averageDropshipASFCapacity;
+                noASF -= (int) (leasedAverageASFDropships * averageDropshipASFCapacity);
                 asfCollars += (int) Math.ceil(leasedAverageASFDropships);
 
                 if ((noASF > 0) && (noASF < (averageDropshipASFCapacity / 2))) {
@@ -5093,7 +5100,7 @@ public class Campaign implements ITechManager {
         // Triumphs
         if (noVehicles > averageDropshipVehicleCapacity) {
             leasedLargeVehicleDropships = noVehicles / (double) largeDropshipVehicleCapacity;
-            noVehicles -= leasedLargeVehicleDropships * largeDropshipVehicleCapacity;
+            noVehicles -= (int) (leasedLargeVehicleDropships * largeDropshipVehicleCapacity);
             vehicleCollars += (int) Math.ceil(leasedLargeVehicleDropships);
 
             if (noVehicles > averageDropshipVehicleCapacity) {
@@ -5128,7 +5135,7 @@ public class Campaign implements ITechManager {
         // Mules
         if (noCargo > averageDropshipCargoCapacity) {
             leasedLargeCargoDropships = noCargo / (double) largeDropshipCargoCapacity;
-            noCargo -= leasedLargeCargoDropships * largeDropshipCargoCapacity;
+            noCargo -= (int) (leasedLargeCargoDropships * largeDropshipCargoCapacity);
             cargoCollars += (int) Math.ceil(leasedLargeCargoDropships);
 
             if (noCargo > averageDropshipCargoCapacity) {
@@ -5142,7 +5149,7 @@ public class Campaign implements ITechManager {
         if (noCargo > 0) {
             leasedAverageCargoDropships = noCargo / (double) averageDropshipCargoCapacity;
             cargoCollars += (int) Math.ceil(leasedAverageCargoDropships);
-            noCargo -= leasedAverageCargoDropships * averageDropshipCargoCapacity;
+            noCargo -= (int) (leasedAverageCargoDropships * averageDropshipCargoCapacity);
 
             if (noCargo > 0 && noCargo < (averageDropshipCargoCapacity / 2)) {
                 leasedAverageCargoDropships += 0.5;
