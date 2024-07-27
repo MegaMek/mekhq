@@ -562,7 +562,7 @@ public final class BriefingTab extends CampaignGuiTab {
             case SUCCESS, PARTIAL -> {
                 if ((getCampaign().getCampaignOptions().isUseStratCon())
                         && (mission instanceof AtBContract)
-                        && (((AtBContract) mission).getStratconCampaignState().getVictoryPoints() >= 5)) {
+                        && (((AtBContract) mission).getStratconCampaignState().getVictoryPoints() >= 3)) {
                     yield getCampaign().getCampaignOptions().getMissionXpOutstandingSuccess();
                 } else {
                     yield getCampaign().getCampaignOptions().getMissionXpSuccess();
