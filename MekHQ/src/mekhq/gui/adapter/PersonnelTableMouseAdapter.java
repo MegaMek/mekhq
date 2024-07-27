@@ -1193,8 +1193,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param title              a String representing the title of the dialog
      */
     private void processPrisonerResolutionCommand(Person[] prisoners, String message, String title) {
-        int executionRolls = (int) Math.floor((double) prisoners.length / 20);
-
         String label;
 
         if (prisoners.length == 1) {
@@ -1204,8 +1202,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (0 == JOptionPane.showConfirmDialog(null,
-                String.format(resources.getString(message), title, executionRolls),
-                resources.getString(label),
+                String.format(resources.getString(message), label),
+                resources.getString(title),
                 JOptionPane.YES_NO_OPTION)) {
             for (Person prisoner : prisoners) {
                 gui.getCampaign().removePerson(prisoner);
