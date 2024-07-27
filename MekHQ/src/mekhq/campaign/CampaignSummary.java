@@ -344,7 +344,9 @@ public class CampaignSummary {
         }
 
         if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
-            int patients = campaign.getPatients().size();
+            int patients = (int) campaign.getPatients().stream()
+                    .filter(patient -> patient.getDoctorId() != null)
+                    .count();
 
             int doctorCapacity = campaign.getActivePersonnel().stream()
                     .filter(person -> (person.getPrimaryRole().isDoctor()) || (person.getSecondaryRole().isDoctor()))
