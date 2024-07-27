@@ -113,16 +113,12 @@ public class Contract extends Mission {
     }
 
     public static String getOverheadCompName(int i) {
-        switch (i) {
-            case OH_NONE:
-                return "None";
-            case OH_HALF:
-                return "Half";
-            case OH_FULL:
-                return "Full";
-            default:
-                return "?";
-        }
+        return switch (i) {
+            case OH_NONE -> "None";
+            case OH_HALF -> "Half";
+            case OH_FULL -> "Full";
+            default -> "?";
+        };
     }
 
     public String getEmployer() {
@@ -659,7 +655,7 @@ public class Contract extends Mission {
     /**
      * Retrieves the percentage of shares for this contract.
      * If the instance is of type AtBContract, it retrieves the dynamic Shares percentage.
-     * Otherwise, it returns a default value of 20.
+     * Otherwise, it returns a default value of 30.
      *
      * @return the percentage of shares
      */
@@ -668,7 +664,7 @@ public class Contract extends Mission {
             return ((AtBContract) this).getAtBSharesPercentage();
         } else {
             // TODO make this campaign option configurable
-            return 20;
+            return 30;
         }
     }
 
