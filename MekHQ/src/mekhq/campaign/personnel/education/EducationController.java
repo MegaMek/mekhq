@@ -1046,7 +1046,9 @@ public class EducationController {
      * @param resources  the resource bundle containing localized strings
      */
     private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        if (person.getEduHighestEducation().isPostGraduate()) {
+        int educationLevel = academy.getEducationLevel(person);
+
+        if (educationLevel == 3) {
             String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
                     + String.format(resources.getString("graduatedMasters.text"), person.getHyperlinkedFullTitle(), academy.getQualifications().get(person.getEduCourseIndex()))
                     + "</span>";
@@ -1055,7 +1057,7 @@ public class EducationController {
 
             ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
 
-        } else if (person.getEduHighestEducation().isDoctorate()) {
+        } else if (educationLevel == 4) {
             String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
                     + String.format(resources.getString("graduatedDoctorate.text"), person.getHyperlinkedFullTitle(), academy.getQualifications().get(person.getEduCourseIndex()))
                     + "</span>";
