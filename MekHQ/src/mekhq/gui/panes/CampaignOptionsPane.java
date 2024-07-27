@@ -1955,7 +1955,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JLabel lblXpCostMultiplier = new JLabel(resources.getString("lblXpCostMultiplier.text"));
         lblXpCostMultiplier.setToolTipText(resources.getString("lblXpCostMultiplier.tooltip"));
-        spnXpCostMultiplier = new JSpinner(new SpinnerNumberModel(1, 0, 5, 0.01));
+        spnXpCostMultiplier = new JSpinner(new SpinnerNumberModel(1, 0, 5, 0.05));
         ((DefaultEditor) spnXpCostMultiplier.getEditor()).getTextField().setEditable(false);
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
