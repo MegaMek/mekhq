@@ -163,13 +163,16 @@ public class ForceViewPanel extends JScrollablePanel {
         long bv = 0;
         Money cost = Money.zero();
         double ton = 0;
-        String commander = "";
         String lanceTech = "";
         String assigned = "";
         String type = null;
 
         Person commanderPerson = campaign.getPerson(force.getForceCommanderID());
-        commander = commanderPerson != null ? commanderPerson.getFullTitle() : "";
+        String commander = commanderPerson != null ? commanderPerson.getFullTitle() : "";
+
+        if ((force.getId() == 0) && (campaign.getFlaggedCommander() != null)) {
+            commander = campaign.getFlaggedCommander().getFullTitle();
+        }
 
         for (UUID uid : force.getAllUnits(false)) {
             Unit u = campaign.getUnit(uid);
@@ -201,7 +204,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
         if (null != type) {
             lblType.setName("lblCommander2");
-            String forceType = (force.isCombatForce() ? "" : "Non-Combat ") + type + " " + resourceMap.getString("unit");
+            String forceType = (force.isCombatForce() ? "" : "Non-Combat ") + type + ' ' + resourceMap.getString("unit");
             lblType.setText("<html><i>" + forceType + "</i></html>");
             lblType.getAccessibleContext().setAccessibleDescription("Force Type: " + forceType);
             gridBagConstraints = new GridBagConstraints();
