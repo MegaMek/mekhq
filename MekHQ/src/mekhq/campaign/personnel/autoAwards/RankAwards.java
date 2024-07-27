@@ -11,6 +11,24 @@ import java.util.Map;
 import java.util.UUID;
 
 public class RankAwards {
+    //region Enum Declarations
+    enum RankAwardsEnums {
+        IMPLICIT("Implicit"),
+        INCLUSIVE("Inclusive"),
+        EXCLUSIVE("Exclusive");
+
+        private final String name;
+
+        RankAwardsEnums(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+    //endRegion Enum Declarations
+
     /**
      * This function loops through Rank Awards, checking whether the person is eligible to receive each type of award.
      *
@@ -20,51 +38,54 @@ public class RankAwards {
      */
     public static Map<Integer, List<Object>> RankAwardsProcessor(Campaign campaign, UUID personId, List<Award> awards) {
         int requiredRankNumeric;
-        boolean isInclusive;
         boolean isEligible;
 
         List<Award> eligibleAwards = new ArrayList<>();
 
         for (Award award : awards) {
-            isEligible = false;
-
             try {
                 requiredRankNumeric = award.getQty();
             } catch (Exception e) {
-                LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}", award.getName(), award.getSet(), award.getQty());
+                LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}",
+                        award.getName(),
+                        award.getSet(),
+                        award.getQty());
                 continue;
             }
 
-            if (award.getRange().equalsIgnoreCase("inclusive")) {
-                isInclusive = true;
-            } else if (award.getRange().equalsIgnoreCase("exclusive")) {
-                isInclusive = false;
-            } else {
-                LogManager.getLogger().warn("Award {} from the {} set has the invalid range {}", award.getName(), award.getSet(), award.getRange());
-                continue;
+            boolean matchFound = false;
+
+            // as there is only a max iteration of 3, there is no reason to use a stream here
+            for (RankAwardsEnums value : RankAwardsEnums.values()) {
+                if (value.getName().equalsIgnoreCase(award.getRange())) {
+                    matchFound = true;
+                    break;
+                }
+            }
+
+            if (!matchFound) {
+                LogManager.getLogger().warn("Award {} from the {} set has the invalid range {}",
+                        award.getName(),
+                        award.getSet(),
+                        award.getRange());
             }
 
             Person person = campaign.getPerson(personId);
 
-            if (award.canBeAwarded(person)) {
-                if (isInclusive) {
-                    if (person.getRankNumeric() >= requiredRankNumeric) {
-                        isEligible = true;
-                    }
-                } else {
-                    if ((requiredRankNumeric <= 20) && (person.getRankNumeric() <= 20)) {
-                        isEligible = true;
-                    } else if ((requiredRankNumeric <= 30) && (person.getRankNumeric() <= 30)) {
-                        isEligible = true;
-                    } else if ((requiredRankNumeric >= 31) && (person.getRankNumeric() >= 31)) {
-                        isEligible = true;
-                    }
-
-                    if (isEligible) {
-                        isEligible = person.getRankNumeric() >= requiredRankNumeric;
+            isEligible = switch (award.getRange()) {
+                case "Implicit" -> person.getRankNumeric() == requiredRankNumeric;
+                case "Inclusive" -> person.getRankNumeric() >= requiredRankNumeric;
+                case "Exclusive" -> {
+                    if ((requiredRankNumeric <= 20 && person.getRankNumeric() <= 20)
+                            || (requiredRankNumeric <= 30 && person.getRankNumeric() <= 30)
+                            || (requiredRankNumeric >= 31 && person.getRankNumeric() >= 31)) {
+                        yield person.getRankNumeric() >= requiredRankNumeric;
+                    } else {
+                        yield false;
                     }
                 }
-            }
+                default -> false;
+            };
 
             if (isEligible) {
                 eligibleAwards.add(award);
