@@ -5040,7 +5040,7 @@ public class Campaign implements ITechManager {
         // If we're transporting more than a company, Overlord analogues are more efficient.
         if (noMech > 12) {
             leasedLargeMechDropships = noMech / (double) largeDropshipMechCapacity;
-            noMech -= leasedLargeMechDropships * largeDropshipMechCapacity;
+            noMech -= (int) (leasedLargeMechDropships * largeDropshipMechCapacity);
             mechCollars += (int) Math.ceil(leasedLargeMechDropships);
 
             // If there's more than a company left over, lease another Overlord. Otherwise
@@ -5052,7 +5052,7 @@ public class Campaign implements ITechManager {
             }
 
             leasedASFCapacity += (int) Math.floor(leasedLargeMechDropships * largeMechDropshipASFCapacity);
-            leasedCargoCapacity += (int) Math.floor(largeMechDropshipCargoCapacity);
+            leasedCargoCapacity += largeMechDropshipCargoCapacity;
         }
 
         // Unions
