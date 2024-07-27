@@ -6502,13 +6502,12 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            if ((getCampaignOptions().isUseShareSystem()) && (contract instanceof AtBContract)) {
+            if (getCampaignOptions().isUseShareSystem()) {
                 ResourceBundle financeResources = ResourceBundle.getBundle("mekhq.resources.Finances",
                         MekHQ.getMHQOptions().getLocale());
 
                 Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
-
-                remainingMoney.minus(shares);
+                remainingMoney = remainingMoney.minus(shares);
 
                 if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
                         String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
