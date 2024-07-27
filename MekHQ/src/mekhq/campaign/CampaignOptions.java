@@ -464,6 +464,7 @@ public class CampaignOptions {
     //endregion Mercenary Tab
 
     //region Experience Tab
+    private double xpCostMultiplier;
     private int scenarioXP;
     private int killXPAward;
     private int killsForXP;
@@ -1064,6 +1065,7 @@ public class CampaignOptions {
         //endregion Mercenary Tab
 
         //region Experience Tab
+        xpCostMultiplier = 1.00;
         scenarioXP = 1;
         killXPAward = 0;
         killsForXP = 0;
@@ -3545,6 +3547,14 @@ public class CampaignOptions {
         this.useQuirks = useQuirks;
     }
 
+    public double getXpCostMultiplier() {
+        return xpCostMultiplier;
+    }
+
+    public void setXpCostMultiplier(final double xpCostMultiplier) {
+        this.xpCostMultiplier = xpCostMultiplier;
+    }
+
     public int getScenarioXP() {
         return scenarioXP;
     }
@@ -4494,6 +4504,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechFirst", assignedTechFirst);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", resetToFirstTech);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQuirks", useQuirks);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCostMultiplier", xpCostMultiplier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioXP", scenarioXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killsForXP", killsForXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killXPAward", killXPAward);
@@ -5052,6 +5063,8 @@ public class CampaignOptions {
                     retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
                     retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("xpCostMultiplier")) {
+                    retVal.xpCostMultiplier = Double.parseDouble(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
                     retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {
