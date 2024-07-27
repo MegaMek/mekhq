@@ -1046,7 +1046,7 @@ public class EducationController {
      * @param resources  the resource bundle containing localized strings
      */
     private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int educationLevel = academy.getEducationLevel(person);
+        int educationLevel = academy.getEducationLevel(person) - 1; // we reduce by 1 to factor in the increase level from graduating
 
         if (educationLevel == 3) {
             String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
