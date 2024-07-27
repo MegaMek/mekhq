@@ -1150,7 +1150,7 @@ public class Campaign implements ITechManager {
     public void importUnit(Unit u) {
         Objects.requireNonNull(u);
 
-        LogManager.getLogger().debug("Importing unit: (" + u.getId() + "): " + u.getName());
+        LogManager.getLogger().debug("Importing unit: ({}): {}", u.getId(), u.getName());
 
         getHangar().addUnit(u);
 
@@ -1175,7 +1175,7 @@ public class Campaign implements ITechManager {
      * @param unit - The ship we want to add to this Set
      */
     public void addTransportShip(Unit unit) {
-        LogManager.getLogger().debug("Adding DropShip/WarShip: " + unit.getId());
+        LogManager.getLogger().debug("Adding DropShip/WarShip: {}", unit.getId());
         transportShips.add(Objects.requireNonNull(unit));
     }
 
@@ -4687,7 +4687,7 @@ public class Campaign implements ITechManager {
                     pw1.println("]]></blk>");
                 }
                 catch (EntitySavingException e) {
-                    LogManager.getLogger().error("Failed to save custom entity " + en.getDisplayName(), e);
+                    LogManager.getLogger().error("Failed to save custom entity {}", en.getDisplayName(), e);
                 }
             }
             pw1.println("\t</custom>");
@@ -4725,7 +4725,7 @@ public class Campaign implements ITechManager {
 
     public void setRankSystem(final @Nullable RankSystem rankSystem) {
         // If they are the same object, there hasn't been a change and thus don't need to process further
-        if (getRankSystem() == rankSystem) {
+        if (Objects.equals(getRankSystem(), rankSystem)) {
             return;
         }
 
