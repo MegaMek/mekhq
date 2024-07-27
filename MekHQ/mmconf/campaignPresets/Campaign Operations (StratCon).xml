@@ -109,6 +109,7 @@
 		<assignedTechFirst>false</assignedTechFirst>
 		<resetToFirstTech>false</resetToFirstTech>
 		<useQuirks>false</useQuirks>
+        <xpCostMultiplier>1</xpCostMultiplier>
 		<scenarioXP>1</scenarioXP>
 		<killsForXP>0</killsForXP>
 		<killXPAward>0</killXPAward>
