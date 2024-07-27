@@ -547,6 +547,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnContractNegotiationXP;
     private JSpinner spnAdminWeeklyXP;
     private JSpinner spnAdminWeeklyXPPeriod;
+    private JSpinner spnMissionXpFail;
+    private JSpinner spnMissionXpSuccess;
+    private JSpinner spnMissionXpOutstandingSuccess;
+
     private JSpinner spnEdgeCost;
     private JTable tableXP;
     private static final String[] TABLE_XP_COLUMN_NAMES = { "+0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10" };
@@ -2181,18 +2185,69 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(new JLabel(resources.getString("lblAdminWeeklyXPPeriod.text")), gridBagConstraints);
 
-        spnEdgeCost = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
-        ((DefaultEditor) spnEdgeCost.getEditor()).getTextField().setEditable(false);
+        spnMissionXpFail = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
+        ((DefaultEditor) spnMissionXpFail.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panXP.add(spnEdgeCost, gridBagConstraints);
+        panXP.add(spnMissionXpFail, gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(new JLabel(resources.getString("spnMissionXpFail.text")), gridBagConstraints);
+
+        spnMissionXpSuccess = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
+        ((DefaultEditor) spnMissionXpSuccess.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(spnMissionXpSuccess, gridBagConstraints);
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(new JLabel(resources.getString("spnMissionXpSuccess.text")), gridBagConstraints);
+
+        spnMissionXpOutstandingSuccess = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
+        ((DefaultEditor) spnMissionXpOutstandingSuccess.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(spnMissionXpOutstandingSuccess, gridBagConstraints);
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(new JLabel(resources.getString("spnMissionXpOutstandingSuccess.text")), gridBagConstraints);
+
+        spnEdgeCost = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
+        ((DefaultEditor) spnEdgeCost.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(spnEdgeCost, gridBagConstraints);
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2211,7 +2266,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         txtInstructionsXP.setMinimumSize(new Dimension(550, 120));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -2239,7 +2294,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         scrXP.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridwidth = 5;
@@ -8391,6 +8446,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnContractNegotiationXP.setValue(options.getContractNegotiationXP());
         spnAdminWeeklyXP.setValue(options.getAdminXP());
         spnAdminWeeklyXPPeriod.setValue(options.getAdminXPPeriod());
+        spnMissionXpFail.setValue(options.getMissionXpFail());
+        spnMissionXpSuccess.setValue(options.getMissionXpSuccess());
+        spnMissionXpOutstandingSuccess.setValue(options.getMissionXpOutstandingSuccess());
         spnEdgeCost.setValue(options.getEdgeCost());
         //endregion Experience Tab
 
@@ -8683,6 +8741,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getValue());
             options.setEdgeCost((Integer) spnEdgeCost.getValue());
             options.setTargetIdleXP((Integer) spnTargetIdleXP.getValue());
+            options.setMissionXpFail((Integer) spnMissionXpFail.getValue());
+            options.setMissionXpSuccess((Integer) spnMissionXpSuccess.getValue());
+            options.setMissionXpOutstandingSuccess((Integer) spnMissionXpOutstandingSuccess.getValue());
 
             options.setLimitByYear(limitByYearBox.isSelected());
             options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());

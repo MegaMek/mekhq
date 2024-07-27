@@ -378,6 +378,15 @@ public final class BriefingTab extends CampaignGuiTab {
         getCampaign().completeMission(mission, status);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
+        // apply mission xp
+        int xpAward = getMissionXpAward(cmd.getStatus(), mission);
+
+        if (xpAward > 0) {
+            for (Person person : getCampaign().getActivePersonnel()) {
+                person.awardXP(getCampaign(), xpAward);
+            }
+        }
+
         // resolve friendly PoW ransoming
         // this needs to be before turnover and autoAwards so friendly PoWs can be factored into those events
         if (getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()) {
@@ -538,6 +547,29 @@ public final class BriefingTab extends CampaignGuiTab {
 
         final List<Mission> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+    }
+
+    /**
+     * Calculates the XP award for completing a mission.
+     *
+     * @param missionStatus The status of the mission as a MissionStatus enum.
+     * @param mission The Mission object representing the completed mission.
+     * @return The XP award for completing the mission.
+     */
+    private int getMissionXpAward(MissionStatus missionStatus, Mission mission) {
+        return switch(missionStatus) {
+            case FAILED, BREACH -> getCampaign().getCampaignOptions().getMissionXpFail();
+            case SUCCESS, PARTIAL -> {
+                if ((getCampaign().getCampaignOptions().isUseStratCon())
+                        && (mission instanceof AtBContract)
+                        && (((AtBContract) mission).getStratconCampaignState().getVictoryPoints() >= 3)) {
+                    yield getCampaign().getCampaignOptions().getMissionXpOutstandingSuccess();
+                } else {
+                    yield getCampaign().getCampaignOptions().getMissionXpSuccess();
+                }
+            }
+            case ACTIVE -> 0;
+        };
     }
 
     /**
