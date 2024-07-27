@@ -266,6 +266,7 @@ public class CampaignOptions {
     private boolean enableTimeAwards;
     private boolean enableTrainingAwards;
     private boolean enableMiscAwards;
+    private String awardSetFilterList;
     //endregion Personnel Tab
 
     //region Life Paths Tab
@@ -814,6 +815,7 @@ public class CampaignOptions {
         setEnableTimeAwards(true);
         setEnableTrainingAwards(true);
         setEnableMiscAwards(true);
+        setAwardSetFilterList("");
         //endregion Personnel Tab
 
         //region Life Paths Tab
@@ -3077,6 +3079,14 @@ public class CampaignOptions {
     public void setEnableMiscAwards(final boolean enableMiscAwards) {
         this.enableMiscAwards = enableMiscAwards;
     }
+
+    public String getAwardSetFilterList() {
+        return awardSetFilterList;
+    }
+
+    public void setAwardSetFilterList(final String awardSetFilterList) {
+        this.awardSetFilterList = awardSetFilterList;
+    }
     //endregion Awards
     //endregion Personnel Tab
 
@@ -4626,6 +4636,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTimeAwards", isEnableTimeAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTrainingAwards", isEnableTrainingAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableMiscAwards", isEnableMiscAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardSetFilterList", getAwardSetFilterList());
         //endregion Awards
         //endregion Personnel Tab
 
@@ -5358,6 +5369,8 @@ public class CampaignOptions {
                     retVal.setEnableTrainingAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableMiscAwards")) {
                     retVal.setEnableMiscAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("awardSetFilterList")) {
+                    retVal.setAwardSetFilterList(wn2.getTextContent().trim());
                     //endregion Awards
                     //endregion Personnel Tab
 

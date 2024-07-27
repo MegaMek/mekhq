@@ -95,6 +95,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 /**
  * @author Justin 'Windchild' Bowen
  */
@@ -430,6 +432,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEnableTimeAwards;
     private JCheckBox chkEnableTrainingAwards;
     private JCheckBox chkEnableMiscAwards;
+    private JLabel lblAwardSetFilterList;
+    private JTextArea txtAwardSetFilterList;
 
     // Death
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
@@ -3826,6 +3830,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         });
 
+        lblAwardSetFilterList = new JLabel(resources.getString("lblAwardSetFilterList.text"));
+        lblAwardSetFilterList.setToolTipText(wordWrap(resources.getString("lblAwardSetFilterList.toolTipText"), 100));
+        lblAwardSetFilterList.setName("lblAwardSetFilterList");
+
+        txtAwardSetFilterList = new JTextArea(5, 20);
+        txtAwardSetFilterList.setLineWrap(true);
+        txtAwardSetFilterList.setWrapStyleWord(true);
+        txtAwardSetFilterList.setToolTipText(wordWrap(resources.getString("lblAwardSetFilterList.toolTipText"), 100));
+        txtAwardSetFilterList.setName("txtAwardSetFilterList");
+        txtAwardSetFilterList.setText("");
+
+        JScrollPane scrollAwardSetFilterList = new JScrollPane(txtAwardSetFilterList);
+        scrollAwardSetFilterList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollAwardSetFilterList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
         chkEnableAutoAwards = new JCheckBox(resources.getString("chkEnableAutoAwards.text"));
         chkEnableAutoAwards.setToolTipText(resources.getString("chkEnableAutoAwards.toolTipText"));
         chkEnableAutoAwards.setName("chkEnableAutoAwards");
@@ -3848,6 +3867,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkEnableTimeAwards.setEnabled(isEnabled);
             chkEnableTrainingAwards.setEnabled(isEnabled);
             chkEnableMiscAwards.setEnabled(isEnabled);
+            lblAwardSetFilterList.setEnabled(isEnabled);
+            txtAwardSetFilterList.setEnabled(isEnabled);
         });
 
         // this prevents a really annoying bug where disabled options don't stay disabled when
@@ -3869,6 +3890,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkEnableTimeAwards.setEnabled(false);
             chkEnableTrainingAwards.setEnabled(false);
             chkEnableMiscAwards.setEnabled(false);
+            lblAwardSetFilterList.setEnabled(false);
+            txtAwardSetFilterList.setEnabled(false);
         }
 
         // Layout the Panel
@@ -3894,6 +3917,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkIssueBestAwardOnly)
                         .addComponent(chkIgnoreStandardSet)
                         .addComponent(autoAwardsPanel)
+                        .addComponent(lblAwardSetFilterList)
+                        .addComponent(scrollAwardSetFilterList)
         );
 
         layout.setHorizontalGroup(
@@ -3909,6 +3934,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkIssueBestAwardOnly)
                         .addComponent(chkIgnoreStandardSet)
                         .addComponent(autoAwardsPanel)
+                        .addComponent(lblAwardSetFilterList)
+                        .addComponent(scrollAwardSetFilterList)
         );
 
         return panel;
@@ -3961,7 +3988,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableTrainingAwards.setName("chkEnableTrainingAwards");
 
         chkEnableMiscAwards = new JCheckBox(resources.getString("chkEnableMiscAwards.text"));
-        chkEnableMiscAwards.setToolTipText(resources.getString("chkEnableMiscAwards.toolTipText"));
+        chkEnableMiscAwards.setToolTipText( resources.getString("chkEnableMiscAwards.toolTipText"));
         chkEnableMiscAwards.setName("chkEnableMiscAwards");
 
         // Layout the Panel
@@ -8131,6 +8158,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableTimeAwards.setSelected(options.isEnableTimeAwards());
         chkEnableTrainingAwards.setSelected(options.isEnableTimeAwards());
         chkEnableMiscAwards.setSelected(options.isEnableMiscAwards());
+        txtAwardSetFilterList.setText(options.getAwardSetFilterList());
         //endregion Personnel Tab
 
         //region Turnover and Retention Tab
@@ -8788,6 +8816,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setEnableTimeAwards(chkEnableTimeAwards.isSelected());
             options.setEnableTimeAwards(chkEnableTrainingAwards.isSelected());
             options.setEnableMiscAwards(chkEnableMiscAwards.isSelected());
+            options.setAwardSetFilterList(txtAwardSetFilterList.getText());
 
             // Medical
             options.setUseAdvancedMedical(chkUseAdvancedMedical.isSelected());
