@@ -188,6 +188,27 @@ public class PersonAwardController {
     }
 
     /**
+     * Removes an award given to this person (without logging the removal) based on:
+     * @param setName is the name of the set of the award
+     * @param awardName is the name of the award
+     * @param awardedDate is the date it was awarded, or null if it is to be bulk removed
+     */
+    public void removeAwardSilent(String setName, String awardName, LocalDate awardedDate) {
+        for (Award award : awards) {
+            if (award.equals(setName, awardName)) {
+                if ((awardedDate != null) && award.hasDates()) {
+                    award.removeDate(awardedDate);
+                } else {
+                    awards.remove(award);
+                }
+
+                MekHQ.triggerEvent(new PersonChangedEvent(person));
+                return;
+            }
+        }
+    }
+
+    /**
      * Adds an entry log for a given award.
      * @param award that was given.
      */

@@ -13,7 +13,7 @@ import java.util.UUID;
 public class RankAwards {
     //region Enum Declarations
     enum RankAwardsEnums {
-        IMPLICIT("Implicit"),
+        PROMOTION("Promotion"),
         INCLUSIVE("Inclusive"),
         EXCLUSIVE("Exclusive");
 
@@ -73,12 +73,13 @@ public class RankAwards {
             Person person = campaign.getPerson(personId);
 
             isEligible = switch (award.getRange()) {
-                case "Implicit" -> person.getRankNumeric() == requiredRankNumeric;
+                case "Promotion" -> (person.getRankNumeric() == requiredRankNumeric)
+                        && ((award.getSize() == null) || (award.getSize().equalsIgnoreCase(person.getRankSystem().getCode())));
                 case "Inclusive" -> person.getRankNumeric() >= requiredRankNumeric;
                 case "Exclusive" -> {
-                    if ((requiredRankNumeric <= 20 && person.getRankNumeric() <= 20)
-                            || (requiredRankNumeric <= 30 && person.getRankNumeric() <= 30)
-                            || (requiredRankNumeric >= 31 && person.getRankNumeric() >= 31)) {
+                    if (((requiredRankNumeric <= 20) && (person.getRankNumeric() <= 20))
+                            || ((requiredRankNumeric <= 30) && (person.getRankNumeric() <= 30))
+                            || ((requiredRankNumeric >= 31) && (person.getRankNumeric() >= 31))) {
                         yield person.getRankNumeric() >= requiredRankNumeric;
                     } else {
                         yield false;
