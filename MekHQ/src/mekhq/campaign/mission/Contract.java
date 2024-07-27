@@ -656,6 +656,22 @@ public class Contract extends Mission {
         setStartAndEndDate(startDate);
     }
 
+    /**
+     * Retrieves the percentage of shares for this contract.
+     * If the instance is of type AtBContract, it retrieves the dynamic Shares percentage.
+     * Otherwise, it returns a default value of 20.
+     *
+     * @return the percentage of shares
+     */
+    public int getSharesPercent() {
+        if (this instanceof AtBContract) {
+            return ((AtBContract) this).getAtBSharesPercentage();
+        } else {
+            // TODO make this campaign option configurable
+            return 20;
+        }
+    }
+
     @Override
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         indent = super.writeToXMLBegin(pw, indent);

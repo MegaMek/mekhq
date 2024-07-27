@@ -217,7 +217,7 @@ public class RetirementDefectionTracker {
 
                     if (!atbContracts.isEmpty()) {
                         for (AtBContract atbContract : atbContracts) {
-                            if ((contract == null) || (contract.getSharesPct() < atbContract.getSharesPct())) {
+                            if ((contract == null) || (contract.getSharesPercent() > atbContract.getSharesPercent())) {
                                 contract = atbContract;
                             }
                         }
@@ -225,7 +225,7 @@ public class RetirementDefectionTracker {
                 }
 
                 if (contract != null) {
-                    targetNumber.addModifier(- Math.max(0, ((contract.getSharesPct() / 10) - 2)), resources.getString("shares.text"));
+                    targetNumber.addModifier(- Math.max(0, ((contract.getSharesPercent() / 10) - 2)), resources.getString("shares.text"));
                 }
             }
 

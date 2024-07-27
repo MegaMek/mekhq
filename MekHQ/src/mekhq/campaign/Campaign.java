@@ -6480,7 +6480,7 @@ public class Campaign implements ITechManager {
             Money remainingMoney = Money.zero();
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
-            // further payment even though this seems stupid
+            // further payment even though this seems foolish
             if ((contract.getStatus().isSuccess())
                     && (contract.getMonthsLeft(getLocalDate()) > 0)) {
                 remainingMoney = contract.getMonthlyPayOut()
@@ -6488,7 +6488,7 @@ public class Campaign implements ITechManager {
             }
 
             // If overage repayment is enabled, we first need to check if the salvage percent is
-            // under 100. 100 means you cannot have a overage.
+            // under 100. 100 means you cannot have an overage.
             // Then, we check if the salvage percent is less than the percent salvaged by the
             // unit in question. If it is, then they owe the assigner some cash
             if (getCampaignOptions().isOverageRepaymentInFinalPayment()
@@ -6499,6 +6499,34 @@ public class Campaign implements ITechManager {
                     final Money amountToRepay = contract.getSalvagedByUnit().minus(maxSalvage);
                     remainingMoney = remainingMoney.minus(amountToRepay);
                     contract.subtractSalvageByUnit(amountToRepay);
+                }
+            }
+
+            if ((getCampaignOptions().isUseShareSystem()) && (contract instanceof AtBContract)) {
+                ResourceBundle financeResources = ResourceBundle.getBundle("mekhq.resources.Finances",
+                        MekHQ.getMHQOptions().getLocale());
+
+                Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+
+                remainingMoney.minus(shares);
+
+                if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
+                        String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
+                    addReport(financeResources.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
+
+                    if (getCampaignOptions().isTrackTotalEarnings()) {
+                        boolean sharesForAll = getCampaignOptions().isSharesForAll();
+
+                        int numberOfShares = getActivePersonnel().stream()
+                                .mapToInt(person -> person.getNumShares(this, sharesForAll))
+                                .sum();
+
+                        Money singleShare = shares.dividedBy(numberOfShares);
+
+                        for (Person person : getActivePersonnel()) {
+                            person.payPersonShares(this, singleShare, sharesForAll);
+                        }
+                    }
                 }
             }
 
