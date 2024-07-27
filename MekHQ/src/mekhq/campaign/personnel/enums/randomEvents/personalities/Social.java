@@ -268,36 +268,36 @@ public enum Social {
     public static Social parseFromString(final String social) {
         return switch (social.toLowerCase()) {
             case "0", "none" -> NONE;
-            case "1", "astute" -> ALTRUISTIC;
-            case "2", "adept" -> APATHETIC;
-            case "3", "avaricious" -> AUTHENTIC;
-            case "4", "corrupt" -> BLUNT;
-            case "5", "dynamic" -> CALLOUS;
-            case "6", "eager" -> COMPASSIONATE;
-            case "7", "enterprising" -> CONDESCENDING;
-            case "8", "exploitative" -> CONSIDERATE;
-            case "9", "fraudulent" -> DISINGENUOUS;
-            case "10", "generous" -> DISMISSIVE;
-            case "11", "greedy" -> ENCOURAGING;
-            case "12", "hoarding" -> ERRATIC;
-            case "13", "insatiable" -> EMPATHETIC;
-            case "14", "insightful" -> FRIENDLY;
-            case "15", "intuitive" -> GREGARIOUS;
-            case "16", "judicious" -> INSPIRING;
-            case "17", "lustful" -> INDIFFERENT;
-            case "18", "mercenary" -> INTROVERTED;
-            case "19", "meticulous" -> IRRITABLE;
-            case "20", "nefarious" -> NARCISSISTIC;
-            case "21", "overreaching" -> NEGLECTFUL;
-            case "22", "profitable" -> POMPOUS;
-            case "23", "savvy" -> PETTY;
-            case "24", "self-serving" -> PERSUASIVE;
-            case "25", "shameless" -> RECEPTIVE;
-            case "26", "shrewd" -> SCHEMING;
-            case "27", "tactical" -> SINCERE;
-            case "28", "thief" -> SUPPORTIVE;
-            case "29", "unprincipled" -> TACTFUL;
-            case "30", "voracious" -> UNTRUSTWORTHY;
+            case "1", "altruistic" -> ALTRUISTIC;
+            case "2", "apathetic" -> APATHETIC;
+            case "3", "authentic" -> AUTHENTIC;
+            case "4", "blunt" -> BLUNT;
+            case "5", "callous" -> CALLOUS;
+            case "6", "compassionate" -> COMPASSIONATE;
+            case "7", "condescending" -> CONDESCENDING;
+            case "8", "considerate" -> CONSIDERATE;
+            case "9", "disingenuous" -> DISINGENUOUS;
+            case "10", "dismissive" -> DISMISSIVE;
+            case "11", "encouraging" -> ENCOURAGING;
+            case "12", "erratic" -> ERRATIC;
+            case "13", "empathetic" -> EMPATHETIC;
+            case "14", "friendly" -> FRIENDLY;
+            case "15", "gregarious" -> GREGARIOUS;
+            case "16", "inspiring" -> INSPIRING;
+            case "17", "indifferent" -> INDIFFERENT;
+            case "18", "introverted" -> INTROVERTED;
+            case "19", "irritable" -> IRRITABLE;
+            case "20", "narcissistic" -> NARCISSISTIC;
+            case "21", "neglectful" -> NEGLECTFUL;
+            case "22", "pompous" -> POMPOUS;
+            case "23", "petty" -> PETTY;
+            case "24", "persuasive" -> PERSUASIVE;
+            case "25", "receptive" -> RECEPTIVE;
+            case "26", "scheming" -> SCHEMING;
+            case "27", "sincere" -> SINCERE;
+            case "28", "supportive" -> SUPPORTIVE;
+            case "29", "tactful" -> TACTFUL;
+            case "30", "untrustworthy" -> UNTRUSTWORTHY;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromString: "
                             + social);
@@ -307,7 +307,7 @@ public enum Social {
     /**
      * Parses an integer value into an Social enum.
      *
-     * @param greed the integer value representing the Social level
+     * @param social the integer value representing the Social level
      * @return the corresponding Social enum value
      * @throws IllegalStateException if the integer value does not correspond to any valid Social enum value
      */
@@ -348,49 +348,6 @@ public enum Social {
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromInt: "
                             + social);
-        };
-    }
-
-    /**
-     * Parses the given Social enum value to an integer.
-     *
-     * @param social the Social enum value to be parsed
-     * @return the integer value representing the parsed Social
-     */
-    @SuppressWarnings(value = "unused")
-    public static int parseToInt(final Social social) {
-        return switch (social) {
-            case NONE -> 0;
-            case ALTRUISTIC -> 1;
-            case APATHETIC -> 2;
-            case AUTHENTIC -> 3;
-            case BLUNT -> 4;
-            case CALLOUS -> 5;
-            case COMPASSIONATE -> 6;
-            case CONDESCENDING -> 7;
-            case CONSIDERATE -> 8;
-            case DISINGENUOUS -> 9;
-            case DISMISSIVE -> 10;
-            case ENCOURAGING -> 11;
-            case ERRATIC -> 12;
-            case EMPATHETIC -> 13;
-            case FRIENDLY -> 14;
-            case GREGARIOUS -> 15;
-            case INSPIRING -> 16;
-            case INDIFFERENT -> 17;
-            case INTROVERTED -> 18;
-            case IRRITABLE -> 19;
-            case NARCISSISTIC -> 20;
-            case NEGLECTFUL -> 21;
-            case POMPOUS -> 22;
-            case PETTY -> 23;
-            case PERSUASIVE -> 24;
-            case RECEPTIVE -> 25;
-            case SCHEMING -> 26;
-            case SINCERE -> 27;
-            case SUPPORTIVE -> 28;
-            case TACTFUL -> 29;
-            case UNTRUSTWORTHY -> 30;
         };
     }
 
