@@ -332,11 +332,31 @@ public class CampaignSummary {
      *
      * @return A summary of fatigue related facilities.
      */
-    public String getFatigueSummary() {
+    public String getFacilityReport() {
         int personnelCount = campaign.getActivePersonnel().size();
 
-        return String.format("Kitchens (%s/%s)",
-                personnelCount, Fatigue.checkFieldKitchenCapacity(campaign));
+        StringBuilder report = new StringBuilder();
+
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            report.append(String.format("Kitchens (%s/%s)  ",
+                    personnelCount,
+                    Fatigue.checkFieldKitchenCapacity(campaign)));
+        }
+
+        if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+            int patients = campaign.getPatients().size();
+
+            int doctorCapacity = campaign.getActivePersonnel().stream()
+                    .filter(person -> (person.getPrimaryRole().isDoctor()) || (person.getSecondaryRole().isDoctor()))
+                    .mapToInt(person -> 35)
+                    .sum();
+
+            report.append(String.format("Hospital Beds (%s/%s)",
+                    patients,
+                    doctorCapacity));
+        }
+
+        return report.toString();
     }
 
     private String createCsv(Collection<?> coll) {
