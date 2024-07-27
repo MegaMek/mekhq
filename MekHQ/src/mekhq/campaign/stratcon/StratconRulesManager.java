@@ -1475,6 +1475,8 @@ public class StratconRulesManager {
                     processTrackForceReturnDates(track, rst.getCampaign());
 
                     track.removeScenario(scenario);
+
+                    scenario.getAssignedForces().clear();
                     break;
                 }
             }
