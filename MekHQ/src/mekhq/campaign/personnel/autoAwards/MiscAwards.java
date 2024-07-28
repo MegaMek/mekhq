@@ -164,11 +164,7 @@ public class MiscAwards {
     private static boolean MedalOfHonor(Campaign campaign, Award award, UUID person, @Nullable Integer killCount, @Nullable Integer injuryCount) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             if ((killCount != null) && (injuryCount != null)) {
-                try {
-                    return (killCount >= Integer.parseInt(award.getSize())) && (injuryCount >= Integer.parseInt(award.getRange()));
-                } catch (Exception e) {
-                    return false;
-                }
+                return (killCount >= Integer.parseInt(award.getSize())) && (injuryCount >= award.getQty());
             }
         }
         return false;

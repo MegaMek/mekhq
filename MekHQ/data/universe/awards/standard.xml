@@ -141,9 +141,10 @@
         <xp>10</xp>
         <edge>3</edge>
         <stackable>true</stackable>
-        <item>Medal Of Honor</item>
-        <size>20</size>
-        <range>5</range>
+        <qty>5</qty>
+        <item>Misc</item>
+        <size>10</size>
+        <range>Medal Of Honor</range>
     </award>
     <award>
         <name>Scenario Awards</name>
@@ -280,7 +281,8 @@
         <group>Mission Awards</group>
         <ribbon>4-05-1-CeremonialDuty.png</ribbon>
         <xp>1</xp>
-        <item>Ceremonial Duty</item>
+        <item>Misc</item>
+        <range>Ceremonial Duty</range>
     </award>
     <award>
         <name>Galactic War on Pirating</name>
