@@ -6,15 +6,6 @@
         <item>Group</item>
     </award>
     <award>
-        <name>Humanitarian Service</name>
-        <description>Defense of civilian person or structures.</description>
-        <group>Manual Awards</group>
-        <medal>HumanitarianServiceM.png</medal>
-        <ribbon>3-05-5-HumanitarianService.png</ribbon>
-        <edge>2</edge>
-        <item>Ignore</item>
-    </award>
-    <award>
         <name>Support Person Of The Year</name>
         <description>Awarded to the most outstanding non-combat member of the year.</description>
         <group>Manual Awards</group>
@@ -210,6 +201,16 @@
         <item>Kill</item>
         <size>Individual</size>
         <range>Scenario</range>
+    </award>
+    <award>
+        <name>Humanitarian Service</name>
+        <description>Defense of civilian person or structures.</description>
+        <group>Scenario Awards</group>
+        <medal>HumanitarianServiceM.png</medal>
+        <ribbon>3-05-5-HumanitarianService.png</ribbon>
+        <edge>2</edge>
+        <item>Misc</item>
+        <range>Civilian Help</range>
     </award>
     <award>
         <name>Mission Awards</name>
