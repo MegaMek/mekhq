@@ -6,15 +6,6 @@
         <item>Group</item>
     </award>
     <award>
-        <name>Drill Instructor</name>
-        <description>Served as basic training drill instructor.</description>
-        <group>Manual Awards</group>
-        <ribbon>4-04-5-DrillInstructor.png</ribbon>
-        <xp>2</xp>
-        <edge>1</edge>
-        <item>Ignore</item>
-    </award>
-    <award>
         <name>Humanitarian Service</name>
         <description>Defense of civilian person or structures.</description>
         <group>Manual Awards</group>
@@ -119,6 +110,16 @@
         <stackable>true</stackable>
         <qty>6</qty>
         <item>Time</item>
+    </award>
+    <award>
+        <name>Drill Instructor</name>
+        <description>Served as basic training drill instructor.</description>
+        <group>Personal Awards</group>
+        <ribbon>4-04-5-DrillInstructor.png</ribbon>
+        <xp>2</xp>
+        <edge>1</edge>
+        <item>Misc</item>
+        <range>Drill Instructor</range>
     </award>
     <award>
         <name>Prisoner of War</name>

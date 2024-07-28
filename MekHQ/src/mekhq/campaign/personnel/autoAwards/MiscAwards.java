@@ -70,10 +70,17 @@ public class MiscAwards {
                     if (CeremonialDuty(campaign, award, person, mission)) {
                         eligibleAwards.add(award);
                     }
+                    break;
                 case "prisonerofwar":
                     if (prisonerOfWar(campaign, award, person)) {
                         eligibleAwards.add(award);
                     }
+                    break;
+                case "drillinstructor":
+                    if (drillInstructor(campaign, award, person)) {
+                        eligibleAwards.add(award);
+                    }
+                    break;
                 default:
             }
         }
@@ -209,6 +216,24 @@ public class MiscAwards {
     private static boolean prisonerOfWar(Campaign campaign, Award award, UUID person) {
         if (award.canBeAwarded(campaign.getPerson(person))) {
             return campaign.getPerson(person).getStatus().isPoW();
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Checks if the given person is a training lance leader and is eligible for the given award.
+     *
+     * @param campaign the campaign object representing the current campaign
+     * @param award the award object representing the award to be checked
+     * @param person the UUID of the person to be checked
+     * @return true if the person is a training lance leader and is eligible for the award, false otherwise
+     */
+    private static boolean drillInstructor(Campaign campaign, Award award, UUID person) {
+        if (award.canBeAwarded(campaign.getPerson(person))) {
+            return campaign.getLanceList().stream()
+                    .anyMatch(lance -> (lance.getRole().isTraining()) && (lance.getCommanderId().equals(person)));
         }
 
         return false;
