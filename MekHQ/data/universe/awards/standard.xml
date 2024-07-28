@@ -1,20 +1,6 @@
 <?xml version="1.0"?>
 <awards>
     <award>
-        <name>Manual Awards</name>
-        <description>Awards not tracked by the automated award eligibility tracker</description>
-        <item>Group</item>
-    </award>
-    <award>
-        <name>Support Person Of The Year</name>
-        <description>Awarded to the most outstanding non-combat member of the year.</description>
-        <group>Manual Awards</group>
-        <ribbon>3-02-8-SupportPersonOfTheYear.png</ribbon>
-        <xp>5</xp>
-        <edge>1</edge>
-        <item>Ignore</item>
-    </award>
-    <award>
         <name>Education Awards</name>
         <description>Awards earned when graduating from academies</description>
         <item>Group</item>
@@ -111,6 +97,16 @@
         <edge>1</edge>
         <item>Misc</item>
         <range>Drill Instructor</range>
+    </award>
+    <award>
+        <name>Support Person Of The Year</name>
+        <description>Awarded to the most outstanding non-combat member of the year.</description>
+        <group>Personal Awards</group>
+        <ribbon>3-02-8-SupportPersonOfTheYear.png</ribbon>
+        <xp>5</xp>
+        <edge>1</edge>
+        <item>Misc</item>
+        <range>Support Person of the Year</range>
     </award>
     <award>
         <name>Prisoner of War</name>

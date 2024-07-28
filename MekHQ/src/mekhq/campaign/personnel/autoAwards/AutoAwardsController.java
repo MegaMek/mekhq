@@ -857,6 +857,26 @@ public class AutoAwardsController {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
+        UUID supportPersonOfTheYear = null;
+
+        if (campaign.getLocalDate().getDayOfYear() == 1) {
+            int supportPoints = 0;
+
+            // we do everybody here, as we want to capture personnel who were support personnel,
+            // even if they're not current support personnel
+            for (UUID person : personnel.keySet()) {
+                Person p = campaign.getPerson(person);
+
+                if (p.getAutoAwardSupportPoints() > supportPoints) {
+                    supportPersonOfTheYear = person;
+                    supportPoints = p.getAutoAwardSupportPoints();
+                }
+
+                // we reset them for next year
+                p.setAutoAwardSupportPoints(0);
+            }
+        }
+
         for (UUID person : personnel.keySet()) {
             Map<Integer, List<Object>> data;
 
@@ -879,7 +899,8 @@ public class AutoAwardsController {
                         missionWasSuccessful,
                         wasCivilianHelp,
                         personalKills.size(),
-                        personnel.get(person)
+                        personnel.get(person),
+                        supportPersonOfTheYear
                 );
             } catch (Exception e) {
                 data = null;
