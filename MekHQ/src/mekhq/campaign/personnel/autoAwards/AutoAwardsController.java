@@ -862,9 +862,14 @@ public class AutoAwardsController {
         if (campaign.getLocalDate().getDayOfYear() == 1) {
             int supportPoints = 0;
 
+
+            // we duplicate and shuffle the list to avoid giving personnel advantage based on name
+            List<UUID> temporaryPersonnelList = new ArrayList<>(personnel.keySet());
+            Collections.shuffle(temporaryPersonnelList);
+
             // we do everybody here, as we want to capture personnel who were support personnel,
             // even if they're not current support personnel
-            for (UUID person : personnel.keySet()) {
+            for (UUID person : temporaryPersonnelList) {
                 Person p = campaign.getPerson(person);
 
                 if (p.getAutoAwardSupportPoints() > supportPoints) {

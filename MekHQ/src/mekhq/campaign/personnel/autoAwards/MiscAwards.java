@@ -39,60 +39,58 @@ public class MiscAwards {
         List<Award> eligibleAwards = new ArrayList<>();
 
         for (Award award : awards) {
-            switch (award.getRange().replaceAll("\\s","").toLowerCase()) {
-                case "missionaccomplished":
-                    if (missionWasSuccessful) {
-                        if (MissionAccomplishedAward(campaign, award, person)) {
-                            eligibleAwards.add(award);
-                        }
+            switch (award.getRange().replaceAll("\\s", "").toLowerCase()) {
+                case "missionaccomplished" -> {
+                    if (missionWasSuccessful && MissionAccomplishedAward(campaign, award, person)) {
+                        eligibleAwards.add(award);
                     }
-                    break;
-                case "houseworldnowar":
+                }
+                case "houseworldnowar" -> {
                     if (HouseWorldWar(campaign, mission, award, person, false)) {
                         eligibleAwards.add(award);
                     }
-                    break;
-                case "houseworldyeswar":
+                }
+                case "houseworldyeswar" -> {
                     if (HouseWorldWar(campaign, mission, award, person, true)) {
                         eligibleAwards.add(award);
                     }
-                    break;
-                case "periphery":
+                }
+                case "periphery" -> {
                     if (Periphery(campaign, mission, award, person)) {
                         eligibleAwards.add(award);
                     }
-                    break;
-                case "medalofhonor":
+                }
+                case "medalofhonor" -> {
                     if (MedalOfHonor(campaign, award, person, killCount, injuryCount)) {
                         eligibleAwards.add(award);
                     }
-                    break;
-                case "ceremonialduty":
+                }
+                case "ceremonialduty" -> {
                     if (CeremonialDuty(campaign, award, person, mission)) {
                         eligibleAwards.add(award);
                     }
-                    break;
-                case "prisonerofwar":
+                }
+                case "prisonerofwar" -> {
                     if (prisonerOfWar(campaign, award, person)) {
                         eligibleAwards.add(award);
                     }
-                    break;
-                case "drillinstructor":
+                }
+                case "drillinstructor" -> {
                     if (drillInstructor(campaign, award, person)) {
                         eligibleAwards.add(award);
                     }
-                    break;
-                case "civilianhelp":
+                }
+                case "civilianhelp" -> {
                     if ((isCivilianHelp) && (award.canBeAwarded(campaign.getPerson(person)))) {
                         eligibleAwards.add(award);
                     }
-                    break;
-                case "supportpersonoftheyear":
+                }
+                case "supportpersonoftheyear" -> {
                     if ((supportPersonOfTheYear != null) && (supportPersonOfTheYear(campaign, award, person, supportPersonOfTheYear))) {
                         eligibleAwards.add(award);
                     }
-                    break;
-                default:
+                }
+                default -> {}
             }
         }
 
