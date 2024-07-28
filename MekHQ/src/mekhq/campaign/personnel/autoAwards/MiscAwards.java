@@ -24,17 +24,19 @@ public class MiscAwards {
      * It checks the eligibility of the person for each type of award and returns a map
      * of eligible awards grouped by their respective IDs.
      *
-     * @param campaign the current campaign
-     * @param mission the mission just completed (null if no mission was completed)
-     * @param person the person to check award eligibility for
-     * @param awards the awards to be processed (should only include awards where item == Kill)
+     * @param campaign             the current campaign
+     * @param mission              the mission just completed (null if no mission was completed)
+     * @param person               the person to check award eligibility for
+     * @param awards               the awards to be processed (should only include awards where item == Kill)
      * @param missionWasSuccessful true if the completed mission was successful, false otherwise
-     * @param killCount the number of kills (null if not applicable)
-     * @param injuryCount the number of injuries (null if not applicable)
+     * @param isCivilianHelp       true if the completed scenario was AtB Scenario CIVILIANHELP
+     * @param killCount            the number of kills (null if not applicable)
+     * @param injuryCount          the number of injuries (null if not applicable)
      * @return a map of eligible awards grouped by their respective IDs
      */
     public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign, @Nullable Mission mission, UUID person, List<Award> awards,
-                                                                 Boolean missionWasSuccessful, @Nullable Integer killCount, @Nullable Integer injuryCount) {
+                                                                 Boolean missionWasSuccessful, boolean isCivilianHelp, @Nullable Integer killCount,
+                                                                 @Nullable Integer injuryCount) {
         List<Award> eligibleAwards = new ArrayList<>();
 
         for (Award award : awards) {
@@ -81,6 +83,10 @@ public class MiscAwards {
                         eligibleAwards.add(award);
                     }
                     break;
+                case "civilianhelp":
+                    if ((isCivilianHelp) && (award.canBeAwarded(campaign.getPerson(person)))) {
+                        eligibleAwards.add(award);
+                    }
                 default:
             }
         }

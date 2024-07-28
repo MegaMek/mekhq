@@ -124,8 +124,9 @@ public class AutoAwardsController {
      * @param c the campaign
      * @param personnel the personnel involved in the scenario, mapped by their UUID
      * @param scenarioKills the kills made during the scenario, mapped by personnel UUID
+     * @param wasCivilianHelp whether the scenario (if any) was AtB Scenario CIVILIANHELP
      */
-    public void PostScenarioController(Campaign c, HashMap<UUID, Integer> personnel, HashMap<UUID, List<Kill>>scenarioKills) {
+    public void PostScenarioController(Campaign c, HashMap<UUID, Integer> personnel, HashMap<UUID, List<Kill>>scenarioKills, boolean wasCivilianHelp) {
         LogManager.getLogger().info("autoAwards (Scenario Conclusion) has started");
 
         campaign = c;
@@ -158,7 +159,7 @@ public class AutoAwardsController {
 
         // beginning the processing & filtering of Misc Awards
         if (!miscAwards.isEmpty()) {
-            processedData = MiscAwardsManager(personnel, false, true, scenarioKills);
+            processedData = MiscAwardsManager(personnel, false, true, wasCivilianHelp, scenarioKills);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -576,7 +577,7 @@ public class AutoAwardsController {
                 personnelMap.put(person, 0);
             }
 
-            processedData = MiscAwardsManager(personnelMap, missionWasSuccessful, false, null);
+            processedData = MiscAwardsManager(personnelMap, missionWasSuccessful, false, false, null);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -846,11 +847,13 @@ public class AutoAwardsController {
      *
      * @param personnel        the personnel to be processed
      * @param missionWasSuccessful    true if the mission was successful, false otherwise
+     * @param wasCivilianHelp  true if the scenario (if relevant) was AtB Scenario type CIVILIANHELP
      * @param wasScenario      true if the award is for a scenario, false otherwise
      * @param scenarioKills    a map of personnel and their corresponding list of Kills
      * @return a map containing the award data, or null if no awards are applicable
      */
-    private Map<Integer, List<Object>> MiscAwardsManager(HashMap<UUID, Integer> personnel, boolean missionWasSuccessful, boolean wasScenario, HashMap<UUID, List<Kill>> scenarioKills) {
+    private Map<Integer, List<Object>> MiscAwardsManager(HashMap<UUID, Integer> personnel, boolean missionWasSuccessful, boolean wasScenario,
+                                                         boolean wasCivilianHelp, HashMap<UUID, List<Kill>> scenarioKills) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -868,7 +871,16 @@ public class AutoAwardsController {
             }
 
             try {
-                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful, personalKills.size(), personnel.get(person));
+                data = MiscAwards.MiscAwardsProcessor(
+                        campaign,
+                        mission,
+                        person,
+                        miscAwards,
+                        missionWasSuccessful,
+                        wasCivilianHelp,
+                        personalKills.size(),
+                        personnel.get(person)
+                );
             } catch (Exception e) {
                 data = null;
                 LogManager.getLogger().info("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());
