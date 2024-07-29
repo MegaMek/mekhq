@@ -52,11 +52,7 @@ ext {
     mmconf = 'mmconf'
     plugins = 'plugins'
     userdata = 'userdata'
-    distributionDir = "${buildDir}/distributions"
     fileStagingDir = "${buildDir}/files"
-    mmRepoDir = "${buildDir}/repo/megamek"
-    mmlRepoDir = "${buildDir}/repo/megameklab"
-    mhqRepoDir = "${buildDir}/repo/mekhq"
     scriptsDir = "${projectDir}/scripts"
     scriptTemplate = "${scriptsDir}/startScriptTemplate.txt"
 
@@ -92,16 +88,16 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.12.0'
     implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
     implementation 'org.commonmark:commonmark:0.22.0'
-    implementation 'org.jfree:jfreechart:1.5.4'
+    implementation 'org.jfree:jfreechart:1.5.5'
     implementation 'org.joda:joda-money:1.0.4'
 
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
     // Required for mml printing scaled vector graphics (SVG) - Eclipse IDE Compatability.
     runtimeOnly 'xml-apis:xml-apis-ext:1.3.04'
 
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.3'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
     testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
 }
@@ -182,17 +178,9 @@ task stageFiles(type: Copy) {
     include 'license.txt'
     include 'SubmitBug.html'
     include "sentry.properties"
-    include "MekHQ.l4j.ini"
+    include "*.ini"
 
     into fileStagingDir
-
-    inputs.dir "${campaigns}"
-    inputs.dir "${data}"
-    inputs.dir "${docs}"
-    inputs.dir "${mmconf}"
-    inputs.dir "${project.ext.plugins}"
-    inputs.files 'license.txt', 'SubmitBug.html', 'sentry.properties', 'MekHQ.l4j.ini'
-    outputs.dir fileStagingDir
 
     doLast {
         mkdir "${fileStagingDir}/${log}"
@@ -203,7 +191,7 @@ task stageFiles(type: Copy) {
 task createStartScripts (type: CreateStartScripts) {
     description = 'Create shell script for generic distribution.'
 
-    applicationName = 'mhq'
+    applicationName = 'mekhq'
     mainClass = application.mainClass
     outputDir = startScripts.outputDir
     classpath = jar.outputs.files + files(project.sourceSets.main.runtimeClasspath.files)
@@ -230,8 +218,8 @@ distributions {
             // MegaMek Includes
             from ("${mmDir}/megamek/build/files")
             from ("${mmDir}/megamek/build/scripts") {
-                include 'mm*'
-                rename 'mm(.*)', 'mm-startup$1'
+                include 'megamek*'
+                rename 'megamek(.*)', 'megamek-startup$1'
             }
             from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
@@ -250,7 +238,9 @@ distributions {
                 into "${lib}"
             }
             from ("${mmDir}/megamek/build/libs/MegaMek.jar")
-            from ("${mmDir}/megamek/*.ini")
+            from ("${mmDir}/megamek/") {
+                include '*.ini'
+            }
 
             // MegaMekLab Includes
             from ("${mmlDir}/megameklab/build/files")
@@ -261,8 +251,8 @@ distributions {
                 into "${data}/images"
             }
             from ("${mmlDir}/megameklab/build/scripts") {
-                include 'mml*'
-                rename 'mml(.*)', 'mml-startup$1'
+                include 'megameklab*'
+                rename 'megameklab(.*)', 'megameklab-startup$1'
             }
             from ("${mmlDir}/megameklab/docs/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
@@ -278,7 +268,9 @@ distributions {
                 into "${lib}"
             }
             from ("${mmlDir}/megameklab/build/libs/MegaMekLab.jar")
-            from ("${mmlDir}/megameklab/*.ini")
+            from ("${mmlDir}/megameklab/") {
+                include '*.ini'
+            }
 
             // MekHQ Includes
             from ("docs/history.txt") {
@@ -289,8 +281,8 @@ distributions {
                 exclude 'history.txt'
             }
             from (createStartScripts) {
-                include 'mhq*'
-                rename 'mhq(.*)', 'mhq-startup$1'
+                include 'mekhq*'
+                rename 'mekhq(.*)', 'mekhq-startup$1'
             }
             from ("${buildDir}/launch4j") {
                 include '*.exe'
@@ -369,6 +361,7 @@ tasks.register("buildAllPackages", Copy) {
     dependsOn gradle.includedBuild('megamek').task(':megamek:assembleDist')
     dependsOn gradle.includedBuild('megameklab').task(':megameklab:assembleDist')
     dependsOn assembleDist
+    group = "distribution"
 
     into layout.buildDirectory.dir("distributions")
     from("${mmDir}/megamek/build/distributions") {
@@ -377,6 +370,14 @@ tasks.register("buildAllPackages", Copy) {
     from("${mmlDir}/megameklab/build/distributions") {
         include "*.tar.gz"
     }
+}
+
+tasks.register("cleanAll") {
+    description = "Cleans all build projects to ensure a clean salte"
+    group = "build"
+    dependsOn gradle.includedBuild('megamek').task(':megamek:clean')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:clean')
+    dependsOn clean
 }
 
 test {
