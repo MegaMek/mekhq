@@ -81,6 +81,6 @@ public class AgeRangeRandomDeath extends AbstractDeath {
     @Override
     public boolean randomlyDies(final int age, final Gender gender) {
         final TenYearAgeRange ageRange = TenYearAgeRange.determineAgeRange(age);
-        return Compute.randomInt() < ((gender.isMale() ? getMale() : getFemale()).get(ageRange));
+        return Compute.randomFloat() < ((gender.isMale() ? getMale() : getFemale()).get(ageRange));
     }
 }

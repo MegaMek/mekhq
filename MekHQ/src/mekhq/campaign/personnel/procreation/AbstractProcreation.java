@@ -396,7 +396,7 @@ public abstract class AbstractProcreation {
         final int pregnancyWeek = determinePregnancyWeek(today, person);
         final double babyBornChance = getBabyBornChance(pregnancyWeek);
 
-        if (Compute.randomInt() < babyBornChance) {
+        if (Compute.randomFloat() < babyBornChance) {
             birth(campaign, today, person);
         }
     }

@@ -39,7 +39,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
-public class randomProcreationTest {
+public class RandomProcreationTest {
     @Mock
     private CampaignOptions mockOptions;
 

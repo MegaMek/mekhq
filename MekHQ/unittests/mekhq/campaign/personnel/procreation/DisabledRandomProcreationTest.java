@@ -57,4 +57,9 @@ public class DisabledRandomProcreationTest {
     public void testRandomlyDies() {
         assertFalse(new DisabledRandomProcreation(mockOptions).procreation(mockPerson));
     }
+
+    @Test
+    public void testRelationshiplessProcreation() {
+        assertFalse(new DisabledRandomProcreation(mockOptions).procreation(mockPerson));
+    }
 }

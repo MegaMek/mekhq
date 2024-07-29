@@ -57,11 +57,11 @@ public class PercentageRandomDivorce extends AbstractDivorce {
 
     @Override
     protected boolean randomOppositeSexDivorce(final Person person) {
-        return Compute.randomInt() < getOppositeSexPercentage();
+        return Compute.randomFloat() < getOppositeSexPercentage();
     }
 
     @Override
     protected boolean randomSameSexDivorce(final Person person) {
-        return Compute.randomInt() < getSameSexPercentage();
+        return Compute.randomFloat() < getSameSexPercentage();
     }
 }

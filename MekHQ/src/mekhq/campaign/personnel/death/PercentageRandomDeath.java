@@ -47,6 +47,6 @@ public class PercentageRandomDeath extends AbstractDeath {
 
     @Override
     public boolean randomlyDies(final int age, final Gender gender) {
-        return Compute.randomInt() < getPercentage();
+        return Compute.randomFloat() < getPercentage();
     }
 }

@@ -65,22 +65,22 @@ public class AgeRangeRandomDeathTest {
         // We're using the same percentages for all age ranges, so we only need to test Genders
         // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomInt).thenReturn(0f);
+            compute.when(Compute::randomFloat).thenReturn(0f);
             assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
             assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
-            compute.when(Compute::randomInt).thenReturn(0.39f);
+            compute.when(Compute::randomFloat).thenReturn(0.39f);
             assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
             assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
-            compute.when(Compute::randomInt).thenReturn(0.40f);
+            compute.when(Compute::randomFloat).thenReturn(0.40f);
             assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
             assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
-            compute.when(Compute::randomInt).thenReturn(0.49f);
+            compute.when(Compute::randomFloat).thenReturn(0.49f);
             assertTrue(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
             assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
-            compute.when(Compute::randomInt).thenReturn(0.5f);
+            compute.when(Compute::randomFloat).thenReturn(0.5f);
             assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
             assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
-            compute.when(Compute::randomInt).thenReturn(1f);
+            compute.when(Compute::randomFloat).thenReturn(1f);
             assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.MALE));
             assertFalse(ageRangeRandomDeath.randomlyDies(50, Gender.FEMALE));
         }
