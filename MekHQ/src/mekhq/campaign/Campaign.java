@@ -1560,7 +1560,7 @@ public class Campaign implements ITechManager {
         p.setPrisonerStatus(this, prisonerStatus, log);
 
         if (getCampaignOptions().isUseSimulatedRelationships()) {
-            if ((prisonerStatus.isFree()) && (!p.getPrimaryRole().isDependent())) {
+            if ((prisonerStatus.isFree()) && (!p.getOriginFaction().isClan()) && (!p.getPrimaryRole().isDependent())) {
                 simulateRelationshipHistory(p);
             }
         }
