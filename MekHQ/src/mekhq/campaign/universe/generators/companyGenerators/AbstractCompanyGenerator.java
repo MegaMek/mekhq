@@ -615,9 +615,9 @@ public abstract class AbstractCompanyGenerator {
         }
 
         if (getOptions().isRunStartingSimulation()) {
-            LocalDate date = campaign.getLocalDate().minusYears(getOptions().getSimulationDuration()).minusDays(1);
+            LocalDate date = campaign.getLocalDate().minusYears(getOptions().getSimulationDuration()).minusWeeks(1);
             while (date.isBefore(campaign.getLocalDate())) {
-                date = date.plusDays(1);
+                date = date.plusWeeks(1);
 
                 for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
