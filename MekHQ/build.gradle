@@ -250,7 +250,9 @@ distributions {
                 into "${lib}"
             }
             from ("${mmDir}/megamek/build/libs/MegaMek.jar")
-            from ("${mmDir}/megamek/*.ini")
+            from ("${mmDir}/megamek/") {
+                include "*.ini"
+            }
 
             // MegaMekLab Includes
             from ("${mmlDir}/megameklab/build/files")
@@ -278,7 +280,9 @@ distributions {
                 into "${lib}"
             }
             from ("${mmlDir}/megameklab/build/libs/MegaMekLab.jar")
-            from ("${mmlDir}/megameklab/*.ini")
+            from ("${mmlDir}/megameklab/") {
+                include "*.ini"
+            }
 
             // MekHQ Includes
             from ("docs/history.txt") {
@@ -370,6 +374,8 @@ tasks.register("buildAllPackages", Copy) {
     dependsOn gradle.includedBuild('megameklab').task(':megameklab:assembleDist')
     dependsOn assembleDist
 
+    group = "build"
+    description = "Builds all 3 repos and places the files within the MekHQ/build/distribution folder"
     into layout.buildDirectory.dir("distributions")
     from("${mmDir}/megamek/build/distributions") {
         include "*.tar.gz"
@@ -377,6 +383,14 @@ tasks.register("buildAllPackages", Copy) {
     from("${mmlDir}/megameklab/build/distributions") {
         include "*.tar.gz"
     }
+}
+
+tasks.register("cleanAll") {
+    dependsOn gradle.includedBuild('megamek').task(':clean')
+    dependsOn gradle.includedBuild('megameklab').task(':clean')
+    dependsOn clean
+    group = "build"
+    description = "Cleans all 3 repositories"
 }
 
 test {
