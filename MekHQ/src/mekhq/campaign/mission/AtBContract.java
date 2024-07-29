@@ -24,6 +24,7 @@ package mekhq.campaign.mission;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
+import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
@@ -480,12 +481,12 @@ public class AtBContract extends Contract {
         int roll = Compute.d6();
         switch (roll) {
             case 1: /* 1d6 dependents */
-                if (c.getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
-                        && c.getCampaignOptions().isUseRandomDependentAddition()) {
+                if (c.getCampaignOptions().isUseRandomDependentAddition()) {
                     number = Compute.d6();
                     c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
+
                     for (int i = 0; i < number; i++) {
-                        Person p = c.newDependent(false);
+                        Person p = c.newDependent(false, Gender.RANDOMIZE);
                         c.recruitPerson(p);
                     }
                 }
@@ -974,7 +975,7 @@ public class AtBContract extends Contract {
     }
 
     public String getEmployerName(int year) {
-        return isMercSubcontract() ? "Mercenary (" + getEmployerFaction().getFullName(year) + ")"
+        return isMercSubcontract() ? "Mercenary (" + getEmployerFaction().getFullName(year) + ')'
                 : getEmployerFaction().getFullName(year);
     }
 

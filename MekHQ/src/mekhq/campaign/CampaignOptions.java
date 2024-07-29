@@ -272,58 +272,11 @@ public class CampaignOptions {
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
     private RandomOriginOptions randomOriginOptions;
+
+    // Random Histories
     private boolean useRandomPersonalities;
+    private boolean useSimulatedRelationships;
 
-    // Retirement
-    private boolean useRandomRetirement;
-
-    private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
-    private SkillLevel turnoverDifficulty;
-    private int turnoverFixedTargetNumber;
-    private boolean aeroRecruitsHaveUnits;
-    private boolean trackOriginalUnit;
-    private TurnoverFrequency turnoverFrequency;
-    private boolean useContractCompletionRandomRetirement;
-    private boolean useRandomFounderTurnover;
-    private boolean useFounderRetirement;
-    private boolean useSubContractSoldiers;
-    private int serviceContractDuration;
-    private int serviceContractModifier;
-    private boolean payBonusDefault;
-    private int payBonusDefaultThreshold;
-
-    private boolean useCustomRetirementModifiers;
-    private boolean useFatigueModifiers;
-    private boolean useSkillModifiers;
-    private boolean useAgeModifiers;
-    private boolean useUnitRatingModifiers;
-    private boolean useFactionModifiers;
-    private boolean useHostileTerritoryModifiers;
-    private boolean useMissionStatusModifiers;
-    private boolean useFamilyModifiers;
-    private boolean useLoyaltyModifiers;
-    private boolean useHideLoyalty;
-
-    private int payoutRateOfficer;
-    private int payoutRateEnlisted;
-    private int payoutRetirementMultiplier;
-    private boolean usePayoutServiceBonus;
-    private int payoutServiceBonusRate;
-
-    private boolean useAdministrativeStrain;
-    private int administrativeCapacity;
-    private int multiCrewStrainDivider;
-
-    private boolean useManagementSkill;
-    private boolean useCommanderLeadershipOnly;
-    private int managementSkillPenalty;
-
-    private boolean useFatigue;
-    private int fatigueRate;
-    private boolean useInjuryFatigue;
-    private int fieldKitchenCapacity;
-    private boolean fieldKitchenIgnoreNonCombatants;
-    private int fatigueLeaveThreshold;
 
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
@@ -410,6 +363,58 @@ public class CampaignOptions {
     private Map<TenYearAgeRange, Double> ageRangeRandomDeathMaleValues;
     private Map<TenYearAgeRange, Double> ageRangeRandomDeathFemaleValues;
     //endregion Life Paths Tab
+
+    //region Turnover and Retention
+    private boolean useRandomRetirement;
+
+    private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
+    private SkillLevel turnoverDifficulty;
+    private int turnoverFixedTargetNumber;
+    private boolean aeroRecruitsHaveUnits;
+    private boolean trackOriginalUnit;
+    private TurnoverFrequency turnoverFrequency;
+    private boolean useContractCompletionRandomRetirement;
+    private boolean useRandomFounderTurnover;
+    private boolean useFounderRetirement;
+    private boolean useSubContractSoldiers;
+    private int serviceContractDuration;
+    private int serviceContractModifier;
+    private boolean payBonusDefault;
+    private int payBonusDefaultThreshold;
+
+    private boolean useCustomRetirementModifiers;
+    private boolean useFatigueModifiers;
+    private boolean useSkillModifiers;
+    private boolean useAgeModifiers;
+    private boolean useUnitRatingModifiers;
+    private boolean useFactionModifiers;
+    private boolean useHostileTerritoryModifiers;
+    private boolean useMissionStatusModifiers;
+    private boolean useFamilyModifiers;
+    private boolean useLoyaltyModifiers;
+    private boolean useHideLoyalty;
+
+    private int payoutRateOfficer;
+    private int payoutRateEnlisted;
+    private int payoutRetirementMultiplier;
+    private boolean usePayoutServiceBonus;
+    private int payoutServiceBonusRate;
+
+    private boolean useAdministrativeStrain;
+    private int administrativeCapacity;
+    private int multiCrewStrainDivider;
+
+    private boolean useManagementSkill;
+    private boolean useCommanderLeadershipOnly;
+    private int managementSkillPenalty;
+
+    private boolean useFatigue;
+    private int fatigueRate;
+    private boolean useInjuryFatigue;
+    private int fieldKitchenCapacity;
+    private boolean fieldKitchenIgnoreNonCombatants;
+    private int fatigueLeaveThreshold;
+    //endregion Turnover and Retention
 
     //region Finance tab
     private boolean payForParts;
@@ -820,7 +825,10 @@ public class CampaignOptions {
         // Personnel Randomization
         setUseDylansRandomXP(false);
         setRandomOriginOptions(new RandomOriginOptions(true));
+
+        // Random Histories
         setUseRandomPersonalities(false);
+        setUseSimulatedRelationships(false);
 
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
@@ -1825,7 +1833,9 @@ public class CampaignOptions {
     public void setRandomOriginOptions(final RandomOriginOptions randomOriginOptions) {
         this.randomOriginOptions = randomOriginOptions;
     }
+    //endregion Personnel Randomization
 
+    //region Random Histories
     public boolean isUseRandomPersonalities() {
         return useRandomPersonalities;
     }
@@ -1833,7 +1843,15 @@ public class CampaignOptions {
     public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
         this.useRandomPersonalities = useRandomPersonalities;
     }
-    //endregion Personnel Randomization
+
+    public boolean isUseSimulatedRelationships() {
+        return useSimulatedRelationships;
+    }
+
+    public void setUseSimulatedRelationships(final boolean useSimulatedRelationships) {
+        this.useSimulatedRelationships = useSimulatedRelationships;
+    }
+    //endregion Random Histories
 
     //region Retirement
     public boolean isUseRandomRetirement() {
@@ -4633,8 +4651,12 @@ public class CampaignOptions {
         //region Personnel Randomization
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
         getRandomOriginOptions().writeToXML(pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
         //endregion Personnel Randomization
+
+        //region Random Histories
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSimulatedRelationships", isUseSimulatedRelationships());
+        //endregion Random Histories
 
         //region Retirement
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", isUseRandomRetirement());
@@ -5374,9 +5396,14 @@ public class CampaignOptions {
                         continue;
                     }
                     retVal.setRandomOriginOptions(randomOriginOptions);
+                    //endregion Personnel Randomization
+
+                    //region Random Histories
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalities")) {
                     retVal.setUseRandomPersonalities(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                    //endregion Personnel Randomization
+                } else if (wn2.getNodeName().equalsIgnoreCase("useSimulatedRelationships")) {
+                    retVal.setUseSimulatedRelationships(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    //endregion Random Histories
 
                     //region Family
                 } else if (wn2.getNodeName().equalsIgnoreCase("familyDisplayLevel")
