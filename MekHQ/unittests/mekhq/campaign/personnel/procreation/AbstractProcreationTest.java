@@ -407,7 +407,7 @@ public class AbstractProcreationTest {
 
         final Person mockPerson = mock(Person.class);
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomFloat).thenReturn(0.24f);
+            compute.when(Compute::randomInt).thenReturn(0.24f);
 
             when(mockPerson.isPregnant()).thenReturn(false);
             mockProcreation.processPregnancyComplications(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
@@ -494,18 +494,19 @@ public class AbstractProcreationTest {
         when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn("Pregnant");
         assertFalse(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
 
+        reset(mockProcreation);
+        doCallRealMethod().when(mockProcreation).randomlyProcreates(any(), any());
+
         when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn(null);
         when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(false);
         assertFalse(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
 
-        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(true);
-        when(mockProcreation.relationshiplessProcreation(any())).thenReturn(true);
-        assertTrue(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
+        reset(mockProcreation);
+        doCallRealMethod().when(mockProcreation).randomlyProcreates(any(), any());
 
         person.getGenealogy().setSpouse(mock(Person.class));
-        when(mockProcreation.relationshipProcreation(any())).thenReturn(true);
+        when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn(null);
+        when(mockProcreation.procreation(any())).thenReturn(true);
         assertTrue(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
     }
-    //endregion Random Procreation
-    //endregion New Day
 }

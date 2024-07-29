@@ -124,7 +124,7 @@ public abstract class AbstractProcreation {
     /**
      * This method determines the number of babies a person will give birth to.
      * @param multiplePregnancyOccurrences the X occurrences for there to be a single multiple
-     *                                    child occurrence (i.e. 1 in X)
+     *                                    child occurrence (i.e., 1 in X)
      * @return the number of babies the person will give birth to, limited to decuplets
      */
     protected int determineNumberOfBabies(final int multiplePregnancyOccurrences) {
@@ -138,7 +138,6 @@ public abstract class AbstractProcreation {
     /**
      * This method determines the duration for a pregnancy, with a variance determined through a
      * Gaussian distribution with a maximum spread of approximately six weeks.
-     *
      * TODO : Swap me to instead use a distribution function that generates an overall length,
      * TODO : Including pre-term and post-term births
      *
@@ -149,8 +148,8 @@ public abstract class AbstractProcreation {
         // pregnancy duration to create a randomized pregnancy duration
         final double gaussian = Math.sqrt(-2.0 * Math.log(Math.random()))
                 * Math.cos(2.0 * Math.PI * Math.random());
-        // To not get weird results, we limit the variance to +/- 4.0 (almost 6 weeks). A base
-        // length of 268 creates a solid enough duration for now.
+        // To not get unusual results, we limit the variance to +/- 4.0 (almost 6 weeks).
+        // A base length of 268 creates a solid enough duration for now.
         return 268 + (int) Math.round(MathUtility.clamp(gaussian, -4d, 4d) * 10.0);
     }
 
@@ -251,7 +250,7 @@ public abstract class AbstractProcreation {
 
     /**
      * This method is how a person becomes pregnant with the specified number of children. They have
-     * their due date set and the parentage of the pregnancy determined.
+     * their due date set, and the parentage of the pregnancy is determined.
      *
      * @param campaign the campaign the person is a part of
      * @param today the current date
@@ -321,7 +320,7 @@ public abstract class AbstractProcreation {
 
         // Create Babies
         for (int i = 0; i < size; i++) {
-            // Create the specific baby
+            // Create a baby
             final Person baby = campaign.newDependent(true);
             baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(mother, father, baby.getGender()));
@@ -388,33 +387,45 @@ public abstract class AbstractProcreation {
                                               final Person person) {
         // The child might be able to be born, albeit into a world without their mother.
         // The status, however, can be manually set for males and for those who are not pregnant.
-        // This is purposeful, to allow for player customization, and thus we first check if they
+        // This is purposeful to allow for player customization, and thus we first check if they
         // are pregnant before checking if the birth occurs
         if (!person.isPregnant()) {
             return;
         }
 
         final int pregnancyWeek = determinePregnancyWeek(today, person);
-        final double babyBornChance;
-        if (pregnancyWeek > 35) {
-            babyBornChance = 0.99;
-        } else if (pregnancyWeek > 29) {
-            babyBornChance = 0.95;
-        } else if (pregnancyWeek > 25) {
-            babyBornChance = 0.9;
-        } else if (pregnancyWeek == 25) {
-            babyBornChance = 0.8;
-        } else if (pregnancyWeek == 24) {
-            babyBornChance = 0.5;
-        } else if (pregnancyWeek == 23) {
-            babyBornChance = 0.25;
-        } else {
-            babyBornChance = 0.0;
-        }
+        final double babyBornChance = getBabyBornChance(pregnancyWeek);
 
-        if (Compute.randomFloat() < babyBornChance) {
+        if (Compute.randomInt() < babyBornChance) {
             birth(campaign, today, person);
         }
+    }
+
+    /**
+     * Calculates the chance of a baby being born based on the pregnancy week.
+     *
+     * @param pregnancyWeek the week of the pregnancy
+     * @return the chance of a baby being born, ranging from 0.0 to 1.0
+     */
+    private static double getBabyBornChance(int pregnancyWeek) {
+        int range = switch (pregnancyWeek) {
+            case 23 -> 1;
+            case 24 -> 2;
+            case 25 -> 3;
+            default -> (pregnancyWeek > 25 && pregnancyWeek <= 29) ? 4 :
+                    (pregnancyWeek > 29 && pregnancyWeek <=35) ? 5 :
+                            (pregnancyWeek > 35) ? 6 : 0;
+        };
+
+        return switch (range) {
+            case 1 -> 0.25;
+            case 2 -> 0.5;
+            case 3 -> 0.8;
+            case 4 -> 0.9;
+            case 5 -> 0.95;
+            case 6 -> 0.99;
+            default -> 0.0;
+        };
     }
 
     //region New Day
@@ -447,7 +458,7 @@ public abstract class AbstractProcreation {
 
     //region Random Procreation
     /**
-     * Determines if a non-pregnant female person procreates on a given day
+     * Determines if a non-pregnant woman procreates on a given day
      * @param today the current day
      * @param person the person in question
      * @return true if they do, otherwise false
@@ -455,12 +466,8 @@ public abstract class AbstractProcreation {
     protected boolean randomlyProcreates(final LocalDate today, final Person person) {
         if (canProcreate(today, person, true) != null) {
             return false;
-        } else if (person.getGenealogy().hasSpouse()) {
-            return relationshipProcreation(person);
-        } else if (isUseRelationshiplessProcreation()) {
-            return relationshiplessProcreation(person);
         } else {
-            return false;
+            return procreation(person);
         }
     }
 
@@ -469,14 +476,5 @@ public abstract class AbstractProcreation {
      * @param person the person to determine for
      * @return true if they do, otherwise false
      */
-    protected abstract boolean relationshipProcreation(final Person person);
-
-    /**
-     * Determines if a person without a partner procreates
-     * @param person the person to determine for
-     * @return true if they do, otherwise false
-     */
-    protected abstract boolean relationshiplessProcreation(final Person person);
-    //endregion Random Procreation
-    //endregion New Day
+    protected abstract boolean procreation(final Person person);
 }

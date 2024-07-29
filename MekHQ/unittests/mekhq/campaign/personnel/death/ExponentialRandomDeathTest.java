@@ -54,27 +54,27 @@ public class ExponentialRandomDeathTest {
     public void testRandomlyDies() {
         final ExponentialRandomDeath exponentialRandomDeath = new ExponentialRandomDeath(mockOptions, false);
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomFloat).thenReturn(0f);
+            compute.when(Compute::randomInt).thenReturn(0f);
             assertTrue(exponentialRandomDeath.randomlyDies(0, Gender.MALE));
             assertTrue(exponentialRandomDeath.randomlyDies(0, Gender.FEMALE));
             assertTrue(exponentialRandomDeath.randomlyDies(50, Gender.MALE));
             assertTrue(exponentialRandomDeath.randomlyDies(50, Gender.FEMALE));
-            compute.when(Compute::randomFloat).thenReturn(0.000001f);
+            compute.when(Compute::randomInt).thenReturn(0.000001f);
             assertFalse(exponentialRandomDeath.randomlyDies(0, Gender.MALE));
             assertFalse(exponentialRandomDeath.randomlyDies(0, Gender.FEMALE));
-            compute.when(Compute::randomFloat).thenReturn(0.0000692f);
+            compute.when(Compute::randomInt).thenReturn(0.0000692f);
             assertTrue(exponentialRandomDeath.randomlyDies(75, Gender.MALE));
             assertTrue(exponentialRandomDeath.randomlyDies(75, Gender.FEMALE));
-            compute.when(Compute::randomFloat).thenReturn(0.0000694f);
+            compute.when(Compute::randomInt).thenReturn(0.0000694f);
             assertTrue(exponentialRandomDeath.randomlyDies(75, Gender.MALE));
             assertFalse(exponentialRandomDeath.randomlyDies(75, Gender.FEMALE));
-            compute.when(Compute::randomFloat).thenReturn(0.000111f);
+            compute.when(Compute::randomInt).thenReturn(0.000111f);
             assertTrue(exponentialRandomDeath.randomlyDies(75, Gender.MALE));
             assertFalse(exponentialRandomDeath.randomlyDies(75, Gender.FEMALE));
-            compute.when(Compute::randomFloat).thenReturn(0.000112f);
+            compute.when(Compute::randomInt).thenReturn(0.000112f);
             assertFalse(exponentialRandomDeath.randomlyDies(75, Gender.MALE));
             assertFalse(exponentialRandomDeath.randomlyDies(75, Gender.FEMALE));
-            compute.when(Compute::randomFloat).thenReturn(1f);
+            compute.when(Compute::randomInt).thenReturn(1f);
             assertFalse(exponentialRandomDeath.randomlyDies(0, Gender.MALE));
             assertFalse(exponentialRandomDeath.randomlyDies(0, Gender.FEMALE));
             assertFalse(exponentialRandomDeath.randomlyDies(50, Gender.MALE));

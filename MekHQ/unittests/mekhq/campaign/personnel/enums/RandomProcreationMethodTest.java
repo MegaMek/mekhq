@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.enums;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
-import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
+import mekhq.campaign.personnel.procreation.randomProcreation;
 import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
@@ -46,8 +46,8 @@ public class RandomProcreationMethodTest {
     public void testGetToolTipText() {
         assertEquals(resources.getString("RandomProcreationMethod.NONE.toolTipText"),
                 RandomProcreationMethod.NONE.getToolTipText());
-        assertEquals(resources.getString("RandomProcreationMethod.PERCENTAGE.toolTipText"),
-                RandomProcreationMethod.PERCENTAGE.getToolTipText());
+        assertEquals(resources.getString("RandomProcreationMethod.DICE_ROLL.toolTipText"),
+                RandomProcreationMethod.DICE_ROLL.getToolTipText());
     }
     //endregion Getters
 
@@ -66,10 +66,10 @@ public class RandomProcreationMethodTest {
     @Test
     public void testIsPercentage() {
         for (final RandomProcreationMethod randomProcreationMethod : methods) {
-            if (randomProcreationMethod == RandomProcreationMethod.PERCENTAGE) {
-                assertTrue(randomProcreationMethod.isPercentage());
+            if (randomProcreationMethod == RandomProcreationMethod.DICE_ROLL) {
+                assertTrue(randomProcreationMethod.isDiceRoll());
             } else {
-                assertFalse(randomProcreationMethod.isPercentage());
+                assertFalse(randomProcreationMethod.isDiceRoll());
             }
         }
     }
@@ -83,18 +83,18 @@ public class RandomProcreationMethodTest {
         when(mockOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
-        when(mockOptions.getPercentageRandomProcreationRelationshipChance()).thenReturn(0.5);
-        when(mockOptions.getPercentageRandomProcreationRelationshiplessChance()).thenReturn(0.5);
+        when(mockOptions.getRandomProcreationRelationshipDiceSize()).thenReturn(5);
+        when(mockOptions.getRandomProcreationRelationshiplessDiceSize()).thenReturn(5);
 
         assertInstanceOf(DisabledRandomProcreation.class, RandomProcreationMethod.NONE.getMethod(mockOptions));
-        assertInstanceOf(PercentageRandomProcreation.class, RandomProcreationMethod.PERCENTAGE.getMethod(mockOptions));
+        assertInstanceOf(randomProcreation.class, RandomProcreationMethod.DICE_ROLL.getMethod(mockOptions));
     }
 
     @Test
     public void testToStringOverride() {
         assertEquals(resources.getString("RandomProcreationMethod.NONE.text"),
                 RandomProcreationMethod.NONE.toString());
-        assertEquals(resources.getString("RandomProcreationMethod.PERCENTAGE.text"),
-                RandomProcreationMethod.PERCENTAGE.toString());
+        assertEquals(resources.getString("RandomProcreationMethod.DICE_ROLL.text"),
+                RandomProcreationMethod.DICE_ROLL.toString());
     }
 }

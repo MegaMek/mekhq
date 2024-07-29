@@ -59,13 +59,13 @@ public class PercentageRandomDivorceTest {
         // This ignores the person, so just using a mocked person
         // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomFloat).thenReturn(0f);
+            compute.when(Compute::randomInt).thenReturn(0f);
             assertTrue(percentageRandomDivorce.randomOppositeSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.49f);
+            compute.when(Compute::randomInt).thenReturn(0.49f);
             assertTrue(percentageRandomDivorce.randomOppositeSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.5f);
+            compute.when(Compute::randomInt).thenReturn(0.5f);
             assertFalse(percentageRandomDivorce.randomOppositeSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(1f);
+            compute.when(Compute::randomInt).thenReturn(1f);
             assertFalse(percentageRandomDivorce.randomOppositeSexDivorce(mockPerson));
         }
     }
@@ -76,13 +76,13 @@ public class PercentageRandomDivorceTest {
         // This ignores the person, so just using a mocked person
         // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomFloat).thenReturn(0f);
+            compute.when(Compute::randomInt).thenReturn(0f);
             assertTrue(percentageRandomDivorce.randomSameSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.49f);
+            compute.when(Compute::randomInt).thenReturn(0.49f);
             assertTrue(percentageRandomDivorce.randomSameSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.5f);
+            compute.when(Compute::randomInt).thenReturn(0.5f);
             assertFalse(percentageRandomDivorce.randomSameSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(1f);
+            compute.when(Compute::randomInt).thenReturn(1f);
             assertFalse(percentageRandomDivorce.randomSameSexDivorce(mockPerson));
         }
     }

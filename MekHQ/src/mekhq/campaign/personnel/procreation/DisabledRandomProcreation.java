@@ -37,12 +37,7 @@ public class DisabledRandomProcreation extends AbstractProcreation {
     }
 
     @Override
-    protected boolean relationshipProcreation(final Person person) {
-        return false;
-    }
-
-    @Override
-    protected boolean relationshiplessProcreation(final Person person) {
+    protected boolean procreation(final Person person) {
         return false;
     }
 }

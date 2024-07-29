@@ -64,7 +64,7 @@ public class ExponentialRandomDeath extends AbstractDeath {
      */
     @Override
     public boolean randomlyDies(final int age, final Gender gender) {
-        return Compute.randomFloat() < (gender.isMale()
+        return Compute.randomInt() < (gender.isMale()
                 ? (getMale()[0] * Math.pow(10, getMale()[1]) * Math.exp(getMale()[2] * age))
                 : (getFemale()[0] * Math.pow(10, getFemale()[1]) * Math.exp(getFemale()[2] * age)));
     }

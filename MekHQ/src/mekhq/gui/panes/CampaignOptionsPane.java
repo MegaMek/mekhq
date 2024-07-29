@@ -95,6 +95,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 /**
  * @author Justin 'Windchild' Bowen
  */
@@ -407,9 +409,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseRelationshiplessRandomProcreation;
     private JCheckBox chkUseRandomClanPersonnelProcreation;
     private JCheckBox chkUseRandomPrisonerProcreation;
-    private JSpinner spnPercentageRandomProcreationRelationshipChance;
-    private JLabel lblPercentageRandomProcreationRelationshiplessChance;
-    private JSpinner spnPercentageRandomProcreationRelationshiplessChance;
+    private JSpinner spnRandomProcreationRelationshipDiceSize;
+    private JLabel lblRandomProcreationRelationshiplessDiceSize;
+    private JSpinner spnRandomProcreationRelationshiplessDiceSize;
 
     // Awards
     private MMComboBox<AwardBonus> comboAwardBonusStyle;
@@ -6542,14 +6544,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 return;
             }
             final boolean enabled = !method.isNone();
-            final boolean percentageEnabled = method.isPercentage();
+            final boolean percentageEnabled = method.isDiceRoll();
             final boolean relationshiplessEnabled = enabled && chkUseRelationshiplessRandomProcreation.isSelected();
             chkUseRelationshiplessRandomProcreation.setEnabled(enabled);
             chkUseRandomClanPersonnelProcreation.setEnabled(enabled && chkUseClanPersonnelProcreation.isSelected());
             chkUseRandomPrisonerProcreation.setEnabled(enabled && chkUsePrisonerProcreation.isSelected());
             percentageRandomProcreationPanel.setEnabled(percentageEnabled);
-            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled && percentageEnabled);
-            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(relationshiplessEnabled && percentageEnabled);
+            lblRandomProcreationRelationshiplessDiceSize.setEnabled(relationshiplessEnabled && percentageEnabled);
+            spnRandomProcreationRelationshiplessDiceSize.setEnabled(relationshiplessEnabled && percentageEnabled);
         });
 
         chkUseRelationshiplessRandomProcreation = new JCheckBox(resources.getString("chkUseRelationshiplessRandomProcreation.text"));
@@ -6562,9 +6564,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
             final boolean sameSexEnabled = chkUseRelationshiplessRandomProcreation.isEnabled()
                     && chkUseRelationshiplessRandomProcreation.isSelected();
-            final boolean percentageEnabled = sameSexEnabled && method.isPercentage();
-            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
-            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
+            final boolean percentageEnabled = sameSexEnabled && method.isDiceRoll();
+            lblRandomProcreationRelationshiplessDiceSize.setEnabled(percentageEnabled);
+            spnRandomProcreationRelationshiplessDiceSize.setEnabled(percentageEnabled);
         });
 
         chkUseRandomClanPersonnelProcreation = new JCheckBox(resources.getString("chkUseRandomClanPersonnelProcreation.text"));
@@ -6617,29 +6619,29 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private void createPercentageRandomProcreationPanel(final JPanel panel) {
         // Create Panel Components
-        final JLabel lblPercentageRandomProcreationRelationshipChance = new JLabel(resources.getString("lblPercentageRandomProcreationRelationshipChance.text"));
-        lblPercentageRandomProcreationRelationshipChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshipChance.toolTipText"));
-        lblPercentageRandomProcreationRelationshipChance.setName("lblPercentageRandomProcreationRelationshipChance");
+        final JLabel lblRandomProcreationRelationshipDiceSize = new JLabel(resources.getString("lblRandomProcreationRelationshipDiceSize.text"));
+        lblRandomProcreationRelationshipDiceSize.setToolTipText(resources.getString("lblRandomProcreationRelationshipDiceSize.toolTipText"));
+        lblRandomProcreationRelationshipDiceSize.setName("lblRandomProcreationRelationshipDiceSize");
 
-        spnPercentageRandomProcreationRelationshipChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnPercentageRandomProcreationRelationshipChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshipChance.toolTipText"));
-        spnPercentageRandomProcreationRelationshipChance.setName("spnPercentageRandomProcreationRelationshipChance");
+        spnRandomProcreationRelationshipDiceSize = new JSpinner(new SpinnerNumberModel(621, 0, 100000, 1));
+        spnRandomProcreationRelationshipDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomProcreationRelationshipDiceSize.toolTipText"), 100));
+        spnRandomProcreationRelationshipDiceSize.setName("spnRandomProcreationRelationshipDiceSize");
 
-        lblPercentageRandomProcreationRelationshiplessChance = new JLabel(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.text"));
-        lblPercentageRandomProcreationRelationshiplessChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
-        lblPercentageRandomProcreationRelationshiplessChance.setName("lblPercentageRandomProcreationRelationshiplessChance");
+        lblRandomProcreationRelationshiplessDiceSize = new JLabel(resources.getString("lblRandomProcreationRelationshiplessDiceSize.text"));
+        lblRandomProcreationRelationshiplessDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomProcreationRelationshiplessDiceSize.toolTipText"), 100));
+        lblRandomProcreationRelationshiplessDiceSize.setName("lblRandomProcreationRelationshiplessDiceSize");
 
-        spnPercentageRandomProcreationRelationshiplessChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnPercentageRandomProcreationRelationshiplessChance.setToolTipText(resources.getString("lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
-        spnPercentageRandomProcreationRelationshiplessChance.setName("spnPercentageRandomProcreationRelationshiplessChance");
+        spnRandomProcreationRelationshiplessDiceSize = new JSpinner(new SpinnerNumberModel(1861, 0, 100000, 1));
+        spnRandomProcreationRelationshiplessDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomProcreationRelationshipDiceSize.toolTipText"), 100));
+        spnRandomProcreationRelationshiplessDiceSize.setName("spnRandomProcreationRelationshiplessDiceSize");
 
         // Programmatically Assign Accessibility Labels
-        lblPercentageRandomProcreationRelationshipChance.setLabelFor(spnPercentageRandomProcreationRelationshipChance);
-        lblPercentageRandomProcreationRelationshiplessChance.setLabelFor(spnPercentageRandomProcreationRelationshiplessChance);
+        lblRandomProcreationRelationshipDiceSize.setLabelFor(spnRandomProcreationRelationshipDiceSize);
+        lblRandomProcreationRelationshiplessDiceSize.setLabelFor(spnRandomProcreationRelationshipDiceSize);
 
         // Layout the Panel
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomProcreationPanel.title")));
-        panel.setToolTipText(RandomProcreationMethod.PERCENTAGE.getToolTipText());
+        panel.setToolTipText(RandomProcreationMethod.DICE_ROLL.getToolTipText());
 
         final GroupLayout layout = new GroupLayout(panel);
         layout.setAutoCreateGaps(true);
@@ -6649,21 +6651,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomProcreationRelationshipChance)
-                                .addComponent(spnPercentageRandomProcreationRelationshipChance, Alignment.LEADING))
+                                .addComponent(lblRandomProcreationRelationshipDiceSize)
+                                .addComponent(spnRandomProcreationRelationshipDiceSize, Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomProcreationRelationshiplessChance)
-                                .addComponent(spnPercentageRandomProcreationRelationshiplessChance, Alignment.LEADING))
+                                .addComponent(lblRandomProcreationRelationshiplessDiceSize)
+                                .addComponent(spnRandomProcreationRelationshiplessDiceSize, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPercentageRandomProcreationRelationshipChance)
-                                .addComponent(spnPercentageRandomProcreationRelationshipChance))
+                                .addComponent(lblRandomProcreationRelationshipDiceSize)
+                                .addComponent(spnRandomProcreationRelationshipDiceSize))
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPercentageRandomProcreationRelationshiplessChance)
-                                .addComponent(spnPercentageRandomProcreationRelationshiplessChance))
+                                .addComponent(lblRandomProcreationRelationshiplessDiceSize)
+                                .addComponent(spnRandomProcreationRelationshiplessDiceSize))
         );
     }
 
@@ -6847,7 +6849,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Layout the Panel
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomDeathPanel.title")));
-        panel.setToolTipText(RandomProcreationMethod.PERCENTAGE.getToolTipText());
+        panel.setToolTipText(RandomProcreationMethod.DICE_ROLL.getToolTipText());
 
         final GroupLayout layout = new GroupLayout(panel);
         layout.setAutoCreateGaps(true);
@@ -8279,8 +8281,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
         chkUseRandomClanPersonnelProcreation.setSelected(options.isUseRandomClanPersonnelProcreation());
         chkUseRandomPrisonerProcreation.setSelected(options.isUseRandomPrisonerProcreation());
-        spnPercentageRandomProcreationRelationshipChance.setValue(options.getPercentageRandomProcreationRelationshipChance() * 100.0);
-        spnPercentageRandomProcreationRelationshiplessChance.setValue(options.getPercentageRandomProcreationRelationshiplessChance() * 100.0);
+        spnRandomProcreationRelationshipDiceSize.setValue(options.getRandomProcreationRelationshipDiceSize());
+        spnRandomProcreationRelationshiplessDiceSize.setValue(options.getRandomProcreationRelationshiplessDiceSize());
 
         // Education
         chkUseEducationModule.setSelected(options.isUseEducationModule());
@@ -8949,8 +8951,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseRelationshiplessRandomProcreation(chkUseRelationshiplessRandomProcreation.isSelected());
             options.setUseRandomClanPersonnelProcreation(chkUseRandomClanPersonnelProcreation.isSelected());
             options.setUseRandomPrisonerProcreation(chkUseRandomPrisonerProcreation.isSelected());
-            options.setPercentageRandomProcreationRelationshipChance((Double) spnPercentageRandomProcreationRelationshipChance.getValue() / 100.0);
-            options.setPercentageRandomProcreationRelationshiplessChance((Double) spnPercentageRandomProcreationRelationshiplessChance.getValue() / 100.0);
+            options.setRandomProcreationRelationshipDiceSize((Integer) spnRandomProcreationRelationshipDiceSize.getValue());
+            options.setRandomProcreationRelationshiplessDiceSize((Integer) spnRandomProcreationRelationshiplessDiceSize.getValue());
 
             // Education
             options.setUseEducationModule(chkUseEducationModule.isSelected());

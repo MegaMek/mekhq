@@ -22,14 +22,14 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
-import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
+import mekhq.campaign.personnel.procreation.randomProcreation;
 
 import java.util.ResourceBundle;
 
 public enum RandomProcreationMethod {
     //region Enum Declarations
     NONE("RandomProcreationMethod.NONE.text", "RandomProcreationMethod.NONE.toolTipText"),
-    PERCENTAGE("RandomProcreationMethod.PERCENTAGE.text", "RandomProcreationMethod.PERCENTAGE.toolTipText");
+    DICE_ROLL("RandomProcreationMethod.DICE_ROLL.text", "RandomProcreationMethod.DICE_ROLL.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -47,28 +47,29 @@ public enum RandomProcreationMethod {
     //endregion Constructors
 
     //region Getters
+    @SuppressWarnings(value = "unused")
     public String getToolTipText() {
         return toolTipText;
     }
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @SuppressWarnings(value = "unused")
     public boolean isNone() {
         return this == NONE;
     }
 
-    public boolean isPercentage() {
-        return this == PERCENTAGE;
+    @SuppressWarnings(value = "unused")
+    public boolean isDiceRoll() {
+        return this == DICE_ROLL;
     }
     //endregion Boolean Comparison Methods
 
     public AbstractProcreation getMethod(final CampaignOptions options) {
-        switch (this) {
-            case PERCENTAGE:
-                return new PercentageRandomProcreation(options);
-            case NONE:
-            default:
-                return new DisabledRandomProcreation(options);
+        if (this == DICE_ROLL) {
+            return new randomProcreation(options);
+        } else {
+            return new DisabledRandomProcreation(options);
         }
     }
 

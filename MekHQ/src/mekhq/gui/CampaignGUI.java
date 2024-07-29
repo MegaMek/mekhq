@@ -21,38 +21,6 @@
  */
 package mekhq.gui;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.List;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPOutputStream;
-
-import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.xml.parsers.DocumentBuilder;
-
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -61,20 +29,11 @@ import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.MechSummaryCache;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.IconPackage;
-import mekhq.MHQConstants;
-import mekhq.MHQOptionsChangedEvent;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
-import mekhq.Utilities;
+import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
@@ -95,14 +54,10 @@ import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
 import mekhq.campaign.personnel.death.ExponentialRandomDeath;
 import mekhq.campaign.personnel.death.PercentageRandomDeath;
 import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.RandomDeathMethod;
-import mekhq.campaign.personnel.enums.RandomDivorceMethod;
-import mekhq.campaign.personnel.enums.RandomMarriageMethod;
-import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
+import mekhq.campaign.personnel.procreation.randomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.report.CargoReport;
@@ -114,12 +69,7 @@ import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
 import mekhq.gui.dialog.nagDialogs.*;
-import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
-import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
-import mekhq.gui.dialog.reportDialogs.NewsReportDialog;
-import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
-import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
-import mekhq.gui.dialog.reportDialogs.UnitRatingReportDialog;
+import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
@@ -136,7 +86,6 @@ import javax.xml.parsers.DocumentBuilder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
@@ -1570,11 +1519,11 @@ public class CampaignGUI extends JPanel {
             getCampaign().getProcreation()
                     .setUseRandomClanPersonnelProcreation(newOptions.isUseRandomClanPersonnelProcreation());
             getCampaign().getProcreation().setUseRandomPrisonerProcreation(newOptions.isUseRandomPrisonerProcreation());
-            if (getCampaign().getProcreation().getMethod().isPercentage()) {
-                ((PercentageRandomProcreation) getCampaign().getProcreation()).setPercentage(
-                        newOptions.getPercentageRandomProcreationRelationshipChance());
-                ((PercentageRandomProcreation) getCampaign().getProcreation()).setRelationshiplessPercentage(
-                        newOptions.getPercentageRandomProcreationRelationshiplessChance());
+            if (getCampaign().getProcreation().getMethod().isDiceRoll()) {
+                ((randomProcreation) getCampaign().getProcreation()).setRelationshipDieSize(
+                        newOptions.getRandomProcreationRelationshipDiceSize());
+                ((randomProcreation) getCampaign().getProcreation()).setRelationshiplessDieSize(
+                        newOptions.getRandomProcreationRelationshiplessDiceSize());
             }
         }
 

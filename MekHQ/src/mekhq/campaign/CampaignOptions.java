@@ -377,8 +377,8 @@ public class CampaignOptions {
     private boolean useRelationshiplessRandomProcreation;
     private boolean useRandomClanPersonnelProcreation;
     private boolean useRandomPrisonerProcreation;
-    private double percentageRandomProcreationRelationshipChance;
-    private double percentageRandomProcreationRelationshiplessChance;
+    private int randomProcreationRelationshipDiceSize;
+    private int randomProcreationRelationshiplessDiceSize;
 
     // Education
     private boolean useEducationModule;
@@ -891,8 +891,8 @@ public class CampaignOptions {
         setUseRelationshiplessRandomProcreation(false);
         setUseRandomClanPersonnelProcreation(false);
         setUseRandomPrisonerProcreation(true);
-        setPercentageRandomProcreationRelationshipChance(0.0005);
-        setPercentageRandomProcreationRelationshiplessChance(0.00005);
+        setRandomProcreationRelationshipDiceSize(621);
+        setRandomProcreationRelationshiplessDiceSize(1861);
 
         // Education
         setUseEducationModule(false);
@@ -2681,32 +2681,31 @@ public class CampaignOptions {
      * This gets the decimal chance (between 0 and 1) of random procreation occurring
      * @return the chance, with a value between 0 and 1
      */
-    public double getPercentageRandomProcreationRelationshipChance() {
-        return percentageRandomProcreationRelationshipChance;
+    public int getRandomProcreationRelationshipDiceSize() {
+        return randomProcreationRelationshipDiceSize;
     }
 
     /**
-     * This sets the decimal chance (between 0 and 1) of random procreation occurring
-     * @param percentageRandomProcreationRelationshipChance the chance, with a value between 0 and 1
+     * This sets the dice size for random procreation
+     * @param randomProcreationRelationshipDiceSize the chance, with a value between 0 and 1
      */
-    public void setPercentageRandomProcreationRelationshipChance(final double percentageRandomProcreationRelationshipChance) {
-        this.percentageRandomProcreationRelationshipChance = percentageRandomProcreationRelationshipChance;
+    public void setRandomProcreationRelationshipDiceSize(final int randomProcreationRelationshipDiceSize) {
+        this.randomProcreationRelationshipDiceSize = randomProcreationRelationshipDiceSize;
     }
 
     /**
-     * This gets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
-     * @return the chance, with a value between 0 and 1
+     * @return the dice size for random procreation
      */
-    public double getPercentageRandomProcreationRelationshiplessChance() {
-        return percentageRandomProcreationRelationshiplessChance;
+    public int getRandomProcreationRelationshiplessDiceSize() {
+        return randomProcreationRelationshiplessDiceSize;
     }
 
     /**
      * This sets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
-     * @param percentageRandomProcreationRelationshiplessChance the chance, with a value between 0 and 1
+     * @param randomProcreationRelationshiplessDiceSize the chance, with a value between 0 and 1
      */
-    public void setPercentageRandomProcreationRelationshiplessChance(final double percentageRandomProcreationRelationshiplessChance) {
-        this.percentageRandomProcreationRelationshiplessChance = percentageRandomProcreationRelationshiplessChance;
+    public void setRandomProcreationRelationshiplessDiceSize(final int randomProcreationRelationshiplessDiceSize) {
+        this.randomProcreationRelationshiplessDiceSize = randomProcreationRelationshiplessDiceSize;
     }
     //endregion Procreation
 
@@ -4752,8 +4751,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRelationshiplessRandomProcreation", isUseRelationshiplessRandomProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelProcreation", isUseRandomClanPersonnelProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerProcreation", isUseRandomPrisonerProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomProcreationRelationshipChance", getPercentageRandomProcreationRelationshipChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomProcreationRelationshiplessChance", getPercentageRandomProcreationRelationshiplessChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomProcreationRelationshipDiceSize", getRandomProcreationRelationshipDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomProcreationRelationshiplessDiceSize", getRandomProcreationRelationshiplessDiceSize());
         //endregion Procreation
 
         //region Education
@@ -5508,10 +5507,10 @@ public class CampaignOptions {
                     retVal.setUseRandomClanPersonnelProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerProcreation")) {
                     retVal.setUseRandomPrisonerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomProcreationRelationshipChance")) {
-                    retVal.setPercentageRandomProcreationRelationshipChance(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomProcreationRelationshiplessChance")) {
-                    retVal.setPercentageRandomProcreationRelationshiplessChance(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomProcreationRelationshipDiceSize")) {
+                    retVal.setRandomProcreationRelationshipDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomProcreationRelationshiplessDiceSize")) {
+                    retVal.setRandomProcreationRelationshiplessDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Procreation
 
                     //region Education
@@ -6016,17 +6015,6 @@ public class CampaignOptions {
                     } else {
                         LogManager.getLogger().error("Unknown length of randomMarriageSurnameWeights");
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation") // Legacy - 0.49.0 Removal
-                        || wn2.getNodeName().equalsIgnoreCase("useProcreation")) { // Legacy - 0.49.4 Removal
-                    retVal.setRandomProcreationMethod(RandomProcreationMethod.PERCENTAGE);
-                    retVal.setUseManualProcreation(true);
-                } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) { // Legacy - 0.49.4 Removal
-                    retVal.setPercentageRandomProcreationRelationshipChance(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship") // Legacy - 0.49.0 Removal
-                        || wn2.getNodeName().equalsIgnoreCase("useProcreationNoRelationship")) { // Legacy - 0.49.4 Removal
-                    retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) { // Legacy - 0.49.4 Removal
-                    retVal.setPercentageRandomProcreationRelationshiplessChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) { // Legacy - 0.49.4 Removal
                     retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) { // Legacy - 0.49.4 Removal
