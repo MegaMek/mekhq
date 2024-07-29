@@ -435,7 +435,7 @@ public abstract class AbstractProcreation {
      * @param today the current day
      * @param person the person to process
      */
-    public void processNewDay(final Campaign campaign, final LocalDate today, final Person person) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person) {
         // Instantly return for male personnel
         if (person.getGender().isMale()) {
             return;

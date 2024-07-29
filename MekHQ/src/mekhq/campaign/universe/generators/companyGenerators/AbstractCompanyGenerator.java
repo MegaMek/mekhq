@@ -625,7 +625,7 @@ public abstract class AbstractCompanyGenerator {
                     }
 
                     if (getOptions().isSimulateRandomProcreation()) {
-                        campaign.getProcreation().processNewDay(campaign, date, tracker.getPerson());
+                        campaign.getProcreation().processNewWeek(campaign, date, tracker.getPerson());
                     }
                 }
             }

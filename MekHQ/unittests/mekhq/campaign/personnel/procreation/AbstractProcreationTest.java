@@ -447,39 +447,39 @@ public class AbstractProcreationTest {
 
     //region New Day
     @Test
-    public void testProcessNewDay() {
-        doCallRealMethod().when(mockProcreation).processNewDay(any(), any(), any());
+    public void testProcessNewWeek() {
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
         doNothing().when(mockProcreation).birth(any(), any(), any());
         doNothing().when(mockProcreation).addPregnancy(any(), any(), any());
 
         final Person mockPerson = mock(Person.class);
 
         when(mockPerson.getGender()).thenReturn(Gender.MALE);
-        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockPerson, never()).isPregnant();
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
 
         when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
         when(mockPerson.isPregnant()).thenReturn(true);
         when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 2));
-        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockProcreation, never()).birth(any(), any(), any());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
 
         when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 1));
-        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockProcreation, times(1)).birth(any(), any(), any());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
 
         when(mockPerson.isPregnant()).thenReturn(false);
 
         when(mockProcreation.randomlyProcreates(any(), any())).thenReturn(false);
-        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockProcreation, times(1)).birth(any(), any(), any());
         verify(mockProcreation, times(1)).randomlyProcreates(any(), any());
 
         when(mockProcreation.randomlyProcreates(any(), any())).thenReturn(true);
-        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockProcreation, times(2)).randomlyProcreates(any(), any());
         verify(mockProcreation, times(1)).addPregnancy(any(), any(), any());
     }

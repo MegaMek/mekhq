@@ -3469,7 +3469,9 @@ public class Campaign implements ITechManager {
             getDivorce().processNewDay(this, getLocalDate(), p);
 
             // Procreation
-            getProcreation().processNewDay(this, getLocalDate(), p);
+            if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+                getProcreation().processNewWeek(this, getLocalDate(), p);
+            }
 
             // Anniversaries
             if ((p.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
@@ -3671,7 +3673,7 @@ public class Campaign implements ITechManager {
         getPersonnelMarket().generatePersonnelForDay(this);
 
         // TODO : AbstractContractMarket : Uncomment
-        //getContractMarket().processNewDay(this);
+        //getContractMarket().processNewWeek(this);
         getUnitMarket().processNewDay(this);
 
         // Process New Day for AtB
