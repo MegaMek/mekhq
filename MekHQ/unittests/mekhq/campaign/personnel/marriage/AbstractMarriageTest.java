@@ -71,7 +71,6 @@ public class AbstractMarriageTest {
         assertEquals(RandomMarriageMethod.NONE, disabledMarriage.getMethod());
         assertFalse(disabledMarriage.isUseClanPersonnelMarriages());
         assertFalse(disabledMarriage.isUsePrisonerMarriages());
-        assertFalse(disabledMarriage.isUseRandomSameSexMarriages());
         assertFalse(disabledMarriage.isUseRandomClanPersonnelMarriages());
         assertFalse(disabledMarriage.isUseRandomPrisonerMarriages());
     }
