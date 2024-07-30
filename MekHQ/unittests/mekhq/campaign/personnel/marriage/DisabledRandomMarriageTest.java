@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -41,18 +41,12 @@ public class DisabledRandomMarriageTest {
     public void beforeEach() {
         when(mockOptions.isUseClanPersonnelMarriages()).thenReturn(false);
         when(mockOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomSameSexMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
     }
 
     @Test
-    public void testRandomOppositeSexMarriage() {
-        assertFalse(new DisabledRandomMarriage(mockOptions).randomOppositeSexMarriage(mockPerson));
-    }
-
-    @Test
-    public void testRandomSameSexMarriage() {
-        assertFalse(new DisabledRandomMarriage(mockOptions).randomSameSexMarriage(mockPerson));
+    public void testRandomMarriage() {
+        assertFalse(new DisabledRandomMarriage(mockOptions).randomMarriage(mockPerson));
     }
 }

@@ -346,8 +346,7 @@ public class CampaignOptions {
     private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
-    private int randomMarriageOppositeSexDiceSize;
-    private int randomMarriageSameSexDiceSize;
+    private int randomMarriageDiceSize;
 
     // Divorce
     private boolean useManualDivorce;
@@ -854,8 +853,7 @@ public class CampaignOptions {
         setUseRandomClanPersonnelMarriages(false);
         setUseRandomPrisonerMarriages(false);
         setRandomMarriageAgeRange(10);
-        setRandomMarriageOppositeSexDiceSize(6250);
-        setRandomMarriageSameSexDiceSize(76923);
+        setRandomMarriageDiceSize(6250);
 
         // Divorce
         setUseManualDivorce(true);
@@ -2404,35 +2402,19 @@ public class CampaignOptions {
     }
 
     /**
-     * @return the number of sides on the die used to determine random opposite sex marriage
+     * @return the number of sides on the die used to determine random marriage
      */
-    public int getRandomMarriageOppositeSexDiceSize() {
-        return randomMarriageOppositeSexDiceSize;
+    public int getRandomMarriageDiceSize() {
+        return randomMarriageDiceSize;
     }
 
     /**
-     * Sets the size of the random opposite sex marriage die.
+     * Sets the size of the random marriage die.
      *
-     * @param randomMarriageOppositeSexDiceSize the size of the random opposite sex marriage die
+     * @param randomMarriageDiceSize the size of the random opposite sex marriage die
      */
-    public void setRandomMarriageOppositeSexDiceSize(final int randomMarriageOppositeSexDiceSize) {
-        this.randomMarriageOppositeSexDiceSize = randomMarriageOppositeSexDiceSize;
-    }
-
-    /**
-     * @return the number of sides on the die used to determine random same-sex marriage
-     */
-    public int getRandomMarriageSameSexDiceSize() {
-        return randomMarriageSameSexDiceSize;
-    }
-
-    /**
-     * Sets the size of the random same-sex marriage die.
-     *
-     * @param randomMarriageSameSexDiceSize the size of the random opposite sex marriage die
-     */
-    public void setRandomMarriageSameSexDiceSize(final int randomMarriageSameSexDiceSize) {
-        this.randomMarriageSameSexDiceSize = randomMarriageSameSexDiceSize;
+    public void setRandomMarriageDiceSize(final int randomMarriageDiceSize) {
+        this.randomMarriageDiceSize = randomMarriageDiceSize;
     }
     //endregion Marriage
 
@@ -4704,8 +4686,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelMarriages", isUseRandomClanPersonnelMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageOppositeSexDiceSize", getRandomMarriageOppositeSexDiceSize());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageSameSexChance", getRandomMarriageSameSexDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageDiceSize", getRandomMarriageDiceSize());
         //endregion Marriage
 
         //region Divorce
@@ -5418,14 +5399,8 @@ public class CampaignOptions {
                     retVal.setUseRandomPrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageAgeRange")) {
                     retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageOppositeSexChance")) {
-                    retVal.setRandomMarriageOppositeSexDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSameSexChance")) {
-                    retVal.setRandomMarriageSameSexDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
-                    if (!Boolean.parseBoolean(wn2.getTextContent().trim())) {
-                        retVal.setRandomMarriageSameSexDiceSize(0); // legacy, pre-50.0
-                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageDiceSize")) {
+                    retVal.setRandomMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Marriage
 
                     //region Divorce

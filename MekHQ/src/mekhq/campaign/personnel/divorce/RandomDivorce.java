@@ -49,8 +49,6 @@ public class RandomDivorce extends AbstractDivorce {
 
     @Override
     protected boolean randomDivorce(final Person person) {
-        double multiplier = Math.max(1, person.getGenealogy().getFormerSpouses().size() * 0.5);
-
-        return Compute.randomInt((int) (divorceDiceSize * multiplier)) == 0;
+        return Compute.randomInt(divorceDiceSize) == 0;
     }
 }

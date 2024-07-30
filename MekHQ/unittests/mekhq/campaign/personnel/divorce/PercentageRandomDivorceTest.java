@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.divorce;
 import megamek.common.Compute;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +28,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -58,12 +55,6 @@ public class PercentageRandomDivorceTest {
     @Test
     public void testRandomDivorce() {
         final RandomDivorce randomDivorce = new RandomDivorce(mockOptions);
-
-        // Create a mock Genealogy
-        Genealogy mockGenealogy = Mockito.mock(Genealogy.class);
-
-        when(mockPerson.getGenealogy()).thenReturn(mockGenealogy);
-        when(mockGenealogy.getFormerSpouses()).thenReturn(new ArrayList<>());
 
         int diceSize = 5;
 

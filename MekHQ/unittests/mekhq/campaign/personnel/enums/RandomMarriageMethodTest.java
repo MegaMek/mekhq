@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -81,11 +81,9 @@ public class RandomMarriageMethodTest {
         final CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockOptions.isUseClanPersonnelMarriages()).thenReturn(false);
         when(mockOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomSameSexMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
-        when(mockOptions.getRandomMarriageOppositeSexDiceSize()).thenReturn(5);
-        when(mockOptions.getRandomMarriageSameSexDiceSize()).thenReturn(5);
+        when(mockOptions.getRandomMarriageDiceSize()).thenReturn(5);
 
         assertInstanceOf(DisabledRandomMarriage.class, RandomMarriageMethod.NONE.getMethod(mockOptions));
         assertInstanceOf(RandomMarriage.class, RandomMarriageMethod.DICE_ROLL.getMethod(mockOptions));

@@ -1499,10 +1499,8 @@ public class CampaignGUI extends JPanel {
                     .setUseRandomClanPersonnelMarriages(newOptions.isUseRandomClanPersonnelMarriages());
             getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
             if (getCampaign().getMarriage().getMethod().isDiceRoll()) {
-                ((RandomMarriage) getCampaign().getMarriage()).setOppositeSexDiceSize(
-                        newOptions.getRandomMarriageOppositeSexDiceSize());
-                ((RandomMarriage) getCampaign().getMarriage()).setSameSexDiceSize(
-                        newOptions.getRandomMarriageSameSexDiceSize());
+                ((RandomMarriage) getCampaign().getMarriage()).setMarriageDiceSize(
+                        newOptions.getRandomMarriageDiceSize());
             }
         }
 

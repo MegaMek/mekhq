@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,12 +30,7 @@ public class DisabledRandomMarriage extends AbstractMarriage {
     //endregion Constructors
 
     @Override
-    protected boolean randomOppositeSexMarriage(final Person person) {
-        return false;
-    }
-
-    @Override
-    protected boolean randomSameSexMarriage(final Person person) {
+    protected boolean randomMarriage(final Person person) {
         return false;
     }
 }

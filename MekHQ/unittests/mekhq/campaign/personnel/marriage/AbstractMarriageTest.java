@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -63,7 +63,6 @@ public class AbstractMarriageTest {
     public void testGettersAndSetters() {
         when(mockCampaignOptions.isUseClanPersonnelMarriages()).thenReturn(false);
         when(mockCampaignOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomSameSexMarriages()).thenReturn(false);
         when(mockCampaignOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
         when(mockCampaignOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
 
@@ -258,7 +257,7 @@ public class AbstractMarriageTest {
         verify(mockMergingSurnameStyle, times(1)).apply(any(), any(), any(), any());
     }
 
-    //region New Day
+    //region New Week
     @Test
     public void testProcessNewWeek() {
         doCallRealMethod().when(mockMarriage).processNewWeek(any(), any(), any());
@@ -268,37 +267,16 @@ public class AbstractMarriageTest {
 
         when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn("Married");
         mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockMarriage, times(0)).randomOppositeSexMarriage(any());
-        verify(mockMarriage, times(0)).randomSameSexMarriage(any());
+        verify(mockMarriage, times(0)).randomMarriage(any());
         verify(mockMarriage, times(0)).marryRandomSpouse(any(), any(), any(), anyBoolean());
 
         when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn(null);
-        when(mockMarriage.randomOppositeSexMarriage(any())).thenReturn(true);
+        when(mockMarriage.randomMarriage(any())).thenReturn(true);
         mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockMarriage, times(1)).randomOppositeSexMarriage(any());
-        verify(mockMarriage, times(0)).randomSameSexMarriage(any());
+        verify(mockMarriage, times(1)).randomMarriage(any());
         verify(mockMarriage, times(1)).marryRandomSpouse(any(), any(), any(), anyBoolean());
-
-        when(mockMarriage.randomOppositeSexMarriage(any())).thenReturn(false);
-        when(mockMarriage.isUseRandomSameSexMarriages()).thenReturn(false);
-        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockMarriage, times(2)).randomOppositeSexMarriage(any());
-        verify(mockMarriage, times(0)).randomSameSexMarriage(any());
-        verify(mockMarriage, times(1)).marryRandomSpouse(any(), any(), any(), anyBoolean());
-
-        when(mockMarriage.isUseRandomSameSexMarriages()).thenReturn(true);
-        when(mockMarriage.randomSameSexMarriage(any())).thenReturn(false);
-        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockMarriage, times(3)).randomOppositeSexMarriage(any());
-        verify(mockMarriage, times(1)).randomSameSexMarriage(any());
-        verify(mockMarriage, times(1)).marryRandomSpouse(any(), any(), any(), anyBoolean());
-
-        when(mockMarriage.randomSameSexMarriage(any())).thenReturn(true);
-        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockMarriage, times(4)).randomOppositeSexMarriage(any());
-        verify(mockMarriage, times(2)).randomSameSexMarriage(any());
-        verify(mockMarriage, times(2)).marryRandomSpouse(any(), any(), any(), anyBoolean());
     }
+
 
     //region Random Marriage
     @Test

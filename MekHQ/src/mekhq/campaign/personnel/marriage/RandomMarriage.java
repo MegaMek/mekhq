@@ -25,67 +25,31 @@ import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
 public class RandomMarriage extends AbstractMarriage {
     //region Variable Declarations
-    private int oppositeSexDiceSize;
-    private int sameSexDiceSize;
+    private int marriageDiceSize;
     //endregion Variable Declarations
 
     //region Constructors
     public RandomMarriage(final CampaignOptions options) {
         super(RandomMarriageMethod.DICE_ROLL, options);
 
-        setOppositeSexDiceSize(options.getRandomMarriageOppositeSexDiceSize());
-
-        setSameSexDiceSize(options.getRandomMarriageSameSexDiceSize());
+        setMarriageDiceSize(options.getRandomMarriageDiceSize());
     }
     //endregion Constructors
 
     //region Getters/Setters
     @SuppressWarnings(value = "unused")
-    public int getOppositeSexDiceSize() {
-        return oppositeSexDiceSize;
+    public int getMarriageDiceSize() {
+        return marriageDiceSize;
     }
 
     @SuppressWarnings(value = "unused")
-    public void setOppositeSexDiceSize(final int oppositeSexDiceSize) {
-        this.oppositeSexDiceSize = oppositeSexDiceSize;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public int getSameSexDiceSize() {
-        return sameSexDiceSize;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setSameSexDiceSize(final int sameSexDiceSize) {
-        this.sameSexDiceSize = sameSexDiceSize;
+    public void setMarriageDiceSize(final int marriageDiceSize) {
+        this.marriageDiceSize = marriageDiceSize;
     }
     //endregion Getters/Setters
 
     @Override
-    protected boolean randomOppositeSexMarriage(final Person person) {
-        // this is used to simulate failed relationships.
-        // it's very arbitrary but serves its purpose for now.
-        // TODO: replace this with a proper relationship system
-        if (Compute.randomInt(100) != 0) {
-            return false;
-        }
-
-        int multiplier = Math.max(1, person.getGenealogy().getFormerSpouses().size());
-
-        return Compute.randomInt(oppositeSexDiceSize * multiplier) == 0;
-    }
-
-    @Override
-    protected boolean randomSameSexMarriage(final Person person) {
-        // this is used to simulate failed relationships.
-        // it's very arbitrary but serves its purpose for now.
-        // TODO: replace this with a proper relationship system
-        if (Compute.randomInt(100) != 0) {
-            return false;
-        }
-
-        int multiplier = Math.max(1, person.getGenealogy().getFormerSpouses().size());
-
-        return Compute.randomInt(sameSexDiceSize * multiplier) == 0;
+    protected boolean randomMarriage(final Person person) {
+        return Compute.randomInt(marriageDiceSize) == 0;
     }
 }

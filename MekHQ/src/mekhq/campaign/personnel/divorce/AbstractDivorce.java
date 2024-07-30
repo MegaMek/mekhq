@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel.divorce;
 
+import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -246,6 +247,16 @@ public abstract class AbstractDivorce {
         origin.getGenealogy().setOriginSpouse(null);
         spouse.getGenealogy().setOriginSpouse(null);
 
+        // roll for removal of marriageable flag
+        if (Compute.d6(1) <= 2) {
+            origin.setMarriageable(false);
+        }
+
+        if (Compute.d6(1) <= 2) {
+            spouse.setMarriageable(false);
+        }
+
+        // trigger person changed events
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
         MekHQ.triggerEvent(new PersonChangedEvent(origin));
     }
