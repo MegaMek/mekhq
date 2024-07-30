@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,14 +23,14 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 
-public class randomProcreation extends AbstractProcreation {
+public class RandomProcreation extends AbstractProcreation {
     //region Variable Declarations
     private int relationshipDieSize;
     private int relationshiplessDieSize;
     //endregion Variable Declarations
 
     //region Constructors
-    public randomProcreation(final CampaignOptions options) {
+    public RandomProcreation(final CampaignOptions options) {
         super(RandomProcreationMethod.DICE_ROLL, options);
         setRelationshipDieSize(options.getRandomProcreationRelationshipDiceSize());
         setRelationshiplessDieSize(options.getRandomProcreationRelationshiplessDiceSize());

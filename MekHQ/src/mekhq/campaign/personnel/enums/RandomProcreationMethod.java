@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,7 +22,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
-import mekhq.campaign.personnel.procreation.randomProcreation;
+import mekhq.campaign.personnel.procreation.RandomProcreation;
 
 import java.util.ResourceBundle;
 
@@ -69,7 +69,7 @@ public enum RandomProcreationMethod {
 
     public AbstractProcreation getMethod(final CampaignOptions options) {
         if (this == DICE_ROLL) {
-            return new randomProcreation(options);
+            return new RandomProcreation(options);
         } else {
             return new DisabledRandomProcreation(options);
         }

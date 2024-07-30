@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,47 +25,32 @@ import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 
 public class RandomDivorce extends AbstractDivorce {
     //region Variable Declarations
-    private int oppositeSexDiceSize;
-    private int sameSexDiceSize;
+    private int divorceDiceSize;
     //endregion Variable Declarations
 
     //region Constructors
     public RandomDivorce(final CampaignOptions options) {
         super(RandomDivorceMethod.DICE_ROLL, options);
-        setOppositeSexDiceSize(options.getRandomDivorceDiceSize());
-        setSameSexDiceSize(options.getRandomDivorceDiceSize());
+        setDivorceDiceSize(options.getRandomDivorceDiceSize());
     }
     //endregion Constructors
 
     //region Getters/Setters
     @SuppressWarnings(value = "unused")
-    public int getOppositeSexDiceSize() {
-        return oppositeSexDiceSize;
+    public int getDivorceDiceSize() {
+        return divorceDiceSize;
     }
 
     @SuppressWarnings(value = "unused")
-    public void setOppositeSexDiceSize(final int oppositeSexDiceSize) {
-        this.oppositeSexDiceSize = oppositeSexDiceSize;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public int getSameSexDiceSize() {
-        return sameSexDiceSize;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setSameSexDiceSize(final int sameSexDiceSize) {
-        this.sameSexDiceSize = sameSexDiceSize;
+    public void setDivorceDiceSize(final int divorceDiceSize) {
+        this.divorceDiceSize = divorceDiceSize;
     }
     //endregion Getters/Setters
 
     @Override
-    protected boolean randomOppositeSexDivorce(final Person person) {
-        return Compute.randomInt(oppositeSexDiceSize) == 0;
-    }
+    protected boolean randomDivorce(final Person person) {
+        double multiplier = Math.max(1, person.getGenealogy().getFormerSpouses().size() * 0.5);
 
-    @Override
-    protected boolean randomSameSexDivorce(final Person person) {
-        return Compute.randomInt(sameSexDiceSize) == 0;
+        return Compute.randomInt((int) (divorceDiceSize * multiplier)) == 0;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -213,7 +213,11 @@ public abstract class AbstractMarriage {
             spouse.performRandomizedLoyaltyChange(campaign, false, true);
         }
 
-        // And finally we trigger person changed events
+        // log the origin spouse for both partners
+        origin.getGenealogy().setOriginSpouse(spouse);
+        spouse.getGenealogy().setOriginSpouse(origin);
+
+        // And finally, we trigger person changed events
         MekHQ.triggerEvent(new PersonChangedEvent(origin));
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
     }

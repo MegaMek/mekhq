@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.enums;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
-import mekhq.campaign.personnel.procreation.randomProcreation;
+import mekhq.campaign.personnel.procreation.RandomProcreation;
 import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
@@ -87,7 +87,7 @@ public class RandomProcreationMethodTest {
         when(mockOptions.getRandomProcreationRelationshiplessDiceSize()).thenReturn(5);
 
         assertInstanceOf(DisabledRandomProcreation.class, RandomProcreationMethod.NONE.getMethod(mockOptions));
-        assertInstanceOf(randomProcreation.class, RandomProcreationMethod.DICE_ROLL.getMethod(mockOptions));
+        assertInstanceOf(RandomProcreation.class, RandomProcreationMethod.DICE_ROLL.getMethod(mockOptions));
     }
 
     @Test

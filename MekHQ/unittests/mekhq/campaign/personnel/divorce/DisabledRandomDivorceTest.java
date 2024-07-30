@@ -48,12 +48,7 @@ public class DisabledRandomDivorceTest {
     }
 
     @Test
-    public void testRandomOppositeSexDivorce() {
-        assertFalse(new DisabledRandomDivorce(mockOptions).randomOppositeSexDivorce(mockPerson));
-    }
-
-    @Test
-    public void testRandomSameSexDivorce() {
-        assertFalse(new DisabledRandomDivorce(mockOptions).randomSameSexDivorce(mockPerson));
+    public void testRandomDivorce() {
+        assertFalse(new DisabledRandomDivorce(mockOptions).randomDivorce(mockPerson));
     }
 }

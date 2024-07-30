@@ -30,12 +30,7 @@ public class DisabledRandomDivorce extends AbstractDivorce {
     //endregion Constructors
 
     @Override
-    protected boolean randomOppositeSexDivorce(final Person person) {
-        return false;
-    }
-
-    @Override
-    protected boolean randomSameSexDivorce(final Person person) {
+    protected boolean randomDivorce(final Person person) {
         return false;
     }
 }

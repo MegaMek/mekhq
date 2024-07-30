@@ -57,7 +57,7 @@ import mekhq.campaign.personnel.divorce.RandomDivorce;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.marriage.RandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.procreation.randomProcreation;
+import mekhq.campaign.personnel.procreation.RandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.report.CargoReport;
@@ -1485,9 +1485,7 @@ public class CampaignGUI extends JPanel {
             getCampaign().getDivorce().setUseRandomClanPersonnelDivorce(newOptions.isUseRandomClanPersonnelDivorce());
             getCampaign().getDivorce().setUseRandomPrisonerDivorce(newOptions.isUseRandomPrisonerDivorce());
             if (getCampaign().getDivorce().getMethod().isDiceRoll()) {
-                ((RandomDivorce) getCampaign().getDivorce()).setOppositeSexDiceSize(
-                        newOptions.getRandomDivorceDiceSize());
-                ((RandomDivorce) getCampaign().getDivorce()).setSameSexDiceSize(
+                ((RandomDivorce) getCampaign().getDivorce()).setDivorceDiceSize(
                         newOptions.getRandomDivorceDiceSize());
             }
         }
@@ -1497,7 +1495,6 @@ public class CampaignGUI extends JPanel {
         } else {
             getCampaign().getMarriage().setUseClanPersonnelMarriages(newOptions.isUseClanPersonnelMarriages());
             getCampaign().getMarriage().setUsePrisonerMarriages(newOptions.isUsePrisonerMarriages());
-            getCampaign().getMarriage().setUseRandomSameSexMarriages(newOptions.isUseRandomSameSexMarriages());
             getCampaign().getMarriage()
                     .setUseRandomClanPersonnelMarriages(newOptions.isUseRandomClanPersonnelMarriages());
             getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
@@ -1520,9 +1517,9 @@ public class CampaignGUI extends JPanel {
                     .setUseRandomClanPersonnelProcreation(newOptions.isUseRandomClanPersonnelProcreation());
             getCampaign().getProcreation().setUseRandomPrisonerProcreation(newOptions.isUseRandomPrisonerProcreation());
             if (getCampaign().getProcreation().getMethod().isDiceRoll()) {
-                ((randomProcreation) getCampaign().getProcreation()).setRelationshipDieSize(
+                ((RandomProcreation) getCampaign().getProcreation()).setRelationshipDieSize(
                         newOptions.getRandomProcreationRelationshipDiceSize());
-                ((randomProcreation) getCampaign().getProcreation()).setRelationshiplessDieSize(
+                ((RandomProcreation) getCampaign().getProcreation()).setRelationshiplessDieSize(
                         newOptions.getRandomProcreationRelationshiplessDiceSize());
             }
         }

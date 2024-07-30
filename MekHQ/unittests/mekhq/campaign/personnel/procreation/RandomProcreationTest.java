@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,7 +59,7 @@ public class RandomProcreationTest {
 
     @Test
     public void testProcreation() {
-        final randomProcreation randomProcreation = new randomProcreation(mockOptions);
+        final RandomProcreation randomProcreation = new RandomProcreation(mockOptions);
         Genealogy mockGenealogy = mock(Genealogy.class);
 
         when(mockGenealogy.hasSpouse()).thenReturn(true);

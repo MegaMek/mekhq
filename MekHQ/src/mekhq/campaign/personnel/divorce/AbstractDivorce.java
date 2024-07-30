@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -150,8 +150,12 @@ public abstract class AbstractDivorce {
                 return resources.getString("cannotDivorce.RandomPrisoner.text");
             } else if (!isUseRandomPrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotDivorce.RandomPrisonerSpouse.text");
+            } else if (!person.equals(person.getGenealogy().getOriginSpouse())) {
+                return resources.getString("cannotDivorce.RandomNotOriginSpouse.text");
             }
+
             final boolean sameSex = person.getGenealogy().getSpouse().getGender() == person.getGender();
+
             if (!isUseRandomOppositeSexDivorce() && !sameSex) {
                 return resources.getString("cannotDivorce.OppositeSexDivorceDisabled.text");
             } else if (!isUseRandomSameSexDivorce() && sameSex) {
@@ -238,6 +242,10 @@ public abstract class AbstractDivorce {
         spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, today, reason));
         origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, today, reason));
 
+        // Clear origin spouses
+        origin.getGenealogy().setOriginSpouse(null);
+        spouse.getGenealogy().setOriginSpouse(null);
+
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
         MekHQ.triggerEvent(new PersonChangedEvent(origin));
     }
@@ -254,26 +262,18 @@ public abstract class AbstractDivorce {
             return;
         }
 
-        if ((person.getGenealogy().getSpouse().getGender() == person.getGender())
-                ? randomSameSexDivorce(person) : randomOppositeSexDivorce(person)) {
+        if (randomDivorce(person)) {
             divorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
         }
     }
 
     //region Random Divorce
     /**
-     * This determines if a person will randomly divorce their opposite sex spouse
-     * @param person the person to determine if they are to randomly divorce their opposite sex spouse
+     * This determines if a person will randomly divorce their spouse
+     * @param person the person to determine if they are to randomly divorce their spouse
      * @return true if the person is to randomly divorce
      */
-    protected abstract boolean randomOppositeSexDivorce(final Person person);
-
-    /**
-     * This determines if a person will randomly divorce their same-sex spouse.
-     * @param person the person who may be randomly divorcing their same-sex spouse
-     * @return true if the person is to randomly divorce
-     */
-    protected abstract boolean randomSameSexDivorce(final Person person);
+    protected abstract boolean randomDivorce(final Person person);
     //endregion Random Divorce
     //endregion New Day
 }
