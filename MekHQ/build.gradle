@@ -191,24 +191,12 @@ task stageFiles(type: Copy) {
 task createStartScripts (type: CreateStartScripts) {
     description = 'Create shell script for generic distribution.'
 
-    applicationName = 'mekhq'
+    applicationName = 'MekHQ'
     mainClass = application.mainClass
     outputDir = startScripts.outputDir
     classpath = jar.outputs.files + files(project.sourceSets.main.runtimeClasspath.files)
             .filter { it.name.endsWith(".jar") }
     defaultJvmOpts = project.ext.mhqJvmOptions
-    // The default template assumes the start script is in a subdirectory and always
-    // sets APP_HOME to the parent directory of the one containing the script.
-    // So we provide a modified template.
-    unixStartScriptGenerator.template = resources.text.fromFile(scriptTemplate)
-    doLast {
-        // The start script assumes all the files on the classpath will be in the lib directory.
-        unixScript.text = unixScript.text.replace('lib/MekHQ', 'MekHQ')
-        windowsScript.text = windowsScript.text.replace('lib/MekHQ', 'MekHQ')
-        // The Windows script just has a single line that needs to be changed to put the script in the root,
-        // so we'll do a simple replace
-        windowsScript.text = windowsScript.text.replace('set APP_HOME=%DIRNAME%..', '')
-    }
 }
 
 distributions {
@@ -218,8 +206,11 @@ distributions {
             // MegaMek Includes
             from ("${mmDir}/megamek/build/files")
             from ("${mmDir}/megamek/build/scripts") {
-                include 'megamek*'
-                rename 'megamek(.*)', 'megamek-startup$1'
+                into "bin"
+            }
+            from ("${mmDir}/megamek/scripts") {
+                include "shell.sh"
+                rename "shell.sh", "MegaMek.sh"
             }
             from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
@@ -251,8 +242,11 @@ distributions {
                 into "${data}/images"
             }
             from ("${mmlDir}/megameklab/build/scripts") {
-                include 'megameklab*'
-                rename 'megameklab(.*)', 'megameklab-startup$1'
+                into "bin"
+            }
+            from ("${mmlDir}/megameklab/scripts") {
+                include "shell.sh"
+                rename "shell.sh", "MegaMekLab.sh"
             }
             from ("${mmlDir}/megameklab/docs/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
@@ -280,9 +274,9 @@ distributions {
             from (fileStagingDir) {
                 exclude 'history.txt'
             }
-            from (createStartScripts) {
-                include 'mekhq*'
-                rename 'mekhq(.*)', 'mekhq-startup$1'
+            from ("${projectDir}/scripts") {
+                include 'shell.sh'
+                rename 'shell.sh', 'MekHQ.sh'
             }
             from ("${buildDir}/launch4j") {
                 include '*.exe'
