@@ -350,9 +350,7 @@ public class CampaignSummary {
 
             int doctorCapacity = campaign.getActivePersonnel().stream()
                     .filter(person -> (person.getPrimaryRole().isDoctor()) || (person.getSecondaryRole().isDoctor()))
-                    // this magic number is defined in mekhq/gui/InfirmaryTab.java/assignDoctor()
-                    // and represents the maximum number of patients each doctor can have
-                    .mapToInt(person -> 24)
+                    .mapToInt(person -> campaign.getCampaignOptions().getMaximumPatients())
                     .sum();
 
             report.append(String.format("Hospital Beds (%s/%s)",

@@ -271,7 +271,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                         && (p.needsFixing()
                                 || (getCampaign().getCampaignOptions().isUseAdvancedMedical() && p.needsAMFixing()))
                         // if this magic number is ever changed, please update mekhq/campaign/CampaignSummary.java/getFacilityReport()
-                        && (getCampaign().getPatientsFor(doctor) < 25)
+                        && (getCampaign().getPatientsFor(doctor) < getCampaign().getCampaignOptions().getMaximumPatients())
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, p));
@@ -284,7 +284,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 if ((null != p)
                         && (p.needsFixing()
                                 || (getCampaign().getCampaignOptions().isUseAdvancedMedical() && p.needsAMFixing()))
-                        && (getCampaign().getPatientsFor(doctor) < 25)
+                        && (getCampaign().getPatientsFor(doctor) < getCampaign().getCampaignOptions().getMaximumPatients())
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, p));
