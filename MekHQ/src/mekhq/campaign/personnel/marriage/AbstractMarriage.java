@@ -44,7 +44,6 @@ public abstract class AbstractMarriage {
     private final RandomMarriageMethod method;
     private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
-    private boolean useRandomSameSexMarriages;
     private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
 
@@ -63,46 +62,47 @@ public abstract class AbstractMarriage {
     //endregion Constructors
 
     //region Getters/Setters
+    @SuppressWarnings(value = "unused")
     public RandomMarriageMethod getMethod() {
         return method;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isUseClanPersonnelMarriages() {
         return useClanPersonnelMarriages;
     }
 
+    @SuppressWarnings(value = "unused")
     public void setUseClanPersonnelMarriages(final boolean useClanPersonnelMarriages) {
         this.useClanPersonnelMarriages = useClanPersonnelMarriages;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isUsePrisonerMarriages() {
         return usePrisonerMarriages;
     }
 
+    @SuppressWarnings(value = "unused")
     public void setUsePrisonerMarriages(final boolean usePrisonerMarriages) {
         this.usePrisonerMarriages = usePrisonerMarriages;
     }
 
-    public boolean isUseRandomSameSexMarriages() {
-        return useRandomSameSexMarriages;
-    }
-
-    public void setUseRandomSameSexMarriages(final boolean useRandomSameSexMarriages) {
-        this.useRandomSameSexMarriages = useRandomSameSexMarriages;
-    }
-
+    @SuppressWarnings(value = "unused")
     public boolean isUseRandomClanPersonnelMarriages() {
         return useRandomClanPersonnelMarriages;
     }
 
+    @SuppressWarnings(value = "unused")
     public void setUseRandomClanPersonnelMarriages(final boolean useRandomClanPersonnelMarriages) {
         this.useRandomClanPersonnelMarriages = useRandomClanPersonnelMarriages;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isUseRandomPrisonerMarriages() {
         return useRandomPrisonerMarriages;
     }
 
+    @SuppressWarnings(value = "unused")
     public void setUseRandomPrisonerMarriages(final boolean useRandomPrisonerMarriages) {
         this.useRandomPrisonerMarriages = useRandomPrisonerMarriages;
     }
@@ -251,7 +251,7 @@ public abstract class AbstractMarriage {
      * @param campaign the campaign the person is a part of
      * @param today the current date
      * @param person the person who is getting randomly married
-     * @param sameSex whether the marriage is homosexual or heterosexual
+     * @param sameSex whether the marriage is between same-sex partners
      */
     protected void marryRandomSpouse(final Campaign campaign, final LocalDate today,
                                      final Person person, final boolean sameSex) {
