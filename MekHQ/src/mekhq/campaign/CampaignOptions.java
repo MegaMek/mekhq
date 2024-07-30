@@ -342,7 +342,7 @@ public class CampaignOptions {
     private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
-    private boolean useRandomSameSexMarriages;
+    private boolean useRandomSameSexMarriages; // legacy, pre-50.0
     private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
@@ -851,7 +851,6 @@ public class CampaignOptions {
         getMarriageSurnameWeights().put(MergingSurnameStyle.MALE, 500);
         getMarriageSurnameWeights().put(MergingSurnameStyle.FEMALE, 160);
         setRandomMarriageMethod(RandomMarriageMethod.NONE);
-        setUseRandomSameSexMarriages(false);
         setUseRandomClanPersonnelMarriages(false);
         setUseRandomPrisonerMarriages(false);
         setRandomMarriageAgeRange(10);
@@ -2359,6 +2358,7 @@ public class CampaignOptions {
     /**
      * @return whether or not to use random same-sex marriages
      */
+    @Deprecated
     public boolean isUseRandomSameSexMarriages() {
         return useRandomSameSexMarriages;
     }
@@ -2366,6 +2366,7 @@ public class CampaignOptions {
     /**
      * @param useRandomSameSexMarriages whether or not to use random same-sex marriages
      */
+    @Deprecated
     public void setUseRandomSameSexMarriages(final boolean useRandomSameSexMarriages) {
         this.useRandomSameSexMarriages = useRandomSameSexMarriages;
     }
@@ -4700,7 +4701,6 @@ public class CampaignOptions {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "marriageSurnameWeights");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageMethod", getRandomMarriageMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomSameSexMarriages", isUseRandomSameSexMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelMarriages", isUseRandomClanPersonnelMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
@@ -5411,8 +5411,6 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageMethod")) {
                     retVal.setRandomMarriageMethod(RandomMarriageMethod.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
-                    retVal.setUseRandomSameSexMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelMarriages")
                         || wn2.getNodeName().equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
                     retVal.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -5424,6 +5422,10 @@ public class CampaignOptions {
                     retVal.setRandomMarriageOppositeSexDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSameSexChance")) {
                     retVal.setRandomMarriageSameSexDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
+                    if (!Boolean.parseBoolean(wn2.getTextContent().trim())) {
+                        retVal.setRandomMarriageSameSexDiceSize(0); // legacy, pre-50.0
+                    }
                     //endregion Marriage
 
                     //region Divorce
