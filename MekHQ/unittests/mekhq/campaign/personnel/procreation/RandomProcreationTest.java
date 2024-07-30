@@ -30,9 +30,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -63,19 +60,14 @@ public class RandomProcreationTest {
         Genealogy mockGenealogy = mock(Genealogy.class);
 
         when(mockGenealogy.hasSpouse()).thenReturn(true);
-        when(mockGenealogy.getChildren()).thenReturn(new ArrayList<>(Collections.singleton(mock(Person.class))));
-
-        // Make sure getGenealogy returns mocked Genealogy
         when(mockPerson.getGenealogy()).thenReturn(mockGenealogy);
 
-        // Assuming diceSize and multiplier are defined...
         int diceSize = 5;
-        int multiplier = 1;
 
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(() -> Compute.randomInt(diceSize * multiplier)).thenReturn(0);
+            compute.when(() -> Compute.randomInt(diceSize)).thenReturn(0);
             assertTrue(randomProcreation.procreation(mockPerson));
-            compute.when(() -> Compute.randomInt(diceSize * multiplier)).thenReturn(1);
+            compute.when(() -> Compute.randomInt(diceSize)).thenReturn(1);
             assertFalse(randomProcreation.procreation(mockPerson));
         }
     }

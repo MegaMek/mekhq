@@ -373,6 +373,11 @@ public abstract class AbstractProcreation {
 
         mother.performRandomizedLoyaltyChange(campaign, false, true);
 
+        // check desire for children
+        if (Compute.d6(1) <= 2) {
+            mother.setTryingToConceive(false);
+        }
+
         // Cleanup Data
         removePregnancy(mother);
     }

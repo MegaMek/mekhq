@@ -57,7 +57,6 @@ public abstract class AbstractMarriage {
         this.method = method;
         setUseClanPersonnelMarriages(options.isUseClanPersonnelMarriages());
         setUsePrisonerMarriages(options.isUsePrisonerMarriages());
-        setUseRandomSameSexMarriages(options.isUseRandomSameSexMarriages());
         setUseRandomClanPersonnelMarriages(options.isUseRandomClanPersonnelMarriages());
         setUseRandomPrisonerMarriages(options.isUseRandomPrisonerMarriages());
     }
