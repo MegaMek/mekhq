@@ -44,10 +44,10 @@ public class RandomProcreationMethodTest {
     //region Getters
     @Test
     public void testGetToolTipText() {
-        assertEquals(resources.getString("RandomProcreationMethod.NONE.toolTipText"),
-                RandomProcreationMethod.NONE.getToolTipText());
-        assertEquals(resources.getString("RandomProcreationMethod.DICE_ROLL.toolTipText"),
-                RandomProcreationMethod.DICE_ROLL.getToolTipText());
+        assertEquals(resources.getString("RandomProcreationMethod.NONE.toolTipText").trim(),
+                RandomProcreationMethod.NONE.getToolTipText().trim());
+        assertEquals(resources.getString("RandomProcreationMethod.DICE_ROLL.toolTipText").trim(),
+                RandomProcreationMethod.DICE_ROLL.getToolTipText().trim());
     }
     //endregion Getters
 

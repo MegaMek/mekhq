@@ -26,6 +26,8 @@ import mekhq.campaign.personnel.procreation.randomProcreation;
 
 import java.util.ResourceBundle;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 public enum RandomProcreationMethod {
     //region Enum Declarations
     NONE("RandomProcreationMethod.NONE.text", "RandomProcreationMethod.NONE.toolTipText"),
@@ -42,7 +44,7 @@ public enum RandomProcreationMethod {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
+        this.toolTipText = wordWrap(resources.getString(toolTipText));
     }
     //endregion Constructors
 

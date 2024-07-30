@@ -22,14 +22,16 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
-import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
+import mekhq.campaign.personnel.marriage.RandomMarriage;
 
 import java.util.ResourceBundle;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
 
 public enum RandomMarriageMethod {
     //region Enum Declarations
     NONE("RandomMarriageMethod.NONE.text", "RandomMarriageMethod.NONE.toolTipText"),
-    PERCENTAGE("RandomMarriageMethod.PERCENTAGE.text", "RandomMarriageMethod.PERCENTAGE.toolTipText");
+    DICE_ROLL("RandomMarriageMethod.DICE_ROLL.text", "RandomMarriageMethod.DICE_ROLL.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -42,33 +44,34 @@ public enum RandomMarriageMethod {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
+        this.toolTipText = wordWrap(resources.getString(toolTipText));
     }
     //endregion Constructors
 
     //region Getters
+    @SuppressWarnings(value = "unused")
     public String getToolTipText() {
         return toolTipText;
     }
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @SuppressWarnings(value = "unused")
     public boolean isNone() {
         return this == NONE;
     }
 
-    public boolean isPercentage() {
-        return this == PERCENTAGE;
+    @SuppressWarnings(value = "unused")
+    public boolean isDiceRoll() {
+        return this == DICE_ROLL;
     }
     //endregion Boolean Comparison Methods
 
     public AbstractMarriage getMethod(final CampaignOptions options) {
-        switch (this) {
-            case PERCENTAGE:
-                return new PercentageRandomMarriage(options);
-            case NONE:
-            default:
-                return new DisabledRandomMarriage(options);
+        if (this == DICE_ROLL) {
+            return new RandomMarriage(options);
+        } else {
+            return new DisabledRandomMarriage(options);
         }
     }
 

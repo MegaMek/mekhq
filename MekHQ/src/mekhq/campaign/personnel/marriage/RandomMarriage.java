@@ -23,45 +23,55 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
-public class PercentageRandomMarriage extends AbstractMarriage {
+public class RandomMarriage extends AbstractMarriage {
     //region Variable Declarations
-    private double oppositeSexPercentage;
-    private double sameSexPercentage;
+    private int oppositeSexDiceSize;
+    private int sameSexDiceSize;
     //endregion Variable Declarations
 
     //region Constructors
-    public PercentageRandomMarriage(final CampaignOptions options) {
-        super(RandomMarriageMethod.PERCENTAGE, options);
-        setOppositeSexPercentage(options.getPercentageRandomMarriageOppositeSexChance());
-        setSameSexPercentage(options.getPercentageRandomMarriageSameSexChance());
+    public RandomMarriage(final CampaignOptions options) {
+        super(RandomMarriageMethod.DICE_ROLL, options);
+
+        setOppositeSexDiceSize(options.getRandomMarriageOppositeSexDiceSize());
+
+        setSameSexDiceSize(options.getRandomMarriageSameSexDiceSize());
     }
     //endregion Constructors
 
     //region Getters/Setters
-    public double getOppositeSexPercentage() {
-        return oppositeSexPercentage;
+    @SuppressWarnings(value = "unused")
+    public int getOppositeSexDiceSize() {
+        return oppositeSexDiceSize;
     }
 
-    public void setOppositeSexPercentage(final double oppositeSexPercentage) {
-        this.oppositeSexPercentage = oppositeSexPercentage;
+    @SuppressWarnings(value = "unused")
+    public void setOppositeSexDiceSize(final int oppositeSexDiceSize) {
+        this.oppositeSexDiceSize = oppositeSexDiceSize;
     }
 
-    public double getSameSexPercentage() {
-        return sameSexPercentage;
+    @SuppressWarnings(value = "unused")
+    public int getSameSexDiceSize() {
+        return sameSexDiceSize;
     }
 
-    public void setSameSexPercentage(final double sameSexPercentage) {
-        this.sameSexPercentage = sameSexPercentage;
+    @SuppressWarnings(value = "unused")
+    public void setSameSexDiceSize(final int sameSexDiceSize) {
+        this.sameSexDiceSize = sameSexDiceSize;
     }
     //endregion Getters/Setters
 
     @Override
     protected boolean randomOppositeSexMarriage(final Person person) {
-        return Compute.randomFloat() < getOppositeSexPercentage();
+        int multiplier = Math.max(1, person.getGenealogy().getFormerSpouses().size());
+
+        return Compute.randomInt(oppositeSexDiceSize * multiplier) == 0;
     }
 
     @Override
     protected boolean randomSameSexMarriage(final Person person) {
-        return Compute.randomFloat() < getSameSexPercentage();
+        int multiplier = Math.max(1, person.getGenealogy().getFormerSpouses().size());
+
+        return Compute.randomInt(sameSexDiceSize * multiplier) == 0;
     }
 }

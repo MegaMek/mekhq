@@ -55,7 +55,7 @@ import mekhq.campaign.personnel.death.ExponentialRandomDeath;
 import mekhq.campaign.personnel.death.PercentageRandomDeath;
 import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
+import mekhq.campaign.personnel.marriage.RandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.randomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -1501,11 +1501,11 @@ public class CampaignGUI extends JPanel {
             getCampaign().getMarriage()
                     .setUseRandomClanPersonnelMarriages(newOptions.isUseRandomClanPersonnelMarriages());
             getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
-            if (getCampaign().getMarriage().getMethod().isPercentage()) {
-                ((PercentageRandomMarriage) getCampaign().getMarriage()).setOppositeSexPercentage(
-                        newOptions.getPercentageRandomMarriageOppositeSexChance());
-                ((PercentageRandomMarriage) getCampaign().getMarriage()).setSameSexPercentage(
-                        newOptions.getPercentageRandomMarriageSameSexChance());
+            if (getCampaign().getMarriage().getMethod().isDiceRoll()) {
+                ((RandomMarriage) getCampaign().getMarriage()).setOppositeSexDiceSize(
+                        newOptions.getRandomMarriageOppositeSexDiceSize());
+                ((RandomMarriage) getCampaign().getMarriage()).setSameSexDiceSize(
+                        newOptions.getRandomMarriageSameSexDiceSize());
             }
         }
 

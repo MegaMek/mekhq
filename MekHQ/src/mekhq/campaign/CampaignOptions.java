@@ -346,8 +346,8 @@ public class CampaignOptions {
     private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
-    private double percentageRandomMarriageOppositeSexChance;
-    private double percentageRandomMarriageSameSexChance;
+    private int randomMarriageOppositeSexDiceSize;
+    private int randomMarriageSameSexDiceSize;
 
     // Divorce
     private boolean useManualDivorce;
@@ -856,8 +856,9 @@ public class CampaignOptions {
         setUseRandomClanPersonnelMarriages(false);
         setUseRandomPrisonerMarriages(true);
         setRandomMarriageAgeRange(10);
-        setPercentageRandomMarriageOppositeSexChance(0.00025);
-        setPercentageRandomMarriageSameSexChance(0.00002);
+        setRandomMarriageOppositeSexDiceSize(542);
+        // this number was determined based on 2* the % of recorded same-sex marriages in the US circa 2022
+        setRandomMarriageSameSexDiceSize(3042);
 
         // Divorce
         setUseManualDivorce(true);
@@ -2405,35 +2406,35 @@ public class CampaignOptions {
     }
 
     /**
-     * This gets the decimal chance (between 0 and 1) of a random opposite sex marriage occurring
-     * @return the chance, with a value between 0 and 1
+     * @return the number of sides on the die used to determine random opposite sex marriage
      */
-    public double getPercentageRandomMarriageOppositeSexChance() {
-        return percentageRandomMarriageOppositeSexChance;
+    public int getRandomMarriageOppositeSexDiceSize() {
+        return randomMarriageOppositeSexDiceSize;
     }
 
     /**
-     * This sets the decimal chance (between 0 and 1) of a random opposite sex marriage occurring
-     * @param percentageRandomMarriageOppositeSexChance the chance, with a value between 0 and 1
+     * Sets the size of the random opposite sex marriage die.
+     *
+     * @param randomMarriageOppositeSexDiceSize the size of the random opposite sex marriage die
      */
-    public void setPercentageRandomMarriageOppositeSexChance(final double percentageRandomMarriageOppositeSexChance) {
-        this.percentageRandomMarriageOppositeSexChance = percentageRandomMarriageOppositeSexChance;
+    public void setRandomMarriageOppositeSexDiceSize(final int randomMarriageOppositeSexDiceSize) {
+        this.randomMarriageOppositeSexDiceSize = randomMarriageOppositeSexDiceSize;
     }
 
     /**
-     * This gets the decimal chance (between 0 and 1) of a random same-sex marriage occurring
-     * @return the chance, with a value between 0 and 1
+     * @return the number of sides on the die used to determine random same-sex marriage
      */
-    public double getPercentageRandomMarriageSameSexChance() {
-        return percentageRandomMarriageSameSexChance;
+    public int getRandomMarriageSameSexDiceSize() {
+        return randomMarriageSameSexDiceSize;
     }
 
     /**
-     * This sets the decimal chance (between 0 and 1) of a random same-sex marriage occurring
-     * @param percentageRandomMarriageSameSexChance the chance, with a value between 0 and 1
+     * Sets the size of the random same-sex marriage die.
+     *
+     * @param randomMarriageSameSexDiceSize the size of the random opposite sex marriage die
      */
-    public void setPercentageRandomMarriageSameSexChance(final double percentageRandomMarriageSameSexChance) {
-        this.percentageRandomMarriageSameSexChance = percentageRandomMarriageSameSexChance;
+    public void setRandomMarriageSameSexDiceSize(final int randomMarriageSameSexDiceSize) {
+        this.randomMarriageSameSexDiceSize = randomMarriageSameSexDiceSize;
     }
     //endregion Marriage
 
@@ -4714,8 +4715,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelMarriages", isUseRandomClanPersonnelMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomMarriageOppositeSexChance", getPercentageRandomMarriageOppositeSexChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomMarriageSameSexChance", getPercentageRandomMarriageSameSexChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageOppositeSexDiceSize", getRandomMarriageOppositeSexDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageSameSexChance", getRandomMarriageSameSexDiceSize());
         //endregion Marriage
 
         //region Divorce
@@ -5431,10 +5432,10 @@ public class CampaignOptions {
                     retVal.setUseRandomPrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageAgeRange")) {
                     retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageOppositeSexChance")) {
-                    retVal.setPercentageRandomMarriageOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageSameSexChance")) {
-                    retVal.setPercentageRandomMarriageSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageOppositeSexChance")) {
+                    retVal.setRandomMarriageOppositeSexDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSameSexChance")) {
+                    retVal.setRandomMarriageSameSexDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Marriage
 
                     //region Divorce
@@ -5992,15 +5993,11 @@ public class CampaignOptions {
                     retVal.setUseRandomDependentAddition(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
                     retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) { // Legacy - 0.49.6 Removal
-                    retVal.setPercentageRandomMarriageOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) { // Legacy - 0.49.6 Removal
-                    retVal.setPercentageRandomMarriageSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.6 Removal
                     retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) { // Legacy - 0.49.6 Removal
                     retVal.setRandomMarriageMethod(Boolean.parseBoolean(wn2.getTextContent().trim())
-                            ? RandomMarriageMethod.PERCENTAGE : RandomMarriageMethod.NONE);
+                            ? RandomMarriageMethod.DICE_ROLL : RandomMarriageMethod.NONE);
                 } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) { // Legacy - 0.49.6 Removal
                     retVal.setLogMarriageNameChanges(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) { // Legacy - 0.49.6 Removal

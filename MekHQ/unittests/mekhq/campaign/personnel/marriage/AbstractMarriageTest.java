@@ -260,41 +260,41 @@ public class AbstractMarriageTest {
 
     //region New Day
     @Test
-    public void testProcessNewDay() {
-        doCallRealMethod().when(mockMarriage).processNewDay(any(), any(), any());
+    public void testProcessNewWeek() {
+        doCallRealMethod().when(mockMarriage).processNewWeek(any(), any(), any());
         doNothing().when(mockMarriage).marryRandomSpouse(any(), any(), any(), anyBoolean());
 
         final Person mockPerson = mock(Person.class);
 
         when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn("Married");
-        mockMarriage.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(0)).randomOppositeSexMarriage(any());
         verify(mockMarriage, times(0)).randomSameSexMarriage(any());
         verify(mockMarriage, times(0)).marryRandomSpouse(any(), any(), any(), anyBoolean());
 
         when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn(null);
         when(mockMarriage.randomOppositeSexMarriage(any())).thenReturn(true);
-        mockMarriage.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(1)).randomOppositeSexMarriage(any());
         verify(mockMarriage, times(0)).randomSameSexMarriage(any());
         verify(mockMarriage, times(1)).marryRandomSpouse(any(), any(), any(), anyBoolean());
 
         when(mockMarriage.randomOppositeSexMarriage(any())).thenReturn(false);
         when(mockMarriage.isUseRandomSameSexMarriages()).thenReturn(false);
-        mockMarriage.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(2)).randomOppositeSexMarriage(any());
         verify(mockMarriage, times(0)).randomSameSexMarriage(any());
         verify(mockMarriage, times(1)).marryRandomSpouse(any(), any(), any(), anyBoolean());
 
         when(mockMarriage.isUseRandomSameSexMarriages()).thenReturn(true);
         when(mockMarriage.randomSameSexMarriage(any())).thenReturn(false);
-        mockMarriage.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(3)).randomOppositeSexMarriage(any());
         verify(mockMarriage, times(1)).randomSameSexMarriage(any());
         verify(mockMarriage, times(1)).marryRandomSpouse(any(), any(), any(), anyBoolean());
 
         when(mockMarriage.randomSameSexMarriage(any())).thenReturn(true);
-        mockMarriage.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(4)).randomOppositeSexMarriage(any());
         verify(mockMarriage, times(2)).randomSameSexMarriage(any());
         verify(mockMarriage, times(2)).marryRandomSpouse(any(), any(), any(), anyBoolean());

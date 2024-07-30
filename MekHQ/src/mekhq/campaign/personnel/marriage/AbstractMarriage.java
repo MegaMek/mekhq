@@ -225,7 +225,7 @@ public abstract class AbstractMarriage {
      * @param today the current day
      * @param person the person to process
      */
-    public void processNewDay(final Campaign campaign, final LocalDate today, final Person person) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person) {
         if (canMarry(campaign, today, person, true) != null) {
             return;
         }

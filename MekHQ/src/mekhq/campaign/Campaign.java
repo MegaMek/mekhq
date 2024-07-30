@@ -3414,7 +3414,9 @@ public class Campaign implements ITechManager {
             }
 
             // Marriage
-            getMarriage().processNewDay(this, getLocalDate(), p);
+            if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+                getMarriage().processNewWeek(this, getLocalDate(), p);
+            }
 
             p.resetMinutesLeft();
             // Reset acquisitions made to 0

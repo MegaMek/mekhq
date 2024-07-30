@@ -621,7 +621,7 @@ public abstract class AbstractCompanyGenerator {
 
                 for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
-                        campaign.getMarriage().processNewDay(campaign, date, tracker.getPerson());
+                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson());
                     }
 
                     if (getOptions().isSimulateRandomProcreation()) {

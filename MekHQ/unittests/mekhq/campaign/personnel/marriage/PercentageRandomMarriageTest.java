@@ -21,6 +21,7 @@ package mekhq.campaign.personnel.marriage;
 import megamek.common.Compute;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +30,11 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
@@ -48,41 +52,47 @@ public class PercentageRandomMarriageTest {
         when(mockOptions.isUseRandomSameSexMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
-        when(mockOptions.getPercentageRandomMarriageOppositeSexChance()).thenReturn(0.5);
-        when(mockOptions.getPercentageRandomMarriageSameSexChance()).thenReturn(0.5);
+        when(mockOptions.getRandomMarriageOppositeSexDiceSize()).thenReturn(5);
+        when(mockOptions.getRandomMarriageSameSexDiceSize()).thenReturn(5);
     }
 
     @Test
     public void testRandomOppositeSexMarriage() {
-        final PercentageRandomMarriage percentageRandomMarriage = new PercentageRandomMarriage(mockOptions);
-        // This ignores the person, so just using a mocked person
-        // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
+        final RandomMarriage randomMarriage = new RandomMarriage(mockOptions);
+        Genealogy mockGenealogy = mock(Genealogy.class);
+
+        when(mockGenealogy.getFormerSpouses()).thenReturn(Collections.emptyList());
+
+        when(mockPerson.getGenealogy()).thenReturn(mockGenealogy);
+
+        int diceSize = 5;
+        int multiplier = 1;
+
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomFloat).thenReturn(0f);
-            assertTrue(percentageRandomMarriage.randomOppositeSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.49f);
-            assertTrue(percentageRandomMarriage.randomOppositeSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.5f);
-            assertFalse(percentageRandomMarriage.randomOppositeSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(1f);
-            assertFalse(percentageRandomMarriage.randomOppositeSexMarriage(mockPerson));
+            compute.when(() -> Compute.randomInt(diceSize * multiplier)).thenReturn(0);
+            assertTrue(randomMarriage.randomOppositeSexMarriage(mockPerson));
+            compute.when(() -> Compute.randomInt(diceSize * multiplier)).thenReturn(1);
+            assertFalse(randomMarriage.randomOppositeSexMarriage(mockPerson));
         }
     }
 
     @Test
     public void testRandomSameSexMarriage() {
-        final PercentageRandomMarriage percentageRandomMarriage = new PercentageRandomMarriage(mockOptions);
-        // This ignores the person, so just using a mocked person
-        // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
+        final RandomMarriage randomMarriage = new RandomMarriage(mockOptions);
+        Genealogy mockGenealogy = mock(Genealogy.class);
+
+        when(mockGenealogy.getFormerSpouses()).thenReturn(Collections.emptyList());
+
+        when(mockPerson.getGenealogy()).thenReturn(mockGenealogy);
+
+        int diceSize = 5;
+        int multiplier = 1;
+
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomFloat).thenReturn(0f);
-            assertTrue(percentageRandomMarriage.randomSameSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.49f);
-            assertTrue(percentageRandomMarriage.randomSameSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.5f);
-            assertFalse(percentageRandomMarriage.randomSameSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(1f);
-            assertFalse(percentageRandomMarriage.randomSameSexMarriage(mockPerson));
+            compute.when(() -> Compute.randomInt(diceSize * multiplier)).thenReturn(0);
+            assertTrue(randomMarriage.randomSameSexMarriage(mockPerson));
+            compute.when(() -> Compute.randomInt(diceSize * multiplier)).thenReturn(1);
+            assertFalse(randomMarriage.randomSameSexMarriage(mockPerson));
         }
     }
 }
