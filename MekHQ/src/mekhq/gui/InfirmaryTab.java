@@ -270,7 +270,6 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 if ((null != p)
                         && (p.needsFixing()
                                 || (getCampaign().getCampaignOptions().isUseAdvancedMedical() && p.needsAMFixing()))
-                        // if this magic number is ever changed, please update mekhq/campaign/CampaignSummary.java/getFacilityReport()
                         && (getCampaign().getPatientsFor(doctor) < getCampaign().getCampaignOptions().getMaximumPatients())
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
