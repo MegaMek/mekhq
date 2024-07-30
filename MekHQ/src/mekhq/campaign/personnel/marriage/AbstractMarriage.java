@@ -320,12 +320,13 @@ public abstract class AbstractMarriage {
         Person externalSpouse = campaign.newDependent(false, gender);
 
         // Adjust the birthday until it's within the correct age range
-        int ageDifference = person.getAge(today) - campaign.getCampaignOptions().getRandomMarriageAgeRange();
+        int personAge = person.getAge(today);
+        int ageDifference = campaign.getCampaignOptions().getRandomMarriageAgeRange();
 
-        if (externalSpouse.getAge(today) < ageDifference) {
-            externalSpouse.setBirthday(today.plusYears(ageDifference - externalSpouse.getAge(today) + 1));
+        if (externalSpouse.getAge(today) < (personAge - ageDifference)) {
+            externalSpouse.setBirthday(today.plusYears(1));
         } else {
-            while ((!externalSpouse.isChild(today)) && (externalSpouse.getAge(today) > ageDifference)) {
+            while ((!externalSpouse.isChild(today)) && (externalSpouse.getAge(today) < (personAge - ageDifference))) {
                 externalSpouse.setBirthday(today.minusYears(1));
             }
         }
