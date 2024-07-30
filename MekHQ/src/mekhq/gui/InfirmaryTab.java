@@ -228,7 +228,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         return patients;
     }
 
-    protected ArrayList<Person> getSelectedUnassignedPatients() {
+    private ArrayList<Person> getSelectedUnassignedPatients() {
         ArrayList<Person> patients = new ArrayList<>();
         int[] indices = listUnassignedPatient.getSelectedIndices();
         if (unassignedPatientModel.getSize() == 0) {
@@ -270,6 +270,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 if ((null != p)
                         && (p.needsFixing()
                                 || (getCampaign().getCampaignOptions().isUseAdvancedMedical() && p.needsAMFixing()))
+                        // if this magic number is ever changed, please update mekhq/campaign/CampaignSummary.java/getFacilityReport()
                         && (getCampaign().getPatientsFor(doctor) < 25)
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
