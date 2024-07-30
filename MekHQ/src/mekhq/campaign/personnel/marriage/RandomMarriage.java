@@ -63,6 +63,13 @@ public class RandomMarriage extends AbstractMarriage {
 
     @Override
     protected boolean randomOppositeSexMarriage(final Person person) {
+        // this is used to simulate failed relationships.
+        // it's very arbitrary but serves its purpose for now.
+        // TODO: replace this with a proper relationship system
+        if (Compute.randomInt(100) != 0) {
+            return false;
+        }
+
         int multiplier = Math.max(1, person.getGenealogy().getFormerSpouses().size());
 
         return Compute.randomInt(oppositeSexDiceSize * multiplier) == 0;
@@ -70,6 +77,13 @@ public class RandomMarriage extends AbstractMarriage {
 
     @Override
     protected boolean randomSameSexMarriage(final Person person) {
+        // this is used to simulate failed relationships.
+        // it's very arbitrary but serves its purpose for now.
+        // TODO: replace this with a proper relationship system
+        if (Compute.randomInt(100) != 0) {
+            return false;
+        }
+
         int multiplier = Math.max(1, person.getGenealogy().getFormerSpouses().size());
 
         return Compute.randomInt(sameSexDiceSize * multiplier) == 0;

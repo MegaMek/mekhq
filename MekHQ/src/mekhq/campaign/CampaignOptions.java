@@ -854,8 +854,8 @@ public class CampaignOptions {
         setUseRandomClanPersonnelMarriages(false);
         setUseRandomPrisonerMarriages(false);
         setRandomMarriageAgeRange(10);
-        setRandomMarriageOppositeSexDiceSize(542);
-        setRandomMarriageSameSexDiceSize(3042);
+        setRandomMarriageOppositeSexDiceSize(6250);
+        setRandomMarriageSameSexDiceSize(76923);
 
         // Divorce
         setUseManualDivorce(true);
@@ -889,9 +889,9 @@ public class CampaignOptions {
         setUseRandomClanPersonnelProcreation(false);
         setUseRandomPrisonerProcreation(true);
         setRandomProcreationRelationshipDiceSize(621);
-        setRandomProcreationRelationshiplessDiceSize(1861);
+        setRandomProcreationRelationshiplessDiceSize(8871);
 
-        // Education
+                // Education
         setUseEducationModule(false);
         setCurriculumXpRate(3);
         setMaximumJumpCount(5);
