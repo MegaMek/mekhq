@@ -21,6 +21,7 @@ package mekhq.campaign.personnel.procreation;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -321,7 +322,7 @@ public abstract class AbstractProcreation {
         // Create Babies
         for (int i = 0; i < size; i++) {
             // Create a baby
-            final Person baby = campaign.newDependent(true);
+            final Person baby = campaign.newDependent(true, Gender.RANDOMIZE);
             baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(mother, father, baby.getGender()));
             baby.setBirthday(today);

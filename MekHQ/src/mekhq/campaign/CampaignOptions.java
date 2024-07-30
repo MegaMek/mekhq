@@ -348,6 +348,7 @@ public class CampaignOptions {
     private int randomMarriageAgeRange;
     private int randomMarriageDiceSize;
     private int randomSameSexMarriageDiceSize;
+    private int randomNewDependentMarriage;
 
     // Divorce
     private boolean useManualDivorce;
@@ -856,6 +857,7 @@ public class CampaignOptions {
         setRandomMarriageAgeRange(10);
         setRandomMarriageDiceSize(6250);
         setRandomSameSexMarriageDiceSize(6250);
+        setRandomNewDependentMarriage(20);
 
         // Divorce
         setUseManualDivorce(true);
@@ -2433,6 +2435,22 @@ public class CampaignOptions {
      */
     public void setRandomSameSexMarriageDiceSize(final int randomSameSexMarriageDiceSize) {
         this.randomSameSexMarriageDiceSize = randomSameSexMarriageDiceSize;
+    }
+
+    /**
+     * @return the number of sides on the die used to determine whether marriage occurs outside of current personnel
+     */
+    public int getRandomNewDependentMarriage() {
+        return randomNewDependentMarriage;
+    }
+
+    /**
+     * Sets the size of the die used to determine whether marriage occurs outside of current personnel
+     *
+     * @param randomNewDependentMarriage the size of the die used to determine whether marriage occurs outside of current personnel
+     */
+    public void setRandomNewDependentMarriage(final int randomNewDependentMarriage) {
+        this.randomNewDependentMarriage = randomNewDependentMarriage;
     }
     //endregion Marriage
 
@@ -4706,6 +4724,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageDiceSize", getRandomMarriageDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomSameSexMarriageDiceSize", getRandomSameSexMarriageDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomNewDependentMarriage", getRandomNewDependentMarriage());
         //endregion Marriage
 
         //region Divorce
@@ -5426,6 +5445,8 @@ public class CampaignOptions {
                     if (!Boolean.parseBoolean(wn2.getTextContent().trim())) {
                         retVal.setRandomSameSexMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomNewDependentMarriage")) {
+                    retVal.setRandomNewDependentMarriage(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Marriage
 
                     //region Divorce

@@ -1353,18 +1353,24 @@ public class Campaign implements ITechManager {
     //region Personnel
     //region Person Creation
     /**
-     * @return A new {@link Person}, who is a dependent.
+     * Creates a new {@link Person} instance who is a dependent.
+     * If {@code baby} is false and the random dependent origin option is enabled,
+     * the new person will have a random origin.
+     *
+     * @param baby          a boolean indicating if the person is a baby or not
+     * @param gender        the Gender enum for the person (should normally be Gender.RANDOMIZE)
+     * @return a new {@link Person} instance who is a dependent
      */
-    public Person newDependent(boolean baby) {
+    public Person newDependent(boolean baby, Gender gender) {
         Person person;
 
-        if (!baby && getCampaignOptions().getRandomOriginOptions().isRandomizeDependentOrigin()) {
-            person = newPerson(PersonnelRole.DEPENDENT);
-        } else {
+        if ((!baby) && (getCampaignOptions().getRandomOriginOptions().isRandomizeDependentOrigin())) {
             person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE,
                     new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions()),
                     new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions()),
-                    Gender.RANDOMIZE);
+                    gender);
+        } else {
+            person = newPerson(PersonnelRole.DEPENDENT);
         }
 
         if (person.getAge(getLocalDate()) < 16) {
@@ -3377,7 +3383,7 @@ public class Campaign implements ITechManager {
             } else {
                 if (getCampaignOptions().isUseRandomDependentAddition()) {
                     for (int i = 0; i < change; i++) {
-                        final Person person = newDependent(false);
+                        final Person person = newDependent(false, Gender.RANDOMIZE);
                         recruitPerson(person, PrisonerStatus.FREE, true, false);
                         addReport(String.format(resources.getString("dependentJoinsForce.text"),
                                 person.getFullTitle()));

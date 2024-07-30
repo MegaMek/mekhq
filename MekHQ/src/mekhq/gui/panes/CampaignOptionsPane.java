@@ -365,6 +365,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnRandomMarriageAgeRange;
     private JSpinner spnRandomMarriageDiceSize;
     private JSpinner spnRandomSameSexMarriageDiceSize;
+    private JSpinner spnRandomNewDependentMarriage;
 
     // Divorce
     private JCheckBox chkUseManualDivorce;
@@ -5698,6 +5699,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnRandomSameSexMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomSameSexMarriageDiceSize.toolTipText")));
         spnRandomSameSexMarriageDiceSize.setName("spnRandomSameSexMarriageDiceSize");
 
+        final JLabel lblRandomNewDependentMarriage = new JLabel(resources.getString("lblRandomNewDependentMarriage.text"));
+        lblRandomNewDependentMarriage.setToolTipText(wordWrap(resources.getString("lblRandomNewDependentMarriage.toolTipText")));
+        lblRandomNewDependentMarriage.setName("lblRandomNewDependentMarriage");
+
+        spnRandomNewDependentMarriage = new JSpinner(new SpinnerNumberModel(542, 0, 100000, 1));
+        spnRandomNewDependentMarriage.setToolTipText(wordWrap(resources.getString("lblRandomNewDependentMarriage.toolTipText")));
+        spnRandomNewDependentMarriage.setName("spnRandomNewDependentMarriage");
+
         // Programmatically Assign Accessibility Labels
         lblRandomMarriageOppositeSexDiceSize.setLabelFor(spnRandomMarriageDiceSize);
 
@@ -5718,6 +5727,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblRandomSameSexMarriageDiceSize)
                                 .addComponent(spnRandomSameSexMarriageDiceSize, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblRandomSameSexMarriageDiceSize)
+                                .addComponent(spnRandomNewDependentMarriage, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -5728,6 +5740,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblRandomSameSexMarriageDiceSize)
                                 .addComponent(spnRandomSameSexMarriageDiceSize))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomSameSexMarriageDiceSize)
+                                .addComponent(spnRandomNewDependentMarriage))
         );
     }
 
@@ -8139,6 +8154,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnRandomMarriageAgeRange.setValue(options.getRandomMarriageAgeRange());
         spnRandomMarriageDiceSize.setValue(options.getRandomMarriageDiceSize());
         spnRandomSameSexMarriageDiceSize.setValue(options.getRandomSameSexMarriageDiceSize());
+        spnRandomNewDependentMarriage.setValue(options.getRandomNewDependentMarriage());
 
         // Divorce
         chkUseManualDivorce.setSelected(options.isUseManualDivorce());
@@ -8826,6 +8842,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setRandomMarriageAgeRange((Integer) spnRandomMarriageAgeRange.getValue());
             options.setRandomMarriageDiceSize((int) spnRandomMarriageDiceSize.getValue());
             options.setRandomSameSexMarriageDiceSize((int) spnRandomSameSexMarriageDiceSize.getValue());
+            options.setRandomNewDependentMarriage((int) spnRandomNewDependentMarriage.getValue());
 
             // Divorce
             options.setUseManualDivorce(chkUseManualDivorce.isSelected());
