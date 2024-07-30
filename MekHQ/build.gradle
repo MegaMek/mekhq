@@ -212,7 +212,7 @@ distributions {
                 include "shell.sh"
                 rename "shell.sh", "MegaMek.sh"
             }
-            from ("${mmDir}/megamek/docs/history.txt") {
+            from ("${mmDir}/megamek/docs") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
@@ -248,7 +248,7 @@ distributions {
                 include "shell.sh"
                 rename "shell.sh", "MegaMekLab.sh"
             }
-            from ("${mmlDir}/megameklab/docs/history.txt") {
+            from ("${mmlDir}/megameklab/docs") {
                 rename 'history.txt', 'mml-history.txt'
                 into "${docs}"
             }
