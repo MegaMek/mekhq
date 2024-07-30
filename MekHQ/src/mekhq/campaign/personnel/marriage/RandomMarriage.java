@@ -50,6 +50,12 @@ public class RandomMarriage extends AbstractMarriage {
 
     @Override
     protected boolean randomMarriage(final Person person) {
+        if (marriageDiceSize == 0) {
+            return false;
+        } else if (marriageDiceSize == 1) {
+            return true;
+        }
+
         return Compute.randomInt(marriageDiceSize) == 0;
     }
 }

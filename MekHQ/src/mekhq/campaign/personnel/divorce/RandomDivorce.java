@@ -49,6 +49,12 @@ public class RandomDivorce extends AbstractDivorce {
 
     @Override
     protected boolean randomDivorce(final Person person) {
+        if (divorceDiceSize == 0) {
+            return false;
+        } else if (divorceDiceSize == 1) {
+            return true;
+        }
+
         return Compute.randomInt(divorceDiceSize) == 0;
     }
 }

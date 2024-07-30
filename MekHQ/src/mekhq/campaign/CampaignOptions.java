@@ -342,11 +342,12 @@ public class CampaignOptions {
     private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
-    private boolean useRandomSameSexMarriages; // legacy, pre-50.0
+    private boolean useRandomSameSexMarriages; // legacy, pre-50.01
     private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
     private int randomMarriageDiceSize;
+    private int randomSameSexMarriageDiceSize;
 
     // Divorce
     private boolean useManualDivorce;
@@ -854,6 +855,7 @@ public class CampaignOptions {
         setUseRandomPrisonerMarriages(false);
         setRandomMarriageAgeRange(10);
         setRandomMarriageDiceSize(6250);
+        setRandomSameSexMarriageDiceSize(6250);
 
         // Divorce
         setUseManualDivorce(true);
@@ -2411,10 +2413,26 @@ public class CampaignOptions {
     /**
      * Sets the size of the random marriage die.
      *
-     * @param randomMarriageDiceSize the size of the random opposite sex marriage die
+     * @param randomMarriageDiceSize the size of the random marriage die
      */
     public void setRandomMarriageDiceSize(final int randomMarriageDiceSize) {
         this.randomMarriageDiceSize = randomMarriageDiceSize;
+    }
+
+    /**
+     * @return the number of sides on the die used to determine random same-sex marriage
+     */
+    public int getRandomSameSexMarriageDiceSize() {
+        return randomSameSexMarriageDiceSize;
+    }
+
+    /**
+     * Sets the size of the random same-sex marriage die.
+     *
+     * @param randomSameSexMarriageDiceSize the size of the random same-sex marriage die
+     */
+    public void setRandomSameSexMarriageDiceSize(final int randomSameSexMarriageDiceSize) {
+        this.randomSameSexMarriageDiceSize = randomSameSexMarriageDiceSize;
     }
     //endregion Marriage
 
@@ -4687,6 +4705,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageDiceSize", getRandomMarriageDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomSameSexMarriageDiceSize", getRandomSameSexMarriageDiceSize());
         //endregion Marriage
 
         //region Divorce
@@ -5401,6 +5420,12 @@ public class CampaignOptions {
                     retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageDiceSize")) {
                     retVal.setRandomMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomSameSexMarriageDiceSize")) {
+                    retVal.setRandomSameSexMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) { // Legacy, pre-50.01
+                    if (!Boolean.parseBoolean(wn2.getTextContent().trim())) {
+                        retVal.setRandomSameSexMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    }
                     //endregion Marriage
 
                     //region Divorce

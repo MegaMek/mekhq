@@ -63,6 +63,12 @@ public class RandomProcreation extends AbstractProcreation {
     protected boolean procreation(final Person person) {
         int diceSize = person.getGenealogy().hasSpouse() ? relationshipDieSize : relationshiplessDieSize;
 
+        if (diceSize == 0) {
+            return false;
+        } else if (diceSize == 1) {
+            return true;
+        }
+
         return Compute.randomInt(diceSize) == 0;
     }
 }
