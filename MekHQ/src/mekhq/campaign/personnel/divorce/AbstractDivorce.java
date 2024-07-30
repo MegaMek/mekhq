@@ -234,7 +234,7 @@ public abstract class AbstractDivorce {
             spouse.getGenealogy().setSpouse(null);
         }
 
-        // Add to former spouse list
+        // Add to the former spouse list
         spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, today, reason));
         origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, today, reason));
 
@@ -249,7 +249,7 @@ public abstract class AbstractDivorce {
      * @param today the current day
      * @param person the person to process
      */
-    public void processNewDay(final Campaign campaign, final LocalDate today, final Person person) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person) {
         if (canDivorce(person, true) != null) {
             return;
         }

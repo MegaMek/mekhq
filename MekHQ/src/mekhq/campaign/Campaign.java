@@ -3413,11 +3413,6 @@ public class Campaign implements ITechManager {
                 continue;
             }
 
-            // Marriage
-            if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                getMarriage().processNewWeek(this, getLocalDate(), p);
-            }
-
             p.resetMinutesLeft();
             // Reset acquisitions made to 0
             p.setAcquisition(0);
@@ -3467,11 +3462,10 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            // Divorce
-            getDivorce().processNewDay(this, getLocalDate(), p);
-
-            // Procreation
+            // Divorce, Marriage, & Procreation
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+                getDivorce().processNewWeek(this, getLocalDate(), p);
+                getMarriage().processNewWeek(this, getLocalDate(), p);
                 getProcreation().processNewWeek(this, getLocalDate(), p);
             }
 

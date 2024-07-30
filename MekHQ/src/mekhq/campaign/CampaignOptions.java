@@ -359,8 +359,7 @@ public class CampaignOptions {
     private boolean useRandomSameSexDivorce;
     private boolean useRandomClanPersonnelDivorce;
     private boolean useRandomPrisonerDivorce;
-    private double percentageRandomDivorceOppositeSexChance;
-    private double percentageRandomDivorceSameSexChance;
+    private int randomDivorceDiceSize;
 
     // Procreation
     private boolean useManualProcreation;
@@ -854,10 +853,9 @@ public class CampaignOptions {
         setRandomMarriageMethod(RandomMarriageMethod.NONE);
         setUseRandomSameSexMarriages(false);
         setUseRandomClanPersonnelMarriages(false);
-        setUseRandomPrisonerMarriages(true);
+        setUseRandomPrisonerMarriages(false);
         setRandomMarriageAgeRange(10);
         setRandomMarriageOppositeSexDiceSize(542);
-        // this number was determined based on 2* the % of recorded same-sex marriages in the US circa 2022
         setRandomMarriageSameSexDiceSize(3042);
 
         // Divorce
@@ -874,8 +872,7 @@ public class CampaignOptions {
         setUseRandomSameSexDivorce(true);
         setUseRandomClanPersonnelDivorce(true);
         setUseRandomPrisonerDivorce(false);
-        setPercentageRandomDivorceOppositeSexChance(0.000001);
-        setPercentageRandomDivorceSameSexChance(0.000001);
+        setRandomDivorceDiceSize(3221);
 
         // Procreation
         setUseManualProcreation(true);
@@ -2511,20 +2508,12 @@ public class CampaignOptions {
         this.useRandomPrisonerDivorce = useRandomPrisonerDivorce;
     }
 
-    public double getPercentageRandomDivorceOppositeSexChance() {
-        return percentageRandomDivorceOppositeSexChance;
+    public int getRandomDivorceDiceSize() {
+        return randomDivorceDiceSize;
     }
 
-    public void setPercentageRandomDivorceOppositeSexChance(final double percentageRandomDivorceOppositeSexChance) {
-        this.percentageRandomDivorceOppositeSexChance = percentageRandomDivorceOppositeSexChance;
-    }
-
-    public double getPercentageRandomDivorceSameSexChance() {
-        return percentageRandomDivorceSameSexChance;
-    }
-
-    public void setPercentageRandomDivorceSameSexChance(final double percentageRandomDivorceSameSexChance) {
-        this.percentageRandomDivorceSameSexChance = percentageRandomDivorceSameSexChance;
+    public void setRandomDivorceDiceSize(final int randomDivorceDiceSize) {
+        this.randomDivorceDiceSize = randomDivorceDiceSize;
     }
     //endregion Divorce
 
@@ -4733,8 +4722,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomSameSexDivorce", isUseRandomSameSexDivorce());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelDivorce", isUseRandomClanPersonnelDivorce());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerDivorce", isUseRandomPrisonerDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDivorceOppositeSexChance", getPercentageRandomDivorceOppositeSexChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDivorceSameSexChance", getPercentageRandomDivorceSameSexChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDivorceDiceSize", getRandomDivorceDiceSize());
         //endregion Divorce
 
         //region Procreation
@@ -5471,10 +5459,8 @@ public class CampaignOptions {
                     retVal.setUseRandomClanPersonnelDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerDivorce")) {
                     retVal.setUseRandomPrisonerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDivorceOppositeSexChance")) {
-                    retVal.setPercentageRandomDivorceOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDivorceSameSexChance")) {
-                    retVal.setPercentageRandomDivorceSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomDivorceDiceSize")) {
+                    retVal.setRandomDivorceDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Divorce
 
                     //region Procreation

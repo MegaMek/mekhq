@@ -22,14 +22,16 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
-import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
+import mekhq.campaign.personnel.divorce.RandomDivorce;
 
 import java.util.ResourceBundle;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
 
 public enum RandomDivorceMethod {
     //region Enum Declarations
     NONE("RandomDivorceMethod.NONE.text", "RandomDivorceMethod.NONE.toolTipText"),
-    PERCENTAGE("RandomDivorceMethod.PERCENTAGE.text", "RandomDivorceMethod.PERCENTAGE.toolTipText");
+    DICE_ROLL("RandomDivorceMethod.DICE_ROLL.text", "RandomDivorceMethod.DICE_ROLL.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -42,33 +44,34 @@ public enum RandomDivorceMethod {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
+        this.toolTipText = wordWrap(resources.getString(toolTipText));
     }
     //endregion Constructors
 
     //region Getters
+    @SuppressWarnings(value = "unused")
     public String getToolTipText() {
         return toolTipText;
     }
     //endregion Getters
 
     //region Boolean Comparisons
+    @SuppressWarnings(value = "unused")
     public boolean isNone() {
         return this == NONE;
     }
 
-    public boolean isPercentage() {
-        return this == PERCENTAGE;
+    @SuppressWarnings(value = "unused")
+    public boolean isDiceRoll() {
+        return this == DICE_ROLL;
     }
     //endregion Boolean Comparisons
 
     public AbstractDivorce getMethod(final CampaignOptions options) {
-        switch (this) {
-            case PERCENTAGE:
-                return new PercentageRandomDivorce(options);
-            case NONE:
-            default:
-                return new DisabledRandomDivorce(options);
+        if (this == DICE_ROLL) {
+            return new RandomDivorce(options);
+        } else {
+            return new DisabledRandomDivorce(options);
         }
     }
 

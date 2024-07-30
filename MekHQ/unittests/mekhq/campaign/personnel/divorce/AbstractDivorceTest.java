@@ -125,7 +125,7 @@ public class AbstractDivorceTest {
     //region New Day
     @Disabled // FIXME : Windchild : Test Missing
     @Test
-    public void testProcessNewDay() {
+    public void testProcessNewWeek() {
 
     }
     //endregion New Day

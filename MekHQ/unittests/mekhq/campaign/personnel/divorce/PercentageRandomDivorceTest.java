@@ -49,41 +49,34 @@ public class PercentageRandomDivorceTest {
         when(mockOptions.isUseRandomSameSexDivorce()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelDivorce()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
-        when(mockOptions.getPercentageRandomDivorceOppositeSexChance()).thenReturn(0.5);
-        when(mockOptions.getPercentageRandomDivorceSameSexChance()).thenReturn(0.5);
+        when(mockOptions.getRandomDivorceDiceSize()).thenReturn(5);
     }
 
     @Test
     public void testRandomOppositeSexDivorce() {
-        final PercentageRandomDivorce percentageRandomDivorce = new PercentageRandomDivorce(mockOptions);
-        // This ignores the person, so just using a mocked person
-        // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
+        final RandomDivorce randomDivorce = new RandomDivorce(mockOptions);
+
+        int diceSize = 5;
+
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomFloat).thenReturn(0f);
-            assertTrue(percentageRandomDivorce.randomOppositeSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.49f);
-            assertTrue(percentageRandomDivorce.randomOppositeSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.5f);
-            assertFalse(percentageRandomDivorce.randomOppositeSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(1f);
-            assertFalse(percentageRandomDivorce.randomOppositeSexDivorce(mockPerson));
+            compute.when(() -> Compute.randomInt(diceSize)).thenReturn(0);
+            assertTrue(randomDivorce.randomOppositeSexDivorce(mockPerson));
+            compute.when(() -> Compute.randomInt(diceSize)).thenReturn(1);
+            assertFalse(randomDivorce.randomOppositeSexDivorce(mockPerson));
         }
     }
 
     @Test
     public void testRandomSameSexDivorce() {
-        final PercentageRandomDivorce percentageRandomDivorce = new PercentageRandomDivorce(mockOptions);
-        // This ignores the person, so just using a mocked person
-        // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
+        final RandomDivorce randomDivorce = new RandomDivorce(mockOptions);
+
+        int diceSize = 5;
+
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomFloat).thenReturn(0f);
-            assertTrue(percentageRandomDivorce.randomSameSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.49f);
-            assertTrue(percentageRandomDivorce.randomSameSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.5f);
-            assertFalse(percentageRandomDivorce.randomSameSexDivorce(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(1f);
-            assertFalse(percentageRandomDivorce.randomSameSexDivorce(mockPerson));
+            compute.when(() -> Compute.randomInt(diceSize)).thenReturn(0);
+            assertTrue(randomDivorce.randomOppositeSexDivorce(mockPerson));
+            compute.when(() -> Compute.randomInt(diceSize)).thenReturn(1);
+            assertFalse(randomDivorce.randomOppositeSexDivorce(mockPerson));
         }
     }
 }
