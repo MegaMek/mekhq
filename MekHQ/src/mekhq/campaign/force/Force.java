@@ -68,6 +68,7 @@ public class Force {
     private String desc;
     private boolean combatForce;
     private FormationLevel formationLevel;
+    private FormationLevel overrideFormationLevel;
     private Force parentForce;
     private final Vector<Force> subForces;
     private final Vector<UUID> units;
@@ -88,6 +89,7 @@ public class Force {
         setDescription("");
         this.combatForce = true;
         this.formationLevel = FormationLevel.NONE;
+        this.overrideFormationLevel = FormationLevel.NONE;
         this.parentForce = null;
         this.subForces = new Vector<>();
         this.units = new Vector<>();
@@ -163,6 +165,16 @@ public class Force {
     @SuppressWarnings(value = "unused")
     public void setFormationLevel(final FormationLevel formationLevel) {
         this.formationLevel = formationLevel;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public FormationLevel getOverrideFormationLevel() {
+        return overrideFormationLevel;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setOverrideFormationLevel(final FormationLevel overrideFormationLevel) {
+        this.overrideFormationLevel = overrideFormationLevel;
     }
 
     public int getScenarioId() {
@@ -449,7 +461,7 @@ public class Force {
 
         // logic: if we found someone eligible who is a higher rank, the first one of those becomes the new commander
         // otherwise, the existing commander remains the commander
-        if (!eligibleCommanders.contains(getForceCommanderID()) && (eligibleCommanders.size() > 0)) {
+        if (!eligibleCommanders.contains(getForceCommanderID()) && (!eligibleCommanders.isEmpty())) {
             forceCommanderID = eligibleCommanders.get(0);
         }
     }
@@ -484,7 +496,7 @@ public class Force {
         // Then, Add the units assigned to this force
         statuses.addAll(getUnits().stream().map(campaign::getUnit).filter(Objects::nonNull)
                 .map(LayeredForceIconOperationalStatus::determineLayeredForceIconOperationalStatus)
-                .collect(Collectors.toList()));
+                .toList());
 
         // Can only update the icon for LayeredForceIcons, but still need to return the processed
         // units for parent force updates
@@ -520,6 +532,7 @@ public class Force {
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideFormationLevel", overrideFormationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceCommanderID", forceCommanderID);
@@ -571,6 +584,8 @@ public class Force {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
                     retVal.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("overrideFormationLevel")) {
+                    retVal.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
                     retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.6 removal
