@@ -91,6 +91,32 @@ public class AutoAwardsController {
     }
 
     /**
+     * The controller for the processing of awards prompted by a change in rank
+     *
+     * @param c                    the campaign to be processed
+     */
+    public void PromotionController(Campaign c, boolean isManualPrompt) {
+        LogManager.getLogger().info("autoAwards (Promotion) has started");
+
+        campaign = c;
+        mission = null;
+
+        buildAwardLists(4);
+
+        List<UUID> personnel = getPersonnel();
+
+        // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
+        if (!personnel.isEmpty()) {
+            // This is the main workhorse function
+            ProcessAwards(personnel, false, null, isManualPrompt);
+        } else {
+            LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
+        }
+
+        LogManager.getLogger().info("autoAwards (Promotion) has finished");
+    }
+
+    /**
      * The primary controller for the automatic processing of Awards
      *
      * @param c                    the campaign to be processed
@@ -251,7 +277,7 @@ public class AutoAwardsController {
     /**
      * Builds the award list and filters it, so we're not processing the same awards multiple times
      *
-     * @param awardListCase when the award controller was called: 0 manual, 1 post-mission, 2 post-scenario
+     * @param awardListCase when the award controller was called: 0 manual (or monthly), 1 post-mission, 2 post-scenario, 3 rank
      */
     private void buildAwardLists(int awardListCase) {
         ArrayList<Award> awards = new ArrayList<>();
@@ -499,7 +525,6 @@ public class AutoAwardsController {
                                         break;
                                     case "training":
                                         if (campaign.getCampaignOptions().isEnableTrainingAwards()) {
-
                                             trainingAwards.add(award);
                                         }
                                         break;
@@ -509,6 +534,26 @@ public class AutoAwardsController {
                             }
 
                             LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
+                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+
+                            break;
+                        // post-promotion
+                        case 4:
+                            for (Award award : awards) {
+                                switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                                    case "divider":
+                                        break;
+                                    case "rank":
+                                        if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                                            rankAwards.add(award);
+                                        }
+                                        break;
+                                    default:
+                                        ignoredAwards.add(award);
+                                }
+                            }
+
+                            LogManager.getLogger().info("autoAwards found {} Training Awards", rankAwards.size());
                             LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;
