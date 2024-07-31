@@ -155,10 +155,12 @@ public class Force {
         }
     }
 
+    @SuppressWarnings(value = "unused")
     public FormationLevel getFormationLevel() {
         return formationLevel;
     }
 
+    @SuppressWarnings(value = "unused")
     public void setFormationLevel(final FormationLevel formationLevel) {
         this.formationLevel = formationLevel;
     }
