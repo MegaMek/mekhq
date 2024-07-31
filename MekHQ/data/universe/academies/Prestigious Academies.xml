@@ -1062,7 +1062,6 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3080</constructionYear>
-        <destructionYear>9999</destructionYear>
         <tuition>5250</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
@@ -1086,7 +1085,6 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3080</constructionYear>
-        <destructionYear>3071</destructionYear>
         <tuition>13125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
@@ -1906,7 +1904,7 @@
         <name>Fleet School of Keid</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is the Star League's largest training facility for naval personnel. Each school has several WarShips and JumpShips for crew training.</description>
+        <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is one of the largest training facilities for naval personnel in the Inner Sphere. Each school has several WarShips and JumpShips for crew training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Keid</locationSystem>
@@ -1941,7 +1939,7 @@
         <name>Fleet School of Keid (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is the Star League's largest training facility for naval personnel. Each school has several WarShips and JumpShips for crew training.</description>
+        <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is one of the largest training facilities for naval personnel in the Inner Sphere. Each school has several WarShips and JumpShips for crew training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Keid</locationSystem>
@@ -2748,7 +2746,7 @@
         <name>Humphreys School of Warfare</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Established on Kanata in late 2762, the Humphreys School of Warfare (HSW) is one of three major military academies created by the Dormuth Council to manage high recruitment numbers in the Free Worlds League. It primarily recruits cadets from the Duchy of Andurien and nearby independent worlds. The Star League Intelligence Command closely monitors the institution to identify potential troublemakers in the politically restless Duchy.</description>
+        <description>Established on Kanata in late 2762, the Humphreys School of Warfare (HSW) is one of three major military academies created by the Dormuth Council to manage high recruitment numbers in the Free Worlds League. It primarily recruits cadets from the Duchy of Andurien and nearby independent worlds.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Kanata</locationSystem>
@@ -3582,7 +3580,7 @@
         <name>Magistracy Aerospace Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>he Magistracy Aerospace Academy stands as one of two aerospace academies inaugurated by the Magistracy of Canopus during the Star League era. The selection of the Marantha system was deliberate, given its flourishing civilian spacecraft industry and expansive asteroid belt, which serves as an ideal locale for avoidance training and is home to a significant Belter population.</description>
+        <description>The Magistracy Aerospace Academy stands as one of two aerospace academies inaugurated by the Magistracy of Canopus during the Star League era. The selection of the Marantha system was deliberate, given its flourishing civilian spacecraft industry and expansive asteroid belt, which serves as an ideal locale for avoidance training and is home to a significant Belter population.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Marantha</locationSystem>
@@ -3865,7 +3863,7 @@
         <name>Military Academy of Aphros</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>As a component of the Star League Defense Force's "War Triad," the Military Academy of Aphros, located on Venus, stood as a premier training institution, particularly renowned for hosting the SLDF's prestigious Gunslinger Program.</description>
+        <description>As a component of the Star League Defense Force's "War Triad," the Military Academy of Aphros, located on Venus, stands as a premier training institution, particularly renowned for hosting the SLDF's prestigious Gunslinger Program.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
@@ -7130,7 +7128,7 @@
     <academy>
         <name>Tharkad University</name>
         <type>University</type>
-        <description>Situated in Olympia on the planet Tharkad, this prestigious Lyran Commonwealth university has educated numerous archons and elites of the Star League. Known for its extensive academic programs, the university remains a highly sought-after choice for students across the galaxy, despite its high tuition fees.</description>
+        <description>Situated in Olympia on the planet Tharkad, this prestigious Lyran Commonwealth university has educated numerous archons and elites of the Inner Sphere. Known for its extensive academic programs, the university remains a highly sought-after choice for students across the galaxy, despite its high tuition fees.</description>
         <locationSystem>Tharkad</locationSystem>
         <constructionYear>2500</constructionYear>
         <tuition>15000</tuition>
@@ -8184,7 +8182,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Dai Da Chi in BattleTech is a renowned Capellan military unit known for its discipline, martial prowess, and deep loyalty to the Capellan Confederation. This elite House plays a crucial role in safeguarding Capellan interests.</description>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Renowned for their ferocity, Dai Da Chi warriors specialize in relentless assaults, often employing unconventional tactics to overwhelm their enemies swiftly.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Drozan</locationSystem>
@@ -8209,7 +8207,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Fujita focuses on stealth and precision strikes, specializing in guerrilla tactics and espionage. They excel in reconnaissance and sabotage missions, maintaining secrecy and striking with deadly efficiency against their enemies.</description>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Fujita warriors are masters of defensive warfare, known for their impenetrable fortifications and unyielding resilience in battle.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Hunan</locationSystem>
@@ -8235,7 +8233,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Hiritsu is renowned for its mastery of heavy BattleMechs and traditional combat techniques. They emphasize strength, resilience, and battlefield strategy. Their elite MechWarriors uphold a legacy of disciplined service and formidable prowess on the battlefield.</description>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Stealth and precision define Hiritsu, whose warriors excel in covert operations and surgical strikes against high-value targets.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Randar</locationSystem>
@@ -8260,7 +8258,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Ijori excels in rapid assault and close-quarters combat. They specialize in lightning-fast strikes and agile BattleMech tactics. Known for their aggressive approach and fearless warriors, they play a pivotal role in the Combine's military operations.</description>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Ijori prides itself on traditional martial discipline, blending ancient combat techniques with modern warfare to maintain battlefield honor.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aldebaran</locationSystem>
@@ -8286,7 +8284,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Imarra emphasizes honor and precision in BattleMech combat. They are skilled in both traditional Bushido principles and advanced warfare tactics. Known for their disciplined warriors and strategic acumen, they uphold a legacy of excellence on the battlefield.</description>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Strategically adept, Imarra warriors emphasize coordination and adaptability, making them formidable opponents in dynamic combat situations.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Sian</locationSystem>
@@ -8311,7 +8309,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Kamata focuses on rapid-response missions and surgical strikes. They excel in precision tactics and covert operations. Known for their agility and decisive maneuvers, they are a critical asset in the Combine's military strategy.</description>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Kamata is synonymous with heavy armor and firepower, favoring direct confrontations and overwhelming force to crush adversaries.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Betelgeuse</locationSystem>
@@ -8336,7 +8334,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Lu Sann specializes in heavy assault tactics and defensive warfare. They prioritize endurance and resilience in BattleMech combat. Known for their steadfast defense and formidable warriors, they are a stalwart force in the Combine's military strategy.</description>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Known for their elite training, Lu Sann warriors combine physical prowess with tactical genius, often leading crucial missions.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Grand Base</locationSystem>
@@ -8362,8 +8360,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Ma-Tsu Kai excels in coordinated assaults and combined arms tactics. They integrate BattleMechs with infantry and aerospace units seamlessly. Known for their decisive maneuvers and versatile combat skills, they are a formidable presence in the Combine's military operations.</description>
         <factionDiscount>0</factionDiscount>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Versatile and innovative, Ma-Tsu Kai warriors adapt to any combat scenario, using creativity to outmaneuver and outthink opponents.</description>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Aragon</locationSystem>
         <constructionYear>2991</constructionYear>
@@ -8388,11 +8386,37 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Rakshasa is renowned for its unorthodox tactics and psychological warfare expertise. They specialize in disinformation, infiltration, and unconventional combat strategies. Known for their cunning and adaptability, they strike fear into their enemies.</description>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Rakshasa warriors are feared for their ruthlessness and psychological warfare, demoralizing enemies before striking with lethal efficiency.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
-        <locationSystem>Highspire</locationSystem>
+        <locationSystem>Bithinia</locationSystem>
         <constructionYear>3071</constructionYear>
+        <destructionYear>3063</destructionYear>
+        <tuition>15313</tuition>
+        <facultySkill>11</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Rakshasa [3063]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Rakshasa warriors are feared for their ruthlessness and psychological warfare, demoralizing enemies before striking with lethal efficiency.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Wazan</locationSystem>
+        <constructionYear>3063</constructionYear>
         <destructionYear>3074</destructionYear>
         <tuition>15313</tuition>
         <facultySkill>11</facultySkill>
@@ -8414,7 +8438,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Tsang Xiao specializes in intelligence gathering and counter-espionage. They excel in covert operations and information warfare. Known for their cunning and strategic acumen, they play a crucial role in defending against internal and external threats.</description>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Tsang Xiao emphasizes spiritual discipline and inner strength, believing that mental fortitude is key to martial success.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Wazan</locationSystem>
@@ -8439,7 +8463,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House White Tiger focuses on defensive tactics and resilience. They specialize in fortifications and counter-assault strategies. Known for their steadfast defense and disciplined warriors, they are a formidable force in protecting Combine territories.</description>
+        <description>The Capellan Warrior House Orders are semi-religious, independent military groups within the Capellan Confederation, reporting directly to the Chancellor. Skilled in strategic adaptability and coordination. Elite and exclusive, White Tiger warriors are distinguished by their exceptional skill and loyalty, often undertaking the most dangerous and critical missions.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Highspire</locationSystem>
