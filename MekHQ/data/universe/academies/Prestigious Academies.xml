@@ -1904,7 +1904,7 @@
         <name>Fleet School of Keid</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is one of the largest training facilities for naval personnel in the Inner Sphere. Each school has several WarShips and JumpShips for crew training.</description>
+        <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is the largest training facility for naval personnel in the Inner Sphere. Each school has several WarShips and JumpShips for crew training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Keid</locationSystem>
@@ -1939,7 +1939,7 @@
         <name>Fleet School of Keid (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is one of the largest training facilities for naval personnel in the Inner Sphere. Each school has several WarShips and JumpShips for crew training.</description>
+        <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is the largest training facility for naval personnel in the Inner Sphere. Each school has several WarShips and JumpShips for crew training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Keid</locationSystem>
