@@ -330,14 +330,12 @@ public class Finances {
                         }
                     }
 
-                    StringBuilder reportString = new StringBuilder(resourceMap.getString("loyaltyChangeGroup.text"));
-                    String color = MekHQ.getMHQOptions().getFontColorWarningHexColor();
+                    ResourceBundle loyaltyChangeResources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+                            MekHQ.getMHQOptions().getLocale());
 
-                    // add chosen color to the string builder.
-                    reportString.insert(0, "<html><font color=" + color + "'>")
-                            .append("</font>");
-
-                    campaign.addReport(reportString.toString());
+                    campaign.addReport(String.format(loyaltyChangeResources.getString("loyaltyChangeGroup.text"),
+                            "<span color=" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                            "</span>"));
                 }
             }
 

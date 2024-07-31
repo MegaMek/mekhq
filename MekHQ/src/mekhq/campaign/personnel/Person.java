@@ -1086,7 +1086,7 @@ public class Person {
         if ((isCommander()) && (status.isDepartedUnit())) {
             if ((!status.isResigned()) && (!status.isRetired())) {
                 if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                    massChangeLoyalty(campaign);
+                    leadershipMassChangeLoyalty(campaign);
                 }
             }
 
@@ -1112,26 +1112,26 @@ public class Person {
      * If the current character is the campaign commander, adjust loyalty across the entire unit.
      * @param campaign The current campaign
      */
-    private void massChangeLoyalty(Campaign campaign) {
-        if (isCommander()) {
-            for (Person person : campaign.getPersonnel()) {
-                if (person.getStatus().isDepartedUnit()) {
-                    continue;
-                }
-
-                if (person.getPrisonerStatus().isCurrentPrisoner()) {
-                    continue;
-                }
-
-                person.performRandomizedLoyaltyChange(campaign, false, false);
+    private void leadershipMassChangeLoyalty(Campaign campaign) {
+        for (Person person : campaign.getPersonnel()) {
+            if (person.getStatus().isDepartedUnit()) {
+                continue;
             }
+
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                continue;
+            }
+
+            person.performRandomizedLoyaltyChange(campaign, false, false);
         }
 
-        campaign.addReport(resources.getString("loyaltyChangeGroup.text"));
+        campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+                "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                "</span>"));
     }
 
     /**
-     * Performs an randomized loyalty change for an individual
+     * Performs a randomized loyalty change for an individual
      *
      * @param campaign The current campaign
      * @param isMajor Flag to indicate if the loyalty change is major.
@@ -1210,7 +1210,6 @@ public class Person {
      * @param originalLoyalty  The original loyalty value before the change.
      */
     private void reportLoyaltyChange(Campaign campaign, int originalLoyalty) {
-        StringBuilder reportString = new StringBuilder();
         StringBuilder changeString = new StringBuilder();
         String color;
 
@@ -1223,16 +1222,10 @@ public class Person {
             changeString.append(resources.getString("loyaltyChangePositive.text"));
         }
 
-        // add chosen color to the string builder.
-        changeString.insert(0, "<html><font color=" + color + "'>")
-                .append("</font>");
+        String report = String.format(resources.getString("loyaltyChangeReport.text"), getHyperlinkedFullTitle(),
+                "<span color=" + color + "'>", changeString, "</span>");
 
-        // use string formatter to supply values to the report string.
-        reportString.append(String.format(resources.getString("loyaltyChangeReport.text"),
-                getHyperlinkedFullTitle(), changeString));
-
-        // publish the report
-        campaign.addReport(reportString.toString());
+        campaign.addReport(report);
     }
 
     /**
