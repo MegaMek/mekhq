@@ -278,8 +278,6 @@ public class CampaignOptions {
     // Retirement
     private boolean useRandomRetirement;
 
-    private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
-    private SkillLevel turnoverDifficulty;
     private int turnoverFixedTargetNumber;
     private boolean aeroRecruitsHaveUnits;
     private boolean trackOriginalUnit;
@@ -960,8 +958,6 @@ public class CampaignOptions {
         //region Turnover and Retention
         // Retirement
         setUseRandomRetirement(false);
-        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.FIXED);
-        setTurnoverDifficulty(SkillLevel.REGULAR);
         setTurnoverFrequency(TurnoverFrequency.MONTHLY);
         setTurnoverFixedTargetNumber(3);
         setAeroRecruitsHaveUnits(false);
@@ -1852,22 +1848,6 @@ public class CampaignOptions {
 
     public void setUseRandomRetirement(final boolean useRandomRetirement) {
         this.useRandomRetirement = useRandomRetirement;
-    }
-
-    public TurnoverTargetNumberMethod getTurnoverTargetNumberMethod() {
-        return turnoverTargetNumberMethod;
-    }
-
-    public void setTurnoverTargetNumberMethod (final TurnoverTargetNumberMethod turnoverTargetNumberMethod) {
-        this.turnoverTargetNumberMethod = turnoverTargetNumberMethod;
-    }
-
-    public SkillLevel getTurnoverDifficulty() {
-        return turnoverDifficulty;
-    }
-
-    public void setTurnoverDifficulty (final SkillLevel turnoverDifficulty) {
-        this.turnoverDifficulty = turnoverDifficulty;
     }
 
     public TurnoverFrequency getTurnoverFrequency() {
@@ -4649,8 +4629,6 @@ public class CampaignOptions {
 
         //region Retirement
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", isUseRandomRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverTargetNumberMethod", getTurnoverTargetNumberMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverDifficulty", getTurnoverDifficulty().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverBaseTn", getTurnoverFixedTargetNumber());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverFrequency", getTurnoverFrequency().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aeroRecruitsHaveUnits", isAeroRecruitsHaveUnits());
@@ -5635,10 +5613,6 @@ public class CampaignOptions {
                 //region Turnover and Retention
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverTargetNumberMethod")) {
-                    retVal.setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverDifficulty")) {
-                    retVal.setTurnoverDifficulty(SkillLevel.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
                     retVal.setTurnoverFixedTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverFrequency")) {
