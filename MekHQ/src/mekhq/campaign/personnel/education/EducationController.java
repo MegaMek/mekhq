@@ -1046,28 +1046,50 @@ public class EducationController {
      * @param resources  the resource bundle containing localized strings
      */
     private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int educationLevel = academy.getEducationLevel(person) - 1; // we reduce by 1 to factor in the increase level from graduating
+        int education = academy.getEducationLevel(person) - 1; // we reduce by 1 to account for the +1 level from graduating
 
-        if (educationLevel == 3) {
-            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                    + String.format(resources.getString("graduatedMasters.text"), person.getHyperlinkedFullTitle(), academy.getQualifications().get(person.getEduCourseIndex()))
-                    + "</span>";
+        EducationLevel educationLevel = EducationLevel.parseFromInt(education);
 
-            campaign.addReport(reportMessage);
+        String qualification = academy.getQualifications().get(person.getEduCourseIndex());
+        String color = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+        String personName = person.getHyperlinkedFullTitle();
 
-            ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
+        String graduationLevel = "";
 
-        } else if (educationLevel == 4) {
-            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                    + String.format(resources.getString("graduatedDoctorate.text"), person.getHyperlinkedFullTitle(), academy.getQualifications().get(person.getEduCourseIndex()))
-                    + "</span>";
+        if (educationLevel.isPostGraduate()) {
+            graduationLevel = resources.getString("graduatedMasters.text");
 
-            campaign.addReport(reportMessage);
+            ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName(), qualification);
+        } else if (educationLevel.isDoctorate()) {
+            graduationLevel = resources.getString("graduatedDoctorate.text");
 
-            ServiceLogger.eduGraduatedDoctorate(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
+            ServiceLogger.eduGraduatedDoctorate(person, campaign.getLocalDate(), person.getEduAcademyName(), qualification);
 
             person.setPreNominal("Dr");
         }
+
+        generatePostGradGraduationReport(campaign, color, personName, graduationLevel, qualification, resources);
+    }
+
+    /**
+     * Generates a post-graduate graduation report and publishes it to the daily report.
+     *
+     * @param campaign The campaign to which the report will be added.
+     * @param fontColor The color of the text in the report.
+     * @param personName The person's name (normally hyperlinked full title)
+     * @param graduationText The text to be included in the graduation report.
+     * @param qualification The qualification just completed
+     */
+    private static void generatePostGradGraduationReport(Campaign campaign, String fontColor, String personName,
+                                                         String graduationText, String qualification, ResourceBundle resources) {
+        String educationLevel = String.format("<span color='%s'>%s</span>",
+                fontColor,
+                graduationText);
+
+        campaign.addReport(String.format(resources.getString("graduatedPostGradReport.text"),
+                personName,
+                educationLevel,
+                qualification));
     }
 
     /**
