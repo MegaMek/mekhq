@@ -897,7 +897,7 @@ public class EducationController {
         }
 
         if (graduationRoll >= 99) {
-            if (Compute.d6(1) > 5) {
+            if (Compute.d6(1) >= 5) {
                 if (academy.isHomeSchool()) {
                     String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
                             + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
@@ -945,7 +945,7 @@ public class EducationController {
 
         // graduated with honors
         if (graduationRoll >= 90) {
-            if (Compute.d6(1) > 5) {
+            if (Compute.d6(1) >= 5) {
 
                 if (academy.isHomeSchool()) {
                     String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
@@ -993,7 +993,7 @@ public class EducationController {
         }
 
         // default graduation
-        if (Compute.d6(1) > 5) {
+        if (Compute.d6(1) >= 5) {
             if (academy.isHomeSchool()) {
                 String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
                         + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
@@ -1373,6 +1373,7 @@ public class EducationController {
      */
     private static String graduationEventPicker() {
         List<String> graduationEventTable = graduationEventTable();
+        Collections.shuffle(graduationEventTable);
 
         return graduationEventTable.get(Compute.randomInt(graduationEventTable.size()));
     }
@@ -1385,8 +1386,6 @@ public class EducationController {
      */
     private static List<String> graduationEventTable() {
         return Arrays.asList(
-                // this should always be the first entry
-                "uneventful.text",
                 // the events
                 "addressEncouragement.text",
                 "addressFriendship.text",

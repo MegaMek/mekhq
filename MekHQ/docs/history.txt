@@ -75,7 +75,18 @@ MEKHQ VERSION HISTORY:
 + FIX #4474: Infantry personalty description is too wide
 + PR #4476: Removed Loyalty Change Event for Executing Prisoners
 + PR #4477: Marked 'FM: Mercenaries (rev)' Unit Rating Method as Deprecated
-+ FIXED #4481: Significant amount of company mysteriously vanished
++ FIX #4481: Significant amount of company mysteriously vanished
++ FIX #4386: Personnel Report Counting Injured Prisoners as Support Personnel
++ PR #4490: Fixed Missing Site Location Change Code & Turnover Information Storage
++ PR #4491: Corrected Qualification Start Years
++ PR #4492: Added Promotion-Based autoAwards Processing
++ PR #4494: Improved Award Tooltips with XP & Edge Benefits
++ PR #4501: Added Hospital Beds to Facility Report, Added Maximum Patients Per Doctor Campaign Option
++ FIX #4270: Top Level of TO&E Displaying Incorrect Commanding Officer
++ PR #4507: Removed Vestigial 'Uneventful' Graduation Event
++ PR #4508: Added autoAwards Support for the Final Three Awards from the Standard Set
++ PR #4509: Removed Turnover Target Number Method Configuration
++ PR #4510: Updated Turnover & Retention Module.pdf
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
