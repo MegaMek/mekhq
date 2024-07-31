@@ -1051,7 +1051,6 @@ public class EducationController {
         EducationLevel educationLevel = EducationLevel.parseFromInt(education);
 
         String qualification = academy.getQualifications().get(person.getEduCourseIndex());
-        String color = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
         String personName = person.getHyperlinkedFullTitle();
 
         String graduationLevel = "";
@@ -1068,27 +1067,24 @@ public class EducationController {
             person.setPreNominal("Dr");
         }
 
-        generatePostGradGraduationReport(campaign, color, personName, graduationLevel, qualification, resources);
+        generatePostGradGraduationReport(campaign, personName, graduationLevel, qualification, resources);
     }
 
     /**
      * Generates a post-graduate graduation report and publishes it to the daily report.
      *
      * @param campaign The campaign to which the report will be added.
-     * @param fontColor The color of the text in the report.
      * @param personName The person's name (normally hyperlinked full title)
      * @param graduationText The text to be included in the graduation report.
      * @param qualification The qualification just completed
      */
-    private static void generatePostGradGraduationReport(Campaign campaign, String fontColor, String personName,
+    private static void generatePostGradGraduationReport(Campaign campaign, String personName,
                                                          String graduationText, String qualification, ResourceBundle resources) {
-        String educationLevel = String.format("<span color='%s'>%s</span>",
-                fontColor,
-                graduationText);
-
         campaign.addReport(String.format(resources.getString("graduatedPostGradReport.text"),
                 personName,
-                educationLevel,
+                "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                graduationText,
+                "</span>",
                 qualification));
     }
 
