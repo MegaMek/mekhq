@@ -30,6 +30,7 @@ import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -65,7 +66,6 @@ import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.io.migration.FactionMigrator;
 import mekhq.io.migration.PersonMigrator;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -122,6 +122,7 @@ public class Person {
 
     private String biography;
     private LocalDate birthday;
+    private LocalDate joinedCampaign;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
     private LocalDate dateOfDeath;
@@ -240,6 +241,8 @@ public class Person {
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
 
+    private static final MMLogger logger = MMLogger.create(Person.class);
+
     // initializes the AtB ransom values
     static {
         MECHWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
@@ -343,6 +346,7 @@ public class Person {
         resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
         dateOfDeath = null;
         recruitment = null;
+        joinedCampaign = null;
         lastRankChangeDate = null;
         retirement = null;
         loyalty = 9;
@@ -1266,6 +1270,14 @@ public class Person {
         return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
     }
 
+    public @Nullable LocalDate getJoinedCampaign() {
+        return joinedCampaign;
+    }
+
+    public void setJoinedCampaign(final @Nullable LocalDate joinedCampaign) {
+        this.joinedCampaign = joinedCampaign;
+    }
+
     public @Nullable LocalDate getRecruitment() {
         return recruitment;
     }
@@ -1888,6 +1900,8 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "birthday", getBirthday());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deathday", getDateOfDeath());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitment", getRecruitment());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "joinedCampaign", getJoinedCampaign());
+
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
@@ -2072,7 +2086,7 @@ public class Person {
                 extraData.writeToXml(pw);
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to write " + getFullName() + " to the XML File", ex);
+            logger.error("Failed to write " + getFullName() + " to the XML File", ex);
             throw ex; // we want to rethrow to ensure that the save fails
         }
 
@@ -2127,7 +2141,7 @@ public class Person {
                         }
                         retVal.originPlanet = p;
                     } catch (NullPointerException e) {
-                        LogManager.getLogger().error("Error loading originPlanet for {}, {}", systemId, planetId, e);
+                        logger.error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
@@ -2222,6 +2236,8 @@ public class Person {
                     retVal.dateOfDeath = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
                     retVal.recruitment = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("joinedCampaign")) {
+                    retVal.joinedCampaign = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
                     retVal.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
@@ -2259,7 +2275,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
@@ -2274,7 +2290,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -2294,7 +2310,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in scenario log nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in scenario log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -2313,7 +2329,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -2330,7 +2346,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
                             continue;
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -2443,7 +2459,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring advantage: {}", adv);
+                        logger.error("Error restoring advantage: {}", adv);
                     }
                 }
             }
@@ -2458,7 +2474,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring edge: {}", adv);
+                        logger.error("Error restoring edge: {}", adv);
                     }
                 }
             }
@@ -2473,7 +2489,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring implants: {}", adv);
+                        logger.error("Error restoring implants: {}", adv);
                     }
                 }
             }
@@ -2489,7 +2505,7 @@ public class Person {
                 retVal.setRecruitment(c.getLocalDate());
             }
         } catch (Exception e) {
-            LogManager.getLogger().error("Failed to read person {} from file", retVal.getFullName(), e);
+            logger.error("Failed to read person {} from file", retVal.getFullName(), e);
             retVal = null;
         }
 
@@ -3994,7 +4010,7 @@ public class Person {
             final UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                LogManager.getLogger().error(String.format("Person %s ('%s') references missing unit %s",
+                logger.error(String.format("Person %s ('%s') references missing unit %s",
                         getId(), getFullName(), id));
             }
         }
@@ -4006,7 +4022,7 @@ public class Person {
                 if (realUnit != null) {
                     techUnits.set(ii, realUnit);
                 } else {
-                    LogManager.getLogger().error(String.format("Person %s ('%s') techs missing unit %s",
+                    logger.error(String.format("Person %s ('%s') techs missing unit %s",
                             getId(), getFullName(), techUnit.getId()));
                     techUnits.remove(ii);
                 }

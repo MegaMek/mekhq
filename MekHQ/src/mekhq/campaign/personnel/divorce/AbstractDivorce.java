@@ -27,11 +27,14 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -254,6 +257,42 @@ public abstract class AbstractDivorce {
 
         if (Compute.d6(1) <= 2) {
             spouse.setMarriageable(false);
+        }
+
+        List<Person> departingPartners = new ArrayList<>();
+
+        if (origin.getPrimaryRole().isDependent()) {
+            departingPartners.add(origin);
+        }
+
+        if (spouse.getPrimaryRole().isDependent()) {
+            departingPartners.add(origin);
+        }
+
+        if (!departingPartners.isEmpty()) {
+            for (Person departingPartner : departingPartners) {
+                departingPartner.changeStatus(campaign, today, PersonnelStatus.LEFT);
+
+                for (Person child : departingPartner.getGenealogy().getChildren()) {
+                    int remainingParents = child.getGenealogy().getParents().size();
+
+                    if ((remainingParents == 0) || (Compute.randomInt(2) == 0)) {
+                        child.changeStatus(campaign, today, PersonnelStatus.LEFT);
+                    }
+                }
+            }
+        }
+
+        // Process any relevant loyalty changes
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            if (origin.getStatus().isLeft() && !spouse.getStatus().isLeft()) {
+                spouse.performRandomizedLoyaltyChange(campaign, false, true);
+            } else if (!origin.getStatus().isLeft() && spouse.getStatus().isLeft()) {
+                origin.performRandomizedLoyaltyChange(campaign, false, true);
+            } else if (origin.getStatus().isLeft() && spouse.getStatus().isLeft()) {
+                origin.performForcedDirectionLoyaltyChange(campaign, false, false, true);
+                spouse.performForcedDirectionLoyaltyChange(campaign, false, false, true);
+            }
         }
 
         // trigger person changed events

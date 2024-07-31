@@ -161,9 +161,9 @@ public class CampaignOptions {
     private boolean noClanPartsFromIS;
     private int penaltyClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
-    private int[] planetTechAcquisitionBonus;
-    private int[] planetIndustryAcquisitionBonus;
-    private int[] planetOutputAcquisitionBonus;
+    private final int[] planetTechAcquisitionBonus;
+    private final int[] planetIndustryAcquisitionBonus;
+    private final int[] planetOutputAcquisitionBonus;
     //endregion Supplies and Acquisition Tab
 
     //region Tech Limits Tab
@@ -487,7 +487,7 @@ public class CampaignOptions {
     //endregion Special Abilities Tab
 
     //region Skill Randomization Tab
-    private int[] phenotypeProbabilities;
+    private final int[] phenotypeProbabilities;
     //endregion Skill Randomization Tab
 
     //region Rank System Tab
@@ -495,7 +495,7 @@ public class CampaignOptions {
 
     //region Name and Portrait Generation
     private boolean useOriginFactionForNames;
-    private boolean[] usePortraitForRole;
+    private final boolean[] usePortraitForRole;
     private boolean assignPortraitOnRoleChange;
     //endregion Name and Portrait Generation
 
@@ -550,7 +550,7 @@ public class CampaignOptions {
     private int baseStrategyDeployment;
     private int additionalStrategyDeployment;
     private boolean adjustPaymentForStrategy;
-    private int[] atbBattleChance;
+    private final int[] atbBattleChance;
     private boolean generateChases;
 
     // Scenarios
@@ -855,8 +855,8 @@ public class CampaignOptions {
         setUseRandomClanPersonnelMarriages(false);
         setUseRandomPrisonerMarriages(false);
         setRandomMarriageAgeRange(10);
-        setRandomMarriageDiceSize(6250);
-        setRandomSameSexMarriageDiceSize(6250);
+        setRandomMarriageDiceSize(5000);
+        setRandomSameSexMarriageDiceSize(14);
         setRandomNewDependentMarriage(20);
 
         // Divorce
@@ -873,7 +873,7 @@ public class CampaignOptions {
         setUseRandomSameSexDivorce(true);
         setUseRandomClanPersonnelDivorce(true);
         setUseRandomPrisonerDivorce(false);
-        setRandomDivorceDiceSize(3221);
+        setRandomDivorceDiceSize(900);
 
         // Procreation
         setUseManualProcreation(true);
@@ -890,8 +890,8 @@ public class CampaignOptions {
         setUseRelationshiplessRandomProcreation(false);
         setUseRandomClanPersonnelProcreation(false);
         setUseRandomPrisonerProcreation(true);
-        setRandomProcreationRelationshipDiceSize(621);
-        setRandomProcreationRelationshiplessDiceSize(8871);
+        setRandomProcreationRelationshipDiceSize(500);
+        setRandomProcreationRelationshiplessDiceSize(2000);
 
                 // Education
         setUseEducationModule(false);
@@ -5443,7 +5443,7 @@ public class CampaignOptions {
                     retVal.setRandomSameSexMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) { // Legacy, pre-50.01
                     if (!Boolean.parseBoolean(wn2.getTextContent().trim())) {
-                        retVal.setRandomSameSexMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                        retVal.setRandomSameSexMarriageDiceSize(0);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomNewDependentMarriage")) {
                     retVal.setRandomNewDependentMarriage(Integer.parseInt(wn2.getTextContent().trim()));

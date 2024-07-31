@@ -219,8 +219,14 @@ public abstract class AbstractMarriage {
         spouse.getGenealogy().setOriginSpouse(origin);
 
         // recruit the spouse if they're not already in the unit
-        if (spouse.getRecruitment() == null) {
-            campaign.recruitPerson(spouse, PrisonerStatus.FREE, true, true);
+        if (spouse.getJoinedCampaign() == null) {
+            campaign.recruitPerson(spouse, PrisonerStatus.FREE, true, false);
+
+            ResourceBundle recruitmentResources = ResourceBundle.getBundle("mekhq.resources.Campaign",
+                    MekHQ.getMHQOptions().getLocale());
+
+            campaign.addReport(String.format(recruitmentResources.getString("dependentJoinsForce.text"),
+                    spouse.getHyperlinkedFullTitle()));
         }
 
         // And finally, we trigger person changed events

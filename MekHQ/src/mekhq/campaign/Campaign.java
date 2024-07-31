@@ -43,6 +43,7 @@ import megamek.common.weapons.autocannons.ACWeapon;
 import megamek.common.weapons.flamers.FlamerWeapon;
 import megamek.common.weapons.gaussrifles.GaussWeapon;
 import megamek.common.weapons.lasers.EnergyWeapon;
+import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -126,7 +127,6 @@ import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.io.PrintWriter;
@@ -149,6 +149,8 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 public class Campaign implements ITechManager {
     public static final String REPORT_LINEBREAK = "<br/><br/>";
 
+    private static final MMLogger logger = MMLogger.create(Person.class);
+
     private UUID id;
 
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
@@ -156,14 +158,14 @@ public class Campaign implements ITechManager {
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
     // and more still - we're tracking DropShips and WarShips in a separate set so that we can assign units to transports
-    private Hangar units = new Hangar();
-    private Set<Unit> transportShips = new HashSet<>();
-    private Map<UUID, Person> personnel = new LinkedHashMap<>();
+    private final Hangar units = new Hangar();
+    private final Set<Unit> transportShips = new HashSet<>();
+    private final Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Warehouse parts = new Warehouse();
-    private TreeMap<Integer, Force> forceIds = new TreeMap<>();
-    private TreeMap<Integer, Mission> missions = new TreeMap<>();
-    private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
-    private Map<UUID, List<Kill>> kills = new HashMap<>();
+    private final TreeMap<Integer, Force> forceIds = new TreeMap<>();
+    private final TreeMap<Integer, Mission> missions = new TreeMap<>();
+    private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
+    private final Map<UUID, List<Kill>> kills = new HashMap<>();
 
     private transient final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
@@ -179,8 +181,8 @@ public class Campaign implements ITechManager {
     // I need to put a basic game object in campaign so that I can
     // assign it to the entities, otherwise some entity methods may get NPE
     // if they try to call up game options
-    private Game game;
-    private Player player;
+    private final Game game;
+    private final Player player;
 
     private GameOptions gameOptions;
 
@@ -190,14 +192,14 @@ public class Campaign implements ITechManager {
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
-    private Hashtable<Integer, Lance> lances; // AtB
+    private final Hashtable<Integer, Lance> lances; // AtB
 
     private Faction faction;
     private int techFactionCode;
     private String retainerEmployerCode; // AtB
     private RankSystem rankSystem;
 
-    private ArrayList<String> currentReport;
+    private final ArrayList<String> currentReport;
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
@@ -219,11 +221,11 @@ public class Campaign implements ITechManager {
 
     private CurrentLocation location;
 
-    private News news;
+    private final News news;
 
-    private PartsStore partsStore;
+    private final PartsStore partsStore;
 
-    private List<String> customs;
+    private final List<String> customs;
 
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
@@ -251,7 +253,7 @@ public class Campaign implements ITechManager {
     private LocalDate shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
-    private CampaignSummary campaignSummary;
+    private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
 
@@ -527,7 +529,7 @@ public class Campaign implements ITechManager {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    LogManager.getLogger().error("", e);
+                    logger.error("", e);
                 }
             }
             rm.setSelectedRATs(campaignOptions.getRATs());
@@ -669,7 +671,7 @@ public class Campaign implements ITechManager {
     public void purchaseShipSearchResult() {
         MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            LogManager.getLogger().error("Cannot find entry for {}", getShipSearchResult());
+            logger.error("Cannot find entry for {}", getShipSearchResult());
             return;
         }
 
@@ -685,7 +687,7 @@ public class Campaign implements ITechManager {
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
-            LogManager.getLogger().error("Unable to load unit: {}", ms.getEntryName(), ex);
+            logger.error("Unable to load unit: {}", ms.getEntryName(), ex);
             return;
         }
 
@@ -1150,7 +1152,7 @@ public class Campaign implements ITechManager {
     public void importUnit(Unit u) {
         Objects.requireNonNull(u);
 
-        LogManager.getLogger().debug("Importing unit: (" + u.getId() + "): " + u.getName());
+        logger.debug("Importing unit: ({}): {}", u.getId(), u.getName());
 
         getHangar().addUnit(u);
 
@@ -1175,7 +1177,7 @@ public class Campaign implements ITechManager {
      * @param unit - The ship we want to add to this Set
      */
     public void addTransportShip(Unit unit) {
-        LogManager.getLogger().debug("Adding DropShip/WarShip: " + unit.getId());
+        logger.debug("Adding DropShip/WarShip: {}", unit.getId());
         transportShips.add(Objects.requireNonNull(unit));
     }
 
@@ -1494,7 +1496,7 @@ public class Campaign implements ITechManager {
     //region Personnel Recruitment
     /**
      * @param p         the person being added
-     * @return          true if the person is hired successfully, otherwise false
+     * @return          true, if the person is hired successfully, otherwise false
      */
     public boolean recruitPerson(Person p) {
         return recruitPerson(p, p.getPrisonerStatus(), false, true);
@@ -1532,6 +1534,7 @@ public class Campaign implements ITechManager {
         if (p == null) {
             return false;
         }
+
         // Only pay if option set, they weren't GM added, and they aren't a dependent, prisoner or bondsman
         if (getCampaignOptions().isPayForRecruitment() && !p.getPrimaryRole().isDependent()
                 && !gmAdd && prisonerStatus.isFree()) {
@@ -1544,6 +1547,7 @@ public class Campaign implements ITechManager {
         }
 
         personnel.put(p.getId(), p);
+        p.setJoinedCampaign(getLocalDate());
 
         if (log) {
             String add = !prisonerStatus.isFree() ? (prisonerStatus.isBondsman() ? " as a bondsman" : " as a prisoner") : "";
@@ -2785,7 +2789,7 @@ public class Campaign implements ITechManager {
      */
     public void mothball(Unit u) {
         if (u.isMothballed()) {
-            LogManager.getLogger().warn("Unit is already mothballed, cannot mothball.");
+            logger.warn("Unit is already mothballed, cannot mothball.");
             return;
         }
 
@@ -2832,7 +2836,7 @@ public class Campaign implements ITechManager {
      */
     public void activate(Unit u) {
         if (!u.isMothballed()) {
-            LogManager.getLogger().warn("Unit is already activated, cannot activate.");
+            logger.warn("Unit is already activated, cannot activate.");
             return;
         }
 
@@ -3385,8 +3389,9 @@ public class Campaign implements ITechManager {
                     for (int i = 0; i < change; i++) {
                         final Person person = newDependent(false, Gender.RANDOMIZE);
                         recruitPerson(person, PrisonerStatus.FREE, true, false);
+
                         addReport(String.format(resources.getString("dependentJoinsForce.text"),
-                                person.getFullTitle()));
+                                person.getHyperlinkedFullTitle()));
                     }
                 }
             }
@@ -3412,26 +3417,26 @@ public class Campaign implements ITechManager {
     public void processNewDayPersonnel() {
         // This MUST use getActivePersonnel as we only want to process active personnel, and
         //  furthermore, this allows us to add and remove personnel without issue
-        for (Person p : getActivePersonnel()) {
+        for (Person person : getActivePersonnel()) {
             // Death
-            if (getDeath().processNewDay(this, getLocalDate(), p)) {
+            if (getDeath().processNewDay(this, getLocalDate(), person)) {
                 // The person has died, so don't continue to process the dead
                 continue;
             }
 
-            p.resetMinutesLeft();
+            person.resetMinutesLeft();
             // Reset acquisitions made to 0
-            p.setAcquisition(0);
-            if (p.needsFixing() && !getCampaignOptions().isUseAdvancedMedical()) {
-                p.decrementDaysToWaitForHealing();
-                Person doctor = getPerson(p.getDoctorId());
+            person.setAcquisition(0);
+            if (person.needsFixing() && !getCampaignOptions().isUseAdvancedMedical()) {
+                person.decrementDaysToWaitForHealing();
+                Person doctor = getPerson(person.getDoctorId());
                 if ((doctor != null) && doctor.isDoctor()) {
-                    if (p.getDaysToWaitForHealing() <= 0) {
-                        addReport(healPerson(p, doctor));
+                    if (person.getDaysToWaitForHealing() <= 0) {
+                        addReport(healPerson(person, doctor));
                     }
-                } else if (p.checkNaturalHealing(15)) {
-                    addReport(p.getHyperlinkedFullTitle() + " heals naturally!");
-                    Unit u = p.getUnit();
+                } else if (person.checkNaturalHealing(15)) {
+                    addReport(person.getHyperlinkedFullTitle() + " heals naturally!");
+                    Unit u = person.getUnit();
                     if (u != null) {
                         u.resetPilotAndEntity();
                     }
@@ -3439,53 +3444,53 @@ public class Campaign implements ITechManager {
             }
             // TODO Advanced Medical needs to go away from here later on
             if (getCampaignOptions().isUseAdvancedMedical()) {
-                InjuryUtil.resolveDailyHealing(this, p);
-                Unit u = p.getUnit();
+                InjuryUtil.resolveDailyHealing(this, person);
+                Unit u = person.getUnit();
                 if (u != null) {
                     u.resetPilotAndEntity();
                 }
             }
 
             // TODO : Reset this based on hasSupportRole(false) instead of checking for each type
-            // TODO : p.isEngineer will need to stay, however
+            // TODO : person.isEngineer will need to stay, however
             // Reset edge points to the purchased value each week. This should only
             // apply for support personnel - combat troops reset with each new mm game
-            if ((p.isAdministrator() || p.isDoctor() || p.isEngineer() || p.isTech())
+            if ((person.isAdministrator() || person.isDoctor() || person.isEngineer() || person.isTech())
                     && (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
-                p.resetCurrentEdge();
+                person.resetCurrentEdge();
             }
 
             if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
-                    && !p.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
-                p.setIdleMonths(p.getIdleMonths() + 1);
-                if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
+                    && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
+                person.setIdleMonths(person.getIdleMonths() + 1);
+                if (person.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-                        p.awardXP(this, getCampaignOptions().getIdleXP());
-                        addReport(p.getHyperlinkedFullTitle() + " has gained "
+                        person.awardXP(this, getCampaignOptions().getIdleXP());
+                        addReport(person.getHyperlinkedFullTitle() + " has gained "
                                 + getCampaignOptions().getIdleXP() + " XP");
                     }
-                    p.setIdleMonths(0);
+                    person.setIdleMonths(0);
                 }
             }
 
             // Divorce, Marriage, & Procreation
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                getDivorce().processNewWeek(this, getLocalDate(), p);
-                getMarriage().processNewWeek(this, getLocalDate(), p);
-                getProcreation().processNewWeek(this, getLocalDate(), p);
+                getDivorce().processNewWeek(this, getLocalDate(), person);
+                getMarriage().processNewWeek(this, getLocalDate(), person);
+                getProcreation().processNewWeek(this, getLocalDate(), person);
             }
 
             // Anniversaries
-            if ((p.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-                if ((p.getBirthday().isEqual(getLocalDate())) && (campaignOptions.isAnnounceBirthdays())) {
+            if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
+                if ((person.getBirthday().isEqual(getLocalDate())) && (campaignOptions.isAnnounceBirthdays())) {
                     addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                            p.getHyperlinkedFullTitle(),
-                            p.getAge(getLocalDate())));
+                            person.getHyperlinkedFullTitle(),
+                            person.getAge(getLocalDate())));
                 }
-            } else if ((p.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays()) ){
-                if (p.getBirthday().isEqual(getLocalDate())) {
+            } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays()) ){
+                if (person.getBirthday().isEqual(getLocalDate())) {
                     addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                            p.getHyperlinkedFullTitle(),
+                            person.getHyperlinkedFullTitle(),
                             18));
                 }
             }
@@ -3507,7 +3512,7 @@ public class Campaign implements ITechManager {
 
                 doMaintenance(u);
             } catch (Exception e) {
-                LogManager.getLogger().error(String.format(
+                logger.error(String.format(
                         "Unable to perform maintenance on %s (%s) due to an error",
                         u.getName(), u.getId().toString()), e);
                 addReport(String.format("ERROR: An error occurred performing maintenance on %s, check the log",
@@ -3559,7 +3564,7 @@ public class Campaign implements ITechManager {
                     try {
                         fixPart(part, tech);
                     } catch (Exception e) {
-                        LogManager.getLogger().error(String.format(
+                        logger.error(String.format(
                                 "Could not perform overnight maintenance on %s (%d) due to an error",
                                 part.getName(), part.getId()), e);
                         addReport(String.format("ERROR: an error occurred performing overnight maintenance on %s, check the log",
@@ -3608,7 +3613,7 @@ public class Campaign implements ITechManager {
             try {
                 MRMSService.mrmsAllUnits(this);
             } catch (Exception ex) {
-                LogManager.getLogger().error("Could not perform mass repair/salvage on units due to an error", ex);
+                logger.error("Could not perform mass repair/salvage on units due to an error", ex);
                 addReport("ERROR: an error occurred performing mass repair/salvage on units, check the log");
             }
         }
@@ -4659,7 +4664,7 @@ public class Campaign implements ITechManager {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
             if (mechFileParser == null) {
                 continue;
@@ -4684,7 +4689,7 @@ public class Campaign implements ITechManager {
                     pw1.println("]]></blk>");
                 }
                 catch (EntitySavingException e) {
-                    LogManager.getLogger().error("Failed to save custom entity " + en.getDisplayName(), e);
+                    logger.error("Failed to save custom entity " + en.getDisplayName(), e);
                 }
             }
             pw1.println("\t</custom>");
@@ -5309,7 +5314,7 @@ public class Campaign implements ITechManager {
 
         final int minutes = Math.min(partWork.getTimeLeft(), techTime);
         if (minutes <= 0) {
-            LogManager.getLogger().error("Attempting to get the target number for a part with zero time left.");
+            logger.error("Attempting to get the target number for a part with zero time left.");
             return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "No part repair time remaining.");
         }
 
@@ -5585,7 +5590,7 @@ public class Campaign implements ITechManager {
             }
 
             if (contract == null) {
-                LogManager.getLogger().error("AtB: used bonus part but no contract has bonus parts available.");
+                logger.error("AtB: used bonus part but no contract has bonus parts available.");
             } else {
                 addReport(resources.getString("bonusPartLog.text") + ' ' + targetWork.getAcquisitionPart().getPartName());
                 contract.useBonusPart();
@@ -6779,7 +6784,7 @@ public class Campaign implements ITechManager {
                         maintenanceReport.append(partReport).append("<br>");
                     }
                 } catch (Exception e) {
-                    LogManager.getLogger().error(String.format(
+                    logger.error(String.format(
                             "Could not perform maintenance on part %s (%d) for %s (%s) due to an error",
                             p.getName(), p.getId(), u.getName(), u.getId().toString()), e);
                     addReport(String.format("ERROR: An error occurred performing maintenance on %s for unit %s, check the log",
@@ -6803,7 +6808,7 @@ public class Campaign implements ITechManager {
             u.setLastMaintenanceReport(maintenanceReport.toString());
 
             if (getCampaignOptions().isLogMaintenance()) {
-                LogManager.getLogger().info(maintenanceReport.toString());
+                logger.info(maintenanceReport.toString());
             }
 
             int quality = u.getQuality();
