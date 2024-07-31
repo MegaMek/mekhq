@@ -23,6 +23,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import mekhq.MekHQ;
+import mekhq.campaign.CampaignOptions;
 import mekhq.utilities.MHQXMLUtility;
 
 import java.io.PrintWriter;
@@ -180,7 +181,7 @@ public class Award implements Comparable<Award> {
     /**
      * Gets the file name of an award given i times.
      * @param i times given the award
-     * @param fileNames list containing all of the file names
+     * @param fileNames list containing all the file names
      * @return the file name
      */
     private String getFileName(int i, List<String> fileNames) {
@@ -343,19 +344,49 @@ public class Award implements Comparable<Award> {
     }
 
     /**
-     * @return an html formatted string to be used as tooltip.
+     * @return the tooltip for an award.
+     *
+     * @param campaignOptions the campaign options to determine the tooltip content
      */
-    public String getTooltip() {
-        StringBuilder string = new StringBuilder();
-        string.append("<html>").append(getName()).append("<br>").append(getDescription())
+    public String getTooltip(CampaignOptions campaignOptions, Person person) {
+        boolean awardXP = (campaignOptions.getAwardBonusStyle().isBoth()) || (campaignOptions.getAwardBonusStyle().isXP());
+        boolean awardEdge = (campaignOptions.getAwardBonusStyle().isBoth()) || (campaignOptions.getAwardBonusStyle().isEdge());
+
+        int issueCount = person.getAwardController().getNumberOfAwards(this);
+
+        StringBuilder tooltip = new StringBuilder();
+        tooltip.append("<html>").append(getName()).append("<br>").append(getDescription())
                 .append("<br>").append("<br>");
-        for (String date : getFormattedDates()) {
-            string.append("(").append(date).append(")").append("<br>");
+
+        if ((awardXP) && (xp > 0)) {
+            tooltip.append("XP: +").append(xp);
+
+            if (issueCount > 1) {
+                tooltip.append(" (+").append(xp * issueCount).append(')');
+            }
+
+            tooltip.append("<br>");
         }
 
-        string.append("</html>");
+        if ((awardEdge) && (edge > 0)) {
+            tooltip.append("Edge: +").append(edge);
 
-        return string.toString();
+            if (issueCount > 1) {
+                tooltip.append(" (+").append(edge * issueCount).append(')');
+            }
+
+            tooltip.append("<br>");
+        }
+
+        tooltip.append("<br>");
+
+        for (String date : getFormattedDates()) {
+            tooltip.append('(').append(date).append(')').append("<br>");
+        }
+
+        tooltip.append("</html>");
+
+        return tooltip.toString();
     }
 
     /**
