@@ -90,9 +90,6 @@ public class RetirementDefectionTracker {
     private static Person mechWarriorCommander;
     private static Integer mechWarriorCommanderModifier;
 
-    private Integer hrSkill;
-    private Integer difficulty;
-
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionTracker");
 
     public RetirementDefectionTracker() {
@@ -104,7 +101,7 @@ public class RetirementDefectionTracker {
 
     /**
      * Computes the target for retirement rolls for all eligible personnel; this includes
-     * all active personnel who are not dependents, prisoners, or bondsmen.
+     * all active personnel who aren’t dependents, prisoners, or bondsmen.
      *
      * @param mission The contract that is being resolved; if the retirement roll is not due to
      *                 contract resolutions (e.g., &gt; 12 months since last roll), this can be null.
@@ -116,11 +113,6 @@ public class RetirementDefectionTracker {
 
         if (null != mission) {
             rollRequired.add(mission.getId());
-        }
-
-        if (!campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isFixed()) {
-            setHrSkill(campaign);
-            getDifficultyModifier(campaign);
         }
 
         if (campaign.getCampaignOptions().isUseManagementSkill()) {
@@ -414,28 +406,6 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Sets the HR skill averaged across all Admin/HR personnel.
-     *
-     * @param campaign the Campaign object to get personnel from.
-     */
-    private void setHrSkill(Campaign campaign) {
-        int hrPersonnelCount = (int) campaign.getActivePersonnel().stream()
-                .filter(person -> (!person.getPrisonerStatus().isPrisoner()) && (!person.getPrisonerStatus().isPrisonerDefector()))
-                .filter(person -> (person.getPrimaryRole().isAdministratorHR()) || (person.getSecondaryRole().isAdministratorHR()))
-                .count();
-
-        if (hrPersonnelCount != 0) {
-            if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
-                hrSkill = getCombinedSkillValues(campaign, SkillType.S_NEG) / hrPersonnelCount;
-            } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
-                hrSkill = getCombinedSkillValues(campaign, SkillType.S_ADMIN) / hrPersonnelCount;
-            }
-        } else {
-            hrSkill = 0;
-        }
-    }
-
-    /**
      * Calculates the management skill modifier for a person
      *
      * @param person the individual we're fetching the modifier for
@@ -698,77 +668,16 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Returns a difficulty modifier based on the turnover difficulty campaign setting.
-     *
-     * @param campaign the current campaign
-     */
-    private void getDifficultyModifier(Campaign campaign) {
-        switch (campaign.getCampaignOptions().getTurnoverDifficulty()) {
-            case NONE:
-                difficulty = -3;
-                break;
-            case ULTRA_GREEN:
-                difficulty = -2;
-                break;
-            case GREEN:
-                difficulty = -1;
-                break;
-            case REGULAR:
-                difficulty = 0;
-                break;
-            case VETERAN:
-                difficulty = 1;
-                break;
-            case ELITE:
-                difficulty = 2;
-                break;
-            case HEROIC:
-                difficulty = 3;
-                break;
-            case LEGENDARY:
-                difficulty = 4;
-                break;
-        }
-    }
-
-    /**
      * This method calculates the base target number.
      *
      * @param campaign the campaign for which the base target number is calculated
      * @return the base target number
      */
     private int getBaseTargetNumber(Campaign campaign, Person person) {
-        if (!campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isFixed()) {
-            int targetNumber;
-
-            // we use 'shellPerson' as we have no way to ensure 'person' has the necessary skills, and we'll get an NPE if they don't
-            Person shellPerson = new Person(campaign);
-
-            if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
-                shellPerson.addSkill(SkillType.S_NEG, 1, 0);
-                targetNumber = shellPerson.getSkills().getSkill(SkillType.S_NEG).getType().getTarget();
-            } else {
-                shellPerson.addSkill(SkillType.S_ADMIN, 1, 0);
-                targetNumber = shellPerson.getSkills().getSkill(SkillType.S_ADMIN).getType().getTarget();
-            }
-
-            if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
-                int loyaltyScore = person.getLoyalty();
-
-                if (person.isCommander()) {
-                    loyaltyScore += 2;
-                }
-
-                return targetNumber - hrSkill + difficulty + person.getLoyaltyModifier(loyaltyScore);
-            } else {
-                return targetNumber - hrSkill + difficulty;
-            }
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
+            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() + person.getLoyalty();
         } else {
-            if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
-                return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() + person.getLoyalty();
-            } else {
-                return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
-            }
+            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
         }
     }
 
