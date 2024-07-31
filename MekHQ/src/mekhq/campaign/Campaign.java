@@ -3489,6 +3489,27 @@ public class Campaign implements ITechManager {
                             18));
                 }
             }
+
+            // autoAwards
+            if (getLocalDate().getDayOfMonth() == 1) {
+                double multiplier = 0;
+
+                int score = 0;
+
+                if (p.getPrimaryRole().isSupport(true)) {
+                    score =  Compute.d6(p.getExperienceLevel(this, false));
+                    multiplier += 0.5;
+                }
+
+                if (p.getSecondaryRole().isSupport(true)) {
+                    score += Compute.d6(p.getExperienceLevel(this, false));
+                    multiplier += 0.5;
+                } else if (p.getSecondaryRole().isNone()) {
+                    multiplier += 0.5;
+                }
+
+                p.changeAutoAwardSupportPoints((int) (score * multiplier));
+            }
         }
     }
 
