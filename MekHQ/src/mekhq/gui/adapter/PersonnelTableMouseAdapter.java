@@ -249,11 +249,19 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_RANK: {
+                List<Person> promotedPersonnel = new ArrayList<>();
                 try {
                     final int rank = Integer.parseInt(data[1]);
                     final int level = (data.length > 2) ? Integer.parseInt(data[2]) : 0;
                     for (final Person person : people) {
                         person.changeRank(gui.getCampaign(), rank, level, true);
+
+                        promotedPersonnel.add(person);
+                    }
+
+                    if ((gui.getCampaign().getCampaignOptions().isEnableAutoAwards()) && (!promotedPersonnel.isEmpty())) {
+                        AutoAwardsController autoAwardsController = new AutoAwardsController();
+                        autoAwardsController.PromotionController(gui.getCampaign(), false);
                     }
                 } catch (Exception e) {
                     LogManager.getLogger().error("", e);
