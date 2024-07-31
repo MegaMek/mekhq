@@ -156,14 +156,14 @@ public class Campaign implements ITechManager {
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
     // and more still - we're tracking DropShips and WarShips in a separate set so that we can assign units to transports
-    private Hangar units = new Hangar();
-    private Set<Unit> transportShips = new HashSet<>();
-    private Map<UUID, Person> personnel = new LinkedHashMap<>();
+    private final Hangar units = new Hangar();
+    private final Set<Unit> transportShips = new HashSet<>();
+    private final Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Warehouse parts = new Warehouse();
-    private TreeMap<Integer, Force> forceIds = new TreeMap<>();
-    private TreeMap<Integer, Mission> missions = new TreeMap<>();
-    private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
-    private Map<UUID, List<Kill>> kills = new HashMap<>();
+    private final TreeMap<Integer, Force> forceIds = new TreeMap<>();
+    private final TreeMap<Integer, Mission> missions = new TreeMap<>();
+    private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
+    private final Map<UUID, List<Kill>> kills = new HashMap<>();
 
     private transient final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
@@ -179,8 +179,8 @@ public class Campaign implements ITechManager {
     // I need to put a basic game object in campaign so that I can
     // assign it to the entities, otherwise some entity methods may get NPE
     // if they try to call up game options
-    private Game game;
-    private Player player;
+    private final Game game;
+    private final Player player;
 
     private GameOptions gameOptions;
 
@@ -190,14 +190,14 @@ public class Campaign implements ITechManager {
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
-    private Hashtable<Integer, Lance> lances; // AtB
+    private final Hashtable<Integer, Lance> lances; // AtB
 
     private Faction faction;
     private int techFactionCode;
     private String retainerEmployerCode; // AtB
     private RankSystem rankSystem;
 
-    private ArrayList<String> currentReport;
+    private final ArrayList<String> currentReport;
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
@@ -219,11 +219,11 @@ public class Campaign implements ITechManager {
 
     private CurrentLocation location;
 
-    private News news;
+    private final News news;
 
-    private PartsStore partsStore;
+    private final PartsStore partsStore;
 
-    private List<String> customs;
+    private final List<String> customs;
 
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
@@ -251,7 +251,7 @@ public class Campaign implements ITechManager {
     private LocalDate shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
-    private CampaignSummary campaignSummary;
+    private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
 
@@ -3748,6 +3748,16 @@ public class Campaign implements ITechManager {
      * @return true if the person should be removed, false otherwise.
      */
     private boolean shouldRemovePerson(Person person, PersonnelStatus status) {
+        // don't remove a character if they are related to a genealogy
+        // with at least one member still present in the campaign
+        Map<FamilialRelationshipType, List<Person>> family = person.getGenealogy().getFamily();
+
+        if (family.keySet().stream()
+                .flatMap(relationshipType -> family.get(relationshipType).stream())
+                .anyMatch(relation -> relation.getStatus().isDepartedUnit())) {
+            return false;
+        }
+
         int retirementMonthValue;
 
         if (person.getRetirement() != null) {
