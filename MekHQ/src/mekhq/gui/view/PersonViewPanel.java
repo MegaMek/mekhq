@@ -378,7 +378,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 }
                 ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
-                ribbonLabel.setToolTipText(award.getTooltip());
+                ribbonLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
                 rowRibbonsBox.add(ribbonLabel, 0);
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);
@@ -464,7 +464,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 }
 
                 medalLabel.setIcon(new ImageIcon(medal));
-                medalLabel.setToolTipText(award.getTooltip());
+                medalLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
                 pnlMedals.add(medalLabel);
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);
@@ -500,7 +500,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
                         Image.SCALE_DEFAULT);
                 miscLabel.setIcon(new ImageIcon(miscAward));
-                miscLabel.setToolTipText(award.getTooltip());
+                miscLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);
