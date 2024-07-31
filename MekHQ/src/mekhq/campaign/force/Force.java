@@ -25,7 +25,6 @@ import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
@@ -38,6 +37,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.io.migration.CamouflageMigrator;
 import mekhq.io.migration.ForceIconMigrator;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -67,13 +67,14 @@ public class Force {
     private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
+    private FormationLevel formationLevel;
     private Force parentForce;
-    private Vector<Force> subForces;
-    private Vector<UUID> units;
+    private final Vector<Force> subForces;
+    private final Vector<UUID> units;
     private int scenarioId;
     private UUID forceCommanderID;
-
     protected UUID techId;
+
 
     //an ID so that forces can be tracked in Campaign hash
     private int id;
@@ -86,6 +87,7 @@ public class Force {
         setCamouflage(new Camouflage());
         setDescription("");
         this.combatForce = true;
+        this.formationLevel = FormationLevel.NONE;
         this.parentForce = null;
         this.subForces = new Vector<>();
         this.units = new Vector<>();
@@ -151,6 +153,14 @@ public class Force {
                 force.setCombatForce(combatForce, true);
             }
         }
+    }
+
+    public FormationLevel getFormationLevel() {
+        return formationLevel;
+    }
+
+    public void setFormationLevel(final FormationLevel formationLevel) {
+        this.formationLevel = formationLevel;
     }
 
     public int getScenarioId() {
@@ -507,6 +517,7 @@ public class Force {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceCommanderID", forceCommanderID);
@@ -556,6 +567,8 @@ public class Force {
                     retVal.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
+                    retVal.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
                     retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.6 removal
