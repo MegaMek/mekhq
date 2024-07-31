@@ -1158,12 +1158,9 @@ public class Person {
 
         applyLoyaltyChange.accept(roll);
 
-        if ((isVerbose) && (originalLoyalty != loyalty)) {
-            if (originalLoyalty > loyalty) {
-                campaign.addReport(String.format(resources.getString("loyaltyChangePositive.text"), getHyperlinkedFullTitle()));
-            } else {
-                campaign.addReport(String.format(resources.getString("loyaltyChangeNegative.text"), getHyperlinkedFullTitle()));
-            }
+        if (isVerbose && originalLoyalty != loyalty) {
+
+            reportLoyaltyChange(campaign, originalLoyalty);
         }
     }
 
@@ -1197,10 +1194,41 @@ public class Person {
             applyLoyaltyChange.accept(Compute.d6(3));
         }
 
-        if (isVerbose && (originalLoyalty != loyalty)) {
-            String messageKey = originalLoyalty > loyalty ? "loyaltyChangePositive.text" : "loyaltyChangeNegative.text";
-            campaign.addReport(String.format(resources.getString(messageKey), getHyperlinkedFullTitle()));
+        if ((isVerbose) && (originalLoyalty != loyalty)) {
+            reportLoyaltyChange(campaign, originalLoyalty);
         }
+    }
+
+    /**
+     * Reports the change in loyalty.
+     *
+     * @param campaign         The campaign for which the loyalty change is being reported.
+     * @param originalLoyalty  The original loyalty value before the change.
+     */
+    private void reportLoyaltyChange(Campaign campaign, int originalLoyalty) {
+        StringBuilder reportString = new StringBuilder();
+        StringBuilder changeString = new StringBuilder();
+        String color;
+
+        // choose the color and string based on the loyalty comparison.
+        if (originalLoyalty > loyalty) {
+            color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            changeString.append(resources.getString("loyaltyChangeNegative.text"));
+        } else {
+            color = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            changeString.append(resources.getString("loyaltyChangePositive.text"));
+        }
+
+        // add chosen color to the string builder.
+        changeString.insert(0, "<html><font color=" + color + "'>")
+                .append("</font>");
+
+        // use string formatter to supply values to the report string.
+        reportString.append(String.format(resources.getString("loyaltyChangeReport.text"),
+                getHyperlinkedFullTitle(), changeString));
+
+        // publish the report
+        campaign.addReport(reportString.toString());
     }
 
     /**

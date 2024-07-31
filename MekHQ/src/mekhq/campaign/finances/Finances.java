@@ -328,9 +328,16 @@ public class Finances {
 
                             person.performForcedDirectionLoyaltyChange(campaign, false, false, false);
                         }
-
-                        campaign.addReport(resourceMap.getString("loyaltyChangeGroup.text"));
                     }
+
+                    StringBuilder reportString = new StringBuilder(resourceMap.getString("loyaltyChangeGroup.text"));
+                    String color = MekHQ.getMHQOptions().getFontColorWarningHexColor();
+
+                    // add chosen color to the string builder.
+                    reportString.insert(0, "<html><font color=" + color + "'>")
+                            .append("</font>");
+
+                    campaign.addReport(reportString.toString());
                 }
             }
 
@@ -407,12 +414,11 @@ public class Finances {
      *
      * @param campaign The campaign for which taxes are to be paid.
      * @param profits  The profits made by the campaign.
-     * @return True if the taxes are paid successfully, false otherwise. (included for debugging)
      */
-    private boolean payTaxes(Campaign campaign, Money profits) {
+    private void payTaxes(Campaign campaign, Money profits) {
         Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions().getTaxesPercentage() / 100).round();
 
-        return debit(
+        debit(
                 TransactionType.TAXES,
                 campaign.getLocalDate(),
                 taxAmount,
