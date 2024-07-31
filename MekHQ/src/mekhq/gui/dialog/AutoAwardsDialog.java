@@ -198,8 +198,7 @@ public class AutoAwardsDialog extends JDialog {
         public void mouseClicked(MouseEvent e) {
             Object source = e.getSource();
 
-            if (source instanceof JButton) {
-                JButton button = (JButton) source;
+            if (source instanceof JButton button) {
                 AutoAwardsTableModel model = (AutoAwardsTableModel) personnelTable.getModel();
 
                 if (button.equals(btnSelectAll)) {
@@ -230,14 +229,36 @@ public class AutoAwardsDialog extends JDialog {
                         Person person = campaign.getPerson((UUID) data.get(rowIndex).get(0));
                         Award award = (Award) data.get(rowIndex).get(1);
 
-                        // in theory, we should have already filtered out ineligible personnel by this stage
-                        // but a little insurance never hurt
-                        if (award.canBeAwarded(person)) {
-                            person.getAwardController().addAndLogAward(campaign, award.getSet(),
-                                    award.getName(), campaign.getLocalDate());
+                        List<Award> awardsForRemoval = new ArrayList<>();
+
+                        if ((award.canBeAwarded(person))
+                                && (award.getItem().equalsIgnoreCase("rank"))
+                                && (award.getRange().equalsIgnoreCase("Promotion"))) {
+                            for (Award existingAward : person.getAwardController().getAwards()) {
+                                if ((!existingAward.getItem().equalsIgnoreCase("rank"))
+                                        || (!existingAward.getRange().equalsIgnoreCase("promotion"))) {
+                                    continue;
+                                }
+
+                                awardsForRemoval.add(existingAward);
+                            }
                         }
+
+                        if (!awardsForRemoval.isEmpty()) {
+                            for (Award awardPendingRemoval : awardsForRemoval) {
+                                person.getAwardController().removeAwardSilent(
+                                        awardPendingRemoval.getSet(),
+                                        awardPendingRemoval.getName(),
+                                        null
+                                );
+                            }
+                        }
+
+                        person.getAwardController().addAndLogAward(campaign, award.getSet(),
+                                award.getName(), campaign.getLocalDate());
                     }
                 }
+
                 // this disables the current page
                 setVisible(false);
 

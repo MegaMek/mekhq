@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2024 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -228,7 +228,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         return patients;
     }
 
-    protected ArrayList<Person> getSelectedUnassignedPatients() {
+    private ArrayList<Person> getSelectedUnassignedPatients() {
         ArrayList<Person> patients = new ArrayList<>();
         int[] indices = listUnassignedPatient.getSelectedIndices();
         if (unassignedPatientModel.getSize() == 0) {
@@ -270,7 +270,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 if ((null != p)
                         && (p.needsFixing()
                                 || (getCampaign().getCampaignOptions().isUseAdvancedMedical() && p.needsAMFixing()))
-                        && (getCampaign().getPatientsFor(doctor) < 25)
+                        && (getCampaign().getPatientsFor(doctor) < getCampaign().getCampaignOptions().getMaximumPatients())
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, p));
@@ -283,7 +283,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 if ((null != p)
                         && (p.needsFixing()
                                 || (getCampaign().getCampaignOptions().isUseAdvancedMedical() && p.needsAMFixing()))
-                        && (getCampaign().getPatientsFor(doctor) < 25)
+                        && (getCampaign().getPatientsFor(doctor) < getCampaign().getCampaignOptions().getMaximumPatients())
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, p));

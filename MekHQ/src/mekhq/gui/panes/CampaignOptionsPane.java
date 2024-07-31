@@ -238,6 +238,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnMinimumHitsForVehicles;
     private JCheckBox chkUseRandomHitsForVehicles;
     private JCheckBox chkUseTougherHealing;
+    private JSpinner spnMaximumPatients;
 
     // Prisoners
     private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
@@ -272,9 +273,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // Settings
     private JPanel turnoverAndRetentionSettingsPanel = new JPanel();
-    private MMComboBox<TurnoverTargetNumberMethod> comboTurnoverTargetNumberMethod;
-    private JLabel lblTurnoverDifficulty;
-    private MMComboBox<SkillLevel> comboTurnoverDifficulty;
     private JLabel lblTurnoverFixedTargetNumber;
     private JSpinner spnTurnoverFixedTargetNumber;
     private MMComboBox<TurnoverFrequency> comboTurnoverFrequency;
@@ -4081,6 +4079,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseTougherHealing.setToolTipText(resources.getString("chkUseTougherHealing.toolTipText"));
         chkUseTougherHealing.setName("chkUseTougherHealing");
 
+        final JLabel lblMaximumPatients = new JLabel(resources.getString("lblMaximumPatients.text"));
+        lblMaximumPatients.setToolTipText(resources.getString("lblMaximumPatients.toolTipText"));
+        lblMaximumPatients.setName("lblMaximumPatients");
+
+        spnMaximumPatients = new JSpinner(new SpinnerNumberModel(25, 1, 100, 1));
+        spnMaximumPatients.setToolTipText(resources.getString("lblMaximumPatients.toolTipText"));
+        spnMaximumPatients.setName("spnMaximumPatients");
+
         // Programmatically Assign Accessibility Labels
         lblHealWaitingPeriod.setLabelFor(spnHealWaitingPeriod);
         lblNaturalHealWaitingPeriod.setLabelFor(spnNaturalHealWaitingPeriod);
@@ -4110,6 +4116,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnMinimumHitsForVehicles, Alignment.LEADING))
                         .addComponent(chkUseRandomHitsForVehicles)
                         .addComponent(chkUseTougherHealing)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblMaximumPatients)
+                                .addComponent(spnMaximumPatients, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -4126,6 +4135,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnMinimumHitsForVehicles))
                         .addComponent(chkUseRandomHitsForVehicles)
                         .addComponent(chkUseTougherHealing)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMaximumPatients)
+                                .addComponent(spnMaximumPatients))
         );
 
         return panel;
@@ -4248,11 +4260,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Special Case Handlers
             // These are elements whose status is influenced by other campaign options.
-            final TurnoverTargetNumberMethod turnoverTargetNumberMethod = comboTurnoverTargetNumberMethod.getSelectedItem();
-            lblTurnoverDifficulty.setEnabled((isEnabled) && (!Objects.requireNonNull(turnoverTargetNumberMethod).isFixed()));
-            comboTurnoverDifficulty.setEnabled((isEnabled) && (!Objects.requireNonNull(turnoverTargetNumberMethod).isFixed()));
-            lblTurnoverFixedTargetNumber.setEnabled((isEnabled) && (Objects.requireNonNull(turnoverTargetNumberMethod).isFixed()));
-            spnTurnoverFixedTargetNumber.setEnabled((isEnabled) && (Objects.requireNonNull(turnoverTargetNumberMethod).isFixed()));
+            lblTurnoverFixedTargetNumber.setEnabled(isEnabled);
+            spnTurnoverFixedTargetNumber.setEnabled(isEnabled);
 
             boolean isUseLoyaltyModifiers = chkUseLoyaltyModifiers.isSelected();
             loyaltySubPanel.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
@@ -4300,62 +4309,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel createTurnoverAndRetentionSettingsPanel() {
         boolean isUseTurnover = campaign.getCampaignOptions().isUseRandomRetirement();
-        boolean isUseFixedTargetNumber = campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isFixed();
-
-        JLabel lblTurnoverTargetNumberMethod = new JLabel(resources.getString("lblTurnoverTargetNumberMethod.text"));
-        lblTurnoverTargetNumberMethod.setToolTipText(resources.getString("lblTurnoverTargetNumberMethod.toolTipText"));
-        lblTurnoverTargetNumberMethod.setName("lblTurnoverTargetNumberMethod");
-        lblTurnoverTargetNumberMethod.setEnabled(isUseTurnover);
-
-        comboTurnoverTargetNumberMethod = new MMComboBox<>("comboTurnoverTargetNumberMethod", TurnoverTargetNumberMethod.values());
-        comboTurnoverTargetNumberMethod.setToolTipText(resources.getString("lblTurnoverTargetNumberMethod.toolTipText"));
-        comboTurnoverTargetNumberMethod.setEnabled(isUseTurnover);
-        comboTurnoverTargetNumberMethod.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof TurnoverTargetNumberMethod) {
-                    list.setToolTipText(((TurnoverTargetNumberMethod) value).getToolTipText());
-                }
-                return this;
-            }
-        });
-        comboTurnoverTargetNumberMethod.addActionListener(evt -> {
-            final TurnoverTargetNumberMethod method = comboTurnoverTargetNumberMethod.getSelectedItem();
-
-            if (method == null) {
-                return;
-            }
-
-            lblTurnoverDifficulty.setEnabled(!method.isFixed());
-            comboTurnoverDifficulty.setEnabled(!method.isFixed());
-
-            lblTurnoverFixedTargetNumber.setEnabled(method.isFixed());
-            spnTurnoverFixedTargetNumber.setEnabled(method.isFixed());
-        });
-
-        lblTurnoverDifficulty = new JLabel(resources.getString("lblTurnoverDifficulty.text"));
-        lblTurnoverDifficulty.setToolTipText(resources.getString("lblTurnoverDifficulty.toolTipText"));
-        lblTurnoverDifficulty.setName("lblTurnoverDifficulty");
-        lblTurnoverDifficulty.setEnabled((isUseTurnover) && (!isUseFixedTargetNumber));
-
-        final DefaultComboBoxModel<SkillLevel> skillLevelModel = new DefaultComboBoxModel<>(Skills.SKILL_LEVELS);
-        skillLevelModel.removeElement(SkillLevel.NONE);
-        comboTurnoverDifficulty = new MMComboBox<>("comboTurnoverDifficulty", skillLevelModel);
-        comboTurnoverDifficulty.setToolTipText(resources.getString("lblTurnoverDifficulty.toolTipText"));
-        comboTurnoverDifficulty.setEnabled((isUseTurnover) && (!isUseFixedTargetNumber));
 
         lblTurnoverFixedTargetNumber = new JLabel(resources.getString("lblTurnoverFixedTargetNumber.text"));
         lblTurnoverFixedTargetNumber.setToolTipText(resources.getString("lblTurnoverFixedTargetNumber.toolTipText"));
         lblTurnoverFixedTargetNumber.setName("lblTurnoverFixedTargetNumber");
-        lblTurnoverFixedTargetNumber.setEnabled((isUseTurnover) && (isUseFixedTargetNumber));
+        lblTurnoverFixedTargetNumber.setEnabled(isUseTurnover);
 
         spnTurnoverFixedTargetNumber = new JSpinner(new SpinnerNumberModel(3, 0, 10, 1));
         spnTurnoverFixedTargetNumber.setToolTipText(resources.getString("lblTurnoverFixedTargetNumber.toolTipText"));
         spnTurnoverFixedTargetNumber.setName("spnTurnoverFixedTargetNumber");
-        spnTurnoverFixedTargetNumber.setEnabled((isUseTurnover) && (isUseFixedTargetNumber));
+        spnTurnoverFixedTargetNumber.setEnabled(isUseTurnover);
 
         lblTurnoverFixedTargetNumber = new JLabel(resources.getString("lblTurnoverFixedTargetNumber.text"));
         lblTurnoverFixedTargetNumber.setToolTipText(resources.getString("lblTurnoverFixedTargetNumber.toolTipText"));
@@ -4466,12 +4429,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblTurnoverTargetNumberMethod)
-                                .addComponent(comboTurnoverTargetNumberMethod, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblTurnoverDifficulty)
-                                .addComponent(comboTurnoverDifficulty, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblTurnoverFixedTargetNumber)
                                 .addComponent(spnTurnoverFixedTargetNumber, Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -4497,12 +4454,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblTurnoverTargetNumberMethod)
-                                .addComponent(comboTurnoverTargetNumberMethod))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblTurnoverDifficulty)
-                                .addComponent(comboTurnoverDifficulty))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblTurnoverFixedTargetNumber)
                                 .addComponent(spnTurnoverFixedTargetNumber))
@@ -8014,6 +7965,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnMinimumHitsForVehicles.setValue(options.getMinimumHitsForVehicles());
         chkUseRandomHitsForVehicles.setSelected(options.isUseRandomHitsForVehicles());
         chkUseTougherHealing.setSelected(options.isTougherHealing());
+        spnMaximumPatients.setValue(options.getMaximumPatients());
 
         // Prisoners
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
@@ -8070,8 +8022,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomRetirement.setSelected(options.isUseRandomRetirement());
 
         // Settings
-        comboTurnoverTargetNumberMethod.setSelectedItem(options.getTurnoverTargetNumberMethod());
-        comboTurnoverDifficulty.setSelectedItem(options.getTurnoverDifficulty());
         spnTurnoverFixedTargetNumber.setValue(options.getTurnoverFixedTargetNumber());
         comboTurnoverFrequency.setSelectedItem(options.getTurnoverFrequency());
         chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
@@ -8723,6 +8673,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setMinimumHitsForVehicles((Integer) spnMinimumHitsForVehicles.getValue());
             options.setUseRandomHitsForVehicles(chkUseRandomHitsForVehicles.isSelected());
             options.setTougherHealing(chkUseTougherHealing.isSelected());
+            options.setMaximumPatients((int) spnMaximumPatients.getValue());
 
             // Prisoners
             options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());
@@ -8759,8 +8710,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseRandomRetirement(chkUseRandomRetirement.isSelected());
 
             // Settings
-            options.setTurnoverTargetNumberMethod(comboTurnoverTargetNumberMethod.getSelectedItem());
-            options.setTurnoverDifficulty(comboTurnoverDifficulty.getSelectedItem());
             options.setTurnoverFixedTargetNumber((Integer) spnTurnoverFixedTargetNumber.getValue());
             options.setTurnoverFrequency(comboTurnoverFrequency.getSelectedItem());
             options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());

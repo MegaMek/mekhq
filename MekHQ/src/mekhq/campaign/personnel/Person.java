@@ -129,6 +129,9 @@ public class Person {
     private List<LogEntry> personnelLog;
     private List<LogEntry> scenarioLog;
 
+    // this is used by autoAwards to abstract the support person of the year award
+    private int autoAwardSupportPoints;
+
     private LocalDate retirement;
     private int loyalty;
     private int fatigue;
@@ -348,6 +351,7 @@ public class Person {
         recruitment = null;
         joinedCampaign = null;
         lastRankChangeDate = null;
+        autoAwardSupportPoints = 0;
         retirement = null;
         loyalty = 9;
         fatigue = 0;
@@ -1364,6 +1368,20 @@ public class Person {
         return genealogy;
     }
 
+    //region autoAwards
+    public int getAutoAwardSupportPoints() {
+        return autoAwardSupportPoints;
+    }
+
+    public void setAutoAwardSupportPoints(final int autoAwardSupportPoints) {
+        this.autoAwardSupportPoints = autoAwardSupportPoints;
+    }
+
+    public void changeAutoAwardSupportPoints(int change) {
+        autoAwardSupportPoints += change;
+    }
+    //endregion autoAwards
+
     //region Turnover and Retention
     public @Nullable LocalDate getRetirement() {
         return retirement;
@@ -1903,6 +1921,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "joinedCampaign", getJoinedCampaign());
 
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoAwardSupportPoints", getAutoAwardSupportPoints());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
@@ -2240,6 +2259,8 @@ public class Person {
                     retVal.joinedCampaign = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
                     retVal.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoAwardSupportPoints")) {
+                    retVal.setAutoAwardSupportPoints(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
                     retVal.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("loyalty")) {

@@ -222,6 +222,7 @@ public class CampaignOptions {
     private int minimumHitsForVehicles;
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
+    private int maximumPatients;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -277,8 +278,6 @@ public class CampaignOptions {
     // Retirement
     private boolean useRandomRetirement;
 
-    private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
-    private SkillLevel turnoverDifficulty;
     private int turnoverFixedTargetNumber;
     private boolean aeroRecruitsHaveUnits;
     private boolean trackOriginalUnit;
@@ -733,6 +732,7 @@ public class CampaignOptions {
         setMinimumHitsForVehicles(1);
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
+        setMaximumPatients(25);
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.TAHARQA);
@@ -957,8 +957,6 @@ public class CampaignOptions {
         //region Turnover and Retention
         // Retirement
         setUseRandomRetirement(false);
-        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.FIXED);
-        setTurnoverDifficulty(SkillLevel.REGULAR);
         setTurnoverFrequency(TurnoverFrequency.MONTHLY);
         setTurnoverFixedTargetNumber(3);
         setAeroRecruitsHaveUnits(false);
@@ -1764,6 +1762,14 @@ public class CampaignOptions {
     public void setTougherHealing(final boolean tougherHealing) {
         this.tougherHealing = tougherHealing;
     }
+
+    public int getMaximumPatients() {
+        return maximumPatients;
+    }
+
+    public void setMaximumPatients(final int maximumPatients) {
+        this.maximumPatients = maximumPatients;
+    }
     //endregion Medical
 
     //region Prisoners
@@ -1841,22 +1847,6 @@ public class CampaignOptions {
 
     public void setUseRandomRetirement(final boolean useRandomRetirement) {
         this.useRandomRetirement = useRandomRetirement;
-    }
-
-    public TurnoverTargetNumberMethod getTurnoverTargetNumberMethod() {
-        return turnoverTargetNumberMethod;
-    }
-
-    public void setTurnoverTargetNumberMethod (final TurnoverTargetNumberMethod turnoverTargetNumberMethod) {
-        this.turnoverTargetNumberMethod = turnoverTargetNumberMethod;
-    }
-
-    public SkillLevel getTurnoverDifficulty() {
-        return turnoverDifficulty;
-    }
-
-    public void setTurnoverDifficulty (final SkillLevel turnoverDifficulty) {
-        this.turnoverDifficulty = turnoverDifficulty;
     }
 
     public TurnoverFrequency getTurnoverFrequency() {
@@ -4581,6 +4571,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumHitsForVehicles", getMinimumHitsForVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomHitsForVehicles", isUseRandomHitsForVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", isTougherHealing());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumPatients", getMaximumPatients());
         //endregion Medical
 
         //region Prisoners
@@ -4646,8 +4637,6 @@ public class CampaignOptions {
 
         //region Retirement
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", isUseRandomRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverTargetNumberMethod", getTurnoverTargetNumberMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverDifficulty", getTurnoverDifficulty().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverBaseTn", getTurnoverFixedTargetNumber());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverFrequency", getTurnoverFrequency().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aeroRecruitsHaveUnits", isAeroRecruitsHaveUnits());
@@ -5254,6 +5243,8 @@ public class CampaignOptions {
                     retVal.setUseRandomHitsForVehicles(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
                     retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("maximumPatients")) {
+                    retVal.setMaximumPatients(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Medical
 
                     //region Prisoners
@@ -5631,10 +5622,6 @@ public class CampaignOptions {
                 //region Turnover and Retention
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverTargetNumberMethod")) {
-                    retVal.setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverDifficulty")) {
-                    retVal.setTurnoverDifficulty(SkillLevel.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
                     retVal.setTurnoverFixedTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverFrequency")) {
