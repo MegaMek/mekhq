@@ -710,8 +710,14 @@ public final class BriefingTab extends CampaignGuiTab {
                 scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
             }
 
+            boolean isCivilianHelp = false;
+
+            if (tracker.getScenario() instanceof AtBScenario) {
+                isCivilianHelp = ((AtBScenario) tracker.getScenario()).getScenarioType() == AtBScenario.CIVILIANHELP;
+            }
+
             AutoAwardsController autoAwardsController = new AutoAwardsController();
-            autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills);
+            autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills, isCivilianHelp);
         }
 
         for (UUID personId : tracker.getPeopleStatus().keySet()) {

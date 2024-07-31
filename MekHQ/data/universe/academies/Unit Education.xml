@@ -51,34 +51,34 @@
         <ageMax>16</ageMax>
         <qualification>MechWarrior Apprenticeship</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
+        <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Mechanized Apprenticeship</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Aerospace Apprenticeship</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
+        <qualificationStartYear>2314</qualificationStartYear>
         <qualification>Black Naval Apprenticeship</qualification>
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
+        <qualificationStartYear>2455</qualificationStartYear>
         <qualification>Infantry Apprenticeship</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>MechTech Apprenticeship</qualification>
         <curriculum>Astech, Tech/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
+        <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Mechanic Apprenticeship</qualification>
         <curriculum>Astech, Tech/Mechanic</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>AeroTech Apprenticeship</qualification>
         <curriculum>Astech, Tech/Aero</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
+        <qualificationStartYear>2314</qualificationStartYear>
         <qualification>Battle Armor Technician Apprenticeship</qualification>
         <curriculum>Astech, Tech/BA</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3050</qualificationStartYear>
         <qualification>Black Naval Tech Apprenticeship</qualification>
         <curriculum>Astech, Tech/Vessel</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
+        <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Administrative Apprenticeship</qualification>
         <curriculum>Administration, Scrounge</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -129,16 +129,16 @@
         <ageMin>16</ageMin>
         <qualification>Basic MechWarrior Training</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
+        <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Basic Aerospace Training</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
+        <qualificationStartYear>2314</qualificationStartYear>
         <qualification>Basic Black Naval Training</qualification>
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
+        <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Basic Battle Armor Training</qualification>
         <curriculum>Gunnery/Battlesuit</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3050</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
 </academies>
