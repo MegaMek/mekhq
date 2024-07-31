@@ -236,6 +236,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnMinimumHitsForVehicles;
     private JCheckBox chkUseRandomHitsForVehicles;
     private JCheckBox chkUseTougherHealing;
+    private JSpinner spnMaximumPatients;
 
     // Prisoners
     private MMComboBox<PrisonerCaptureStyle> comboPrisonerCaptureStyle;
@@ -4098,6 +4099,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseTougherHealing.setToolTipText(resources.getString("chkUseTougherHealing.toolTipText"));
         chkUseTougherHealing.setName("chkUseTougherHealing");
 
+        final JLabel lblMaximumPatients = new JLabel(resources.getString("lblMaximumPatients.text"));
+        lblMaximumPatients.setToolTipText(resources.getString("lblMaximumPatients.toolTipText"));
+        lblMaximumPatients.setName("lblMaximumPatients");
+
+        spnMaximumPatients = new JSpinner(new SpinnerNumberModel(25, 1, 100, 1));
+        spnMaximumPatients.setToolTipText(resources.getString("lblMaximumPatients.toolTipText"));
+        spnMaximumPatients.setName("spnMaximumPatients");
+
         // Programmatically Assign Accessibility Labels
         lblHealWaitingPeriod.setLabelFor(spnHealWaitingPeriod);
         lblNaturalHealWaitingPeriod.setLabelFor(spnNaturalHealWaitingPeriod);
@@ -4127,6 +4136,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnMinimumHitsForVehicles, Alignment.LEADING))
                         .addComponent(chkUseRandomHitsForVehicles)
                         .addComponent(chkUseTougherHealing)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblMaximumPatients)
+                                .addComponent(spnMaximumPatients, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -4143,6 +4155,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnMinimumHitsForVehicles))
                         .addComponent(chkUseRandomHitsForVehicles)
                         .addComponent(chkUseTougherHealing)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMaximumPatients)
+                                .addComponent(spnMaximumPatients))
         );
 
         return panel;
@@ -8082,6 +8097,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnMinimumHitsForVehicles.setValue(options.getMinimumHitsForVehicles());
         chkUseRandomHitsForVehicles.setSelected(options.isUseRandomHitsForVehicles());
         chkUseTougherHealing.setSelected(options.isTougherHealing());
+        spnMaximumPatients.setValue(options.getMaximumPatients());
 
         // Prisoners
         comboPrisonerCaptureStyle.setSelectedItem(options.getPrisonerCaptureStyle());
@@ -8798,6 +8814,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setMinimumHitsForVehicles((Integer) spnMinimumHitsForVehicles.getValue());
             options.setUseRandomHitsForVehicles(chkUseRandomHitsForVehicles.isSelected());
             options.setTougherHealing(chkUseTougherHealing.isSelected());
+            options.setMaximumPatients((int) spnMaximumPatients.getValue());
 
             // Prisoners
             options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());

@@ -222,6 +222,7 @@ public class CampaignOptions {
     private int minimumHitsForVehicles;
     private boolean useRandomHitsForVehicles;
     private boolean tougherHealing;
+    private int maximumPatients;
 
     // Prisoners
     private PrisonerCaptureStyle prisonerCaptureStyle;
@@ -733,6 +734,7 @@ public class CampaignOptions {
         setMinimumHitsForVehicles(1);
         setUseRandomHitsForVehicles(false);
         setTougherHealing(false);
+        setMaximumPatients(25);
 
         // Prisoners
         setPrisonerCaptureStyle(PrisonerCaptureStyle.TAHARQA);
@@ -1764,6 +1766,14 @@ public class CampaignOptions {
 
     public void setTougherHealing(final boolean tougherHealing) {
         this.tougherHealing = tougherHealing;
+    }
+
+    public int getMaximumPatients() {
+        return maximumPatients;
+    }
+
+    public void setMaximumPatients(final int maximumPatients) {
+        this.maximumPatients = maximumPatients;
     }
     //endregion Medical
 
@@ -4573,6 +4583,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumHitsForVehicles", getMinimumHitsForVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomHitsForVehicles", isUseRandomHitsForVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", isTougherHealing());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumPatients", getMaximumPatients());
         //endregion Medical
 
         //region Prisoners
@@ -5247,6 +5258,8 @@ public class CampaignOptions {
                     retVal.setUseRandomHitsForVehicles(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
                     retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("maximumPatients")) {
+                    retVal.setMaximumPatients(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Medical
 
                     //region Prisoners
