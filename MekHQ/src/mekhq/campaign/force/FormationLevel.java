@@ -210,6 +210,21 @@ public enum FormationLevel {
     public boolean isLevelSix() {
         return this == LEVEL_VI;
     }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isLanceEquivalent() {
+        return this == LANCE || this == STAR_OR_NOVA || this == LEVEL_II_OR_CHOIR;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isCompanyEquivalent() {
+        return this == COMPANY || this == BINARY_OR_TRINARY || this == LEVEL_III;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isBattalionEquivalent() {
+        return this == BATTALION || this == CLUSTER || this == LEVEL_IV;
+    }
     //endregion Boolean Comparison Methods
 
     //region File I/O
