@@ -145,7 +145,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         final Contract contract = null;
         generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, contract);
 
-        MekHQ.triggerEvent(new OrganizationChangedEvent(getCompanyGenerationOptionsPanel().getCampaign().getForces()));
+        MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCompanyGenerationOptionsPanel().getCampaign().getForces()));
 
         if (campaign.getCampaignOptions().isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();

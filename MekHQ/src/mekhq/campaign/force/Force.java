@@ -26,6 +26,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -255,9 +256,9 @@ public class Force {
         for (int i = ancestors.size() - 1; i >= 0; i--) {
             Force ancestor = ancestors.get(i);
             id = 17 * id + ancestor.id + 1;
-            result.append(ancestor.getName()).append("|").append(id);
+            result.append(ancestor.getName()).append('|').append(id);
             if (!ancestor.getCamouflage().isDefault()) {
-                result.append("|").append(ancestor.getCamouflage().getCategory()).append("|").append(ancestor.getCamouflage().getFilename());
+                result.append('|').append(ancestor.getCamouflage().getCategory()).append('|').append(ancestor.getCamouflage().getFilename());
             }
             result.append("||");
         }
@@ -532,7 +533,7 @@ public class Force {
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "overrideFormationLevel", overrideFormationLevel.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceCommanderID", forceCommanderID);
@@ -584,7 +585,7 @@ public class Force {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
                 } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
                     retVal.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("overrideFormationLevel")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("populateOriginNode")) {
                     retVal.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
                     retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
@@ -612,7 +613,7 @@ public class Force {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in Forces nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -768,7 +769,7 @@ public class Force {
      * @param force the current force. Should always equal campaign.getForce(0), if called remotely
      * @param depth the current recursive depth. Can be left null, if called remotely
      */
-    public static int getMaximumDepth(Force force, @Nullable Integer depth) {
+    public static int getMaximumDepth(Force force, Integer depth) {
         if (depth == null) {
             depth = 0;
         }
@@ -777,16 +778,114 @@ public class Force {
 
         Vector<Force> subForces = force.getSubForces();
 
-        if (!subForces.isEmpty()) {
-            for (Force subforce : subForces) {
-                int nextDepth = getMaximumDepth(subforce, depth + 1);
+        for (Force subforce : subForces) {
+            int nextDepth = getMaximumDepth(subforce, depth + 1);
 
-                if (nextDepth > maximumDepth) {
-                    maximumDepth = nextDepth;
-                }
+            if (nextDepth > maximumDepth) {
+                maximumDepth = nextDepth;
             }
         }
 
         return maximumDepth;
+    }
+
+    /**
+     * Populates the formation levels of a force hierarchy starting from the given force.
+     * For all subforces of the given force, it sets the formation level to one level lower than the current level.
+     * If the resulting formation level is below the lower boundary determined by available formation level enums,
+     * it sets the formation level to ILLEGAL.
+     *
+     * @param campaign the campaign to determine the lower boundary
+     */
+    public static void populateFormationLevelsFromOrigin(Campaign campaign) {
+        Force force = campaign.getForce(0);
+
+        populateOriginNode(campaign, force);
+
+        // we then set lower boundaries (i.e., how far we can decrease formation level)
+        int lowerBoundary = getLowerBoundary(campaign);
+        int currentFormationLevel = force.getFormationLevel().parseToInt();
+
+        for (Force subforce : force.getSubForces()) {
+            if (currentFormationLevel - 1 < lowerBoundary) {
+                subforce.setFormationLevel(FormationLevel.INVALID);
+                continue;
+            }
+
+            subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
+
+            changeFormationLevel(subforce, currentFormationLevel - 1, lowerBoundary);
+        }
+    }
+
+    /**
+     * Changes the formation level of a force and its sub-forces.
+     *
+     * @param force               the force whose formation level is to be changed
+     * @param currentFormationLevel the current formation level of the force
+     * @param lowerBoundary       the lower boundary for the formation level
+     */
+    private static void changeFormationLevel(Force force, int currentFormationLevel, int lowerBoundary) {
+        force.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel));
+
+        for (Force subforce : force.getSubForces()) {
+            if (currentFormationLevel - 1 < lowerBoundary) {
+                subforce.setFormationLevel(FormationLevel.INVALID);
+                continue;
+            }
+
+            subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
+        }
+    }
+
+    /**
+     * Retrieves the lower boundary value based on the given campaign.
+     *
+     * @param campaign the campaign object to retrieve the lower boundary for
+     * @return the lower boundary value as an integer
+     */
+    private static int getLowerBoundary(Campaign campaign) {
+        int lowerBoundary = FormationLevel.values().length;
+
+        for (FormationLevel level : FormationLevel.values()) {
+            if (level.isNone() || level.isInvalid() || level.isRemoveOverride()) {
+                continue;
+            }
+
+            boolean isValid = false;
+
+            if (campaign.getFaction().isClan() && level.isClan()) {
+                isValid = true;
+            } else if (campaign.getFaction().isComStarOrWoB()) {
+                isValid = true;
+            } if (!campaign.getFaction().isClan() && !campaign.getFaction().isComStarOrWoB()) {
+                isValid = level.isInnerSphere();
+            }
+
+            if (isValid) {
+                lowerBoundary = level.parseToInt() < lowerBoundary ? level.parseToInt() : lowerBoundary;
+            }
+        }
+        return lowerBoundary;
+    }
+
+    /**
+     * Populates the origin node (the force normally named after the campaign) with an appropriate Formation Level.
+     *
+     * @param campaign the current campaign
+     * @param origin the origin node
+     */
+    private static void populateOriginNode(Campaign campaign, Force origin) {
+        FormationLevel overrideFormationLevel = origin.getOverrideFormationLevel();
+        int maximumDepth = getMaximumDepth(origin, 0);
+
+        if (!overrideFormationLevel.isNone() && !overrideFormationLevel.isRemoveOverride()) {
+            origin.setFormationLevel(overrideFormationLevel);
+        } else {
+            origin.setFormationLevel(FormationLevel.parseFromDepth(campaign, maximumDepth));
+            origin.setOverrideFormationLevel(FormationLevel.NONE);
+        }
+
+        MekHQ.triggerEvent(new OrganizationChangedEvent(origin));
     }
 }
