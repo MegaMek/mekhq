@@ -21,6 +21,7 @@
 package mekhq.campaign.personnel.autoAwards;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
@@ -32,7 +33,6 @@ import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.AutoAwardsDialog;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.Dialog.ModalityType;
@@ -56,13 +56,15 @@ public class AutoAwardsController {
     final private List<Award> trainingAwards = new ArrayList<>();
     final private List<Award> ignoredAwards = new ArrayList<>();
 
+    private static final MMLogger logger = MMLogger.create(AutoAwardsController.class);
+
     /**
      * The controller for the manual-automatic processing of Awards
      *
      * @param c                    the campaign to be processed
      */
     public void ManualController(Campaign c, boolean isManualPrompt) {
-        LogManager.getLogger().info("autoAwards (Manual) has started");
+        logger.info("autoAwards (Manual) has started");
 
         campaign = c;
         mission = null;
@@ -76,7 +78,7 @@ public class AutoAwardsController {
             // This is the main workhorse function
             ProcessAwards(personnel, false, null, isManualPrompt);
         } else {
-            LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
+            logger.info("AutoAwards found no personnel, skipping the Award Ceremony");
 
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
                     MekHQ.getMHQOptions().getLocale());
@@ -87,7 +89,7 @@ public class AutoAwardsController {
                     JOptionPane.INFORMATION_MESSAGE);
         }
 
-        LogManager.getLogger().info("autoAwards (Manual) has finished");
+        logger.info("autoAwards (Manual) has finished");
     }
 
     /**
@@ -96,7 +98,7 @@ public class AutoAwardsController {
      * @param c                    the campaign to be processed
      */
     public void PromotionController(Campaign c, boolean isManualPrompt) {
-        LogManager.getLogger().info("autoAwards (Promotion) has started");
+        logger.info("autoAwards (Promotion) has started");
 
         campaign = c;
         mission = null;
@@ -110,10 +112,10 @@ public class AutoAwardsController {
             // This is the main workhorse function
             ProcessAwards(personnel, false, null, isManualPrompt);
         } else {
-            LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
+            logger.info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
 
-        LogManager.getLogger().info("autoAwards (Promotion) has finished");
+        logger.info("autoAwards (Promotion) has finished");
     }
 
     /**
@@ -124,7 +126,7 @@ public class AutoAwardsController {
      * @param missionWasSuccessful true if the Mission was a complete Success, otherwise false
      */
     public void PostMissionController(Campaign c, Mission m, Boolean missionWasSuccessful) {
-        LogManager.getLogger().info("autoAwards (Mission Conclusion) has started");
+        logger.info("autoAwards (Mission Conclusion) has started");
 
         campaign = c;
         mission = m;
@@ -138,10 +140,10 @@ public class AutoAwardsController {
             // This is the main workhorse function
             ProcessAwards(personnel, missionWasSuccessful, null, false);
         } else {
-            LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
+            logger.info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
 
-        LogManager.getLogger().info("autoAwards (Mission Conclusion) has finished");
+        logger.info("autoAwards (Mission Conclusion) has finished");
     }
 
     /**
@@ -153,7 +155,7 @@ public class AutoAwardsController {
      * @param wasCivilianHelp whether the scenario (if any) was AtB Scenario CIVILIANHELP
      */
     public void PostScenarioController(Campaign c, HashMap<UUID, Integer> personnel, HashMap<UUID, List<Kill>>scenarioKills, boolean wasCivilianHelp) {
-        LogManager.getLogger().info("autoAwards (Scenario Conclusion) has started");
+        logger.info("autoAwards (Scenario Conclusion) has started");
 
         campaign = c;
 
@@ -208,10 +210,10 @@ public class AutoAwardsController {
             autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
             autoAwardsDialog.setVisible(true);
         } else {
-            LogManager.getLogger().info("Zero personnel were found eligible for Awards");
+            logger.info("Zero personnel were found eligible for Awards");
         }
 
-        LogManager.getLogger().info("autoAwards (Scenario Conclusion) has finished");
+        logger.info("autoAwards (Scenario Conclusion) has finished");
     }
 
     /**
@@ -220,7 +222,7 @@ public class AutoAwardsController {
      * @param c                    the campaign to be processed
      */
     public void PostGraduationController(Campaign c, List<UUID> personnel, HashMap<UUID, List<Object>> academyAttributes) {
-        LogManager.getLogger().info("autoAwards (Education Conclusion) has started");
+        logger.info("autoAwards (Education Conclusion) has started");
 
         campaign = c;
 
@@ -231,10 +233,10 @@ public class AutoAwardsController {
             // This is the main workhorse function
             ProcessAwards(personnel, false, academyAttributes, false);
         } else {
-            LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
+            logger.info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
 
-        LogManager.getLogger().info("autoAwards (Education Conclusion) has finished");
+        logger.info("autoAwards (Education Conclusion) has finished");
     }
 
     /**
@@ -252,7 +254,7 @@ public class AutoAwardsController {
                 .map(Person::getId)
                 .collect(Collectors.toList());
 
-        LogManager.getLogger().debug("Personnel {}", personnel);
+        logger.debug("Personnel {}", personnel);
 
         return personnel;
     }
@@ -286,16 +288,16 @@ public class AutoAwardsController {
 
         if (campaign.getCampaignOptions().isIgnoreStandardSet()) {
             allSetNames.removeIf(setName -> setName.equalsIgnoreCase("standard"));
-            LogManager.getLogger().info("Ignoring the Standard Set");
+            logger.info("Ignoring the Standard Set");
         }
 
         // we start by building a primary list of all awards
         if (!allSetNames.isEmpty()) {
-            LogManager.getLogger().info("Getting all Award Sets");
+            logger.info("Getting all Award Sets");
 
             for (String setName : allSetNames) {
                 if (!allSetNames.isEmpty()) {
-                    LogManager.getLogger().info("Getting all awards from set: {}", setName);
+                    logger.info("Getting all awards from set: {}", setName);
 
                     awards.addAll(AwardsFactory.getInstance().getAllAwardsForSet(setName));
 
@@ -370,14 +372,14 @@ public class AutoAwardsController {
                                 }
                             }
                             // These logs help users double-check that the number of awards found matches their records
-                            LogManager.getLogger().info("autoAwards found {} Kill Awards (excluding Mission & Scenario Kill Awards)", killAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Rank Awards", rankAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Scenario Awards", scenarioAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Skill Awards", skillAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Time Awards", timeAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
-                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+                            logger.info("autoAwards found {} Kill Awards (excluding Mission & Scenario Kill Awards)", killAwards.size());
+                            logger.info("autoAwards found {} Rank Awards", rankAwards.size());
+                            logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
+                            logger.info("autoAwards found {} Skill Awards", skillAwards.size());
+                            logger.info("autoAwards found {} Time Awards", timeAwards.size());
+                            logger.info("autoAwards found {} Training Awards", trainingAwards.size());
+                            logger.info("autoAwards found {} Misc Awards", miscAwards.size());
+                            logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;
                         // post-mission
@@ -471,15 +473,15 @@ public class AutoAwardsController {
                                 }
                             }
                             // These logs help users double-check that the number of awards found matches their records
-                            LogManager.getLogger().info("autoAwards found {} Kill Awards (excluding Scenario Kill Awards)", killAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Contract Awards", contractAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Rank Awards", rankAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Scenario Awards", scenarioAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Skill Awards", skillAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Time Awards", timeAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
-                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+                            logger.info("autoAwards found {} Kill Awards (excluding Scenario Kill Awards)", killAwards.size());
+                            logger.info("autoAwards found {} Contract Awards", contractAwards.size());
+                            logger.info("autoAwards found {} Rank Awards", rankAwards.size());
+                            logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
+                            logger.info("autoAwards found {} Skill Awards", skillAwards.size());
+                            logger.info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());
+                            logger.info("autoAwards found {} Time Awards", timeAwards.size());
+                            logger.info("autoAwards found {} Misc Awards", miscAwards.size());
+                            logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;
                         // post-scenario
@@ -512,10 +514,10 @@ public class AutoAwardsController {
                                 }
                             }
 
-                            LogManager.getLogger().info("autoAwards found {} Scenario Kill Awards (excluding Mission & Lifetime Kill Awards)", killAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Injury Awards", injuryAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
-                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+                            logger.info("autoAwards found {} Scenario Kill Awards (excluding Mission & Lifetime Kill Awards)", killAwards.size());
+                            logger.info("autoAwards found {} Injury Awards", injuryAwards.size());
+                            logger.info("autoAwards found {} Misc Awards", miscAwards.size());
+                            logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;
                         // post-graduation
@@ -534,8 +536,8 @@ public class AutoAwardsController {
                                 }
                             }
 
-                            LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
-                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+                            logger.info("autoAwards found {} Training Awards", trainingAwards.size());
+                            logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;
                         // post-promotion
@@ -554,19 +556,19 @@ public class AutoAwardsController {
                                 }
                             }
 
-                            LogManager.getLogger().info("autoAwards found {} Training Awards", rankAwards.size());
-                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+                            logger.info("autoAwards found {} Training Awards", rankAwards.size());
+                            logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;
                         default:
                             throw new IllegalStateException("Unexpected awardListCase: " + awardListCase);
                     }
                 } else {
-                    LogManager.getLogger().info("autoAwards failed to find any awards in set {}", setName);
+                    logger.info("autoAwards failed to find any awards in set {}", setName);
                 }
             }
         } else {
-            LogManager.getLogger().info("AutoAwards failed to find any award sets");
+            logger.info("AutoAwards failed to find any award sets");
         }
     }
 
@@ -688,7 +690,7 @@ public class AutoAwardsController {
             autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
             autoAwardsDialog.setVisible(true);
         } else {
-            LogManager.getLogger().info("Zero personnel were found eligible for Awards");
+            logger.info("Zero personnel were found eligible for Awards");
 
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
                     MekHQ.getMHQOptions().getLocale());
@@ -718,7 +720,7 @@ public class AutoAwardsController {
                 data = ContractAwards.ContractAwardsProcessor(campaign, mission, person, contractAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Contract Awards.",
+                logger.debug("{} is not eligible for any Contract Awards.",
                         campaign.getPerson(person).getFullName());
             }
 
@@ -757,7 +759,7 @@ public class AutoAwardsController {
                 data = FactionHunterAwards.FactionHunterAwardsProcessor(campaign, mission, person, factionHunterAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Faction Hunter Awards.",
+                logger.debug("{} is not eligible for any Faction Hunter Awards.",
                         campaign.getPerson(person).getFullName());
             }
 
@@ -793,7 +795,7 @@ public class AutoAwardsController {
                 data = InjuryAwards.InjuryAwardsProcessor(campaign, person, injuryAwards, personnel.get(person));
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Injury Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Injury Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -818,16 +820,31 @@ public class AutoAwardsController {
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> KillAwardsManager(List<UUID> personnel) {
+        // prep the kill award data so that we only have to process it once
+        Map<Integer, List<Kill>> missionKillData = new HashMap<>();
+
+        for (UUID person : personnel) {
+            for (Kill kill : campaign.getKillsFor(person)) {
+                if (kill.getMissionId() == mission.getId()) {
+                    // get the current list of kills, or create an empty one if it doesn't exist
+                    List<Kill> missionKills = missionKillData.computeIfAbsent(kill.getForceId(), k -> new ArrayList<>());
+                    // add the new kill
+                    missionKills.add(kill);
+                }
+            }
+        }
+
+        // process the award data, checking for award eligibility
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
         for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
-                data = KillAwards.KillAwardProcessor(campaign, mission, person, killAwards);
+                data = KillAwards.KillAwardProcessor(campaign, mission, person, killAwards, missionKillData);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Kill Awards.",
+                logger.debug("{} is not eligible for any Kill Awards.",
                         campaign.getPerson(person).getFullName());
             }
 
@@ -867,7 +884,7 @@ public class AutoAwardsController {
                 data = ScenarioKillAwards.ScenarioKillAwardsProcessor(campaign, person, killAwards, personalKills.size());
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Scenario Kill Awards.",
+                logger.debug("{} is not eligible for any Scenario Kill Awards.",
                         campaign.getPerson(person).getFullName());
             }
 
@@ -954,7 +971,7 @@ public class AutoAwardsController {
                 );
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -988,7 +1005,7 @@ public class AutoAwardsController {
                 data = RankAwards.RankAwardsProcessor(campaign, person, rankAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Rank Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Rank Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1022,7 +1039,7 @@ public class AutoAwardsController {
                 data = ScenarioAwards.ScenarioAwardsProcessor(campaign, person, scenarioAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Scenario Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Scenario Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1056,7 +1073,7 @@ public class AutoAwardsController {
                 data = SkillAwards.SkillAwardsProcessor(campaign, person, skillAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Skill Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Skill Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1090,7 +1107,7 @@ public class AutoAwardsController {
                 data = TheatreOfWarAwards.TheatreOfWarAwardsProcessor(campaign, mission, person, theatreOfWarAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Theatre of War Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Theatre of War Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1124,7 +1141,7 @@ public class AutoAwardsController {
                 data = TimeAwards.TimeAwardsProcessor(campaign, person, timeAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Time Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Time Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -1159,7 +1176,7 @@ public class AutoAwardsController {
                 data = TrainingAwards.TrainingAwardsProcessor(campaign, person, academyAttributes.get(person), trainingAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Training Awards.", campaign.getPerson(person).getFullName());
+                logger.debug("{} is not eligible for any Training Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
