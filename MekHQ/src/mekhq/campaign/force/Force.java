@@ -2,7 +2,7 @@
  * Force.java
  *
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -790,10 +790,10 @@ public class Force {
     }
 
     /**
-     * Populates the formation levels of a force hierarchy starting from the given force.
+     * Populates the formation levels of a force hierarchy starting from the origin force.
      * For all subforces of the given force, it sets the formation level to one level lower than the current level.
      * If the resulting formation level is below the lower boundary determined by available formation level enums,
-     * it sets the formation level to ILLEGAL.
+     * it sets the formation level to INVALID.
      *
      * @param campaign the campaign to determine the lower boundary
      */
