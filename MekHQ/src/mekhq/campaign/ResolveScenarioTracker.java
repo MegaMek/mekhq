@@ -27,6 +27,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.OptionsConstants;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
@@ -45,7 +46,6 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.gui.FileDialogs;
-import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.util.*;
@@ -90,6 +90,8 @@ public class ResolveScenarioTracker {
     Client client;
     Boolean control;
     private GameVictoryEvent victoryEvent;
+
+    private static final MMLogger logger = MMLogger.create(ResolveScenarioTracker.class);
 
     public ResolveScenarioTracker(Scenario s, Campaign c, boolean ctrl) {
         this.scenario = s;
@@ -149,7 +151,7 @@ public class ResolveScenarioTracker {
             try {
                 loadUnitsAndPilots(unitList.get());
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         } else {
             initUnitsAndPilotsWithoutBattle();
@@ -477,20 +479,22 @@ public class ResolveScenarioTracker {
                 if (killCredits.get(killed).equalsIgnoreCase("None")) {
                     continue;
                 }
+
                 if (u.getId().toString().equals(killCredits.get(killed))) {
                     for (Person p : u.getActiveCrew()) {
                         PersonStatus status = peopleStatus.get(p.getId());
+
                         if (null == status) {
                             //this shouldn't happen so report
-                            LogManager.getLogger().error("A null person status was found for person id {} when trying to assign kills", p.getId().toString());
+                            logger.error("A null person status was found for person id {} when trying to assign kills", p.getId().toString());
                             continue;
                         }
+
                         status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getLocalDate(),
-                                getMissionId(), getScenarioId()));
+                                getMissionId(), getScenarioId(), p.getUnit().getForceId(), u.getEntity().getEntityType()));
                     }
                 }
             }
-
         }
     }
 
@@ -692,7 +696,7 @@ public class ResolveScenarioTracker {
                 Entity e = entities.get(UUID.fromString(id));
                 // Invalid entity?
                 if (e == null) {
-                    LogManager.getLogger().error("Null entity reference in:{}getEscapeCraft()", aero.getDisplayName());
+                    logger.error("Null entity reference in:{}getEscapeCraft()", aero.getDisplayName());
                     continue;
                 }
                 // If the escape craft was destroyed in combat, skip it
@@ -1060,7 +1064,7 @@ public class ResolveScenarioTracker {
         try {
             parser = new MULParser(unitFile, campaign.getGameOptions());
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return;
         }
 
@@ -1777,12 +1781,12 @@ public class ResolveScenarioTracker {
      *
      */
     public static class PersonStatus implements Comparable<PersonStatus> {
-        private String name;
-        private String unitName;
+        private final String name;
+        private final String unitName;
         private int hits;
         private boolean missing;
         private int xp;
-        private ArrayList<Kill> kills;
+        private final ArrayList<Kill> kills;
         private boolean remove;
         private boolean pickedUp;
         private UUID personId;
@@ -1907,7 +1911,7 @@ public class ResolveScenarioTracker {
      */
     public static class OppositionPersonnelStatus extends PersonStatus {
         //for prisoners we have to track a whole person
-        private Person person;
+        private final Person person;
         private boolean captured;
         private boolean ransomed = false;
 
@@ -1943,13 +1947,13 @@ public class ResolveScenarioTracker {
      *
      */
     public static class UnitStatus {
-        private String name;
-        private String chassis;
-        private String model;
+        private final String name;
+        private final String chassis;
+        private final String model;
         private boolean totalLoss;
         private Entity entity;
         private Entity baseEntity;
-        private Unit unit;
+        private final Unit unit;
 
         public UnitStatus(Unit unit) {
             this.unit = unit;
@@ -1967,7 +1971,7 @@ public class ResolveScenarioTracker {
                             : unit.getEntity();
                     baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
-                    LogManager.getLogger().error("", e);
+                    logger.error("", e);
                 }
             }
         }

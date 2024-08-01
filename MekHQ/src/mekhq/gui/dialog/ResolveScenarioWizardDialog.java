@@ -2,7 +2,7 @@
  * ResolveScenarioWizardDialog.java
  *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,6 +28,7 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.GunEmplacement;
 import megamek.common.options.OptionsConstants;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -47,7 +48,6 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -75,10 +75,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             OBJECTIVEPANEL, PREVIEWPANEL
     };
 
-    private JFrame frame;
+    private final JFrame frame;
 
-    private ResolveScenarioTracker tracker;
-    private ScenarioObjectiveProcessor objectiveProcessor;
+    private final ResolveScenarioTracker tracker;
+    private final ScenarioObjectiveProcessor objectiveProcessor;
 
     private JButton btnNext;
     private JButton btnFinish;
@@ -114,19 +114,19 @@ public class ResolveScenarioWizardDialog extends JDialog {
     /*
      * Pilot status panel components
      */
-    private List<JCheckBox> miaBtns = new ArrayList<>();
-    private List<JCheckBox> kiaBtns = new ArrayList<>();
-    private List<JSlider> hitSliders = new ArrayList<>();
-    private List<PersonStatus> pstatuses = new ArrayList<>();
+    private final List<JCheckBox> miaBtns = new ArrayList<>();
+    private final List<JCheckBox> kiaBtns = new ArrayList<>();
+    private final List<JSlider> hitSliders = new ArrayList<>();
+    private final List<PersonStatus> pstatuses = new ArrayList<>();
 
     /*
      * Prisoner status panel components
      */
-    private List<JCheckBox> prisonerCapturedBtns = new ArrayList<>();
-    private List<JCheckBox> prisonerRansomedBtns = new ArrayList<>();
-    private List<JCheckBox> prisonerKiaBtns = new ArrayList<>();
-    private List<JSlider> pr_hitSliders = new ArrayList<>();
-    private List<OppositionPersonnelStatus> prstatuses = new ArrayList<>();
+    private final List<JCheckBox> prisonerCapturedBtns = new ArrayList<>();
+    private final List<JCheckBox> prisonerRansomedBtns = new ArrayList<>();
+    private final List<JCheckBox> prisonerKiaBtns = new ArrayList<>();
+    private final List<JSlider> pr_hitSliders = new ArrayList<>();
+    private final List<OppositionPersonnelStatus> prstatuses = new ArrayList<>();
 
     //region Salvage Panel Components
     private List<JLabel> salvageUnitLabel;
@@ -134,7 +134,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private List<JCheckBox> soldUnitBoxes;
     private List<JCheckBox> escapeBoxes;
     private List<JButton> btnsSalvageEditUnit;
-    private List<Unit> salvageables;
+    private final List<Unit> salvageables;
 
     private JLabel lblSalvageValueUnit2;
     private JLabel lblSalvageValueEmployer2;
@@ -155,16 +155,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
      * Collect Rewards components
      */
     private List<JCheckBox> lootBoxes;
-    private List<Loot> loots;
+    private final List<Loot> loots;
 
     //region Preview Panel components
     private JComboBox<ScenarioStatus> choiceStatus;
-    private JScrollPane scrRecoveredUnits;
-    private JScrollPane scrRecoveredPilots;
-    private JScrollPane scrMissingUnits;
-    private JScrollPane scrMissingPilots;
-    private JScrollPane scrDeadPilots;
-    private JScrollPane scrSalvage;
     private MarkdownEditorPanel txtReport;
     private JTextArea txtRecoveredUnits;
     private JTextArea txtRecoveredPilots;
@@ -173,8 +167,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private JTextArea txtDeadPilots;
     private JTextArea txtSalvage;
     private JTextArea txtRewards;
-    private JLabel lblStatus;
     //endregion Preview Panel components
+
+    private static final MMLogger logger = MMLogger.create(ResolveScenarioWizardDialog.class);
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog",
             MekHQ.getMHQOptions().getLocale());
@@ -213,8 +208,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private void initComponents() {
         // Initialize Local Variables
         GridBagConstraints gridBagConstraints;
-        int gridy = 0;
-        int gridx = 0;
+        int gridy;
+        int gridx;
         int i = 2;
         int j = 0;
 
@@ -509,7 +504,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 kiaCheck.setSelected(true);
             } else if (status.isCaptured()
                     && tracker.getCampaign().getCampaignOptions().getPrisonerCaptureStyle().isAtB()) {
-                boolean wasCaptured = false;
+                boolean wasCaptured;
                 if (status.wasPickedUp()) {
                     wasCaptured = true;
                 } else {
@@ -784,12 +779,12 @@ public class ResolveScenarioWizardDialog extends JDialog {
          */
         pnlPreview = new JPanel();
         choiceStatus = new JComboBox<>();
-        scrRecoveredUnits = new JScrollPane();
-        scrRecoveredPilots = new JScrollPane();
-        scrMissingUnits = new JScrollPane();
-        scrMissingPilots = new JScrollPane();
-        scrDeadPilots = new JScrollPane();
-        scrSalvage = new JScrollPane();
+        JScrollPane scrRecoveredUnits = new JScrollPane();
+        JScrollPane scrRecoveredPilots = new JScrollPane();
+        JScrollPane scrMissingUnits = new JScrollPane();
+        JScrollPane scrMissingPilots = new JScrollPane();
+        JScrollPane scrDeadPilots = new JScrollPane();
+        JScrollPane scrSalvage = new JScrollPane();
         txtInstructions = new JTextArea();
         txtReport = new MarkdownEditorPanel("After-Action Report");
         txtRecoveredUnits = new JTextArea();
@@ -799,7 +794,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         txtDeadPilots = new JTextArea();
         txtSalvage = new JTextArea();
         txtRewards = new JTextArea();
-        lblStatus = new JLabel();
+        JLabel lblStatus = new JLabel();
 
         pnlPreview.setLayout(new GridBagLayout());
 
@@ -1149,7 +1144,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -1377,6 +1372,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 }
             }
         }
+
         tracker.assignKills();
 
         //now get loot
@@ -1718,7 +1714,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         Person person = isPrisoner ? ((OppositionPersonnelStatus) status).getPerson()
                 : tracker.getCampaign().getPerson(status.getId());
         if (person == null) {
-            LogManager.getLogger().error("Failed to show person after selecting view personnel for a "
+            logger.error("Failed to show person after selecting view personnel for a "
                     + (isPrisoner ? "Prisoner" : "member of the force") +
                     " because the person could not be found.");
             return;
@@ -1790,8 +1786,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
      * @author NickAragua
      */
     private static class CheckBoxKIAListener implements ItemListener {
-        private JSlider slider;
-        private JCheckBox checkbox;
+        private final JSlider slider;
+        private final JCheckBox checkbox;
 
         public CheckBoxKIAListener(JSlider slider, JCheckBox checkBox) {
             this.slider = slider;
