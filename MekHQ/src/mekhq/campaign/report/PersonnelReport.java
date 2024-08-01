@@ -46,7 +46,7 @@ public class PersonnelReport extends AbstractReport {
         Money salary = Money.zero();
 
         for (Person p : getCampaign().getPersonnel()) {
-            if (!p.getPrimaryRole().isCombat() || !p.getPrisonerStatus().isFree()) {
+            if ((!p.getPrimaryRole().isCombat()) || (!p.getPrisonerStatus().isFreeOrBondsman())) {
                 continue;
             }
 
@@ -61,6 +61,10 @@ public class PersonnelReport extends AbstractReport {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary(getCampaign()));
+            } else if ((p.getPrisonerStatus().isBondsman()) && (p.getStatus().isActive())) {
+                if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
+                    countInjured++;
+                }
             } else if (p.getStatus().isRetired()) {
                 countRetired++;
             } else if (p.getStatus().isMIA()) {
@@ -84,7 +88,7 @@ public class PersonnelReport extends AbstractReport {
             }
         }
 
-        sb.append("\n")
+        sb.append('\n')
                 .append(String.format("%-30s        %4s\n", "Injured Combat Personnel", countInjured))
                 .append(String.format("%-30s        %4s\n", "MIA Combat Personnel", countMIA))
                 .append(String.format("%-30s        %4s\n", "KIA Combat Personnel", countKIA))
@@ -122,9 +126,6 @@ public class PersonnelReport extends AbstractReport {
                 salary = salary.plus(p.getSalary(getCampaign()));
             } else if (p.getPrisonerStatus().isCurrentPrisoner() && p.getStatus().isActive()) {
                 prisoners++;
-                if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
-                    countInjured++;
-                }
             } else if (p.getPrisonerStatus().isBondsman() && p.getStatus().isActive()) {
                 bondsmen++;
                 if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
@@ -157,7 +158,7 @@ public class PersonnelReport extends AbstractReport {
             }
         }
 
-        sb.append("\n")
+        sb.append('\n')
                 .append(String.format("%-30s        %4s\n", "Injured Support Personnel", countInjured))
                 .append(String.format("%-30s        %4s\n", "MIA Support Personnel", countMIA))
                 .append(String.format("%-30s        %4s\n", "KIA Support Personnel", countKIA))
@@ -165,7 +166,7 @@ public class PersonnelReport extends AbstractReport {
                 .append(String.format("%-30s        %4s\n", "Dead Support Personnel", countDead))
                 .append("\nMonthly Salary For Support Personnel: ").append(salary.toAmountAndSymbolString())
                 .append(String.format("\nYou have " + dependents + " %s", (dependents == 1) ? "dependent" : "dependents"))
-                .append(String.format("\nYou have " + prisoners + " prisoner%s", (prisoners == 1) ? "" : "s"))
+                .append(String.format("\nYou have " + prisoners + " prisoner%s", prisoners == 1 ? "" : "s"))
                 .append(String.format("\nYou have " + bondsmen + " %s", (bondsmen == 1) ? "bondsman" : "bondsmen"));
 
         return sb.toString();
