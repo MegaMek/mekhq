@@ -3503,12 +3503,22 @@ public class Campaign implements ITechManager {
                 int score = 0;
 
                 if (p.getPrimaryRole().isSupport(true)) {
-                    score =  Compute.d6(p.getExperienceLevel(this, false));
+                    int dice = p.getExperienceLevel(this, false);
+
+                    if (dice > 0) {
+                        score = Compute.d6(dice);
+                    }
+
                     multiplier += 0.5;
                 }
 
                 if (p.getSecondaryRole().isSupport(true)) {
-                    score += Compute.d6(p.getExperienceLevel(this, false));
+                    int dice = p.getExperienceLevel(this, true);
+
+                    if (dice > 0) {
+                        score += Compute.d6(dice);
+                    }
+
                     multiplier += 0.5;
                 } else if (p.getSecondaryRole().isNone()) {
                     multiplier += 0.5;
@@ -3785,6 +3795,16 @@ public class Campaign implements ITechManager {
      * @return true if the person should be removed, false otherwise.
      */
     private boolean shouldRemovePerson(Person person, PersonnelStatus status) {
+        // don't remove a character if they are related to a genealogy
+        // with at least one member still present in the campaign
+        Map<FamilialRelationshipType, List<Person>> family = person.getGenealogy().getFamily();
+
+        if (family.keySet().stream()
+                .flatMap(relationshipType -> family.get(relationshipType).stream())
+                .anyMatch(relation -> relation.getStatus().isDepartedUnit())) {
+            return false;
+        }
+
         int retirementMonthValue;
 
         if (person.getRetirement() != null) {

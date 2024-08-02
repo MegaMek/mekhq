@@ -66,7 +66,7 @@ public enum Ambition {
 
     //region Constructors
     Ambition(final String name, final String description, boolean isPositive, boolean isMajor) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.description = resources.getString(description);
@@ -258,7 +258,7 @@ public enum Ambition {
     //region File I/O
     /**
      * Parses a given string and returns the corresponding Ambition enum.
-     * Accepts either the ENUM ordinal value, or its name
+     * Accepts either the ENUM ordinal value or its name
      *
      * @param ambition the string to be parsed
      * @return the Ambition enum that corresponds to the given string
@@ -266,38 +266,40 @@ public enum Ambition {
      */
     @SuppressWarnings(value = "unused")
     public static Ambition parseFromString(final String ambition) {
-        return switch (ambition.toLowerCase()) {
-            case "0", "none" -> NONE;
-            case "1", "ambitious" -> AMBITIOUS;
-            case "2", "arrogant" -> ARROGANT;
-            case "3", "aspiring" -> ASPIRING;
-            case "4", "calculating" -> CALCULATING;
-            case "5", "conniving" -> CONNIVING;
-            case "6", "controlling" -> CONTROLLING;
-            case "7", "cutthroat" -> CUTTHROAT;
-            case "8", "dishonest" -> DISHONEST;
-            case "9", "diligent" -> DILIGENT;
-            case "10", "driven" -> DRIVEN;
-            case "11", "energetic" -> ENERGETIC;
-            case "12", "excessive" -> EXCESSIVE;
-            case "13", "focused" -> FOCUSED;
-            case "14", "goal-oriented" -> GOAL_ORIENTED;
-            case "15", "innovative" -> INNOVATIVE;
-            case "16", "manipulative" -> MANIPULATIVE;
-            case "17", "motivated" -> MOTIVATED;
-            case "18", "opportunistic" -> OPPORTUNISTIC;
-            case "19", "overconfident" -> OVERCONFIDENT;
-            case "20", "persistent" -> PERSISTENT;
-            case "21", "proactive" -> PROACTIVE;
-            case "22", "resilient" -> RESILIENT;
-            case "23", "resourceful" -> RESOURCEFUL;
-            case "24", "ruthless" -> RUTHLESS;
-            case "25", "selfish" -> SELFISH;
-            case "26", "strategic" -> STRATEGIC;
-            case "27", "tyrannical" -> TYRANNICAL;
-            case "28", "unambitious" -> UNAMBITIOUS;
-            case "29", "unscrupulous" -> UNSCRUPULOUS;
-            case "30", "visionary" -> VISIONARY;
+        return switch (ambition) {
+            case "0", "None" -> NONE;
+            // Minor Characteristics
+            case "1", "Ambitious" -> AMBITIOUS;
+            case "2", "Arrogant" -> ARROGANT;
+            case "3", "Aspiring" -> ASPIRING;
+            case "4", "Calculating" -> CALCULATING;
+            case "5", "Conniving" -> CONNIVING;
+            case "6", "Controlling" -> CONTROLLING;
+            case "7", "Cutthroat" -> CUTTHROAT;
+            case "8", "Diligent" -> DILIGENT;
+            case "9", "Driven" -> DRIVEN;
+            case "10", "Energetic" -> ENERGETIC;
+            case "11", "Excessive" -> EXCESSIVE;
+            case "12", "Focused" -> FOCUSED;
+            case "13", "Goal-Oriented" -> GOAL_ORIENTED;
+            case "14", "Motivated" -> MOTIVATED;
+            case "15", "Opportunistic" -> OPPORTUNISTIC;
+            case "16", "Overconfident" -> OVERCONFIDENT;
+            case "17", "Persistent" -> PERSISTENT;
+            case "18", "Proactive" -> PROACTIVE;
+            case "19", "Resilient" -> RESILIENT;
+            case "20", "Ruthless" -> RUTHLESS;
+            case "21", "Selfish" -> SELFISH;
+            case "22", "Strategic" -> STRATEGIC;
+            case "23", "Unambitious" -> UNAMBITIOUS;
+            case "24", "Unscrupulous" -> UNSCRUPULOUS;
+            // Major Characteristics
+            case "25", "Dishonest" -> DISHONEST;
+            case "26", "Innovative" -> INNOVATIVE;
+            case "27", "Manipulative" -> MANIPULATIVE;
+            case "28", "Resourceful" -> RESOURCEFUL;
+            case "29", "Tyrannical" -> TYRANNICAL;
+            case "30", "Visionary" -> VISIONARY;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Ambition.java/parseFromString: "
                             + ambition);
@@ -315,6 +317,7 @@ public enum Ambition {
     public static Ambition parseFromInt(final int ambition) {
         return switch (ambition) {
             case 0 -> NONE;
+            // Minor Characteristics
             case 1 -> AMBITIOUS;
             case 2 -> ARROGANT;
             case 3 -> ASPIRING;
@@ -322,28 +325,29 @@ public enum Ambition {
             case 5 -> CONNIVING;
             case 6 -> CONTROLLING;
             case 7 -> CUTTHROAT;
-            case 8 -> DISHONEST;
-            case 9 -> DILIGENT;
-            case 10 -> DRIVEN;
-            case 11 -> ENERGETIC;
-            case 12 -> EXCESSIVE;
-            case 13 -> FOCUSED;
-            case 14 -> GOAL_ORIENTED;
-            case 15 -> INNOVATIVE;
-            case 16 -> MANIPULATIVE;
-            case 17 -> MOTIVATED;
-            case 18 -> OPPORTUNISTIC;
-            case 19 -> OVERCONFIDENT;
-            case 20 -> PERSISTENT;
-            case 21 -> PROACTIVE;
-            case 22 -> RESILIENT;
-            case 23 -> RESOURCEFUL;
-            case 24 -> RUTHLESS;
-            case 25 -> SELFISH;
-            case 26 -> STRATEGIC;
-            case 27 -> TYRANNICAL;
-            case 28 -> UNAMBITIOUS;
-            case 29 -> UNSCRUPULOUS;
+            case 8 -> DILIGENT;
+            case 9 -> DRIVEN;
+            case 10 -> ENERGETIC;
+            case 11 -> EXCESSIVE;
+            case 12 -> FOCUSED;
+            case 13 -> GOAL_ORIENTED;
+            case 14 -> MOTIVATED;
+            case 15 -> OPPORTUNISTIC;
+            case 16 -> OVERCONFIDENT;
+            case 17 -> PERSISTENT;
+            case 18 -> PROACTIVE;
+            case 19 -> RESILIENT;
+            case 20 -> RUTHLESS;
+            case 21 -> SELFISH;
+            case 22 -> STRATEGIC;
+            case 23 -> UNAMBITIOUS;
+            case 24 -> UNSCRUPULOUS;
+            // Major Characteristics
+            case 25 -> DISHONEST;
+            case 26 -> INNOVATIVE;
+            case 27 -> MANIPULATIVE;
+            case 28 -> RESOURCEFUL;
+            case 29 -> TYRANNICAL;
             case 30 -> VISIONARY;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Ambition.java/parseFromInt: "

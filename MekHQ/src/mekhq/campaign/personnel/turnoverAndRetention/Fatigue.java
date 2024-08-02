@@ -12,7 +12,6 @@ import java.time.DayOfWeek;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 /**
  * The Fatigue class contains static methods for calculating and processing fatigue levels and actions.
@@ -65,16 +64,28 @@ public class Fatigue {
 
         if (campaign.getCampaignOptions().isUseFatigue()) {
             if ((effectiveFatigue >= 5) && (effectiveFatigue < 9)) {
-                campaign.addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueTired.text"));
+                campaign.addReport(String.format(resources.getString("fatigueTired.text"), person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                        "</span>"));
+
                 person.setIsRecoveringFromFatigue(true);
             } else if ((effectiveFatigue >= 9) && (effectiveFatigue < 12)) {
-                campaign.addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueFatigued.text"));
+                campaign.addReport(String.format(resources.getString("fatigueFatigued.text"), person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                        "</span>"));
+
                 person.setIsRecoveringFromFatigue(true);
             } else if ((effectiveFatigue >= 12) && (effectiveFatigue < 16)) {
-                campaign.addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueExhausted.text"));
+                campaign.addReport(String.format(resources.getString("fatigueExhausted.text"), person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                        "</span>"));
+
                 person.setIsRecoveringFromFatigue(true);
             } else if (effectiveFatigue >= 17) {
-                campaign.addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueCritical.text"));
+                campaign.addReport(String.format(resources.getString("fatigueCritical.text"), person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                        "</span>"));
+
                 person.setIsRecoveringFromFatigue(true);
             }
         }
@@ -103,7 +114,7 @@ public class Fatigue {
 
         List<Person> undepartedPersonnel = campaign.getPersonnel().stream()
                 .filter(person -> !person.getStatus().isDepartedUnit())
-                .collect(Collectors.toList());
+                .toList();
 
         for (Person person : undepartedPersonnel) {
             if (campaign.getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
@@ -132,8 +143,10 @@ public class Fatigue {
                 }
 
                 if (person.getIsRecoveringFromFatigue()) {
-                    if (person.getFatigue() == 0) {
-                        campaign.addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueRecovered.text"));
+                    if (person.getFatigue() <= 0) {
+                        campaign.addReport(String.format(resources.getString("fatigueRecovered.text"), person.getHyperlinkedFullTitle(),
+                                "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                                "</span>"));
 
                         person.setIsRecoveringFromFatigue(false);
 
