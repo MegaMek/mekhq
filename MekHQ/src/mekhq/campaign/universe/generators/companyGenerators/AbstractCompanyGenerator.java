@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1715,6 +1715,9 @@ public abstract class AbstractCompanyGenerator {
 
         // Generate the Forces and Assign Units to them
         generateUnit(campaign, sortPersonnelIntoLances(trackers));
+
+        // assign appropriate Formation Levels to the forces
+        Force.populateFormationLevelsFromOrigin(campaign);
 
         return units;
     }

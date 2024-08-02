@@ -855,11 +855,14 @@ public class Campaign implements ITechManager {
 
     public void moveForce(Force force, Force superForce) {
         Force parentForce = force.getParentForce();
+
         if (null != parentForce) {
             parentForce.removeSubForce(force.getId());
         }
+
         superForce.addSubForce(force, true);
         force.setScenarioId(superForce.getScenarioId());
+
         for (Object o : force.getAllChildren(this)) {
             if (o instanceof Unit) {
                 ((Unit) o).setScenarioId(superForce.getScenarioId());
@@ -867,6 +870,9 @@ public class Campaign implements ITechManager {
                 ((Force) o).setScenarioId(superForce.getScenarioId());
             }
         }
+
+        // repopulate formation levels across the TO&E
+        Force.populateFormationLevelsFromOrigin(this);
     }
 
     /**
@@ -916,7 +922,7 @@ public class Campaign implements ITechManager {
             // We log removal if we don't use transfers or if it can't be assigned to a new force
             prevForce.removeUnit(this, u.getId(), transferLog || (force == null));
             useTransfers = !transferLog;
-            MekHQ.triggerEvent(new OrganizationChangedEvent(prevForce, u));
+            MekHQ.triggerEvent(new OrganizationChangedEvent(this, prevForce, u));
         }
 
         if (null != force) {
@@ -937,7 +943,7 @@ public class Campaign implements ITechManager {
                 }
             }
             force.addUnit(this, u.getId(), useTransfers, prevForce);
-            MekHQ.triggerEvent(new OrganizationChangedEvent(force, u));
+            MekHQ.triggerEvent(new OrganizationChangedEvent(this, force, u));
         }
 
         if (campaignOptions.isUseAtB()) {
@@ -3506,12 +3512,22 @@ public class Campaign implements ITechManager {
                 int score = 0;
 
                 if (p.getPrimaryRole().isSupport(true)) {
-                    score =  Compute.d6(p.getExperienceLevel(this, false));
+                    int dice = p.getExperienceLevel(this, false);
+
+                    if (dice > 0) {
+                        score = Compute.d6(dice);
+                    }
+
                     multiplier += 0.5;
                 }
 
                 if (p.getSecondaryRole().isSupport(true)) {
-                    score += Compute.d6(p.getExperienceLevel(this, false));
+                    int dice = p.getExperienceLevel(this, true);
+
+                    if (dice > 0) {
+                        score += Compute.d6(dice);
+                    }
+
                     multiplier += 0.5;
                 } else if (p.getSecondaryRole().isNone()) {
                     multiplier += 0.5;
@@ -3645,7 +3661,10 @@ public class Campaign implements ITechManager {
     }
 
     private void processNewDayForces() {
-        // Update the force icons based on the end of day unit status if desired
+        // update formation levels
+        Force.populateFormationLevelsFromOrigin(this);
+
+        // Update the force icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
             getForces().updateForceIconOperationalStatus(this);
         }
@@ -3785,6 +3804,16 @@ public class Campaign implements ITechManager {
      * @return true if the person should be removed, false otherwise.
      */
     private boolean shouldRemovePerson(Person person, PersonnelStatus status) {
+        // don't remove a character if they are related to a genealogy
+        // with at least one member still present in the campaign
+        Map<FamilialRelationshipType, List<Person>> family = person.getGenealogy().getFamily();
+
+        if (family.keySet().stream()
+                .flatMap(relationshipType -> family.get(relationshipType).stream())
+                .anyMatch(relation -> relation.getStatus().isDepartedUnit())) {
+            return false;
+        }
+
         int retirementMonthValue;
 
         if (person.getRetirement() != null) {
@@ -4091,7 +4120,7 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-        MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+        MekHQ.triggerEvent(new OrganizationChangedEvent(this, force));
         // also remove this force's id from any scenarios
         if (force.isDeployed()) {
             Scenario s = getScenario(force.getScenarioId());
@@ -4118,7 +4147,7 @@ public class Campaign implements ITechManager {
         ArrayList<Force> subs = new ArrayList<>(force.getSubForces());
         for (Force sub : subs) {
             removeForce(sub);
-            MekHQ.triggerEvent(new OrganizationChangedEvent(sub));
+            MekHQ.triggerEvent(new OrganizationChangedEvent(this, sub));
         }
     }
 

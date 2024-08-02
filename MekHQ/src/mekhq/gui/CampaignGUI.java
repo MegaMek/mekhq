@@ -107,9 +107,9 @@ public class CampaignGUI extends JPanel {
 
     private JFrame frame;
 
-    private MekHQ app;
+    private final MekHQ app;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
             MekHQ.getMHQOptions().getLocale());
 
     /* for the main panel */
@@ -126,7 +126,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miAwardEligibilityDialog;
     private JMenuItem miCompanyGenerator;
 
-    private EnumMap<MHQTabType, CampaignGuiTab> standardTabs;
+    private final EnumMap<MHQTabType, CampaignGuiTab> standardTabs;
 
     /* Components for the status panel */
     private JPanel statusPanel;
@@ -1377,11 +1377,11 @@ public class CampaignGUI extends JPanel {
             LogManager.getLogger().info("Campaign saved to {}", file);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
-            JOptionPane.showMessageDialog(frame,
-                    "Oh no! The program was unable to correctly save your game. We know this\n"
-                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                            + "mekhq.log file from this game so we can prevent this from happening in\n"
-                            + "the future.",
+            JOptionPane.showMessageDialog(frame, """
+                            Oh no! The program was unable to correctly save your game. We know this
+                            is annoying and apologize. Please help us out and submit a bug with the
+                            mekhq.log file from this game so we can prevent this from happening in
+                            the future.""",
                     "Could not save game",
                     JOptionPane.ERROR_MESSAGE);
 
@@ -1541,7 +1541,7 @@ public class CampaignGUI extends JPanel {
             if (newOptions.isUseAtB()) {
                 getCampaign().initAtB(false);
                 // refresh lance assignment table
-                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
+                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getForces()));
             }
             miContractMarket.setVisible(newOptions.isUseAtB());
             miShipSearch.setVisible(newOptions.isUseAtB());
@@ -2216,11 +2216,11 @@ public class CampaignGUI extends JPanel {
             LogManager.getLogger().info("Parts saved to {}", file);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
-            JOptionPane.showMessageDialog(getFrame(),
-                    "Oh no! The program was unable to correctly export your parts. We know this\n"
-                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                            + "mekhq.log file from this game so we can prevent this from happening in\n"
-                            + "the future.",
+            JOptionPane.showMessageDialog(getFrame(), """
+                            Oh no! The program was unable to correctly export your parts. We know this
+                            is annoying and apologize. Please help us out and submit a bug with the
+                            mekhq.log file from this game so we can prevent this from happening in
+                            the future.""",
                     "Could not export parts", JOptionPane.ERROR_MESSAGE);
             // restore the backup file
             file.delete();
@@ -2317,7 +2317,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
+    private final ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
     public void refreshLocation() {
         lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));
