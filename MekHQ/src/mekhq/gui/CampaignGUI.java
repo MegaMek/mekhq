@@ -21,38 +21,6 @@
  */
 package mekhq.gui;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.List;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPOutputStream;
-
-import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.xml.parsers.DocumentBuilder;
-
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -61,20 +29,11 @@ import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.MechSummaryCache;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.IconPackage;
-import mekhq.MHQConstants;
-import mekhq.MHQOptionsChangedEvent;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
-import mekhq.Utilities;
+import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
@@ -95,11 +54,7 @@ import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
 import mekhq.campaign.personnel.death.ExponentialRandomDeath;
 import mekhq.campaign.personnel.death.PercentageRandomDeath;
 import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.RandomDeathMethod;
-import mekhq.campaign.personnel.enums.RandomDivorceMethod;
-import mekhq.campaign.personnel.enums.RandomMarriageMethod;
-import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
@@ -114,12 +69,7 @@ import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
 import mekhq.gui.dialog.nagDialogs.*;
-import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
-import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
-import mekhq.gui.dialog.reportDialogs.NewsReportDialog;
-import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
-import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
-import mekhq.gui.dialog.reportDialogs.UnitRatingReportDialog;
+import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
@@ -136,7 +86,6 @@ import javax.xml.parsers.DocumentBuilder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
@@ -158,9 +107,9 @@ public class CampaignGUI extends JPanel {
 
     private JFrame frame;
 
-    private MekHQ app;
+    private final MekHQ app;
 
-    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+    private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
             MekHQ.getMHQOptions().getLocale());
 
     /* for the main panel */
@@ -177,7 +126,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miAwardEligibilityDialog;
     private JMenuItem miCompanyGenerator;
 
-    private EnumMap<MHQTabType, CampaignGuiTab> standardTabs;
+    private final EnumMap<MHQTabType, CampaignGuiTab> standardTabs;
 
     /* Components for the status panel */
     private JPanel statusPanel;
@@ -1428,11 +1377,11 @@ public class CampaignGUI extends JPanel {
             LogManager.getLogger().info("Campaign saved to {}", file);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
-            JOptionPane.showMessageDialog(frame,
-                    "Oh no! The program was unable to correctly save your game. We know this\n"
-                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                            + "mekhq.log file from this game so we can prevent this from happening in\n"
-                            + "the future.",
+            JOptionPane.showMessageDialog(frame, """
+                            Oh no! The program was unable to correctly save your game. We know this
+                            is annoying and apologize. Please help us out and submit a bug with the
+                            mekhq.log file from this game so we can prevent this from happening in
+                            the future.""",
                     "Could not save game",
                     JOptionPane.ERROR_MESSAGE);
 
@@ -1597,7 +1546,7 @@ public class CampaignGUI extends JPanel {
             if (newOptions.isUseAtB()) {
                 getCampaign().initAtB(false);
                 // refresh lance assignment table
-                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
+                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCampaign().getForces()));
             }
             miContractMarket.setVisible(newOptions.isUseAtB());
             miShipSearch.setVisible(newOptions.isUseAtB());
@@ -2272,11 +2221,11 @@ public class CampaignGUI extends JPanel {
             LogManager.getLogger().info("Parts saved to {}", file);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
-            JOptionPane.showMessageDialog(getFrame(),
-                    "Oh no! The program was unable to correctly export your parts. We know this\n"
-                            + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                            + "mekhq.log file from this game so we can prevent this from happening in\n"
-                            + "the future.",
+            JOptionPane.showMessageDialog(getFrame(), """
+                            Oh no! The program was unable to correctly export your parts. We know this
+                            is annoying and apologize. Please help us out and submit a bug with the
+                            mekhq.log file from this game so we can prevent this from happening in
+                            the future.""",
                     "Could not export parts", JOptionPane.ERROR_MESSAGE);
             // restore the backup file
             file.delete();
@@ -2373,7 +2322,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
+    private final ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
 
     public void refreshLocation() {
         lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getLocalDate()));

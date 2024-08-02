@@ -95,6 +95,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 /**
  * @author Justin 'Windchild' Bowen
  */
@@ -427,6 +429,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEnableTimeAwards;
     private JCheckBox chkEnableTrainingAwards;
     private JCheckBox chkEnableMiscAwards;
+    private JLabel lblAwardSetFilterList;
+    private JTextArea txtAwardSetFilterList;
 
     // Death
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
@@ -531,6 +535,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Mercenary Tab
 
     //region Experience Tab
+    private JSpinner spnXpCostMultiplier;
     private JSpinner spnScenarioXP;
     private JSpinner spnKillXP;
     private JSpinner spnKills;
@@ -544,6 +549,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnContractNegotiationXP;
     private JSpinner spnAdminWeeklyXP;
     private JSpinner spnAdminWeeklyXPPeriod;
+    private JSpinner spnMissionXpFail;
+    private JSpinner spnMissionXpSuccess;
+    private JSpinner spnMissionXpOutstandingSuccess;
+
     private JSpinner spnEdgeCost;
     private JTable tableXP;
     private static final String[] TABLE_XP_COLUMN_NAMES = { "+0", "+1", "+2", "+3", "+4", "+5", "+6", "+7", "+8", "+9", "+10" };
@@ -1945,12 +1954,33 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final AbstractMHQScrollablePanel panXP = new DefaultMHQScrollablePanel(getFrame(),
                 "experiencePanel", new GridBagLayout());
 
-        JLabel lblScenarioXP = new JLabel(resources.getString("lblScenarioXP.text"));
-        spnScenarioXP = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
-        ((DefaultEditor) spnScenarioXP.getEditor()).getTextField().setEditable(false);
+        JLabel lblXpCostMultiplier = new JLabel(resources.getString("lblXpCostMultiplier.text"));
+        lblXpCostMultiplier.setToolTipText(resources.getString("lblXpCostMultiplier.tooltip"));
+        spnXpCostMultiplier = new JSpinner(new SpinnerNumberModel(1, 0, 5, 0.05));
+        ((DefaultEditor) spnXpCostMultiplier.getEditor()).getTextField().setEditable(false);
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(spnXpCostMultiplier, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(lblXpCostMultiplier, gridBagConstraints);
+
+        JLabel lblScenarioXP = new JLabel(resources.getString("lblScenarioXP.text"));
+        spnScenarioXP = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
+        ((DefaultEditor) spnScenarioXP.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -1958,7 +1988,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -1970,7 +2000,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnKillXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -1978,7 +2008,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -1989,7 +2019,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnKills.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -1997,7 +2027,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2008,7 +2038,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnTaskXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2016,7 +2046,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2028,7 +2058,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2036,7 +2066,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2048,7 +2078,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2056,7 +2086,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -2068,7 +2098,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnMistakeXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2076,7 +2106,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -2087,14 +2117,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnIdleXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(spnIdleXP, gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2104,14 +2134,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnMonthsIdleXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(spnMonthsIdleXP, gridBagConstraints);
 
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2121,7 +2151,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnTargetIdleXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2131,14 +2161,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnContractNegotiationXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(spnContractNegotiationXP, gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2148,14 +2178,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnAdminWeeklyXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(spnAdminWeeklyXP, gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2165,31 +2195,82 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         ((DefaultEditor) spnAdminWeeklyXPPeriod.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(spnAdminWeeklyXPPeriod, gridBagConstraints);
 
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(new JLabel(resources.getString("lblAdminWeeklyXPPeriod.text")), gridBagConstraints);
 
+        spnMissionXpFail = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
+        ((DefaultEditor) spnMissionXpFail.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(spnMissionXpFail, gridBagConstraints);
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(new JLabel(resources.getString("spnMissionXpFail.text")), gridBagConstraints);
+
+        spnMissionXpSuccess = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
+        ((DefaultEditor) spnMissionXpSuccess.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(spnMissionXpSuccess, gridBagConstraints);
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(new JLabel(resources.getString("spnMissionXpSuccess.text")), gridBagConstraints);
+
+        spnMissionXpOutstandingSuccess = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
+        ((DefaultEditor) spnMissionXpOutstandingSuccess.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(spnMissionXpOutstandingSuccess, gridBagConstraints);
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panXP.add(new JLabel(resources.getString("spnMissionXpOutstandingSuccess.text")), gridBagConstraints);
+
         spnEdgeCost = new JSpinner(new SpinnerNumberModel(0, 0, 10000, 1));
         ((DefaultEditor) spnEdgeCost.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panXP.add(spnEdgeCost, gridBagConstraints);
 
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -2208,7 +2289,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         txtInstructionsXP.setMinimumSize(new Dimension(550, 120));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -2236,7 +2317,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         scrXP.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridwidth = 5;
@@ -3823,6 +3904,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         });
 
+        lblAwardSetFilterList = new JLabel(resources.getString("lblAwardSetFilterList.text"));
+        lblAwardSetFilterList.setToolTipText(wordWrap(resources.getString("lblAwardSetFilterList.toolTipText"), 100));
+        lblAwardSetFilterList.setName("lblAwardSetFilterList");
+
+        txtAwardSetFilterList = new JTextArea(5, 20);
+        txtAwardSetFilterList.setLineWrap(true);
+        txtAwardSetFilterList.setWrapStyleWord(true);
+        txtAwardSetFilterList.setToolTipText(wordWrap(resources.getString("lblAwardSetFilterList.toolTipText"), 100));
+        txtAwardSetFilterList.setName("txtAwardSetFilterList");
+        txtAwardSetFilterList.setText("");
+
+        JScrollPane scrollAwardSetFilterList = new JScrollPane(txtAwardSetFilterList);
+        scrollAwardSetFilterList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollAwardSetFilterList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
         chkEnableAutoAwards = new JCheckBox(resources.getString("chkEnableAutoAwards.text"));
         chkEnableAutoAwards.setToolTipText(resources.getString("chkEnableAutoAwards.toolTipText"));
         chkEnableAutoAwards.setName("chkEnableAutoAwards");
@@ -3845,6 +3941,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkEnableTimeAwards.setEnabled(isEnabled);
             chkEnableTrainingAwards.setEnabled(isEnabled);
             chkEnableMiscAwards.setEnabled(isEnabled);
+            lblAwardSetFilterList.setEnabled(isEnabled);
+            txtAwardSetFilterList.setEnabled(isEnabled);
         });
 
         // this prevents a really annoying bug where disabled options don't stay disabled when
@@ -3866,6 +3964,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkEnableTimeAwards.setEnabled(false);
             chkEnableTrainingAwards.setEnabled(false);
             chkEnableMiscAwards.setEnabled(false);
+            lblAwardSetFilterList.setEnabled(false);
+            txtAwardSetFilterList.setEnabled(false);
         }
 
         // Layout the Panel
@@ -3891,6 +3991,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkIssueBestAwardOnly)
                         .addComponent(chkIgnoreStandardSet)
                         .addComponent(autoAwardsPanel)
+                        .addComponent(lblAwardSetFilterList)
+                        .addComponent(scrollAwardSetFilterList)
         );
 
         layout.setHorizontalGroup(
@@ -3906,6 +4008,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkIssueBestAwardOnly)
                         .addComponent(chkIgnoreStandardSet)
                         .addComponent(autoAwardsPanel)
+                        .addComponent(lblAwardSetFilterList)
+                        .addComponent(scrollAwardSetFilterList)
         );
 
         return panel;
@@ -3958,7 +4062,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableTrainingAwards.setName("chkEnableTrainingAwards");
 
         chkEnableMiscAwards = new JCheckBox(resources.getString("chkEnableMiscAwards.text"));
-        chkEnableMiscAwards.setToolTipText(resources.getString("chkEnableMiscAwards.toolTipText"));
+        chkEnableMiscAwards.setToolTipText( resources.getString("chkEnableMiscAwards.toolTipText"));
         chkEnableMiscAwards.setName("chkEnableMiscAwards");
 
         // Layout the Panel
@@ -8082,6 +8186,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableTimeAwards.setSelected(options.isEnableTimeAwards());
         chkEnableTrainingAwards.setSelected(options.isEnableTimeAwards());
         chkEnableMiscAwards.setSelected(options.isEnableMiscAwards());
+        txtAwardSetFilterList.setText(options.getAwardSetFilterList());
         //endregion Personnel Tab
 
         //region Turnover and Retention Tab
@@ -8327,6 +8432,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //endregion Mercenary Tab
 
         //region Experience Tab
+        spnXpCostMultiplier.setValue(options.getXpCostMultiplier());
         spnScenarioXP.setValue(options.getScenarioXP());
         spnKillXP.setValue(options.getKillXPAward());
         spnKills.setValue(options.getKillsForXP());
@@ -8340,6 +8446,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnContractNegotiationXP.setValue(options.getContractNegotiationXP());
         spnAdminWeeklyXP.setValue(options.getAdminXP());
         spnAdminWeeklyXPPeriod.setValue(options.getAdminXPPeriod());
+        spnMissionXpFail.setValue(options.getMissionXpFail());
+        spnMissionXpSuccess.setValue(options.getMissionXpSuccess());
+        spnMissionXpOutstandingSuccess.setValue(options.getMissionXpOutstandingSuccess());
         spnEdgeCost.setValue(options.getEdgeCost());
         //endregion Experience Tab
 
@@ -8617,6 +8726,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             }
 
+            options.setXpCostMultiplier((Double) spnXpCostMultiplier.getValue());
             options.setScenarioXP((Integer) spnScenarioXP.getValue());
             options.setKillsForXP((Integer) spnKills.getValue());
             options.setKillXPAward((Integer) spnKillXP.getValue());
@@ -8632,6 +8742,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getValue());
             options.setEdgeCost((Integer) spnEdgeCost.getValue());
             options.setTargetIdleXP((Integer) spnTargetIdleXP.getValue());
+            options.setMissionXpFail((Integer) spnMissionXpFail.getValue());
+            options.setMissionXpSuccess((Integer) spnMissionXpSuccess.getValue());
+            options.setMissionXpOutstandingSuccess((Integer) spnMissionXpOutstandingSuccess.getValue());
 
             options.setLimitByYear(limitByYearBox.isSelected());
             options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
@@ -8737,6 +8850,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setEnableTimeAwards(chkEnableTimeAwards.isSelected());
             options.setEnableTimeAwards(chkEnableTrainingAwards.isSelected());
             options.setEnableMiscAwards(chkEnableMiscAwards.isSelected());
+            options.setAwardSetFilterList(txtAwardSetFilterList.getText());
 
             // Medical
             options.setUseAdvancedMedical(chkUseAdvancedMedical.isSelected());
