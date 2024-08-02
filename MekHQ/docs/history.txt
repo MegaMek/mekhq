@@ -99,6 +99,7 @@ MEKHQ VERSION HISTORY:
 + PR #4534: Added the Automation and Tracking of Formation Levels within The TO&E Pane
 + PR #4536: Added Force and Unit Type to Kill Tracking
 + PR #4538: Fixed Support Score Calculation
++ PR #4500: Corrected Masters and Doctorate Graduation Checks
 
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
