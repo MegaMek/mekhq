@@ -300,6 +300,33 @@ public abstract class AbstractDivorce {
         MekHQ.triggerEvent(new PersonChangedEvent(origin));
     }
 
+    /**
+     * This divorces two married people.
+     * This version is meant to be used to log historic divorces that occur during a characters' random background.
+     * It is a watered down version of divorce()
+     *
+     * @param campaign the campaign the two people are a part of
+     * @param today the current date
+     * @param origin the origin person being divorced
+     */
+    public void divorceHistoric(final Campaign campaign, final LocalDate today, final Person origin) {
+        final Person spouse = origin.getGenealogy().getSpouse();
+
+        SplittingSurnameStyle.WEIGHTED.apply(campaign, origin, spouse);
+
+        PersonalLogger.divorcedFrom(origin, spouse, today);
+        PersonalLogger.divorcedFrom(spouse, origin, today);
+
+        spouse.setMaidenName(null);
+        origin.setMaidenName(null);
+
+        spouse.getGenealogy().setSpouse(null);
+        origin.getGenealogy().setSpouse(null);
+
+        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, today, FormerSpouseReason.DIVORCE));
+        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, today, FormerSpouseReason.DIVORCE));
+    }
+
     //region New Day
     /**
      * Processes new day random divorce for an individual.

@@ -26,7 +26,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.AmmoType.Munitions;
 import megamek.common.annotations.Nullable;
@@ -1570,8 +1569,160 @@ public class Campaign implements ITechManager {
 
         p.setPrisonerStatus(this, prisonerStatus, log);
 
+        if (getCampaignOptions().isUseSimulatedRelationships()) {
+            if ((prisonerStatus.isFree()) && (!p.getOriginFaction().isClan()) && (!p.getPrimaryRole().isDependent())) {
+                simulateRelationshipHistory(p);
+            }
+        }
+
         MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
+    }
+
+    private void simulateRelationshipHistory(Person person) {
+        // how many weeks should the simulation run?
+        // we use weeks as we can get similar results to days for 1/7 of the processing debt
+        LocalDate localDate = getLocalDate();
+        long weeksBetween = ChronoUnit.WEEKS.between(person.getBirthday().plusYears(18), localDate);
+
+        LogManager.getLogger().info(weeksBetween);
+
+        // this means there is nothing to simulate
+        if (weeksBetween == 0) {
+            return;
+        }
+
+        // get all the variables needed for the simulation
+
+        // procreation chances
+        double childChanceRelationship = getCampaignOptions().getRandomProcreationMethod().isPercentage() ?
+                getCampaignOptions().getPercentageRandomProcreationRelationshipChance() * 7 : 0;
+
+        double childChanceRelationshipless = getCampaignOptions().getRandomProcreationMethod().isPercentage() ?
+                getCampaignOptions().getPercentageRandomProcreationRelationshiplessChance() * 7 : 0;
+
+        // marriage chances & age range
+        double relationshipChanceOppositeSex = getCampaignOptions().getRandomMarriageMethod().isPercentage() ?
+                getCampaignOptions().getPercentageRandomMarriageOppositeSexChance() * 7 : 0;
+
+        double relationshipChanceSameSex = (getCampaignOptions().isUseRandomSameSexMarriages() && getCampaignOptions().getRandomMarriageMethod().isPercentage()) ?
+                    getCampaignOptions().getPercentageRandomMarriageSameSexChance() * 7 : 0;
+
+        int relationshipAgeRange = getCampaignOptions().getRandomMarriageAgeRange();
+
+        double relationshipChance = Math.max(relationshipChanceOppositeSex, relationshipChanceSameSex);
+
+        // divorce chances
+        double divorceChanceOppositeSex = getCampaignOptions().getRandomDivorceMethod().isPercentage() ?
+                getCampaignOptions().getPercentageRandomDivorceOppositeSexChance() * 7 : 0;
+
+        double divorceChanceSameSex = (getCampaignOptions().isUseRandomSameSexDivorce() && getCampaignOptions().getRandomDivorceMethod().isPercentage()) ?
+                getCampaignOptions().getPercentageRandomDivorceSameSexChance() * 7 : 0;
+
+        double divorceChance = Math.max(divorceChanceOppositeSex, divorceChanceSameSex);
+
+        List<Person> children = new ArrayList<>();
+        Person currentSpouse = null;
+
+        Gender spouseGender = Gender.FEMALE;
+
+        if (getCampaignOptions().isUseRandomSameSexMarriages()) {
+            spouseGender = Gender.RANDOMIZE;
+        } else if (person.getGender().isFemale()) {
+            spouseGender = Gender.MALE;
+        }
+
+        // run the simulation
+        for (long weeksRemaining = weeksBetween; weeksRemaining >= 0; weeksRemaining--) {
+            if (currentSpouse == null) {
+                // first, we check for out-of-relationship children
+                if (person.getGender().isFemale()) {
+                    if (Compute.randomFloat() <= childChanceRelationshipless) {
+                        // if the person was not old enough at potential conception, we skip
+                        if (person.getAge(localDate.minusWeeks(weeksRemaining + 40)) < 18) {
+                            continue;
+                        }
+
+                        getProcreation().addPregnancy(this, localDate.minusWeeks(weeksRemaining + 40), person, true);
+                        children.addAll(getProcreation().birthHistoric(this, localDate.minusWeeks(weeksRemaining), person, null));
+                    }
+                }
+
+                // then, we check for new relationships
+                if (Compute.randomFloat() <= relationshipChance) {
+                    currentSpouse = newDependent(false, spouseGender);
+
+                    currentSpouse.setOriginFaction(person.getOriginFaction());
+                    currentSpouse.setOriginPlanet(person.getOriginPlanet());
+
+
+                    // this needs to be 19, not 18, due to rounding errors making it possible to have 17-year-old spouses if we put 18
+                    currentSpouse.setBirthday(localDate.minusYears(Math.max(19, person.getAge(localDate) - Compute.randomInt(relationshipAgeRange))));
+
+                    AbstractMarriage.performMarriageChanges(this, localDate.minusWeeks(weeksRemaining), person, currentSpouse, MergingSurnameStyle.WEIGHTED);
+                }
+            } else {
+                // add age appropriate female personnel to a list
+                List<Person> potentialMothers = new ArrayList<>();
+
+                if ((person.getGender().isFemale()) && (person.getAge(localDate.minusWeeks(weeksRemaining + 40)) >= 18)) {
+                    potentialMothers.add(person);
+                }
+
+                if ((currentSpouse.getGender().isFemale()) && (person.getAge(localDate.minusWeeks(weeksRemaining + 40)) >= 18)) {
+                    potentialMothers.add(currentSpouse);
+                }
+
+                if (!potentialMothers.isEmpty()) {
+                    Collections.shuffle(potentialMothers);
+
+                    // pick mother and father, if there are no males in the relationship father remains null
+                    Person potentialMother = potentialMothers.get(0);
+                    Person potentialFather = null;
+
+                    if (person.equals(potentialMother)) {
+                        if (currentSpouse.getGender().isMale()) {
+                            potentialFather = currentSpouse;
+                        }
+                    } else {
+                        if (person.getGender().isMale()) {
+                            potentialFather = person;
+                        }
+                    }
+
+                    // next we check for out-of-relationship children
+                    if (Compute.randomFloat() <= childChanceRelationship) {
+                        getProcreation().addPregnancy(this, localDate.minusWeeks(weeksRemaining + 40), potentialMother, true);
+                        children.addAll(getProcreation().birthHistoric(this, localDate.minusWeeks(weeksRemaining), potentialMother, potentialFather));
+                    }
+
+                    // here, we check for relationships ending
+                    if (Compute.randomFloat() <= divorceChance) {
+                        getDivorce().divorceHistoric(this, localDate.minusWeeks(weeksRemaining), person);
+
+                        // there is a chance the departing spouse will take some children with them
+                        children.removeIf(child -> (Compute.randomInt(1) == 0));
+
+                        currentSpouse = null;
+                    }
+                }
+            }
+        }
+
+        // finally, we add the current spouse (if any) and any remaining children to the unit
+        if (currentSpouse != null) {
+
+            recruitPerson(currentSpouse, PrisonerStatus.FREE, true, true);
+        }
+
+        if (!children.isEmpty()) {
+            for (Person child : children) {
+                child.setOriginFaction(person.getOriginFaction());
+                child.setOriginPlanet(person.getOriginPlanet());
+
+                recruitPerson(child, PrisonerStatus.FREE, true, true);
+            }
+        }
     }
     //endregion Personnel Recruitment
 
@@ -1766,6 +1917,17 @@ public class Campaign implements ITechManager {
     public List<Person> getActivePersonnel() {
         return getPersonnel().stream()
                 .filter(p -> p.getStatus().isActive())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Provides a filtered list of personnel including only active Dependents.
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getActiveDependents() {
+        return getPersonnel().stream()
+                .filter(person -> person.getPrimaryRole().isDependent())
+                .filter(person -> person.getStatus().isActive())
                 .collect(Collectors.toList());
     }
 
@@ -3748,6 +3910,10 @@ public class Campaign implements ITechManager {
             autoAwardsController.ManualController(this, false);
         }
 
+        if ((getLocation().isOnPlanet()) && (getLocalDate().getDayOfMonth() == 1)) {
+            processRandomDependents();
+        }
+
         resetAstechMinutes();
 
         processNewDayUnits();
@@ -3776,6 +3942,103 @@ public class Campaign implements ITechManager {
         }
 
         return true;
+    }
+
+    /**
+     * This method processes the random dependents for a campaign. It shuffles the active dependents list and performs
+     * actions based on the campaign options and unit rating modifiers.
+     *
+     * First, it determines the dependent capacity based on 20% of the active personnel count. Then, it calculates
+     * the number of dependents currently in the list.
+     *
+     * If the campaign options allow random dependent removal, it iterates over each dependent and determines if they
+     * should leave the force based on a lower roll value. If the roll value is less than or equal to 4 minus the unit
+     * rating modifier, the dependent is removed from the force.
+     *
+     * If the campaign options allow random dependent addition and the number of dependents is less than the dependent
+     * capacity, it iterates a number of times equal to the difference between the dependent capacity and the number of
+     * dependents. It determines if a lower roll value is less than or equal to the unit rating modifier multiplied by 2.
+     * If true, it recruits a new dependent and adds a report indicating the dependent has joined the force.
+     */
+    private void processRandomDependents() {
+        List<Person> dependents = getActiveDependents();
+        Collections.shuffle(dependents);
+
+        // we use this value a lot, so might as well store it for easier retrieval
+        LocalDate currentDate = getLocalDate();
+
+        // we don't want to include Dependents or children when determining capacity
+        List<Person> activeNonDependents = getActivePersonnel().stream()
+                .filter(person -> !person.getPrimaryRole().isDependent())
+                .filter(person -> !person.isChild(currentDate))
+                .toList();
+
+        int dependentCapacity = (int) Math.max(1, (activeNonDependents.size() * 0.05));
+        int dependentCount = dependents.size();
+
+        // roll for random removal
+        if (getCampaignOptions().isUseRandomDependentRemoval()) {
+            for (Person dependent : dependents) {
+                if (!isRemovalEligible(dependent, currentDate)) {
+                    continue;
+                }
+
+                int lowerRoll = (dependents.size() > dependentCapacity) ? getLowerRandomInt() : Compute.randomInt(100);
+
+                if (lowerRoll <= 4 - getUnitRatingMod()) {
+                    addReport(String.format(resources.getString("dependentLeavesForce.text"),
+                            dependent.getFullTitle()));
+
+                    removePerson(dependent, false);
+                    dependentCount--;
+                }
+            }
+        }
+
+        // then roll for random addition
+        if ((getCampaignOptions().isUseRandomDependentAddition()) && (dependentCount < dependentCapacity)) {
+            int availableCapacity = dependentCapacity - dependentCount;
+            int rollCount = (int) Math.max(1, availableCapacity * 0.2);
+
+            for (int i = 0; i < rollCount; i++) {
+                int lowerRoll = (dependentCount <= (dependentCapacity / 2)) ? getLowerRandomInt() : Compute.randomInt(100);
+
+                if (lowerRoll <= (getUnitRatingMod() * 2)) {
+                    final Person dependent = newDependent(false, Gender.RANDOMIZE);
+
+                    recruitPerson(dependent, PrisonerStatus.FREE, true, false);
+
+                    addReport(String.format(resources.getString("dependentJoinsForce.text"),
+                            dependent.getHyperlinkedFullTitle()));
+
+                    dependentCount++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the lower value between two random integers generated between 0 and 99 (inclusive).
+     *
+     * @return the lower random integer value
+     */
+    private int getLowerRandomInt() {
+        int roll = Compute.randomInt(100);
+        int secondRoll = Compute.randomInt(100);
+        return Math.min(roll, secondRoll);
+    }
+
+    /**
+     * Checks if a dependent is eligible for removal.
+     *
+     * @param dependent the person to check
+     * @param currentDate the current date
+     * @return {@code true} if the person is eligible for removal, {@code false} otherwise
+     */
+    private boolean isRemovalEligible(Person dependent, LocalDate currentDate) {
+        return !(dependent.getGenealogy().hasNonAdultChildren(currentDate)
+                || dependent.getGenealogy().hasSpouse()
+                || dependent.isChild(currentDate));
     }
 
     /**

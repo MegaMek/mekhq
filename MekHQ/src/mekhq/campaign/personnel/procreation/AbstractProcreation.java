@@ -40,6 +40,8 @@ import mekhq.campaign.personnel.randomEvents.PersonalityController;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -243,10 +245,16 @@ public abstract class AbstractProcreation {
      * @param campaign the campaign the person is a part of
      * @param today the current date
      * @param mother the newly pregnant mother
+     * @param isNoReport true if no message should be posted to the daily report
      */
-    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother) {
-        addPregnancy(campaign, today, mother, determineNumberOfBabies(
-                campaign.getCampaignOptions().getMultiplePregnancyOccurrences()));
+    public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother, boolean isNoReport) {
+        addPregnancy(
+                campaign,
+                today,
+                mother,
+                determineNumberOfBabies(campaign.getCampaignOptions().getMultiplePregnancyOccurrences()),
+                isNoReport
+        );
     }
 
     /**
@@ -257,24 +265,34 @@ public abstract class AbstractProcreation {
      * @param today the current date
      * @param mother the newly pregnant mother
      * @param size the number of children the mother is having
+     * @param isNoReport true if no message should be posted to the daily report
      */
     public void addPregnancy(final Campaign campaign, final LocalDate today, final Person mother,
-                             final int size) {
+                             final int size, boolean isNoReport) {
         if (size < 1) {
             return;
         }
 
         mother.setExpectedDueDate(today.plusDays(MHQConstants.PREGNANCY_STANDARD_DURATION));
+
         mother.setDueDate(today.plusDays(determinePregnancyDuration()));
+
         mother.getExtraData().set(PREGNANCY_CHILDREN_DATA, size);
+
         mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()
                 ? mother.getGenealogy().getSpouse().getId().toString() : null);
 
         final String babyAmount = resources.getString("babyAmount.text").split(",")[size - 1];
-        campaign.addReport(String.format(resources.getString("babyConceived.report"),
-                mother.getHyperlinkedName(), babyAmount).trim());
+
+        if (!isNoReport) {
+            campaign.addReport(String.format(resources.getString("babyConceived.report"),
+                    mother.getHyperlinkedName(),
+                    babyAmount).trim());
+        }
+
         if (campaign.getCampaignOptions().isLogProcreation()) {
             MedicalLogger.hasConceived(mother, today, babyAmount);
+
             if (mother.getGenealogy().hasSpouse()) {
                 PersonalLogger.spouseConceived(mother.getGenealogy().getSpouse(),
                         mother.getFullName(), today, babyAmount);
@@ -331,20 +349,7 @@ public abstract class AbstractProcreation {
             campaign.addReport(String.format(resources.getString("babyBorn.report"),
                     mother.getHyperlinkedName(), baby.getHyperlinkedName(),
                     GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender())));
-            if (campaign.getCampaignOptions().isLogProcreation()) {
-                MedicalLogger.deliveredBaby(mother, baby, today);
-                if (father != null) {
-                    PersonalLogger.ourChildBorn(father, baby, mother.getFullName(), today);
-                }
-            }
-
-            // Create genealogy information
-            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
-            mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
-            if (father != null) {
-                baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
-                father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
-            }
+            logAndUpdateFamily(campaign, today, mother, baby, father);
 
             // Founder Tag Assignment
             if (campaign.getCampaignOptions().isAssignNonPrisonerBabiesFounderTag()
@@ -381,6 +386,80 @@ public abstract class AbstractProcreation {
 
         // Cleanup Data
         removePregnancy(mother);
+    }
+
+    /**
+     * Logs the birth of a baby and updates the genealogy information of the family.
+     *
+     * @param campaign the ongoing campaign
+     * @param today the current date
+     * @param mother the mother of the baby
+     * @param baby the newborn baby
+     * @param father the father of the baby, null if unknown
+     */
+    private static void logAndUpdateFamily(Campaign campaign, LocalDate today, Person mother, Person baby, Person father) {
+        if (campaign.getCampaignOptions().isLogProcreation()) {
+            MedicalLogger.deliveredBaby(mother, baby, today);
+            if (father != null) {
+                PersonalLogger.ourChildBorn(father, baby, mother.getFullName(), today);
+            }
+        }
+
+        // Create genealogy information
+        baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
+        mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
+        if (father != null) {
+            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
+            father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
+        }
+    }
+
+    /**
+     * Creates baby/babies and performs any necessary operations such as setting birthdate, creating reports,
+     * updating genealogy, setting education, loyalty, personality, and recruiting the baby.
+     * This version is for historic births that occur as part of a character's background.
+     *
+     * @param campaign the campaign object
+     * @param today the current date
+     * @param mother the mother person object
+     * @param father the father person object, can be null if the father is unknown
+     * @return the babies
+     */
+    public List<Person> birthHistoric(final Campaign campaign, final LocalDate today, final Person mother, @Nullable final Person father) {
+        List<Person> babies = new ArrayList<>();
+
+        // Determine the number of children
+        final int size = mother.getExtraData().get(PREGNANCY_CHILDREN_DATA, 1);
+        // Create Babies
+        for (int i = 0; i < size; i++) {
+            // Create the babies
+            final Person baby = campaign.newDependent(true, Gender.RANDOMIZE);
+
+            baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
+                    .generateBabySurname(mother, father, baby.getGender()));
+
+            baby.setBirthday(today);
+
+            // Create reports and log the birth
+            logAndUpdateFamily(campaign, today, mother, baby, father);
+
+            // set education
+            baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+
+            // set loyalty
+            baby.setLoyalty(Compute.d6(4, 3));
+
+            // set baby's personality
+            PersonalityController.generatePersonality(baby);
+
+            // add to the list of babies
+            babies.add(baby);
+        }
+
+        // Cleanup Data
+        removePregnancy(mother);
+
+        return babies;
     }
 
     /**
@@ -458,7 +537,7 @@ public abstract class AbstractProcreation {
 
         // Make the required checks for random procreation
         if (randomlyProcreates(today, person)) {
-            addPregnancy(campaign, today, person);
+            addPregnancy(campaign, today, person, false);
         }
     }
 

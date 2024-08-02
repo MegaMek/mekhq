@@ -190,6 +190,32 @@ public abstract class AbstractMarriage {
             return;
         }
 
+        performMarriageChanges(campaign, today, origin, spouse, surnameStyle);
+
+        campaign.addReport(String.format(resources.getString("marriage.report"), origin.getHyperlinkedName(),
+                spouse.getHyperlinkedName()));
+
+        // Process the loyalty change
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            origin.performRandomizedLoyaltyChange(campaign, false, true);
+            spouse.performRandomizedLoyaltyChange(campaign, false, true);
+        }
+
+        // And finally we trigger person changed events
+        MekHQ.triggerEvent(new PersonChangedEvent(origin));
+        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
+    }
+
+    /**
+     * Updates the necessary information to perform a marriage between two individuals.
+     *
+     * @param campaign the campaign in which the marriage is taking place
+     * @param today the current date of the marriage
+     * @param origin the first person getting married
+     * @param spouse the second person getting married
+     * @param surnameStyle the style of surname changes to be applied
+     */
+    public static void performMarriageChanges(Campaign campaign, LocalDate today, Person origin, Person spouse, MergingSurnameStyle surnameStyle) {
         // Immediately set both Maiden Names, to avoid any divorce bugs (as the default is now an empty string)
         origin.setMaidenName(origin.getSurname());
         spouse.setMaidenName(spouse.getSurname());
