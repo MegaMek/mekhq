@@ -1791,7 +1791,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (!spa.isEligible(person)) {
                         continue;
                     }
-                    cost = spa.getCost();
+                    cost = (int) (spa.getCost() * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
                     String costDesc;
                     if (cost < 0) {
                         costDesc = resources.getString("costNotPossible.text");
@@ -2038,6 +2038,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             for (int i = 0; i < SkillType.getSkillList().length; i++) {
                 String type = SkillType.getSkillList()[i];
                 int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove() : SkillType.getType(type).getCost(0);
+                cost *= (int) gui.getCampaign().getCampaignOptions().getXpCostMultiplier();
                 if (cost >= 0) {
                     String desc = String.format(resources.getString("skillDesc.format"), type, cost);
                     menuItem = new JMenuItem(desc);
@@ -2057,7 +2058,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Edge Purchasing
             if (gui.getCampaign().getCampaignOptions().isUseEdge()) {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
-                int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
+                int cost = (int) (gui.getCampaign().getCampaignOptions().getEdgeCost() * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
 
                 if ((cost >= 0) && (person.getXP() >= cost)) {
                     menuItem = new JMenuItem(String.format(resources.getString("spendOnEdge.text"), cost));
