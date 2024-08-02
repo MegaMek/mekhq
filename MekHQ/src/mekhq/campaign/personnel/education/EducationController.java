@@ -69,7 +69,7 @@ public class EducationController {
         if (tuition > 0) {
             if (campaign.getFinances().getBalance().isLessThan(Money.of(tuition))) {
                 String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                        + String.format(resources.getString("insufficientFunds.text"), person.getHyperlinkedFullTitle())
+                        + String.format(resources.getString("insufficientFunds.text"), person.getFullTitle())
                         + "</span>";
 
                 campaign.addReport(reportMessage);
@@ -598,9 +598,13 @@ public class EducationController {
                     if (Compute.d6(2) >= 5) {
                         processTrainingInjury(campaign, academy, person, resources);
                     } else {
-                        String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                + String.format(resources.getString("eventTrainingAccidentKilled.text"), person.getHyperlinkedFullTitle())
-                                + "</span>";
+                        String resultString = String.format(resources.getString("eventTrainingAccidentKilled.text"),
+                                "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                                "</span>");
+
+                        String reportMessage = String.format(resources.getString("eventTrainingAccident.text"),
+                                person.getHyperlinkedFullTitle(),
+                                resultString);
 
                         campaign.addReport(reportMessage);
 
@@ -624,9 +628,14 @@ public class EducationController {
     private static void processTrainingInjury(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         int roll = Compute.d6(3);
 
-        String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                + String.format(resources.getString("eventTrainingAccident.text"), person.getHyperlinkedFullTitle(), roll)
-                + "</span>";
+        String resultString = String.format(resources.getString("eventTrainingAccidentWounded.text"),
+                "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                "</span>",
+                roll);
+
+        String reportMessage = String.format(resources.getString("eventTrainingAccident.text"),
+                person.getHyperlinkedFullTitle(),
+                resultString);
 
         campaign.addReport(reportMessage);
 
@@ -676,28 +685,17 @@ public class EducationController {
                     if (academy.isReeducationCamp()) {
                         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
                     } else {
-                        if (academy.isHomeSchool()) {
-                            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                    + String.format(resources.getString("dropOutHomeSchooled.text"), person.getHyperlinkedFullTitle())
-                                    + "</span>";
-
-                            campaign.addReport(reportMessage);
-                        } else {
-                            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                    + String.format(resources.getString("dropOut.text"), person.getHyperlinkedFullTitle())
-                                    + "</span>";
-
-                            campaign.addReport(reportMessage);
-                        }
+                        reportDropOut(campaign, person, academy, resources);
 
                         ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
                         person.setEduEducationStage(EducationStage.DROPPING_OUT);
                         addFacultyXp(campaign, person, academy, 0);
                     }
                 } else {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                            + String.format(resources.getString("dropOutRejected.text"), person.getHyperlinkedFullTitle())
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("dropOutRejected.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
                 }
@@ -705,9 +703,10 @@ public class EducationController {
                 return true;
             } else if ((roll < (diceSize / 20)) && (!academy.isPrepSchool())) {
                 // might as well scare the player
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                        + String.format(resources.getString("dropOutRejected.text"), person.getHyperlinkedFullTitle())
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("dropOutRejected.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                        "</span>");
 
                 campaign.addReport(reportMessage);
                 return true;
@@ -719,23 +718,41 @@ public class EducationController {
     /**
      * This method processes a forced drop out for a person.
      *
-     * @param campaign the campaign to add the drop out report to
+     * @param campaign the campaign to add the drop-out report to
      * @param person the person who is forced to drop out
      * @param academy the academy where the person was studying
      */
     public static void processForcedDropOut(Campaign campaign, Person person, Academy academy) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
-        String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                + String.format(resources.getString("dropOut.text"), person.getHyperlinkedFullTitle())
-                + "</span>";
-
-        campaign.addReport(reportMessage);
+        reportDropOut(campaign, person, academy, resources);
 
         ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
         person.setEduEducationStage(EducationStage.DROPPING_OUT);
 
         addFacultyXp(campaign, person, academy, 0);
+    }
+
+    /**
+     * Generates a dropout report and adds it to the campaign's reports.
+     *
+     * @param campaign  the campaign object to add the report to
+     * @param person    the person object representing the dropout
+     * @param academy   the academy object the person initially enrolled in
+     * @param resources the resource bundle containing localized strings
+     */
+    private static void reportDropOut(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+        String personTitle = person.getHyperlinkedFullTitle();
+        String negativeHexColor = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+
+        String reportText = academy.isHomeSchool() ? "dropOutHomeSchooled.text" : "dropOut.text";
+
+        String coloredOpen = String.format("<span color='%s'>", negativeHexColor);
+        String coloredClose = "</span>";
+
+        String report = String.format(resources.getString(reportText), personTitle, coloredOpen, coloredClose);
+
+        campaign.addReport(report);
     }
 
     /**
@@ -749,9 +766,10 @@ public class EducationController {
      */
     private static boolean checkForAcademyFactionConflict(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (academy.isFactionConflict(campaign, person)) {
-            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                    + String.format(resources.getString("eventWarExpelled.text"), person.getHyperlinkedFullTitle())
-                    + "</span>";
+            String reportMessage = String.format(resources.getString("eventWarExpelled.text"),
+                    person.getHyperlinkedFullTitle(),
+                    "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                    "</span>");
 
             campaign.addReport(reportMessage);
 
@@ -772,9 +790,10 @@ public class EducationController {
      */
     private static void checkForAcademyClosure(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (campaign.getLocalDate().getYear() >= academy.getClosureYear()) {
-            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                    + String.format(resources.getString("eventClosure.text"), person.getHyperlinkedFullTitle())
-                    + "</span>";
+            String reportMessage = String.format(resources.getString("eventClosure.text"),
+                    person.getHyperlinkedFullTitle(),
+                    "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                    "</span>");
 
             campaign.addReport(reportMessage);
             person.setEduEducationStage(EducationStage.DROPPING_OUT);
@@ -796,26 +815,35 @@ public class EducationController {
                 || (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0)) {
             if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
                 if (Compute.d6(2) >= 5) {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                            + String.format(resources.getString("eventDestruction.text"), person.getHyperlinkedFullTitle())
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("eventDestruction.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                            "</span>",
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
 
                     person.setEduEducationStage(EducationStage.DROPPING_OUT);
                 } else {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                            + String.format(resources.getString("eventDestructionKilled.text"), person.getHyperlinkedFullTitle())
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("eventDestructionKilled.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                            "</span>",
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
 
                     person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
                 }
             } else {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                        + String.format(resources.getString("eventDestruction.text"), person.getHyperlinkedFullTitle())
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("eventDestruction.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                        "</span>",
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                        "</span>");
 
                 campaign.addReport(reportMessage);
 
@@ -859,15 +887,17 @@ public class EducationController {
         // qualification failed
         if (graduationRoll < 5) {
             if (academy.isHomeSchool()) {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                        + String.format(resources.getString("graduatedFailedHomeSchooled.text"), person.getHyperlinkedFullTitle())
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("graduatedFailedHomeSchooled.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                        "</span>");
 
                 campaign.addReport(reportMessage);
             } else {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                        + String.format(resources.getString("graduatedFailed.text"), person.getHyperlinkedFullTitle())
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("graduatedFailed.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                        "</span>");
 
                 campaign.addReport(reportMessage);
             }
@@ -885,9 +915,12 @@ public class EducationController {
         // class resits required
         if (graduationRoll < 20) {
             roll = Compute.d6(3);
-            String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                    + String.format(resources.getString("graduatedClassNeeded.text"), person.getHyperlinkedFullTitle(), roll)
-                    + "</span>";
+
+            String reportMessage = String.format(resources.getString("graduatedClassNeeded.text"),
+                    person.getHyperlinkedFullTitle(),
+                    "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                    "</span>",
+                    roll);
 
             campaign.addReport(reportMessage);
 
@@ -899,29 +932,39 @@ public class EducationController {
         if (graduationRoll >= 99) {
             if (Compute.d6(1) >= 5) {
                 if (academy.isHomeSchool()) {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
                 } else {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + String.format(resources.getString("graduatedTop.text"), person.getHyperlinkedFullTitle(), ' ' + resources.getString(graduationEventPicker()))
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("graduatedTop.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>",
+                            ' ' + resources.getString(graduationEventPicker()),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
                 }
             } else {
                 if (academy.isHomeSchool()) {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
                 } else {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + String.format(resources.getString("graduatedTop.text"), person.getHyperlinkedFullTitle(), "")
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("graduatedTop.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>",
+                            "",
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
                 }
@@ -948,29 +991,39 @@ public class EducationController {
             if (Compute.d6(1) >= 5) {
 
                 if (academy.isHomeSchool()) {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
                 } else {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + String.format(resources.getString("graduatedHonors.text"), person.getHyperlinkedFullTitle(), ' ' + resources.getString(graduationEventPicker()))
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("graduatedHonors.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>",
+                            ' ' + resources.getString(graduationEventPicker()),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
                 }
             } else {
                 if (academy.isHomeSchool()) {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
                 } else {
-                    String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + String.format(resources.getString("graduatedHonors.text"), person.getHyperlinkedFullTitle(), "")
-                            + "</span>";
+                    String reportMessage = String.format(resources.getString("graduatedHonors.text"),
+                            person.getHyperlinkedFullTitle(),
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>",
+                            "",
+                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                            "</span>");
 
                     campaign.addReport(reportMessage);
                 }
@@ -995,29 +1048,35 @@ public class EducationController {
         // default graduation
         if (Compute.d6(1) >= 5) {
             if (academy.isHomeSchool()) {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                        "</span>");
 
                 campaign.addReport(reportMessage);
             } else {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + String.format(resources.getString("graduated.text"), person.getHyperlinkedFullTitle(), ' ' + resources.getString(graduationEventPicker()))
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("graduated.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                        "</span>",
+                        ' ' + resources.getString(graduationEventPicker()));
 
                 campaign.addReport(reportMessage);
             }
         } else {
             if (academy.isHomeSchool()) {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                        "</span>");
 
                 campaign.addReport(reportMessage);
             } else {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + String.format(resources.getString("graduated.text"), person.getHyperlinkedFullTitle(), "")
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("graduated.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                        "</span>",
+                        "");
 
                 campaign.addReport(reportMessage);
             }
@@ -1112,29 +1171,33 @@ public class EducationController {
 
         if (graduationRoll < 30) {
             if (academy.isHomeSchool()) {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + String.format(resources.getString("graduatedBarelyHomeSchooled.text"), person.getHyperlinkedFullTitle())
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("graduatedBarelyHomeSchooled.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                        "</span>");
 
                 campaign.addReport(reportMessage);
             } else {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + String.format(resources.getString("graduatedBarely.text"), person.getHyperlinkedFullTitle(), person.getEduAcademyName())
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("graduatedBarely.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                        "</span>");
 
                 campaign.addReport(reportMessage);
             }
         } else {
             if (academy.isHomeSchool()) {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + String.format(resources.getString("graduatedHomeSchooled.text"), person.getHyperlinkedFullTitle())
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                        "</span>");
 
                 campaign.addReport(reportMessage);
             } else {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + String.format(resources.getString("graduatedChild.text"), person.getHyperlinkedFullTitle(), person.getEduAcademyName())
-                        + "</span>";
+                String reportMessage = String.format(resources.getString("graduatedChild.text"),
+                        person.getHyperlinkedFullTitle(),
+                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                        "</span>");
 
                 campaign.addReport(reportMessage);
             }
