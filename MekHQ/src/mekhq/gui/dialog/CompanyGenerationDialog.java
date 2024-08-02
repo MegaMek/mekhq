@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -145,7 +145,7 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         final Contract contract = null;
         generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, contract);
 
-        MekHQ.triggerEvent(new OrganizationChangedEvent(getCompanyGenerationOptionsPanel().getCampaign().getForces()));
+        MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(), getCompanyGenerationOptionsPanel().getCampaign().getForces()));
 
         if (campaign.getCampaignOptions().isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
