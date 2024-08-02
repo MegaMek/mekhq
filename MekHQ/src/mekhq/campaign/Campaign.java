@@ -1158,7 +1158,7 @@ public class Campaign implements ITechManager {
     public void importUnit(Unit u) {
         Objects.requireNonNull(u);
 
-        LogManager.getLogger().debug("Importing unit: ({}): {}", u.getId(), u.getName());
+        logger.debug("Importing unit: ({}): {}", u.getId(), u.getName());
 
         getHangar().addUnit(u);
 
@@ -1183,7 +1183,7 @@ public class Campaign implements ITechManager {
      * @param unit - The ship we want to add to this Set
      */
     public void addTransportShip(Unit unit) {
-        LogManager.getLogger().debug("Adding DropShip/WarShip: {}", unit.getId());
+        logger.debug("Adding DropShip/WarShip: {}", unit.getId());
         transportShips.add(Objects.requireNonNull(unit));
     }
 
@@ -3511,8 +3511,8 @@ public class Campaign implements ITechManager {
 
                 int score = 0;
 
-                if (p.getPrimaryRole().isSupport(true)) {
-                    int dice = p.getExperienceLevel(this, false);
+                if (person.getPrimaryRole().isSupport(true)) {
+                    int dice = person.getExperienceLevel(this, false);
 
                     if (dice > 0) {
                         score = Compute.d6(dice);
@@ -3521,19 +3521,19 @@ public class Campaign implements ITechManager {
                     multiplier += 0.5;
                 }
 
-                if (p.getSecondaryRole().isSupport(true)) {
-                    int dice = p.getExperienceLevel(this, true);
+                if (person.getSecondaryRole().isSupport(true)) {
+                    int dice = person.getExperienceLevel(this, true);
 
                     if (dice > 0) {
                         score += Compute.d6(dice);
                     }
 
                     multiplier += 0.5;
-                } else if (p.getSecondaryRole().isNone()) {
+                } else if (person.getSecondaryRole().isNone()) {
                     multiplier += 0.5;
                 }
 
-                p.changeAutoAwardSupportPoints((int) (score * multiplier));
+                person.changeAutoAwardSupportPoints((int) (score * multiplier));
             }
         }
     }
@@ -4746,7 +4746,7 @@ public class Campaign implements ITechManager {
                     pw1.println("]]></blk>");
                 }
                 catch (EntitySavingException e) {
-                    LogManager.getLogger().error("Failed to save custom entity {}", en.getDisplayName(), e);
+                    logger.error("Failed to save custom entity {}", en.getDisplayName(), e);
                 }
             }
             pw1.println("\t</custom>");
