@@ -3503,12 +3503,22 @@ public class Campaign implements ITechManager {
                 int score = 0;
 
                 if (p.getPrimaryRole().isSupport(true)) {
-                    score =  Compute.d6(p.getExperienceLevel(this, false));
+                    int dice = p.getExperienceLevel(this, false);
+
+                    if (dice > 0) {
+                        score = Compute.d6(dice);
+                    }
+
                     multiplier += 0.5;
                 }
 
                 if (p.getSecondaryRole().isSupport(true)) {
-                    score += Compute.d6(p.getExperienceLevel(this, false));
+                    int dice = p.getExperienceLevel(this, true);
+
+                    if (dice > 0) {
+                        score += Compute.d6(dice);
+                    }
+
                     multiplier += 0.5;
                 } else if (p.getSecondaryRole().isNone()) {
                     multiplier += 0.5;
