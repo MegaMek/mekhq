@@ -2,7 +2,7 @@
  * Force.java
  *
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,8 +25,8 @@ import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -38,6 +38,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.io.migration.CamouflageMigrator;
 import mekhq.io.migration.ForceIconMigrator;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -67,13 +68,15 @@ public class Force {
     private Camouflage camouflage;
     private String desc;
     private boolean combatForce;
+    private FormationLevel formationLevel;
+    private FormationLevel overrideFormationLevel;
     private Force parentForce;
-    private Vector<Force> subForces;
-    private Vector<UUID> units;
+    private final Vector<Force> subForces;
+    private final Vector<UUID> units;
     private int scenarioId;
     private UUID forceCommanderID;
-
     protected UUID techId;
+
 
     //an ID so that forces can be tracked in Campaign hash
     private int id;
@@ -86,6 +89,8 @@ public class Force {
         setCamouflage(new Camouflage());
         setDescription("");
         this.combatForce = true;
+        this.formationLevel = FormationLevel.NONE;
+        this.overrideFormationLevel = FormationLevel.NONE;
         this.parentForce = null;
         this.subForces = new Vector<>();
         this.units = new Vector<>();
@@ -151,6 +156,26 @@ public class Force {
                 force.setCombatForce(combatForce, true);
             }
         }
+    }
+
+    @SuppressWarnings(value = "unused")
+    public FormationLevel getFormationLevel() {
+        return formationLevel;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setFormationLevel(final FormationLevel formationLevel) {
+        this.formationLevel = formationLevel;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public FormationLevel getOverrideFormationLevel() {
+        return overrideFormationLevel;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setOverrideFormationLevel(final FormationLevel overrideFormationLevel) {
+        this.overrideFormationLevel = overrideFormationLevel;
     }
 
     public int getScenarioId() {
@@ -231,9 +256,9 @@ public class Force {
         for (int i = ancestors.size() - 1; i >= 0; i--) {
             Force ancestor = ancestors.get(i);
             id = 17 * id + ancestor.id + 1;
-            result.append(ancestor.getName()).append("|").append(id);
+            result.append(ancestor.getName()).append('|').append(id);
             if (!ancestor.getCamouflage().isDefault()) {
-                result.append("|").append(ancestor.getCamouflage().getCategory()).append("|").append(ancestor.getCamouflage().getFilename());
+                result.append('|').append(ancestor.getCamouflage().getCategory()).append('|').append(ancestor.getCamouflage().getFilename());
             }
             result.append("||");
         }
@@ -437,7 +462,7 @@ public class Force {
 
         // logic: if we found someone eligible who is a higher rank, the first one of those becomes the new commander
         // otherwise, the existing commander remains the commander
-        if (!eligibleCommanders.contains(getForceCommanderID()) && (eligibleCommanders.size() > 0)) {
+        if (!eligibleCommanders.contains(getForceCommanderID()) && (!eligibleCommanders.isEmpty())) {
             forceCommanderID = eligibleCommanders.get(0);
         }
     }
@@ -472,7 +497,7 @@ public class Force {
         // Then, Add the units assigned to this force
         statuses.addAll(getUnits().stream().map(campaign::getUnit).filter(Objects::nonNull)
                 .map(LayeredForceIconOperationalStatus::determineLayeredForceIconOperationalStatus)
-                .collect(Collectors.toList()));
+                .toList());
 
         // Can only update the icon for LayeredForceIcons, but still need to return the processed
         // units for parent force updates
@@ -507,6 +532,8 @@ public class Force {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "desc", desc);
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "formationLevel", formationLevel.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "populateOriginNode", overrideFormationLevel.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceCommanderID", forceCommanderID);
@@ -556,6 +583,10 @@ public class Force {
                     retVal.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
                     retVal.setCombatForce(Boolean.parseBoolean(wn2.getTextContent().trim()), false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("formationLevel")) {
+                    retVal.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("populateOriginNode")) {
+                    retVal.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
                     retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.6 removal
@@ -582,7 +613,7 @@ public class Force {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in Forces nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in Forces nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -738,7 +769,7 @@ public class Force {
      * @param force the current force. Should always equal campaign.getForce(0), if called remotely
      * @param depth the current recursive depth. Can be left null, if called remotely
      */
-    public static int getMaximumDepth(Force force, @Nullable Integer depth) {
+    public static int getMaximumDepth(Force force, Integer depth) {
         if (depth == null) {
             depth = 0;
         }
@@ -747,16 +778,114 @@ public class Force {
 
         Vector<Force> subForces = force.getSubForces();
 
-        if (!subForces.isEmpty()) {
-            for (Force subforce : subForces) {
-                int nextDepth = getMaximumDepth(subforce, depth + 1);
+        for (Force subforce : subForces) {
+            int nextDepth = getMaximumDepth(subforce, depth + 1);
 
-                if (nextDepth > maximumDepth) {
-                    maximumDepth = nextDepth;
-                }
+            if (nextDepth > maximumDepth) {
+                maximumDepth = nextDepth;
             }
         }
 
         return maximumDepth;
+    }
+
+    /**
+     * Populates the formation levels of a force hierarchy starting from the origin force.
+     * For all subforces of the given force, it sets the formation level to one level lower than the current level.
+     * If the resulting formation level is below the lower boundary determined by available formation level enums,
+     * it sets the formation level to INVALID.
+     *
+     * @param campaign the campaign to determine the lower boundary
+     */
+    public static void populateFormationLevelsFromOrigin(Campaign campaign) {
+        Force force = campaign.getForce(0);
+
+        populateOriginNode(campaign, force);
+
+        // we then set lower boundaries (i.e., how far we can decrease formation level)
+        int lowerBoundary = getLowerBoundary(campaign);
+        int currentFormationLevel = force.getFormationLevel().parseToInt();
+
+        for (Force subforce : force.getSubForces()) {
+            if (currentFormationLevel - 1 < lowerBoundary) {
+                subforce.setFormationLevel(FormationLevel.INVALID);
+                continue;
+            }
+
+            subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
+
+            changeFormationLevel(subforce, currentFormationLevel - 1, lowerBoundary);
+        }
+    }
+
+    /**
+     * Changes the formation level of a force and its sub-forces.
+     *
+     * @param force               the force whose formation level is to be changed
+     * @param currentFormationLevel the current formation level of the force
+     * @param lowerBoundary       the lower boundary for the formation level
+     */
+    private static void changeFormationLevel(Force force, int currentFormationLevel, int lowerBoundary) {
+        force.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel));
+
+        for (Force subforce : force.getSubForces()) {
+            if (currentFormationLevel - 1 < lowerBoundary) {
+                subforce.setFormationLevel(FormationLevel.INVALID);
+                continue;
+            }
+
+            subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
+        }
+    }
+
+    /**
+     * Retrieves the lower boundary value based on the given campaign.
+     *
+     * @param campaign the campaign object to retrieve the lower boundary for
+     * @return the lower boundary value as an integer
+     */
+    private static int getLowerBoundary(Campaign campaign) {
+        int lowerBoundary = FormationLevel.values().length;
+
+        for (FormationLevel level : FormationLevel.values()) {
+            if (level.isNone() || level.isInvalid() || level.isRemoveOverride()) {
+                continue;
+            }
+
+            boolean isValid = false;
+
+            if (campaign.getFaction().isClan() && level.isClan()) {
+                isValid = true;
+            } else if (campaign.getFaction().isComStarOrWoB()) {
+                isValid = true;
+            } if (!campaign.getFaction().isClan() && !campaign.getFaction().isComStarOrWoB()) {
+                isValid = level.isInnerSphere();
+            }
+
+            if (isValid) {
+                lowerBoundary = level.parseToInt() < lowerBoundary ? level.parseToInt() : lowerBoundary;
+            }
+        }
+        return lowerBoundary;
+    }
+
+    /**
+     * Populates the origin node (the force normally named after the campaign) with an appropriate Formation Level.
+     *
+     * @param campaign the current campaign
+     * @param origin the origin node
+     */
+    private static void populateOriginNode(Campaign campaign, Force origin) {
+        FormationLevel overrideFormationLevel = origin.getOverrideFormationLevel();
+        int maximumDepth = getMaximumDepth(origin, 0);
+
+        if (!overrideFormationLevel.isNone() && !overrideFormationLevel.isRemoveOverride()) {
+            origin.setFormationLevel(overrideFormationLevel);
+        } else {
+            origin.setFormationLevel(FormationLevel.parseFromDepth(campaign, maximumDepth));
+            origin.setOverrideFormationLevel(FormationLevel.NONE);
+        }
+
+        MekHQ.triggerEvent(new OrganizationChangedEvent(origin));
     }
 }

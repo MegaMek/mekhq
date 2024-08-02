@@ -289,12 +289,19 @@ public class AutoAwardsController {
             LogManager.getLogger().info("Ignoring the Standard Set");
         }
 
+        String[] filterList = campaign.getCampaignOptions().getAwardSetFilterList().split(",");
+
         // we start by building a primary list of all awards
         if (!allSetNames.isEmpty()) {
             LogManager.getLogger().info("Getting all Award Sets");
 
             for (String setName : allSetNames) {
                 if (!allSetNames.isEmpty()) {
+                    if (Arrays.asList(filterList).contains(setName)) {
+                        LogManager.getLogger().info("'{}' was found in the list of sets to be ignored. Ignoring it.", setName);
+                        continue;
+                    }
+
                     LogManager.getLogger().info("Getting all awards from set: {}", setName);
 
                     awards.addAll(AwardsFactory.getInstance().getAllAwardsForSet(setName));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2011-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,27 +42,11 @@ import java.util.UUID;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceViewPanel extends JScrollablePanel {
-    private Force force;
-    private Campaign campaign;
+    private final Force force;
+    private final Campaign campaign;
 
-    private JLabel lblIcon;
     private JPanel pnlStats;
     private JPanel pnlSubUnits;
-    private JTextPane txtDesc;
-
-    private JLabel lblType;
-    private JLabel lblAssign1;
-    private JLabel lblAssign2;
-    private JLabel lblCommander1;
-    private JLabel lblCommander2;
-    private JLabel lblBV1;
-    private JLabel lblBV2;
-    private JLabel lblTonnage1;
-    private JLabel lblTonnage2;
-    private JLabel lblCost1;
-    private JLabel lblCost2;
-    private JLabel lblTech1;
-    private JLabel lblTech2;
 
     public ForceViewPanel(Force f, Campaign c) {
         super();
@@ -74,10 +58,10 @@ public class ForceViewPanel extends JScrollablePanel {
     private void initComponents() {
         getAccessibleContext().setAccessibleName("Selected Force: " + force.getFullName());
 
-        lblIcon = new JLabel();
+        JLabel lblIcon = new JLabel();
         pnlStats = new JPanel();
         pnlSubUnits = new JPanel();
-        txtDesc = new JTextPane();
+        JTextPane txtDesc = new JTextPane();
 
         setLayout(new GridBagLayout());
 
@@ -142,19 +126,21 @@ public class ForceViewPanel extends JScrollablePanel {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel",
                 MekHQ.getMHQOptions().getLocale());
 
-        lblType = new JLabel();
-        lblAssign1 = new JLabel();
-        lblAssign2 = new JLabel();
-        lblCommander1 = new JLabel();
-        lblCommander2 = new JLabel();
-        lblBV1 = new JLabel();
-        lblBV2 = new JLabel();
-        lblCost1 = new JLabel();
-        lblCost2 = new JLabel();
-        lblTonnage1 = new JLabel();
-        lblTonnage2 = new JLabel();
-        lblTech1 = new JLabel();
-        lblTech2 = new JLabel();
+        JLabel lblType = new JLabel();
+        JLabel lblAssign1 = new JLabel();
+        JLabel lblAssign2 = new JLabel();
+        JLabel lblFormationType1 = new JLabel();
+        JLabel lblFormationType2 = new JLabel();
+        JLabel lblCommander1 = new JLabel();
+        JLabel lblCommander2 = new JLabel();
+        JLabel lblBV1 = new JLabel();
+        JLabel lblBV2 = new JLabel();
+        JLabel lblCost1 = new JLabel();
+        JLabel lblCost2 = new JLabel();
+        JLabel lblTonnage1 = new JLabel();
+        JLabel lblTonnage2 = new JLabel();
+        JLabel lblTech1 = new JLabel();
+        JLabel lblTech2 = new JLabel();
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
 
@@ -241,6 +227,29 @@ public class ForceViewPanel extends JScrollablePanel {
             pnlStats.add(lblCommander2, gridBagConstraints);
             nexty++;
         }
+
+        lblFormationType1.setName("lblFormationType1");
+        lblFormationType1.setText(resourceMap.getString("lblFormationType1.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblFormationType1, gridBagConstraints);
+
+        lblFormationType2.setName("lblFormationType2");
+        lblFormationType2.setText(force.getFormationLevel().toString());
+        lblFormationType1.setLabelFor(lblFormationType2);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = nexty;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblFormationType2, gridBagConstraints);
+        nexty++;
+
         if (null != force.getTechID()) {
             if (!lanceTech.isBlank()) {
                 lblTech1.setName("lblTech1");

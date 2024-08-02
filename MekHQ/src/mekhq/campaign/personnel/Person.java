@@ -1086,7 +1086,7 @@ public class Person {
         if ((isCommander()) && (status.isDepartedUnit())) {
             if ((!status.isResigned()) && (!status.isRetired())) {
                 if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                    massChangeLoyalty(campaign);
+                    leadershipMassChangeLoyalty(campaign);
                 }
             }
 
@@ -1112,26 +1112,26 @@ public class Person {
      * If the current character is the campaign commander, adjust loyalty across the entire unit.
      * @param campaign The current campaign
      */
-    private void massChangeLoyalty(Campaign campaign) {
-        if (isCommander()) {
-            for (Person person : campaign.getPersonnel()) {
-                if (person.getStatus().isDepartedUnit()) {
-                    continue;
-                }
-
-                if (person.getPrisonerStatus().isCurrentPrisoner()) {
-                    continue;
-                }
-
-                person.performRandomizedLoyaltyChange(campaign, false, false);
+    private void leadershipMassChangeLoyalty(Campaign campaign) {
+        for (Person person : campaign.getPersonnel()) {
+            if (person.getStatus().isDepartedUnit()) {
+                continue;
             }
+
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                continue;
+            }
+
+            person.performRandomizedLoyaltyChange(campaign, false, false);
         }
 
-        campaign.addReport(resources.getString("loyaltyChangeGroup.text"));
+        campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+                "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                "</span>"));
     }
 
     /**
-     * Performs an randomized loyalty change for an individual
+     * Performs a randomized loyalty change for an individual
      *
      * @param campaign The current campaign
      * @param isMajor Flag to indicate if the loyalty change is major.
@@ -1162,12 +1162,9 @@ public class Person {
 
         applyLoyaltyChange.accept(roll);
 
-        if ((isVerbose) && (originalLoyalty != loyalty)) {
-            if (originalLoyalty > loyalty) {
-                campaign.addReport(String.format(resources.getString("loyaltyChangePositive.text"), getHyperlinkedFullTitle()));
-            } else {
-                campaign.addReport(String.format(resources.getString("loyaltyChangeNegative.text"), getHyperlinkedFullTitle()));
-            }
+        if (isVerbose && originalLoyalty != loyalty) {
+
+            reportLoyaltyChange(campaign, originalLoyalty);
         }
     }
 
@@ -1201,10 +1198,34 @@ public class Person {
             applyLoyaltyChange.accept(Compute.d6(3));
         }
 
-        if (isVerbose && (originalLoyalty != loyalty)) {
-            String messageKey = originalLoyalty > loyalty ? "loyaltyChangePositive.text" : "loyaltyChangeNegative.text";
-            campaign.addReport(String.format(resources.getString(messageKey), getHyperlinkedFullTitle()));
+        if ((isVerbose) && (originalLoyalty != loyalty)) {
+            reportLoyaltyChange(campaign, originalLoyalty);
         }
+    }
+
+    /**
+     * Reports the change in loyalty.
+     *
+     * @param campaign         The campaign for which the loyalty change is being reported.
+     * @param originalLoyalty  The original loyalty value before the change.
+     */
+    private void reportLoyaltyChange(Campaign campaign, int originalLoyalty) {
+        StringBuilder changeString = new StringBuilder();
+        String color;
+
+        // choose the color and string based on the loyalty comparison.
+        if (originalLoyalty > loyalty) {
+            color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            changeString.append(resources.getString("loyaltyChangeNegative.text"));
+        } else {
+            color = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            changeString.append(resources.getString("loyaltyChangePositive.text"));
+        }
+
+        String report = String.format(resources.getString("loyaltyChangeReport.text"), getHyperlinkedFullTitle(),
+                "<span color=" + color + "'>", changeString, "</span>");
+
+        campaign.addReport(report);
     }
 
     /**

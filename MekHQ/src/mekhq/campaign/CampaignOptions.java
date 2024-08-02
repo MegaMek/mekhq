@@ -266,6 +266,7 @@ public class CampaignOptions {
     private boolean enableTimeAwards;
     private boolean enableTrainingAwards;
     private boolean enableMiscAwards;
+    private String awardSetFilterList;
     //endregion Personnel Tab
 
     //region Life Paths Tab
@@ -462,6 +463,7 @@ public class CampaignOptions {
     //endregion Mercenary Tab
 
     //region Experience Tab
+    private double xpCostMultiplier;
     private int scenarioXP;
     private int killXPAward;
     private int killsForXP;
@@ -475,6 +477,10 @@ public class CampaignOptions {
     private int contractNegotiationXP;
     private int adminXP;
     private int adminXPPeriod;
+    private int missionXpFail;
+    private int missionXpSuccess;
+    private int missionXpOutstandingSuccess;
+
     private int edgeCost;
     //endregion Experience Tab
 
@@ -812,6 +818,7 @@ public class CampaignOptions {
         setEnableTimeAwards(true);
         setEnableTrainingAwards(true);
         setEnableMiscAwards(true);
+        setAwardSetFilterList("");
         //endregion Personnel Tab
 
         //region Life Paths Tab
@@ -1056,6 +1063,7 @@ public class CampaignOptions {
         //endregion Mercenary Tab
 
         //region Experience Tab
+        xpCostMultiplier = 1.00;
         scenarioXP = 1;
         killXPAward = 0;
         killsForXP = 0;
@@ -1069,6 +1077,9 @@ public class CampaignOptions {
         contractNegotiationXP = 0;
         adminXP = 0;
         adminXPPeriod = 1;
+        missionXpFail = 1;
+        missionXpSuccess = 3;
+        missionXpOutstandingSuccess = 5;
         edgeCost = 10;
         //endregion Experience Tab
 
@@ -3057,6 +3068,14 @@ public class CampaignOptions {
     public void setEnableMiscAwards(final boolean enableMiscAwards) {
         this.enableMiscAwards = enableMiscAwards;
     }
+
+    public String getAwardSetFilterList() {
+        return awardSetFilterList;
+    }
+
+    public void setAwardSetFilterList(final String awardSetFilterList) {
+        this.awardSetFilterList = awardSetFilterList;
+    }
     //endregion Awards
     //endregion Personnel Tab
 
@@ -3518,6 +3537,14 @@ public class CampaignOptions {
         this.useQuirks = useQuirks;
     }
 
+    public double getXpCostMultiplier() {
+        return xpCostMultiplier;
+    }
+
+    public void setXpCostMultiplier(final double xpCostMultiplier) {
+        this.xpCostMultiplier = xpCostMultiplier;
+    }
+
     public int getScenarioXP() {
         return scenarioXP;
     }
@@ -3732,6 +3759,30 @@ public class CampaignOptions {
 
     public void setAdminXPPeriod(final int adminXPPeriod) {
         this.adminXPPeriod = adminXPPeriod;
+    }
+
+    public int getMissionXpFail() {
+        return missionXpFail;
+    }
+
+    public void setMissionXpFail(final int missionXpFail) {
+        this.missionXpFail = missionXpFail;
+    }
+
+    public int getMissionXpSuccess() {
+        return missionXpFail;
+    }
+
+    public void setMissionXpSuccess(final int missionXpSuccess) {
+        this.missionXpSuccess = missionXpSuccess;
+    }
+
+    public int getMissionXpOutstandingSuccess() {
+        return missionXpOutstandingSuccess;
+    }
+
+    public void setMissionXpOutstandingSuccess(final int missionXpOutstandingSuccess) {
+        this.missionXpOutstandingSuccess = missionXpOutstandingSuccess;
     }
 
     public int getEdgeCost() {
@@ -4443,6 +4494,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechFirst", assignedTechFirst);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", resetToFirstTech);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQuirks", useQuirks);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpCostMultiplier", xpCostMultiplier);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioXP", scenarioXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killsForXP", killsForXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killXPAward", killXPAward);
@@ -4456,6 +4508,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractNegotiationXP", contractNegotiationXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminWeeklyXP", adminXP);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminXPPeriod", adminXPPeriod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionXpFail", missionXpFail);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionXpSuccess", missionXpSuccess);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionXpOutstandingSuccess", missionXpOutstandingSuccess);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeCost", edgeCost);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitByYear", limitByYear);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disallowExtinctStuff", disallowExtinctStuff);
@@ -4606,6 +4661,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTimeAwards", isEnableTimeAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTrainingAwards", isEnableTrainingAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableMiscAwards", isEnableMiscAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardSetFilterList", getAwardSetFilterList());
         //endregion Awards
         //endregion Personnel Tab
 
@@ -4996,6 +5052,8 @@ public class CampaignOptions {
                     retVal.resetToFirstTech = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
                     retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("xpCostMultiplier")) {
+                    retVal.xpCostMultiplier = Double.parseDouble(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
                     retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {
@@ -5020,8 +5078,12 @@ public class CampaignOptions {
                     retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adminWeeklyXP")) {
                     retVal.adminXP = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("adminXPPeriod")) {
-                    retVal.adminXPPeriod = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionXpFail")) {
+                    retVal.missionXpFail = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionXpSuccess")) {
+                    retVal.missionXpSuccess = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionXpOutstandingSuccess")) {
+                    retVal.missionXpOutstandingSuccess = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("edgeCost")) {
                     retVal.edgeCost = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
@@ -5336,6 +5398,8 @@ public class CampaignOptions {
                     retVal.setEnableTrainingAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableMiscAwards")) {
                     retVal.setEnableMiscAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("awardSetFilterList")) {
+                    retVal.setAwardSetFilterList(wn2.getTextContent().trim());
                     //endregion Awards
                     //endregion Personnel Tab
 

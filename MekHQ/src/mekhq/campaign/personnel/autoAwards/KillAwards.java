@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.campaign.Campaign;
@@ -46,7 +64,7 @@ public class KillAwards {
         int forceDepth;
 
         try {
-            maximumDepth = Force.getMaximumDepth(campaign.getForce(0), null);
+            maximumDepth = Force.getMaximumDepth(campaign.getForce(0), 0);
             forceId = campaign.getPerson(person).getUnit().getForceId();
             forceDepth = Force.getDepth(campaign.getForce(forceId));
         } catch (Exception e) {
@@ -117,7 +135,7 @@ public class KillAwards {
                         break;
                     // company
                     case 2:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), null);
+                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
 
                         if (maximumDepth <= 2) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
@@ -128,7 +146,7 @@ public class KillAwards {
                         break;
                     // battalion
                     case 3:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), null);
+                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
 
                         if (maximumDepth <= 3) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
@@ -139,7 +157,7 @@ public class KillAwards {
                         break;
                     // regiment
                     case 4:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), null);
+                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
 
                         if (maximumDepth <= 4) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
@@ -150,7 +168,7 @@ public class KillAwards {
                         break;
                     // brigade
                     case 5:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), null);
+                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
 
                         if (maximumDepth <= 5) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
@@ -161,7 +179,7 @@ public class KillAwards {
                         break;
                     // division
                     case 6:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), null);
+                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
 
                         if (maximumDepth <= 6) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
@@ -172,7 +190,7 @@ public class KillAwards {
                         break;
                     // corps
                     case 7:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), null);
+                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
 
                         if (maximumDepth <= 7) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
@@ -183,7 +201,7 @@ public class KillAwards {
                         break;
                     // army
                     case 8:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), null);
+                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
 
                         if (maximumDepth <= 8) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));

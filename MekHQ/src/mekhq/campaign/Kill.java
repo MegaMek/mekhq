@@ -2,7 +2,7 @@
  * Kill.java
  *
  * Copyright (c) 2011 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,8 +22,8 @@
 package mekhq.campaign;
 
 import megamek.Version;
+import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -43,65 +43,107 @@ public class Kill {
     private String killer;
     private int missionId = 0;
     private int scenarioId = 0;
+    private int forceId = 0;
+    private long unitType = 0;
+
+    private static final MMLogger logger = MMLogger.create(Kill.class);
 
     public Kill() {
     }
 
-    public Kill(UUID id, String kill, String killer, LocalDate d, int missionId, int scenarioId) {
+    public Kill(UUID id, String kill, String killer, LocalDate d, int missionId, int scenarioId, int forceId, long unitType) {
         pilotId = id;
         this.killed = kill;
         this.killer = killer;
         date = d;
         this.missionId = missionId;
         this.scenarioId = scenarioId;
+        this.forceId = forceId;
+        this.unitType = unitType;
     }
 
+    @SuppressWarnings(value = "unused")
     public UUID getPilotId() {
         return pilotId;
     }
 
+    @SuppressWarnings(value = "unused")
     public void setPilotId(UUID id) {
         pilotId = id;
     }
 
+    @SuppressWarnings(value = "unused")
     public LocalDate getDate() {
         return date;
     }
 
-    public String getWhatKilled() {
-        return killed;
-    }
-
-    public String getKilledByWhat() {
-        return killer;
-    }
-
-    public int getMissionId() {
-        return missionId;
-    }
-
-    public int getScenarioId() {
-        return scenarioId;
-    }
-
+    @SuppressWarnings(value = "unused")
     public void setDate(LocalDate d) {
         date = d;
     }
 
+    @SuppressWarnings(value = "unused")
+    public String getWhatKilled() {
+        return killed;
+    }
+
+    @SuppressWarnings(value = "unused")
     public void setWhatKilled(String s) {
         killed = s;
     }
 
+    @SuppressWarnings(value = "unused")
+    public String getKilledByWhat() {
+        return killer;
+    }
+
+    @SuppressWarnings(value = "unused")
     public void setKilledByWhat(String s) {
         killer = s;
     }
 
+    @SuppressWarnings(value = "unused")
+    public int getMissionId() {
+        return missionId;
+    }
+
+    @SuppressWarnings(value = "unused")
     public void setMissionId(int id) {
         missionId = id;
     }
 
+    @SuppressWarnings(value = "unused")
+    public int getScenarioId() {
+        return scenarioId;
+    }
+
+    @SuppressWarnings(value = "unused")
     public void setScenarioId(int id) {
         scenarioId = id;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public int getForceId() {
+        return forceId;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setForceId(final int id) {
+        forceId = id;
+    }
+
+    /**
+     * @return the long corresponding to the Entity type killed,
+     * or -1 if the kill does not have a unit type logged
+     */
+    @SuppressWarnings(value = "unused")
+    public long getUnitType() {
+        return unitType;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setUnitType(final long type) {
+        unitType = type;
     }
 
     public static Kill generateInstanceFromXML(Node wn, Version version) {
@@ -124,13 +166,17 @@ public class Kill {
                     retVal.missionId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitType")) {
+                    retVal.unitType = Long.parseLong(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
+                    retVal.forceId = Integer.parseInt(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
         return retVal;
     }
@@ -143,11 +189,13 @@ public class Kill {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionId", missionId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioId", scenarioId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceId", forceId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitType", unitType);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "kill");
     }
 
     @Override
     public Kill clone() {
-        return new Kill(getPilotId(), getWhatKilled(), getKilledByWhat(), getDate(), getMissionId(), getScenarioId());
+        return new Kill(getPilotId(), getWhatKilled(), getKilledByWhat(), getDate(), getMissionId(), getScenarioId(), getForceId(), getUnitType());
     }
 }
