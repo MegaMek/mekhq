@@ -22,6 +22,7 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.options.IOption;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -31,19 +32,16 @@ import mekhq.campaign.ExtraData.StringKey;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * AbstractProcreation is the baseline class for procreation and birth in MekHQ. It holds all the
@@ -359,15 +357,6 @@ public abstract class AbstractProcreation {
                 baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
             }
 
-            // set education
-            baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-
-            // set loyalty
-            baby.setLoyalty(Compute.d6(4, 3));
-
-            // set baby's personality
-            PersonalityController.generatePersonality(baby);
-
             // Recruit the baby
             campaign.recruitPerson(baby, prisonerStatus, true, true);
         }
@@ -408,6 +397,7 @@ public abstract class AbstractProcreation {
         // Create genealogy information
         baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
         mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
+
         if (father != null) {
             baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
             father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
@@ -438,19 +428,24 @@ public abstract class AbstractProcreation {
             baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(mother, father, baby.getGender()));
 
-            baby.setBirthday(today);
+            baby.setBirthday(today);// Limit skills by age for children and adolescents
+
+            baby.removeAllSkills();
+
+            // re-roll SPAs to include in any age and skill adjustments
+            Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
+
+            for (IOption option : Collections.list(options)) {
+                baby.getOptions().getOption(option.getName()).clearValue();
+            }
+
+            baby.setLoyalty(Compute.d6(3) + 2);
+
+            // set education based on age
+            baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
 
             // Create reports and log the birth
             logAndUpdateFamily(campaign, today, mother, baby, father);
-
-            // set education
-            baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-
-            // set loyalty
-            baby.setLoyalty(Compute.d6(4, 3));
-
-            // set baby's personality
-            PersonalityController.generatePersonality(baby);
 
             // add to the list of babies
             babies.add(baby);
@@ -536,8 +531,22 @@ public abstract class AbstractProcreation {
         }
 
         // Make the required checks for random procreation
+        processRandomProcreationCheck(campaign, today, person, false);
+    }
+
+    /**
+     * Checks if a person randomly procreates on the given day in the campaign.
+     * If the person does procreate, add a pregnancy to the campaign for the person.
+     *
+     * @param campaign The campaign to check procreation for.
+     * @param today The current date.
+     * @param person The person to check for procreation.
+     * @param isNoReport true, if the player shouldn't be informed, otherwise false
+     */
+    public void processRandomProcreationCheck(final Campaign campaign, final LocalDate today,
+                                              final Person person, boolean isNoReport) {
         if (randomlyProcreates(today, person)) {
-            addPregnancy(campaign, today, person, false);
+            addPregnancy(campaign, today, person, isNoReport);
         }
     }
 

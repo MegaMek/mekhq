@@ -358,7 +358,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 gui.getCampaign().getMarriage().marry(gui.getCampaign(),
                         gui.getCampaign().getLocalDate(), selectedPerson,
                         gui.getCampaign().getPerson(UUID.fromString(data[1])),
-                        MergingSurnameStyle.valueOf(data[2]));
+                        MergingSurnameStyle.valueOf(data[2]), false);
                 break;
             }
             case CMD_ADD_AWARD: {

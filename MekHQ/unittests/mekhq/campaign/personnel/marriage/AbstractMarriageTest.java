@@ -233,22 +233,25 @@ public class AbstractMarriageTest {
 
     @Test
     public void testMarry() {
-        doCallRealMethod().when(mockMarriage).marry(any(), any(), any(), any(), any());
+        doCallRealMethod().when(mockMarriage).marry(any(), any(), any(), any(), any(), anyBoolean());
 
         when(mockCampaign.getRankSystem()).thenReturn(mock(RankSystem.class));
         doNothing().when(mockCampaign).addReport(any());
 
         final Person origin = new Person("Origin", "Origin", mockCampaign);
+        origin.setJoinedCampaign(LocalDate.ofYearDay(3025, 1));
+
         final Person spouse = new Person("Spouse", "Spouse", mockCampaign);
+        spouse.setJoinedCampaign(LocalDate.ofYearDay(3025, 1));
 
         final MergingSurnameStyle mockMergingSurnameStyle = mock(MergingSurnameStyle.class);
         doNothing().when(mockMergingSurnameStyle).apply(any(), any(), any(), any());
 
-        mockMarriage.marry(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, null, mockMergingSurnameStyle);
+        mockMarriage.marry(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, null, mockMergingSurnameStyle, false);
         assertNull(origin.getMaidenName());
         assertFalse(origin.getGenealogy().hasSpouse());
 
-        mockMarriage.marry(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse, mockMergingSurnameStyle);
+        mockMarriage.marry(mockCampaign, LocalDate.ofYearDay(3025, 1), origin, spouse, mockMergingSurnameStyle, false);
         assertEquals("Origin", origin.getMaidenName());
         assertEquals("Spouse", spouse.getMaidenName());
         assertEquals(origin, spouse.getGenealogy().getSpouse());
@@ -260,27 +263,27 @@ public class AbstractMarriageTest {
     @Test
     public void testProcessNewWeek() {
         doCallRealMethod().when(mockMarriage).processNewWeek(any(), any(), any());
-        doNothing().when(mockMarriage).marryRandomSpouse(any(), any(), any(), anyBoolean(), anyBoolean());
+        doNothing().when(mockMarriage).marryRandomSpouse(any(), any(), any(), anyBoolean(), anyBoolean(), eq(true));
 
         final Person mockPerson = mock(Person.class);
 
         when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn("Married");
         mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(0)).randomMarriage(any());
-        verify(mockMarriage, times(0)).marryRandomSpouse(any(), any(), any(), anyBoolean(), eq(true));
+        verify(mockMarriage, times(0)).marryRandomSpouse(any(), any(), any(), anyBoolean(), anyBoolean(), anyBoolean());
 
         when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn(null);
         when(mockMarriage.randomMarriage(any())).thenReturn(true);
         mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(1)).randomMarriage(any());
-        verify(mockMarriage, times(1)).marryRandomSpouse(any(), any(), any(), anyBoolean(), eq(false));
+        verify(mockMarriage, times(1)).marryRandomSpouse(any(), any(), any(), anyBoolean(), anyBoolean(), anyBoolean());
     }
 
 
     //region Random Marriage
     @Test
     public void testMarryRandomSpouse() {
-        doCallRealMethod().when(mockMarriage).marryRandomSpouse(any(), any(), any(), anyBoolean(), eq(true));
+        doCallRealMethod().when(mockMarriage).marryRandomSpouse(any(), any(), any(), anyBoolean(), eq(true), eq(true));
 
         final Person mockMale = mock(Person.class);
         when(mockMale.getGender()).thenReturn(Gender.MALE);
@@ -298,7 +301,7 @@ public class AbstractMarriageTest {
 
         // No Potential Spouses
         when(mockMarriage.isPotentialRandomSpouse(any(), any(), any(), any(), any())).thenReturn(false);
-        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true);
+        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true, true);
 
         // Replace AbstractMarriage::isPotentialRandomSpouse with this simple gender comparison
         doAnswer(invocation -> invocation.getArgument(3, Person.class).getGender() == invocation.getArgument(4))
@@ -309,16 +312,16 @@ public class AbstractMarriageTest {
             final Person spouse = invocation.getArgument(3);
             assertEquals(spouse, mockFemale);
             return null;
-        }).when(mockMarriage).marry(any(), any(), any(), any(), any());
-        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true);
+        }).when(mockMarriage).marry(any(), any(), any(), any(), any(), anyBoolean());
+        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true, true);
 
         // Opposite sex, Female: Expect marry to be called with mockMale as the spouse
         doAnswer(invocation -> {
             final Person spouse = invocation.getArgument(3);
             assertEquals(spouse, mockMale);
             return null;
-        }).when(mockMarriage).marry(any(), any(), any(), any(), any());
-        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false, true);
+        }).when(mockMarriage).marry(any(), any(), any(), any(), any(), anyBoolean());
+        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false, true, true);
 
         // Same-sex, Male: Expect marry to be called with mockMale as the spouse
         when(mockPerson.getGender()).thenReturn(Gender.MALE);
@@ -326,16 +329,16 @@ public class AbstractMarriageTest {
             final Person spouse = invocation.getArgument(3);
             assertEquals(spouse, mockMale);
             return null;
-        }).when(mockMarriage).marry(any(), any(), any(), any(), any());
-        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true);
+        }).when(mockMarriage).marry(any(), any(), any(), any(), any(), anyBoolean());
+        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true, true, true);
 
         // Opposite sex, Male: Expect marry to be called with mockFemale as the spouse
         doAnswer(invocation -> {
             final Person spouse = invocation.getArgument(3);
             assertEquals(spouse, mockFemale);
             return null;
-        }).when(mockMarriage).marry(any(), any(), any(), any(), any());
-        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false, true);
+        }).when(mockMarriage).marry(any(), any(), any(), any(), any(), anyBoolean());
+        mockMarriage.marryRandomSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false, true, true);
     }
 
     @Test

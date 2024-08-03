@@ -18,11 +18,8 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import java.time.LocalDate;
-import java.util.Objects;
-
-import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.Utilities;
@@ -32,6 +29,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+
+import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Represents a class which can generate new {@link Person} objects
@@ -99,7 +99,7 @@ public abstract class AbstractPersonnelGenerator {
      * @param person The {@link Person} being generated.
      * @return An integer value between {@link SkillType#EXP_ULTRA_GREEN} and {@link SkillType#EXP_ELITE}.
      */
-    protected int generateExperienceLevel(Campaign campaign, Person person) {
+    public int generateExperienceLevel(Campaign campaign, Person person) {
         int bonus = getSkillPreferences().getOverallRecruitBonus()
                 + getSkillPreferences().getRecruitBonus(person.getPrimaryRole());
 

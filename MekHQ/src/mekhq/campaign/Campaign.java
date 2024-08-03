@@ -26,6 +26,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
+import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.AmmoType.Munitions;
 import megamek.common.annotations.Nullable;
@@ -83,15 +84,11 @@ import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
-import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
-import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.generator.*;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -1380,14 +1377,6 @@ public class Campaign implements ITechManager {
             person = newPerson(PersonnelRole.DEPENDENT);
         }
 
-        if (person.getAge(getLocalDate()) < 16) {
-            person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-        } else {
-            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-        }
-
-        PersonalityController.generatePersonality(person);
-
         return person;
     }
 
@@ -1478,13 +1467,6 @@ public class Campaign implements ITechManager {
         if (getCampaignOptions().isUsePortraitForRole(primaryRole)) {
             assignRandomPortraitFor(person);
         }
-
-        // TODO remove this once we have the Personnel Histories module
-        if (person.getAge(getLocalDate()) >= 16) {
-            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-        }
-
-        PersonalityController.generatePersonality(person);
 
         return person;
     }
@@ -1581,147 +1563,118 @@ public class Campaign implements ITechManager {
 
     private void simulateRelationshipHistory(Person person) {
         // how many weeks should the simulation run?
-        // we use weeks as we can get similar results to days for 1/7 of the processing debt
         LocalDate localDate = getLocalDate();
         long weeksBetween = ChronoUnit.WEEKS.between(person.getBirthday().plusYears(18), localDate);
-
-        LogManager.getLogger().info(weeksBetween);
 
         // this means there is nothing to simulate
         if (weeksBetween == 0) {
             return;
         }
 
-        // get all the variables needed for the simulation
-
-        // procreation chances
-        double childChanceRelationship = getCampaignOptions().getRandomProcreationMethod().isPercentage() ?
-                getCampaignOptions().getPercentageRandomProcreationRelationshipChance() * 7 : 0;
-
-        double childChanceRelationshipless = getCampaignOptions().getRandomProcreationMethod().isPercentage() ?
-                getCampaignOptions().getPercentageRandomProcreationRelationshiplessChance() * 7 : 0;
-
-        // marriage chances & age range
-        double relationshipChanceOppositeSex = getCampaignOptions().getRandomMarriageMethod().isPercentage() ?
-                getCampaignOptions().getPercentageRandomMarriageOppositeSexChance() * 7 : 0;
-
-        double relationshipChanceSameSex = (getCampaignOptions().isUseRandomSameSexMarriages() && getCampaignOptions().getRandomMarriageMethod().isPercentage()) ?
-                    getCampaignOptions().getPercentageRandomMarriageSameSexChance() * 7 : 0;
-
-        int relationshipAgeRange = getCampaignOptions().getRandomMarriageAgeRange();
-
-        double relationshipChance = Math.max(relationshipChanceOppositeSex, relationshipChanceSameSex);
-
-        // divorce chances
-        double divorceChanceOppositeSex = getCampaignOptions().getRandomDivorceMethod().isPercentage() ?
-                getCampaignOptions().getPercentageRandomDivorceOppositeSexChance() * 7 : 0;
-
-        double divorceChanceSameSex = (getCampaignOptions().isUseRandomSameSexDivorce() && getCampaignOptions().getRandomDivorceMethod().isPercentage()) ?
-                getCampaignOptions().getPercentageRandomDivorceSameSexChance() * 7 : 0;
-
-        double divorceChance = Math.max(divorceChanceOppositeSex, divorceChanceSameSex);
-
         List<Person> children = new ArrayList<>();
         Person currentSpouse = null;
 
-        Gender spouseGender = Gender.FEMALE;
-
-        if (getCampaignOptions().isUseRandomSameSexMarriages()) {
-            spouseGender = Gender.RANDOMIZE;
-        } else if (person.getGender().isFemale()) {
-            spouseGender = Gender.MALE;
-        }
-
         // run the simulation
         for (long weeksRemaining = weeksBetween; weeksRemaining >= 0; weeksRemaining--) {
-            if (currentSpouse == null) {
-                // first, we check for out-of-relationship children
-                if (person.getGender().isFemale()) {
-                    if (Compute.randomFloat() <= childChanceRelationshipless) {
-                        // if the person was not old enough at potential conception, we skip
-                        if (person.getAge(localDate.minusWeeks(weeksRemaining + 40)) < 18) {
-                            continue;
-                        }
+            LocalDate currentDate = getLocalDate().plusWeeks(weeksRemaining);
 
-                        getProcreation().addPregnancy(this, localDate.minusWeeks(weeksRemaining + 40), person, true);
-                        children.addAll(getProcreation().birthHistoric(this, localDate.minusWeeks(weeksRemaining), person, null));
+            logger.info(weeksRemaining);
+
+            // first, we check for old relationships ending and new relationships beginning
+            if (currentSpouse != null) {
+                logger.info("relationship ending roll");
+                getDivorce().processNewWeek(this, currentDate, person);
+
+                List<Person> toRemove = new ArrayList<>();
+
+                // there is a chance a departing spouse might take some of their children with them
+                for (Person child : children) {
+                    if (child.getGenealogy().getParents().contains(currentSpouse)) {
+                        if (Compute.randomInt(2) == 0) {
+                            toRemove.add(child);
+                        }
                     }
                 }
 
-                // then, we check for new relationships
-                if (Compute.randomFloat() <= relationshipChance) {
-                    currentSpouse = newDependent(false, spouseGender);
+                children.removeAll(toRemove);
 
-                    currentSpouse.setOriginFaction(person.getOriginFaction());
-                    currentSpouse.setOriginPlanet(person.getOriginPlanet());
-
-
-                    // this needs to be 19, not 18, due to rounding errors making it possible to have 17-year-old spouses if we put 18
-                    currentSpouse.setBirthday(localDate.minusYears(Math.max(19, person.getAge(localDate) - Compute.randomInt(relationshipAgeRange))));
-
-                    AbstractMarriage.performMarriageChanges(this, localDate.minusWeeks(weeksRemaining), person, currentSpouse, MergingSurnameStyle.WEIGHTED);
-                }
+                currentSpouse = null;
             } else {
-                // add age appropriate female personnel to a list
-                List<Person> potentialMothers = new ArrayList<>();
+                logger.info("relationship starting roll");
+                getMarriage().processBackgroundMarriageRolls(this, currentDate, person);
 
-                if ((person.getGender().isFemale()) && (person.getAge(localDate.minusWeeks(weeksRemaining + 40)) >= 18)) {
-                    potentialMothers.add(person);
+                if (person.getGenealogy().hasSpouse()) {
+                    currentSpouse = person.getGenealogy().getSpouse();
                 }
+            }
 
-                if ((currentSpouse.getGender().isFemale()) && (person.getAge(localDate.minusWeeks(weeksRemaining + 40)) >= 18)) {
-                    potentialMothers.add(currentSpouse);
+            logger.info(currentSpouse);
+
+            // then we check for children
+            if (person.getGender().isFemale()) {
+                logger.info("rolling for Person pregnancy");
+                getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining), person, true);
+
+                if (person.isPregnant()) {
+                    children.addAll(getProcreation().birthHistoric(this, person.getDueDate(), person, null));
                 }
+            }
 
-                if (!potentialMothers.isEmpty()) {
-                    Collections.shuffle(potentialMothers);
+            if ((currentSpouse != null) && (currentSpouse.getGender().isFemale())) {
+                logger.info("rolling for Spouse pregnancy");
+                getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining), person, true);
 
-                    // pick mother and father, if there are no males in the relationship father remains null
-                    Person potentialMother = potentialMothers.get(0);
-                    Person potentialFather = null;
-
-                    if (person.equals(potentialMother)) {
-                        if (currentSpouse.getGender().isMale()) {
-                            potentialFather = currentSpouse;
-                        }
-                    } else {
-                        if (person.getGender().isMale()) {
-                            potentialFather = person;
-                        }
-                    }
-
-                    // next we check for out-of-relationship children
-                    if (Compute.randomFloat() <= childChanceRelationship) {
-                        getProcreation().addPregnancy(this, localDate.minusWeeks(weeksRemaining + 40), potentialMother, true);
-                        children.addAll(getProcreation().birthHistoric(this, localDate.minusWeeks(weeksRemaining), potentialMother, potentialFather));
-                    }
-
-                    // here, we check for relationships ending
-                    if (Compute.randomFloat() <= divorceChance) {
-                        getDivorce().divorceHistoric(this, localDate.minusWeeks(weeksRemaining), person);
-
-                        // there is a chance the departing spouse will take some children with them
-                        children.removeIf(child -> (Compute.randomInt(1) == 0));
-
-                        currentSpouse = null;
-                    }
+                if (person.isPregnant()) {
+                    getProcreation().birthHistoric(this, person.getDueDate(), person, null);
                 }
             }
         }
 
-        // finally, we add the current spouse (if any) and any remaining children to the unit
-        if (currentSpouse != null) {
+        logger.info("simulation has ended for {}", person.getFullTitle());
 
+        // with the simulation concluded, we add the current spouse (if any) and any remaining children to the unit
+        if (currentSpouse != null) {
             recruitPerson(currentSpouse, PrisonerStatus.FREE, true, true);
         }
 
-        if (!children.isEmpty()) {
-            for (Person child : children) {
-                child.setOriginFaction(person.getOriginFaction());
-                child.setOriginPlanet(person.getOriginPlanet());
+        for (Person child : children) {
+            child.setOriginFaction(person.getOriginFaction());
+            child.setOriginPlanet(person.getOriginPlanet());
 
-                recruitPerson(child, PrisonerStatus.FREE, true, true);
+            int age = child.getAge(localDate);
+
+            // Limit skills by age for children and adolescents
+            if (age < 16) {
+                child.removeAllSkills();
+            } else if (age < 18) {
+                child.limitSkills(0);
             }
+
+            // re-roll SPAs to include in any age and skill adjustments
+            Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
+
+            for (IOption option : Collections.list(options)) {
+                child.getOptions().getOption(option.getName()).clearValue();
+            }
+
+            int experienceLevel = child.getExperienceLevel(this, false);
+
+            // set loyalty
+            if (experienceLevel <= 0) {
+                person.setLoyalty(Compute.d6(3) + 2);
+            } else if (experienceLevel == 1) {
+                person.setLoyalty(Compute.d6(3) + 1);
+            } else {
+                person.setLoyalty(Compute.d6(3));
+            }
+
+            if (experienceLevel >= 0) {
+                AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
+                specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+                specialAbilityGenerator.generateSpecialAbilities(this, child, experienceLevel);
+            }
+
+            recruitPerson(child, PrisonerStatus.FREE, true, true);
         }
     }
     //endregion Personnel Recruitment

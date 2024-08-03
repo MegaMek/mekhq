@@ -28,7 +28,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
     //region Constructors
@@ -62,8 +61,13 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         // roll small arms skill
         if (!person.getSkills().hasSkill(SkillType.S_SMALL_ARMS)) {
             int sarmsLvl = Utilities.generateExpLevel(
-                    (primaryRole.isSupport() || secondaryRole.isSupport(true))
+                    (primaryRole.isSupport(true) || secondaryRole.isSupport(true))
                             ? rskillPrefs.getSupportSmallArmsBonus() : rskillPrefs.getCombatSmallArmsBonus());
+
+            if (primaryRole.isCivilian()) {
+                sarmsLvl = 0;
+            }
+
             if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
                 addSkill(person, SkillType.S_SMALL_ARMS, sarmsLvl, rskillPrefs.randomizeSkill(), bonus);
             }
@@ -100,7 +104,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
             final List<String> possibleSkills = Arrays.stream(SkillType.skillList)
                     .filter(stype -> !person.getSkills().hasSkill(stype))
-                    .collect(Collectors.toList());
+                    .toList();
             String selSkill = possibleSkills.get(Compute.randomInt(possibleSkills.size()));
             int secondLvl = Utilities.generateExpLevel(rskillPrefs.getSecondSkillBonus());
             addSkill(person, selSkill, secondLvl, rskillPrefs.randomizeSkill(), bonus);

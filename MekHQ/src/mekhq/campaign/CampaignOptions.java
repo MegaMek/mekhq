@@ -369,8 +369,6 @@ public class CampaignOptions {
     //region Turnover and Retention
     private boolean useRandomRetirement;
 
-    private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
-    private SkillLevel turnoverDifficulty;
     private int turnoverFixedTargetNumber;
     private boolean aeroRecruitsHaveUnits;
     private boolean trackOriginalUnit;

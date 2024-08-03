@@ -21,9 +21,12 @@ package mekhq.campaign.personnel.generator;
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
@@ -82,20 +85,28 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         generateBirthday(campaign, person, expLvl, person.isClanPersonnel() && !person.getPhenotype().isNone());
 
-        if (expLvl == 0) {
-            person.setLoyalty(Compute.d6(3) + 2);
-        } else if (expLvl == 1) {
-            person.setLoyalty(Compute.d6(3) + 1);
-        } else {
-            person.setLoyalty(Compute.d6(3));
-        }
-
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(getSkillPreferences());
         skillGenerator.generateSkills(campaign, person, expLvl);
 
-        AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-        specialAbilityGenerator.setSkillPreferences(getSkillPreferences());
-        specialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl);
+        // Limit skills by age for children and adolescents
+        int age = person.getAge(campaign.getLocalDate());
+
+        if (age < 16) {
+            person.removeAllSkills();
+            // regenerate expLvl to factor in skill changes from age
+            expLvl = generateExperienceLevel(campaign, person);
+        } else if (age < 18) {
+            person.limitSkills(1);
+
+            expLvl = generateExperienceLevel(campaign, person);
+        }
+
+        // set SPAs
+        if (expLvl >= 0) {
+            AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
+            specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+            specialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl);
+        }
 
         // Do naming at the end, to ensure the keys are set
         generateName(campaign, person, gender);
@@ -104,6 +115,25 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         campaign.checkBloodnameAdd(person, false);
 
         person.setDaysToWaitForHealing(campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
+
+        // set loyalty
+        if (expLvl <= 0) {
+            person.setLoyalty(Compute.d6(3) + 2);
+        } else if (expLvl == 1) {
+            person.setLoyalty(Compute.d6(3) + 1);
+        } else {
+            person.setLoyalty(Compute.d6(3));
+        }
+
+        // set education based on age
+        if (age < 16) {
+            person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+        } else {
+            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
+        }
+
+        // generate personality
+        PersonalityController.generatePersonality(person);
 
         // generate background
         BackgroundsController.generateBackground(campaign, person);
