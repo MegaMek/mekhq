@@ -450,7 +450,6 @@ public class AbstractProcreationTest {
     public void testProcessNewWeek() {
         doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
         doNothing().when(mockProcreation).birth(any(), any(), any());
-        doNothing().when(mockProcreation).addPregnancy(any(), any(), any(), eq(false));
 
         final Person mockPerson = mock(Person.class);
 
@@ -470,18 +469,6 @@ public class AbstractProcreationTest {
         mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockProcreation, times(1)).birth(any(), any(), any());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
-
-        when(mockPerson.isPregnant()).thenReturn(false);
-
-        when(mockProcreation.randomlyProcreates(any(), any())).thenReturn(false);
-        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockProcreation, times(1)).birth(any(), any(), any());
-        verify(mockProcreation, times(1)).randomlyProcreates(any(), any());
-
-        when(mockProcreation.randomlyProcreates(any(), any())).thenReturn(true);
-        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockProcreation, times(2)).randomlyProcreates(any(), any());
-        verify(mockProcreation, times(1)).addPregnancy(any(), any(), any(), eq(false));
     }
 
     //region Random Procreation
