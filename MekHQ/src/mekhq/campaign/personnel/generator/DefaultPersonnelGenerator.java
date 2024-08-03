@@ -77,7 +77,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         person.setPrimaryRoleDirect(primaryRole);
         person.setSecondaryRoleDirect(secondaryRole);
 
-        int expLvl = generateExperienceLevel(campaign, person);
+        int expLvl = generateExperienceLevel(person);
 
         generateXp(campaign, person);
 
@@ -94,11 +94,11 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         if (age < 16) {
             person.removeAllSkills();
             // regenerate expLvl to factor in skill changes from age
-            expLvl = generateExperienceLevel(campaign, person);
+            expLvl = generateExperienceLevel(person);
         } else if (age < 18) {
             person.limitSkills(1);
 
-            expLvl = generateExperienceLevel(campaign, person);
+            expLvl = generateExperienceLevel(person);
         }
 
         // set SPAs

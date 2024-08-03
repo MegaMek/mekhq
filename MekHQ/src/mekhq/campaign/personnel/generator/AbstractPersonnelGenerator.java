@@ -95,11 +95,10 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Generates an experience level for a {@link Person}.
-     * @param campaign The {@link Campaign} which tracks the person.
      * @param person The {@link Person} being generated.
      * @return An integer value between {@link SkillType#EXP_ULTRA_GREEN} and {@link SkillType#EXP_ELITE}.
      */
-    public int generateExperienceLevel(Campaign campaign, Person person) {
+    public int generateExperienceLevel(Person person) {
         int bonus = getSkillPreferences().getOverallRecruitBonus()
                 + getSkillPreferences().getRecruitBonus(person.getPrimaryRole());
 

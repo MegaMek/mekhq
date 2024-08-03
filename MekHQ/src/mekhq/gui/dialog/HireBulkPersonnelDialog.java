@@ -65,11 +65,6 @@ public class HireBulkPersonnelDialog extends JDialog {
     private JSpinner spnNumber;
     private JTextField jtf;
 
-    private JButton btnHire;
-    private JButton btnGmHire;
-    private JButton btnClose;
-    private JPanel panButtons;
-
     private JSpinner minAge;
     private JSpinner maxAge;
 
@@ -110,10 +105,10 @@ public class HireBulkPersonnelDialog extends JDialog {
         choiceType = new JComboBox<>();
         choiceRanks = new JComboBox<>();
 
-        btnHire = new JButton(resourceMap.getString("btnHire.text"));
-        btnGmHire = new JButton(resourceMap.getString("btnGmHire.text"));
-        btnClose = new JButton(resourceMap.getString("btnClose.text"));
-        panButtons = new JPanel(new GridBagLayout());
+        JButton btnHire = new JButton(resourceMap.getString("btnHire.text"));
+        JButton btnGmHire = new JButton(resourceMap.getString("btnGmHire.text"));
+        JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
+        JPanel panButtons = new JPanel(new GridBagLayout());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
