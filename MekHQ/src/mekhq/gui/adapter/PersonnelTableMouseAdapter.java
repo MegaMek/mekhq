@@ -147,6 +147,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_JETTISON = "JETTISON";
     private static final String CMD_RECRUIT = "RECRUIT";
     private static final String CMD_ABTAKHA = "ABTAKHA";
+    private static final String CMD_ADOPTION = "ADOPTION";
     private static final String CMD_RANSOM = "RANSOM";
     private static final String CMD_RANSOM_FRIENDLY = "RANSOM_FRIENDLY";
 
@@ -696,6 +697,34 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.FREE, true);
                     }
                 }
+                break;
+            }
+            case CMD_ADOPTION: {
+                Person orphan = gui.getCampaign().getPerson(UUID.fromString(data[1]));
+
+                // clear the old parents
+                for (Person parent : orphan.getGenealogy().getParents()) {
+                    orphan.getGenealogy().removeFamilyMember(FamilialRelationshipType.PARENT, parent);
+                }
+
+                // add the new
+                for (Person person : people) {
+                    person.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, orphan);
+                    orphan.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, person);
+
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+
+                    if (person.getGenealogy().hasSpouse()) {
+                        Person spouse = person.getGenealogy().getSpouse();
+
+                        spouse.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, orphan);
+                        orphan.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, spouse);
+
+                        MekHQ.triggerEvent(new PersonChangedEvent(spouse));
+                    }
+                }
+
+                MekHQ.triggerEvent(new PersonChangedEvent(orphan));
                 break;
             }
             case CMD_RANSOM: {
@@ -1400,6 +1429,30 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(newMenuItem(resources.getString("abtakha.text"), CMD_ABTAKHA));
         }
 
+        if ((oneSelected) && (!person.isChild(gui.getCampaign().getLocalDate()))) {
+            List<Person> orphans = gui.getCampaign().getActivePersonnel().stream()
+                    .filter(child -> (child.isChild(gui.getCampaign().getLocalDate())) && (!child.getGenealogy().hasLivingParents()))
+                    .toList();
+
+            if (!orphans.isEmpty()) {
+                JMenu orphanMenu = new JMenu(resources.getString("adopt.text"));
+
+                for (final Person orphan : orphans) {
+                    String status = String.format(resources.getString("adopt.description"),
+                            orphan.getFullName(),
+                            orphan.getGender(),
+                            orphan.getAge(gui.getCampaign().getLocalDate()));
+
+                    JMenuItem orphanItem = new JMenuItem(status);
+                    orphanItem.setActionCommand(makeCommand(CMD_ADOPTION, String.valueOf(orphan.getId())));
+                    orphanItem.addActionListener(this);
+                    orphanMenu.add(orphanItem);
+                }
+
+                JMenuHelpers.addMenuIfNonEmpty(popup, orphanMenu);
+            }
+        }
+
         final PersonnelRole[] roles = PersonnelRole.values();
         menu = new JMenu(resources.getString("changePrimaryRole.text"));
 
@@ -1444,8 +1497,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(gui.getCampaign(), selected));
 
-        LogManager.getLogger().info(gui.getCampaign().getMarriage().canMarry(gui.getCampaign().getLocalDate(), person, false));
-
         if (oneSelected && person.getStatus().isActive()) {
             if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
                     && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign().getLocalDate(), person, false) == null)) {
@@ -1468,11 +1519,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     final String status;
                     final String founder = potentialSpouse.isFounder() ? resources.getString("spouseFounder.text") : "";
                     if (potentialSpouse.getPrisonerStatus().isBondsman()) {
-                        status = String.format(resources.getString("marriageBondsmanDesc.format"), potentialSpouse.getFullName(), potentialSpouse.getAge(today), potentialSpouse.getRoleDesc(), founder);
+                        status = String.format(resources.getString("marriageBondsmanDesc.format"),
+                                potentialSpouse.getFullName(),
+                                potentialSpouse.getAge(today),
+                                potentialSpouse.getRoleDesc(),
+                                founder);
                     } else if (potentialSpouse.getPrisonerStatus().isCurrentPrisoner()) {
-                        status = String.format(resources.getString("marriagePrisonerDesc.format"), potentialSpouse.getFullName(), potentialSpouse.getAge(today), potentialSpouse.getRoleDesc(), founder);
+                        status = String.format(resources.getString("marriagePrisonerDesc.format"),
+                                potentialSpouse.getFullName(),
+                                potentialSpouse.getAge(today),
+                                potentialSpouse.getRoleDesc(),
+                                founder);
                     } else {
-                        status = String.format(resources.getString("marriagePartnerDesc.format"), potentialSpouse.getFullName(), potentialSpouse.getAge(today), potentialSpouse.getRoleDesc(), founder);
+                        status = String.format(resources.getString("marriagePartnerDesc.format"),
+                                potentialSpouse.getFullName(),
+                                potentialSpouse.getAge(today),
+                                potentialSpouse.getRoleDesc(),
+                                founder);
                     }
 
                     spouseMenu = new JMenu(status);
