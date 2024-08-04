@@ -240,7 +240,7 @@ public abstract class AbstractMarriage {
         }
 
         // log the origin spouse for both partners
-        origin.getGenealogy().setOriginSpouse(spouse);
+        origin.getGenealogy().setOriginSpouse(origin);
         spouse.getGenealogy().setOriginSpouse(origin);
 
         // recruit the spouse if they're not already in the unit
@@ -319,7 +319,7 @@ public abstract class AbstractMarriage {
                 isSameSex = true;
             }
 
-            marryRandomSpouse(campaign, today, person, isSameSex, false, false);
+            marryRandomSpouse(campaign, today, person, isSameSex, false, true);
         }
     }
 
@@ -379,21 +379,22 @@ public abstract class AbstractMarriage {
     Person createExternalSpouse(final Campaign campaign, final LocalDate today, final Person person, Gender gender) {
         Person externalSpouse = campaign.newDependent(false, gender);
 
-        // Adjust the birthday until it's within the correct age range
+
+        // Calculate person's age and the maximum and minimum allowable spouse ages
         int personAge = person.getAge(today);
-        int ageDifference = campaign.getCampaignOptions().getRandomMarriageAgeRange();
+        int externalSpouseAge = externalSpouse.getAge(today);
+        int maximumAgeDifference = campaign.getCampaignOptions().getRandomMarriageAgeRange();
+        int externalSpouseMinAge = Math.max (18, personAge - maximumAgeDifference);
+        int externalSpouseMaxAge = personAge + maximumAgeDifference;
 
-        if (externalSpouse.getAge(today) < (personAge - ageDifference)) {
-            externalSpouse.setBirthday(today.plusYears(1));
-        } else {
-            while ((!externalSpouse.isChild(today)) && (externalSpouse.getAge(today) < (personAge - ageDifference))) {
-                externalSpouse.setBirthday(today.minusYears(1));
-            }
-        }
+        if (externalSpouseAge < externalSpouseMinAge) {
+            int difference = externalSpouseMinAge - externalSpouseAge;
 
-        // Make sure the spouse is not a child
-        while (externalSpouse.isChild(today)) {
-            externalSpouse.setBirthday(today.plusYears(1));
+            externalSpouse.setBirthday(externalSpouse.getBirthday().minusYears(difference));
+        } else if (externalSpouseAge > externalSpouseMaxAge) {
+            int difference = externalSpouseMaxAge - externalSpouseAge;
+
+            externalSpouse.setBirthday(externalSpouse.getBirthday().plusYears(difference));
         }
 
         return externalSpouse;

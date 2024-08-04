@@ -860,7 +860,7 @@ public class Person {
         return getSecondaryRole().getName(isClanPersonnel());
     }
 
-    public boolean canPerformRole(final PersonnelRole role, final boolean primary) {
+    public boolean canPerformRole(LocalDate today, Person person, final PersonnelRole role, final boolean primary) {
         if (primary) {
             // Primary Role:
             // We only do a few here, as it is better on the UX-side to correct the issues when
@@ -893,6 +893,10 @@ public class Person {
                     || (role.isMedic() && getPrimaryRole().isMedicalStaff())) {
                 return false;
             }
+        }
+
+        if (person.isChild(today)) {
+            return false;
         }
 
         return switch (role) {
@@ -2126,7 +2130,7 @@ public class Person {
                 extraData.writeToXml(pw);
             }
         } catch (Exception ex) {
-            logger.error("Failed to write " + getFullName() + " to the XML File", ex);
+            logger.error("Failed to write {} to the XML File", getFullName(), ex);
             throw ex; // we want to rethrow to ensure that the save fails
         }
 
@@ -2317,7 +2321,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            logger.error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in techUnitIds nodes: {}", wn3.getNodeName());
                             continue;
                         }
                         retVal.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
@@ -2332,7 +2336,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in personnel log nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -2352,7 +2356,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            logger.error("Unknown node type not loaded in scenario log nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in scenario log nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -2371,7 +2375,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            logger.error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in personnel log nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -2388,7 +2392,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            logger.error("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in injury nodes: {}", wn3.getNodeName());
                             continue;
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -2933,7 +2937,7 @@ public class Person {
                         return SkillType.EXP_NONE;
                     }
                 }
-            case VEHICLE_CREW:
+            case VEHICLE_CREW, MECHANIC:
                 return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() : SkillType.EXP_NONE;
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
@@ -3000,8 +3004,6 @@ public class Person {
                 return hasSkill(SkillType.S_NAV) ? getSkill(SkillType.S_NAV).getExperienceLevel() : SkillType.EXP_NONE;
             case MECH_TECH:
                 return hasSkill(SkillType.S_TECH_MECH) ? getSkill(SkillType.S_TECH_MECH).getExperienceLevel() : SkillType.EXP_NONE;
-            case MECHANIC:
-                return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() : SkillType.EXP_NONE;
             case AERO_TECH:
                 return hasSkill(SkillType.S_TECH_AERO) ? getSkill(SkillType.S_TECH_AERO).getExperienceLevel() : SkillType.EXP_NONE;
             case BA_TECH:

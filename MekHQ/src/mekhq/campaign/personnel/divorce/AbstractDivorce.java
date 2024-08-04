@@ -300,19 +300,13 @@ public abstract class AbstractDivorce {
         MekHQ.triggerEvent(new PersonChangedEvent(origin));
     }
 
-    /**
-     * This divorces two married people.
-     * This version is meant to be used to log historic divorces that occur during a characters' random background.
-     * It is a watered down version of divorce()
-     *
-     * @param campaign the campaign the two people are a part of
-     * @param today the current date
-     * @param origin the origin person being divorced
-     */
-    public void divorceHistoric(final Campaign campaign, final LocalDate today, final Person origin) {
+    public void backgroundDivorce(final Campaign campaign, final LocalDate today, final Person origin,
+                        final SplittingSurnameStyle style) {
         final Person spouse = origin.getGenealogy().getSpouse();
 
-        SplittingSurnameStyle.WEIGHTED.apply(campaign, origin, spouse);
+        style.apply(campaign, origin, spouse);
+
+        final FormerSpouseReason reason = FormerSpouseReason.DIVORCE;
 
         PersonalLogger.divorcedFrom(origin, spouse, today);
         PersonalLogger.divorcedFrom(spouse, origin, today);
@@ -323,8 +317,18 @@ public abstract class AbstractDivorce {
         spouse.getGenealogy().setSpouse(null);
         origin.getGenealogy().setSpouse(null);
 
-        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, today, FormerSpouseReason.DIVORCE));
-        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, today, FormerSpouseReason.DIVORCE));
+        // Add to the former spouse list
+        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, today, reason));
+        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, today, reason));
+
+        // Clear origin spouses
+        origin.getGenealogy().setOriginSpouse(null);
+        spouse.getGenealogy().setOriginSpouse(null);
+
+        // roll for removal of marriageable flag
+        if (Compute.d6(1) <= 2) {
+            origin.setMarriageable(false);
+        }
     }
 
     //region New Day
@@ -333,14 +337,19 @@ public abstract class AbstractDivorce {
      * @param campaign the campaign to process
      * @param today the current day
      * @param person the person to process
+     * @param isBackground whether the divorce occurred during a character's backstory
      */
-    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person, boolean isBackground) {
         if (canDivorce(person, true) != null) {
             return;
         }
 
         if (randomDivorce(person)) {
-            divorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
+            if (isBackground) {
+                backgroundDivorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
+            } else {
+                divorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
+            }
         }
     }
 

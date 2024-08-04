@@ -353,6 +353,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         .forEach(person -> gui.getCampaign().getDivorce().divorce(gui.getCampaign(),
                                 gui.getCampaign().getLocalDate(), person,
                                 SplittingSurnameStyle.valueOf(data[1])));
+                break;
             }
             case CMD_ADD_SPOUSE: {
                 gui.getCampaign().getMarriage().marry(gui.getCampaign(),
@@ -1400,8 +1401,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         final PersonnelRole[] roles = PersonnelRole.values();
         menu = new JMenu(resources.getString("changePrimaryRole.text"));
+
         for (final PersonnelRole role : roles) {
-            if (person.canPerformRole(role, true)) {
+            if (person.canPerformRole(gui.getCampaign().getLocalDate(), person, role, true)) {
                 cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanPersonnel()));
                 cbMenuItem.setActionCommand(makeCommand(CMD_PRIMARY_ROLE, role.name()));
                 cbMenuItem.setSelected(person.getPrimaryRole() == role);
@@ -1413,7 +1415,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         menu = new JMenu(resources.getString("changeSecondaryRole.text"));
         for (final PersonnelRole role : roles) {
-            if (person.canPerformRole(role, false)) {
+            if (person.canPerformRole(gui.getCampaign().getLocalDate(), person, role, false)) {
                 cbMenuItem = new JCheckBoxMenuItem(role.getName(person.isClanPersonnel()));
                 cbMenuItem.setActionCommand(makeCommand(CMD_SECONDARY_ROLE, role.name()));
                 cbMenuItem.setSelected(person.getSecondaryRole() == role);
@@ -1440,6 +1442,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(gui.getCampaign(), selected));
+
+        LogManager.getLogger().info(gui.getCampaign().getMarriage().canMarry(gui.getCampaign(),
+                gui.getCampaign().getLocalDate(), person, false));
 
         if (oneSelected && person.getStatus().isActive()) {
             if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
@@ -1496,7 +1501,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
 
-        if (gui.getCampaign().getCampaignOptions().isUseManualDivorce() && Stream.of(selected).anyMatch(p -> gui.getCampaign().getDivorce().canDivorce(person, false) == null)) {
+        if (gui.getCampaign().getCampaignOptions().isUseManualDivorce() && (Stream.of(selected)
+                .anyMatch(p -> gui.getCampaign()
+                        .getDivorce()
+                        .canDivorce(person, false) == null))) {
             menu = new JMenu(resources.getString("removeSpouse.text"));
 
             for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {

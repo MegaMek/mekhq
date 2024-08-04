@@ -1576,31 +1576,29 @@ public class Campaign implements ITechManager {
 
         // run the simulation
         for (long weeksRemaining = weeksBetween; weeksRemaining >= 0; weeksRemaining--) {
-            LocalDate currentDate = getLocalDate().plusWeeks(weeksRemaining);
-
-            logger.info(weeksRemaining);
+            LocalDate currentDate = getLocalDate().minusWeeks(weeksRemaining);
 
             // first, we check for old relationships ending and new relationships beginning
             if (currentSpouse != null) {
-                logger.info("relationship ending roll");
-                getDivorce().processNewWeek(this, currentDate, person);
+                getDivorce().processNewWeek(this, currentDate, person, true);
 
-                List<Person> toRemove = new ArrayList<>();
+                if (!person.getGenealogy().hasSpouse()) {
+                    List<Person> toRemove = new ArrayList<>();
 
-                // there is a chance a departing spouse might take some of their children with them
-                for (Person child : children) {
-                    if (child.getGenealogy().getParents().contains(currentSpouse)) {
-                        if (Compute.randomInt(2) == 0) {
-                            toRemove.add(child);
+                    // there is a chance a departing spouse might take some of their children with them
+                    for (Person child : children) {
+                        if (child.getGenealogy().getParents().contains(currentSpouse)) {
+                            if (Compute.randomInt(2) == 0) {
+                                toRemove.add(child);
+                            }
                         }
                     }
+
+                    children.removeAll(toRemove);
+
+                    currentSpouse = null;
                 }
-
-                children.removeAll(toRemove);
-
-                currentSpouse = null;
             } else {
-                logger.info("relationship starting roll");
                 getMarriage().processBackgroundMarriageRolls(this, currentDate, person);
 
                 if (person.getGenealogy().hasSpouse()) {
@@ -1608,33 +1606,48 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            logger.info(currentSpouse);
-
             // then we check for children
             if (person.getGender().isFemale()) {
-                logger.info("rolling for Person pregnancy");
                 getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining), person, true);
 
                 if (person.isPregnant()) {
-                    children.addAll(getProcreation().birthHistoric(this, person.getDueDate(), person, null));
+
+                    Person father = null;
+
+                    if ((currentSpouse != null) && (currentSpouse.getGender().isMale())) {
+                        father = currentSpouse;
+                    }
+
+                    children.addAll(getProcreation().birthHistoric(this, person.getDueDate(), person, father));
                 }
             }
 
             if ((currentSpouse != null) && (currentSpouse.getGender().isFemale())) {
-                logger.info("rolling for Spouse pregnancy");
                 getProcreation().processRandomProcreationCheck(this, localDate.minusWeeks(weeksRemaining), person, true);
 
                 if (person.isPregnant()) {
-                    getProcreation().birthHistoric(this, person.getDueDate(), person, null);
+
+                    Person father = null;
+
+                    if (person.getGender().isMale()) {
+                        father = currentSpouse;
+                    }
+
+                    getProcreation().birthHistoric(this, person.getDueDate(), person, father);
                 }
             }
         }
 
-        logger.info("simulation has ended for {}", person.getFullTitle());
-
         // with the simulation concluded, we add the current spouse (if any) and any remaining children to the unit
         if (currentSpouse != null) {
-            recruitPerson(currentSpouse, PrisonerStatus.FREE, true, true);
+            recruitPerson(currentSpouse, PrisonerStatus.FREE, true, false);
+
+            addReport(String.format(resources.getString("relativeJoinsForce.text"),
+                    currentSpouse.getHyperlinkedFullTitle(),
+                    person.getHyperlinkedFullTitle(),
+                    resources.getString("relativeJoinsForceSpouse.text")));
+
+            MekHQ.triggerEvent(new PersonChangedEvent(currentSpouse));
         }
 
         for (Person child : children) {
@@ -1674,8 +1687,17 @@ public class Campaign implements ITechManager {
                 specialAbilityGenerator.generateSpecialAbilities(this, child, experienceLevel);
             }
 
-            recruitPerson(child, PrisonerStatus.FREE, true, true);
+            recruitPerson(child, PrisonerStatus.FREE, true, false);
+
+            addReport(String.format(resources.getString("relativeJoinsForce.text"),
+                    child.getHyperlinkedFullTitle(),
+                    person.getHyperlinkedFullTitle(),
+                    resources.getString("relativeJoinsForceChild.text")));
+
+            MekHQ.triggerEvent(new PersonChangedEvent(child));
         }
+
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
     //endregion Personnel Recruitment
 
@@ -3600,7 +3622,7 @@ public class Campaign implements ITechManager {
 
             // Divorce, Marriage, & Procreation
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                getDivorce().processNewWeek(this, getLocalDate(), person);
+                getDivorce().processNewWeek(this, getLocalDate(), person, false);
                 getMarriage().processNewWeek(this, getLocalDate(), person);
                 getProcreation().processNewWeek(this, getLocalDate(), person);
             }
