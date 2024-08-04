@@ -78,9 +78,7 @@ public class AbstractMarriageTest {
 
     @Test
     public void testCanMarry() {
-        doCallRealMethod().when(mockMarriage).canMarry(any(), any(), any(), anyBoolean());
-
-        when(mockCampaignOptions.getMinimumMarriageAge()).thenReturn(16);
+        doCallRealMethod().when(mockMarriage).canMarry(any(), any(), anyBoolean());
 
         final Genealogy mockGenealogy = mock(Genealogy.class);
 
@@ -89,77 +87,79 @@ public class AbstractMarriageTest {
 
         // Have to be marriageable
         when(mockPerson.isMarriageable()).thenReturn(false);
-        assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        assertNotNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
-        // Can't be married already
+        // Can't be married
         when(mockPerson.isMarriageable()).thenReturn(true);
         when(mockGenealogy.hasSpouse()).thenReturn(true);
-        assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        assertNotNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
         // Must be active
         when(mockGenealogy.hasSpouse()).thenReturn(false);
         when(mockPerson.getStatus()).thenReturn(PersonnelStatus.KIA);
-        assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        assertNotNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
         // Can't be deployed
         when(mockPerson.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockPerson.isDeployed()).thenReturn(true);
-        assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        assertNotNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
         // Can't be younger than the minimum marriage age
         when(mockPerson.isDeployed()).thenReturn(false);
-        when(mockPerson.getAge(any())).thenReturn(15);
-        assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        when(mockPerson.isChild(any())).thenReturn(true);
+        when(mockPerson.isChild(any())).thenReturn(true);
+        assertNotNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
         // Can't be Clan Personnel with Clan Marriage Disabled
-        when(mockPerson.getAge(any())).thenReturn(16);
+        when(mockPerson.isChild(any())).thenReturn(false);
         when(mockPerson.isClanPersonnel()).thenReturn(true);
-        when(mockMarriage.isUseClanPersonnelMarriages()).thenReturn(false);
-        when(mockMarriage.isUsePrisonerMarriages()).thenReturn(true);
-        assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        lenient().when(mockMarriage.isUseClanPersonnelMarriages()).thenReturn(false);
+        lenient().when(mockMarriage.isUsePrisonerMarriages()).thenReturn(true);
+        assertNotNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
         // Can be Non-Clan Personnel with Clan Marriage Disabled
         when(mockPerson.isClanPersonnel()).thenReturn(false);
-        assertNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        when(mockPerson.isChild(any())).thenReturn(false);
+        assertNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
         // Can be a Non-Prisoner with Prisoner Marriage Disabled
         when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockMarriage.isUsePrisonerMarriages()).thenReturn(false);
-        assertNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        assertNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
         // Can't be a Prisoner with Prisoner Marriage Disabled
         when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
-        assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        assertNotNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
         // Can be a Non-Random Clan Prisoner with Clan and Prisoner Marriage Enabled and Random Marriage Disabled
         when(mockPerson.isClanPersonnel()).thenReturn(true);
         when(mockMarriage.isUseClanPersonnelMarriages()).thenReturn(true);
         when(mockMarriage.isUsePrisonerMarriages()).thenReturn(true);
-        assertNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, false));
+        assertNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, false));
 
         // Can't be Clan Personnel with Random Clan Marriage Disabled
         when(mockMarriage.isUseRandomClanPersonnelMarriages()).thenReturn(false);
         when(mockMarriage.isUseRandomPrisonerMarriages()).thenReturn(true);
-        assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true));
+        assertNotNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, true));
 
         // Can be Non-Clan Personnel with Random Clan Marriage Disabled
         when(mockPerson.isClanPersonnel()).thenReturn(false);
-        assertNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true));
+        assertNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, true));
 
         // Can be a Non-Prisoner with Random Prisoner Marriage Disabled
         when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
         when(mockMarriage.isUseRandomPrisonerMarriages()).thenReturn(false);
-        assertNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true));
+        assertNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, true));
 
         // Can't be a Prisoner with Random Prisoner Marriage Disabled
         when(mockPerson.getPrisonerStatus()).thenReturn(PrisonerStatus.PRISONER);
-        assertNotNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true));
+        assertNotNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, true));
 
         // Can be a Clan Prisoner with Random Clan and Random Prisoner Marriage Enabled
         lenient().when(mockPerson.isClanPersonnel()).thenReturn(true);
         when(mockMarriage.isUseRandomClanPersonnelMarriages()).thenReturn(true);
         when(mockMarriage.isUseRandomPrisonerMarriages()).thenReturn(true);
-        assertNull(mockMarriage.canMarry(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, true));
+        assertNull(mockMarriage.canMarry(LocalDate.ofYearDay(3025, 1), mockPerson, true));
     }
 
     @Test
@@ -177,11 +177,11 @@ public class AbstractMarriageTest {
         assertFalse(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockPerson, false));
 
         // Need to be able to marry
-        when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn("Married");
+        when(mockMarriage.canMarry(any(), any(), anyBoolean())).thenReturn("Married");
         assertFalse(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, false));
 
         // Can't be closely related
-        when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn(null);
+        when(mockMarriage.canMarry(any(), any(), anyBoolean())).thenReturn(null);
         when(mockGenealogy.checkMutualAncestors(any(), anyInt())).thenReturn(true);
         assertFalse(mockMarriage.safeSpouse(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson, mockSpouse, false));
 
@@ -267,12 +267,12 @@ public class AbstractMarriageTest {
 
         final Person mockPerson = mock(Person.class);
 
-        when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn("Married");
+        when(mockMarriage.canMarry(any(), any(), anyBoolean())).thenReturn("Married");
         mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(0)).randomMarriage(any());
         verify(mockMarriage, times(0)).marryRandomSpouse(any(), any(), any(), anyBoolean(), anyBoolean(), anyBoolean());
 
-        when(mockMarriage.canMarry(any(), any(), any(), anyBoolean())).thenReturn(null);
+        when(mockMarriage.canMarry(any(), any(), anyBoolean())).thenReturn(null);
         when(mockMarriage.randomMarriage(any())).thenReturn(true);
         mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockMarriage, times(1)).randomMarriage(any());

@@ -78,6 +78,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 
@@ -1443,13 +1444,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(gui.getCampaign(), selected));
 
-        LogManager.getLogger().info(gui.getCampaign().getMarriage().canMarry(gui.getCampaign(),
-                gui.getCampaign().getLocalDate(), person, false));
+        LogManager.getLogger().info(gui.getCampaign().getMarriage().canMarry(gui.getCampaign().getLocalDate(), person, false));
 
         if (oneSelected && person.getStatus().isActive()) {
             if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
-                    && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign(),
-                    gui.getCampaign().getLocalDate(), person, false) == null)) {
+                    && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign().getLocalDate(), person, false) == null)) {
                 menu = new JMenu(resources.getString("chooseSpouse.text"));
                 JMenu maleMenu = new JMenu(resources.getString("spouseMenuMale.text"));
                 JMenu femaleMenu = new JMenu(resources.getString("spouseMenuFemale.text"));
@@ -2575,8 +2574,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone())
                 && Stream.of(selected).allMatch(p -> p.isMarriageable() == person.isMarriageable())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miMarriageable.text"));
-            cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(String.format(resources.getString("miMarriageable.toolTipText"),
-                    gui.getCampaign().getCampaignOptions().getMinimumMarriageAge()), 100));
+            cbMenuItem.setToolTipText(wordWrap(resources.getString("miMarriageable.toolTipText")));
             cbMenuItem.setName("miMarriageable");
             cbMenuItem.setSelected(person.isMarriageable());
             cbMenuItem.addActionListener(evt -> {

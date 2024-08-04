@@ -109,13 +109,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private RandomSkillPreferences rSkillPrefs;
     private LocalDate date;
     private Camouflage camouflage;
-    private PlayerColour colour;
+    private final PlayerColour colour;
     private StandardForceIcon unitIcon;
-    private Hashtable<String, JSpinner> hashSkillTargets;
-    private Hashtable<String, JSpinner> hashGreenSkill;
-    private Hashtable<String, JSpinner> hashRegSkill;
-    private Hashtable<String, JSpinner> hashVetSkill;
-    private Hashtable<String, JSpinner> hashEliteSkill;
+    private final Hashtable<String, JSpinner> hashSkillTargets;
+    private final Hashtable<String, JSpinner> hashGreenSkill;
+    private final Hashtable<String, JSpinner> hashRegSkill;
+    private final Hashtable<String, JSpinner> hashVetSkill;
+    private final Hashtable<String, JSpinner> hashEliteSkill;
     //endregion General Variables (ones not relating to a specific tab)
 
     //region General Tab
@@ -225,7 +225,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkShowOriginFaction;
 
     // Admin
-    private JPanel administratorsPanel = new JPanel();
+    private final JPanel administratorsPanel = new JPanel();
     private JCheckBox chkAdminsHaveNegotiation;
     private JCheckBox chkAdminsHaveScrounge;
     private JCheckBox chkAdminExperienceLevelIncludeNegotiation;
@@ -272,7 +272,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseRandomRetirement;
 
     // Settings
-    private JPanel turnoverAndRetentionSettingsPanel = new JPanel();
+    private final JPanel turnoverAndRetentionSettingsPanel = new JPanel();
     private JLabel lblTurnoverFixedTargetNumber;
     private JSpinner spnTurnoverFixedTargetNumber;
     private MMComboBox<TurnoverFrequency> comboTurnoverFrequency;
@@ -289,7 +289,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnPayBonusDefaultThreshold;
 
     // Modifiers
-    private JPanel turnoverAndRetentionModifiersPanel = new JPanel();
+    private final JPanel turnoverAndRetentionModifiersPanel = new JPanel();
     private JCheckBox chkUseCustomRetirementModifiers;
     private JCheckBox chkUseFatigueModifiers;
     private JCheckBox chkUseSkillModifiers;
@@ -301,41 +301,41 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseFamilyModifiers;
     private JCheckBox chkUseLoyaltyModifiers;
 
-    private JPanel loyaltySubPanel = new JPanel();
+    private final JPanel loyaltySubPanel = new JPanel();
     private JCheckBox chkUseHideLoyalty;
 
     // Payout
-    private JPanel turnoverAndRetentionPayoutPanel = new JPanel();
+    private final JPanel turnoverAndRetentionPayoutPanel = new JPanel();
     private JSpinner spnPayoutRateOfficer;
     private JSpinner spnPayoutRateEnlisted;
     private JSpinner spnPayoutRetirementMultiplier;
     private JCheckBox chkUsePayoutServiceBonus;
 
-    private JPanel payoutServiceBonusSubPanel = new JPanel();
+    private final JPanel payoutServiceBonusSubPanel = new JPanel();
     private JLabel lblPayoutServiceBonusRate;
     private JSpinner spnPayoutServiceBonusRate;
 
     // Unit Cohesion
-    private JPanel turnoverAndRetentionUnitCohesionPanel = new JPanel();
+    private final JPanel turnoverAndRetentionUnitCohesionPanel = new JPanel();
     private JCheckBox chkUseAdministrativeStrain;
     private JCheckBox chkUseManagementSkill;
 
-    private JPanel administrativeStrainSubPanel = new JPanel();
+    private final JPanel administrativeStrainSubPanel = new JPanel();
     private JLabel lblAdministrativeCapacity;
     private JSpinner spnAdministrativeCapacity;
     private JLabel lblMultiCrewStrainDivider;
     private JSpinner spnMultiCrewStrainDivider;
 
-    private JPanel managementSkillSubPanel = new JPanel();
+    private final JPanel managementSkillSubPanel = new JPanel();
     private JCheckBox chkUseCommanderLeadershipOnly;
     private JLabel lblManagementSkillPenalty;
     private JSpinner spnManagementSkillPenalty;
 
     // Fatigue
-    private JPanel turnoverAndRetentionFatiguePanel = new JPanel();
+    private final JPanel turnoverAndRetentionFatiguePanel = new JPanel();
     private JCheckBox chkUseFatigue;
 
-    private JPanel fatigueSubPanel = new JPanel();
+    private final JPanel fatigueSubPanel = new JPanel();
     private JSpinner spnFatigueRate;
     private JCheckBox chkUseInjuryFatigue;
     private JSpinner spnFieldKitchenCapacity;
@@ -356,7 +356,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseManualMarriages;
     private JCheckBox chkUseClanPersonnelMarriages;
     private JCheckBox chkUsePrisonerMarriages;
-    private JSpinner spnMinimumMarriageAge;
     private JSpinner spnCheckMutualAncestorsDepth;
     private JCheckBox chkLogMarriageNameChanges;
     private Map<MergingSurnameStyle, JSpinner> spnMarriageSurnameWeights;
@@ -439,7 +438,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private MMComboBox<FamilialRelationshipDisplayLevel> comboFamilyDisplayLevel;
 
     // Anniversaries
-    private JPanel anniversaryPanel = new JPanel();
+    private final JPanel anniversaryPanel = new JPanel();
     private JCheckBox chkAnnounceBirthdays;
     private JCheckBox chkAnnounceOfficersOnly;
     private JCheckBox chkAnnounceChildBirthdays;
@@ -5567,14 +5566,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkUseRandomPrisonerMarriages.setEnabled(!method.isNone() && chkUsePrisonerMarriages.isSelected());
         });
 
-        final JLabel lblMinimumMarriageAge = new JLabel(resources.getString("lblMinimumMarriageAge.text"));
-        lblMinimumMarriageAge.setToolTipText(resources.getString("lblMinimumMarriageAge.toolTipText"));
-        lblMinimumMarriageAge.setName("lblMinimumMarriageAge");
-
-        spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(16, 14, null, 1));
-        spnMinimumMarriageAge.setToolTipText(resources.getString("lblMinimumMarriageAge.toolTipText"));
-        spnMinimumMarriageAge.setName("spnMinimumMarriageAge");
-
         final JLabel lblCheckMutualAncestorsDepth = new JLabel(resources.getString("lblCheckMutualAncestorsDepth.text"));
         lblCheckMutualAncestorsDepth.setToolTipText(resources.getString("lblCheckMutualAncestorsDepth.toolTipText"));
         lblCheckMutualAncestorsDepth.setName("lblCheckMutualAncestorsDepth");
@@ -5592,7 +5583,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final JPanel randomMarriagePanel = createRandomMarriagePanel();
 
         // Programmatically Assign Accessibility Labels
-        lblMinimumMarriageAge.setLabelFor(spnMinimumMarriageAge);
         lblCheckMutualAncestorsDepth.setLabelFor(spnCheckMutualAncestorsDepth);
 
         // Layout the Panel
@@ -5611,9 +5601,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseClanPersonnelMarriages)
                         .addComponent(chkUsePrisonerMarriages)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblMinimumMarriageAge)
-                                .addComponent(spnMinimumMarriageAge, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCheckMutualAncestorsDepth)
                                 .addComponent(spnCheckMutualAncestorsDepth, Alignment.LEADING))
                         .addComponent(chkLogMarriageNameChanges)
@@ -5626,9 +5613,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseManualMarriages)
                         .addComponent(chkUseClanPersonnelMarriages)
                         .addComponent(chkUsePrisonerMarriages)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblMinimumMarriageAge)
-                                .addComponent(spnMinimumMarriageAge))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCheckMutualAncestorsDepth)
                                 .addComponent(spnCheckMutualAncestorsDepth))
@@ -8231,7 +8215,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseManualMarriages.setSelected(options.isUseManualMarriages());
         chkUseClanPersonnelMarriages.setSelected(options.isUseClanPersonnelMarriages());
         chkUsePrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
-        spnMinimumMarriageAge.setValue(options.getMinimumMarriageAge());
         spnCheckMutualAncestorsDepth.setValue(options.getCheckMutualAncestorsDepth());
         chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
         for (final Entry<MergingSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
@@ -8930,7 +8913,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseManualMarriages(chkUseManualMarriages.isSelected());
             options.setUseClanPersonnelMarriages(chkUseClanPersonnelMarriages.isSelected());
             options.setUsePrisonerMarriages(chkUsePrisonerMarriages.isSelected());
-            options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getValue());
             options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getValue());
             options.setLogMarriageNameChanges(chkLogMarriageNameChanges.isSelected());
             for (final Entry<MergingSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
@@ -9533,7 +9515,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * contains the main table.
      */
     public static class RowNamesTable extends JTable implements ChangeListener, PropertyChangeListener {
-        private JTable main;
+        private final JTable main;
 
         public RowNamesTable(JTable table) {
             main = table;

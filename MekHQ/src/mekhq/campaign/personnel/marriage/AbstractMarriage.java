@@ -118,8 +118,7 @@ public abstract class AbstractMarriage {
      * @param randomMarriage if this is for random marriage or manual marriage
      * @return null if they can, otherwise the reason why they cannot
      */
-    public @Nullable String canMarry(final Campaign campaign, final LocalDate today,
-                                     final Person person, final boolean randomMarriage) {
+    public @Nullable String canMarry(final LocalDate today, final Person person, final boolean randomMarriage) {
         if (!person.isMarriageable()) {
             return resources.getString("cannotMarry.NotMarriageable.text");
         } else if (person.getGenealogy().hasSpouse()) {
@@ -128,7 +127,7 @@ public abstract class AbstractMarriage {
             return resources.getString("cannotMarry.Inactive.text");
         } else if (person.isDeployed()) {
             return resources.getString("cannotMarry.Deployed.text");
-        } else if (person.getAge(today) < campaign.getCampaignOptions().getMinimumMarriageAge()) {
+        } else if (person.isChild(today)) {
             return resources.getString("cannotMarry.TooYoung.text");
         } else if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
             return resources.getString("cannotMarry.ClanPersonnel.text");
@@ -165,7 +164,7 @@ public abstract class AbstractMarriage {
         // marriages.
 
         if (person.equals(potentialSpouse)
-                || (canMarry(campaign, today, potentialSpouse, randomMarriage) != null)
+                || (canMarry(today, potentialSpouse, randomMarriage) != null)
                 || person.getGenealogy().checkMutualAncestors(potentialSpouse,
                         campaign.getCampaignOptions().getCheckMutualAncestorsDepth())) {
             return false;
@@ -267,7 +266,7 @@ public abstract class AbstractMarriage {
      * @param person the person to process
      */
     public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person) {
-        if (canMarry(campaign, today, person, true) != null) {
+        if (canMarry(today, person, true) != null) {
             return;
         }
 
@@ -304,7 +303,7 @@ public abstract class AbstractMarriage {
      * @param person the person for whom to process the marriage rolls
      */
     public void processBackgroundMarriageRolls(final Campaign campaign, final LocalDate today, final Person person) {
-        if (canMarry(campaign, today, person, true) != null) {
+        if (canMarry(today, person, true) != null) {
             return;
         }
 

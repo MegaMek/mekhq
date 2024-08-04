@@ -57,7 +57,7 @@ public class CampaignOptions {
     public static final int TECH_ADVANCED = 2;
     public static final int TECH_EXPERIMENTAL = 3;
     public static final int TECH_UNOFFICIAL = 4;
-    // This must always be the highest tech level in order to hide parts
+    // This must always be the highest tech level to hide parts
     // that haven't been invented yet, or that are completely extinct
     public static final int TECH_UNKNOWN = 5;
 
@@ -292,7 +292,6 @@ public class CampaignOptions {
     private boolean useManualMarriages;
     private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
-    private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
     private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
@@ -849,7 +848,6 @@ public class CampaignOptions {
         setUseManualMarriages(true);
         setUseClanPersonnelMarriages(false);
         setUsePrisonerMarriages(true);
-        setMinimumMarriageAge(16);
         setCheckMutualAncestorsDepth(4);
         setLogMarriageNameChanges(false);
         setMarriageSurnameWeights(new HashMap<>());
@@ -894,7 +892,7 @@ public class CampaignOptions {
         setUseManualProcreation(true);
         setUseClanPersonnelProcreation(false);
         setUsePrisonerProcreation(true);
-        setMultiplePregnancyOccurrences(50); // Hellin's Law is 89, but we make it more common so it shows up more
+        setMultiplePregnancyOccurrences(50); // Hellin's Law is 89, but we make it more common, so it shows up more
         setBabySurnameStyle(BabySurnameStyle.MOTHERS);
         setAssignNonPrisonerBabiesFounderTag(false);
         setAssignChildrenOfFoundersFounderTag(false);
@@ -1600,7 +1598,7 @@ public class CampaignOptions {
 
     //region Expanded Personnel Information
     /**
-     * @return whether or not to use time in service
+     * @return whether to use time in service
      */
     public boolean isUseTimeInService() {
         return useTimeInService;
@@ -1628,14 +1626,14 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to use time in rank
+     * @return whether to use time in rank
      */
     public boolean isUseTimeInRank() {
         return useTimeInRank;
     }
 
     /**
-     * @param useTimeInRank the new value for whether or not to use time in rank
+     * @param useTimeInRank the new value for whether to use time in rank
      */
     public void setUseTimeInRank(final boolean useTimeInRank) {
         this.useTimeInRank = useTimeInRank;
@@ -1656,28 +1654,28 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to track the total earnings of personnel
+     * @return whether to track the total earnings of personnel
      */
     public boolean isTrackTotalEarnings() {
         return trackTotalEarnings;
     }
 
     /**
-     * @param trackTotalEarnings the new value for whether or not to track total earnings for personnel
+     * @param trackTotalEarnings the new value for whether to track total earnings for personnel
      */
     public void setTrackTotalEarnings(final boolean trackTotalEarnings) {
         this.trackTotalEarnings = trackTotalEarnings;
     }
 
     /**
-     * @return whether or not to track the total experience earnings of personnel
+     * @return whether to track the total experience earnings of personnel
      */
     public boolean isTrackTotalXPEarnings() {
         return trackTotalXPEarnings;
     }
 
     /**
-     * @param trackTotalXPEarnings the new value for whether or not to track total experience
+     * @param trackTotalXPEarnings the new value for whether to track total experience
      *                             earnings for personnel
      */
     public void setTrackTotalXPEarnings(final boolean trackTotalXPEarnings) {
@@ -1685,7 +1683,7 @@ public class CampaignOptions {
     }
 
     /**
-     * Gets a value indicating whether or not to show a person's origin faction when displaying
+     * Gets a value indicating whether to show a person's origin faction when displaying
      * their details.
      */
     public boolean isShowOriginFaction() {
@@ -1693,7 +1691,7 @@ public class CampaignOptions {
     }
 
     /**
-     * Sets a value indicating whether or not to show a person's origin faction when displaying
+     * Sets a value indicating whether to show a person's origin faction when displaying
      * their details.
      */
     public void setShowOriginFaction(final boolean showOriginFaction) {
@@ -2281,14 +2279,14 @@ public class CampaignOptions {
 
     //region Marriage
     /**
-     * @return whether or not to use manual marriages
+     * @return whether to use manual marriages
      */
     public boolean isUseManualMarriages() {
         return useManualMarriages;
     }
 
     /**
-     * @param useManualMarriages whether or not to use manual marriages
+     * @param useManualMarriages whether to use manual marriages
      */
     public void setUseManualMarriages(final boolean useManualMarriages) {
         this.useManualMarriages = useManualMarriages;
@@ -2311,20 +2309,6 @@ public class CampaignOptions {
     }
 
     /**
-     * @return the minimum age a person can get married at
-     */
-    public int getMinimumMarriageAge() {
-        return minimumMarriageAge;
-    }
-
-    /**
-     * @param minimumMarriageAge the minimum age a person can get married at
-     */
-    public void setMinimumMarriageAge(final int minimumMarriageAge) {
-        this.minimumMarriageAge = minimumMarriageAge;
-    }
-
-    /**
      * This gets the number of recursions to use when checking mutual ancestors between two personnel
      * @return the number of recursions to use
      */
@@ -2341,7 +2325,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to log a name change in a marriage
+     * @return whether to log a name change in a marriage
      */
     public boolean isLogMarriageNameChanges() {
         return logMarriageNameChanges;
@@ -2377,7 +2361,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to use random same-sex marriages
+     * @return whether to use random same-sex marriages
      */
     @Deprecated
     public boolean isUseRandomSameSexMarriages() {
@@ -2385,7 +2369,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @param useRandomSameSexMarriages whether or not to use random same-sex marriages
+     * @param useRandomSameSexMarriages whether to use random same-sex marriages
      */
     @Deprecated
     public void setUseRandomSameSexMarriages(final boolean useRandomSameSexMarriages) {
@@ -2581,7 +2565,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @return the X occurrences for there to be a single multiple child occurrence (i.e. 1 in X)
+     * @return the X occurrences for there to be a single multiple child occurrence (i.e., 1 in X)
      */
     public int getMultiplePregnancyOccurrences() {
         return multiplePregnancyOccurrences;
@@ -2589,7 +2573,7 @@ public class CampaignOptions {
 
     /**
      * @param multiplePregnancyOccurrences the number of occurrences for there to be a single
-     *                                     occurrence of a multiple child pregnancy (i.e. 1 in X)
+     *                                     occurrence of a multiple child pregnancy (i.e., 1 in X)
      */
     public void setMultiplePregnancyOccurrences(final int multiplePregnancyOccurrences) {
         this.multiplePregnancyOccurrences = multiplePregnancyOccurrences;
@@ -2626,14 +2610,14 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to determine the father at birth instead of at conception
+     * @return whether to determine the father at birth instead of at conception
      */
     public boolean isDetermineFatherAtBirth() {
         return determineFatherAtBirth;
     }
 
     /**
-     * @param determineFatherAtBirth whether or not to determine the father at birth instead of at conception
+     * @param determineFatherAtBirth whether to determine the father at birth instead of at conception
      */
     public void setDetermineFatherAtBirth(final boolean determineFatherAtBirth) {
         this.determineFatherAtBirth = determineFatherAtBirth;
@@ -2676,14 +2660,14 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to use random procreation for personnel without a spouse
+     * @return whether to use random procreation for personnel without a spouse
      */
     public boolean isUseRelationshiplessRandomProcreation() {
         return useRelationshiplessRandomProcreation;
     }
 
     /**
-     * @param useRelationshiplessRandomProcreation whether or not to use random procreation without a spouse
+     * @param useRelationshiplessRandomProcreation whether to use random procreation without a spouse
      */
     public void setUseRelationshiplessRandomProcreation(final boolean useRelationshiplessRandomProcreation) {
         this.useRelationshiplessRandomProcreation = useRelationshiplessRandomProcreation;
@@ -3259,14 +3243,14 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to export finances to CSV at the end of a financial year
+     * @return whether to export finances to CSV at the end of a financial year
      */
     public boolean isNewFinancialYearFinancesToCSVExport() {
         return newFinancialYearFinancesToCSVExport;
     }
 
     /**
-     * @param newFinancialYearFinancesToCSVExport whether or not to export finances to CSV at the end of a financial year
+     * @param newFinancialYearFinancesToCSVExport whether to export finances to CSV at the end of a financial year
      */
     public void setNewFinancialYearFinancesToCSVExport(final boolean newFinancialYearFinancesToCSVExport) {
         this.newFinancialYearFinancesToCSVExport = newFinancialYearFinancesToCSVExport;
@@ -4777,7 +4761,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualMarriages", isUseManualMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelMarriages", isUseClanPersonnelMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerMarriages", isUsePrisonerMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumMarriageAge", getMinimumMarriageAge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "marriageSurnameWeights");
@@ -5335,7 +5318,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
                     retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
-                    // Most of this is legacy - 0.47.X Removal
+                    // Most of this is legacy handlers - 0.47.X Removal
                     String prisonerStatus = wn2.getTextContent().trim();
 
                     try {
@@ -5490,8 +5473,6 @@ public class CampaignOptions {
                     retVal.setUseClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerMarriages")) {
                     retVal.setUsePrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
-                    retVal.setMinimumMarriageAge(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
                     retVal.setCheckMutualAncestorsDepth(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChanges")) {
@@ -6199,7 +6180,7 @@ public class CampaignOptions {
             }
         }
 
-        // Now we need to test to figure out the weights have changed. If not, we will keep the
+        // Now we need to test it to figure out the weights have changed. If not, we will keep the
         // new default values. If they have, we save their changes and add the new surname weights
         if (
                 (weights[0] != getMarriageSurnameWeights().get(MergingSurnameStyle.NO_CHANGE))
