@@ -984,7 +984,10 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
-            for (FormerSpouse formerSpouse : person.getGenealogy().getFormerSpouses()) {
+            List<FormerSpouse> formerSpouses = person.getGenealogy().getFormerSpouses();
+            Collections.reverse(person.getGenealogy().getFormerSpouses());
+
+            for (FormerSpouse formerSpouse : formerSpouses) {
                 Person ex = formerSpouse.getFormerSpouse();
                 String name = getRelativeName(ex);
 
@@ -995,7 +998,7 @@ public class PersonViewPanel extends JScrollablePanel {
                         new AccessibleRelation(AccessibleRelation.LABELED_BY, lblFormerSpouses1)
                 );
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
+                lblFormerSpouses2.setText(String.format("<html>%s, %s, %s</html>",
                         name, formerSpouse.getReason(),
                         MekHQ.getMHQOptions().getDisplayFormattedDate(formerSpouse.getDate())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
@@ -1035,7 +1038,7 @@ public class PersonViewPanel extends JScrollablePanel {
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblChildren1)
                     );
                     lblChildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblChildren2.setText(String.format("<html><a href='#'>%s</a></html>", name));
+                    lblChildren2.setText(String.format("<html>%s</html>", name));
                     lblChildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -1075,7 +1078,7 @@ public class PersonViewPanel extends JScrollablePanel {
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandchildren1)
                     );
                     lblGrandchildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblGrandchildren2.setText(String.format("<html><a href='#'>%s</a></html>", name));
+                    lblGrandchildren2.setText(String.format("<html>%s</html>", name));
                     lblGrandchildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -1285,9 +1288,9 @@ public class PersonViewPanel extends JScrollablePanel {
      */
     private static String getRelativeName(Person relative) {
         if (relative.getJoinedCampaign() == null) {
-            return relative.getFirstName() + " (Absent)";
+            return relative.getFirstName();
         } else {
-            return relative.getHyperlinkedFullTitle();
+            return "<a href='#'>" + relative.getHyperlinkedFullTitle() + "</a>";
         }
     }
 
