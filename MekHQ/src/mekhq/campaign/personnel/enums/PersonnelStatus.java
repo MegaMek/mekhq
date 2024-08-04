@@ -54,7 +54,8 @@ public enum PersonnelStatus {
     MEDICAL_COMPLICATIONS("PersonnelStatus.MEDICAL_COMPLICATIONS.text", "PersonnelStatus.MEDICAL_COMPLICATIONS.toolTipText", "PersonnelStatus.MEDICAL_COMPLICATIONS.reportText", "PersonnelStatus.MEDICAL_COMPLICATIONS.logText"),
     PREGNANCY_COMPLICATIONS("PersonnelStatus.PREGNANCY_COMPLICATIONS.text", "PersonnelStatus.PREGNANCY_COMPLICATIONS.toolTipText", "PersonnelStatus.PREGNANCY_COMPLICATIONS.reportText", "PersonnelStatus.PREGNANCY_COMPLICATIONS.logText"),
     UNDETERMINED("PersonnelStatus.UNDETERMINED.text", "PersonnelStatus.UNDETERMINED.toolTipText", "PersonnelStatus.UNDETERMINED.reportText", "PersonnelStatus.UNDETERMINED.logText"),
-    SUICIDE("PersonnelStatus.SUICIDE.text", "PersonnelStatus.SUICIDE.toolTipText", "PersonnelStatus.SUICIDE.reportText", "PersonnelStatus.SUICIDE.logText");
+    SUICIDE("PersonnelStatus.SUICIDE.text", "PersonnelStatus.SUICIDE.toolTipText", "PersonnelStatus.SUICIDE.reportText", "PersonnelStatus.SUICIDE.logText"),
+    ON_MATERNITY_LEAVE("PersonnelStatus.ON_MATERNITY_LEAVE.text", "PersonnelStatus.ON_MATERNITY_LEAVE.toolTipText", "PersonnelStatus.ON_MATERNITY_LEAVE.reportText", "PersonnelStatus.ON_MATERNITY_LEAVE.logText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -105,6 +106,10 @@ public enum PersonnelStatus {
 
     public boolean isOnLeave() {
         return this == ON_LEAVE;
+    }
+
+    public boolean isOnMaternityLeave() {
+        return this == ON_MATERNITY_LEAVE;
     }
 
     public boolean isAwol() {
@@ -191,7 +196,7 @@ public enum PersonnelStatus {
      * @return true if a person is currently absent from the core force, otherwise false
      */
     public boolean isAbsent() {
-        return isMIA() || isPoW() || isOnLeave() || isAwol() || isStudent() || isMissing();
+        return isMIA() || isPoW() || isOnLeave() || isOnMaternityLeave() || isAwol() || isStudent() || isMissing();
     }
 
     /**
@@ -283,6 +288,8 @@ public enum PersonnelStatus {
                     return SUICIDE;
                 case 22:
                     return SACKED;
+                case 23:
+                    return ON_MATERNITY_LEAVE;
                 default:
                     break;
             }

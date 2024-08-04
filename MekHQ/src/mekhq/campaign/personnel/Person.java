@@ -965,7 +965,7 @@ public class Person {
                     campaign.addReport(String.format(resources.getString("recoveredPoW.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.recoveredPoW(this, campaign.getLocalDate());
-                } else if (getStatus().isOnLeave()) {
+                } else if (getStatus().isOnLeave() || getStatus().isOnMaternityLeave()) {
                     campaign.addReport(String.format(resources.getString("returnedFromLeave.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());

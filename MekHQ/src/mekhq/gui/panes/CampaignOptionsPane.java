@@ -390,6 +390,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkAssignChildrenOfFoundersFounderTag;
     private JCheckBox chkDetermineFatherAtBirth;
     private JCheckBox chkDisplayTrueDueDate;
+    private JCheckBox chkUseMaternityLeave;
     private JCheckBox chkLogProcreation;
     private MMComboBox<RandomProcreationMethod> comboRandomProcreationMethod;
     private JCheckBox chkUseRelationshiplessRandomProcreation;
@@ -6116,6 +6117,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkDisplayTrueDueDate.setToolTipText(resources.getString("chkDisplayTrueDueDate.toolTipText"));
         chkDisplayTrueDueDate.setName("chkDisplayTrueDueDate");
 
+        chkUseMaternityLeave = new JCheckBox(resources.getString("chkUseMaternityLeave.text"));
+        chkUseMaternityLeave.setToolTipText(wordWrap(resources.getString("chkUseMaternityLeave.toolTipText")));
+        chkUseMaternityLeave.setName("chkUseMaternityLeave");
+
         chkLogProcreation = new JCheckBox(resources.getString("chkLogProcreation.text"));
         chkLogProcreation.setToolTipText(resources.getString("chkLogProcreation.toolTipText"));
         chkLogProcreation.setName("chkLogProcreation");
@@ -6152,6 +6157,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
                         .addComponent(chkDisplayTrueDueDate)
+                        .addComponent(chkUseMaternityLeave)
                         .addComponent(chkLogProcreation)
                         .addComponent(randomProcreationPanel)
         );
@@ -6172,6 +6178,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
                         .addComponent(chkDisplayTrueDueDate)
+                        .addComponent(chkUseMaternityLeave)
                         .addComponent(chkLogProcreation)
                         .addComponent(randomProcreationPanel)
         );
@@ -8265,6 +8272,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAssignChildrenOfFoundersFounderTag.setSelected(options.isAssignChildrenOfFoundersFounderTag());
         chkDetermineFatherAtBirth.setSelected(options.isDetermineFatherAtBirth());
         chkDisplayTrueDueDate.setSelected(options.isDisplayTrueDueDate());
+        chkUseMaternityLeave.setSelected(options.isUseMaternityLeave());
         chkLogProcreation.setSelected(options.isLogProcreation());
         comboRandomProcreationMethod.setSelectedItem(options.getRandomProcreationMethod());
         if (chkUseRelationshiplessRandomProcreation.isSelected() != options.isUseRelationshiplessRandomProcreation()) {
@@ -8950,6 +8958,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setAssignChildrenOfFoundersFounderTag(chkAssignChildrenOfFoundersFounderTag.isSelected());
             options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
             options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
+            options.setUseMaternityLeave(chkUseMaternityLeave.isSelected());
             options.setLogProcreation(chkLogProcreation.isSelected());
             options.setRandomProcreationMethod(comboRandomProcreationMethod.getSelectedItem());
             options.setUseRelationshiplessRandomProcreation(chkUseRelationshiplessRandomProcreation.isSelected());

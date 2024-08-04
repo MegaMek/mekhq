@@ -3625,6 +3625,28 @@ public class Campaign implements ITechManager {
                 getDivorce().processNewWeek(this, getLocalDate(), person, false);
                 getMarriage().processNewWeek(this, getLocalDate(), person);
                 getProcreation().processNewWeek(this, getLocalDate(), person);
+
+                if (person.getGender().isFemale()) {
+                    if (campaignOptions.isUseMaternityLeave()) {
+                        if ((person.isPregnant())
+                                && (person.getStatus().isActive())
+                                && (person.getDueDate().minusWeeks(20).isEqual(getLocalDate()))) {
+
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.ON_MATERNITY_LEAVE);
+                        }
+
+                        List<Person> children = person.getGenealogy().getChildren();
+
+                        if ((person.getStatus().isOnMaternityLeave()) && (!children.isEmpty())) {
+
+                            children.sort(Comparator.comparing(Person::getBirthday).reversed());
+
+                            if (getLocalDate().isAfter(children.get(0).getBirthday().plusDays(41))) {
+                                person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
+                            }
+                        }
+                    }
+                }
             }
 
             // Anniversaries

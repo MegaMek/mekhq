@@ -324,6 +324,7 @@ public class CampaignOptions {
     private BabySurnameStyle babySurnameStyle;
     private boolean assignNonPrisonerBabiesFounderTag;
     private boolean assignChildrenOfFoundersFounderTag;
+    private boolean useMaternityLeave;
     private boolean determineFatherAtBirth;
     private boolean displayTrueDueDate;
     private boolean logProcreation;
@@ -896,6 +897,7 @@ public class CampaignOptions {
         setBabySurnameStyle(BabySurnameStyle.MOTHERS);
         setAssignNonPrisonerBabiesFounderTag(false);
         setAssignChildrenOfFoundersFounderTag(false);
+        setUseMaternityLeave(true);
         setDetermineFatherAtBirth(false);
         setDisplayTrueDueDate(false);
         setLogProcreation(false);
@@ -2607,6 +2609,14 @@ public class CampaignOptions {
 
     public void setAssignChildrenOfFoundersFounderTag(final boolean assignChildrenOfFoundersFounderTag) {
         this.assignChildrenOfFoundersFounderTag = assignChildrenOfFoundersFounderTag;
+    }
+
+    public boolean isUseMaternityLeave() {
+        return useMaternityLeave;
+    }
+
+    public void setUseMaternityLeave(final boolean useMaternityLeave) {
+        this.useMaternityLeave = useMaternityLeave;
     }
 
     /**
@@ -4802,6 +4812,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "babySurnameStyle", getBabySurnameStyle().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignChildrenOfFoundersFounderTag", isAssignChildrenOfFoundersFounderTag());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMaternityLeave", isUseMaternityLeave());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "determineFatherAtBirth", isDetermineFatherAtBirth());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayTrueDueDate", isDisplayTrueDueDate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logProcreation", isLogProcreation());
@@ -5565,6 +5576,8 @@ public class CampaignOptions {
                     retVal.setAssignNonPrisonerBabiesFounderTag(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("assignChildrenOfFoundersFounderTag")) {
                     retVal.setAssignChildrenOfFoundersFounderTag(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMaternityLeave")) {
+                    retVal.setUseMaternityLeave(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
                     retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
