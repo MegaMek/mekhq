@@ -53,22 +53,27 @@ public enum EducationLevel {
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @SuppressWarnings(value = "unused")
     public boolean isEarlyChildhood() {
         return this == EARLY_CHILDHOOD;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isHighSchool() {
         return this == HIGH_SCHOOL;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isCollege() {
         return this == COLLEGE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isPostGraduate() {
         return this == POST_GRADUATE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isDoctorate() {
         return this == DOCTORATE;
     }
@@ -77,29 +82,22 @@ public enum EducationLevel {
     //region File I/O
     /**
      * Parses a given string and returns the corresponding AcademyType.
-     * Accepts either the ENUM ordinal value, or its name
+     * Accepts either the ENUM ordinal value or its name
      *
      * @param educationLevel the string to be parsed
      * @return the AcademyType object that corresponds to the given string
      * @throws IllegalStateException if the given string does not match any valid AcademyType
      */
     public static EducationLevel parseFromString(final String educationLevel) {
-        switch (educationLevel) {
-            case "None":
-            case "Early Childhood":
-                return EARLY_CHILDHOOD;
-            case "High School":
-                return HIGH_SCHOOL;
-            case "College":
-                return COLLEGE;
-            case "Post-Graduate":
-                return POST_GRADUATE;
-            case "Doctorate":
-                return DOCTORATE;
-            default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromString: "
-                        + educationLevel);
-        }
+        return switch (educationLevel) {
+            case "None", "Early Childhood" -> EARLY_CHILDHOOD;
+            case "High School" -> HIGH_SCHOOL;
+            case "College" -> COLLEGE;
+            case "Post-Graduate" -> POST_GRADUATE;
+            case "Doctorate" -> DOCTORATE;
+            default ->
+                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromString: " + educationLevel);
+        };
     }
 
     /**
@@ -110,21 +108,15 @@ public enum EducationLevel {
      * @throws IllegalStateException if the integer value does not correspond to any valid EducationLevel enum value
      */
     public static EducationLevel parseFromInt(final int educationLevel) {
-        switch (educationLevel) {
-            case 0:
-                return EARLY_CHILDHOOD;
-            case 1:
-                return HIGH_SCHOOL;
-            case 2:
-                return COLLEGE;
-            case 3:
-                return POST_GRADUATE;
-            case 4:
-                return DOCTORATE;
-            default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromInt: "
-                        + educationLevel);
-        }
+        return switch (educationLevel) {
+            case 0 -> EARLY_CHILDHOOD;
+            case 1 -> HIGH_SCHOOL;
+            case 2 -> COLLEGE;
+            case 3 -> POST_GRADUATE;
+            case 4 -> DOCTORATE;
+            default ->
+                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromInt: " + educationLevel);
+        };
     }
 
     /**
@@ -135,21 +127,13 @@ public enum EducationLevel {
      * @throws IllegalStateException if the given EducationLevel is unexpected
      */
     public static int parseToInt(final EducationLevel educationLevel) {
-        switch (educationLevel) {
-            case EARLY_CHILDHOOD:
-                return 0;
-            case HIGH_SCHOOL:
-                return 1;
-            case COLLEGE:
-                return 2;
-            case POST_GRADUATE:
-                return 3;
-            case DOCTORATE:
-                return 4;
-            default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseToInt: "
-                        + educationLevel);
-        }
+        return switch (educationLevel) {
+            case EARLY_CHILDHOOD -> 0;
+            case HIGH_SCHOOL -> 1;
+            case COLLEGE -> 2;
+            case POST_GRADUATE -> 3;
+            case DOCTORATE -> 4;
+        };
     }
     //endregion File I/O
 

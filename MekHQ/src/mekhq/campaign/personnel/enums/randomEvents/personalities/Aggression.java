@@ -67,7 +67,7 @@ public enum Aggression {
 
     //region Constructors
     Aggression(final String name, final String description, boolean isPositive, boolean isMajor) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.description = resources.getString(description);
@@ -259,7 +259,7 @@ public enum Aggression {
     //region File I/O
     /**
      * Parses a given string and returns the corresponding Aggression enum.
-     * Accepts either the ENUM ordinal value, or its name
+     * Accepts either the ENUM ordinal value or its name
      *
      * @param aggression the string to be parsed
      * @return the Aggression enum that corresponds to the given string
@@ -268,38 +268,40 @@ public enum Aggression {
 
     @SuppressWarnings(value = "unused")
     public static Aggression parseFromString(final String aggression) {
-        return switch (aggression.toLowerCase()) {
-            case "0", "none" -> NONE;
-            case "1", "bloodthirsty" -> BLOODTHIRSTY;
-            case "2", "bold" -> BOLD;
-            case "3", "aggressive" -> AGGRESSIVE;
-            case "4", "assertive" -> ASSERTIVE;
-            case "5", "belligerent" -> BELLIGERENT;
-            case "6", "brash" -> BRASH;
-            case "7", "confident" -> CONFIDENT;
-            case "8", "courageous" -> COURAGEOUS;
-            case "9", "daring" -> DARING;
-            case "10", "decisive" -> DECISIVE;
-            case "11", "determined" -> DETERMINED;
-            case "12", "diplomatic" -> DIPLOMATIC;
-            case "13", "domineering" -> DOMINEERING;
-            case "14", "fearless" -> FEARLESS;
-            case "15", "hostile" -> HOSTILE;
-            case "16", "hot-headed" -> HOT_HEADED;
-            case "17", "impetuous" -> IMPETUOUS;
-            case "18", "impulsive" -> IMPULSIVE;
-            case "19", "inflexible" -> INFLEXIBLE;
-            case "20", "intrepid" -> INTREPID;
-            case "21", "murderous" -> MURDEROUS;
-            case "22", "overbearing" -> OVERBEARING;
-            case "23", "pacifistic" -> PACIFISTIC;
-            case "24", "reckless" -> RECKLESS;
-            case "25", "resolute" -> RESOLUTE;
-            case "26", "sadistic" -> SADISTIC;
-            case "27", "savage" -> SAVAGE;
-            case "28", "stubborn" -> STUBBORN;
-            case "29", "tenacious" -> TENACIOUS;
-            case "30", "vigilant" -> VIGILANT;
+        return switch (aggression) {
+            case "0", "None" -> NONE;
+            // Minor Characteristics
+            case "1", "Bold" -> BOLD;
+            case "2", "Aggressive" -> AGGRESSIVE;
+            case "3", "Assertive" -> ASSERTIVE;
+            case "4", "Belligerent" -> BELLIGERENT;
+            case "5", "Brash" -> BRASH;
+            case "6", "Confident" -> CONFIDENT;
+            case "7", "Courageous" -> COURAGEOUS;
+            case "8", "Daring" -> DARING;
+            case "9", "Decisive" -> DECISIVE;
+            case "10", "Determined" -> DETERMINED;
+            case "11", "Domineering" -> DOMINEERING;
+            case "12", "Fearless" -> FEARLESS;
+            case "13", "Hostile" -> HOSTILE;
+            case "14", "Hot-Headed" -> HOT_HEADED;
+            case "15", "Impetuous" -> IMPETUOUS;
+            case "16", "Impulsive" -> IMPULSIVE;
+            case "17", "Inflexible" -> INFLEXIBLE;
+            case "18", "Intrepid" -> INTREPID;
+            case "19", "Overbearing" -> OVERBEARING;
+            case "20", "Reckless" -> RECKLESS;
+            case "21", "Resolute" -> RESOLUTE;
+            case "22", "Stubborn" -> STUBBORN;
+            case "23", "Tenacious" -> TENACIOUS;
+            case "24", "Vigilant" -> VIGILANT;
+            // Major Characteristics
+            case "25", "Bloodthirsty" -> BLOODTHIRSTY;
+            case "26", "Diplomatic" -> DIPLOMATIC;
+            case "27", "Murderous" -> MURDEROUS;
+            case "28", "Pacifistic" -> PACIFISTIC;
+            case "29", "Sadistic" -> SADISTIC;
+            case "30", "Savage" -> SAVAGE;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Aggression.java/parseFromString: "
                             + aggression);
@@ -318,36 +320,38 @@ public enum Aggression {
     public static Aggression parseFromInt(final int aggression) {
         return switch (aggression) {
             case 0 -> NONE;
-            case 1 -> BLOODTHIRSTY;
-            case 2 -> BOLD;
-            case 3 -> AGGRESSIVE;
-            case 4 -> ASSERTIVE;
-            case 5 -> BELLIGERENT;
-            case 6 -> BRASH;
-            case 7 -> CONFIDENT;
-            case 8 -> COURAGEOUS;
-            case 9 -> DARING;
-            case 10 -> DECISIVE;
-            case 11 -> DETERMINED;
-            case 12 -> DIPLOMATIC;
-            case 13 -> DOMINEERING;
-            case 14 -> FEARLESS;
-            case 15 -> HOSTILE;
-            case 16 -> HOT_HEADED;
-            case 17 -> IMPETUOUS;
-            case 18 -> IMPULSIVE;
-            case 19 -> INFLEXIBLE;
-            case 20 -> INTREPID;
-            case 21 -> MURDEROUS;
-            case 22 -> OVERBEARING;
-            case 23 -> PACIFISTIC;
-            case 24 -> RECKLESS;
-            case 25 -> RESOLUTE;
-            case 26 -> SADISTIC;
-            case 27 -> SAVAGE;
-            case 28 -> STUBBORN;
-            case 29 -> TENACIOUS;
-            case 30 -> VIGILANT;
+            // Minor Characteristics
+            case 1 -> BOLD;
+            case 2 -> AGGRESSIVE;
+            case 3 -> ASSERTIVE;
+            case 4 -> BELLIGERENT;
+            case 5 -> BRASH;
+            case 6 -> CONFIDENT;
+            case 7 -> COURAGEOUS;
+            case 8 -> DARING;
+            case 9 -> DECISIVE;
+            case 10 -> DETERMINED;
+            case 11 -> DOMINEERING;
+            case 12 -> FEARLESS;
+            case 13 -> HOSTILE;
+            case 14 -> HOT_HEADED;
+            case 15 -> IMPETUOUS;
+            case 16 -> IMPULSIVE;
+            case 17 -> INFLEXIBLE;
+            case 18 -> INTREPID;
+            case 19 -> OVERBEARING;
+            case 20 -> RECKLESS;
+            case 21 -> RESOLUTE;
+            case 22 -> STUBBORN;
+            case 23 -> TENACIOUS;
+            case 24 -> VIGILANT;
+            // Major Characteristics
+            case 25 -> BLOODTHIRSTY;
+            case 26 -> DIPLOMATIC;
+            case 27 -> MURDEROUS;
+            case 28 -> PACIFISTIC;
+            case 29 -> SADISTIC;
+            case 30 -> SAVAGE;
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Aggression.java/parseFromInt: "
                             + aggression);
