@@ -108,6 +108,13 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
             specialAbilityGenerator.generateSpecialAbilities(campaign, person, expLvl);
         }
 
+        // set interest in marriage and children flags
+        int interestInMarriageDiceSize = campaign.getCampaignOptions().getNoInterestInMarriageDiceSize();
+        person.setMarriageable(((interestInMarriageDiceSize != 0) && (Compute.randomInt(interestInMarriageDiceSize)) != 0));
+
+        int interestInChildren = campaign.getCampaignOptions().getNoInterestInChildrenDiceSize();
+        person.setTryingToConceive(((interestInChildren != 0) && (Compute.randomInt(interestInChildren)) != 0));
+
         // Do naming at the end, to ensure the keys are set
         generateNameAndGender(campaign, person, gender);
 

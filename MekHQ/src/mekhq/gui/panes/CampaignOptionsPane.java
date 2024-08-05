@@ -358,6 +358,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseClanPersonnelMarriages;
     private JCheckBox chkUsePrisonerMarriages;
     private JSpinner spnCheckMutualAncestorsDepth;
+    private JSpinner spnNoInterestInMarriageDiceSize;
     private JCheckBox chkLogMarriageNameChanges;
     private Map<MergingSurnameStyle, JSpinner> spnMarriageSurnameWeights;
     private MMComboBox<RandomMarriageMethod> comboRandomMarriageMethod;
@@ -391,6 +392,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkAssignChildrenOfFoundersFounderTag;
     private JCheckBox chkDetermineFatherAtBirth;
     private JCheckBox chkDisplayTrueDueDate;
+    private JSpinner spnNoInterestInChildrenDiceSize;
     private JCheckBox chkUseMaternityLeave;
     private JCheckBox chkLogProcreation;
     private MMComboBox<RandomProcreationMethod> comboRandomProcreationMethod;
@@ -5582,6 +5584,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkUseRandomPrisonerMarriages.setEnabled(!method.isNone() && chkUsePrisonerMarriages.isSelected());
         });
 
+        final JLabel lblNoInterestInMarriageDiceSize = new JLabel(resources.getString("lblNoInterestInMarriageDiceSize.text"));
+        lblNoInterestInMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblNoInterestInMarriageDiceSize.toolTipText")));
+        lblNoInterestInMarriageDiceSize.setName("lblNoInterestInMarriageDiceSize");
+
+        spnNoInterestInMarriageDiceSize = new JSpinner(new SpinnerNumberModel(10, 1, 100000, 1));
+        spnNoInterestInMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblNoInterestInMarriageDiceSize.toolTipText")));
+        spnNoInterestInMarriageDiceSize.setName("spnNoInterestInMarriageDiceSize");
+
         final JLabel lblCheckMutualAncestorsDepth = new JLabel(resources.getString("lblCheckMutualAncestorsDepth.text"));
         lblCheckMutualAncestorsDepth.setToolTipText(resources.getString("lblCheckMutualAncestorsDepth.toolTipText"));
         lblCheckMutualAncestorsDepth.setName("lblCheckMutualAncestorsDepth");
@@ -5617,6 +5627,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseClanPersonnelMarriages)
                         .addComponent(chkUsePrisonerMarriages)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblNoInterestInMarriageDiceSize)
+                                .addComponent(spnNoInterestInMarriageDiceSize, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCheckMutualAncestorsDepth)
                                 .addComponent(spnCheckMutualAncestorsDepth, Alignment.LEADING))
                         .addComponent(chkLogMarriageNameChanges)
@@ -5629,6 +5642,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseManualMarriages)
                         .addComponent(chkUseClanPersonnelMarriages)
                         .addComponent(chkUsePrisonerMarriages)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblNoInterestInMarriageDiceSize)
+                                .addComponent(spnNoInterestInMarriageDiceSize))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCheckMutualAncestorsDepth)
                                 .addComponent(spnCheckMutualAncestorsDepth))
@@ -6132,6 +6148,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkDisplayTrueDueDate.setToolTipText(resources.getString("chkDisplayTrueDueDate.toolTipText"));
         chkDisplayTrueDueDate.setName("chkDisplayTrueDueDate");
 
+        final JLabel lblNoInterestInChildrenDiceSize = new JLabel(resources.getString("lblNoInterestInChildrenDiceSize.text"));
+        lblNoInterestInChildrenDiceSize.setToolTipText(wordWrap(resources.getString("lblNoInterestInChildrenDiceSize.toolTipText")));
+        lblNoInterestInChildrenDiceSize.setName("lblNoInterestInChildrenDiceSize");
+
+        spnNoInterestInChildrenDiceSize = new JSpinner(new SpinnerNumberModel(3, 1, 100000, 1));
+        spnNoInterestInChildrenDiceSize.setToolTipText(wordWrap(resources.getString("lblNoInterestInChildrenDiceSize.toolTipText")));
+        spnNoInterestInChildrenDiceSize.setName("spnNoInterestInChildrenDiceSize");
+
         chkUseMaternityLeave = new JCheckBox(resources.getString("chkUseMaternityLeave.text"));
         chkUseMaternityLeave.setToolTipText(wordWrap(resources.getString("chkUseMaternityLeave.toolTipText")));
         chkUseMaternityLeave.setName("chkUseMaternityLeave");
@@ -6172,6 +6196,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
                         .addComponent(chkDisplayTrueDueDate)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblNoInterestInChildrenDiceSize)
+                                .addComponent(spnNoInterestInChildrenDiceSize, Alignment.LEADING))
                         .addComponent(chkUseMaternityLeave)
                         .addComponent(chkLogProcreation)
                         .addComponent(randomProcreationPanel)
@@ -6193,6 +6220,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
                         .addComponent(chkDisplayTrueDueDate)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblNoInterestInChildrenDiceSize)
+                                .addComponent(spnNoInterestInChildrenDiceSize))
                         .addComponent(chkUseMaternityLeave)
                         .addComponent(chkLogProcreation)
                         .addComponent(randomProcreationPanel)
@@ -8238,6 +8268,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseManualMarriages.setSelected(options.isUseManualMarriages());
         chkUseClanPersonnelMarriages.setSelected(options.isUseClanPersonnelMarriages());
         chkUsePrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
+        spnNoInterestInMarriageDiceSize.setValue(options.getNoInterestInMarriageDiceSize());
         spnCheckMutualAncestorsDepth.setValue(options.getCheckMutualAncestorsDepth());
         chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
         for (final Entry<MergingSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
@@ -8288,6 +8319,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAssignChildrenOfFoundersFounderTag.setSelected(options.isAssignChildrenOfFoundersFounderTag());
         chkDetermineFatherAtBirth.setSelected(options.isDetermineFatherAtBirth());
         chkDisplayTrueDueDate.setSelected(options.isDisplayTrueDueDate());
+        spnNoInterestInChildrenDiceSize.setValue(options.getNoInterestInChildrenDiceSize());
         chkUseMaternityLeave.setSelected(options.isUseMaternityLeave());
         chkLogProcreation.setSelected(options.isLogProcreation());
         comboRandomProcreationMethod.setSelectedItem(options.getRandomProcreationMethod());
@@ -8938,6 +8970,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseManualMarriages(chkUseManualMarriages.isSelected());
             options.setUseClanPersonnelMarriages(chkUseClanPersonnelMarriages.isSelected());
             options.setUsePrisonerMarriages(chkUsePrisonerMarriages.isSelected());
+            options.setNoInterestInMarriageDiceSize((int) spnNoInterestInMarriageDiceSize.getValue());
             options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getValue());
             options.setLogMarriageNameChanges(chkLogMarriageNameChanges.isSelected());
             for (final Entry<MergingSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
@@ -8975,6 +9008,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setAssignChildrenOfFoundersFounderTag(chkAssignChildrenOfFoundersFounderTag.isSelected());
             options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
             options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
+            options.setNoInterestInChildrenDiceSize((int) spnNoInterestInChildrenDiceSize.getValue());
             options.setUseMaternityLeave(chkUseMaternityLeave.isSelected());
             options.setLogProcreation(chkLogProcreation.isSelected());
             options.setRandomProcreationMethod(comboRandomProcreationMethod.getSelectedItem());

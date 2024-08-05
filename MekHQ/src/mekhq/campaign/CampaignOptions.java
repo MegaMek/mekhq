@@ -294,6 +294,7 @@ public class CampaignOptions {
     private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
     private int checkMutualAncestorsDepth;
+    private int noInterestInMarriageDiceSize;
     private boolean logMarriageNameChanges;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
@@ -328,6 +329,7 @@ public class CampaignOptions {
     private boolean useMaternityLeave;
     private boolean determineFatherAtBirth;
     private boolean displayTrueDueDate;
+    private int noInterestInChildrenDiceSize;
     private boolean logProcreation;
     private RandomProcreationMethod randomProcreationMethod;
     private boolean useRelationshiplessRandomProcreation;
@@ -852,6 +854,7 @@ public class CampaignOptions {
         setUseClanPersonnelMarriages(false);
         setUsePrisonerMarriages(true);
         setCheckMutualAncestorsDepth(4);
+        setNoInterestInMarriageDiceSize(10);
         setLogMarriageNameChanges(false);
         setMarriageSurnameWeights(new HashMap<>());
         getMarriageSurnameWeights().put(MergingSurnameStyle.NO_CHANGE, 100);
@@ -902,6 +905,7 @@ public class CampaignOptions {
         setUseMaternityLeave(true);
         setDetermineFatherAtBirth(false);
         setDisplayTrueDueDate(false);
+        setNoInterestInChildrenDiceSize(3);
         setLogProcreation(false);
         setRandomProcreationMethod(RandomProcreationMethod.NONE);
         setUseRelationshiplessRandomProcreation(false);
@@ -2335,6 +2339,14 @@ public class CampaignOptions {
         this.checkMutualAncestorsDepth = checkMutualAncestorsDepth;
     }
 
+    public int getNoInterestInMarriageDiceSize() {
+        return noInterestInMarriageDiceSize;
+    }
+
+    public void setNoInterestInMarriageDiceSize(final int noInterestInMarriageDiceSize) {
+        this.noInterestInMarriageDiceSize = noInterestInMarriageDiceSize;
+    }
+
     /**
      * @return whether to log a name change in a marriage
      */
@@ -2654,6 +2666,14 @@ public class CampaignOptions {
      */
     public void setDisplayTrueDueDate(final boolean displayTrueDueDate) {
         this.displayTrueDueDate = displayTrueDueDate;
+    }
+
+    public int getNoInterestInChildrenDiceSize() {
+        return noInterestInChildrenDiceSize;
+    }
+
+    public void setNoInterestInChildrenDiceSize(final int noInterestInChildrenDiceSize) {
+        this.noInterestInChildrenDiceSize = noInterestInChildrenDiceSize;
     }
 
     /**
@@ -4782,6 +4802,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelMarriages", isUseClanPersonnelMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerMarriages", isUsePrisonerMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noInterestInMarriageDiceSize", getNoInterestInMarriageDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "marriageSurnameWeights");
         for (final Entry<MergingSurnameStyle, Integer> entry : getMarriageSurnameWeights().entrySet()) {
@@ -4825,6 +4846,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMaternityLeave", isUseMaternityLeave());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "determineFatherAtBirth", isDetermineFatherAtBirth());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayTrueDueDate", isDisplayTrueDueDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noInterestInChildrenDiceSize", getNoInterestInChildrenDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logProcreation", isLogProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomProcreationMethod", getRandomProcreationMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRelationshiplessRandomProcreation", isUseRelationshiplessRandomProcreation());
@@ -5498,6 +5520,8 @@ public class CampaignOptions {
                     retVal.setUsePrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
                     retVal.setCheckMutualAncestorsDepth(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("noInterestInMarriageDiceSize")) {
+                    retVal.setNoInterestInMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChanges")) {
                     retVal.setLogMarriageNameChanges(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("marriageSurnameWeights")) {
@@ -5594,6 +5618,8 @@ public class CampaignOptions {
                     retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
                     retVal.setDisplayTrueDueDate(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("noInterestInChildrenDiceSize")) {
+                    retVal.setNoInterestInChildrenDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("logProcreation")) {
                     retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomProcreationMethod")) {
