@@ -111,13 +111,20 @@ public abstract class AbstractPersonnelGenerator {
     }
 
     /**
-     * Generates a name for a {@link Person}.
-     * @param campaign The {@link Campaign} to use to generate the person
-     * @param person The {@link Person} whose name is being generated.
-     * @param gender The person's gender, or a randomize value
+     * Generates and sets the name and gender of a person.
+     *
+     * @param campaign the campaign the person belongs to
+     * @param person the person whose name and gender is being generated
+     * @param gender the gender of the person. Can be Gender.MALE, Gender.FEMALE, Gender.NON_BINARY, or Gender.RANDOMIZE
      */
-    protected void generateName(Campaign campaign, Person person, Gender gender) {
-        person.setGender((gender == Gender.RANDOMIZE) ? RandomGenderGenerator.generate() : gender);
+    protected void generateNameAndGender(Campaign campaign, Person person, Gender gender) {
+        int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
+
+        if ((gender == Gender.RANDOMIZE) && (nonBinaryDiceSize > 0) && (Compute.randomInt(nonBinaryDiceSize) == 0)) {
+            person.setGender(RandomGenderGenerator.generateOther());
+        } else {
+            person.setGender(RandomGenderGenerator.generate());
+        }
 
         String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames()
                 ? person.getOriginFaction().getShortName()

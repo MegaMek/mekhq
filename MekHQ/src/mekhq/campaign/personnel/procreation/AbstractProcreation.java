@@ -523,8 +523,8 @@ public abstract class AbstractProcreation {
 
         // Check if they are already pregnant
         if (person.isPregnant()) {
-            // They give birth if the due date is the current day
-            if (today.isEqual(person.getDueDate())) {
+            // They give birth if the due date has passed
+            if ((today.isAfter(person.getDueDate())) || (today.isEqual(person.getDueDate()))) {
                 birth(campaign, today, person);
             }
             return;

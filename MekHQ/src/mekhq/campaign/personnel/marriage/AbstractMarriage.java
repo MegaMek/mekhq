@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel.marriage;
 
+import megamek.client.generator.RandomGenderGenerator;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -343,15 +344,25 @@ public abstract class AbstractMarriage {
     protected void marryRandomSpouse(final Campaign campaign, final LocalDate today,
                                      final Person person, final boolean sameSex,
                                      boolean isInterUnit, boolean isBackground) {
-        final Gender gender = sameSex ? person.getGender()
-                : (person.getGender().isMale() ? Gender.FEMALE : Gender.MALE);
+        Gender personGender = person.getGender();
+
+        boolean isNonBinary = (campaign.getCampaignOptions().getNonBinaryDiceSize() > 0)
+                && (Compute.randomInt(campaign.getCampaignOptions().getNonBinaryDiceSize()) == 0);
+
+        Gender spouseGender = switch (personGender) {
+            case MALE, OTHER_MALE -> sameSex ? (isNonBinary ?
+                    Gender.OTHER_MALE : Gender.MALE) : (isNonBinary ? Gender.OTHER_FEMALE : Gender.FEMALE);
+            case FEMALE, OTHER_FEMALE -> sameSex ? (isNonBinary ?
+                    Gender.OTHER_FEMALE : Gender.FEMALE) : (isNonBinary ? Gender.OTHER_MALE : Gender.MALE);
+            case RANDOMIZE -> RandomGenderGenerator.generate();
+        };
 
         List<Person> potentialSpouses = new ArrayList<>();
         Person spouse = null;
 
         if (isInterUnit) {
             potentialSpouses = campaign.getActivePersonnel().stream()
-                    .filter(potentialSpouse -> isPotentialRandomSpouse(campaign, today, person, potentialSpouse, gender))
+                    .filter(potentialSpouse -> isPotentialRandomSpouse(campaign, today, person, potentialSpouse, spouseGender))
                     .toList();
 
             if (!potentialSpouses.isEmpty()) {
@@ -360,7 +371,7 @@ public abstract class AbstractMarriage {
         }
 
         if ((!isInterUnit) || (potentialSpouses.isEmpty())) {
-            spouse = createExternalSpouse(campaign, today, person, gender);
+            spouse = createExternalSpouse(campaign, today, person, spouseGender);
         }
 
         marry(campaign, today, person, spouse, MergingSurnameStyle.WEIGHTED, isBackground);

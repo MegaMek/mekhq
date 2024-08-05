@@ -29,16 +29,16 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.UnitGeneratorParameters;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.math3.distribution.GammaDistribution;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -426,7 +426,16 @@ public class BotForceRandomizer {
 
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
         rng.setChosenFaction(faction.getNameGenerator());
-        Gender gender = RandomGenderGenerator.generate();
+
+        Gender gender;
+        int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
+
+        if ((nonBinaryDiceSize > 0) && (Compute.randomInt(nonBinaryDiceSize) == 0)) {
+            gender = RandomGenderGenerator.generateOther();
+        } else {
+            gender = RandomGenderGenerator.generate();
+        }
+
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
         crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
@@ -625,12 +634,8 @@ public class BotForceRandomizer {
     }
 
     public String getShortDescription() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(forceMultiplier);
-        sb.append(" (");
-        sb.append(balancingMethod.toString());
-        sb.append(")");
-        return sb.toString();
+        String sb = forceMultiplier + " (" + balancingMethod.toString() + ")";
+        return sb;
     }
 
     /**

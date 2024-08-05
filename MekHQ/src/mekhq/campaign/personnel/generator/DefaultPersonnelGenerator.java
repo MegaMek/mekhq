@@ -109,7 +109,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         }
 
         // Do naming at the end, to ensure the keys are set
-        generateName(campaign, person, gender);
+        generateNameAndGender(campaign, person, gender);
 
         //check for Bloodname
         campaign.checkBloodnameAdd(person, false);

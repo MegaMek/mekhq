@@ -273,9 +273,10 @@ public class CampaignOptions {
     //region Life Paths Tab
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
-    private RandomOriginOptions randomOriginOptions;
+    private int nonBinaryDiceSize;
 
     // Random Histories
+    private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
     private boolean useSimulatedRelationships;
 
@@ -831,6 +832,7 @@ public class CampaignOptions {
         //region Life Paths Tab
         // Personnel Randomization
         setUseDylansRandomXP(false);
+        setNonBinaryDiceSize(60);
         setRandomOriginOptions(new RandomOriginOptions(true));
 
         // Random Histories
@@ -908,7 +910,7 @@ public class CampaignOptions {
         setRandomProcreationRelationshipDiceSize(500);
         setRandomProcreationRelationshiplessDiceSize(2000);
 
-                // Education
+        // Education
         setUseEducationModule(false);
         setCurriculumXpRate(3);
         setMaximumJumpCount(5);
@@ -1841,7 +1843,16 @@ public class CampaignOptions {
     public void setUseDylansRandomXP(final boolean useDylansRandomXP) {
         this.useDylansRandomXP = useDylansRandomXP;
     }
+    public int getNonBinaryDiceSize() {
+        return nonBinaryDiceSize;
+    }
 
+    public void setNonBinaryDiceSize(final int nonBinaryDiceSize) {
+        this.nonBinaryDiceSize = nonBinaryDiceSize;
+    }
+    //endregion Personnel Randomization
+
+    //region Random Histories
     public RandomOriginOptions getRandomOriginOptions() {
         return randomOriginOptions;
     }
@@ -1849,9 +1860,7 @@ public class CampaignOptions {
     public void setRandomOriginOptions(final RandomOriginOptions randomOriginOptions) {
         this.randomOriginOptions = randomOriginOptions;
     }
-    //endregion Personnel Randomization
 
-    //region Random Histories
     public boolean isUseRandomPersonalities() {
         return useRandomPersonalities;
     }
@@ -4699,10 +4708,11 @@ public class CampaignOptions {
         //region Life Paths Tab
         //region Personnel Randomization
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
-        getRandomOriginOptions().writeToXML(pw, indent);
-        //endregion Personnel Randomization
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nonBinaryDiceSize", getNonBinaryDiceSize());
+       //endregion Personnel Randomization
 
         //region Random Histories
+        getRandomOriginOptions().writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSimulatedRelationships", isUseSimulatedRelationships());
         //endregion Random Histories
@@ -5443,6 +5453,11 @@ public class CampaignOptions {
                     //region Personnel Randomization
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXP")) {
                     retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("nonBinaryDiceSize")) {
+                    retVal.setNonBinaryDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                //endregion Personnel Randomization
+
+                    //region Random Histories
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomOriginOptions")) {
                     if (!wn2.hasChildNodes()) {
                         continue;
@@ -5452,9 +5467,6 @@ public class CampaignOptions {
                         continue;
                     }
                     retVal.setRandomOriginOptions(randomOriginOptions);
-                    //endregion Personnel Randomization
-
-                    //region Random Histories
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalities")) {
                     retVal.setUseRandomPersonalities(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useSimulatedRelationships")) {

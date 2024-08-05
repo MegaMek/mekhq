@@ -346,9 +346,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //region Life Paths Tab
     // Personnel Randomization
     private JCheckBox chkUseDylansRandomXP;
-    private RandomOriginOptionsPanel randomOriginOptionsPanel;
+    private JSpinner spnNonBinaryDiceSize;
 
     // Random Histories
+    private RandomOriginOptionsPanel randomOriginOptionsPanel;
     private JCheckBox chkUseRandomPersonalities;
     private JCheckBox chkUseSimulatedRelationships;
 
@@ -5017,7 +5018,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
-        randomOriginOptionsPanel = new RandomOriginOptionsPanel(getFrame(), campaign, comboFaction);
+        JLabel lblNonBinaryDiceSize = new JLabel(resources.getString("lblNonBinaryDiceSize.text"));
+        lblNonBinaryDiceSize.setToolTipText(resources.getString("lblNonBinaryDiceSize.toolTipText"));
+        lblNonBinaryDiceSize.setName("lblNonBinaryDiceSize");
+
+        spnNonBinaryDiceSize = new JSpinner(new SpinnerNumberModel(60, 0, 100000, 1));
+        spnNonBinaryDiceSize.setToolTipText(wordWrap(resources.getString("lblNonBinaryDiceSize.toolTipText")));
+        spnNonBinaryDiceSize.setName("spnNonBinaryDiceSize");
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -5032,19 +5039,25 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseDylansRandomXP)
-                        .addComponent(randomOriginOptionsPanel)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                            .addComponent(lblNonBinaryDiceSize)
+                            .addComponent(spnNonBinaryDiceSize, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseDylansRandomXP)
-                        .addComponent(randomOriginOptionsPanel)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(lblNonBinaryDiceSize)
+                            .addComponent(spnNonBinaryDiceSize))
         );
 
         return panel;
     }
 
     private JPanel createRandomHistoriesPanel() {
+        randomOriginOptionsPanel = new RandomOriginOptionsPanel(getFrame(), campaign, comboFaction);
+
         chkUseRandomPersonalities = new JCheckBox(resources.getString("chkUseRandomPersonalities.text"));
         chkUseRandomPersonalities.setToolTipText(resources.getString("chkUseRandomPersonalities.toolTipText"));
         chkUseRandomPersonalities.setName("chkUseRandomPersonalities");
@@ -5065,12 +5078,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addComponent(randomOriginOptionsPanel)
                         .addComponent(chkUseRandomPersonalities)
                         .addComponent(chkUseSimulatedRelationships)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(randomOriginOptionsPanel)
                         .addComponent(chkUseRandomPersonalities)
                         .addComponent(chkUseSimulatedRelationships)
         );
@@ -8204,9 +8219,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         //region Life Paths Tab
         // Personnel Randomization
         chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
-        randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
+        spnNonBinaryDiceSize.setValue(options.getNonBinaryDiceSize());
 
         // Random Histories
+        randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
         chkUseSimulatedRelationships.setSelected(options.isUseSimulatedRelationships());
 
@@ -8903,9 +8919,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             //region Life Paths Tab
             // Personnel Randomization
             options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
-            options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
+            options.setNonBinaryDiceSize((int) spnNonBinaryDiceSize.getValue());
 
             // Random Histories
+            options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
             options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
             options.setUseSimulatedRelationships(chkUseSimulatedRelationships.isSelected());
 
@@ -9569,7 +9586,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         /*
          * This table does not use any data from the main TableModel,
-         * so just return a value based on the row parameter.
+         * so return a value based on the row parameter.
          */
         @Override
         public Object getValueAt(int row, int column) {
