@@ -7757,7 +7757,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblDropShipBonusPercentage.setToolTipText(wordWrap(resources.getString("lblDropShipBonusPercentage.toolTipText")));
         lblDropShipBonusPercentage.setName("lblDropShipBonusPercentage");
 
-        spnDropShipBonusPercentage = new JSpinner(new SpinnerNumberModel(0, 0, 100, 5));
+        spnDropShipBonusPercentage = new JSpinner(new SpinnerNumberModel(0, 0, 20, 5));
         spnDropShipBonusPercentage.setToolTipText(resources.getString("lblDropShipBonusPercentage.toolTipText"));
         spnDropShipBonusPercentage.setName("spnDropShipBonusPercentage");
 
