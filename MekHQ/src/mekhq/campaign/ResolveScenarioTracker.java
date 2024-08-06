@@ -66,6 +66,7 @@ public class ResolveScenarioTracker {
     Hashtable<UUID, Crew> pilots;
     Hashtable<UUID, Crew> mia;
     List<TestUnit> potentialSalvage;
+    Money dropShipBonus;
     List<TestUnit> alliedUnits;
     List<TestUnit> actualSalvage;
     List<TestUnit> ransomedSalvage;
@@ -100,6 +101,7 @@ public class ResolveScenarioTracker {
         unitsStatus = new Hashtable<>();
         salvageStatus = new Hashtable<>();
         potentialSalvage = new ArrayList<>();
+        dropShipBonus = Money.zero();
         alliedUnits = new ArrayList<>();
         actualSalvage = new ArrayList<>();
         ransomedSalvage = new ArrayList<>();
@@ -364,11 +366,21 @@ public class ResolveScenarioTracker {
                     continue;
                 }
                 if (control) {
-                    TestUnit nu = generateNewTestUnit(e);
-                    UnitStatus us = new UnitStatus(nu);
-                    us.setTotalLoss(false);
-                    salvageStatus.put(nu.getId(), us);
-                    potentialSalvage.add(nu);
+                    double dropShipBonusPercentage = (double) campaign.getCampaignOptions().getDropShipBonusPercentage() / 100;
+
+                    if ((e.isDropShip())
+                            && (dropShipBonusPercentage > 0)
+                            && (scenario.getBoardType() == Scenario.T_GROUND)) {
+                        dropShipBonus = dropShipBonus.plus(
+                                generateNewTestUnit(e).getSellValue().multipliedBy(dropShipBonusPercentage)
+                        );
+                    } else {
+                        TestUnit nu = generateNewTestUnit(e);
+                        UnitStatus us = new UnitStatus(nu);
+                        us.setTotalLoss(false);
+                        salvageStatus.put(nu.getId(), us);
+                        potentialSalvage.add(nu);
+                    }
                 }
             }
 
@@ -1302,6 +1314,10 @@ public class ResolveScenarioTracker {
 
     public List<TestUnit> getPotentialSalvage() {
         return potentialSalvage;
+    }
+
+    public Money getDropShipBonus() {
+        return dropShipBonus;
     }
 
     public List<TestUnit> getActualSalvage() {
