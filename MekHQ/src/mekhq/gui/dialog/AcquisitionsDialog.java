@@ -487,32 +487,42 @@ public class AcquisitionsDialog extends JDialog {
             btnUseBonus.addActionListener(ev -> useBonusPart());
             actionButtons.add(btnUseBonus, gbcActions);
             gbcActions.gridy++;
-
+            JButton btnOrderOne;
+            JButton btnOrderInBulk;
             if (partCountInfo.isCanBeAcquired()) {
-                JButton btnOrderOne = new JButton("Order One");
-                btnOrderOne.setToolTipText("Order one item");
-                btnOrderOne.setName("btnOrderOne");
-                btnOrderOne.addActionListener(ev -> {
-                    campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(),
-                            1, campaignGUI.getCampaign());
-                    refresh();
-                });
-                actionButtons.add(btnOrderOne, gbcActions);
-                gbcActions.gridy++;
+                btnOrderOne = new JButton("Order One");
+                btnOrderInBulk = new JButton("Order in Bulk");
+            } else {
+                btnOrderOne = new JButton("Order One (TN: Impossible)");
+                btnOrderInBulk = new JButton("Order in Bulk (TN: Impossible)");
             }
+            btnOrderOne.setToolTipText("Order one item");
+            btnOrderOne.setName("btnOrderOne");
+            btnOrderOne.addActionListener(ev -> {
+                campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(),
+                        1, campaignGUI.getCampaign());
+                refresh();
+            });
+            actionButtons.add(btnOrderOne, gbcActions);
+            gbcActions.gridy++;
 
-            if (!partCountInfo.isCanBeAcquired()) {
-                JButton btnOrderOne = new JButton("Order One (TN: Impossible)");
-                btnOrderOne.setToolTipText("Order one item");
-                btnOrderOne.setName("btnOrderOne");
-                btnOrderOne.addActionListener(ev -> {
-                    campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(),
-                            1, campaignGUI.getCampaign());
+            btnOrderInBulk.setToolTipText("Order item in bulk");
+            btnOrderInBulk.setName("btnOrderInBulk");
+            btnOrderInBulk.addActionListener(ev -> {
+                int quantity = 1;
+                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
+                    true, "How Many " + part.getName() + '?', quantity,
+                    1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                pcd.setVisible(true);
+                quantity = pcd.getValue();
+                if (quantity > 0) {
+                    campaignGUI.getCampaign().getShoppingList()
+                        .addShoppingItem(part.getAcquisitionWork(), quantity, campaignGUI.getCampaign());
                     refresh();
-                });
-                actionButtons.add(btnOrderOne, gbcActions);
-                gbcActions.gridy++;
-            }
+                }
+            });
+            actionButtons.add(btnOrderInBulk, gbcActions);
+            gbcActions.gridy++;
 
             btnOrderAll = new JButton("Order All (" + partCountInfo.getMissingCount() + ")");
             btnOrderAll.setToolTipText("Order all missing");
