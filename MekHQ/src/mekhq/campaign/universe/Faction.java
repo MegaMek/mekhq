@@ -150,9 +150,15 @@ public class Faction {
             } else if (year < 3067) {
                 //Era: Clan Invasion
                 return eraMods[7];
-            } else {
+            } else if (year < 3086) {
                 //Era: Jihad
                 return eraMods[8];
+            } else if (year < 3151) {
+                //Era: Dark Age
+                return eraMods[9];
+            } else {
+                //Era: ilClan
+                return eraMods[10];
             }
         }
     }
