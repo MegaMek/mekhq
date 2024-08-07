@@ -508,7 +508,10 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        List<Person> prisoners = getCampaign().getCurrentPrisoners();
+        // we have to rebuild the list, so we can factor in any prisoners that have been ransomed.
+        List<Person> prisoners = getCampaign().getActivePersonnel().stream()
+                .filter(prisoner -> prisoner.getPrisonerStatus().isPrisoner())
+                .toList();
 
         if (!prisoners.isEmpty()) {
             String title = (prisoners.size() == 1) ? prisoners.get(0).getFullTitle()

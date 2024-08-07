@@ -2734,7 +2734,7 @@ public class Person {
         // Prisoner Status Modifications
         rankName = rankName.equalsIgnoreCase("None")
                 ? getPrisonerStatus().getTitleExtension()
-                : getPrisonerStatus().getTitleExtension() + rankName;
+                : getPrisonerStatus().getTitleExtension() + ' ' + rankName;
 
         // We have our name, return it
         return rankName.trim();
