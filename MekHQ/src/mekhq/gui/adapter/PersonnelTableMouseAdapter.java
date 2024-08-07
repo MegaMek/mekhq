@@ -3007,8 +3007,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 // find the first faction that accepts applications from all persons in personnel
                 Optional<String> suitableFaction = personnel.stream()
                         .map(person -> academy.getFilteredFaction(campaign, person, campaign.getCurrentSystem().getFactions(campaign.getLocalDate())))
-                        .filter(faction -> personnel.stream().allMatch(person -> faction.equals(academy.getFilteredFaction(campaign, person, campaign.getCurrentSystem().getFactions(campaign.getLocalDate())))))
+                        .filter(faction -> personnel.stream().allMatch(person ->
+                                Objects.equals(
+                                        faction,
+                                        academy.getFilteredFaction(campaign, person, campaign.getCurrentSystem().getFactions(campaign.getLocalDate()))
+                                )))
                         .distinct()
+                        .filter(Objects::nonNull)
                         .findFirst();
 
                 if (suitableFaction.isPresent()) {
