@@ -1732,6 +1732,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                                                 if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() < educationLevel)) {
                                                     improvementPossible++;
+                                                } else if (!person.hasSkill(skillParsed)) {
+                                                    improvementPossible++;
                                                 }
                                             }
                                         }
