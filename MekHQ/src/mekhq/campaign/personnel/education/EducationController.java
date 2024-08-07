@@ -140,6 +140,13 @@ public class EducationController {
                 person.setEduJourneyTime(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
                 person.setEduAcademySystem(campus);
             }
+
+            for (Person child : person.getGenealogy().getChildren()) {
+                if ((child.getStatus().isActive()) && (child.isChild(campaign.getLocalDate()))) {
+                    person.addEduTagAlong(child.getId());
+                    child.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
+                }
+            }
         }
 
         // this should already be 0, but we reset it just in case
@@ -487,6 +494,10 @@ public class EducationController {
         // has the person arrived home?
         if (person.getEduDaysOfTravel() >= person.getEduJourneyTime()) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+
+            for (UUID tagAlong : person.getEduTagAlongs()) {
+                campaign.getPerson(tagAlong).changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+            }
         }
     }
 

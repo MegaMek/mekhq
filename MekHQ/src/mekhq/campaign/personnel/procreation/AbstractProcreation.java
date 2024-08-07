@@ -30,10 +30,8 @@ import mekhq.campaign.ExtraData.StringKey;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.education.EducationController;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.randomEvents.PersonalityController;
 
@@ -365,6 +363,14 @@ public abstract class AbstractProcreation {
 
             // Recruit the baby
             campaign.recruitPerson(baby, prisonerStatus, true, true);
+
+            // if the mother is at school, add the baby to the list of tag alongs
+            if ((!mother.getEduAcademyName().isBlank())
+                    && (!EducationController.getAcademy(mother.getEduAcademyName(), mother.getEduAcademyNameInSet()).isHomeSchool())) {
+
+                mother.addEduTagAlong(baby.getId());
+                baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
+            }
         }
 
         // adjust parents' loyalty
