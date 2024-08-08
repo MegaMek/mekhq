@@ -71,6 +71,7 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -181,20 +182,14 @@ public class Unit implements ITechnology {
     }
 
     public static String getDamageStateName(int i) {
-        switch (i) {
-            case Entity.DMG_NONE:
-                return "Undamaged";
-            case Entity.DMG_LIGHT:
-                return "Light Damage";
-            case Entity.DMG_MODERATE:
-                return "Moderate Damage";
-            case Entity.DMG_HEAVY:
-                return "Heavy Damage";
-            case Entity.DMG_CRIPPLED:
-                return "Crippled";
-            default:
-                return "Unknown";
-        }
+        return switch (i) {
+            case Entity.DMG_NONE -> "Undamaged";
+            case Entity.DMG_LIGHT -> "Light Damage";
+            case Entity.DMG_MODERATE -> "Moderate Damage";
+            case Entity.DMG_HEAVY -> "Heavy Damage";
+            case Entity.DMG_CRIPPLED -> "Crippled";
+            default -> "Unknown";
+        };
     }
 
     public Campaign getCampaign() {
@@ -473,7 +468,7 @@ public class Unit implements ITechnology {
             // unless they are grounded spheroid dropships or jumpships
             boolean hasNoWalkMP = en.getWalkMP() <= 0;
             boolean isJumpship = en instanceof Jumpship;
-            boolean isGroundedSpheroid = (en instanceof Dropship) && ((Dropship) en).isSpheroid() && en.getAltitude() == 0;
+            boolean isGroundedSpheroid = (en instanceof Dropship) && en.isSpheroid() && en.getAltitude() == 0;
             if (hasNoWalkMP && !isJumpship && !isGroundedSpheroid) {
                 return false;
             }
@@ -565,8 +560,7 @@ public class Unit implements ITechnology {
         // need to set up an array of part ids to avoid concurrent modification
         // problems because some updateCondition methods will remove the part and put
         // in a new one
-        List<Part> tempParts = new ArrayList<>();
-        tempParts.addAll(parts);
+        List<Part> tempParts = new ArrayList<>(parts);
 
         for (Part part : tempParts) {
             part.updateConditionFromEntity(checkForDestruction);
@@ -610,12 +604,14 @@ public class Unit implements ITechnology {
     public boolean hasPartsNeedingFixing() {
         boolean onlyNotBeingWorkedOn = false;
         for (Part part : parts) {
-            if (part.needsFixing() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
+            if (part.needsFixing()) {
+                isPartAvailableForRepairs(part, onlyNotBeingWorkedOn);
                 return true;
             }
         }
         for (PodSpace pod : podSpace) {
-            if (pod.needsFixing() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
+            if (pod.needsFixing()) {
+                isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn);
                 return true;
             }
         }
@@ -649,12 +645,14 @@ public class Unit implements ITechnology {
     public boolean hasSalvageableParts() {
         boolean onlyNotBeingWorkedOn = false;
         for (Part part : parts) {
-            if (part.isSalvaging() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
+            if (part.isSalvaging()) {
+                isPartAvailableForRepairs(part, onlyNotBeingWorkedOn);
                 return true;
             }
         }
         for (PodSpace pod : podSpace) {
-            if (pod.hasSalvageableParts() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
+            if (pod.hasSalvageableParts()) {
+                isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn);
                 return true;
             }
         }
@@ -690,22 +688,19 @@ public class Unit implements ITechnology {
             //check per location really, since armor can be used anywhere. So stop after we reach
             //the first Armor needing replacement
             //TODO: we need to adjust for patchwork armor, which can have different armor types by location
-            if (!armorFound && part instanceof Armor) {
-                Armor a = (Armor) part;
+            if (!armorFound && part instanceof Armor a) {
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
                 }
             }
-            if (!armorFound && part instanceof ProtomekArmor) {
-                ProtomekArmor a = (ProtomekArmor) part;
+            if (!armorFound && part instanceof ProtomekArmor a) {
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
                 }
             }
-            if (!armorFound && part instanceof BaArmor) {
-                BaArmor a = (BaArmor) part;
+            if (!armorFound && part instanceof BaArmor a) {
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
@@ -786,8 +781,8 @@ public class Unit implements ITechnology {
 
     public String getPilotDesc() {
         if (hasPilot()) {
-            return entity.getCrew().getName() + " "
-                    + entity.getCrew().getGunnery() + "/"
+            return entity.getCrew().getName() + ' '
+                    + entity.getCrew().getGunnery() + '/'
                     + entity.getCrew().getPiloting();
         }
         return "NO PILOT";
@@ -808,37 +803,25 @@ public class Unit implements ITechnology {
     }
 
     public TargetRoll getSiteMod() {
-        switch (site) {
-            case SITE_FIELD:
-                return new TargetRoll(2, "in the field");
-            case SITE_MOBILE_BASE:
-                return new TargetRoll(1, "field workshop");
-            case SITE_BAY:
-                return new TargetRoll(0, "transport bay");
-            case SITE_FACILITY:
-                return new TargetRoll(-2, "maintenance facility");
-            case SITE_FACTORY:
-                return new TargetRoll(-4, "factory");
-            default:
-                return new TargetRoll(0, "unknown location");
-        }
+        return switch (site) {
+            case SITE_FIELD -> new TargetRoll(2, "in the field");
+            case SITE_MOBILE_BASE -> new TargetRoll(1, "field workshop");
+            case SITE_BAY -> new TargetRoll(0, "transport bay");
+            case SITE_FACILITY -> new TargetRoll(-2, "maintenance facility");
+            case SITE_FACTORY -> new TargetRoll(-4, "factory");
+            default -> new TargetRoll(0, "unknown location");
+        };
     }
 
     public static String getSiteName(int loc) {
-        switch (loc) {
-            case SITE_FIELD:
-                return "In the Field";
-            case SITE_MOBILE_BASE:
-                return "Field Workshop";
-            case SITE_BAY:
-                return "Transport Bay";
-            case SITE_FACILITY:
-                return "Maintenance Facility";
-            case SITE_FACTORY:
-                return "Factory";
-            default:
-                return "Unknown";
-        }
+        return switch (loc) {
+            case SITE_FIELD -> "In the Field";
+            case SITE_MOBILE_BASE -> "Field Workshop";
+            case SITE_BAY -> "Transport Bay";
+            case SITE_FACILITY -> "Maintenance Facility";
+            case SITE_FACTORY -> "Factory";
+            default -> "Unknown";
+        };
     }
 
     public String getCurrentSiteName() {
@@ -1145,8 +1128,7 @@ public class Unit implements ITechnology {
                 partsValue = partsValue.plus(200000.0);
             }
             // Jump sail and KF drive support systems
-            if ((entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
-                Jumpship js = (Jumpship) entity;
+            if ((entity instanceof Jumpship js) && !(entity instanceof SpaceStation)) {
                 Money driveCost = Money.zero();
                 // sail
                 driveCost = driveCost.plus(50000.0 * (30.0 + (js.getWeight() / 7500.0)));
@@ -1216,7 +1198,11 @@ public class Unit implements ITechnology {
         }
 
         // Scale the final value by the entity's price multiplier
-        partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
+        if (entity instanceof Infantry) {
+            partsValue = Money.of(entity.getAlternateCost());
+        } else {
+            partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
+        }
 
         return partsValue;
     }
@@ -1716,7 +1702,7 @@ public class Unit implements ITechnology {
                 tonnage = 25;
             }
         } else if (entity instanceof Dropship) {
-            if (((Aero) entity).isSpheroid()) {
+            if (entity.isSpheroid()) {
                 multiplier = 28;
             } else {
                 multiplier = 36;
@@ -2051,7 +2037,7 @@ public class Unit implements ITechnology {
      * @return
      */
     public @Nullable String getQuirksList() {
-        String quirkString = "";
+        StringBuilder quirkString = new StringBuilder();
         boolean first = true;
         if (null != getEntity().getGame() && getEntity().getGame().getOptions().booleanOption("stratops_quirks")) {
             for (Enumeration<IOptionGroup> i = getEntity().getQuirks().getGroups(); i.hasMoreElements();) {
@@ -2062,14 +2048,14 @@ public class Unit implements ITechnology {
                         if (first) {
                             first = false;
                         } else {
-                            quirkString += "<br>";
+                            quirkString.append("<br>");
                         }
-                        quirkString += quirk.getDisplayableNameWithValue();
+                        quirkString.append(quirk.getDisplayableNameWithValue());
                     }
                 }
             }
         }
-        return quirkString.isBlank() ? null : "<html>" + quirkString + "</html>";
+        return quirkString.toString().isBlank() ? null : "<html>" + quirkString + "</html>";
     }
 
     public void acquireQuirk(String name, Object value) {
@@ -2395,15 +2381,13 @@ public class Unit implements ITechnology {
             } else if (part instanceof MissingEquipmentPart) {
                 equipParts.put(((MissingEquipmentPart) part).getEquipmentNum(), part);
             } else if (part instanceof MekActuator || part instanceof MissingMekActuator) {
-                int type = -1;
-                int loc = -1;
+                int type;
                 if (part instanceof MekActuator) {
                     type = ((MekActuator) part).getType();
-                    loc = ((MekActuator) part).getLocation();
                 } else {
                     type = ((MissingMekActuator) part).getType();
-                    loc = ((MissingMekActuator) part).getLocation();
                 }
+                int loc = part.getLocation();
                 if (type == Mech.ACTUATOR_UPPER_ARM) {
                     if (loc == Mech.LOC_RARM) {
                         rightUpperArm = part;
@@ -3319,9 +3303,7 @@ public class Unit implements ITechnology {
             Optional<Part> bayPart = getParts().stream()
                     .filter(p -> (p instanceof TransportBayPart) && ((TransportBayPart) p).getBayNumber() == bayNum)
                     .findAny();
-            if (bayPart.isPresent()) {
-                bayPartsToAdd.get(bayNum).forEach(p -> bayPart.get().addChildPart(p));
-            }
+            bayPart.ifPresent(part -> bayPartsToAdd.get(bayNum).forEach(part::addChildPart));
         }
         if (getEntity().isOmni()) {
             podSpace.clear();
@@ -3639,7 +3621,7 @@ public class Unit implements ITechnology {
                         Collectors.collectingAndThen(
                             Collectors.groupingBy(IOption::getValue, Collectors.counting()),
                             m -> m.entrySet().stream().filter(e -> (cyberOptionNames.contains(e.getKey()) ? e.getValue() >= crewSize : e.getValue() > crewSize / 2))
-                                .max(Map.Entry.comparingByValue()).map(Map.Entry::getKey)
+                                .max(Entry.comparingByValue()).map(Entry::getKey)
                         )
                     ));
 
@@ -3680,7 +3662,6 @@ public class Unit implements ITechnology {
                 // This overwrites the Edge value assigned above.
                 if (getCampaign().getCampaignOptions().isUseEdge()) {
                     double sumEdge = 0;
-                    int edge;
                     for (Person p : drivers) {
                         sumEdge += p.getEdge();
                     }
@@ -3692,7 +3673,7 @@ public class Unit implements ITechnology {
                     }
                     // Average the edge values of pilots and gunners. The Spacecraft Engineer (vessel crewmembers)
                     // handle edge solely through MHQ as noncombat personnel, so aren't considered here
-                    edge = (int) Math.round(sumEdge / crewSize);
+                    int edge = (int) Math.round(sumEdge / crewSize);
                     IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
                     edgeOption.setValue((Integer) edge);
                 }
@@ -3882,11 +3863,7 @@ public class Unit implements ITechnology {
                 entity.getCrew().setMissing(true, 0);
                 return;
             }
-            if (nDrivers == 0) {
-                ((Tank) entity).setDriverHit(true);
-            } else {
-                ((Tank) entity).setDriverHit(false);
-            }
+            ((Tank) entity).setDriverHit(nDrivers == 0);
         } else if (entity instanceof Infantry) {
             if (nDrivers == 0 && nGunners == 0) {
                 //nobody is healthy
@@ -4932,24 +4909,13 @@ public class Unit implements ITechnology {
         int retVal = 0;
 
         if (getEntity() instanceof Mech) {
-            switch (getEntity().getWeightClass()) {
-                case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
-                    retVal = 30;
-                    break;
-                case EntityWeightClass.WEIGHT_LIGHT:
-                    retVal = 45;
-                    break;
-                case EntityWeightClass.WEIGHT_MEDIUM:
-                    retVal = 60;
-                    break;
-                case EntityWeightClass.WEIGHT_HEAVY:
-                    retVal = 75;
-                    break;
-                case EntityWeightClass.WEIGHT_ASSAULT:
-                default:
-                    retVal = 90;
-                    break;
-            }
+            retVal = switch (getEntity().getWeightClass()) {
+                case EntityWeightClass.WEIGHT_ULTRA_LIGHT -> 30;
+                case EntityWeightClass.WEIGHT_LIGHT -> 45;
+                case EntityWeightClass.WEIGHT_MEDIUM -> 60;
+                case EntityWeightClass.WEIGHT_HEAVY -> 75;
+                default -> 90;
+            };
         } else if (getEntity() instanceof Protomech) {
             retVal = 20;
         } else if (getEntity() instanceof BattleArmor) {
@@ -4961,63 +4927,31 @@ public class Unit implements ITechnology {
         } else if (getEntity() instanceof Aero
                 && !(getEntity() instanceof Dropship)
                 && !(getEntity() instanceof Jumpship)) {
-            switch (getEntity().getWeightClass()) {
-                case EntityWeightClass.WEIGHT_LIGHT:
-                    retVal = 45;
-                    break;
-                case EntityWeightClass.WEIGHT_MEDIUM:
-                    retVal = 60;
-                    break;
-                case EntityWeightClass.WEIGHT_HEAVY:
-                default:
-                    retVal = 75;
-                    break;
-            }
+            retVal = switch (getEntity().getWeightClass()) {
+                case EntityWeightClass.WEIGHT_LIGHT -> 45;
+                case EntityWeightClass.WEIGHT_MEDIUM -> 60;
+                default -> 75;
+            };
         } else if (getEntity() instanceof SupportTank) {
-            switch (getEntity().getWeightClass()) {
-                case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                    retVal = 20;
-                    break;
-                case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                    retVal = 35;
-                    break;
-                case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                default:
-                    retVal = 100;
-                    break;
-            }
+            retVal = switch (getEntity().getWeightClass()) {
+                case EntityWeightClass.WEIGHT_SMALL_SUPPORT -> 20;
+                case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT -> 35;
+                default -> 100;
+            };
         } else if (getEntity() instanceof SupportVTOL) {
-            switch (getEntity().getWeightClass()) {
-                case EntityWeightClass.WEIGHT_SMALL_SUPPORT:
-                    retVal = 20;
-                    break;
-                case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT:
-                    retVal = 35;
-                    break;
-                case EntityWeightClass.WEIGHT_LARGE_SUPPORT:
-                default:
-                    retVal = 100;
-                    break;
-            }
+            retVal = switch (getEntity().getWeightClass()) {
+                case EntityWeightClass.WEIGHT_SMALL_SUPPORT -> 20;
+                case EntityWeightClass.WEIGHT_MEDIUM_SUPPORT -> 35;
+                default -> 100;
+            };
         } else if (getEntity() instanceof Tank) {
-            switch (getEntity().getWeightClass()) {
-                case EntityWeightClass.WEIGHT_LIGHT:
-                    retVal = 30;
-                    break;
-                case EntityWeightClass.WEIGHT_MEDIUM:
-                    retVal = 50;
-                    break;
-                case EntityWeightClass.WEIGHT_HEAVY:
-                    retVal = 75;
-                    break;
-                case EntityWeightClass.WEIGHT_ASSAULT:
-                    retVal = 90;
-                    break;
-                case EntityWeightClass.WEIGHT_SUPER_HEAVY:
-                default:
-                    retVal = 120;
-                    break;
-            }
+            retVal = switch (getEntity().getWeightClass()) {
+                case EntityWeightClass.WEIGHT_LIGHT -> 30;
+                case EntityWeightClass.WEIGHT_MEDIUM -> 50;
+                case EntityWeightClass.WEIGHT_HEAVY -> 75;
+                case EntityWeightClass.WEIGHT_ASSAULT -> 90;
+                default -> 120;
+            };
         }
 
         // default value for retVal is zero, so anything that didn't fall into one of the
@@ -5725,25 +5659,13 @@ public class Unit implements ITechnology {
                 12
         );
 
-        switch (roll) {
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                return Part.QUALITY_A;
-            case 6:
-            case 7:
-            case 8:
-                return Part.QUALITY_B;
-            case 9:
-            case 10:
-                return Part.QUALITY_C;
-            case 11:
-                return Part.QUALITY_D;
-            case 12:
-                return Part.QUALITY_F;
-            default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
-        }
+        return switch (roll) {
+            case 2, 3, 4, 5 -> Part.QUALITY_A;
+            case 6, 7, 8 -> Part.QUALITY_B;
+            case 9, 10 -> Part.QUALITY_C;
+            case 11 -> Part.QUALITY_D;
+            case 12 -> Part.QUALITY_F;
+            default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
+        };
     }
 }
