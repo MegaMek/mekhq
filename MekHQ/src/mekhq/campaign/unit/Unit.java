@@ -804,22 +804,22 @@ public class Unit implements ITechnology {
 
     public TargetRoll getSiteMod() {
         return switch (site) {
-            case SITE_FIELD -> new TargetRoll(2, "in the field");
-            case SITE_MOBILE_BASE -> new TargetRoll(1, "field workshop");
-            case SITE_BAY -> new TargetRoll(0, "transport bay");
-            case SITE_FACILITY -> new TargetRoll(-2, "maintenance facility");
-            case SITE_FACTORY -> new TargetRoll(-4, "factory");
-            default -> new TargetRoll(0, "unknown location");
+            case SITE_FIELD -> new TargetRoll(2, "Improvised");
+            case SITE_MOBILE_BASE -> new TargetRoll(1, "Field Workshop");
+            case SITE_BAY -> new TargetRoll(0, "Facility - Basic");
+            case SITE_FACILITY -> new TargetRoll(-2, "Facility - Maintenance");
+            case SITE_FACTORY -> new TargetRoll(-4, "Factory Conditions");
+            default -> new TargetRoll(0, "Unknown Location");
         };
     }
 
     public static String getSiteName(int loc) {
         return switch (loc) {
-            case SITE_FIELD -> "In the Field";
+            case SITE_FIELD -> "Improvised";
             case SITE_MOBILE_BASE -> "Field Workshop";
-            case SITE_BAY -> "Transport Bay";
-            case SITE_FACILITY -> "Maintenance Facility";
-            case SITE_FACTORY -> "Factory";
+            case SITE_BAY -> "Facility - Basic";
+            case SITE_FACILITY -> "Facility - Maintenance";
+            case SITE_FACTORY -> "Factory Conditions";
             default -> "Unknown";
         };
     }
