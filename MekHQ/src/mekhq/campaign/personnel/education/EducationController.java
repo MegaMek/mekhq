@@ -986,10 +986,6 @@ public class EducationController {
 
             processGraduation(campaign, person, academy, 2, resources);
 
-            if (!academy.isMilitary()) {
-                reportMastersOrDoctorateGain(campaign, person, academy, resources);
-            }
-
             person.setEduEducationStage(EducationStage.GRADUATING);
 
             person.changeLoyalty(academy.getDurationDays() / 300);
@@ -1045,10 +1041,6 @@ public class EducationController {
 
             processGraduation(campaign, person, academy, 1, resources);
 
-            if (!academy.isMilitary()) {
-                reportMastersOrDoctorateGain(campaign, person, academy, resources);
-            }
-
             person.setEduEducationStage(EducationStage.GRADUATING);
 
             person.changeLoyalty(academy.getDurationDays() / 300);
@@ -1097,10 +1089,6 @@ public class EducationController {
 
         processGraduation(campaign, person, academy, 0, resources);
 
-        if (!academy.isMilitary()) {
-            reportMastersOrDoctorateGain(campaign, person, academy, resources);
-        }
-
         person.setEduEducationStage(EducationStage.GRADUATING);
 
         person.changeLoyalty(academy.getDurationDays() / 300);
@@ -1111,33 +1099,52 @@ public class EducationController {
     /**
      * This method generates a report for individuals who have completed either a Master's or Doctorate degree.
      *
-     * @param campaign   the campaign to add the report to
-     * @param person     the person who completed the degree
-     * @param resources  the resource bundle containing localized strings
+     * @param campaign       the campaign to add the report to
+     * @param person         the person who completed the degree
+     * @param education the education level taught by the academy
+     * @param resources      the resource bundle containing localized strings
      */
-    private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int education = academy.getEducationLevel(person) - 1; // we reduce by 1 to account for the +1 level from graduating
-
+    private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy,
+                                                     int education, ResourceBundle resources) {
         EducationLevel educationLevel = EducationLevel.parseFromInt(education);
 
         String qualification = academy.getQualifications().get(person.getEduCourseIndex());
         String personName = person.getHyperlinkedFullTitle();
 
-        String graduationLevel = "";
-
         if (educationLevel.isPostGraduate()) {
-            graduationLevel = resources.getString("graduatedMasters.text");
+            ServiceLogger.eduGraduatedMasters(
+                    person,
+                    campaign.getLocalDate(),
+                    person.getEduAcademyName(),
+                    qualification
+            );
 
-            ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName(), qualification);
+            generatePostGradGraduationReport(
+                    campaign,
+                    personName,
+                    resources.getString("graduatedMasters.text"),
+                    qualification,
+                    resources
+            );
+
         } else if (educationLevel.isDoctorate()) {
-            graduationLevel = resources.getString("graduatedDoctorate.text");
-
-            ServiceLogger.eduGraduatedDoctorate(person, campaign.getLocalDate(), person.getEduAcademyName(), qualification);
+            ServiceLogger.eduGraduatedDoctorate(
+                    person,
+                    campaign.getLocalDate(),
+                    person.getEduAcademyName(),
+                    qualification
+            );
 
             person.setPreNominal("Dr");
-        }
 
-        generatePostGradGraduationReport(campaign, personName, graduationLevel, qualification, resources);
+            generatePostGradGraduationReport(
+                    campaign,
+                    personName,
+                    resources.getString("graduatedDoctorate.text"),
+                    qualification,
+                    resources
+            );
+        }
     }
 
     /**
@@ -1152,7 +1159,7 @@ public class EducationController {
                                                          String graduationText, String qualification, ResourceBundle resources) {
         campaign.addReport(String.format(resources.getString("graduatedPostGradReport.text"),
                 personName,
-                "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
                 graduationText,
                 "</span>",
                 qualification));
@@ -1257,7 +1264,6 @@ public class EducationController {
         int educationLevel = academy.getEducationLevel(person);
 
         if (EducationLevel.parseToInt(person.getEduHighestEducation()) < educationLevel) {
-            LogManager.getLogger().info(educationLevel);
             person.setEduHighestEducation(EducationLevel.parseFromInt(educationLevel));
         }
 
@@ -1278,6 +1284,10 @@ public class EducationController {
             person.setLoyalty(rolls.get(1) + rolls.get(2) + rolls.get(3));
         } else {
             adjustLoyalty(person);
+        }
+
+        if (!academy.isMilitary()) {
+            reportMastersOrDoctorateGain(campaign, person, academy, educationLevel, resources);
         }
     }
 
@@ -1304,9 +1314,6 @@ public class EducationController {
         }
 
         for (String skill : curriculum) {
-            LogManager.getLogger().info(skill);
-            LogManager.getLogger().info(educationLevel);
-
             if (skill.equalsIgnoreCase("none")) {
                 return;
             }
