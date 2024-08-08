@@ -1711,7 +1711,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     // here we check that the person will benefit from re-enrollment
                                     int improvementPossible = 0;
 
-                                    if (academy.getFilteredFaction(campaign, person, List.of(person.getEduAcademyFaction())) != null) {
+                                    String filteredFaction = academy.getFilteredFaction(campaign, person, List.of(person.getEduAcademyFaction()));
+
+                                    if (filteredFaction != null) {
                                         int educationLevel = academy.getEducationLevel(person);
 
                                         String[] skills = academy.getCurriculums().get(person.getEduCourseIndex()).split(",");
@@ -1732,29 +1734,31 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                                                 if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() < educationLevel)) {
                                                     improvementPossible++;
+                                                } else if (!person.hasSkill(skillParsed)) {
+                                                    improvementPossible++;
                                                 }
                                             }
                                         }
+
+                                        JMenuItem reEnroll;
+
+                                        if (improvementPossible > 0) {
+                                            reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
+                                            reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
+                                            reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT,
+                                                    academy.getSet(),
+                                                    academy.getName(),
+                                                    String.valueOf(person.getEduCourseIndex()),
+                                                    person.getEduAcademySystem(),
+                                                    person.getEduAcademyFaction()));
+                                            reEnroll.addActionListener(this);
+                                        } else {
+                                            reEnroll = new JMenuItem(resources.getString("eduReEnrollImpossible.text"));
+                                            reEnroll.setToolTipText(resources.getString("eduReEnrollImpossible.toolTip"));
+                                        }
+
+                                        academyMenu.add(reEnroll);
                                     }
-
-                                    JMenuItem reEnroll;
-
-                                    if (improvementPossible > 0) {
-                                        reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
-                                        reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
-                                        reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT,
-                                                academy.getSet(),
-                                                academy.getName(),
-                                                String.valueOf(person.getEduCourseIndex()),
-                                                person.getEduAcademySystem(),
-                                                person.getEduAcademyFaction()));
-                                        reEnroll.addActionListener(this);
-                                    } else {
-                                        reEnroll = new JMenuItem(resources.getString("eduReEnrollImpossible.text"));
-                                        reEnroll.setToolTipText(resources.getString("eduReEnrollImpossible.toolTip"));
-                                    }
-
-                                    academyMenu.add(reEnroll);
                                 }
                             }
                         }
@@ -3020,7 +3024,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     JMenu academyOption = new JMenu(academy.getName());
                     educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
 
-                    buildEducationSubMenus(campaign, academy, personnel, academyOption, campaign.getCurrentSystem().getId(), String.valueOf(suitableFaction));
+                    buildEducationSubMenus(campaign, academy, personnel, academyOption, campaign.getCurrentSystem().getId(), suitableFaction.get());
                 }
             } else if (academy.isHomeSchool()) {
                 JMenu academyOption = new JMenu(academy.getName());
@@ -3052,7 +3056,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             JMenu academyOption = new JMenu(academy.getName());
                             educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
 
-                            buildEducationSubMenus(campaign, academy, personnel, academyOption, nearestCampus, String.valueOf(suitableFaction));
+                            buildEducationSubMenus(campaign, academy, personnel, academyOption, nearestCampus, suitableFaction.get());
                         }
                     }
                 }
