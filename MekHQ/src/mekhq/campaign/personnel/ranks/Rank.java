@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2023 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -52,7 +52,7 @@ public class Rank {
     public static final int RO_MAX = 50;
     public static final int RO_NUM = 51; // Number that comes after RO_MAX
     // Total
-    public static final int RC_NUM = 51; // Same as RO_MAX+1
+    public static final int RC_NUM = 51; // Same as RO_MAX + 1
 
     private Map<Profession, String> rankNames;
     private Map<Profession, Integer> rankLevels;
@@ -144,13 +144,13 @@ public class Rank {
     }
 
     public String getNameWithLevels(final Profession profession) {
-        return getRankNames().get(profession) + ((getRankLevels().get(profession) > 1) ? ":" + getRankLevels().get(profession) : "");
+        return getName(profession) + ((getRankLevels().get(profession) > 1) ? ":" + getRankLevels().get(profession) : "");
     }
 
     public String getRankNamesAsString(final String delimiter) {
         StringJoiner joiner = new StringJoiner(delimiter);
         for (final Profession profession : Profession.values()) {
-            String name = getRankNames().get(profession);
+            String name = getName(profession);
             name = (name == null) ? "-" : name;
             if (getRankLevels().containsKey(profession) && (getRankLevels().get(profession) > 1)) {
                 joiner.add(name + getRankLevels().get(profession));
@@ -163,12 +163,12 @@ public class Rank {
 
     //region Boolean Comparison Methods
     public boolean isEmpty(final Profession profession) {
-        return !getRankNames().containsKey(profession) || getRankNames().get(profession).isBlank()
-                || getRankNames().get(profession).equals("-");
+        return !getRankNames().containsKey(profession) || getName(profession).isBlank()
+                || "-".equals(getName(profession));
     }
 
     public boolean indicatesAlternativeSystem(final Profession profession) {
-        return getRankNames().containsKey(profession) && getRankNames().get(profession).startsWith("--");
+        return getRankNames().containsKey(profession) && getName(profession).startsWith("--");
     }
     //endregion Boolean Comparison Methods
 
