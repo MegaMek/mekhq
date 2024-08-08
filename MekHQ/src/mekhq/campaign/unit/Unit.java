@@ -568,7 +568,7 @@ public class Unit implements ITechnology {
     }
 
     private boolean isPartAvailableForRepairs(IPartWork partWork, boolean onlyNotBeingWorkedOn) {
-        return (!onlyNotBeingWorkedOn || (onlyNotBeingWorkedOn && !partWork.isBeingWorkedOn()));
+        return !onlyNotBeingWorkedOn || !partWork.isBeingWorkedOn();
     }
 
     /**
@@ -1081,15 +1081,12 @@ public class Unit implements ITechnology {
                     heatSinkType = MiscType.F_DOUBLE_HEAT_SINK;
                     isHeatSink = true;
                 } else if (etype.hasFlag(MiscType.F_HEAT_SINK)) {
-                    heatSinkType = MiscType.F_HEAT_SINK;
                     isHeatSink = true;
                 }
             }
 
             if (isHeatSink) {
-                if (TechConstants.getTechName(etype.getTechLevel(year)).equals("Inner Sphere")) {
-                    heatSinkIsClanTechBase = false;
-                } else if (TechConstants.getTechName(etype.getTechLevel(year)).equals("Clan")) {
+                if (TechConstants.getTechName(etype.getTechLevel(year)).equals("Clan")) {
                     heatSinkIsClanTechBase = true;
                 }
                 break;
@@ -1101,7 +1098,7 @@ public class Unit implements ITechnology {
             heatSinkTypeString += "Laser Heat Sink";
         } else if (heatSinkType.equals(MiscType.F_DOUBLE_HEAT_SINK)) {
             heatSinkTypeString += "Double Heat Sink";
-        } else if (heatSinkType.equals(MiscType.F_HEAT_SINK)) {
+        } else {
             heatSinkTypeString += "Heat Sink";
         }
 
@@ -1109,6 +1106,11 @@ public class Unit implements ITechnology {
     }
 
     public Money getSellValue() {
+        // we use an alternative method of getting sell value for infantry
+        if (entity instanceof Infantry) {
+            return Money.of(entity.getAlternateCost());
+        }
+
         Money partsValue = Money.zero();
 
         partsValue = partsValue
@@ -1198,11 +1200,7 @@ public class Unit implements ITechnology {
         }
 
         // Scale the final value by the entity's price multiplier
-        if (entity instanceof Infantry) {
-            partsValue = Money.of(entity.getAlternateCost());
-        } else {
-            partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
-        }
+        partsValue = partsValue.multipliedBy(entity.getPriceMultiplier());
 
         return partsValue;
     }
@@ -2008,7 +2006,7 @@ public class Unit implements ITechnology {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("Could not parse unit " + idNode.getTextContent().trim(), ex);
+            LogManager.getLogger().error("Could not parse unit {}", idNode.getTextContent().trim(), ex);
             return null;
         }
 
@@ -2418,7 +2416,7 @@ public class Unit implements ITechnology {
                     } else if (loc == Mech.LOC_CLEG) {
                         centerUpperLeg = part;
                     } else {
-                        LogManager.getLogger().error("Unknown location of " + loc + " for a Upper Leg Actuator.");
+                        LogManager.getLogger().error("Unknown location of {} for a Upper Leg Actuator.", loc);
                     }
                 } else if (type == Mech.ACTUATOR_LOWER_LEG) {
                     if (loc == Mech.LOC_LARM) {
@@ -2432,7 +2430,7 @@ public class Unit implements ITechnology {
                     } else if (loc == Mech.LOC_CLEG) {
                         centerLowerLeg = part;
                     } else {
-                        LogManager.getLogger().error("Unknown location of " + loc + " for a Lower Leg Actuator.");
+                        LogManager.getLogger().error("Unknown location of {} for a Lower Leg Actuator.", loc);
                     }
                 } else if (type == Mech.ACTUATOR_FOOT) {
                     if (loc == Mech.LOC_LARM) {
@@ -5185,12 +5183,12 @@ public class Unit implements ITechnology {
                 partsCost = partsCost.plus(6 * 0.002 * 10000);
             } else {
                 partsCost = partsCost.plus(entity.getWeight() * 0.002 * 10000);
-                LogManager.getLogger().error(getName() + " is not a generic CI. Movement mode is " + entity.getMovementModeAsString());
+                LogManager.getLogger().error("{} is not a generic CI. Movement mode is {}", getName(), entity.getMovementModeAsString());
             }
         } else {
             // Only ProtoMechs should fall here. Anything else needs to be logged
             if (!(entity instanceof Protomech)) {
-                LogManager.getLogger().error(getName() + " has no Spare Parts value for unit type " + Entity.getEntityTypeName(entity.getEntityType()));
+                LogManager.getLogger().error("{} has no Spare Parts value for unit type {}", getName(), Entity.getEntityTypeName(entity.getEntityType()));
             }
         }
 
