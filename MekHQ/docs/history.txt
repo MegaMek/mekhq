@@ -118,6 +118,9 @@ MEKHQ VERSION HISTORY:
 + PR #4571: Renamed Game Options to MegaMek Options to Improve Clarity
 + PR #4573: Fixed Formation Level Calculations
 + PR #4574: Updated Repair Site Names to Match CamOps
++ PR #4576: Fixed Prisoner of War Award Categorization
++ PR #4577: Fixed Index Out-of-Bounds Error During eraMods Parsing
++ PR #4578: Updated Awards Module.pdf
 
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
