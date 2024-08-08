@@ -750,7 +750,6 @@ public class Force {
      * Finds the distance (depth) from the origin force
      * @param force the force to get depth for
      */
-    @SuppressWarnings(value = "unused")
     public static int getDepth(Force force) {
         int depth = 0;
 
@@ -805,11 +804,9 @@ public class Force {
 
         // we then set lower boundaries (i.e., how far we can decrease formation level)
         int lowerBoundary = getLowerBoundary(campaign);
-        int currentFormationLevel;
+        int currentFormationLevel = force.getFormationLevel().parseToInt();
 
         for (Force subforce : force.getSubForces()) {
-            currentFormationLevel = force.getFormationLevel().parseToInt();
-
             if (currentFormationLevel - 1 < lowerBoundary) {
                 subforce.setFormationLevel(FormationLevel.INVALID);
                 continue;
@@ -838,8 +835,6 @@ public class Force {
             }
 
             subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
-
-            changeFormationLevel(subforce, currentFormationLevel - 1, lowerBoundary);
         }
     }
 
