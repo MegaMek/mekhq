@@ -303,7 +303,7 @@
 		<managementSkillPenalty>0</managementSkillPenalty>
 		<useFatigue>true</useFatigue>
 		<fatigueRate>1</fatigueRate>
-		<useInjuryFatigue>false</useInjuryFatigue>
+		<useInjuryFatigue>true</useInjuryFatigue>
 		<fieldKitchenCapacity>150</fieldKitchenCapacity>
 		<fieldKitchenIgnoreNonCombatants>true</fieldKitchenIgnoreNonCombatants>
 		<fatigueLeaveThreshold>13</fatigueLeaveThreshold>
