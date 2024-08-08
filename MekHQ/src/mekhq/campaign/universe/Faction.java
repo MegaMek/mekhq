@@ -333,9 +333,10 @@ public class Faction {
                             MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
                             wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
-                    retVal.eraMods = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
                     String[] values = wn2.getTextContent().split(",", -2);
-                    for (int i = 0; i < retVal.eraMods.length; i++) {
+                    int eraModCount = values.length;
+                    retVal.eraMods = new int[eraModCount];
+                    for (int i = 0; i < eraModCount; i++) {
                         retVal.eraMods[i] = Integer.parseInt(values[i]);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
