@@ -109,13 +109,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private RandomSkillPreferences rSkillPrefs;
     private LocalDate date;
     private Camouflage camouflage;
-    private PlayerColour colour;
+    private final PlayerColour colour;
     private StandardForceIcon unitIcon;
-    private Hashtable<String, JSpinner> hashSkillTargets;
-    private Hashtable<String, JSpinner> hashGreenSkill;
-    private Hashtable<String, JSpinner> hashRegSkill;
-    private Hashtable<String, JSpinner> hashVetSkill;
-    private Hashtable<String, JSpinner> hashEliteSkill;
+    private final Hashtable<String, JSpinner> hashSkillTargets;
+    private final Hashtable<String, JSpinner> hashGreenSkill;
+    private final Hashtable<String, JSpinner> hashRegSkill;
+    private final Hashtable<String, JSpinner> hashVetSkill;
+    private final Hashtable<String, JSpinner> hashEliteSkill;
     //endregion General Variables (ones not relating to a specific tab)
 
     //region General Tab
@@ -225,7 +225,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkShowOriginFaction;
 
     // Admin
-    private JPanel administratorsPanel = new JPanel();
+    private final JPanel administratorsPanel = new JPanel();
     private JCheckBox chkAdminsHaveNegotiation;
     private JCheckBox chkAdminsHaveScrounge;
     private JCheckBox chkAdminExperienceLevelIncludeNegotiation;
@@ -272,7 +272,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseRandomRetirement;
 
     // Settings
-    private JPanel turnoverAndRetentionSettingsPanel = new JPanel();
+    private final JPanel turnoverAndRetentionSettingsPanel = new JPanel();
     private JLabel lblTurnoverFixedTargetNumber;
     private JSpinner spnTurnoverFixedTargetNumber;
     private JLabel lblTurnoverFrequency;
@@ -292,7 +292,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnPayBonusDefaultThreshold;
 
     // Modifiers
-    private JPanel turnoverAndRetentionModifiersPanel = new JPanel();
+    private final JPanel turnoverAndRetentionModifiersPanel = new JPanel();
     private JCheckBox chkUseCustomRetirementModifiers;
     private JCheckBox chkUseFatigueModifiers;
     private JCheckBox chkUseSkillModifiers;
@@ -304,11 +304,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseFamilyModifiers;
     private JCheckBox chkUseLoyaltyModifiers;
 
-    private JPanel loyaltySubPanel = new JPanel();
+    private final JPanel loyaltySubPanel = new JPanel();
     private JCheckBox chkUseHideLoyalty;
 
     // Payout
-    private JPanel turnoverAndRetentionPayoutPanel = new JPanel();
+    private final JPanel turnoverAndRetentionPayoutPanel = new JPanel();
     private JLabel lblPayoutRateOfficer;
     private JSpinner spnPayoutRateOfficer;
     private JLabel lblPayoutRateEnlisted;
@@ -317,31 +317,31 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnPayoutRetirementMultiplier;
     private JCheckBox chkUsePayoutServiceBonus;
 
-    private JPanel payoutServiceBonusSubPanel = new JPanel();
+    private final JPanel payoutServiceBonusSubPanel = new JPanel();
     private JLabel lblPayoutServiceBonusRate;
     private JSpinner spnPayoutServiceBonusRate;
 
     // Unit Cohesion
-    private JPanel turnoverAndRetentionUnitCohesionPanel = new JPanel();
+    private final JPanel turnoverAndRetentionUnitCohesionPanel = new JPanel();
     private JCheckBox chkUseAdministrativeStrain;
     private JCheckBox chkUseManagementSkill;
 
-    private JPanel administrativeStrainSubPanel = new JPanel();
+    private final JPanel administrativeStrainSubPanel = new JPanel();
     private JLabel lblAdministrativeCapacity;
     private JSpinner spnAdministrativeCapacity;
     private JLabel lblMultiCrewStrainDivider;
     private JSpinner spnMultiCrewStrainDivider;
 
-    private JPanel managementSkillSubPanel = new JPanel();
+    private final JPanel managementSkillSubPanel = new JPanel();
     private JCheckBox chkUseCommanderLeadershipOnly;
     private JLabel lblManagementSkillPenalty;
     private JSpinner spnManagementSkillPenalty;
 
     // Fatigue
-    private JPanel turnoverAndRetentionFatiguePanel = new JPanel();
+    private final JPanel turnoverAndRetentionFatiguePanel = new JPanel();
     private JCheckBox chkUseFatigue;
 
-    private JPanel fatigueSubPanel = new JPanel();
+    private final JPanel fatigueSubPanel = new JPanel();
     private JLabel lblFatigueWarning;
     private JLabel lblFatigueRate;
     private JSpinner spnFatigueRate;
@@ -449,7 +449,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private MMComboBox<FamilialRelationshipDisplayLevel> comboFamilyDisplayLevel;
 
     // Anniversaries
-    private JPanel anniversaryPanel = new JPanel();
+    private final JPanel anniversaryPanel = new JPanel();
     private JCheckBox chkAnnounceBirthdays;
     private JCheckBox chkAnnounceOfficersOnly;
     private JCheckBox chkAnnounceChildBirthdays;
@@ -626,6 +626,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkVariableContractLength;
     private JCheckBox chkContractMarketReportRefresh;
     private JSpinner spnContractMaxSalvagePercentage;
+    private JSpinner spnDropShipBonusPercentage;
     //endregion Markets Tab
 
     //region RATs Tab
@@ -7752,6 +7753,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnContractMaxSalvagePercentage.setToolTipText(resources.getString("lblContractMaxSalvagePercentage.toolTipText"));
         spnContractMaxSalvagePercentage.setName("spnContractMaxSalvagePercentage");
 
+        JLabel lblDropShipBonusPercentage = new JLabel(resources.getString("lblDropShipBonusPercentage.text"));
+        lblDropShipBonusPercentage.setToolTipText(wordWrap(resources.getString("lblDropShipBonusPercentage.toolTipText")));
+        lblDropShipBonusPercentage.setName("lblDropShipBonusPercentage");
+
+        spnDropShipBonusPercentage = new JSpinner(new SpinnerNumberModel(0, 0, 20, 5));
+        spnDropShipBonusPercentage.setToolTipText(resources.getString("lblDropShipBonusPercentage.toolTipText"));
+        spnDropShipBonusPercentage.setName("spnDropShipBonusPercentage");
+
         // Programmatically Assign Accessibility Labels
         lblContractMarketMethod.setLabelFor(comboContractMarketMethod);
         lblContractSearchRadius.setLabelFor(spnContractSearchRadius);
@@ -7779,6 +7788,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCoontractMaxSalvagePercentage)
                                 .addComponent(spnContractMaxSalvagePercentage, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblDropShipBonusPercentage)
+                                .addComponent(spnDropShipBonusPercentage, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -7794,6 +7806,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCoontractMaxSalvagePercentage)
                                 .addComponent(spnContractMaxSalvagePercentage))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblDropShipBonusPercentage)
+                                .addComponent(spnDropShipBonusPercentage))
         );
 
         return contractMarketPanel;
@@ -8537,6 +8552,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkVariableContractLength.setSelected(options.isVariableContractLength());
         chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
         spnContractMaxSalvagePercentage.setValue(options.getContractMaxSalvagePercentage());
+        spnDropShipBonusPercentage.setValue(options.getDropShipBonusPercentage());
         //endregion Markets Tab
 
         //region RATs Tab
@@ -9102,6 +9118,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setVariableContractLength(chkVariableContractLength.isSelected());
             options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
             options.setContractMaxSalvagePercentage((Integer) spnContractMaxSalvagePercentage.getValue());
+            options.setDropShipBonusPercentage((int) spnDropShipBonusPercentage.getValue());
             //endregion Markets Tab
 
             //region RATs Tab
@@ -9571,7 +9588,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * contains the main table.
      */
     public static class RowNamesTable extends JTable implements ChangeListener, PropertyChangeListener {
-        private JTable main;
+        private final JTable main;
 
         public RowNamesTable(JTable table) {
             main = table;
