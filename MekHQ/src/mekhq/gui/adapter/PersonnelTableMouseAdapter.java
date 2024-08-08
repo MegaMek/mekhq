@@ -1623,13 +1623,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         //region Education Menu
         if (gui.getCampaign().getCampaignOptions().isUseEducationModule()) {
-            if (Arrays.stream(selected).noneMatch(prospectiveStudent -> person.needsFixing())) {
-                JMenu academyMenu = new JMenu(resources.getString("eduEducation.text"));
+            JMenu academyMenu = new JMenu(resources.getString("eduEducation.text"));
 
-                // we use 'campaign' a lot here, so let's store it, so we don't have to re-call it every time
-                Campaign campaign = gui.getCampaign();
+            // we use 'campaign' a lot here, so let's store it, so we don't have to re-call it every time
+            Campaign campaign = gui.getCampaign();
 
-                if (StaticChecks.areAllActive(selected)) {
+            if (StaticChecks.areAllActive(selected)) {
+                if (Arrays.stream(selected).noneMatch(prospectiveStudent -> person.needsFixing())) {
                     // this next block preps variables for use by the menu & tooltip
                     List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
                     Collections.sort(academySetNames);
