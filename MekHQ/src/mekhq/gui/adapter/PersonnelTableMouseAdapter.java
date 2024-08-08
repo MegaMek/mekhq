@@ -1622,13 +1622,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         //endregion Awards Menu
 
         //region Education Menu
-        // TODO remove this once we have the Personnel Histories module
-        // this tells mhq that all characters over 16 have completed high school.
-        // this helps grandfather in existing campaign personnel.
-        if ((person.getAge(gui.getCampaign().getLocalDate()) >= 16) && (EducationLevel.parseToInt(person.getEduHighestEducation()) < 1)) {
-            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-        }
-
         if (gui.getCampaign().getCampaignOptions().isUseEducationModule()) {
             JMenu academyMenu = new JMenu(resources.getString("eduEducation.text"));
 
@@ -1636,53 +1629,55 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             Campaign campaign = gui.getCampaign();
 
             if (StaticChecks.areAllActive(selected)) {
-                // this next block preps variables for use by the menu & tooltip
-                List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
-                Collections.sort(academySetNames);
+                if (Arrays.stream(selected).noneMatch(prospectiveStudent -> person.needsFixing())) {
+                    // this next block preps variables for use by the menu & tooltip
+                    List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
+                    Collections.sort(academySetNames);
 
-                // this filters out any academy sets that are disabled in Campaign Options,
-                // or not applicable for the current campaign faction
-                if (academySetNames.contains("Local Academies")) {
-                    if (!campaign.getCampaignOptions().isEnableLocalAcademies()) {
-                        academySetNames.remove("Local Academies");
-                    }
-                }
-
-                if (academySetNames.contains("Prestigious Academies")) {
-                    if (!campaign.getCampaignOptions().isEnablePrestigiousAcademies()) {
-                        academySetNames.remove("Prestigious Academies");
-                    }
-                }
-
-                if (academySetNames.contains("Unit Education")) {
-                    if (!campaign.getCampaignOptions().isEnableUnitEducation()) {
-                        academySetNames.remove("Unit Education");
-                    }
-                }
-
-                // We then start processing the remaining academy sets
-                for (String setName : academySetNames) {
-                    JMenu setAcademyMenu = new JMenu(setName);
-
-                    // we filter each academy into one of these three categories
-                    JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
-                    JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
-
-                    setAcademyMenu.add(civilianMenu);
-                    setAcademyMenu.add(militaryMenu);
-
-                    List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
-                    Collections.sort(academiesOfSet);
-
-                    for (Academy academy : academiesOfSet) {
-                        // time to start filtering the academies
-                        if (oneSelected) {
-                            buildEducationMenusSingleton(campaign, person, academy, militaryMenu, civilianMenu);
-                        } else {
-                            buildEducationMenusMassEnroll(campaign, Arrays.asList(selected), academy, militaryMenu, civilianMenu);
+                    // this filters out any academy sets that are disabled in Campaign Options,
+                    // or not applicable for the current campaign faction
+                    if (academySetNames.contains("Local Academies")) {
+                        if (!campaign.getCampaignOptions().isEnableLocalAcademies()) {
+                            academySetNames.remove("Local Academies");
                         }
                     }
-                    academyMenu.add(setAcademyMenu);
+
+                    if (academySetNames.contains("Prestigious Academies")) {
+                        if (!campaign.getCampaignOptions().isEnablePrestigiousAcademies()) {
+                            academySetNames.remove("Prestigious Academies");
+                        }
+                    }
+
+                    if (academySetNames.contains("Unit Education")) {
+                        if (!campaign.getCampaignOptions().isEnableUnitEducation()) {
+                            academySetNames.remove("Unit Education");
+                        }
+                    }
+
+                    // We then start processing the remaining academy sets
+                    for (String setName : academySetNames) {
+                        JMenu setAcademyMenu = new JMenu(setName);
+
+                        // we filter each academy into one of these three categories
+                        JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
+                        JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
+
+                        setAcademyMenu.add(civilianMenu);
+                        setAcademyMenu.add(militaryMenu);
+
+                        List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
+                        Collections.sort(academiesOfSet);
+
+                        for (Academy academy : academiesOfSet) {
+                            // time to start filtering the academies
+                            if (oneSelected) {
+                                buildEducationMenusSingleton(campaign, person, academy, militaryMenu, civilianMenu);
+                            } else {
+                                buildEducationMenusMassEnroll(campaign, Arrays.asList(selected), academy, militaryMenu, civilianMenu);
+                            }
+                        }
+                        academyMenu.add(setAcademyMenu);
+                    }
                 }
             }
 
