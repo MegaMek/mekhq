@@ -46,7 +46,6 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     private JPanel panMapView;
     private InterstellarMapPanel panMap;
     private PlanetarySystemMapPanel panSystem;
-    private JSplitPane splitMap;
     private JScrollPane scrollPlanetView;
     JSuggestField suggestPlanet;
 
@@ -142,7 +141,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         scrollPlanetView.setPreferredSize(new Dimension(400, 600));
         scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPlanetView.setViewportView(null);
-        splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mapView, scrollPlanetView);
+        JSplitPane splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mapView, scrollPlanetView);
         splitMap.setOneTouchExpandable(true);
         splitMap.setResizeWeight(1.0);
         splitMap.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPlanetView());
@@ -188,7 +187,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMap.setJumpPath(new JumpPath());
         panMap.repaint();
 
-        getCampaign().getUnits().forEach(unit -> unit.setSite(Unit.SITE_BAY));
+        getCampaign().getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
     }
 
     private void refreshSystemView() {

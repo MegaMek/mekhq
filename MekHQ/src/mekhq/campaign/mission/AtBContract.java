@@ -399,18 +399,18 @@ public class AtBContract extends Contract {
     public int getRepairLocation(final int unitRating) {
         int repairLocation;
         if (getContractType().isGuerrillaWarfare() || getContractType().isRaidType()) {
-            repairLocation = Unit.SITE_FIELD;
+            repairLocation = Unit.SITE_IMPROVISED;
         } else if (!getContractType().isGarrisonType()) {
-            repairLocation = Unit.SITE_MOBILE_BASE;
+            repairLocation = Unit.SITE_FIELD_WORKSHOP;
         } else {
-            repairLocation = Unit.SITE_BAY;
+            repairLocation = Unit.SITE_FACILITY_BASIC;
         }
 
         if (unitRating >= IUnitRating.DRAGOON_B) {
             repairLocation++;
         }
 
-        return Math.min(repairLocation, Unit.SITE_BAY);
+        return Math.min(repairLocation, Unit.SITE_FACILITY_BASIC);
     }
 
     public void addMoraleMod(int mod) {
@@ -974,7 +974,7 @@ public class AtBContract extends Contract {
     }
 
     public String getEmployerName(int year) {
-        return isMercSubcontract() ? "Mercenary (" + getEmployerFaction().getFullName(year) + ")"
+        return isMercSubcontract() ? "Mercenary (" + getEmployerFaction().getFullName(year) + ')'
                 : getEmployerFaction().getFullName(year);
     }
 
