@@ -156,14 +156,14 @@ public class Campaign implements ITechManager {
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
     // and more still - we're tracking DropShips and WarShips in a separate set so that we can assign units to transports
-    private Hangar units = new Hangar();
-    private Set<Unit> transportShips = new HashSet<>();
-    private Map<UUID, Person> personnel = new LinkedHashMap<>();
+    private final Hangar units = new Hangar();
+    private final Set<Unit> transportShips = new HashSet<>();
+    private final Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Warehouse parts = new Warehouse();
-    private TreeMap<Integer, Force> forceIds = new TreeMap<>();
-    private TreeMap<Integer, Mission> missions = new TreeMap<>();
-    private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
-    private Map<UUID, List<Kill>> kills = new HashMap<>();
+    private final TreeMap<Integer, Force> forceIds = new TreeMap<>();
+    private final TreeMap<Integer, Mission> missions = new TreeMap<>();
+    private final TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
+    private final Map<UUID, List<Kill>> kills = new HashMap<>();
 
     private transient final UnitNameTracker unitNameTracker = new UnitNameTracker();
 
@@ -179,8 +179,8 @@ public class Campaign implements ITechManager {
     // I need to put a basic game object in campaign so that I can
     // assign it to the entities, otherwise some entity methods may get NPE
     // if they try to call up game options
-    private Game game;
-    private Player player;
+    private final Game game;
+    private final Player player;
 
     private GameOptions gameOptions;
 
@@ -190,14 +190,14 @@ public class Campaign implements ITechManager {
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
-    private Hashtable<Integer, Lance> lances; // AtB
+    private final Hashtable<Integer, Lance> lances; // AtB
 
     private Faction faction;
     private int techFactionCode;
     private String retainerEmployerCode; // AtB
     private RankSystem rankSystem;
 
-    private ArrayList<String> currentReport;
+    private final ArrayList<String> currentReport;
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
@@ -219,11 +219,11 @@ public class Campaign implements ITechManager {
 
     private CurrentLocation location;
 
-    private News news;
+    private final News news;
 
-    private PartsStore partsStore;
+    private final PartsStore partsStore;
 
-    private List<String> customs;
+    private final List<String> customs;
 
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
@@ -251,7 +251,7 @@ public class Campaign implements ITechManager {
     private LocalDate shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
-    private CampaignSummary campaignSummary;
+    private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
 
@@ -853,11 +853,14 @@ public class Campaign implements ITechManager {
 
     public void moveForce(Force force, Force superForce) {
         Force parentForce = force.getParentForce();
+
         if (null != parentForce) {
             parentForce.removeSubForce(force.getId());
         }
+
         superForce.addSubForce(force, true);
         force.setScenarioId(superForce.getScenarioId());
+
         for (Object o : force.getAllChildren(this)) {
             if (o instanceof Unit) {
                 ((Unit) o).setScenarioId(superForce.getScenarioId());
@@ -865,6 +868,9 @@ public class Campaign implements ITechManager {
                 ((Force) o).setScenarioId(superForce.getScenarioId());
             }
         }
+
+        // repopulate formation levels across the TO&E
+        Force.populateFormationLevelsFromOrigin(this);
     }
 
     /**
@@ -914,7 +920,7 @@ public class Campaign implements ITechManager {
             // We log removal if we don't use transfers or if it can't be assigned to a new force
             prevForce.removeUnit(this, u.getId(), transferLog || (force == null));
             useTransfers = !transferLog;
-            MekHQ.triggerEvent(new OrganizationChangedEvent(prevForce, u));
+            MekHQ.triggerEvent(new OrganizationChangedEvent(this, prevForce, u));
         }
 
         if (null != force) {
@@ -935,7 +941,7 @@ public class Campaign implements ITechManager {
                 }
             }
             force.addUnit(this, u.getId(), useTransfers, prevForce);
-            MekHQ.triggerEvent(new OrganizationChangedEvent(force, u));
+            MekHQ.triggerEvent(new OrganizationChangedEvent(this, force, u));
         }
 
         if (campaignOptions.isUseAtB()) {
@@ -1150,7 +1156,7 @@ public class Campaign implements ITechManager {
     public void importUnit(Unit u) {
         Objects.requireNonNull(u);
 
-        LogManager.getLogger().debug("Importing unit: (" + u.getId() + "): " + u.getName());
+        LogManager.getLogger().debug("Importing unit: ({}): {}", u.getId(), u.getName());
 
         getHangar().addUnit(u);
 
@@ -1175,7 +1181,7 @@ public class Campaign implements ITechManager {
      * @param unit - The ship we want to add to this Set
      */
     public void addTransportShip(Unit unit) {
-        LogManager.getLogger().debug("Adding DropShip/WarShip: " + unit.getId());
+        LogManager.getLogger().debug("Adding DropShip/WarShip: {}", unit.getId());
         transportShips.add(Objects.requireNonNull(unit));
     }
 
@@ -3241,6 +3247,10 @@ public class Campaign implements ITechManager {
                 continue;
             }
 
+            if (getLocalDate().equals(contract.getStartDate())) {
+                getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation(getUnitRatingMod())));
+            }
+
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
                 int deficit = getDeploymentDeficit(contract);
                 if (deficit > 0) {
@@ -3485,6 +3495,37 @@ public class Campaign implements ITechManager {
                             18));
                 }
             }
+
+            // autoAwards
+            if (getLocalDate().getDayOfMonth() == 1) {
+                double multiplier = 0;
+
+                int score = 0;
+
+                if (p.getPrimaryRole().isSupport(true)) {
+                    int dice = p.getExperienceLevel(this, false);
+
+                    if (dice > 0) {
+                        score = Compute.d6(dice);
+                    }
+
+                    multiplier += 0.5;
+                }
+
+                if (p.getSecondaryRole().isSupport(true)) {
+                    int dice = p.getExperienceLevel(this, true);
+
+                    if (dice > 0) {
+                        score += Compute.d6(dice);
+                    }
+
+                    multiplier += 0.5;
+                } else if (p.getSecondaryRole().isNone()) {
+                    multiplier += 0.5;
+                }
+
+                p.changeAutoAwardSupportPoints((int) (score * multiplier));
+            }
         }
     }
 
@@ -3611,7 +3652,10 @@ public class Campaign implements ITechManager {
     }
 
     private void processNewDayForces() {
-        // Update the force icons based on the end of day unit status if desired
+        // update formation levels
+        Force.populateFormationLevelsFromOrigin(this);
+
+        // Update the force icons based on the end-of-day unit status if desired
         if (MekHQ.getMHQOptions().getNewDayForceIconOperationalStatus()) {
             getForces().updateForceIconOperationalStatus(this);
         }
@@ -3621,6 +3665,9 @@ public class Campaign implements ITechManager {
      * @return <code>true</code> if the new day arrived
      */
     public boolean newDay() {
+        // clear previous retirement information
+        turnoverRetirementInformation.clear();
+
         // Refill Automated Pools, if the options are selected
         if (MekHQ.getMHQOptions().getNewDayAstechPoolFill() && requiresAdditionalAstechs()) {
             fillAstechPool();
@@ -3748,6 +3795,16 @@ public class Campaign implements ITechManager {
      * @return true if the person should be removed, false otherwise.
      */
     private boolean shouldRemovePerson(Person person, PersonnelStatus status) {
+        // don't remove a character if they are related to a genealogy
+        // with at least one member still present in the campaign
+        Map<FamilialRelationshipType, List<Person>> family = person.getGenealogy().getFamily();
+
+        if (family.keySet().stream()
+                .flatMap(relationshipType -> family.get(relationshipType).stream())
+                .anyMatch(relation -> relation.getStatus().isDepartedUnit())) {
+            return false;
+        }
+
         int retirementMonthValue;
 
         if (person.getRetirement() != null) {
@@ -4054,7 +4111,7 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-        MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+        MekHQ.triggerEvent(new OrganizationChangedEvent(this, force));
         // also remove this force's id from any scenarios
         if (force.isDeployed()) {
             Scenario s = getScenario(force.getScenarioId());
@@ -4081,7 +4138,7 @@ public class Campaign implements ITechManager {
         ArrayList<Force> subs = new ArrayList<>(force.getSubForces());
         for (Force sub : subs) {
             removeForce(sub);
-            MekHQ.triggerEvent(new OrganizationChangedEvent(sub));
+            MekHQ.triggerEvent(new OrganizationChangedEvent(this, sub));
         }
     }
 
@@ -4680,7 +4737,7 @@ public class Campaign implements ITechManager {
                     pw1.println("]]></blk>");
                 }
                 catch (EntitySavingException e) {
-                    LogManager.getLogger().error("Failed to save custom entity " + en.getDisplayName(), e);
+                    LogManager.getLogger().error("Failed to save custom entity {}", en.getDisplayName(), e);
                 }
             }
             pw1.println("\t</custom>");
@@ -4718,7 +4775,7 @@ public class Campaign implements ITechManager {
 
     public void setRankSystem(final @Nullable RankSystem rankSystem) {
         // If they are the same object, there hasn't been a change and thus don't need to process further
-        if (getRankSystem() == rankSystem) {
+        if (Objects.equals(getRankSystem(), rankSystem)) {
             return;
         }
 
@@ -5033,7 +5090,7 @@ public class Campaign implements ITechManager {
         // If we're transporting more than a company, Overlord analogues are more efficient.
         if (noMech > 12) {
             leasedLargeMechDropships = noMech / (double) largeDropshipMechCapacity;
-            noMech -= leasedLargeMechDropships * largeDropshipMechCapacity;
+            noMech -= (int) (leasedLargeMechDropships * largeDropshipMechCapacity);
             mechCollars += (int) Math.ceil(leasedLargeMechDropships);
 
             // If there's more than a company left over, lease another Overlord. Otherwise
@@ -5045,13 +5102,13 @@ public class Campaign implements ITechManager {
             }
 
             leasedASFCapacity += (int) Math.floor(leasedLargeMechDropships * largeMechDropshipASFCapacity);
-            leasedCargoCapacity += (int) Math.floor(largeMechDropshipCargoCapacity);
+            leasedCargoCapacity += largeMechDropshipCargoCapacity;
         }
 
         // Unions
         if (noMech > 0) {
             leasedAverageMechDropships = noMech / (double) averageDropshipMechCapacity;
-            noMech -= leasedAverageMechDropships * averageDropshipMechCapacity;
+            noMech -= (int) (leasedAverageMechDropships * averageDropshipMechCapacity);
             mechCollars += (int) Math.ceil(leasedAverageMechDropships);
 
             // If we can fit in a smaller DropShip, lease one of those instead.
@@ -5074,7 +5131,7 @@ public class Campaign implements ITechManager {
 
             if (noASF > 0) {
                 leasedAverageASFDropships = noASF / (double) averageDropshipASFCapacity;
-                noASF -= leasedAverageASFDropships * averageDropshipASFCapacity;
+                noASF -= (int) (leasedAverageASFDropships * averageDropshipASFCapacity);
                 asfCollars += (int) Math.ceil(leasedAverageASFDropships);
 
                 if ((noASF > 0) && (noASF < (averageDropshipASFCapacity / 2))) {
@@ -5093,7 +5150,7 @@ public class Campaign implements ITechManager {
         // Triumphs
         if (noVehicles > averageDropshipVehicleCapacity) {
             leasedLargeVehicleDropships = noVehicles / (double) largeDropshipVehicleCapacity;
-            noVehicles -= leasedLargeVehicleDropships * largeDropshipVehicleCapacity;
+            noVehicles -= (int) (leasedLargeVehicleDropships * largeDropshipVehicleCapacity);
             vehicleCollars += (int) Math.ceil(leasedLargeVehicleDropships);
 
             if (noVehicles > averageDropshipVehicleCapacity) {
@@ -5128,7 +5185,7 @@ public class Campaign implements ITechManager {
         // Mules
         if (noCargo > averageDropshipCargoCapacity) {
             leasedLargeCargoDropships = noCargo / (double) largeDropshipCargoCapacity;
-            noCargo -= leasedLargeCargoDropships * largeDropshipCargoCapacity;
+            noCargo -= (int) (leasedLargeCargoDropships * largeDropshipCargoCapacity);
             cargoCollars += (int) Math.ceil(leasedLargeCargoDropships);
 
             if (noCargo > averageDropshipCargoCapacity) {
@@ -5142,7 +5199,7 @@ public class Campaign implements ITechManager {
         if (noCargo > 0) {
             leasedAverageCargoDropships = noCargo / (double) averageDropshipCargoCapacity;
             cargoCollars += (int) Math.ceil(leasedAverageCargoDropships);
-            noCargo -= leasedAverageCargoDropships * averageDropshipCargoCapacity;
+            noCargo -= (int) (leasedAverageCargoDropships * averageDropshipCargoCapacity);
 
             if (noCargo > 0 && noCargo < (averageDropshipCargoCapacity / 2)) {
                 leasedAverageCargoDropships += 0.5;

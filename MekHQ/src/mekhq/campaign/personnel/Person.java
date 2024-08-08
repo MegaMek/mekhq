@@ -128,6 +128,9 @@ public class Person {
     private List<LogEntry> personnelLog;
     private List<LogEntry> scenarioLog;
 
+    // this is used by autoAwards to abstract the support person of the year award
+    private int autoAwardSupportPoints;
+
     private LocalDate retirement;
     private int loyalty;
     private int fatigue;
@@ -344,6 +347,7 @@ public class Person {
         dateOfDeath = null;
         recruitment = null;
         lastRankChangeDate = null;
+        autoAwardSupportPoints = 0;
         retirement = null;
         loyalty = 9;
         fatigue = 0;
@@ -1082,7 +1086,7 @@ public class Person {
         if ((isCommander()) && (status.isDepartedUnit())) {
             if ((!status.isResigned()) && (!status.isRetired())) {
                 if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                    massChangeLoyalty(campaign);
+                    leadershipMassChangeLoyalty(campaign);
                 }
             }
 
@@ -1108,26 +1112,26 @@ public class Person {
      * If the current character is the campaign commander, adjust loyalty across the entire unit.
      * @param campaign The current campaign
      */
-    private void massChangeLoyalty(Campaign campaign) {
-        if (isCommander()) {
-            for (Person person : campaign.getPersonnel()) {
-                if (person.getStatus().isDepartedUnit()) {
-                    continue;
-                }
-
-                if (person.getPrisonerStatus().isCurrentPrisoner()) {
-                    continue;
-                }
-
-                person.performRandomizedLoyaltyChange(campaign, false, false);
+    private void leadershipMassChangeLoyalty(Campaign campaign) {
+        for (Person person : campaign.getPersonnel()) {
+            if (person.getStatus().isDepartedUnit()) {
+                continue;
             }
+
+            if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                continue;
+            }
+
+            person.performRandomizedLoyaltyChange(campaign, false, false);
         }
 
-        campaign.addReport(resources.getString("loyaltyChangeGroup.text"));
+        campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+                "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                "</span>"));
     }
 
     /**
-     * Performs an randomized loyalty change for an individual
+     * Performs a randomized loyalty change for an individual
      *
      * @param campaign The current campaign
      * @param isMajor Flag to indicate if the loyalty change is major.
@@ -1158,12 +1162,9 @@ public class Person {
 
         applyLoyaltyChange.accept(roll);
 
-        if ((isVerbose) && (originalLoyalty != loyalty)) {
-            if (originalLoyalty > loyalty) {
-                campaign.addReport(String.format(resources.getString("loyaltyChangePositive.text"), getHyperlinkedFullTitle()));
-            } else {
-                campaign.addReport(String.format(resources.getString("loyaltyChangeNegative.text"), getHyperlinkedFullTitle()));
-            }
+        if (isVerbose && originalLoyalty != loyalty) {
+
+            reportLoyaltyChange(campaign, originalLoyalty);
         }
     }
 
@@ -1197,10 +1198,34 @@ public class Person {
             applyLoyaltyChange.accept(Compute.d6(3));
         }
 
-        if (isVerbose && (originalLoyalty != loyalty)) {
-            String messageKey = originalLoyalty > loyalty ? "loyaltyChangePositive.text" : "loyaltyChangeNegative.text";
-            campaign.addReport(String.format(resources.getString(messageKey), getHyperlinkedFullTitle()));
+        if ((isVerbose) && (originalLoyalty != loyalty)) {
+            reportLoyaltyChange(campaign, originalLoyalty);
         }
+    }
+
+    /**
+     * Reports the change in loyalty.
+     *
+     * @param campaign         The campaign for which the loyalty change is being reported.
+     * @param originalLoyalty  The original loyalty value before the change.
+     */
+    private void reportLoyaltyChange(Campaign campaign, int originalLoyalty) {
+        StringBuilder changeString = new StringBuilder();
+        String color;
+
+        // choose the color and string based on the loyalty comparison.
+        if (originalLoyalty > loyalty) {
+            color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
+            changeString.append(resources.getString("loyaltyChangeNegative.text"));
+        } else {
+            color = MekHQ.getMHQOptions().getFontColorPositiveHexColor();
+            changeString.append(resources.getString("loyaltyChangePositive.text"));
+        }
+
+        String report = String.format(resources.getString("loyaltyChangeReport.text"), getHyperlinkedFullTitle(),
+                "<span color=" + color + "'>", changeString, "</span>");
+
+        campaign.addReport(report);
     }
 
     /**
@@ -1351,6 +1376,20 @@ public class Person {
     public Genealogy getGenealogy() {
         return genealogy;
     }
+
+    //region autoAwards
+    public int getAutoAwardSupportPoints() {
+        return autoAwardSupportPoints;
+    }
+
+    public void setAutoAwardSupportPoints(final int autoAwardSupportPoints) {
+        this.autoAwardSupportPoints = autoAwardSupportPoints;
+    }
+
+    public void changeAutoAwardSupportPoints(int change) {
+        autoAwardSupportPoints += change;
+    }
+    //endregion autoAwards
 
     //region Turnover and Retention
     public @Nullable LocalDate getRetirement() {
@@ -1889,6 +1928,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deathday", getDateOfDeath());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitment", getRecruitment());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoAwardSupportPoints", getAutoAwardSupportPoints());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
@@ -2224,6 +2264,8 @@ public class Person {
                     retVal.recruitment = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
                     retVal.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoAwardSupportPoints")) {
+                    retVal.setAutoAwardSupportPoints(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
                     retVal.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("loyalty")) {

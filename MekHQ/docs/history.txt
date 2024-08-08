@@ -75,7 +75,35 @@ MEKHQ VERSION HISTORY:
 + FIX #4474: Infantry personalty description is too wide
 + PR #4476: Removed Loyalty Change Event for Executing Prisoners
 + PR #4477: Marked 'FM: Mercenaries (rev)' Unit Rating Method as Deprecated
-+ FIXED #4481: Significant amount of company mysteriously vanished
++ FIX #4481: Significant amount of company mysteriously vanished
++ FIX #4386: Personnel Report Counting Injured Prisoners as Support Personnel
++ PR #4490: Fixed Missing Site Location Change Code & Turnover Information Storage
++ PR #4491: Corrected Qualification Start Years
++ PR #4492: Added Promotion-Based autoAwards Processing
++ PR #4494: Improved Award Tooltips with XP & Edge Benefits
++ PR #4501: Added Hospital Beds to Facility Report, Added Maximum Patients Per Doctor Campaign Option
++ FIX #4270: Top Level of TO&E Displaying Incorrect Commanding Officer
++ PR #4507: Removed Vestigial 'Uneventful' Graduation Event
++ PR #4508: Added autoAwards Support for the Final Three Awards from the Standard Set
++ PR #4509: Removed Turnover Target Number Method Configuration
++ PR #4510: Updated Turnover & Retention Module.pdf
++ PR #4489: Refactored Personality Characteristic Generation Logic 
++ PR #4493: Added Ability to Tell autoAwards to Ignore Individual Custom Award Sets
++ PR #4497: Updated Prisoner Resolution Messages
++ PR #4498: Added AToW Mission Completion XP Awards, Added Global XP Cost Multiplier Option
++ PR #4523: Prevented Automated Removal of Genealogically Relevant Characters
++ PR #4524: Update Loyalty Change Reporting with Color-Coded Messages
++ PR #4526: Education Module Data Fixes
++ PR #4527: Improved Color Formatting for Education Events
++ PR #4528: Refactored Fatigue Messages to Support Colored Span Tags
++ PR #4534: Added the Automation and Tracking of Formation Levels within The TO&E Pane
++ PR #4536: Added Force and Unit Type to Kill Tracking
++ PR #4538: Fixed Support Score Calculation
++ PR #4500: Corrected Masters and Doctorate Graduation Checks
++ FIX #4532, #4546: Fixed NPE in Mass Enroll Filters
++ PR #4553: Added "Buy in Bulk" Button to Parts Acquisition in Repair Bay
++ PR #4566: Updated era modifiers to reflect CamOps
+
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update

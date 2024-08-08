@@ -91,6 +91,32 @@ public class AutoAwardsController {
     }
 
     /**
+     * The controller for the processing of awards prompted by a change in rank
+     *
+     * @param c                    the campaign to be processed
+     */
+    public void PromotionController(Campaign c, boolean isManualPrompt) {
+        LogManager.getLogger().info("autoAwards (Promotion) has started");
+
+        campaign = c;
+        mission = null;
+
+        buildAwardLists(4);
+
+        List<UUID> personnel = getPersonnel();
+
+        // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
+        if (!personnel.isEmpty()) {
+            // This is the main workhorse function
+            ProcessAwards(personnel, false, null, isManualPrompt);
+        } else {
+            LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
+        }
+
+        LogManager.getLogger().info("autoAwards (Promotion) has finished");
+    }
+
+    /**
      * The primary controller for the automatic processing of Awards
      *
      * @param c                    the campaign to be processed
@@ -124,8 +150,9 @@ public class AutoAwardsController {
      * @param c the campaign
      * @param personnel the personnel involved in the scenario, mapped by their UUID
      * @param scenarioKills the kills made during the scenario, mapped by personnel UUID
+     * @param wasCivilianHelp whether the scenario (if any) was AtB Scenario CIVILIANHELP
      */
-    public void PostScenarioController(Campaign c, HashMap<UUID, Integer> personnel, HashMap<UUID, List<Kill>>scenarioKills) {
+    public void PostScenarioController(Campaign c, HashMap<UUID, Integer> personnel, HashMap<UUID, List<Kill>>scenarioKills, boolean wasCivilianHelp) {
         LogManager.getLogger().info("autoAwards (Scenario Conclusion) has started");
 
         campaign = c;
@@ -158,7 +185,7 @@ public class AutoAwardsController {
 
         // beginning the processing & filtering of Misc Awards
         if (!miscAwards.isEmpty()) {
-            processedData = MiscAwardsManager(personnel, false, true, scenarioKills);
+            processedData = MiscAwardsManager(personnel, false, true, wasCivilianHelp, scenarioKills);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -251,7 +278,7 @@ public class AutoAwardsController {
     /**
      * Builds the award list and filters it, so we're not processing the same awards multiple times
      *
-     * @param awardListCase when the award controller was called: 0 manual, 1 post-mission, 2 post-scenario
+     * @param awardListCase when the award controller was called: 0 manual (or monthly), 1 post-mission, 2 post-scenario, 3 rank
      */
     private void buildAwardLists(int awardListCase) {
         ArrayList<Award> awards = new ArrayList<>();
@@ -262,12 +289,19 @@ public class AutoAwardsController {
             LogManager.getLogger().info("Ignoring the Standard Set");
         }
 
+        String[] filterList = campaign.getCampaignOptions().getAwardSetFilterList().split(",");
+
         // we start by building a primary list of all awards
         if (!allSetNames.isEmpty()) {
             LogManager.getLogger().info("Getting all Award Sets");
 
             for (String setName : allSetNames) {
                 if (!allSetNames.isEmpty()) {
+                    if (Arrays.asList(filterList).contains(setName)) {
+                        LogManager.getLogger().info("'{}' was found in the list of sets to be ignored. Ignoring it.", setName);
+                        continue;
+                    }
+
                     LogManager.getLogger().info("Getting all awards from set: {}", setName);
 
                     awards.addAll(AwardsFactory.getInstance().getAllAwardsForSet(setName));
@@ -499,7 +533,6 @@ public class AutoAwardsController {
                                         break;
                                     case "training":
                                         if (campaign.getCampaignOptions().isEnableTrainingAwards()) {
-
                                             trainingAwards.add(award);
                                         }
                                         break;
@@ -509,6 +542,26 @@ public class AutoAwardsController {
                             }
 
                             LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
+                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+
+                            break;
+                        // post-promotion
+                        case 4:
+                            for (Award award : awards) {
+                                switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                                    case "divider":
+                                        break;
+                                    case "rank":
+                                        if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                                            rankAwards.add(award);
+                                        }
+                                        break;
+                                    default:
+                                        ignoredAwards.add(award);
+                                }
+                            }
+
+                            LogManager.getLogger().info("autoAwards found {} Training Awards", rankAwards.size());
                             LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;
@@ -576,7 +629,7 @@ public class AutoAwardsController {
                 personnelMap.put(person, 0);
             }
 
-            processedData = MiscAwardsManager(personnelMap, missionWasSuccessful, false, null);
+            processedData = MiscAwardsManager(personnelMap, missionWasSuccessful, false, false, null);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -846,13 +899,40 @@ public class AutoAwardsController {
      *
      * @param personnel        the personnel to be processed
      * @param missionWasSuccessful    true if the mission was successful, false otherwise
+     * @param wasCivilianHelp  true if the scenario (if relevant) was AtB Scenario type CIVILIANHELP
      * @param wasScenario      true if the award is for a scenario, false otherwise
      * @param scenarioKills    a map of personnel and their corresponding list of Kills
      * @return a map containing the award data, or null if no awards are applicable
      */
-    private Map<Integer, List<Object>> MiscAwardsManager(HashMap<UUID, Integer> personnel, boolean missionWasSuccessful, boolean wasScenario, HashMap<UUID, List<Kill>> scenarioKills) {
+    private Map<Integer, List<Object>> MiscAwardsManager(HashMap<UUID, Integer> personnel, boolean missionWasSuccessful, boolean wasScenario,
+                                                         boolean wasCivilianHelp, HashMap<UUID, List<Kill>> scenarioKills) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
+
+        UUID supportPersonOfTheYear = null;
+
+        if (campaign.getLocalDate().getDayOfYear() == 1) {
+            int supportPoints = 0;
+
+
+            // we duplicate and shuffle the list to avoid giving personnel advantage based on name
+            List<UUID> temporaryPersonnelList = new ArrayList<>(personnel.keySet());
+            Collections.shuffle(temporaryPersonnelList);
+
+            // we do everybody here, as we want to capture personnel who were support personnel,
+            // even if they're not current support personnel
+            for (UUID person : temporaryPersonnelList) {
+                Person p = campaign.getPerson(person);
+
+                if (p.getAutoAwardSupportPoints() > supportPoints) {
+                    supportPersonOfTheYear = person;
+                    supportPoints = p.getAutoAwardSupportPoints();
+                }
+
+                // we reset them for next year
+                p.setAutoAwardSupportPoints(0);
+            }
+        }
 
         for (UUID person : personnel.keySet()) {
             Map<Integer, List<Object>> data;
@@ -868,7 +948,17 @@ public class AutoAwardsController {
             }
 
             try {
-                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful, personalKills.size(), personnel.get(person));
+                data = MiscAwards.MiscAwardsProcessor(
+                        campaign,
+                        mission,
+                        person,
+                        miscAwards,
+                        missionWasSuccessful,
+                        wasCivilianHelp,
+                        personalKills.size(),
+                        personnel.get(person),
+                        supportPersonOfTheYear
+                );
             } catch (Exception e) {
                 data = null;
                 LogManager.getLogger().info("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());
