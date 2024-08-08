@@ -65,6 +65,8 @@ import java.io.PrintStream;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
     private CampaignGUI gui;
@@ -244,7 +246,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 int selected = Integer.parseInt(command.split(":")[1]);
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
-                        if ((selected > -1) && (selected < Unit.SITE_N)) {
+                        if ((selected > -1) && (selected < Unit.SITE_UNKNOWN)) {
                             unit.setSite(selected);
                             MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                         }
@@ -634,8 +636,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // change the location
             menu = new JMenu("Change site");
             boolean allSameSite = StaticChecks.areAllSameSite(units);
-            for (int i = 0; i < Unit.SITE_N; i++) {
+
+            for (int i = 0; i < Unit.SITE_UNKNOWN; i++) {
                 cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
+                cbMenuItem.setToolTipText(wordWrap(Unit.getSiteToolTipText(i)));
                 if (allSameSite && unit.getSite() == i) {
                     cbMenuItem.setSelected(true);
                 } else {

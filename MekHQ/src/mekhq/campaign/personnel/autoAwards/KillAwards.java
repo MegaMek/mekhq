@@ -21,204 +21,179 @@ package mekhq.campaign.personnel.autoAwards;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 
+import static mekhq.campaign.force.FormationLevel.*;
+
 public class KillAwards {
     /**
      * This function loops through Kill Awards, checking whether the person is eligible to receive each type of award
      *
-     * @param campaign the campaign to be processed
-     * @param mission the mission just completed
-     * @param person the person to check award eligibility for
-     * @param awards the awards to be processed (should only include awards where item == Kill)
+     * @param campaign    the campaign to be processed
+     * @param mission     the mission just completed
+     * @param person      the person to check award eligibility for
+     * @param awards      the awards to be processed (should only include awards where item == Kill)
+     * @param killData    the pre-processed list of kills mapped to Force ID
      */
-    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, UUID person, List<Award> awards) {
-        int formationDepth;
-        String killDepth;
-
-        int killCount = 0;
-        int killsNeeded;
-
+    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, UUID person, List<Award> awards, Map<Integer, List<Kill>> killData) {
         List<Award> individualAwards = new ArrayList<>();
 
         List<Award> groupAwards = new ArrayList<>();
-        // the int corresponds to formationDepth
-        List<Award> groupAwards1 = new ArrayList<>();
-        List<Award> groupAwards2 = new ArrayList<>();
-        List<Award> groupAwards3 = new ArrayList<>();
-        List<Award> groupAwards4 = new ArrayList<>();
-        List<Award> groupAwards5 = new ArrayList<>();
-        List<Award> groupAwards6 = new ArrayList<>();
-        List<Award> groupAwards7 = new ArrayList<>();
-        List<Award> groupAwards8 = new ArrayList<>();
+        // the int corresponds to force depth (distance from origin force)
+        List<Award> awardsDepth0 = new ArrayList<>();
+        List<Award> awardsDepth1 = new ArrayList<>();
+        List<Award> awardsDepth2 = new ArrayList<>();
+        List<Award> awardsDepth3 = new ArrayList<>();
+        List<Award> awardsDepth4 = new ArrayList<>();
+        List<Award> awardsDepth5 = new ArrayList<>();
+        List<Award> awardsDepth6 = new ArrayList<>();
+        List<Award> awardsDepth7 = new ArrayList<>();
 
         Award bestAward = new Award();
         List<Award>  eligibleAwards = new ArrayList<>();
 
-        int maximumDepth;
-        int forceId;
-        int forceDepth;
-
-        try {
-            maximumDepth = Force.getMaximumDepth(campaign.getForce(0), 0);
-            forceId = campaign.getPerson(person).getUnit().getForceId();
-            forceDepth = Force.getDepth(campaign.getForce(forceId));
-        } catch (Exception e) {
-            LogManager.getLogger().info("AutoAwards failed to fill essential values for {}, using defaults",
-                    campaign.getPerson(person).getFullName()   );
-            forceId = -1;
-            maximumDepth = 0;
-            forceDepth = 0;
-        }
-
         for (Award award : awards) {
+            int killsNeeded;
+            String awardScope;
+
             if (award.canBeAwarded(campaign.getPerson(person))) {
-                // this allows us to convert non-IS formations into IS equivalents
-                formationDepth = getFormation(campaign, award);
-
-                // we skip if an invalid formationDepth has been provided
-                if (formationDepth == -1) {
-                    continue;
-                }
-
-                // we also skip if the unit isn't assigned to a Force and this isn't an Individual Kill Award
-                if ((formationDepth != 0) && (forceId == -1)) {
-                    continue;
-                }
-
                 List<String> validOptions = Arrays.asList("scenario", "mission", "lifetime");
 
                 if (validOptions.contains(award.getRange().toLowerCase())) {
-                    killDepth = award.getRange().toLowerCase();
+                    awardScope = award.getRange().toLowerCase();
                 } else {
-                    LogManager.getLogger().warn("Award {} from the {} set has invalid range value {}",
+                    LogManager.getLogger().warn("Award {} from the {} set has invalid range value {}. Skipping",
                             award.getName(), award.getSet(), award.getRange());
                     continue;
                 }
 
                 // scenario kill awards are handled by their own class
-                if (killDepth.equals("scenario")) {
+                if (awardScope.equals("scenario")) {
                     continue;
                 }
 
                 try {
                     killsNeeded = award.getQty();
                 } catch (Exception e) {
-                    LogManager.getLogger().warn("Award {} from the {} set has invalid range qty {}",
+                    LogManager.getLogger().warn("Award {} from the {} set has invalid range qty {}. Skipping",
                             award.getName(), award.getSet(), award.getQty());
                     continue;
                 }
 
+                FormationLevel awardDepth = getFormation(award);
+                List<Integer> killCount = new ArrayList<>();
+
                 // with all the parameters validated, we can begin processing the award
-                switch (formationDepth) {
-                    // individual
-                    case 0:
-                        killCount = getIndividualKills(campaign, mission, person, killDepth.equals("mission"));
-
-                        break;
-                    // lance
-                    case 1:
-                        // if the maximum depth is <= than the depth we're searching, we can just cheat
-                        // and get all kills
-                        if (maximumDepth <= 1) {
-                            killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                            // otherwise, check to make sure force is of the type we're looking for
-                        } else if (forceDepth == maximumDepth) {
-                            // if it is, get all the kills for the force and any child forces
-                            killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
-                        }
-
-                        break;
-                    // company
-                    case 2:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
-
-                        if (maximumDepth <= 2) {
-                            killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (forceDepth == maximumDepth - 1) {
-                            killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
-                        }
-
-                        break;
-                    // battalion
-                    case 3:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
-
-                        if (maximumDepth <= 3) {
-                            killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (forceDepth == maximumDepth - 2) {
-                            killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
-                        }
-
-                        break;
-                    // regiment
-                    case 4:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
-
-                        if (maximumDepth <= 4) {
-                            killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (forceDepth == maximumDepth - 3) {
-                            killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
-                        }
-
-                        break;
-                    // brigade
-                    case 5:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
-
-                        if (maximumDepth <= 5) {
-                            killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (forceDepth == maximumDepth - 4) {
-                            killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
-                        }
-
-                        break;
-                    // division
-                    case 6:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
-
-                        if (maximumDepth <= 6) {
-                            killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (forceDepth == maximumDepth - 5) {
-                            killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
-                        }
-
-                        break;
-                    // corps
-                    case 7:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
-
-                        if (maximumDepth <= 7) {
-                            killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (forceDepth == maximumDepth - 6) {
-                            killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
-                        }
-
-                        break;
-                    // army
-                    case 8:
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), 0);
-
-                        if (maximumDepth <= 8) {
-                            killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (forceDepth == maximumDepth - 7) {
-                            killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
-                        }
-
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected value in formationDepth: " + formationDepth);
+                if ((awardDepth.isNone()) && (awardScope.equalsIgnoreCase("lifetime"))) {
+                    killCount.add(campaign.getKillsFor(person).size());
+                } else if ((!awardDepth.isNone()) && (awardScope.equalsIgnoreCase("lifetime"))) {
+                    LogManager.getLogger().warn("Award {} from the {} set has a invalid combination: range value {} with size {}. Skipping",
+                            award.getName(), award.getSet(), award.getRange(), award.getSize());
+                    continue;
                 }
 
-                if (killCount >= killsNeeded) {
-                    if (formationDepth == 0) {
-                        individualAwards.add(award);
+                if (awardScope.equalsIgnoreCase("mission")) {
+                    List<Kill> killCredits = campaign.getKillsFor(person).stream()
+                            .filter(kill -> kill.getMissionId() == mission.getId())
+                            .toList();
+
+                    // -1 corresponds to 'individual', so we only care about the pilot's personal kills
+                    if (awardDepth == NONE) {
+                        killCount.add(killCredits.size());
+
+                    // otherwise, we need to identify all relevant kills across the TO&E
                     } else {
-                        groupAwards.add(award);
+                        FormationLevel maximumDepth = campaign.getForce(0).getFormationLevel();
+
+                        // in the event that the depth of the award exceeds the highest depth of the origin force
+                        // (the one named after the campaign), we can cheat and just total all kills
+                        if (maximumDepth.getDepth() < awardDepth.getDepth()) {
+                            killCount.add(killData.keySet().stream()
+                                    .mapToInt(force -> force)
+                                    .filter(force -> force != -1) // a value of -1 means no force was recorded for that kill
+                                    .map(force -> killData.get(force).size())
+                                    .sum());
+
+                        // if we can't cheat, we need to read the TO&E and gather a list of appropriate kill counts.
+                        } else {
+                            List<Integer> forceCredits = new ArrayList<>();
+
+                            for (Kill kill : killCredits) {
+                                if (!forceCredits.contains(kill.getForceId())) {
+                                    forceCredits.add(kill.getForceId());
+                                }
+                            }
+
+                            // first, we build a list of all the forces the character has at least one kill in
+                            int originForce = -1; // this number is used as a 'force id missing' proxy
+
+                            // if the characters' current force isn't in that list, we add it
+                            // this will fail if the character doesn't have a unit,
+                            // but that's ok, in that case we just use a default value
+                            try {
+                                originForce = campaign.getPerson(person).getUnit().getForceId();
+                            } catch (Exception ignored) {}
+
+                            if ((originForce != -1) && (!forceCredits.contains(originForce))) {
+                                forceCredits.add(originForce);
+                            }
+
+                            // next, we need to cycle through each force the character has credits in,
+                            // walking through the TO&E and gathering any associated kills
+                            for (int forceId : forceCredits) {
+                                originForce = forceId;
+                                int kills;
+
+                                try {
+                                    // Get the current formation depth of the origin force
+                                    int depth = campaign.getForce(originForce).getFormationLevel().getDepth();
+
+                                    // Continue the loop until the depth of the original force is not smaller than the award depth
+                                    while (depth < awardDepth.getDepth()) {
+                                        // Get the ID of the origin force's parent force
+                                        int parentForce = campaign.getForce(originForce).getParentForce().getId();
+
+                                        // If the depth is greater or equal to the maximum depth, exit the loop
+                                        if (depth >= maximumDepth.getDepth()) {
+                                            break;
+                                        }
+
+                                        // Set the origin force to its parent force
+                                        originForce = parentForce;
+                                        // Update the depth to the depth of the new origin force
+                                        depth = campaign.getForce(originForce).getFormationLevel().getDepth();
+                                    }
+
+                                    Force originNode = campaign.getForce(originForce);
+                                    kills = walkToeForKills(killData, originNode, new HashSet<>(forceCredits));
+                                } catch (Exception e) {
+                                    kills = killData.get(forceId).size();
+                                }
+
+                                if (kills >= killsNeeded) {
+                                    killCount.add(kills);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // now check whether any of the entries in killCount meet or beat the score required for the award;
+                    for (Integer kill : killCount) {
+                        if (kill >= killsNeeded){
+                            if (awardDepth.isNone()) {
+                                individualAwards.add(award);
+                            } else {
+                                groupAwards.add(award);
+                            }
+
+                            break;
+                        }
                     }
                 }
             }
@@ -250,40 +225,26 @@ public class KillAwards {
                 // if they are eligible for a 'better' Award from another Award Group.
                 // by removing each Award, as they're filtered, we can ensure all Awards have been removed
                 for (Award award : groupAwards) {
-                    switch (getFormation(campaign, award)) {
-                        case 1:
-                            groupAwards1.add(award);
-                            break;
-                        case 2:
-                            groupAwards2.add(award);
-                            break;
-                        case 3:
-                            groupAwards3.add(award);
-                            break;
-                        case 4:
-                            groupAwards4.add(award);
-                            break;
-                        case 5:
-                            groupAwards5.add(award);
-                            break;
-                        case 6:
-                            groupAwards6.add(award);
-                            break;
-                        case 7:
-                            groupAwards7.add(award);
-                            break;
-                        case 8:
-                            groupAwards8.add(award);
-                            break;
-                        default:
-                            throw new IllegalStateException("Unexpected value in getFormation: " + getFormation(campaign, award));
+                    List<Award> targetList;
+
+                    switch (getFormation(award).getDepth()) {
+                        case 0 -> targetList = awardsDepth0;
+                        case 1 -> targetList = awardsDepth1;
+                        case 2 -> targetList = awardsDepth2;
+                        case 3 -> targetList = awardsDepth3;
+                        case 4 -> targetList = awardsDepth4;
+                        case 5 -> targetList = awardsDepth5;
+                        case 6 -> targetList = awardsDepth6;
+                        case 7 -> targetList = awardsDepth7;
+                        default -> throw new IllegalStateException("Unexpected value in getFormation: " + getFormation(award));
                     }
+
+                    targetList.add(award);
                 }
 
                 // As mentioned previously, the int after 'groupAwards' corresponds to formationDepth
-                List<List<Award>> allGroupAwards = Arrays.asList(groupAwards1, groupAwards2,
-                        groupAwards3, groupAwards4, groupAwards5, groupAwards6, groupAwards7,
-                        groupAwards8);
+                List<List<Award>> allGroupAwards = Arrays.asList(awardsDepth0, awardsDepth1, awardsDepth2,
+                        awardsDepth3, awardsDepth4, awardsDepth5, awardsDepth6, awardsDepth7);
 
                 for (List<Award> awardGroup : allGroupAwards) {
                     if (!awardGroup.isEmpty()) {
@@ -306,121 +267,64 @@ public class KillAwards {
         return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 
-        /**
-         * Retrieves the formation depth for a given award, translating non-IS formations into the IS equivalent.
-         * It also validates the award size and returns -1 if an invalid size is provided.
+    /**
+     * Calculates the total number of kills from a given originNode in the killData map.
+     *
+     * @param killData      the map of kill records mapped to Force ID
+     * @param originNode    the Force node to start the traversal from
+     * @param forceCredits  the set of Force IDs eligible for kills
+     * @return the total number of kills for the originNode
+     */
+    private static int walkToeForKills(Map<Integer, List<Kill>> killData, Force originNode, Set<Integer> forceCredits) {
+        int kills = 0;
+
+        Stack<Force> stack = new Stack<>();
+        // we add visited nodes to a set, so we don't run the risk of re-evaluating previously visited nodes
+        Set<Integer> visitedForces = new HashSet<>();
+        stack.push(originNode);
+
+        while (!stack.isEmpty()) {
+            Force currentNode = stack.pop();
+
+            if (!visitedForces.contains(currentNode.getId())) {
+                if (forceCredits.contains(currentNode.getId())) {
+                    kills += killData.get(currentNode.getId()).size();
+                }
+
+                for (Force subForce : currentNode.getSubForces()) {
+                    stack.push(subForce);
+                }
+
+                visitedForces.add(currentNode.getId());
+            }
+        }
+
+        return kills;
+    }
+
+    /**
+         * @return the FormationLevel enum based on the size of the award.
          *
-         * @param campaign the campaign object
-         * @param award the award providing the formation
-         * @return the formation depth or -1 if an invalid size is provided or if the formation kill awards are disabled
+         * @param award the award to determine the FormationLevel for
          */
-        private static int getFormation(Campaign campaign, Award award){
-            int formationDepth = switch (award.getSize().toLowerCase()) {
-                case "individual" -> 0;
-                case "lance" -> 1;
-                case "company" -> 2;
-                case "battalion" -> 3;
-                case "regiment" -> 4;
-                case "brigade" -> 5;
-                case "division" -> 6;
-                case "corps" -> 7;
-                case "army" -> 8;
+        private static FormationLevel getFormation(Award award){
+            return switch (award.getSize().toLowerCase()) {
+                case "individual" -> NONE;
+                case "lance" -> LANCE;
+                case "company" -> COMPANY;
+                case "battalion" -> BATTALION;
+                case "regiment" -> REGIMENT;
+                case "brigade" -> BRIGADE;
+                case "division" -> DIVISION;
+                case "corps" -> CORPS;
+                case "army" -> ARMY;
                 default -> {
-                    LogManager.getLogger().warn("Award {} from the {} set has invalid size value {}", award.getName(), award.getSet(), award.getSize());
-                    yield -1;
+                    LogManager.getLogger().warn("Award {} from the {} set has invalid size value {}",
+                            award.getName(),
+                            award.getSet(),
+                            award.getSize());
+                    yield NONE;
                 }
             };
-
-            switch (formationDepth) {
-                case -1:
-                    return -1;
-                case 0:
-                    if (campaign.getCampaignOptions().isEnableIndividualKillAwards()) {
-                        return formationDepth;
-                    } else {
-                        return -1;
-                    }
-                // default will catch anything over 0
-                default:
-                    if (campaign.getCampaignOptions().isEnableFormationKillAwards()) {
-                        return formationDepth;
-                    } else {
-                        return -1;
-                    }
-            }
-        }
-
-        /**
-         * This function gathers kills from all the force and all sub-forces
-         * @param campaign the campaign being processed
-         * @param mission the mission just completed
-         * @param forceId the id for the force we want to parse
-         * @param filterOtherMissionKills true, if we should only count kills from the mission just completed
-         */
-        private static int getAllForceKills(Campaign campaign, Mission mission, int forceId, boolean filterOtherMissionKills){
-            int killCount = 0;
-
-            // this grabs the kills for any loose units that exist outside lances
-            Vector<Force> subForces = campaign.getForce(forceId).getSubForces();
-
-            killCount += getForceKills(campaign, mission, forceId, filterOtherMissionKills);
-
-            if (!subForces.isEmpty()) {
-                killCount += subForces.stream().mapToInt(subforce
-                        -> getAllForceKills(campaign, mission, subforce
-                        .getId(), filterOtherMissionKills)).sum();
-            }
-
-            return killCount;
-        }
-
-        /**
-         * This function gathers kills from the entire force
-         * @param campaign the campaign being processed
-         * @param mission the mission just completed
-         * @param forceId the id for the force we want to parse
-         * @param filterOtherMissionKills true, if we should only count kills from the mission just completed
-         */
-        private static int getForceKills(Campaign campaign, Mission mission, int forceId, boolean filterOtherMissionKills){
-            int killCount;
-
-            Vector<UUID> units = campaign.getForce(forceId).getUnits();
-
-            if (!units.isEmpty()) {
-                killCount = units.stream().mapToInt(unit -> getIndividualKills(campaign, mission,
-                        campaign.getUnit(unit).getCommander().getId(), filterOtherMissionKills)).sum();
-
-                return killCount;
-            } else {
-                return 0;
-            }
-        }
-
-        /**
-         * This function gathers kills from individual personnel
-         *
-         * @param campaign the campaign being processed
-         * @param mission the mission just completed
-         * @param commander the unit commander whose kills are being counted
-         * @param filterOtherMissionKills true, if we should only count kills from the mission just completed
-         */
-        private static int getIndividualKills(Campaign campaign, Mission mission, UUID commander, boolean filterOtherMissionKills) {
-            List<Kill> allKills;
-
-            try {
-                allKills = campaign.getKillsFor(campaign.getPerson(commander).getId());
-            } catch (Exception e) {
-                return 0;
-            }
-
-            long count = 0;
-
-            if (filterOtherMissionKills) {
-                count = allKills.stream()
-                        .filter(kill -> kill.getMissionId() == mission.getId())
-                        .count();
-            }
-
-            return (int) count;
         }
     }

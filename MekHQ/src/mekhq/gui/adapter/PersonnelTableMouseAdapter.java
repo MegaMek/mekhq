@@ -1679,54 +1679,58 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         academyMenu.add(setAcademyMenu);
                     }
                 }
+            }
 
-                if (StaticChecks.areAllStudents(selected)) {
-                    JMenuItem completeStage = new JMenuItem(resources.getString("eduDropOut.text"));
-                    completeStage.setToolTipText(resources.getString("eduDropOut.toolTip"));
-                    completeStage.setActionCommand(makeCommand(CMD_DROP_OUT));
-                    completeStage.addActionListener(this);
-                    academyMenu.add(completeStage);
-                }
+            if (StaticChecks.areAllStudents(selected)) {
+                JMenuItem completeStage = new JMenuItem(resources.getString("eduDropOut.text"));
+                completeStage.setToolTipText(resources.getString("eduDropOut.toolTip"));
+                completeStage.setActionCommand(makeCommand(CMD_DROP_OUT));
+                completeStage.addActionListener(this);
+                academyMenu.add(completeStage);
+            }
 
-                if ((oneSelected) && (StaticChecks.areAllStudents(selected))) {
-                    Academy academy = EducationController.getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+            if ((oneSelected) && (StaticChecks.areAllStudents(selected))) {
+                Academy academy = EducationController.getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
-                    // this pile of if-statements just checks that the individual is eligible for re-enrollment
-                    // has the person finished their education, but not yet returned to the unit?
-                    if ((!person.getEduEducationStage().isJourneyToCampus()) && (!person.getEduEducationStage().isEducation())) {
-                        // is the academy still standing?
-                        if ((campaign.getGameYear() < academy.getDestructionYear()) && (campaign.getGameYear() < academy.getClosureYear())) {
-                            // if the academy is local, is the system still populated?
-                            if ((!academy.isLocal()) || (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) > 0)) {
-                                // is the person still within the correct age band?
-                                if ((person.getAge(campaign.getLocalDate()) < academy.getAgeMax()) && (person.getAge(campaign.getLocalDate()) >= academy.getAgeMin())) {
-                                    // has the person been edited at some point and is no longer qualified?
-                                    if (academy.isQualified(person)) {
-                                        // here we check that the person will benefit from re-enrollment
-                                        int improvementPossible = 0;
+                // this pile of if-statements just checks that the individual is eligible for re-enrollment
+                // has the person finished their education, but not yet returned to the unit?
+                if ((!person.getEduEducationStage().isJourneyToCampus()) && (!person.getEduEducationStage().isEducation())) {
+                    // is the academy still standing?
+                    if ((campaign.getGameYear() < academy.getDestructionYear()) && (campaign.getGameYear() < academy.getClosureYear())) {
+                        // if the academy is local, is the system still populated?
+                        if ((!academy.isLocal()) || (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) > 0)) {
+                            // is the person still within the correct age band?
+                            if ((person.getAge(campaign.getLocalDate()) < academy.getAgeMax()) && (person.getAge(campaign.getLocalDate()) >= academy.getAgeMin())) {
+                                // has the person been edited at some point and is no longer qualified?
+                                if (academy.isQualified(person)) {
+                                    // here we check that the person will benefit from re-enrollment
+                                    int improvementPossible = 0;
 
-                                        if (academy.getFilteredFaction(campaign, person, List.of(person.getEduAcademyFaction())) != null) {
-                                            int educationLevel = academy.getEducationLevel(person);
+                                    String filteredFaction = academy.getFilteredFaction(campaign, person, List.of(person.getEduAcademyFaction()));
 
-                                            String[] skills = academy.getCurriculums().get(person.getEduCourseIndex()).split(",");
+                                    if (filteredFaction != null) {
+                                        int educationLevel = academy.getEducationLevel(person);
 
-                                            skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
+                                        String[] skills = academy.getCurriculums().get(person.getEduCourseIndex()).split(",");
 
-                                            for (String skill : skills) {
-                                                if (skill.equalsIgnoreCase("none")) {
-                                                    continue;
+                                        skills = Arrays.stream(skills).map(String::trim).toArray(String[]::new);
+
+                                        for (String skill : skills) {
+                                            if (skill.equalsIgnoreCase("none")) {
+                                                continue;
+                                            }
+
+                                            if (skill.equalsIgnoreCase("xp")) {
+                                                if (EducationLevel.parseToInt(person.getEduHighestEducation()) < educationLevel) {
+                                                    improvementPossible++;
                                                 }
+                                            } else {
+                                                String skillParsed = skillParser(skill);
 
-                                                if (skill.equalsIgnoreCase("xp")) {
-                                                    if (EducationLevel.parseToInt(person.getEduHighestEducation()) < educationLevel) {
-                                                        improvementPossible++;
-                                                    }
-                                                } else {
-                                                    String skillParsed = skillParser(skill);
-
-                                                    if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() < educationLevel)) {
-                                                        improvementPossible++;
-                                                    }
+                                                if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() < educationLevel)) {
+                                                    improvementPossible++;
+                                                } else if (!person.hasSkill(skillParsed)) {
+                                                    improvementPossible++;
                                                 }
                                             }
                                         }
@@ -1755,17 +1759,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                 }
-
-                if ((StaticChecks.areAllStudents(selected)) && (campaign.isGM())) {
-                    JMenuItem completeStage = new JMenuItem(resources.getString("eduCompleteStage.text"));
-                    completeStage.setToolTipText(resources.getString("eduCompleteStage.toolTip"));
-                    completeStage.setActionCommand(makeCommand(CMD_COMPLETE_STAGE));
-                    completeStage.addActionListener(this);
-                    academyMenu.add(completeStage);
-                }
-
-                popup.add(academyMenu);
             }
+
+            if ((StaticChecks.areAllStudents(selected)) && (campaign.isGM())) {
+                JMenuItem completeStage = new JMenuItem(resources.getString("eduCompleteStage.text"));
+                completeStage.setToolTipText(resources.getString("eduCompleteStage.toolTip"));
+                completeStage.setActionCommand(makeCommand(CMD_COMPLETE_STAGE));
+                completeStage.addActionListener(this);
+                academyMenu.add(completeStage);
+            }
+
+            popup.add(academyMenu);
         }
         //endregion Education Menu
 
@@ -3015,7 +3019,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     JMenu academyOption = new JMenu(academy.getName());
                     educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
 
-                    buildEducationSubMenus(campaign, academy, personnel, academyOption, campaign.getCurrentSystem().getId(), String.valueOf(suitableFaction));
+                    buildEducationSubMenus(campaign, academy, personnel, academyOption, campaign.getCurrentSystem().getId(), suitableFaction.get());
                 }
             } else if (academy.isHomeSchool()) {
                 JMenu academyOption = new JMenu(academy.getName());
@@ -3047,7 +3051,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             JMenu academyOption = new JMenu(academy.getName());
                             educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
 
-                            buildEducationSubMenus(campaign, academy, personnel, academyOption, nearestCampus, String.valueOf(suitableFaction));
+                            buildEducationSubMenus(campaign, academy, personnel, academyOption, nearestCampus, suitableFaction.get());
                         }
                     }
                 }
