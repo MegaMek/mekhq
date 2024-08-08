@@ -81,12 +81,12 @@ import java.util.stream.Collectors;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Unit implements ITechnology {
-    public static final int SITE_FIELD = 0;
-    public static final int SITE_MOBILE_BASE = 1;
-    public static final int SITE_BAY = 2;
-    public static final int SITE_FACILITY = 3;
-    public static final int SITE_FACTORY = 4;
-    public static final int SITE_N = 5;
+    public static final int SITE_IMPROVISED = 0;
+    public static final int SITE_FIELD_WORKSHOP = 1;
+    public static final int SITE_FACILITY_BASIC = 2;
+    public static final int SITE_FACILITY_MAINTENANCE = 3;
+    public static final int SITE_FACTORY_CONDITIONS = 4;
+    public static final int SITE_UNKNOWN = 5;
 
     // To be used for transport and cargo reports
     public static final int ETYPE_MOTHBALLED = -9876;
@@ -165,7 +165,7 @@ public class Unit implements ITechnology {
         if (entity != null) {
             entity.setCamouflage(new Camouflage());
         }
-        this.site = SITE_BAY;
+        this.site = SITE_FACILITY_BASIC;
         this.campaign = c;
         this.parts = new ArrayList<>();
         this.podSpace = new ArrayList<>();
@@ -804,23 +804,34 @@ public class Unit implements ITechnology {
 
     public TargetRoll getSiteMod() {
         return switch (site) {
-            case SITE_FIELD -> new TargetRoll(2, "Improvised");
-            case SITE_MOBILE_BASE -> new TargetRoll(1, "Field Workshop");
-            case SITE_BAY -> new TargetRoll(0, "Facility - Basic");
-            case SITE_FACILITY -> new TargetRoll(-2, "Facility - Maintenance");
-            case SITE_FACTORY -> new TargetRoll(-4, "Factory Conditions");
+            case SITE_IMPROVISED -> new TargetRoll(2, "Improvised");
+            case SITE_FIELD_WORKSHOP -> new TargetRoll(1, "Field Workshop");
+            case SITE_FACILITY_BASIC -> new TargetRoll(0, "Facility - Basic");
+            case SITE_FACILITY_MAINTENANCE -> new TargetRoll(-2, "Facility - Maintenance");
+            case SITE_FACTORY_CONDITIONS -> new TargetRoll(-4, "Factory Conditions");
             default -> new TargetRoll(0, "Unknown Location");
         };
     }
 
     public static String getSiteName(int loc) {
         return switch (loc) {
-            case SITE_FIELD -> "Improvised";
-            case SITE_MOBILE_BASE -> "Field Workshop";
-            case SITE_BAY -> "Facility - Basic";
-            case SITE_FACILITY -> "Facility - Maintenance";
-            case SITE_FACTORY -> "Factory Conditions";
+            case SITE_IMPROVISED -> "Improvised";
+            case SITE_FIELD_WORKSHOP -> "Field Workshop";
+            case SITE_FACILITY_BASIC -> "Facility - Basic";
+            case SITE_FACILITY_MAINTENANCE -> "Facility - Maintenance";
+            case SITE_FACTORY_CONDITIONS -> "Factory Conditions";
             default -> "Unknown";
+        };
+    }
+
+    public static String getSiteToolTipText(int loc) {
+        return switch (loc) {
+            case SITE_IMPROVISED -> "Battle-worn structures and improvised tools; survival depends on ingenuity and determination. Barely enough to keep units operational.";
+            case SITE_FIELD_WORKSHOP -> "Mobile units with essential gear; repairs are quick but rudimentary. Vital for frontline operations.";
+            case SITE_FACILITY_BASIC -> "Reliable shelter with all necessary tools for routine maintenance. Adequate but not exceptional.";
+            case SITE_FACILITY_MAINTENANCE -> "Well-equipped base with specialized machinery. Enables thorough repairs and maintenance, vital for prolonged campaigns.";
+            case SITE_FACTORY_CONDITIONS -> "State-of-the-art facility with advanced equipment. Peak efficiency for production and maintenance, ensuring top performance.";
+            default -> "";
         };
     }
 
@@ -1827,7 +1838,7 @@ public class Unit implements ITechnology {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvaged", true);
         }
 
-        if (site != SITE_BAY) {
+        if (site != SITE_FACILITY_BASIC) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "site", site);
         }
 
