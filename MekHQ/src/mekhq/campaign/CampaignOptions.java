@@ -516,6 +516,7 @@ public class CampaignOptions {
     private UnitMarketMethod unitMarketMethod;
     private boolean unitMarketRegionalMechVariations;
     private int unitMarketSpecialUnitChance;
+    private int unitMarketRarityModifier;
     private boolean instantUnitMarketDelivery;
     private boolean unitMarketReportRefresh;
 
@@ -1133,6 +1134,7 @@ public class CampaignOptions {
         setUnitMarketMethod(UnitMarketMethod.NONE);
         setUnitMarketRegionalMechVariations(true);
         setUnitMarketSpecialUnitChance(30);
+        setUnitMarketRarityModifier(0);
         setInstantUnitMarketDelivery(false);
         setUnitMarketReportRefresh(true);
 
@@ -3417,6 +3419,14 @@ public class CampaignOptions {
         this.unitMarketSpecialUnitChance = unitMarketSpecialUnitChance;
     }
 
+    public int getUnitMarketRarityModifier() {
+        return unitMarketRarityModifier;
+    }
+
+    public void setUnitMarketRarityModifier(final int unitMarketRarityModifier) {
+        this.unitMarketRarityModifier = unitMarketRarityModifier;
+    }
+
     public boolean isInstantUnitMarketDelivery() {
         return instantUnitMarketDelivery;
     }
@@ -4916,6 +4926,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketMethod", getUnitMarketMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRegionalMechVariations", isUnitMarketRegionalMechVariations());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketSpecialUnitChance", getUnitMarketSpecialUnitChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRarityModifier", getUnitMarketRarityModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", isInstantUnitMarketDelivery());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketReportRefresh", isUnitMarketReportRefresh());
         //endregion Unit Market
@@ -5887,6 +5898,8 @@ public class CampaignOptions {
                     retVal.setUnitMarketRegionalMechVariations(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketSpecialUnitChance")) {
                     retVal.setUnitMarketSpecialUnitChance(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketRarityModifier")) {
+                    retVal.setUnitMarketRarityModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
                     retVal.setInstantUnitMarketDelivery(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
