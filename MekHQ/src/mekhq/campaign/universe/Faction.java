@@ -22,9 +22,9 @@
 package mekhq.campaign.universe;
 
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -34,6 +34,7 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -89,7 +90,7 @@ public class Faction {
     }
 
     public String getFullName(int year) {
-        Map.Entry<Integer,String> change = nameChanges.floorEntry(year);
+        Entry<Integer,String> change = nameChanges.floorEntry(year);
         if (null == change) {
             return fullName;
         } else {
@@ -118,7 +119,7 @@ public class Faction {
     }
 
     public String getStartingPlanet(final LocalDate date) {
-        final Map.Entry<LocalDate, String> change = planetChanges.floorEntry(date);
+        final Entry<LocalDate, String> change = planetChanges.floorEntry(date);
         return (change == null) ? startingPlanet : change.getValue();
     }
 
@@ -150,9 +151,15 @@ public class Faction {
             } else if (year < 3067) {
                 //Era: Clan Invasion
                 return eraMods[7];
-            } else {
+            } else if (year < 3086) {
                 //Era: Jihad
                 return eraMods[8];
+            } else if (year < 3151) {
+                //Era: Dark Age
+                return eraMods[9];
+            } else {
+                //Era: ilClan
+                return eraMods[10];
             }
         }
     }
@@ -326,9 +333,10 @@ public class Faction {
                             MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("year").getTextContent().trim()),
                             wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
-                    retVal.eraMods = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
                     String[] values = wn2.getTextContent().split(",", -2);
-                    for (int i = 0; i < values.length; i++) {
+                    int eraModCount = values.length;
+                    retVal.eraMods = new int[eraModCount];
+                    for (int i = 0; i < eraModCount; i++) {
                         retVal.eraMods[i] = Integer.parseInt(values[i]);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
@@ -365,7 +373,7 @@ public class Faction {
         }
 
         if ((retVal.eraMods != null) && (retVal.eraMods.length < 9)) {
-            LogManager.getLogger().warn(retVal.fullName + " faction did not have a long enough eraMods vector");
+            LogManager.getLogger().warn("{} faction did not have a long enough eraMods vector", retVal.fullName);
         }
 
         return retVal;
@@ -394,8 +402,7 @@ public class Faction {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Faction) {
-            final Faction other = (Faction) obj;
+        if (obj instanceof Faction other) {
             return (null != shortName) && (shortName.equals(other.shortName));
         }
         return false;

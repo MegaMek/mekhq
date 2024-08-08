@@ -37,6 +37,7 @@ import mekhq.campaign.ResolveScenarioTracker.OppositionPersonnelStatus;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ScenarioObjective;
@@ -1359,6 +1360,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
             } else if (!escaped.isSelected()) { // Only salvage if they don't escape
                 tracker.doNotSalvageUnit(i);
             }
+        }
+
+        // now DropShip bonuses (if any)
+        if (tracker.getDropShipBonus().isPositive()) {
+            tracker.getCampaign().getFinances().credit(
+                    TransactionType.MISCELLANEOUS,
+                    tracker.getCampaign().getLocalDate(),
+                    tracker.getDropShipBonus(),
+                    resourceMap.getString("dropShipBonus.text")
+            );
         }
 
         //now assign kills

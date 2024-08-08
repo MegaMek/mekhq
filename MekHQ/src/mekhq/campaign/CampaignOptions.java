@@ -161,9 +161,9 @@ public class CampaignOptions {
     private boolean noClanPartsFromIS;
     private int penaltyClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
-    private int[] planetTechAcquisitionBonus;
-    private int[] planetIndustryAcquisitionBonus;
-    private int[] planetOutputAcquisitionBonus;
+    private final int[] planetTechAcquisitionBonus;
+    private final int[] planetIndustryAcquisitionBonus;
+    private final int[] planetOutputAcquisitionBonus;
     //endregion Supplies and Acquisition Tab
 
     //region Tech Limits Tab
@@ -492,7 +492,7 @@ public class CampaignOptions {
     //endregion Special Abilities Tab
 
     //region Skill Randomization Tab
-    private int[] phenotypeProbabilities;
+    private final int[] phenotypeProbabilities;
     //endregion Skill Randomization Tab
 
     //region Rank System Tab
@@ -500,7 +500,7 @@ public class CampaignOptions {
 
     //region Name and Portrait Generation
     private boolean useOriginFactionForNames;
-    private boolean[] usePortraitForRole;
+    private final boolean[] usePortraitForRole;
     private boolean assignPortraitOnRoleChange;
     //endregion Name and Portrait Generation
 
@@ -516,6 +516,7 @@ public class CampaignOptions {
     private UnitMarketMethod unitMarketMethod;
     private boolean unitMarketRegionalMechVariations;
     private int unitMarketSpecialUnitChance;
+    private int unitMarketRarityModifier;
     private boolean instantUnitMarketDelivery;
     private boolean unitMarketReportRefresh;
 
@@ -525,6 +526,7 @@ public class CampaignOptions {
     private boolean variableContractLength;
     private boolean contractMarketReportRefresh;
     private int contractMaxSalvagePercentage;
+    private int dropShipBonusPercentage;
     //endregion Markets Tab
 
     //region RATs Tab
@@ -555,7 +557,7 @@ public class CampaignOptions {
     private int baseStrategyDeployment;
     private int additionalStrategyDeployment;
     private boolean adjustPaymentForStrategy;
-    private int[] atbBattleChance;
+    private final int[] atbBattleChance;
     private boolean generateChases;
 
     // Scenarios
@@ -1132,6 +1134,7 @@ public class CampaignOptions {
         setUnitMarketMethod(UnitMarketMethod.NONE);
         setUnitMarketRegionalMechVariations(true);
         setUnitMarketSpecialUnitChance(30);
+        setUnitMarketRarityModifier(0);
         setInstantUnitMarketDelivery(false);
         setUnitMarketReportRefresh(true);
 
@@ -1141,6 +1144,7 @@ public class CampaignOptions {
         setVariableContractLength(true);
         setContractMarketReportRefresh(true);
         setContractMaxSalvagePercentage(100);
+        setDropShipBonusPercentage(0);
         //endregion Markets Tab
 
         //region RATs Tab
@@ -3415,6 +3419,14 @@ public class CampaignOptions {
         this.unitMarketSpecialUnitChance = unitMarketSpecialUnitChance;
     }
 
+    public int getUnitMarketRarityModifier() {
+        return unitMarketRarityModifier;
+    }
+
+    public void setUnitMarketRarityModifier(final int unitMarketRarityModifier) {
+        this.unitMarketRarityModifier = unitMarketRarityModifier;
+    }
+
     public boolean isInstantUnitMarketDelivery() {
         return instantUnitMarketDelivery;
     }
@@ -3471,6 +3483,14 @@ public class CampaignOptions {
 
     public void setContractMaxSalvagePercentage(final int contractMaxSalvagePercentage) {
         this.contractMaxSalvagePercentage = contractMaxSalvagePercentage;
+    }
+
+    public int getDropShipBonusPercentage() {
+        return dropShipBonusPercentage;
+    }
+
+    public void setDropShipBonusPercentage(final int dropShipBonusPercentage) {
+        this.dropShipBonusPercentage = dropShipBonusPercentage;
     }
     //endregion Contract Market
     //endregion Markets Tab
@@ -4906,6 +4926,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketMethod", getUnitMarketMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRegionalMechVariations", isUnitMarketRegionalMechVariations());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketSpecialUnitChance", getUnitMarketSpecialUnitChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRarityModifier", getUnitMarketRarityModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", isInstantUnitMarketDelivery());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketReportRefresh", isUnitMarketReportRefresh());
         //endregion Unit Market
@@ -4916,6 +4937,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableContractLength", isVariableContractLength());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketReportRefresh", isContractMarketReportRefresh());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMaxSalvagePercentage", getContractMaxSalvagePercentage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dropShipBonusPercentage", getDropShipBonusPercentage());
         //endregion Contract Market
         //endregion Markets Tab
 
@@ -5876,6 +5898,8 @@ public class CampaignOptions {
                     retVal.setUnitMarketRegionalMechVariations(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketSpecialUnitChance")) {
                     retVal.setUnitMarketSpecialUnitChance(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketRarityModifier")) {
+                    retVal.setUnitMarketRarityModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
                     retVal.setInstantUnitMarketDelivery(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
@@ -5894,6 +5918,8 @@ public class CampaignOptions {
                     retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMaxSalvagePercentage")) {
                     retVal.setContractMaxSalvagePercentage(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("dropShipBonusPercentage")) {
+                    retVal.setDropShipBonusPercentage(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Contract Market
                     //endregion Markets Tab
 

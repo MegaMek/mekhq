@@ -808,7 +808,8 @@ public class Academy implements Comparable<Academy> {
                 if (faction.equals(originFaction) || faction.equals(campaignFaction)) {
                     return faction.getShortName();
                 }
-                continue;
+
+                return null;
             }
 
             if (!hints.isAtWarWith(originFaction, faction, campaign.getLocalDate())
