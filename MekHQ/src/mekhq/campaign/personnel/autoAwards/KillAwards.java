@@ -99,7 +99,7 @@ public class KillAwards {
 
                 if (awardScope.equalsIgnoreCase("mission")) {
                     List<Kill> killCredits = campaign.getKillsFor(person).stream()
-                            .filter(kill -> kill.getMissionId() != mission.getId())
+                            .filter(kill -> kill.getMissionId() == mission.getId())
                             .toList();
 
                     // -1 corresponds to 'individual', so we only care about the pilot's personal kills
@@ -145,28 +145,36 @@ public class KillAwards {
 
                             // next, we need to cycle through each force the character has credits in,
                             // walking through the TO&E and gathering any associated kills
-                            for (int ignored : forceCredits) {
-                                // first, we need to find the 'origin force'.
-                                // we overwrite the previous entry in originForce,
-                                // as we can reuse that variable here without issue
-                                while (campaign.getForce(originForce).getFormationLevel().getDepth() < awardDepth.getDepth()) {
-                                    Force parentForce = campaign.getForce(originForce).getParentForce();
+                            for (int forceId : forceCredits) {
+                                originForce = forceId;
+                                int kills;
 
-                                    // neither of these should occur, but we add this here as a guardrail
-                                    if (parentForce == null) {
-                                        break;
-                                    } else if (originForce >= maximumDepth.getDepth()) {
-                                        break;
+                                try {
+                                    // Get the current formation depth of the origin force
+                                    int depth = campaign.getForce(originForce).getFormationLevel().getDepth();
+
+                                    // Continue the loop until the depth of the original force is not smaller than the award depth
+                                    while (depth < awardDepth.getDepth()) {
+                                        // Get the ID of the origin force's parent force
+                                        int parentForce = campaign.getForce(originForce).getParentForce().getId();
+
+                                        // If the depth is greater or equal to the maximum depth, exit the loop
+                                        if (depth >= maximumDepth.getDepth()) {
+                                            break;
+                                        }
+
+                                        // Set the origin force to its parent force
+                                        originForce = parentForce;
+                                        // Update the depth to the depth of the new origin force
+                                        depth = campaign.getForce(originForce).getFormationLevel().getDepth();
                                     }
 
-                                    originForce = parentForce.getFormationLevel().getDepth();
+                                    Force originNode = campaign.getForce(originForce);
+                                    kills = walkToeForKills(killData, originNode, new HashSet<>(forceCredits));
+                                } catch (Exception e) {
+                                    kills = killData.get(forceId).size();
                                 }
 
-                                // with the origin identified, we can start walking through the TO&E counting any relevant kills
-                                Force originNode = campaign.getForce(originForce);
-                                int kills = walkToeForKills(killData, originNode, new HashSet<>(forceCredits));
-
-                                // once we hit this at least once, no need to continue iterating.
                                 if (kills >= killsNeeded) {
                                     killCount.add(kills);
                                     break;
@@ -271,17 +279,23 @@ public class KillAwards {
         int kills = 0;
 
         Stack<Force> stack = new Stack<>();
+        // we add visited nodes to a set, so we don't run the risk of re-evaluating previously visited nodes
+        Set<Integer> visitedForces = new HashSet<>();
         stack.push(originNode);
 
         while (!stack.isEmpty()) {
             Force currentNode = stack.pop();
 
-            if (forceCredits.contains(currentNode.getId())) {
-                kills += killData.get(currentNode.getId()).size();
-            }
+            if (!visitedForces.contains(currentNode.getId())) {
+                if (forceCredits.contains(currentNode.getId())) {
+                    kills += killData.get(currentNode.getId()).size();
+                }
 
-            for (Force subForce : currentNode.getSubForces()) {
-                stack.push(subForce);
+                for (Force subForce : currentNode.getSubForces()) {
+                    stack.push(subForce);
+                }
+
+                visitedForces.add(currentNode.getId());
             }
         }
 

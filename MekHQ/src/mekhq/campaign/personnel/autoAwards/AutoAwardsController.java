@@ -828,18 +828,10 @@ public class AutoAwardsController {
      */
     private Map<Integer, List<Object>> KillAwardsManager(List<UUID> personnel) {
         // prep the kill award data so that we only have to process it once
-        Map<Integer, List<Kill>> missionKillData = new HashMap<>();
-
-        for (UUID person : personnel) {
-            for (Kill kill : campaign.getKillsFor(person)) {
-                if (kill.getMissionId() == mission.getId()) {
-                    // get the current list of kills, or create an empty one if it doesn't exist
-                    List<Kill> missionKills = missionKillData.computeIfAbsent(kill.getForceId(), k -> new ArrayList<>());
-                    // add the new kill
-                    missionKills.add(kill);
-                }
-            }
-        }
+        Map<Integer, List<Kill>> missionKillData = personnel.stream()
+                .flatMap(person -> campaign.getKillsFor(person).stream())
+                .filter(kill -> kill.getMissionId() == mission.getId())
+                .collect(Collectors.groupingBy(Kill::getForceId));
 
         // process the award data, checking for award eligibility
         Map<Integer, List<Object>> awardData = new HashMap<>();
