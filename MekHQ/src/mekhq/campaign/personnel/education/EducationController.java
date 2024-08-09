@@ -892,7 +892,7 @@ public class EducationController {
         }
 
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            graduationRoll += Intelligence.parseToInt(person.getIntelligence()) - 12;
+            graduationRoll += person.getIntelligence().getIntelligenceScore();
         }
 
         // qualification failed

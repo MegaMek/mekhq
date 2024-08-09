@@ -733,16 +733,6 @@ public class PersonnelTableModelColumnTest {
         }
     }
 
-    @Test
-    public void testIsPortraitPath() {
-        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
-            if (personnelTableModelColumn == PersonnelTableModelColumn.PORTRAIT_PATH) {
-                assertTrue(personnelTableModelColumn.isPortraitPath());
-            } else {
-                assertFalse(personnelTableModelColumn.isPortraitPath());
-            }
-        }
-    }
     //endregion Boolean Comparison Methods
 
     @Disabled // FIXME : Windchild : Test Missing
@@ -890,6 +880,7 @@ public class PersonnelTableModelColumnTest {
                 case EDGE:
                 case SPA_COUNT:
                 case IMPLANT_COUNT:
+                case LOYALTY:
                     assertInstanceOf(IntegerStringSorter.class,
                             personnelTableModelColumn.getComparator(mockCampaign));
                     break;
@@ -934,7 +925,5 @@ public class PersonnelTableModelColumnTest {
                 PersonnelTableModelColumn.TECH_MECHANIC.toString());
         assertEquals(resources.getString("PersonnelTableModelColumn.RECRUITMENT_DATE.text"),
                 PersonnelTableModelColumn.RECRUITMENT_DATE.toString());
-        assertEquals(resources.getString("PersonnelTableModelColumn.PORTRAIT_PATH.text"),
-                PersonnelTableModelColumn.PORTRAIT_PATH.toString());
     }
 }

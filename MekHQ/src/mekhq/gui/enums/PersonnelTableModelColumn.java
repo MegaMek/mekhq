@@ -33,6 +33,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.sorter.*;
@@ -109,8 +110,14 @@ public enum PersonnelTableModelColumn {
     EDGE("PersonnelTableModelColumn.EDGE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
     IMPLANT_COUNT("PersonnelTableModelColumn.IMPLANT_COUNT.text"),
-    PORTRAIT_PATH("PersonnelTableModelColumn.PORTRAIT_PATH.text"),
-    EDUCATION("PersonnelTableModelColumn.EDUCATION.text");
+    LOYALTY("PersonnelTableModelColumn.LOYALTY.text"),
+    EDUCATION("PersonnelTableModelColumn.EDUCATION.text"),
+    AGGRESSION("PersonnelTableModelColumn.AGGRESSION.text"),
+    AMBITION("PersonnelTableModelColumn.AMBITION.text"),
+    GREED("PersonnelTableModelColumn.GREED.text"),
+    SOCIAL("PersonnelTableModelColumn.SOCIAL.text"),
+    INTELLIGENCE("PersonnelTableModelColumn.INTELLIGENCE.text");
+
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -127,277 +134,377 @@ public enum PersonnelTableModelColumn {
     //endregion Constructors
 
     //region Boolean Comparison Methods
+    @SuppressWarnings(value = "unused")
     public boolean isPerson() {
         return this == PERSON;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isRank() {
         return this == RANK;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isFirstName() {
         return this == FIRST_NAME;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isLastName() {
         return this == LAST_NAME;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isPreNominal() {
         return this == PRE_NOMINAL;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isGivenName() {
         return this == GIVEN_NAME;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isSurname() {
         return this == SURNAME;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isBloodname() {
         return this == BLOODNAME;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isPostNominal() {
         return this == POST_NOMINAL;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isCallsign() {
         return this == CALLSIGN;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isAge() {
         return this == AGE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isPersonnelStatus() {
         return this == PERSONNEL_STATUS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isGender() {
         return this == GENDER;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isSkillLevel() {
         return this == SKILL_LEVEL;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isPersonnelRole() {
         return this == PERSONNEL_ROLE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isUnitAssignment() {
         return this == UNIT_ASSIGNMENT;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isForce() {
         return this == FORCE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isDeployed() {
         return this == DEPLOYED;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isMek() {
         return this == MEK;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isGroundVehicle() {
         return this == GROUND_VEHICLE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isNavalVehicle() {
         return this == NAVAL_VEHICLE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isVTOL() {
         return this == VTOL;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isAerospace() {
         return this == AEROSPACE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isConventionalAircraft() {
         return this == CONVENTIONAL_AIRCRAFT;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isVessel() {
         return this == VESSEL;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isBattleArmour() {
         return this == BATTLE_ARMOUR;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isSmallArms() {
         return this == SMALL_ARMS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isAntiMek() {
         return this == ANTI_MEK;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isArtillery() {
         return this == ARTILLERY;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isTactics() {
         return this == TACTICS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isStrategy() {
         return this == STRATEGY;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isLeadership() {
         return this == LEADERSHIP;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isTechMek() {
         return this == TECH_MEK;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isTechAero() {
         return this == TECH_AERO;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isTechMechanic() {
         return this == TECH_MECHANIC;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isTechBA() {
         return this == TECH_BA;
     }
+
+    @SuppressWarnings(value = "unused")
     public boolean isTechVessel() {
         return this == TECH_VESSEL;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isMedical() {
         return this == MEDICAL;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isAdministration() {
         return this == ADMINISTRATION;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isNegotiation() {
         return this == NEGOTIATION;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isScrounge() {
         return this == SCROUNGE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isInjuries() {
         return this == INJURIES;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isKills() {
         return this == KILLS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isSalary() {
         return this == SALARY;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isXP() {
         return this == XP;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isOriginFaction() {
         return this == ORIGIN_FACTION;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isOriginPlanet() {
         return this == ORIGIN_PLANET;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isBirthday() {
         return this == BIRTHDAY;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isRecruitmentDate() {
         return this == RECRUITMENT_DATE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isLastRankChangeDate() {
         return this == LAST_RANK_CHANGE_DATE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isDueDate() {
         return this == DUE_DATE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isRetirementDate() {
         return this == RETIREMENT_DATE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isDeathDate() {
         return this == DEATH_DATE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isCommander() {
         return this == COMMANDER;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isFounder() {
         return this == FOUNDER;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isClanPersonnel() {
         return this == CLAN_PERSONNEL;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isMarriageable() {
         return this == MARRIAGEABLE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isDivorceable() {
         return this == DIVORCEABLE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isTryingToConceive() {
         return this == TRYING_TO_CONCEIVE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isImmortal() {
         return this == IMMORTAL;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isToughness() {
         return this == TOUGHNESS;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isFatigue() {
         return this == FATIGUE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isEdge() {
         return this == EDGE;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isSPACount() {
         return this == SPA_COUNT;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isImplantCount() {
         return this == IMPLANT_COUNT;
     }
 
-    public boolean isPortraitPath() {
-        return this == PORTRAIT_PATH;
+    @SuppressWarnings(value = "unused")
+    public boolean isLoyalty() {
+        return this == LOYALTY;
     }
 
+    @SuppressWarnings(value = "unused")
     public boolean isEducation() {
         return this == EDUCATION;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isAggression() {
+        return this == AGGRESSION;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isAmbition() {
+        return this == AMBITION;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isGreed() {
+        return this == GREED;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isSocial() {
+        return this == SOCIAL;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isIntelligence() {
+        return this == INTELLIGENCE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isPersonality() {
+        return isAggression() || isAmbition() || isGreed() || isSocial() || isIntelligence();
     }
     //endregion Boolean Comparison Methods
 
     public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket,
                                final Person person, final boolean loadAssignmentFromMarket,
                                final boolean groupByUnit) {
+        String sign;
+
         switch (this) {
             case PERSON:
                 return "";
@@ -427,7 +534,7 @@ public enum PersonnelTableModelColumn {
                     }
 
                     // The crew size is the number of personnel under their charge, excluding
-                    // themselves of course
+                    //  themselves, of course
                     final int crewSize = unit.getCrew().size() - 1;
                     if (crewSize <= 0) {
                         // If there is only one crew member, just return their name
@@ -676,10 +783,34 @@ public enum PersonnelTableModelColumn {
                 return Integer.toString(person.countOptions(PersonnelOptions.LVL3_ADVANTAGES));
             case IMPLANT_COUNT:
                 return Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
-            case PORTRAIT_PATH:
-                return person.getPortrait().toString();
+            case LOYALTY:
+                return String.valueOf(person.getLoyalty());
             case EDUCATION:
                 return person.getEduHighestEducation().toString();
+            case AGGRESSION:
+                Aggression aggression = person.getAggression();
+                sign = aggression.isTraitPositive() ? "+" : "-";
+
+                return '(' + (aggression.isTraitMajor() ? sign + sign : sign) + ") " + aggression;
+            case AMBITION:
+                Ambition ambition = person.getAmbition();
+                sign = ambition.isTraitPositive() ? "+" : "-";
+
+                return '(' + (ambition.isTraitMajor() ? sign + sign : sign) + ") " + ambition;
+            case GREED:
+                Greed greed = person.getGreed();
+                sign = greed.isTraitPositive() ? "+" : "-";
+
+                return '(' + (greed.isTraitMajor() ? sign + sign : sign) + ") " + greed;
+            case SOCIAL:
+                Social social = person.getSocial();
+                sign = social.isTraitPositive() ? "+" : "-";
+
+                return '(' + (social.isTraitMajor() ? sign + sign : sign) + ") " + social;
+            case INTELLIGENCE:
+                Intelligence intelligence = person.getIntelligence();
+
+                return '(' + String.valueOf(intelligence.ordinal()) + ") " + intelligence;
             default:
                 return "UNIMPLEMENTED";
         }
@@ -792,8 +923,19 @@ public enum PersonnelTableModelColumn {
                      IMMORTAL -> true;
                 default -> false;
             };
+            case PERSONALITY -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME -> true;
+                case AGGRESSION, AMBITION, GREED, SOCIAL, INTELLIGENCE -> campaign.getCampaignOptions().isUseRandomPersonalities();
+                default -> false;
+            };
             case OTHER -> switch (this) {
-                case RANK, FIRST_NAME, LAST_NAME, TOUGHNESS, FATIGUE, EDGE, SPA_COUNT, IMPLANT_COUNT, PORTRAIT_PATH -> true;
+                case RANK, FIRST_NAME, LAST_NAME -> true;
+                case TOUGHNESS -> campaign.getCampaignOptions().isUseToughness();
+                case FATIGUE -> campaign.getCampaignOptions().isUseFatigue();
+                case EDGE -> campaign.getCampaignOptions().isUseEdge();
+                case SPA_COUNT -> campaign.getCampaignOptions().isUseAbilities();
+                case IMPLANT_COUNT -> campaign.getCampaignOptions().isUseImplants();
+                case LOYALTY -> campaign.getCampaignOptions().isUseLoyaltyModifiers() && !campaign.getCampaignOptions().isUseHideLoyalty();
                 default -> false;
             };
         };
@@ -808,7 +950,7 @@ public enum PersonnelTableModelColumn {
             case MEK, GROUND_VEHICLE, NAVAL_VEHICLE, VTOL, AEROSPACE, CONVENTIONAL_AIRCRAFT, VESSEL, BATTLE_ARMOUR, SMALL_ARMS, ANTI_MEK,
                  ARTILLERY, TACTICS, STRATEGY, LEADERSHIP, TECH_MEK, TECH_AERO, TECH_MECHANIC, TECH_BA, TECH_VESSEL, MEDICAL,
                  ADMINISTRATION, NEGOTIATION, SCROUNGE -> new BonusSorter();
-            case INJURIES, KILLS, XP, TOUGHNESS, EDGE, SPA_COUNT, IMPLANT_COUNT -> new IntegerStringSorter();
+            case INJURIES, KILLS, XP, TOUGHNESS, EDGE, SPA_COUNT, IMPLANT_COUNT, LOYALTY -> new IntegerStringSorter();
             case SALARY -> new FormattedNumberSorter();
             default -> new NaturalOrderComparator();
         };

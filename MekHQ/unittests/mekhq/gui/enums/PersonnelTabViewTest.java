@@ -168,6 +168,17 @@ public class PersonnelTabViewTest {
     }
 
     @Test
+    public void testIsPersonality() {
+        for (final PersonnelTabView personnelTabView : views) {
+            if (personnelTabView == PersonnelTabView.PERSONALITY) {
+                assertTrue(personnelTabView.isPersonality());
+            } else {
+                assertFalse(personnelTabView.isPersonality());
+            }
+        }
+    }
+
+    @Test
     public void testIsOther() {
         for (final PersonnelTabView personnelTabView : views) {
             if (personnelTabView == PersonnelTabView.OTHER) {
