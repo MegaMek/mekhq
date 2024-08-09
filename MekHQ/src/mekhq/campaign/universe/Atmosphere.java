@@ -26,21 +26,71 @@ public enum Atmosphere {
 
     // For old life form data
     public static Atmosphere parseAtmosphere(String val) {
-        switch (val.toLowerCase()) {
-            case "tainted (poisonous)": return TAINTEDPOISON;
-            case "tainted (caustic)": return TAINTEDCAUSTIC;
-            case "tainted (flammable)": return TAINTEDFLAME;
-            case "toxic (poisonous)": return TOXICPOISON;
-            case "toxic (caustic)": return TOXICCAUSTIC;
-            case "toxic (flammable)": return TOXICFLAME;
-            case "breathable": return BREATHABLE;
-            default: return NONE;
-        }
+        return switch (val.toLowerCase()) {
+            case "tainted (poisonous)" -> TAINTEDPOISON;
+            case "tainted (caustic)" -> TAINTEDCAUSTIC;
+            case "tainted (flammable)" -> TAINTEDFLAME;
+            case "toxic (poisonous)" -> TOXICPOISON;
+            case "toxic (caustic)" -> TOXICCAUSTIC;
+            case "toxic (flammable)" -> TOXICFLAME;
+            case "breathable" -> BREATHABLE;
+            default -> NONE;
+        };
     }
 
     public final String name;
 
-    private Atmosphere(String name) {
+    Atmosphere(String name) {
         this.name = name;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isNone() {
+        return this == NONE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isTaintedPoison() {
+        return this == TAINTEDPOISON;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isTaintedCaustic() {
+        return this == TAINTEDCAUSTIC;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isTaintedFlame() {
+        return this == TAINTEDFLAME;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isToxicPoison() {
+        return this == TOXICPOISON;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isToxicCaustic() {
+        return this == TOXICCAUSTIC;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isToxicFlame() {
+        return this == TOXICFLAME;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isBreathable() {
+        return this == BREATHABLE;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isTainted() {
+        return isTaintedPoison() || isTaintedCaustic() || isTaintedFlame();
+    }
+
+    @SuppressWarnings(value = "unused")
+    public boolean isToxic() {
+        return isToxicPoison() || isToxicCaustic() || isToxicFlame();
     }
 }
