@@ -8273,7 +8273,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Fatigue
         chkUseFatigue.setSelected(options.isUseFatigue());
         spnFatigueRate.setValue(options.getFatigueRate());
-        chkUseInjuryFatigue.setVisible(options.isUseInjuryFatigue());
+        chkUseInjuryFatigue.setSelected(options.isUseInjuryFatigue());
         spnFieldKitchenCapacity.setValue(options.getFieldKitchenCapacity());
         chkFieldKitchenIgnoreNonCombatants.setSelected(options.isUseFieldKitchenIgnoreNonCombatants());
         spnFatigueLeaveThreshold.setValue(options.getFatigueLeaveThreshold());
