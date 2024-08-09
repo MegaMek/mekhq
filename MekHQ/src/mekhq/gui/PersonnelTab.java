@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,8 +25,8 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.event.Subscribe;
-import mekhq.MekHQ;
 import mekhq.MHQOptionsChangedEvent;
+import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
@@ -39,6 +39,7 @@ import mekhq.gui.view.PersonViewPanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -51,7 +52,7 @@ import java.util.UUID;
  * Tab for interacting with all personnel
  */
 public final class PersonnelTab extends CampaignGuiTab {
-    public static final int PERSONNEL_VIEW_WIDTH = 500;
+    public static final int PERSONNEL_VIEW_WIDTH = 475;
 
     private JSplitPane splitPersonnel;
     private JTable personnelTable;
@@ -85,11 +86,10 @@ public final class PersonnelTab extends CampaignGuiTab {
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
                 MekHQ.getMHQOptions().getLocale());
-        GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
 
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
@@ -181,15 +181,13 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.setColumnModel(personColumnModel);
         personnelTable.createDefaultColumnsFromModel();
         personnelSorter = new TableRowSorter<>(personModel);
-        final ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        final ArrayList<SortKey> sortKeys = new ArrayList<>();
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
             final Comparator<?> comparator = column.getComparator(getCampaign());
-            if (comparator != null) {
-                personnelSorter.setComparator(column.ordinal(), comparator);
-            }
+            personnelSorter.setComparator(column.ordinal(), comparator);
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {
-                sortKeys.add(new RowSorter.SortKey(column.ordinal(), sortOrder));
+                sortKeys.add(new SortKey(column.ordinal(), sortOrder));
             }
         }
         personnelSorter.setSortKeys(sortKeys);
