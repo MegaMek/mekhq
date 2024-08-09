@@ -46,7 +46,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -610,22 +609,20 @@ public abstract class AbstractCompanyGenerator {
             } else {
                 tracker.getPerson().setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
             }
-
-            PersonalityController.generatePersonality(tracker.getPerson());
         }
 
         if (getOptions().isRunStartingSimulation()) {
-            LocalDate date = campaign.getLocalDate().minusYears(getOptions().getSimulationDuration()).minusDays(1);
+            LocalDate date = campaign.getLocalDate().minusYears(getOptions().getSimulationDuration()).minusWeeks(1);
             while (date.isBefore(campaign.getLocalDate())) {
-                date = date.plusDays(1);
+                date = date.plusWeeks(1);
 
                 for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
-                        campaign.getMarriage().processNewDay(campaign, date, tracker.getPerson());
+                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson());
                     }
 
                     if (getOptions().isSimulateRandomProcreation()) {
-                        campaign.getProcreation().processNewDay(campaign, date, tracker.getPerson());
+                        campaign.getProcreation().processNewWeek(campaign, date, tracker.getPerson());
                     }
                 }
             }

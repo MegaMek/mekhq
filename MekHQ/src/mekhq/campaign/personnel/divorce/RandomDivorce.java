@@ -18,19 +18,43 @@
  */
 package mekhq.campaign.personnel.divorce;
 
+import megamek.common.Compute;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 
-public class DisabledRandomDivorce extends AbstractDivorce {
+public class RandomDivorce extends AbstractDivorce {
+    //region Variable Declarations
+    private int divorceDiceSize;
+    //endregion Variable Declarations
+
     //region Constructors
-    public DisabledRandomDivorce(final CampaignOptions options) {
-        super(RandomDivorceMethod.NONE, options);
+    public RandomDivorce(final CampaignOptions options) {
+        super(RandomDivorceMethod.DICE_ROLL, options);
+        setDivorceDiceSize(options.getRandomDivorceDiceSize());
     }
     //endregion Constructors
 
+    //region Getters/Setters
+    @SuppressWarnings(value = "unused")
+    public int getDivorceDiceSize() {
+        return divorceDiceSize;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setDivorceDiceSize(final int divorceDiceSize) {
+        this.divorceDiceSize = divorceDiceSize;
+    }
+    //endregion Getters/Setters
+
     @Override
     protected boolean randomDivorce(final Person person) {
-        return false;
+        if (divorceDiceSize == 0) {
+            return false;
+        } else if (divorceDiceSize == 1) {
+            return true;
+        }
+
+        return Compute.randomInt(divorceDiceSize) == 0;
     }
 }

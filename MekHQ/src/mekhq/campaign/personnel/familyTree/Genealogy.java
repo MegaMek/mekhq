@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,7 @@ public class Genealogy {
     //region Variables
     private final Person origin;
     private Person spouse;
+    private Person originSpouse; // the person who originated the marriage
     private final List<FormerSpouse> formerSpouses = new ArrayList<>();
     private final Map<FamilialRelationshipType, List<Person>> family = new HashMap<>();
     //endregion Variables
@@ -58,6 +60,7 @@ public class Genealogy {
     /**
      * @return the origin person
      */
+    @SuppressWarnings(value = "unused")
     public Person getOrigin() {
         return origin;
     }
@@ -65,6 +68,7 @@ public class Genealogy {
     /**
      * @return the current person's spouse
      */
+    @SuppressWarnings(value = "unused")
     public @Nullable Person getSpouse() {
         return spouse;
     }
@@ -72,13 +76,31 @@ public class Genealogy {
     /**
      * @param spouse the new spouse for the current person
      */
+    @SuppressWarnings(value = "unused")
     public void setSpouse(final @Nullable Person spouse) {
         this.spouse = spouse;
     }
 
     /**
+     * @return the person who originated the marriage
+     */
+    @SuppressWarnings(value = "unused")
+    public @Nullable Person getOriginSpouse() {
+        return originSpouse;
+    }
+
+    /**
+     * @param originSpouse the person who originated the marriage
+     */
+    @SuppressWarnings(value = "unused")
+    public void setOriginSpouse(final @Nullable Person originSpouse) {
+        this.originSpouse = originSpouse;
+    }
+
+    /**
      * @return a list of FormerSpouse objects for all the former spouses of the current person
      */
+    @SuppressWarnings(value = "unused")
     public List<FormerSpouse> getFormerSpouses() {
         return formerSpouses;
     }
@@ -86,6 +108,7 @@ public class Genealogy {
     /**
      * @param formerSpouse a former spouse to add to the current person's list
      */
+    @SuppressWarnings(value = "unused")
     public void addFormerSpouse(final FormerSpouse formerSpouse) {
         getFormerSpouses().add(formerSpouse);
     }
@@ -95,6 +118,7 @@ public class Genealogy {
      *                     note that this may remove multiple identical former spouses, as we do
      *                     not require uniqueness for former spouses.
      */
+    @SuppressWarnings(value = "unused")
     public void removeFormerSpouse(final FormerSpouse formerSpouse) {
         getFormerSpouses().removeIf(ex -> ex.equals(formerSpouse));
     }
@@ -102,6 +126,7 @@ public class Genealogy {
     /**
      * @param formerSpouse the former spouse to remove from the current person's list
      */
+    @SuppressWarnings(value = "unused")
     public void removeFormerSpouse(final Person formerSpouse) {
         getFormerSpouses().removeIf(ex -> ex.getFormerSpouse().equals(formerSpouse));
     }
@@ -109,6 +134,7 @@ public class Genealogy {
     /**
      * @return the family map for this person
      */
+    @SuppressWarnings(value = "unused")
     public Map<FamilialRelationshipType, List<Person>> getFamily() {
         return family;
     }
@@ -118,6 +144,7 @@ public class Genealogy {
      * @param relationshipType the relationship type between the two people
      * @param person the person to add
      */
+    @SuppressWarnings(value = "unused")
     public void addFamilyMember(final FamilialRelationshipType relationshipType,
                                 final @Nullable Person person) {
         if (person != null) {
@@ -130,6 +157,7 @@ public class Genealogy {
      * @param relationshipType the FamilialRelationshipType of the person to remove
      * @param person the person to remove
      */
+    @SuppressWarnings(value = "unused")
     public void removeFamilyMember(final @Nullable FamilialRelationshipType relationshipType,
                                    final Person person) {
         if (relationshipType == null) {
@@ -192,6 +220,13 @@ public class Genealogy {
      */
     public boolean hasChildren() {
         return getFamily().get(FamilialRelationshipType.CHILD) != null;
+    }
+
+    /**
+     * @return true if the person has at least one kid, false otherwise
+     */
+    public boolean hasNonAdultChildren(LocalDate localDate) {
+        return getChildren().stream().anyMatch(child -> child.isChild(localDate));
     }
 
     /**

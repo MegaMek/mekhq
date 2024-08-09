@@ -69,26 +69,26 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         NONE
     }
 
-    private Person person;
-    private boolean editOrigin;
-    private boolean editBirthday;
-    private boolean editGender;
+    private final Person person;
+    private final boolean editOrigin;
+    private final boolean editBirthday;
+    private final boolean editGender;
     private boolean limitFaction;
-    private NameRestrictions nameRestrictions;
+    private final NameRestrictions nameRestrictions;
 
     private String instructions;
-    private int xpPool;
+    private final int xpPool;
 
     private Portrait portrait;
 
     private List<DialogOptionComponent> optionComps = new ArrayList<>();
-    private Map<String, JSpinner> skillLvls = new Hashtable<>();
-    private Map<String, JSpinner> skillBonus = new Hashtable<>();
-    private Map<String, JLabel> skillValues = new Hashtable<>();
-    private Map<String, JCheckBox> skillChks = new Hashtable<>();
+    private final Map<String, JSpinner> skillLvls = new Hashtable<>();
+    private final Map<String, JSpinner> skillBonus = new Hashtable<>();
+    private final Map<String, JLabel> skillValues = new Hashtable<>();
+    private final Map<String, JCheckBox> skillChks = new Hashtable<>();
     private PersonnelOptions options;
     private LocalDate birthdate;
-    private JFrame frame;
+    private final JFrame frame;
 
     private JButton btnDate;
     private JComboBox<Gender> choiceGender;
@@ -125,7 +125,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private JButton doneButton;
 
-    private Campaign campaign;
+    private final Campaign campaign;
 
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CreateCharacterDialog",
         MekHQ.getMHQOptions().getLocale());
@@ -345,14 +345,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         demogPanel.add(lblGender, gridBagConstraints);
 
-        DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>();
-        for (Gender gender : Gender.getExternalOptions()) {
-            genderModel.addElement(gender);
-        }
-        choiceGender = new JComboBox<>(genderModel);
+        choiceGender = new JComboBox<>(Gender.values());
         choiceGender.setName("choiceGender");
-        choiceGender.setSelectedItem(person.getGender().isExternal() ? person.getGender()
-                : person.getGender().getExternalVariant());
+        choiceGender.setSelectedItem(person.getGender());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
@@ -1454,9 +1449,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 ? "" : textBloodname.getText());
         person.setBiography(txtBio.getText());
         if (choiceGender.getSelectedItem() != null) {
-            person.setGender(person.getGender().isInternal()
-                    ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
-                    : (Gender) choiceGender.getSelectedItem());
+            person.setGender((Gender) choiceGender.getSelectedItem());
         }
         person.setBirthday(birthdate);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());

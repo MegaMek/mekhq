@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,12 +37,7 @@ public class DisabledRandomProcreation extends AbstractProcreation {
     }
 
     @Override
-    protected boolean relationshipProcreation(final Person person) {
-        return false;
-    }
-
-    @Override
-    protected boolean relationshiplessProcreation(final Person person) {
+    protected boolean procreation(final Person person) {
         return false;
     }
 }

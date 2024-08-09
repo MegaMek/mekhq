@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,14 +22,16 @@ import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
-import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
+import mekhq.campaign.personnel.procreation.RandomProcreation;
 
 import java.util.ResourceBundle;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
 
 public enum RandomProcreationMethod {
     //region Enum Declarations
     NONE("RandomProcreationMethod.NONE.text", "RandomProcreationMethod.NONE.toolTipText"),
-    PERCENTAGE("RandomProcreationMethod.PERCENTAGE.text", "RandomProcreationMethod.PERCENTAGE.toolTipText");
+    DICE_ROLL("RandomProcreationMethod.DICE_ROLL.text", "RandomProcreationMethod.DICE_ROLL.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -42,33 +44,34 @@ public enum RandomProcreationMethod {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.toolTipText = resources.getString(toolTipText);
+        this.toolTipText = wordWrap(resources.getString(toolTipText));
     }
     //endregion Constructors
 
     //region Getters
+    @SuppressWarnings(value = "unused")
     public String getToolTipText() {
         return toolTipText;
     }
     //endregion Getters
 
     //region Boolean Comparison Methods
+    @SuppressWarnings(value = "unused")
     public boolean isNone() {
         return this == NONE;
     }
 
-    public boolean isPercentage() {
-        return this == PERCENTAGE;
+    @SuppressWarnings(value = "unused")
+    public boolean isDiceRoll() {
+        return this == DICE_ROLL;
     }
     //endregion Boolean Comparison Methods
 
     public AbstractProcreation getMethod(final CampaignOptions options) {
-        switch (this) {
-            case PERCENTAGE:
-                return new PercentageRandomProcreation(options);
-            case NONE:
-            default:
-                return new DisabledRandomProcreation(options);
+        if (this == DICE_ROLL) {
+            return new RandomProcreation(options);
+        } else {
+            return new DisabledRandomProcreation(options);
         }
     }
 

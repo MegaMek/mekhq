@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -103,6 +103,17 @@ public class PersonnelStatusTest {
                 assertTrue(personnelStatus.isOnLeave());
             } else {
                 assertFalse(personnelStatus.isOnLeave());
+            }
+        }
+    }
+
+    @Test
+    public void testIsOnMaternityLeave() {
+        for (final PersonnelStatus personnelStatus : statuses) {
+            if (personnelStatus == PersonnelStatus.ON_MATERNITY_LEAVE) {
+                assertTrue(personnelStatus.isOnMaternityLeave());
+            } else {
+                assertFalse(personnelStatus.isOnMaternityLeave());
             }
         }
     }
@@ -281,6 +292,7 @@ public class PersonnelStatusTest {
                 case ON_LEAVE:
                 case STUDENT:
                 case MISSING:
+                case ON_MATERNITY_LEAVE:
                 case AWOL:
                     assertTrue(personnelStatus.isAbsent());
                     break;
@@ -380,9 +392,10 @@ public class PersonnelStatusTest {
         assertEquals(PersonnelStatus.UNDETERMINED, PersonnelStatus.parseFromString("20"));
         assertEquals(PersonnelStatus.SUICIDE, PersonnelStatus.parseFromString("21"));
         assertEquals(PersonnelStatus.SACKED, PersonnelStatus.parseFromString("22"));
+        assertEquals(PersonnelStatus.ON_MATERNITY_LEAVE, PersonnelStatus.parseFromString("23"));
 
         // Error Case
-        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("23"));
+        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("24"));
         assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("blah"));
     }
     //endregion File I/O

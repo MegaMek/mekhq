@@ -18,19 +18,44 @@
  */
 package mekhq.campaign.personnel.marriage;
 
+import megamek.common.Compute;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
-public class DisabledRandomMarriage extends AbstractMarriage {
+public class RandomMarriage extends AbstractMarriage {
+    //region Variable Declarations
+    private int marriageDiceSize;
+    //endregion Variable Declarations
+
     //region Constructors
-    public DisabledRandomMarriage(final CampaignOptions options) {
-        super(RandomMarriageMethod.NONE, options);
+    public RandomMarriage(final CampaignOptions options) {
+        super(RandomMarriageMethod.DICE_ROLL, options);
+
+        setMarriageDiceSize(options.getRandomMarriageDiceSize());
     }
     //endregion Constructors
 
+    //region Getters/Setters
+    @SuppressWarnings(value = "unused")
+    public int getMarriageDiceSize() {
+        return marriageDiceSize;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setMarriageDiceSize(final int marriageDiceSize) {
+        this.marriageDiceSize = marriageDiceSize;
+    }
+    //endregion Getters/Setters
+
     @Override
     protected boolean randomMarriage(final Person person) {
-        return false;
+        if (marriageDiceSize == 0) {
+            return false;
+        } else if (marriageDiceSize == 1) {
+            return true;
+        }
+
+        return Compute.randomInt(marriageDiceSize) == 0;
     }
 }
