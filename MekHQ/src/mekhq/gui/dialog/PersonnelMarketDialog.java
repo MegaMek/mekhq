@@ -213,7 +213,7 @@ public class PersonnelMarketDialog extends JDialog {
 
         scrollTablePersonnel.setMinimumSize(new Dimension(500, 400));
         scrollTablePersonnel.setName("srcTablePersonnel");
-        scrollTablePersonnel.setPreferredSize(new Dimension(500, 400));
+        scrollTablePersonnel.setPreferredSize(new Dimension(800, 400));
 
         tablePersonnel.setModel(personnelModel);
         tablePersonnel.setName("tablePersonnel");
@@ -254,8 +254,8 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.setShowGrid(false);
         scrollTablePersonnel.setViewportView(tablePersonnel);
 
-        scrollPersonnelView.setMinimumSize(new Dimension(200, 600));
-        scrollPersonnelView.setPreferredSize(new Dimension(200, 600));
+        scrollPersonnelView.setMinimumSize(new Dimension(490, 600));
+        scrollPersonnelView.setPreferredSize(new Dimension(490, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPersonnelView.setViewportView(null);
 
