@@ -103,6 +103,27 @@ MEKHQ VERSION HISTORY:
 + FIX #4532, #4546: Fixed NPE in Mass Enroll Filters
 + PR #4553: Added "Buy in Bulk" Button to Parts Acquisition in Repair Bay
 + PR #4566: Updated era modifiers to reflect CamOps
++ FIX #4566: AutoAward misinterprets TOE for formation kills
++ FIX #1795, #2552, #4473: Adjusted Sale Value for Infantry and Battle Armor Units
++ PR #4499: Replaced Legacy Presets, Took StratCon Out of Alpha & Into Beta
++ FIX #4522: Education: Children born to parents at school should stay with the parent until they return
++ FIX #4544: Corrected Errors in Post-Grad & Doctorate Graduation Handler
++ FIX #4550: "Use StratCon Rules" appears twice on that Campaign Options tab
++ FIX #4557: Education - Re-enroll options shows 'nothing more to learn' on drop-outs from military academies
++ PR #4558: Added DropShip Bounty Settings
++ PR #4560: Updated Assertiveness and Removed Toughness Biography Entries
++ PR #4563: Added Education Module Handler for Injured Personnel
++ PR #4569: Added Unit Market Rarity Setting to Campaign Options, Updated Unit Markets.pdf
++ PR #4570: Separated Handling of Prisoners & Prisoner-Defectors in Resolve Mission Dialogs
++ PR #4571: Renamed Game Options to MegaMek Options to Improve Clarity
++ PR #4573: Fixed Formation Level Calculations
++ PR #4574: Updated Repair Site Names to Match CamOps
++ PR #4576: Fixed Prisoner of War Award Categorization
++ PR #4577: Fixed Index Out-of-Bounds Error During eraMods Parsing
++ PR #4578: Updated Awards Module.pdf
++ PR #4580: Refactored Infantry Sell Value Calculation to Include Unit Quality Multipliers
++ PR #4582: Corrected New Presets, Added Missing Updated SPA Costs
++ PR #4583: Fixed Injury Fatigue Checkbox
 
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)

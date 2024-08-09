@@ -607,6 +607,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUnitMarketRegionalMechVariations;
     private JLabel lblUnitMarketSpecialUnitChance;
     private JSpinner spnUnitMarketSpecialUnitChance;
+    private JLabel lblUnitMarketRarityModifier;
+    private JSpinner spnUnitMarketRarityModifier;
     private JCheckBox chkInstantUnitMarketDelivery;
     private JCheckBox chkUnitMarketReportRefresh;
 
@@ -617,6 +619,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkVariableContractLength;
     private JCheckBox chkContractMarketReportRefresh;
     private JSpinner spnContractMaxSalvagePercentage;
+    private JSpinner spnDropShipBonusPercentage;
     //endregion Markets Tab
 
     //region RATs Tab
@@ -7623,6 +7626,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkUnitMarketRegionalMechVariations.setEnabled(enabled);
             lblUnitMarketSpecialUnitChance.setEnabled(enabled);
             spnUnitMarketSpecialUnitChance.setEnabled(enabled);
+            lblUnitMarketRarityModifier.setEnabled(enabled);
+            spnUnitMarketRarityModifier.setEnabled(enabled);
             chkInstantUnitMarketDelivery.setEnabled(enabled);
             chkUnitMarketReportRefresh.setEnabled(enabled);
         });
@@ -7639,6 +7644,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnUnitMarketSpecialUnitChance = new JSpinner(new SpinnerNumberModel(30, 0, 100, 1));
         spnUnitMarketSpecialUnitChance.setToolTipText(resources.getString("lblUnitMarketSpecialUnitChance.toolTipText"));
         spnUnitMarketSpecialUnitChance.setName("spnUnitMarketSpecialUnitChance");
+
+        lblUnitMarketRarityModifier = new JLabel(resources.getString("lblUnitMarketRarityModifier.text"));
+        lblUnitMarketRarityModifier.setToolTipText(resources.getString("lblUnitMarketRarityModifier.toolTipText"));
+        lblUnitMarketRarityModifier.setName("lblUnitMarketRarityModifier");
+
+        spnUnitMarketRarityModifier = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
+        spnUnitMarketRarityModifier.setToolTipText(resources.getString("lblUnitMarketRarityModifier.toolTipText"));
+        spnUnitMarketRarityModifier.setName("spnUnitMarketRarityModifier");
 
         chkInstantUnitMarketDelivery = new JCheckBox(resources.getString("chkInstantUnitMarketDelivery.text"));
         chkInstantUnitMarketDelivery.setToolTipText(resources.getString("chkInstantUnitMarketDelivery.toolTipText"));
@@ -7670,6 +7683,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblUnitMarketSpecialUnitChance)
                                 .addComponent(spnUnitMarketSpecialUnitChance, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblUnitMarketRarityModifier)
+                                .addComponent(spnUnitMarketRarityModifier, Alignment.LEADING))
                         .addComponent(chkInstantUnitMarketDelivery)
                         .addComponent(chkUnitMarketReportRefresh)
         );
@@ -7683,6 +7699,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblUnitMarketSpecialUnitChance)
                                 .addComponent(spnUnitMarketSpecialUnitChance))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblUnitMarketRarityModifier)
+                                .addComponent(spnUnitMarketRarityModifier))
                         .addComponent(chkInstantUnitMarketDelivery)
                         .addComponent(chkUnitMarketReportRefresh)
         );
@@ -7752,6 +7771,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnContractMaxSalvagePercentage.setToolTipText(resources.getString("lblContractMaxSalvagePercentage.toolTipText"));
         spnContractMaxSalvagePercentage.setName("spnContractMaxSalvagePercentage");
 
+        JLabel lblDropShipBonusPercentage = new JLabel(resources.getString("lblDropShipBonusPercentage.text"));
+        lblDropShipBonusPercentage.setToolTipText(wordWrap(resources.getString("lblDropShipBonusPercentage.toolTipText")));
+        lblDropShipBonusPercentage.setName("lblDropShipBonusPercentage");
+
+        spnDropShipBonusPercentage = new JSpinner(new SpinnerNumberModel(0, 0, 20, 5));
+        spnDropShipBonusPercentage.setToolTipText(resources.getString("lblDropShipBonusPercentage.toolTipText"));
+        spnDropShipBonusPercentage.setName("spnDropShipBonusPercentage");
+
         // Programmatically Assign Accessibility Labels
         lblContractMarketMethod.setLabelFor(comboContractMarketMethod);
         lblContractSearchRadius.setLabelFor(spnContractSearchRadius);
@@ -7779,6 +7806,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCoontractMaxSalvagePercentage)
                                 .addComponent(spnContractMaxSalvagePercentage, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblDropShipBonusPercentage)
+                                .addComponent(spnDropShipBonusPercentage, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -7794,6 +7824,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCoontractMaxSalvagePercentage)
                                 .addComponent(spnContractMaxSalvagePercentage))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblDropShipBonusPercentage)
+                                .addComponent(spnDropShipBonusPercentage))
         );
 
         return contractMarketPanel;
@@ -8240,7 +8273,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Fatigue
         chkUseFatigue.setSelected(options.isUseFatigue());
         spnFatigueRate.setValue(options.getFatigueRate());
-        chkUseInjuryFatigue.setVisible(options.isUseInjuryFatigue());
+        chkUseInjuryFatigue.setSelected(options.isUseInjuryFatigue());
         spnFieldKitchenCapacity.setValue(options.getFieldKitchenCapacity());
         chkFieldKitchenIgnoreNonCombatants.setSelected(options.isUseFieldKitchenIgnoreNonCombatants());
         spnFatigueLeaveThreshold.setValue(options.getFatigueLeaveThreshold());
@@ -8527,6 +8560,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
         chkUnitMarketRegionalMechVariations.setSelected(options.isUnitMarketRegionalMechVariations());
         spnUnitMarketSpecialUnitChance.setValue(options.getUnitMarketSpecialUnitChance());
+        spnUnitMarketRarityModifier.setValue(options.getUnitMarketRarityModifier());
         chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
         chkUnitMarketReportRefresh.setSelected(options.isUnitMarketReportRefresh());
 
@@ -8536,6 +8570,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkVariableContractLength.setSelected(options.isVariableContractLength());
         chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
         spnContractMaxSalvagePercentage.setValue(options.getContractMaxSalvagePercentage());
+        spnDropShipBonusPercentage.setValue(options.getDropShipBonusPercentage());
         //endregion Markets Tab
 
         //region RATs Tab
@@ -9097,6 +9132,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUnitMarketMethod(comboUnitMarketMethod.getSelectedItem());
             options.setUnitMarketRegionalMechVariations(chkUnitMarketRegionalMechVariations.isSelected());
             options.setUnitMarketSpecialUnitChance((Integer) spnUnitMarketSpecialUnitChance.getValue());
+            options.setUnitMarketRarityModifier((int) spnUnitMarketRarityModifier.getValue());
             options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
             options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
 
@@ -9106,6 +9142,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setVariableContractLength(chkVariableContractLength.isSelected());
             options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
             options.setContractMaxSalvagePercentage((Integer) spnContractMaxSalvagePercentage.getValue());
+            options.setDropShipBonusPercentage((int) spnDropShipBonusPercentage.getValue());
             //endregion Markets Tab
 
             //region RATs Tab

@@ -26,7 +26,7 @@ public enum Aggression {
     //region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
     AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.description", false, false),
-    ASSERTIVE("Aggression.ASSERTIVE.text", "Aggression.ASSERTIVE.description", false, false),
+    ASSERTIVE("Aggression.ASSERTIVE.text", "Aggression.ASSERTIVE.description", true, false),
     BELLIGERENT("Aggression.BELLIGERENT.text", "Aggression.BELLIGERENT.description", false, false),
     BLOODTHIRSTY("Aggression.BLOODTHIRSTY.text", "Aggression.BLOODTHIRSTY.description", false, true),
     BOLD("Aggression.BOLD.text", "Aggression.BOLD.description", true, false),

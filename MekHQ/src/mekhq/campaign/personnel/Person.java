@@ -213,6 +213,7 @@ public class Person {
     private int eduJourneyTime;
     private int eduEducationTime;
     private int eduDaysOfTravel;
+    private List<UUID> eduTagAlongs;
     //endregion Education
 
     //region Personality
@@ -376,6 +377,7 @@ public class Person {
         eduJourneyTime = 0;
         eduEducationTime = 0;
         eduDaysOfTravel = 0;
+        eduTagAlongs = new ArrayList<>();
         eduAcademySet = null;
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
@@ -1113,6 +1115,12 @@ public class Person {
         this.setEduJourneyTime(0);
         this.setEduDaysOfTravel(0);
 
+        for (UUID tagAlongId : eduTagAlongs) {
+            Person tagAlong = campaign.getPerson(tagAlongId);
+            tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+        }
+        this.setEduTagAlongs(new ArrayList<>());
+
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }
 
@@ -1611,6 +1619,18 @@ public class Person {
         this.eduDaysOfTravel = eduDaysOfTravel;
     }
 
+    public List<UUID> getEduTagAlongs() {
+        return eduTagAlongs;
+    }
+
+    public void setEduTagAlongs(final List<UUID> eduTagAlongs) {
+        this.eduTagAlongs = eduTagAlongs;
+    }
+
+    public void addEduTagAlong(final UUID tagAlong) {
+        this.eduTagAlongs.add(tagAlong);
+    }
+
     /**
      * Increments the number educational travel days by 1.
      */
@@ -2038,6 +2058,16 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravel", eduDaysOfTravel);
             }
 
+            if (!eduTagAlongs.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "eduTagAlongs");
+
+                for (UUID tagAlong : eduTagAlongs) {
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tagAlong", tagAlong.toString());
+                }
+
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduTagAlongs");
+            }
+
             if (eduAcademySystem != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
             }
@@ -2412,6 +2442,22 @@ public class Person {
                     retVal.eduJourneyTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravel")) {
                     retVal.eduDaysOfTravel = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduTagAlongs")) {
+                    if (wn2.getNodeName().equalsIgnoreCase("eduTagAlongs")) {
+                        NodeList uuidNodes = wn2.getChildNodes();
+
+                        for (int j = 0; j < uuidNodes.getLength(); j++) {
+                            Node uuidNode = uuidNodes.item(j);
+
+                            if (uuidNode.getNodeName().equalsIgnoreCase("tagAlong")) {
+                                String uuidString = uuidNode.getTextContent();
+
+                                UUID uuid = UUID.fromString(uuidString);
+
+                                retVal.eduTagAlongs.add(uuid);
+                            }
+                        }
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
                     retVal.eduAcademySystem = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyName")) {
@@ -2754,7 +2800,7 @@ public class Person {
         // Prisoner Status Modifications
         rankName = rankName.equalsIgnoreCase("None")
                 ? getPrisonerStatus().getTitleExtension()
-                : getPrisonerStatus().getTitleExtension() + rankName;
+                : getPrisonerStatus().getTitleExtension() + ' ' + rankName;
 
         // We have our name, return it
         return rankName.trim();

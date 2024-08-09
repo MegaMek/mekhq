@@ -524,6 +524,7 @@ public class CampaignOptions {
     private UnitMarketMethod unitMarketMethod;
     private boolean unitMarketRegionalMechVariations;
     private int unitMarketSpecialUnitChance;
+    private int unitMarketRarityModifier;
     private boolean instantUnitMarketDelivery;
     private boolean unitMarketReportRefresh;
 
@@ -533,6 +534,7 @@ public class CampaignOptions {
     private boolean variableContractLength;
     private boolean contractMarketReportRefresh;
     private int contractMaxSalvagePercentage;
+    private int dropShipBonusPercentage;
     //endregion Markets Tab
 
     //region RATs Tab
@@ -1145,6 +1147,7 @@ public class CampaignOptions {
         setUnitMarketMethod(UnitMarketMethod.NONE);
         setUnitMarketRegionalMechVariations(true);
         setUnitMarketSpecialUnitChance(30);
+        setUnitMarketRarityModifier(0);
         setInstantUnitMarketDelivery(false);
         setUnitMarketReportRefresh(true);
 
@@ -1154,6 +1157,7 @@ public class CampaignOptions {
         setVariableContractLength(true);
         setContractMarketReportRefresh(true);
         setContractMaxSalvagePercentage(100);
+        setDropShipBonusPercentage(0);
         //endregion Markets Tab
 
         //region RATs Tab
@@ -3464,6 +3468,14 @@ public class CampaignOptions {
         this.unitMarketSpecialUnitChance = unitMarketSpecialUnitChance;
     }
 
+    public int getUnitMarketRarityModifier() {
+        return unitMarketRarityModifier;
+    }
+
+    public void setUnitMarketRarityModifier(final int unitMarketRarityModifier) {
+        this.unitMarketRarityModifier = unitMarketRarityModifier;
+    }
+
     public boolean isInstantUnitMarketDelivery() {
         return instantUnitMarketDelivery;
     }
@@ -3520,6 +3532,14 @@ public class CampaignOptions {
 
     public void setContractMaxSalvagePercentage(final int contractMaxSalvagePercentage) {
         this.contractMaxSalvagePercentage = contractMaxSalvagePercentage;
+    }
+
+    public int getDropShipBonusPercentage() {
+        return dropShipBonusPercentage;
+    }
+
+    public void setDropShipBonusPercentage(final int dropShipBonusPercentage) {
+        this.dropShipBonusPercentage = dropShipBonusPercentage;
     }
     //endregion Contract Market
     //endregion Markets Tab
@@ -4961,6 +4981,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketMethod", getUnitMarketMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRegionalMechVariations", isUnitMarketRegionalMechVariations());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketSpecialUnitChance", getUnitMarketSpecialUnitChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRarityModifier", getUnitMarketRarityModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", isInstantUnitMarketDelivery());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketReportRefresh", isUnitMarketReportRefresh());
         //endregion Unit Market
@@ -4971,6 +4992,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableContractLength", isVariableContractLength());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketReportRefresh", isContractMarketReportRefresh());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMaxSalvagePercentage", getContractMaxSalvagePercentage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dropShipBonusPercentage", getDropShipBonusPercentage());
         //endregion Contract Market
         //endregion Markets Tab
 
@@ -5944,6 +5966,8 @@ public class CampaignOptions {
                     retVal.setUnitMarketRegionalMechVariations(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketSpecialUnitChance")) {
                     retVal.setUnitMarketSpecialUnitChance(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketRarityModifier")) {
+                    retVal.setUnitMarketRarityModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
                     retVal.setInstantUnitMarketDelivery(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
@@ -5962,6 +5986,8 @@ public class CampaignOptions {
                     retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMaxSalvagePercentage")) {
                     retVal.setContractMaxSalvagePercentage(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("dropShipBonusPercentage")) {
+                    retVal.setDropShipBonusPercentage(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Contract Market
                     //endregion Markets Tab
 

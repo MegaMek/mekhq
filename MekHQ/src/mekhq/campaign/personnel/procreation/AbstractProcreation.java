@@ -359,6 +359,14 @@ public abstract class AbstractProcreation {
 
             // Recruit the baby
             campaign.recruitPerson(baby, prisonerStatus, true, true);
+
+            // if the mother is at school, add the baby to the list of tag alongs
+            if ((!mother.getEduAcademyName().isBlank())
+                    && (!EducationController.getAcademy(mother.getEduAcademyName(), mother.getEduAcademyNameInSet()).isHomeSchool())) {
+
+                mother.addEduTagAlong(baby.getId());
+                baby.changeStatus(campaign, today, PersonnelStatus.ON_LEAVE);
+            }
         }
 
         // adjust parents' loyalty
