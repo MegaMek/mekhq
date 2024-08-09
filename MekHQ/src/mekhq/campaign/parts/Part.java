@@ -379,7 +379,7 @@ public abstract class Part implements IPartWork, ITechnology {
             if (getDaysToArrival() > 1) {
                 dayName += "s";
             }
-            toReturn = "In transit (" + getDaysToArrival() + " " + dayName + ")";
+            toReturn = "In transit (" + getDaysToArrival() + ' ' + dayName + ')';
         }
         return toReturn;
     }
@@ -409,8 +409,7 @@ public abstract class Part implements IPartWork, ITechnology {
         if (getAllMods(null).getValue() > -1) {
             bonus = '+' + bonus;
         }
-        bonus = '(' + bonus + ')';
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font size='3'";
         String action = "Repair ";
         if (isSalvaging()) {
             action = "Salvage ";
@@ -421,18 +420,24 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         toReturn += ">";
-        toReturn += "<b>" + action + getName() + "</b><br/>";
+        toReturn += "<b>" + action + getName();
+
+        if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+            toReturn += " - <b><span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
+                    + "</span></b></b><br/>";
+        } else {
+            toReturn += "</b><br/>";
+        }
+
         toReturn += getDetails() + "<br/>";
         if (getSkillMin() > SkillType.EXP_ELITE) {
             toReturn += "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</font>";
         } else {
             toReturn += getTimeLeft() + " minutes" + scheduled;
-            if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-                toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
-            }
-            toReturn += ' ' + bonus;
+            toReturn += " <b>TN:</b> " + bonus;
             if (getMode() != WorkTime.NORMAL) {
-                toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+                toReturn += " <i>" + getCurrentModeName() + "</i>";
             }
         }
         toReturn += "</font></html>";
@@ -448,12 +453,18 @@ public abstract class Part implements IPartWork, ITechnology {
             }
             String bonus = getAllMods(null).getValueAsString();
             if (getAllMods(null).getValue() > -1) {
-                bonus = "+" + bonus;
+                bonus = '+' + bonus;
             }
-            bonus = "(" + bonus + ")";
+
             toReturn += getTimeLeft() + " minutes" + scheduled;
-            toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
-            toReturn += " " + bonus;
+
+            if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+                toReturn += ", <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                        + SkillType.getExperienceLevelName(getSkillMin()) + '+'
+                        + "</span>";
+            }
+
+            toReturn += ", TN: " + bonus;
             if (getMode() != WorkTime.NORMAL) {
                 toReturn += ", " + getCurrentModeName();
             }
@@ -1342,7 +1353,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     public String getQuantityName(int quantity) {
-        String answer = "" + quantity + " " + getName();
+        String answer = String.valueOf(quantity) + ' ' + getName();
         if (quantity > 1) {
             answer += "s";
         }
@@ -1490,7 +1501,7 @@ public abstract class Part implements IPartWork, ITechnology {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(getName());
-        sb.append(" ");
+        sb.append(' ');
         sb.append(getDetails());
         sb.append(", q: ");
         sb.append(quantity);

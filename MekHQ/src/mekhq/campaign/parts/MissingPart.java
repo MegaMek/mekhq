@@ -86,26 +86,29 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         if (getAllMods(null).getValue() > -1) {
             bonus = '+' + bonus;
         }
-        bonus = '(' + bonus + ')';
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font size='3'";
         String scheduled = "";
         if (getTech() != null) {
             scheduled = " (scheduled) ";
         }
 
         toReturn += ">";
-        toReturn += "<b>Replace " + getName() + "</b><br/>";
-        toReturn += getDetails() + "<br/>";
+        toReturn += "<b>Replace " + getName();
+
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</font>";
+            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</b></span>";
         } else {
+            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
+                    + "</span></b></b><br/>";
+        }
+
+        toReturn += getDetails() + "<br/>";
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
             toReturn += getTimeLeft() + " minutes" + scheduled;
-            if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-                toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
-            }
-            toReturn += ' ' + bonus;
+            toReturn += " <b>TN:</b> " + bonus;
             if (getMode() != WorkTime.NORMAL) {
-                toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+                toReturn += " <i>" + getCurrentModeName() + "</i>";
             }
         }
         toReturn += "</font></html>";
@@ -268,7 +271,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         //availability mod
         int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ')');
 
         return target;
     }
@@ -309,10 +312,10 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     public String getAcquisitionBonus() {
         String bonus = getAllAcquisitionMods().getValueAsString();
         if (getAllAcquisitionMods().getValue() > -1) {
-            bonus = "+" + bonus;
+            bonus = '+' + bonus;
         }
 
-        return "(" + bonus + ")";
+        return '(' + bonus + ')';
     }
 
     @Override
@@ -375,7 +378,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     public String getAcquisitionName() {
         String details = getNewPart().getDetails();
         details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
-        return getPartName() + " " + details;
+        return getPartName() + ' ' + details;
     }
 
     @Override

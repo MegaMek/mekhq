@@ -558,7 +558,7 @@ public class ProtomekLocation extends Part {
         if ((!isBreached() && !isBlownOff()) || isSalvaging()) {
             return super.getDesc();
         }
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font size='3'";
         String scheduled = "";
         if (getTech() != null) {
             scheduled = " (scheduled) ";
@@ -566,27 +566,35 @@ public class ProtomekLocation extends Part {
 
         toReturn += ">";
         if (isBlownOff()) {
-            toReturn += "<b>Re-attach " + getName() + "</b><br/>";
+            toReturn += "<b>Re-attach " + getName();
         } else {
-            toReturn += "<b>Seal " + getName() + "</b><br/>";
+            toReturn += "<b>Seal " + getName();
+
         }
-        toReturn += getDetails() + "<br/>";
-        if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</font>";
+
+        if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+            if (getSkillMin() > SkillType.EXP_ELITE) {
+                toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</b></span>";
+            } else {
+            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
+                    + "</span></b></b><br/>";
+            }
         } else {
+            toReturn += "</b><br/>";
+        }
+
+        toReturn += getDetails() + "<br/>";
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
             toReturn += getTimeLeft() + " minutes" + scheduled;
             if (isBlownOff()) {
                 String bonus = getAllMods(null).getValueAsString();
                 if (getAllMods(null).getValue() > -1) {
                     bonus = '+' + bonus;
                 }
-                bonus = '(' + bonus + ')';
-                if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-                    toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
-                }
-                toReturn += ' ' + bonus;
+                toReturn += " <b>TN:</b> " + bonus;
                 if (getMode() != WorkTime.NORMAL) {
-                    toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+                    toReturn += " <i>" + getCurrentModeName() + "</i>";
                 }
             }
         }

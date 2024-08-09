@@ -177,7 +177,7 @@ public class PodSpace implements IPartWork {
                     }
                 }
                 return "There are no replacement parts available for "
-                    + unit.getEntity().getLocationName(location) + ".";
+                    + unit.getEntity().getLocationName(location) + '.';
             }
         }
         return null;
@@ -368,8 +368,7 @@ public class PodSpace implements IPartWork {
         if (getAllMods(null).getValue() > -1) {
             bonus = '+' + bonus;
         }
-        bonus = '(' + bonus + ')';
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font size='3'";
         String action = "Replace ";
         if (isSalvaging()) {
             action = "Salvage ";
@@ -380,16 +379,20 @@ public class PodSpace implements IPartWork {
         }
 
         toReturn += ">";
-        toReturn += "<b>" + action + getPartName() + " Equipment</b><br/>";
-        toReturn += getDetails() + "<br/>";
+        toReturn += "<b>" + action + getPartName() + " Equipment";
+
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</font>";
+            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</b></span>";
         } else {
+            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
+                    + "</span></b></b><br/>";
+        }
+
+        toReturn += getDetails() + "<br/>";
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
             toReturn += getTimeLeft() + " minutes" + scheduled;
-            if (!campaign.getCampaignOptions().isDestroyByMargin()) {
-                toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
-            }
-            toReturn += ' ' + bonus;
+            toReturn += " <b>TN:</b> " + bonus;
         }
         toReturn += "</font></html>";
         return toReturn;
