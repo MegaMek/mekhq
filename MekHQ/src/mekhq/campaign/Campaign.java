@@ -141,6 +141,7 @@ import java.util.stream.Collectors;
 
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -5408,6 +5409,37 @@ public class Campaign implements ITechManager {
 
         if (getCampaignOptions().isUseEraMods()) {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
+        }
+
+        if (partWork.getUnit().getSite() < SITE_FACILITY_MAINTENANCE) {
+            if (getLocation().isOnPlanet()) {
+                Planet planet = getLocation().getPlanet();
+                Atmosphere atmosphere = planet.getAtmosphere(getLocalDate());
+                megamek.common.planetaryconditions.Atmosphere planetaryConditions = megamek.common.planetaryconditions.Atmosphere.getAtmosphere(planet.getPressure(getLocalDate()));
+                int temperature = planet.getTemperature(getLocalDate());
+
+                if (planet.getGravity() < 0.8) {
+                    target.addModifier(2, "Low Gravity");
+                } else if (planet.getGravity() >= 2.0) {
+                    target.addModifier(4, "Very High Gravity");
+                } else if (planet.getGravity() > 1.2) {
+                    target.addModifier(1, "High Gravity");
+                }
+
+                if (atmosphere.isTainted() || atmosphere.isToxic()) {
+                    target.addModifier(2, "Tainted or Toxic Atmosphere");
+                } else if (planetaryConditions.isVacuum()) {
+                    target.addModifier(2, "Vacuum");
+                }
+
+                if (planetaryConditions.isTrace() || planetaryConditions.isVeryHigh()) {
+                    target.addModifier(1, "Trace or Very High Pressure Atmosphere");
+                }
+
+                if (temperature < -30 || temperature > 50) {
+                    target.addModifier(1, "Extreme Temperature");
+                }
+            }
         }
 
         if (null != partWork.getUnit() && null != tech) {
