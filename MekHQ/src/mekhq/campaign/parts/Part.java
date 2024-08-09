@@ -409,7 +409,6 @@ public abstract class Part implements IPartWork, ITechnology {
         if (getAllMods(null).getValue() > -1) {
             bonus = '+' + bonus;
         }
-        bonus = '(' + bonus + ')';
         String toReturn = "<html><font size='3'";
         String action = "Repair ";
         if (isSalvaging()) {
