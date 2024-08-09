@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -192,6 +193,13 @@ public class Genealogy {
      */
     public boolean hasChildren() {
         return getFamily().get(FamilialRelationshipType.CHILD) != null;
+    }
+
+    /**
+     * @return true if the person has at least one kid, false otherwise
+     */
+    public boolean hasNonAdultChildren(LocalDate localDate) {
+        return getChildren().stream().anyMatch(child -> child.isChild(localDate));
     }
 
     /**

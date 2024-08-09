@@ -248,8 +248,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkAtBPrisonerRansom;
 
     // Dependent
-    private JPanel randomDependentPanel;
-    private MMComboBox<RandomDependentMethod> comboRandomDependentMethod;
     private JCheckBox chkUseRandomDependentAddition;
     private JCheckBox chkUseRandomDependentRemoval;
 
@@ -2870,13 +2868,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final boolean enabled = chkUseAtB.isSelected();
             enableAtBComponents(panAtB, enabled);
 
-            if (randomDependentPanel.isEnabled() != enabled) {
-                randomDependentPanel.setEnabled(enabled);
-                if (enabled) {
-                    comboRandomDependentMethod.setSelectedItem(comboRandomDependentMethod.getSelectedItem());
-                }
-            }
-
             // TODO : AbstractContractMarket : Delink more from AtB
             if (contractMarketPanel.isEnabled() != enabled) {
                 comboContractMarketMethod.setSelectedItem(enabled
@@ -5154,7 +5145,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel createDependentPanel() {
         // Create Panel Components
-        createRandomDependentPanel();
+        chkUseRandomDependentAddition = new JCheckBox(resources.getString("chkUseRandomDependentAddition.text"));
+        chkUseRandomDependentAddition.setToolTipText(resources.getString("chkUseRandomDependentAddition.toolTipText"));
+        chkUseRandomDependentAddition.setName("chkUseRandomDependentAddition");
+
+        chkUseRandomDependentRemoval = new JCheckBox(resources.getString("chkUseRandomDependentRemoval.text"));
+        chkUseRandomDependentRemoval.setToolTipText(resources.getString("chkUseRandomDependentRemoval.toolTipText"));
+        chkUseRandomDependentRemoval.setName("chkUseRandomDependentRemoval");
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -5169,12 +5166,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(randomDependentPanel)
+                        .addComponent(chkUseRandomDependentAddition)
+                        .addComponent(chkUseRandomDependentRemoval)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(randomDependentPanel)
+                        .addComponent(chkUseRandomDependentAddition)
+                        .addComponent(chkUseRandomDependentRemoval)
         );
 
         return panel;
@@ -5302,76 +5301,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         );
 
         return turnoverAndRetentionFatiguePanel;
-    }
-
-    private void createRandomDependentPanel() {
-        // Create Panel Components
-        final JLabel lblRandomDependentMethod = new JLabel(resources.getString("lblRandomDependentMethod.text"));
-        lblRandomDependentMethod.setToolTipText(resources.getString("lblRandomDependentMethod.toolTipText"));
-        lblRandomDependentMethod.setName("lblRandomDependentMethod");
-
-        comboRandomDependentMethod = new MMComboBox<>("comboRandomDependentMethod", RandomDependentMethod.values());
-        comboRandomDependentMethod.setToolTipText(resources.getString("lblRandomDependentMethod.toolTipText"));
-        comboRandomDependentMethod.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof RandomDependentMethod) {
-                    list.setToolTipText(((RandomDependentMethod) value).getToolTipText());
-                }
-                return this;
-            }
-        });
-        comboRandomDependentMethod.addActionListener(evt -> {
-            final RandomDependentMethod method = comboRandomDependentMethod.getSelectedItem();
-            if (method == null) {
-                return;
-            }
-            final boolean enabled = randomDependentPanel.isEnabled() && !method.isNone();
-            chkUseRandomDependentAddition.setEnabled(enabled);
-            chkUseRandomDependentRemoval.setEnabled(enabled);
-        });
-
-        chkUseRandomDependentAddition = new JCheckBox(resources.getString("chkUseRandomDependentAddition.text"));
-        chkUseRandomDependentAddition.setToolTipText(resources.getString("chkUseRandomDependentAddition.toolTipText"));
-        chkUseRandomDependentAddition.setName("chkUseRandomDependentAddition");
-
-        chkUseRandomDependentRemoval = new JCheckBox(resources.getString("chkUseRandomDependentRemoval.text"));
-        chkUseRandomDependentRemoval.setToolTipText(resources.getString("chkUseRandomDependentRemoval.toolTipText"));
-        chkUseRandomDependentRemoval.setName("chkUseRandomDependentRemoval");
-
-        // Programmatically Assign Accessibility Labels
-        lblRandomDependentMethod.setLabelFor(comboRandomDependentMethod);
-
-        // Layout the Panel
-        randomDependentPanel = new JDisableablePanel("randomDependentPanel");
-        randomDependentPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomDependentPanel.title")));
-        randomDependentPanel.setToolTipText(resources.getString("randomDependentPanel.toolTipText"));
-
-        final GroupLayout layout = new GroupLayout(randomDependentPanel);
-        randomDependentPanel.setLayout(layout);
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblRandomDependentMethod)
-                                .addComponent(comboRandomDependentMethod, Alignment.LEADING))
-                        .addComponent(chkUseRandomDependentAddition)
-                        .addComponent(chkUseRandomDependentRemoval)
-        );
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRandomDependentMethod)
-                                .addComponent(comboRandomDependentMethod))
-                        .addComponent(chkUseRandomDependentAddition)
-                        .addComponent(chkUseRandomDependentRemoval)
-        );
     }
 
     private JPanel createSalaryPanel() {
@@ -8179,7 +8108,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAtBPrisonerRansom.setSelected(options.isUseAtBPrisonerRansom());
 
         // Dependent
-        comboRandomDependentMethod.setSelectedItem(options.getRandomDependentMethod());
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
 
@@ -8906,7 +8834,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
 
             // Dependent
-            options.setRandomDependentMethod(comboRandomDependentMethod.getSelectedItem());
             options.setUseRandomDependentAddition(chkUseRandomDependentAddition.isSelected());
             options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 
