@@ -52,7 +52,7 @@ import java.util.UUID;
  * Tab for interacting with all personnel
  */
 public final class PersonnelTab extends CampaignGuiTab {
-    public static final int PERSONNEL_VIEW_WIDTH = 475;
+    public static final int PERSONNEL_VIEW_WIDTH = 490;
 
     private JSplitPane splitPersonnel;
     private JTable personnelTable;
