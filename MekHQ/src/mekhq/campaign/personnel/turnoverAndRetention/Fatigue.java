@@ -64,25 +64,29 @@ public class Fatigue {
 
         if (campaign.getCampaignOptions().isUseFatigue()) {
             if ((effectiveFatigue >= 5) && (effectiveFatigue < 9)) {
-                campaign.addReport(String.format(resources.getString("fatigueTired.text"), person.getHyperlinkedFullTitle(),
+                campaign.addReport(String.format(resources.getString("fatigueTired.text"),
+                        person.getHyperlinkedFullTitle(),
                         "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
                         "</span>"));
 
                 person.setIsRecoveringFromFatigue(true);
             } else if ((effectiveFatigue >= 9) && (effectiveFatigue < 12)) {
-                campaign.addReport(String.format(resources.getString("fatigueFatigued.text"), person.getHyperlinkedFullTitle(),
+                campaign.addReport(String.format(resources.getString("fatigueFatigued.text"),
+                        person.getHyperlinkedFullTitle(),
                         "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
                         "</span>"));
 
                 person.setIsRecoveringFromFatigue(true);
             } else if ((effectiveFatigue >= 12) && (effectiveFatigue < 16)) {
-                campaign.addReport(String.format(resources.getString("fatigueExhausted.text"), person.getHyperlinkedFullTitle(),
+                campaign.addReport(String.format(resources.getString("fatigueExhausted.text"),
+                        person.getHyperlinkedFullTitle(),
                         "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
                         "</span>"));
 
                 person.setIsRecoveringFromFatigue(true);
             } else if (effectiveFatigue >= 17) {
-                campaign.addReport(String.format(resources.getString("fatigueCritical.text"), person.getHyperlinkedFullTitle(),
+                campaign.addReport(String.format(resources.getString("fatigueCritical.text"),
+                        person.getHyperlinkedFullTitle(),
                         "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
                         "</span>"));
 
@@ -144,7 +148,8 @@ public class Fatigue {
 
                 if (person.getIsRecoveringFromFatigue()) {
                     if (person.getFatigue() <= 0) {
-                        campaign.addReport(String.format(resources.getString("fatigueRecovered.text"), person.getHyperlinkedFullTitle(),
+                        campaign.addReport(String.format(resources.getString("fatigueRecovered.text"),
+                                person.getHyperlinkedFullTitle(),
                                 "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
                                 "</span>"));
 
