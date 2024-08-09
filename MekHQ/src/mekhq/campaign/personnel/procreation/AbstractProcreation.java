@@ -33,10 +33,8 @@ import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.education.EducationController;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 
 import java.time.LocalDate;
