@@ -365,7 +365,7 @@ public abstract class AbstractProcreation {
             campaign.recruitPerson(baby, prisonerStatus, true, true);
 
             // if the mother is at school, add the baby to the list of tag alongs
-            if ((!mother.getEduAcademyName().isBlank())
+            if ((mother.getEduAcademyName() != null)
                     && (!EducationController.getAcademy(mother.getEduAcademyName(), mother.getEduAcademyNameInSet()).isHomeSchool())) {
 
                 mother.addEduTagAlong(baby.getId());
