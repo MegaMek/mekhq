@@ -84,7 +84,7 @@ public class CampaignOptions {
             default -> "Unknown";
         };
     }
-
+  private static final int Example = 0;
     public static String getTransitUnitName(final int unit) {
         return switch (unit) {
             case TRANSIT_UNIT_DAY -> "Days";
