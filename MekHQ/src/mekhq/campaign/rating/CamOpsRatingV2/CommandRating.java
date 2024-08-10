@@ -53,7 +53,7 @@ public class CommandRating {
      */
     private static int getSkillValue(Person person, String skill) {
         if (person.hasSkill(skill)) {
-            return person.getSkill(skill).getFinalSkillValue();
+            return person.getSkill(skill).getExperienceLevel();
         } else {
             return 0;
         }
