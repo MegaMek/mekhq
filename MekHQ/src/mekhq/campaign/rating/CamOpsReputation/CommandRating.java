@@ -1,4 +1,4 @@
-package mekhq.campaign.rating.CamOpsRatingV2;
+package mekhq.campaign.rating.CamOpsReputation;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;

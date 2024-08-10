@@ -1,4 +1,4 @@
-package mekhq.campaign.rating.CamOpsRatingV2;
+package mekhq.campaign.rating.CamOpsReputation;
 
 import megamek.common.Bay;
 import megamek.common.Entity;

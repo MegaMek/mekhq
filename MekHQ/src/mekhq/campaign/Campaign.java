@@ -141,7 +141,7 @@ import java.util.stream.Collectors;
 
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.rating.CamOpsRatingV2.AverageExperienceRating.getAtBModifier;
+import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getAtBModifier;
 
 /**
  * The main campaign class, keeps track of teams and units

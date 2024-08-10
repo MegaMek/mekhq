@@ -1,4 +1,4 @@
-package mekhq.campaign.rating.CamOpsRatingV2;
+package mekhq.campaign.rating.CamOpsReputation;
 
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
