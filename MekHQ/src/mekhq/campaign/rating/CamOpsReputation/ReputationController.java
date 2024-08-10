@@ -84,5 +84,22 @@ public class ReputationController {
         // step seven: calculate other modifiers
         otherModifiersMap = calculateOtherModifiers(campaign);
         otherModifiers = otherModifiersMap.get("total");
+
+        // step eight: total everything
+        calculateTotalReputation();
+    }
+
+    /**
+     * Calculates the total reputation by adding up various ratings and modifiers.
+     * This method updates the reputationRating variable.
+     */
+    private void calculateTotalReputation() {
+        reputationRating += averageExperienceRating;
+        reputationRating += commanderRating;
+        reputationRating += combatRecordRating;
+        reputationRating += transportationRating;
+        reputationRating += financialRating;
+        reputationRating += crimeRating;
+        reputationRating += otherModifiers;
     }
 }
