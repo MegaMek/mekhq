@@ -141,6 +141,7 @@ import java.util.stream.Collectors;
 
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.rating.CamOpsRatingV2.AverageExperienceRating.getAtBModifier;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -6027,28 +6028,25 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Against the Bot Calculates and returns dragoon rating if that is the chosen
-     * method; for IOps method, returns unit reputation / 10. If the player chooses
-     * not to use unit rating at all, use a default value of C. Note that the AtB
-     * system is designed for use with FMMerc dragoon rating, and use of the IOps
-     * Beta system may have unsatisfactory results, but we follow the options set by
-     * the user here.
+     * Retrieves the unit rating modifier based on campaign options.
+     * If the unit rating method is not enabled, it returns the default value of IUnitRating.DRAGOON_C.
+     * If the unit rating method uses FMMR, it returns the unit rating as an integer.
+     * Otherwise, it calculates the modifier using the getAtBModifier method.
+     *
+     * @return The unit rating modifier based on the campaign options.
      */
     public int getUnitRatingMod() {
         if (!getCampaignOptions().getUnitRatingMethod().isEnabled()) {
             return IUnitRating.DRAGOON_C;
         }
-        IUnitRating rating = getUnitRating();
-        return getCampaignOptions().getUnitRatingMethod().isFMMR() ? rating.getUnitRatingAsInteger()
-                : (int) MathUtility.clamp((rating.getModifier() / campaignOptions.getAtbCamOpsDivision()), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
+
+        return getCampaignOptions().getUnitRatingMethod().isFMMR() ?
+                getUnitRating().getUnitRatingAsInteger() : getAtBModifier(this);
     }
 
-    /**
-     * This is a better method for pairing AtB with IOpts with regards to Prisoner Capture
-     */
+    @Deprecated
     public int getUnitRatingAsInteger() {
-        return getCampaignOptions().getUnitRatingMethod().isEnabled()
-                ? getUnitRating().getUnitRatingAsInteger() : IUnitRating.DRAGOON_C;
+        return getUnitRatingMod();
     }
 
     public RandomSkillPreferences getRandomSkillPreferences() {
