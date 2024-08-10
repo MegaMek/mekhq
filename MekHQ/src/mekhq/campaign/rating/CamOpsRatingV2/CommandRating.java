@@ -30,26 +30,27 @@ public class CommandRating {
      *         - "personality": the value of the commander's personality characteristics (or 0, if disabled)
      */
     protected static Map<String, Integer> calculateCommanderRating(Campaign campaign, Person commander) {
-        Map<String, Integer> commanderRating = new HashMap<>();
+        Map<String, Integer> commandRating = new HashMap<>();
 
-        commanderRating.put("leadership", getSkillValue(commander, SkillType.S_LEADER));
-        commanderRating.put("tactics", getSkillValue(commander, SkillType.S_TACTICS));
-        commanderRating.put("strategy", getSkillValue(commander, SkillType.S_STRATEGY));
-        commanderRating.put("negotiation", getSkillValue(commander, SkillType.S_NEG));
+        commandRating.put("leadership", getSkillValue(commander, SkillType.S_LEADER));
+        commandRating.put("tactics", getSkillValue(commander, SkillType.S_TACTICS));
+        commandRating.put("strategy", getSkillValue(commander, SkillType.S_STRATEGY));
+        commandRating.put("negotiation", getSkillValue(commander, SkillType.S_NEG));
 
         // ATOW traits are not currently tracked by mhq, but when they are, this is where we'd add that data
-        commanderRating.put("traits", 0);
+        commandRating.put("traits", 0);
 
         // this will return 0 if personalities are disabled
-        commanderRating.put("personality", getPersonalityValue(campaign, commander));
+        commandRating.put("personality", getPersonalityValue(campaign, commander));
 
-        commanderRating.put("total", commanderRating.values().stream().mapToInt(rating -> rating).sum());
+        commandRating.put("total", commandRating.values().stream().mapToInt(rating -> rating).sum());
 
-        logger.info(commanderRating.keySet().stream()
-                .map(key -> "Command Rating = " + key + ": " + commanderRating.get(key) + '\n')
-                .collect(Collectors.joining()));
+        logger.info("Command Rating = {}",
+                commandRating.keySet().stream()
+                        .map(key -> key + ": " + commandRating.get(key) + '\n')
+                        .collect(Collectors.joining()));
 
-        return commanderRating;
+        return commandRating;
     }
 
     /**
