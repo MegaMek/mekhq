@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.Version;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import mekhq.utilities.MHQXMLUtility;
@@ -140,6 +139,15 @@ public class Skill {
         } else {
             return type.getTarget() - level - bonus;
         }
+    }
+
+    /**
+     * Calculates the total skill value by summing the level and bonus.
+     *
+     * @return The total skill value.
+     */
+    public int getTotalSkillLevel() {
+        return level + bonus;
     }
 
     public void improve() {

@@ -97,6 +97,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -3787,6 +3788,9 @@ public class Campaign implements ITechManager {
                 changeCrimeRating(2);
             }
         }
+
+        ReputationController reputationController = new ReputationController();
+        reputationController.initializeReputation(this);
     }
 
     /**

@@ -76,7 +76,7 @@ public class CombatRecordRating {
         // post a log to aid debugging
         logger.info("Combat Record Rating = {}",
                 combatRecord.keySet().stream()
-                        .map(key -> String.format("%s: %d", key.hashCode(), combatRecord.get(key)))
+                        .map(key -> String.format("%s: %d", key, combatRecord.get(key)))
                         .collect(Collectors.joining("\n")));
 
         // return the completed map

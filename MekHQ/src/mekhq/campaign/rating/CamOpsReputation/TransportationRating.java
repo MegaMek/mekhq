@@ -1,8 +1,6 @@
 package mekhq.campaign.rating.CamOpsReputation;
 
-import megamek.common.Bay;
-import megamek.common.Entity;
-import megamek.common.InfantryBay;
+import megamek.common.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -32,8 +30,8 @@ public class TransportationRating {
         // calculate the rating adjustment based on the capacity and requirements
 
         // Small Craft
-        int capacity = transportationCapacities.get("SmallCraftBay"); // Get the capacity for the entity
-        int requirements = transportationRequirements.get("SmallCraft"); // Get the requirements for the entity
+        int capacity = transportationCapacities.get("smallCraftBays"); // Get the capacity for the entity
+        int requirements = transportationRequirements.get("smallCraftCount"); // Get the requirements for the entity
 
         // Add the rating adjustment to the total; We do this for each following entity
         transportationRating += calculateRating(capacity, requirements);
@@ -45,57 +43,57 @@ public class TransportationRating {
         // The above logic is repeated for the remaining entities
 
         // ASF
-        capacity = transportationCapacities.get("ASFBay");
-        requirements = Math.max(1, transportationRequirements.get("AeroSpaceFighter") - spareCapacity);
+        capacity = transportationCapacities.get("asfBays");
+        requirements = Math.max(0, transportationRequirements.get("asfCount") - spareCapacity);
 
         transportationRating += calculateRating(capacity, requirements);
 
         // Mechs
-        capacity = transportationCapacities.get("MechBay");
-        requirements = transportationRequirements.get("Mech");
+        capacity = transportationCapacities.get("mechBays");
+        requirements = transportationRequirements.get("mechCount");
 
         transportationRating += calculateRating(capacity, requirements);
 
         // Super Heavy Vehicles
-        capacity = transportationCapacities.get("SuperHeavyVehicleBay");
-        requirements = transportationRequirements.get("SuperHeavyVehicle");
+        capacity = transportationCapacities.get("superHeavyVehicleBays");
+        requirements = transportationRequirements.get("superHeavyVehicleCount");
 
         transportationRating += calculateRating(capacity, requirements);
 
         spareCapacity = Math.max(0, capacity - requirements);
 
         // Heavy Vehicles
-        capacity = transportationCapacities.get("HeavyVehicleBay");
-        requirements = Math.max(0, transportationRequirements.get("HeavyVehicle") - spareCapacity);
+        capacity = transportationCapacities.get("heavyVehicleBays");
+        requirements = Math.max(0, transportationRequirements.get("heavyVehicleCount") - spareCapacity);
 
         transportationRating += calculateRating(capacity, requirements);
 
         // as this spare capacity can also be used by light vehicles,
         // we need to track the remaining spare capacity
-        spareCapacity -= Math.max(0, transportationRequirements.get("HeavyVehicle"));
+        spareCapacity -= Math.max(0, transportationRequirements.get("heavyVehicleCount"));
         spareCapacity += Math.max(0, capacity - requirements);
 
         // Light Vehicles
-        capacity = transportationCapacities.get("LightVehicleBay");
-        requirements = Math.max(0, transportationRequirements.get("LightVehicle") - spareCapacity);
+        capacity = transportationCapacities.get("lightVehicleBays");
+        requirements = Math.max(0, transportationRequirements.get("lightVehicleCount") - spareCapacity);
 
         transportationRating += calculateRating(capacity, requirements);
 
         // ProtoMechs
-        capacity = transportationCapacities.get("ProtomechBay");
-        requirements = transportationRequirements.get("Protomech");
+        capacity = transportationCapacities.get("protoMechBays");
+        requirements = transportationRequirements.get("protoMechCount");
 
         transportationRating += calculateRating(capacity, requirements);
 
         // Battle Armor
-        capacity = transportationCapacities.get("BattleArmorBay");
-        requirements = transportationRequirements.get("BattleArmor");
+        capacity = transportationCapacities.get("battleArmorBays");
+        requirements = transportationRequirements.get("battleArmorCount");
 
         transportationRating += calculateRating(capacity, requirements);
 
         // Infantry
-        capacity = transportationCapacities.get("InfantryBay");
-        requirements = transportationRequirements.get("Infantry");
+        capacity = transportationCapacities.get("infantryBays");
+        requirements = transportationRequirements.get("infantryCount");
 
         transportationRating += calculateRating(capacity, requirements);
 
@@ -103,20 +101,26 @@ public class TransportationRating {
         capacity = transportationCapacities.get("passengerCapacity");
         requirements = transportationRequirements.get("passengerCount");
 
-        if (capacity >= requirements) {
+        if ((capacity > 0) && (capacity >= requirements)) {
             transportationRating += 3;
-        } else if (transportationRating > 0) {
+            logger.info("Exceeding Support Personnel Transport Requirements: +3");
+        } else if ((requirements > 0) && (transportationRating > 0)) {
             transportationRating -= 3;
+            logger.info("Below Support Personnel Transport Requirements: -3");
         }
 
         // JumpShip & WarShip Presence
-        if (transportationRequirements.get("hasJumpShipOrWarShip") > 0) {
+        if (transportationCapacities.get("hasJumpShipOrWarShip") > 0) {
             transportationRating += 10;
+            logger.info("Has JumpShip or WarShip: +10");
         }
 
         // Docking Collar Requirements
-        if (transportationCapacities.get("dockingCollars") >= transportationRequirements.get("Dropship")) {
+        int dockingCollarCount = transportationCapacities.get("dockingCollars");
+
+        if ((dockingCollarCount > 0) && (dockingCollarCount >= transportationRequirements.get("dropShipCount"))) {
             transportationRating += 5;
+            logger.info("Exceeding docking collar requirements: +5");
         }
 
         // Finally, the calculated transportation rating is added to the map of transportation capacities
@@ -136,11 +140,11 @@ public class TransportationRating {
      */
     private static int calculateRating(int capacity, int requirements) {
         if (requirements > 0) {
-            double usagePercentage = (double) capacity / requirements;
+            int usage = capacity - requirements;
 
-            if (usagePercentage < 0.0) {
+            if (usage < 0) {
                 return -5;
-            } else if (usagePercentage > 2.0) {
+            } else if (usage > requirements * 2) {
                 return 10;
             } else {
                 return 5;
@@ -158,14 +162,12 @@ public class TransportationRating {
      *         a bay type and its corresponding value represents the count or capacity
      */
     private static Map<String, Integer> calculateTransportationCapacities(Campaign campaign) {
-        // Declaring and initializing a map to store the bay counts
-        Map<String, Integer> transportationCapacities = new HashMap<>();
-
         int uncrewedUnits = 0;
-        int passengerCapacity = 0;
         int dockingCollars = 0;
         int hasJumpShipOrWarShip = 0;
 
+        int smallCraftBays = 0, mechBays = 0, asfBays = 0, superHeavyVehicleBays = 0, heavyVehicleBays = 0,
+                lightVehicleBays = 0, protoMechBays = 0, battleArmorBays = 0, infantryBays = 0, passengerCapacity = 0;
 
         // Iterating through each unit in the campaign
         for (Unit unit : campaign.getUnits()) {
@@ -192,22 +194,45 @@ public class TransportationRating {
 
             // Iterate through each bay in entity
             for (Bay bay : entity.getTransportBays()) {
-                String key = bay.getClass().getSimpleName();
-
-                // Calculate the capacity of each bay and then store it in the map
-                if (bay instanceof InfantryBay) {
-                    int additionalCapacity = (int) Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight());
-                    transportationCapacities.put(key, transportationCapacities.getOrDefault(key, 0) + additionalCapacity);
-                } else {
-                    transportationCapacities.put(key, transportationCapacities.getOrDefault(key, 0) + (int)bay.getCapacity());
+                if (bay instanceof SmallCraftBay) {
+                    smallCraftBays += (int) bay.getCapacity();
+                } else if (bay instanceof MechBay) {
+                    mechBays += (int) bay.getCapacity();
+                } else if (bay instanceof ASFBay) {
+                    asfBays += (int) bay.getCapacity();
+                } else if (bay instanceof SuperHeavyVehicleBay) {
+                    superHeavyVehicleBays += (int) bay.getCapacity();
+                } else if (bay instanceof HeavyVehicleBay) {
+                    heavyVehicleBays += (int) bay.getCapacity();
+                } else if (bay instanceof LightVehicleBay) {
+                    lightVehicleBays += (int) bay.getCapacity();
+                } else if (bay instanceof ProtomechBay) {
+                    protoMechBays += (int) bay.getCapacity();
+                }  else if (bay instanceof BattleArmorBay) {
+                    battleArmorBays += (int) bay.getCapacity();
+                } else if (bay instanceof InfantryBay) {
+                    infantryBays += (int) Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight());
                 }
 
                 passengerCapacity += bay.getPersonnel(entity.isClan());
             }
         }
 
+        // Map the capacity of each bay type
+        Map<String, Integer> transportationCapacities = new HashMap<>(Map.of(
+                "smallCraftBays", smallCraftBays,
+                "mechBays", mechBays,
+                "asfBays", asfBays,
+                "superHeavyVehicleBays", superHeavyVehicleBays,
+                "heavyVehicleBays", heavyVehicleBays,
+                "lightVehicleBays", lightVehicleBays,
+                "protoMechBays", protoMechBays,
+                "battleArmorBays", battleArmorBays,
+                "infantryBays", infantryBays,
+                "passengerCapacity", passengerCapacity)
+        );
+
         // add the supplemental information to the map
-        transportationCapacities.put("passengerCapacity", passengerCapacity);
         transportationCapacities.put("hasJumpShipOrWarShip", hasJumpShipOrWarShip);
         transportationCapacities.put("dockingCollars", dockingCollars);
         transportationCapacities.put("uncrewedUnits", uncrewedUnits);
@@ -229,54 +254,75 @@ public class TransportationRating {
      * @return a map containing the count for each type of entity in the campaign
      */
     private static Map<String, Integer> calculateTransportRequirements(Campaign campaign) {
-        Map<String, Integer> transportRequirements = new HashMap<>();
+        // Initialize variables to store counts of different unit types
+        int dropShipCount = 0, smallCraftCount = 0, mechCount = 0, asfCount = 0, superHeavyVehicleCount = 0,
+                heavyVehicleCount = 0, lightVehicleCount = 0, protoMechCount = 0, battleArmorCount = 0,
+                infantryCount = 0;
 
+        // Iterate through each unit in the campaign
         for (Unit unit : campaign.getUnits()) {
-            // get the key for the type of unit
-            String entityKey = getKey(unit.getEntity());
+            Entity entity = unit.getEntity();
 
-            // Increase the count for this kind of entity
-            transportRequirements.put(entityKey, transportRequirements.getOrDefault(entityKey, 0) + 1);
+            // Vehicles are handled separately based on their weight
+            if (entity.isVehicle()) {
+                double weight = entity.getWeight();
+                if (weight > 100) {
+                    superHeavyVehicleCount++;
+                } else if (weight > 50) {
+                    heavyVehicleCount++;
+                } else {
+                    lightVehicleCount++;
+                }
+            }
+            // Non-vehicle entities are categorized based on the entity types
+            else {
+                if (entity.isDropShip()) {
+                    dropShipCount++;
+                } else if (entity.isSmallCraft()) {
+                    smallCraftCount++;
+                } else if (entity.isMek()) {
+                    mechCount++;
+                } else if (entity.isAerospaceFighter() || entity.isConventionalFighter()) {
+                    asfCount++;
+                } else if (entity.isProtoMek()) {
+                    protoMechCount++;
+                }  else if (entity.isBattleArmor()) {
+                    battleArmorCount++;
+                } else if (entity.isInfantry()) {
+                    infantryCount++;
+                }
+            }
         }
 
-        int nonUnitCrewCount = (int) campaign.getPersonnel().stream()
+        // Count the number of passengers by filtering the personnel list
+        int passengerCount = (int) campaign.getPersonnel().stream()
                 .filter(person -> !person.getStatus().isAbsent() && !person.getStatus().isDepartedUnit())
                 .filter(person -> person.getUnit() == null)
                 .count();
 
-        transportRequirements.put("passengerCount", nonUnitCrewCount);
+        // Map each unit count to its type
+        Map<String, Integer> transportRequirements = new HashMap<>(Map.of(
+                "dropShipCount", dropShipCount,
+                "smallCraftCount", smallCraftCount,
+                "mechCount", mechCount,
+                "asfCount", asfCount,
+                "superHeavyVehicleCount", superHeavyVehicleCount,
+                "heavyVehicleCount", heavyVehicleCount,
+                "lightVehicleCount", lightVehicleCount,
+                "protoMechCount", protoMechCount,
+                "battleArmorCount", battleArmorCount,
+                "infantryCount", infantryCount)
+        );
 
-        // Logging the transport requirements
+        transportRequirements.put("passengerCount", passengerCount);
+
+        // Log the calculated transport requirements
         logger.info("Transportation Requirements = {}",
                 transportRequirements.entrySet().stream()
                         .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
                         .collect(Collectors.joining()));
 
+        // Returns a map with calculated counts for each unit type
         return transportRequirements;
-    }
-
-    /**
-     * Returns the key for the given unit.
-     * If the unit represents a vehicle, the key is determined based on the weight of the entity.
-     * If the unit does not represent a vehicle, the key is determined based on the classname of the entity.
-     *
-     * @param entity the unit
-     * @return the key for the given unit
-     */
-    private static String getKey(Entity entity) {
-        // Handle vehicle weights separately
-        if (entity.isVehicle()) {
-            double weight = entity.getWeight();
-            if (weight > 100) {
-                return "SuperHeavyVehicle";
-            } else if (weight > 50) {
-                return "HeavyVehicle";
-            } else {
-                return "LightVehicle";
-            }
-        // Otherwise, use the classname of the entity
-        } else {
-            return entity.getClass().getSimpleName();
-        }
     }
 }

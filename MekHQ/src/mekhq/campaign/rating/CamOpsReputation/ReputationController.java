@@ -1,6 +1,7 @@
 package mekhq.campaign.rating.CamOpsReputation;
 
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 
 import java.time.LocalDate;
@@ -18,6 +19,8 @@ import static mekhq.campaign.rating.CamOpsReputation.OtherModifiers.calculateOth
 import static mekhq.campaign.rating.CamOpsReputation.TransportationRating.calculateTransportationRating;
 
 public class ReputationController {
+    private static final MMLogger logger = MMLogger.create(ReputationController.class);
+
     // average experience rating
     private SkillLevel averageSkillLevel = SkillLevel.NONE;
     private int averageExperienceRating = 0;
@@ -210,10 +213,9 @@ public class ReputationController {
     }
     //endregion Getters and Setters
 
-
     public void initializeReputation(Campaign campaign) {
         // step one: calculate average experience rating
-        averageSkillLevel = getSkillLevel(campaign);
+        averageSkillLevel = getSkillLevel(campaign, true);
         averageExperienceRating = getReputationModifier(averageSkillLevel);
 
         // step two: calculate command rating
@@ -247,6 +249,7 @@ public class ReputationController {
 
         // step eight: total everything
         calculateTotalReputation();
+        logger.info("TOTAL REPUTATION = {}", reputationRating);
     }
 
     /**
