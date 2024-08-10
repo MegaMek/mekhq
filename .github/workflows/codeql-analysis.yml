@@ -22,12 +22,60 @@ jobs:
       - name: "Check out MekHQ"
         uses: actions/checkout@v4
 
+      - name: Find the Right MegaMek Branch
+        id: find_mm
+        shell: bash {0}
+        run: |
+          git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megamek.git ${{ github.event.pull_request.head.ref }}
+          if [ "$?" == "0" ]
+          then
+            echo "mmRepo=${{ github.event.pull_request.head.repo.owner.login }}/megamek" >> $GITHUB_OUTPUT
+            echo "mmBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "mmRepo=MegaMek/megamek" >> $GITHUB_OUTPUT
+            echo "mmBranch=master" >> $GITHUB_OUTPUT
+          fi
+          exit 0
+
+      - name: Checkout MegaMek
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.find_mm.outputs.mmRepo }}
+          ref: ${{ steps.find_mm.outputs.mmBranch }}
+          path: megamek
+
+      - name: Find the Right MegaMekLab Branch
+        id: find_mml
+        shell: bash {0}
+        run: |
+          git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megameklab.git ${{ github.event.pull_request.head.ref }}
+          if [ "$?" == "0" ]
+          then
+            echo "mmlRepo=${{ github.event.pull_request.head.repo.owner.login }}/megameklab" >> $GITHUB_OUTPUT
+            echo "mmlBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "mmlRepo=MegaMek/megameklab" >> $GITHUB_OUTPUT
+            echo "mmlBranch=master" >> $GITHUB_OUTPUT
+          fi
+          exit 0
+
+      - name: Checkout MegaMekLab
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.find_mml.outputs.mmlRepo }}
+          ref: ${{ steps.find_mml.outputs.mmlBranch }}
+          path: megameklab
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: java-kotlin
           build-mode: none
           queries: security-and-quality
+          config: |
+            paths-ignore:
+              - megamek
+              - megameklab
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
