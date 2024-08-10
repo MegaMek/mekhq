@@ -694,6 +694,8 @@ public class CampaignXmlParser {
                     retVal.setFactionCode(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                     retVal.setRetainerEmployerCode(wn.getTextContent());
+                } else if (xn.equalsIgnoreCase("retainerStartDate")) {
+                    retVal.setRetainerStartDate(LocalDate.parse(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("rankSystem")) {
                     if (!wn.hasChildNodes()) { // we need there to be child nodes to parse from
                         continue;

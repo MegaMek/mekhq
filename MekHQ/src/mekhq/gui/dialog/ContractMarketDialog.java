@@ -215,8 +215,7 @@ public class ContractMarketDialog extends JDialog {
         Vector<Vector<String>> data = new Vector<>();
         for (Contract c : contractMarket.getContracts()) {
             // Changes in rating or force size since creation can alter some details
-            if (c instanceof AtBContract) {
-                final AtBContract atbContract = (AtBContract) c;
+            if (c instanceof AtBContract atbContract) {
                 atbContract.initContractDetails(campaign);
                 atbContract.calculatePaymentMultiplier(campaign);
                 atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculatePartsAvailabilityLevel());
@@ -321,6 +320,7 @@ public class ContractMarketDialog extends JDialog {
         btnEndRetainer.setVisible(null != campaign.getRetainerEmployerCode());
         btnEndRetainer.addActionListener(ev -> {
             campaign.setRetainerEmployerCode(null);
+            campaign.setRetainerStartDate(null);
             lblCurrentRetainer.setVisible(false);
             lblRetainerEmployer.setVisible(false);
             btnEndRetainer.setVisible(false);

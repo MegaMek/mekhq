@@ -15,10 +15,12 @@ public class ReputationController {
     private Map<String, Integer> commanderMap = new HashMap<>();
     private int commanderRating = 0;
 
+    // combat record rating
+    private Map<String, Integer> combatRecordMap = new HashMap<>();
+    private int combatRecordRating = 0;
+
 
     public void initializeReputation(Campaign campaign) {
-        int reputation = 0;
-
         // step one: calculate average experience rating
         averageSkillLevel = AverageExperienceRating.getSkillLevel(campaign);
         averageExperienceRating = AverageExperienceRating.getReputationModifier(averageSkillLevel);
@@ -27,6 +29,10 @@ public class ReputationController {
         // TODO add a campaign option to disable personality rating
         commanderMap = CommandRating.calculateCommanderRating(campaign, campaign.getFlaggedCommander());
         commanderRating = commanderMap.get("total");
+
+        // step three: calculate combat record rating
+        combatRecordMap = CombatRecordRating.calculateCombatRecordRating(campaign);
+        combatRecordRating = combatRecordMap.get("total");
 
     }
 }

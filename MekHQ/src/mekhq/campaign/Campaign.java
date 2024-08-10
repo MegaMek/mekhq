@@ -196,6 +196,7 @@ public class Campaign implements ITechManager {
     private Faction faction;
     private int techFactionCode;
     private String retainerEmployerCode; // AtB
+    private LocalDate retainerStartDate; // AtB
     private RankSystem rankSystem;
 
     private final ArrayList<String> currentReport;
@@ -283,6 +284,7 @@ public class Campaign implements ITechManager {
         setFaction(Factions.getInstance().getDefaultFaction());
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
+        retainerStartDate = null;
         setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
@@ -4359,6 +4361,14 @@ public class Campaign implements ITechManager {
         retainerEmployerCode = code;
     }
 
+    public LocalDate getRetainerStartDate() {
+        return retainerStartDate;
+    }
+
+    public void setRetainerStartDate(LocalDate retainerStartDate) {
+        this.retainerStartDate = retainerStartDate;
+    }
+
     private void addInMemoryLogHistory(LogEntry le) {
         if (!inMemoryLogHistory.isEmpty()) {
             while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > MHQConstants.MAX_HISTORICAL_LOG_DAYS) {
@@ -4513,6 +4523,13 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
         if (retainerEmployerCode != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerEmployerCode", retainerEmployerCode);
+
+            if (retainerStartDate == null) {
+                // this handles <50.0 campaigns
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerStartDate", currentDay);
+            } else {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerStartDate", retainerStartDate);
+            }
         }
 
         // this handles campaigns that predate 49.20
