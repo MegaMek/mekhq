@@ -1,0 +1,6 @@
+rootProject.name = 'MekHQRoot'
+
+includeBuild('megamek')
+includeBuild('megameklab')
+
+include 'MekHQ'

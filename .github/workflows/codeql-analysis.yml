@@ -73,7 +73,7 @@ jobs:
       - name: Update Settings.gradle
         run: |
           rm settings.gradle
-          echo "rootProject.name = 'MekHQRoot' \n includeBuild('megamek') \n includeBuild('megameklab') \n include 'MekHQ'" >> settings.gradle
+          cp .github/settings.gradle ./settings.gradle
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
