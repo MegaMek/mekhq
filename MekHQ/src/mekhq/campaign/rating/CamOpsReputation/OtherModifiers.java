@@ -25,13 +25,15 @@ public class OtherModifiers {
     protected static Map<String, Integer> calculateOtherModifiers(Campaign campaign) {
         // Calculate inactive years if campaign options allow
         int inactiveYears = campaign.getCampaignOptions().isUseAtB() ? getInactiveYears(campaign) : 0;
+        int manualModifier = campaign.getCampaignOptions().getManualUnitRatingModifier();
 
         // Crime rating improvements are handled on New Day, so are not included here.
 
         // Create a map for modifiers with "inactive years" and "total" calculated from inactive years
         Map<String, Integer> modifierMap = Map.of(
                 "inactiveYears", inactiveYears,
-                "total", -(inactiveYears * 5)
+                "customModifier", manualModifier,
+                "total", manualModifier - (inactiveYears * 5)
         );
 
         // Log the calculated modifiers
