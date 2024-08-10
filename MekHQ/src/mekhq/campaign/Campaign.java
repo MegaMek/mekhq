@@ -3784,7 +3784,7 @@ public class Campaign implements ITechManager {
             long yearsBetween = ChronoUnit.YEARS.between(currentDay, dateOfLastCrime);
 
             if (yearsBetween >= 1) {
-                changeCrimeRating(3);
+                changeCrimeRating(2);
             }
         }
     }
