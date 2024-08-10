@@ -21,9 +21,13 @@ public class ReputationController {
     private int combatRecordRating = 0;
 
     // transportation rating
-    Map<String, Integer> transportationCapacities =  new HashMap<>();
-    Map<String, Integer> transportationRequirements =  new HashMap<>();
+    private Map<String, Integer> transportationCapacities =  new HashMap<>();
+    private Map<String, Integer> transportationRequirements =  new HashMap<>();
     private int transportationRating = 0;
+
+    // financial rating
+    private Map<String, Integer> financialRatingMap =  new HashMap<>();
+    private int financialRating = 0;
 
 
     public void initializeReputation(Campaign campaign) {
@@ -47,5 +51,10 @@ public class ReputationController {
 
         transportationRating = transportationCapacities.get("total");
         transportationCapacities.remove("total");
+
+        // step five: calculate financial rating
+        financialRatingMap = FinancialRating.calculateFinancialRating(campaign.getFinances());
+        financialRating = financialRatingMap.get("total");
+
     }
 }
