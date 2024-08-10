@@ -4,6 +4,7 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ReputationController {
@@ -18,6 +19,11 @@ public class ReputationController {
     // combat record rating
     private Map<String, Integer> combatRecordMap = new HashMap<>();
     private int combatRecordRating = 0;
+
+    // transportation rating
+    Map<String, Integer> transportationCapacities =  new HashMap<>();
+    Map<String, Integer> transportationRequirements =  new HashMap<>();
+    private int transportationRating = 0;
 
 
     public void initializeReputation(Campaign campaign) {
@@ -34,5 +40,12 @@ public class ReputationController {
         combatRecordMap = CombatRecordRating.calculateCombatRecordRating(campaign);
         combatRecordRating = combatRecordMap.get("total");
 
+        // step four: calculate transportation rating
+        List<Map<String, Integer>> rawTransportationData = TransportationRating.calculateTransportationRating(campaign);
+        transportationCapacities = rawTransportationData.get(0);
+        transportationRequirements = rawTransportationData.get(1);
+
+        transportationRating = transportationCapacities.get("total");
+        transportationCapacities.remove("total");
     }
 }
