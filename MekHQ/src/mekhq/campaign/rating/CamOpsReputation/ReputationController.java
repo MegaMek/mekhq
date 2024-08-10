@@ -3,9 +3,18 @@ package mekhq.campaign.rating.CamOpsReputation;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getReputationModifier;
+import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getSkillLevel;
+import static mekhq.campaign.rating.CamOpsReputation.CombatRecordRating.calculateCombatRecordRating;
+import static mekhq.campaign.rating.CamOpsReputation.CommandRating.calculateCommanderRating;
+import static mekhq.campaign.rating.CamOpsReputation.CrimeRating.calculateCrimeRating;
+import static mekhq.campaign.rating.CamOpsReputation.FinancialRating.calculateFinancialRating;
+import static mekhq.campaign.rating.CamOpsReputation.TransportationRating.calculateTransportationRating;
 
 public class ReputationController {
     // average experience rating
@@ -29,23 +38,27 @@ public class ReputationController {
     private Map<String, Integer> financialRatingMap =  new HashMap<>();
     private int financialRating = 0;
 
+    // crime rating
+    private LocalDate dateOfLastCrime = null;
+    private int crimeRating = 0;
+
 
     public void initializeReputation(Campaign campaign) {
         // step one: calculate average experience rating
-        averageSkillLevel = AverageExperienceRating.getSkillLevel(campaign);
-        averageExperienceRating = AverageExperienceRating.getReputationModifier(averageSkillLevel);
+        averageSkillLevel = getSkillLevel(campaign);
+        averageExperienceRating = getReputationModifier(averageSkillLevel);
 
         // step two: calculate command rating
         // TODO add a campaign option to disable personality rating
-        commanderMap = CommandRating.calculateCommanderRating(campaign, campaign.getFlaggedCommander());
+        commanderMap = calculateCommanderRating(campaign, campaign.getFlaggedCommander());
         commanderRating = commanderMap.get("total");
 
         // step three: calculate combat record rating
-        combatRecordMap = CombatRecordRating.calculateCombatRecordRating(campaign);
+        combatRecordMap = calculateCombatRecordRating(campaign);
         combatRecordRating = combatRecordMap.get("total");
 
         // step four: calculate transportation rating
-        List<Map<String, Integer>> rawTransportationData = TransportationRating.calculateTransportationRating(campaign);
+        List<Map<String, Integer>> rawTransportationData = calculateTransportationRating(campaign);
         transportationCapacities = rawTransportationData.get(0);
         transportationRequirements = rawTransportationData.get(1);
 
@@ -53,8 +66,12 @@ public class ReputationController {
         transportationCapacities.remove("total");
 
         // step five: calculate financial rating
-        financialRatingMap = FinancialRating.calculateFinancialRating(campaign.getFinances());
+        financialRatingMap = calculateFinancialRating(campaign.getFinances());
         financialRating = financialRatingMap.get("total");
+
+        // step six: calculate crime rating
+        dateOfLastCrime = campaign.getDateOfLastCrime();
+        crimeRating = calculateCrimeRating(campaign);
 
     }
 }

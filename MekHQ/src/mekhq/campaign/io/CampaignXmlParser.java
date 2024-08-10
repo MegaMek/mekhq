@@ -696,6 +696,10 @@ public class CampaignXmlParser {
                     retVal.setRetainerEmployerCode(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("retainerStartDate")) {
                     retVal.setRetainerStartDate(LocalDate.parse(wn.getTextContent()));
+                } else if (xn.equalsIgnoreCase("crimeRating")) {
+                    retVal.setCrimeRating(Integer.parseInt(wn.getTextContent()));
+                } else if (xn.equalsIgnoreCase("dateOfLastCrime")) {
+                    retVal.setDateOfLastCrime(LocalDate.parse(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("rankSystem")) {
                     if (!wn.hasChildNodes()) { // we need there to be child nodes to parse from
                         continue;

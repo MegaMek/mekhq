@@ -253,6 +253,8 @@ public class Campaign implements ITechManager {
     private LocalDate shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
     private IUnitRating unitRating;
+    private int crimeRating;
+    private LocalDate dateOfLastCrime;
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
@@ -285,6 +287,8 @@ public class Campaign implements ITechManager {
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
         retainerStartDate = null;
+        crimeRating = 0;
+        dateOfLastCrime = null;
         setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
@@ -3733,6 +3737,9 @@ public class Campaign implements ITechManager {
 
         processFatigueNewDay();
 
+        // TODO check whether CamOps reputation is being used
+        processUnitReputation();
+
         if (campaignOptions.isUseEducationModule()) {
             processEducationNewDay();
         }
@@ -3770,6 +3777,16 @@ public class Campaign implements ITechManager {
         }
 
         return true;
+    }
+
+    private void processUnitReputation() {
+        if ((getActiveMissions(false).isEmpty()) && (currentDay.getDayOfMonth() == 1)) {
+            long yearsBetween = ChronoUnit.YEARS.between(currentDay, dateOfLastCrime);
+
+            if (yearsBetween >= 1) {
+                changeCrimeRating(3);
+            }
+        }
     }
 
     /**
@@ -4369,6 +4386,42 @@ public class Campaign implements ITechManager {
         this.retainerStartDate = retainerStartDate;
     }
 
+    public int getRawCrimeRating() {
+        return crimeRating;
+    }
+
+    public void setCrimeRating(int crimeRating) {
+        this.crimeRating = crimeRating;
+    }
+
+    /**
+     * Updates the crime rating by the specified change.
+     * If improving crime rating, use a positive number, otherwise negative
+     *
+     * @param change the change to be applied to the crime rating
+     */
+    public void changeCrimeRating(int change) {
+        this.crimeRating = Math.min(0, crimeRating + change);
+    }
+
+    /**
+     * @return the adjusted crime rating based on the faction type.
+     * <p>
+     * If the faction is a pirate, the crime rating is increased by 100.
+     * Otherwise, the crime rating remains unchanged.
+     */
+    public int getAdjustedCrimeRating() {
+        return faction.isPirate() ? crimeRating - 100 : crimeRating;
+    }
+
+    public LocalDate getDateOfLastCrime() {
+        return dateOfLastCrime;
+    }
+
+    public void setDateOfLastCrime(LocalDate dateOfLastCrime) {
+        this.dateOfLastCrime = dateOfLastCrime;
+    }
+
     private void addInMemoryLogHistory(LogEntry le) {
         if (!inMemoryLogHistory.isEmpty()) {
             while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > MHQConstants.MAX_HISTORICAL_LOG_DAYS) {
@@ -4530,6 +4583,14 @@ public class Campaign implements ITechManager {
             } else {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerStartDate", retainerStartDate);
             }
+        }
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "crimeRating", crimeRating);
+
+        // this handles <50.0 campaigns
+        if (dateOfLastCrime != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dateOfLastCrime", dateOfLastCrime);
+        } else if (crimeRating < 0) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dateOfLastCrime", currentDay);
         }
 
         // this handles campaigns that predate 49.20
