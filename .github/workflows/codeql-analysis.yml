@@ -72,8 +72,8 @@ jobs:
 
       - name: Update Settings.gradle
         run: |
-          rm settings.gradle
-          cp .github/settings.gradle ./settings.gradle
+          rm mekhq/settings.gradle
+          cp mekhq/.github/settings.gradle ./mekhq/settings.gradle
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
