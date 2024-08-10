@@ -117,7 +117,6 @@ public class AverageExperienceRating {
             }
 
             Crew crew = entity.getCrew();
-            double averageExperience;
 
             // Experience calculation varies depending on the type of entity
             if (entity instanceof Infantry) {
