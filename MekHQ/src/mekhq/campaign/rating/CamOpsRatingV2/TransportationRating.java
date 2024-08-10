@@ -99,6 +99,26 @@ public class TransportationRating {
 
         transportationRating += calculateRating(capacity, requirements);
 
+        // Support Personnel
+        capacity = transportationCapacities.get("passengerCapacity");
+        requirements = transportationRequirements.get("passengerCount");
+
+        if (capacity >= requirements) {
+            transportationRating += 3;
+        } else if (transportationRating > 0) {
+            transportationRating -= 3;
+        }
+
+        // JumpShip & WarShip Presence
+        if (transportationRequirements.get("hasJumpShipOrWarShip") > 0) {
+            transportationRating += 10;
+        }
+
+        // Docking Collar Requirements
+        if (transportationCapacities.get("dockingCollars") >= transportationRequirements.get("Dropship")) {
+            transportationRating += 5;
+        }
+
         // Finally, the calculated transportation rating is added to the map of transportation capacities
         transportationCapacities.put("total", transportationRating);
         logger.info("Transportation Rating = {}", transportationRating);
@@ -209,23 +229,30 @@ public class TransportationRating {
      * @return a map containing the count for each type of entity in the campaign
      */
     private static Map<String, Integer> calculateTransportRequirements(Campaign campaign) {
-        Map<String, Integer> entityCounts = new HashMap<>();
+        Map<String, Integer> transportRequirements = new HashMap<>();
 
         for (Unit unit : campaign.getUnits()) {
             // get the key for the type of unit
             String entityKey = getKey(unit.getEntity());
 
             // Increase the count for this kind of entity
-            entityCounts.put(entityKey, entityCounts.getOrDefault(entityKey, 0) + 1);
+            transportRequirements.put(entityKey, transportRequirements.getOrDefault(entityKey, 0) + 1);
         }
+
+        int nonUnitCrewCount = (int) campaign.getPersonnel().stream()
+                .filter(person -> !person.getStatus().isAbsent() && !person.getStatus().isDepartedUnit())
+                .filter(person -> person.getUnit() == null)
+                .count();
+
+        transportRequirements.put("passengerCount", nonUnitCrewCount);
 
         // Logging the transport requirements
         logger.info("Transportation Requirements = {}",
-                entityCounts.entrySet().stream()
+                transportRequirements.entrySet().stream()
                         .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
                         .collect(Collectors.joining()));
 
-        return entityCounts;
+        return transportRequirements;
     }
 
     /**
