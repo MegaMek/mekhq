@@ -3780,7 +3780,7 @@ public class Campaign implements ITechManager {
     }
 
     private void processUnitReputation() {
-        if ((getActiveMissions(false).isEmpty()) && (currentDay.getDayOfMonth() == 1)) {
+        if (currentDay.getDayOfMonth() == 1) {
             long yearsBetween = ChronoUnit.YEARS.between(currentDay, dateOfLastCrime);
 
             if (yearsBetween >= 1) {
