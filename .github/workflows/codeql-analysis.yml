@@ -15,6 +15,10 @@ jobs:
   analyze:
     name: Analyze
     strategy:
+      matrix:
+        os: [ubuntu-latest]
+        java-distribution: [temurin]
+        java-version: [17]
       fail-fast: false
     runs-on: [ubuntu-latest]
 
