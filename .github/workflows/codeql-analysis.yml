@@ -25,8 +25,6 @@ jobs:
     steps:
       - name: "Check out MekHQ"
         uses: actions/checkout@v4
-        with:
-          path: mekhq
 
       - name: Find the Right MegaMek Branch
         id: find_mm
@@ -72,6 +70,11 @@ jobs:
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
           path: megameklab
 
+      - name: Update Settings.gradle
+        run: |
+          rm settings.gradle
+          echo "rootProject.name = 'MekHQRoot' \n includeBuild('megamek') \n includeBuild('megameklab') \n include 'MekHQ'" >> settings.gradle
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -79,8 +82,6 @@ jobs:
           build-mode: none
           queries: security-and-quality
           config: |
-            src:
-              - mekhq
             paths-ignore:
               - megamek
               - megameklab
