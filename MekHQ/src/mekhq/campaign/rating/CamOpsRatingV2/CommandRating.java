@@ -1,5 +1,6 @@
 package mekhq.campaign.rating.CamOpsRatingV2;
 
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -10,8 +11,11 @@ import mekhq.campaign.personnel.enums.randomEvents.personalities.Social;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CommandRating {
+    private static final MMLogger logger = MMLogger.create(CommandRating.class);
+
     /**
      * Calculates the rating of a commander based on their skills and personality.
      *
@@ -40,6 +44,10 @@ public class CommandRating {
         commanderRating.put("personality", getPersonalityValue(campaign, commander));
 
         commanderRating.put("total", commanderRating.values().stream().mapToInt(rating -> rating).sum());
+
+        logger.info(commanderRating.keySet().stream()
+                .map(key -> "Command Rating = " + key + ": " + commanderRating.get(key) + '\n')
+                .collect(Collectors.joining()));
 
         return commanderRating;
     }

@@ -1,6 +1,5 @@
 package mekhq.campaign.rating.CamOpsRatingV2;
 
-import megamek.MegaMek;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
@@ -10,7 +9,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 public class AverageExperienceRating {
-    private static final MMLogger logger = MMLogger.create(MegaMek.class);
+    private static final MMLogger logger = MMLogger.create(AverageExperienceRating.class);
 
     /**
      * Calculates the skill level based on the average experience rating of a campaign.
