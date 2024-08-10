@@ -26,6 +26,11 @@ jobs:
       - name: "Check out MekHQ"
         uses: actions/checkout@v4
 
+      - name: Update Settings.gradle
+        run: |
+          rm settings.gradle
+          cp settings.gradle.actions settings.gradle
+
       - name: Find the Right MegaMek Branch
         id: find_mm
         shell: bash {0}
@@ -69,11 +74,6 @@ jobs:
           repository: ${{ steps.find_mml.outputs.mmlRepo }}
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
           path: megameklab
-
-      - name: Update Settings.gradle
-        run: |
-          rm mekhq/settings.gradle
-          cp mekhq/.github/settings.gradle ./mekhq/settings.gradle
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
