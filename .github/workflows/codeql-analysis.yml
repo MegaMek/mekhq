@@ -42,7 +42,7 @@ jobs:
         with:
           repository: ${{ steps.find_mm.outputs.mmRepo }}
           ref: ${{ steps.find_mm.outputs.mmBranch }}
-          path: megamek
+          path: ../megamek
 
       - name: Find the Right MegaMekLab Branch
         id: find_mml
@@ -64,7 +64,7 @@ jobs:
         with:
           repository: ${{ steps.find_mml.outputs.mmlRepo }}
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
-          path: megameklab
+          path: ../megameklab
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
