@@ -14,6 +14,7 @@ import static mekhq.campaign.rating.CamOpsReputation.CombatRecordRating.calculat
 import static mekhq.campaign.rating.CamOpsReputation.CommandRating.calculateCommanderRating;
 import static mekhq.campaign.rating.CamOpsReputation.CrimeRating.calculateCrimeRating;
 import static mekhq.campaign.rating.CamOpsReputation.FinancialRating.calculateFinancialRating;
+import static mekhq.campaign.rating.CamOpsReputation.OtherModifiers.calculateOtherModifiers;
 import static mekhq.campaign.rating.CamOpsReputation.TransportationRating.calculateTransportationRating;
 
 public class ReputationController {
@@ -41,6 +42,13 @@ public class ReputationController {
     // crime rating
     private LocalDate dateOfLastCrime = null;
     private int crimeRating = 0;
+
+    // other modifiers
+    private Map<String, Integer> otherModifiersMap =  new HashMap<>();
+    private int otherModifiers = 0;
+
+    // total
+    private int reputationRating = 0;
 
 
     public void initializeReputation(Campaign campaign) {
@@ -73,5 +81,8 @@ public class ReputationController {
         dateOfLastCrime = campaign.getDateOfLastCrime();
         crimeRating = calculateCrimeRating(campaign);
 
+        // step seven: calculate other modifiers
+        otherModifiersMap = calculateOtherModifiers(campaign);
+        otherModifiers = otherModifiersMap.get("total");
     }
 }
