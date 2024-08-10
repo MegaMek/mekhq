@@ -52,6 +52,10 @@ public class CommandRating {
      * @param skill the skill
      */
     private static int getSkillValue(Person person, String skill) {
+        if (person == null) {
+            return 0;
+        }
+
         if (person.hasSkill(skill)) {
             return person.getSkill(skill).getExperienceLevel();
         } else {
@@ -67,6 +71,10 @@ public class CommandRating {
      * @return the total personality value of the person in the campaign
      */
     private static int getPersonalityValue(Campaign campaign, Person person) {
+        if (person == null) {
+            return 0;
+        }
+
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
             int personalityValue = 0;
             int modifier;
