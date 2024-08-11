@@ -18,11 +18,9 @@
  */
 package mekhq.gui.dialog.reportDialogs;
 
-import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class UnitRatingReportDialog extends AbstractReportDialog {
     //region Variable Declarations
@@ -45,9 +43,15 @@ public class UnitRatingReportDialog extends AbstractReportDialog {
     @Override
     protected JTextPane createTxtReport() {
         final JTextPane txtReport = new JTextPane();
-        txtReport.setText(getCampaign().getUnitRating().getDetails());
+
+        txtReport.setContentType("text/html");
+
+        if (campaign.getCampaignOptions().getUnitRatingMethod().isFMMR()) {
+            txtReport.setText(getCampaign().getUnitRating().getDetails());
+        } else {
+            txtReport.setText(String.format(getCampaign().getReputationController().getDescription(campaign)));
+        }
         txtReport.setName("txtReport");
-        txtReport.setFont(new Font(MHQConstants.FONT_COURIER_NEW, Font.PLAIN, 12));
         txtReport.setEditable(false);
         txtReport.setCaretPosition(0);
         return txtReport;

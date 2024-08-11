@@ -54,6 +54,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.unit.Unit;
@@ -713,13 +714,14 @@ public class AtBDynamicScenarioFactory {
             // For BV-scaled forces, check whether to stop generating after each formation is
             // generated.
             if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-
                 // Check random number vs. percentage of the BV budget already generated, with the
                 // percentage chosen based on unit rating
                 int roll = Compute.randomInt(100);
                 double rollTarget = ((double) forceBV / forceBVBudget) * 100;
-                stopGenerating = rollTarget > minimumBVPercentage[campaign.getUnitRating().getUnitRatingAsInteger()] &&
-                        roll < rollTarget;
+
+                int unitRating = getUnitRating(campaign);
+
+                stopGenerating = rollTarget > minimumBVPercentage[unitRating] && roll < rollTarget;
             } else {
                 // For generation methods other than scaled BV, compare to the overall budget
                 stopGenerating = generatedEntities.size() >= forceUnitBudget;
@@ -761,6 +763,25 @@ public class AtBDynamicScenarioFactory {
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
         return generatedLanceCount;
+    }
+
+    /**
+     * Retrieves the unit rating from the given campaign.
+     *
+     * @param campaign the campaign from which the unit rating is to be retrieved
+     * @return the unit rating value as an integer
+     */
+    private static int getUnitRating(Campaign campaign) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final UnitRatingMethod unitRatingMethod = campaignOptions.getUnitRatingMethod();
+
+        int unitRating = IUnitRating.DRAGOON_C;
+        if (unitRatingMethod.isFMMR()) {
+            unitRating = campaign.getUnitRating().getUnitRatingAsInteger();
+        } else if (unitRatingMethod.isCampaignOperations()) {
+            unitRating = campaign.getReputationController().getAtbModifier();
+        }
+        return unitRating;
     }
 
     /**

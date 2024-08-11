@@ -38,6 +38,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.campaign.universe.Factions;
@@ -351,6 +352,8 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                     campaign.restore();
                     campaign.cleanUp();
                 }
+
+                campaign.setReputationController(new ReputationController(campaign));
                 //endregion Progress 6
 
                 //region Progress 7
