@@ -36,6 +36,7 @@ public class ReputationController {
     // transportation rating
     private Map<String, Integer> transportationCapacities =  new HashMap<>();
     private Map<String, Integer> transportationRequirements =  new HashMap<>();
+    private Map<String, Integer> transportationValues =  new HashMap<>();
     private int transportationRating = 0;
 
     // financial rating
@@ -52,6 +53,184 @@ public class ReputationController {
 
     // total
     private int reputationRating = 0;
+
+    public String getDescription(Campaign campaign) {
+        StringBuilder description = new StringBuilder();
+
+        description.append("<font size='6'><b>Unit Reputation: ").append(reputationRating).append("</b></font><br><br>");
+
+        // AVERAGE EXPERIENCE RATING
+        description.append(String.format("<b><font size='5'>Average Experience Rating: %s</font></b><br>", averageExperienceRating));
+        description.append(String.format("<b>     Experience Level: </b>%s<br><br>", averageSkillLevel.toString()));
+
+        // COMMAND RATING
+        description.append(String.format("<b><font size='5'>Command Rating: %s</font></b><br>", commanderRating));
+        description.append(String.format("<b>     Leadership: </b>%s<br>", commanderMap.get("leadership")));
+        description.append(String.format("<b>     Tactics: </b>%s<br>", commanderMap.get("tactics")));
+        description.append(String.format("<b>     Strategy: </b>%s<br>", commanderMap.get("strategy")));
+        description.append(String.format("<b>     Negotiation: </b>%s<br>", commanderMap.get("negotiation")));
+        description.append(String.format("<b>     Traits: </b>%s <i>Not Implemented</i><br>", commanderMap.get("traits")));
+
+        // TODO: this will also need to confirm that the option to enable personality modifiers is enabled
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+            description.append(String.format("<b>     Personality: </b>%s<br>", commanderMap.get("personality"))).append("<br>");
+        } else {
+            description.append("<br>");
+        }
+
+        // COMBAT RECORD RATING
+        description.append(String.format("<b><font size='5'>Combat Record Rating: %s</font></b><br>", combatRecordRating));
+
+        description.append(getMissionString("successes", "Successes", 5));
+        description.append(getMissionString("partialSuccesses", "Partial Successes", 0));
+        description.append(getMissionString("failures", "Failures", -10));
+        description.append(getMissionString("contractsBreached", "Contracts Breached", -25));
+
+        if (campaign.getRetainerStartDate() != null) {
+            description.append(getMissionString("retainerDuration", "Retainer Duration", 5)).append("<br>");
+        } else {
+            description.append("<br>");
+        }
+
+        // TRANSPORTATION RATING
+        description.append("<b><font size='5'>Transportation Rating: ").append(transportationRating).append("</font></b><br>");
+
+        if (transportationCapacities.get("hasJumpShipOrWarShip") == 1) {
+            description.append("<b>     Has JumpShip or WarShip: </b>+10<br>");
+        }
+
+        description.append(getDropShipString());
+        description.append(getTransportString("smallCraftCount", "smallCraftBays", "smallCraft", "Small Craft", true));
+        description.append(getTransportString("asfCount", "asfBays", "asf", "Fighters", false));
+        description.append(getTransportString("mechCount", "mechBays", "mech", "BattleMechs", false));
+        description.append(getTransportString("superHeavyVehicleCount", "superHeavyVehicleBays", "superHeavyVehicle", "Vehicles (Super Heavy)", true));
+        description.append(getTransportString("heavyVehicleCount", "heavyVehicleBays", "heavyVehicle", "Vehicles (Heavy)", true));
+        description.append(getTransportString("lightVehicleCount", "lightVehicleBays", "lightVehicle", "Vehicles (Light)", false));
+        description.append(getTransportString("protoMechCount", "protoMechBays", "protoMech", "ProtoMechs", false));
+        description.append(getTransportString("battleArmorCount", "battleArmorBays", "battleArmor", "Battle Armor", false));
+        description.append(getTransportString("infantryCount", "infantryBays", "infantry", "Infantry", false));
+        description.append("<i>* Lighter units will occupy spare bays</i><br><br>");
+
+        // FINANCIAL RATING
+        description.append(String.format("<b><font size='5'>Financial Rating: %s</font></b><br>", transportationRating));
+
+        if ((financialRatingMap.get("hasLoan") + financialRatingMap.get("inDebt")) > 0) {
+            description.append("<b>     Has Loan or Debt: -10</b><br><br>");
+        } else {
+            description.append("<br>");
+        }
+
+        // CRIME RATING
+        description.append(String.format("<b><font size='5'>Crime Rating: %s</font></b><br>", crimeRating));
+
+        if (crimeRating < 0) {
+            description.append(String.format("<b>     Date of Last Crime: </b>%s<br><br>", dateOfLastCrime));
+        } else {
+            description.append("<br>");
+        }
+
+        // OTHER MODIFIERS
+        description.append(String.format("<b><font size='5'>Other Modifiers: %s</font></b><br>", otherModifiers));
+
+        int inactiveYears = otherModifiersMap.get("inactiveYears");
+
+        if (inactiveYears > 0) {
+            description.append(String.format("<b>     Inactivity: </b>%d<br>", -inactiveYears * 5));
+        }
+
+        int customModifier = otherModifiersMap.get("customModifier");
+
+        if (customModifier != 0) {
+            String modifier = String.format("(%+d)", customModifier);
+            description.append(String.format("<b>     Custom Modifier: </b>%s", modifier));
+        }
+
+        return description.toString();
+    }
+
+    /**
+     * Generates the mission string with the given key, label, and multiplier.
+     *
+     * @param key        the key for accessing the combat record count
+     * @param label      the label to be displayed in the mission string
+     * @param multiplier the multiplier to apply to the count
+     * @return the generated mission string, formatted as
+     * "<b>     label: </b>count (+multiplier)<br>", or null if the count is <= 0
+     */
+    private String getMissionString(String key, String label, int multiplier) {
+        int count = combatRecordMap.get(key);
+
+        if (count > 0) {
+            return String.format("<b>     %s: </b>%d (+%d)<br>",
+                    label,
+                    count,
+                    count * multiplier);
+        } else {
+            return "";
+        }
+    }
+
+
+    /**
+     * Generates DropShip string information for the unit report
+     *
+     * @return the generated string in HTML format, formatted as
+     * "<b>     DropShips: </b>unitCount / bayCapacity Docking Collars (modifier)<br>"
+     */
+    private String getDropShipString() {
+        int unitCount = transportationRequirements.get("dropShipCount");
+        int bayCapacity = transportationCapacities.get("dockingCollars");
+        String modifier = "0";
+
+        if (unitCount == 0) {
+            modifier = "No DropShip: -5";
+        } else if (bayCapacity >= unitCount) {
+            modifier = "+5";
+        }
+
+        return String.format("<b>     DropShips: </b>%d / %d Docking Collars (%s)<br>",
+                unitCount,
+                bayCapacity,
+                modifier);
+    }
+
+    /**
+     * Generates a transport string with the given unitKey, bayKey, valueKey, label, and displayAsterisk.
+     *
+     * @param unitKey         the key to access the unit count in the transportationRequirements map
+     * @param bayKey          the key to access the bay capacity in the transportationCapacities map
+     * @param valueKey        the key to access the rating in the transportationValues map
+     * @param label           the label to be displayed in the transport string
+     * @param displayAsterisk whether to display an asterisk in the transport string
+     * @return the generated transport string in HTML format, formatted as
+     * "<b>     label: </b>unitCount / bayCount Bays* modifier<br>", or an empty string if unitCount and bayCount
+     *  are both 0
+     */
+    private String getTransportString(String unitKey, String bayKey, String valueKey, String label, boolean displayAsterisk) {
+        int unitCount = transportationRequirements.get(unitKey);
+        int bayCount = transportationCapacities.get(bayKey);
+        int rating = transportationValues.get(valueKey);
+
+        String asterisk = displayAsterisk ? "*" : "";
+        String modifier = "";
+
+        if (unitCount > 0 || bayCount > 0) {
+            if (rating > 0) {
+                modifier = String.format("(+%d)", rating);
+            } else if (rating < 0) {
+                modifier = String.format("(-%d)", rating);
+            }
+
+            return String.format("<b>     %s: </b>%d / %d Bays%s %s<br>",
+                    label,
+                    unitCount,
+                    bayCount,
+                    asterisk,
+                    modifier);
+        } else {
+            return "";
+        }
+    }
 
     //region Getters and Setters
     @SuppressWarnings(value = "unused")
@@ -213,6 +392,11 @@ public class ReputationController {
     }
     //endregion Getters and Setters
 
+    /**
+     * Performs and stores all reputation calculations.
+     *
+     * @param campaign the campaign for which to initialize the reputation
+     */
     public void initializeReputation(Campaign campaign) {
         // step one: calculate average experience rating
         averageSkillLevel = getSkillLevel(campaign, true);
@@ -229,8 +413,10 @@ public class ReputationController {
 
         // step four: calculate transportation rating
         List<Map<String, Integer>> rawTransportationData = calculateTransportationRating(campaign);
+
         transportationCapacities = rawTransportationData.get(0);
         transportationRequirements = rawTransportationData.get(1);
+        transportationValues = rawTransportationData.get(2);
 
         transportationRating = transportationCapacities.get("total");
         transportationCapacities.remove("total");
