@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 public class SupportRating {
     private static final MMLogger logger = MMLogger.create(SupportRating.class);
+    private static final int VEHICLE_WEIGHT_DIVIDER = 15;
 
     /**
      * This method calculates the support rating for a campaign.
@@ -26,12 +27,12 @@ public class SupportRating {
         // Create a map to store the results
         Map<String, Map<String, ?>> supportRating = new HashMap<>();
 
-        // Calculate the administration requirements for this campaign
-        Map<String, Integer> administrationRequirements = calculateAdministratorRequirements(campaign);
         // Calculate the crew requirements for this campaign
         Map<String, Integer> crewRequirements = calculateCrewRequirements(campaign);
         // Calculate the technician requirements for this campaign
         Map<String, List<Integer>> technicianRequirements = calculateTechnicianRequirements(campaign, transportationRequirements);
+        // Calculate the administration requirements for this campaign
+        Map<String, Integer> administrationRequirements = calculateAdministratorRequirements(campaign, technicianRequirements.get("totals").get(0));
 
         // Add the calculated requirements into the supportRating map
         supportRating.put("administrationRequirements", administrationRequirements);
@@ -52,26 +53,24 @@ public class SupportRating {
         return supportRating;
     }
 
-
     /**
      * Calculates the campaign's administrative requirements.
      *
      * @param campaign The campaign for which to calculate the administrative requirements.
+     * @param technicianRequirements The number of technicians required by the campaign.
      * @return A map containing the following information:
-     *         - "totalPersonnelCount": The total number of personnel in the campaign.
-     *         - "administratorCount": The number of administrators in the campaign.
-     *         - "personnelCount": The calculated number of non-administrator personnel required based on the campaign faction.
-     *         - "total": A calculated value indicating the total administrative requirement, where 0 indicates
-     *                    a sufficient of non-administrator personnel compared to administrators, and -5 indicates
-     *                    a shortage.
+     * - "totalPersonnelCount": The total number of personnel in the campaign.
+     * - "administratorCount": The number of administrators in the campaign.
+     * - "personnelCount": The calculated number of non-administrator personnel required based on the campaign faction.
+     * - "total": A calculated value indicating the total administrative requirement, where 0 indicates
+     * a sufficient of non-administrator personnel compared to administrators, and -5 indicates
+     * a shortage.
      */
-    private static Map<String, Integer> calculateAdministratorRequirements(Campaign campaign) {
+    private static Map<String, Integer> calculateAdministratorRequirements(Campaign campaign, int technicianRequirements) {
         Map<String, Integer> administrationRequirements = new HashMap<>();
 
-        // Count personnel and administrators
-        int totalPersonnelCount = campaign.getUnits().stream()
-                .mapToInt(unit -> unit.getCrew().size())
-                .sum();
+        // Get the total sums of personnel and administrators
+        int totalPersonnelCount = getTotalPersonnelCount(campaign, technicianRequirements);
 
         int administratorCount = (int) campaign.getActivePersonnel().stream()
                 .filter(Person::isAdministrator)
@@ -96,6 +95,32 @@ public class SupportRating {
                         .collect(Collectors.joining()));
 
         return administrationRequirements;
+    }
+
+    /**
+     * Calculates the total personnel count required for the campaign, taking into account technician requirements.
+     *
+     * @param campaign The campaign for which to calculate the total personnel count.
+     * @param technicianRequirements The number of technicians required for the campaign.
+     * @return The total personnel count required for the campaign.
+     */
+    private static int getTotalPersonnelCount(Campaign campaign, int technicianRequirements) {
+        int totalPersonnelCount = technicianRequirements;
+
+        // Count personnel
+        for (Unit unit : campaign.getUnits()) {
+            Entity entity = unit.getEntity();
+
+            if (entity.isMek() || entity.isAerospaceFighter() || entity.isConventionalFighter()) {
+                totalPersonnelCount++;
+            } else if (entity.isVehicle()) {
+                totalPersonnelCount += (int) Math.ceil(entity.getWeight() / VEHICLE_WEIGHT_DIVIDER);
+            } else {
+                totalPersonnelCount += unit.getFullCrewSize();
+            }
+        }
+
+        return totalPersonnelCount;
     }
 
     /**
