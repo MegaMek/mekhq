@@ -340,6 +340,7 @@ public class TransportationRating {
                 "infantryCount", infantryCount)
         );
 
+        transportRequirements.put("totalVehicleCount", (superHeavyVehicleCount + heavyVehicleCount + lightVehicleCount));
         transportRequirements.put("passengerCount", passengerCount);
 
         // Log the calculated transport requirements

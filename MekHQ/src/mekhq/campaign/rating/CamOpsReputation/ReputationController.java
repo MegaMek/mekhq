@@ -17,6 +17,7 @@ import static mekhq.campaign.rating.CamOpsReputation.CommandRating.calculateComm
 import static mekhq.campaign.rating.CamOpsReputation.CrimeRating.calculateCrimeRating;
 import static mekhq.campaign.rating.CamOpsReputation.FinancialRating.calculateFinancialRating;
 import static mekhq.campaign.rating.CamOpsReputation.OtherModifiers.calculateOtherModifiers;
+import static mekhq.campaign.rating.CamOpsReputation.SupportRating.calculateSupportRating;
 import static mekhq.campaign.rating.CamOpsReputation.TransportationRating.calculateTransportationRating;
 
 public class ReputationController {
@@ -40,6 +41,12 @@ public class ReputationController {
     private Map<String, Integer> transportationRequirements =  new HashMap<>();
     private Map<String, Integer> transportationValues =  new HashMap<>();
     private int transportationRating = 0;
+
+    // support rating
+    private Map<String, Integer> administrationRequirements =  new HashMap<>();
+    private Map<String, Integer> crewRequirements =  new HashMap<>();
+    private Map<String, List<Integer>> technicianRequirements =  new HashMap<>();
+    private int supportRating = 0;
 
     // financial rating
     private Map<String, Integer> financialRatingMap =  new HashMap<>();
@@ -75,7 +82,7 @@ public class ReputationController {
         return this.averageExperienceRating;
     }
     @SuppressWarnings(value = "unused")
-    public void setAverageExperienceRating(int rating) {
+    public void setAverageExperienceRating(final int rating) {
         this.averageExperienceRating = rating;
     }
 
@@ -84,7 +91,7 @@ public class ReputationController {
         return this.atbModifier;
     }
     @SuppressWarnings(value = "unused")
-    public void setAtbModifier(int atbModifier) {
+    public void setAtbModifier(final int atbModifier) {
         this.atbModifier = atbModifier;
     }
 
@@ -94,7 +101,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setCommanderMap(Map<String, Integer> commanderMap) {
+    public void setCommanderMap(final Map<String, Integer> commanderMap) {
         this.commanderMap = commanderMap;
     }
 
@@ -104,7 +111,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setCommanderRating(int commanderRating) {
+    public void setCommanderRating(final int commanderRating) {
         this.commanderRating = commanderRating;
     }
 
@@ -114,7 +121,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setCombatRecordMap(Map<String, Integer> combatRecordMap) {
+    public void setCombatRecordMap(final Map<String, Integer> combatRecordMap) {
         this.combatRecordMap = combatRecordMap;
     }
 
@@ -124,7 +131,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setCombatRecordRating(int combatRecordRating) {
+    public void setCombatRecordRating(final int combatRecordRating) {
         this.combatRecordRating = combatRecordRating;
     }
 
@@ -134,7 +141,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setTransportationCapacities(Map<String, Integer> transportationCapacities) {
+    public void setTransportationCapacities(final Map<String, Integer> transportationCapacities) {
         this.transportationCapacities = transportationCapacities;
     }
 
@@ -144,7 +151,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setTransportationRequirements(Map<String, Integer> transportationRequirements) {
+    public void setTransportationRequirements(final Map<String, Integer> transportationRequirements) {
         this.transportationRequirements = transportationRequirements;
     }
 
@@ -154,8 +161,48 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setTransportationRating(int transportationRating) {
+    public void setTransportationRating(final int transportationRating) {
         this.transportationRating = transportationRating;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public Map<String, Integer> getAdministrationRequirements() {
+        return this.administrationRequirements;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setAdministrationRequirements(final Map<String, Integer> administrationRequirements) {
+        this.administrationRequirements = administrationRequirements;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public Map<String, Integer> getCrewRequirements() {
+        return this.crewRequirements;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setCrewRequirements(final Map<String, Integer> crewRequirements) {
+        this.crewRequirements = crewRequirements;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public Map<String, List<Integer>> technicianRequirements() {
+        return this.technicianRequirements;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void technicianRequirements(final Map<String, List<Integer>> technicianRequirements) {
+        this.technicianRequirements = technicianRequirements;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public int supportRating() {
+        return this.supportRating;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void supportRating(final int supportRating) {
+        this.supportRating = supportRating;
     }
 
     @SuppressWarnings(value = "unused")
@@ -164,7 +211,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setFinancialRatingMap(Map<String, Integer> financialRatingMap) {
+    public void setFinancialRatingMap(final Map<String, Integer> financialRatingMap) {
         this.financialRatingMap = financialRatingMap;
     }
 
@@ -174,7 +221,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setFinancialRating(int financialRating) {
+    public void setFinancialRating(final int financialRating) {
         this.financialRating = financialRating;
     }
 
@@ -184,7 +231,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setDateOfLastCrime(LocalDate dateOfLastCrime) {
+    public void setDateOfLastCrime(final LocalDate dateOfLastCrime) {
         this.dateOfLastCrime = dateOfLastCrime;
     }
 
@@ -194,7 +241,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setCrimeRating(int crimeRating) {
+    public void setCrimeRating(final int crimeRating) {
         this.crimeRating = crimeRating;
     }
 
@@ -204,7 +251,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setOtherModifiersMap(Map<String, Integer> otherModifiersMap) {
+    public void setOtherModifiersMap(final Map<String, Integer> otherModifiersMap) {
         this.otherModifiersMap = otherModifiersMap;
     }
 
@@ -214,7 +261,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setOtherModifiers(int otherModifiers) {
+    public void setOtherModifiers(final int otherModifiers) {
         this.otherModifiers = otherModifiers;
     }
 
@@ -224,7 +271,7 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
-    public void setReputationRating(int reputationRating) {
+    public void setReputationRating(final int reputationRating) {
         this.reputationRating = reputationRating;
     }
     //endregion Getters and Setters
@@ -234,6 +281,7 @@ public class ReputationController {
      *
      * @param campaign the campaign for which to initialize the reputation
      */
+    @SuppressWarnings(value = "unchecked")
     public void initializeReputation(Campaign campaign) {
         // step one: calculate average experience rating
         averageSkillLevel = getSkillLevel(campaign, true);
@@ -259,19 +307,28 @@ public class ReputationController {
         transportationRating = transportationCapacities.get("total");
         transportationCapacities.remove("total");
 
-        // step five: calculate financial rating
+        // step five: support rating
+        Map<String, Map<String, ?>> rawSupportData = calculateSupportRating(campaign, transportationRequirements);
+
+        administrationRequirements = (Map<String, Integer>) rawSupportData.get("administrationRequirements");
+        crewRequirements = (Map<String, Integer>) rawSupportData.get("crewRequirements");
+        technicianRequirements = (Map<String, List<Integer>>) rawSupportData.get("technicianRequirements");
+
+        supportRating = (int) rawSupportData.get("total").get("total");
+
+        // step six: calculate financial rating
         financialRatingMap = calculateFinancialRating(campaign.getFinances());
         financialRating = financialRatingMap.get("total");
 
-        // step six: calculate crime rating
+        // step seven: calculate crime rating
         dateOfLastCrime = campaign.getDateOfLastCrime();
         crimeRating = calculateCrimeRating(campaign);
 
-        // step seven: calculate other modifiers
+        // step eight: calculate other modifiers
         otherModifiersMap = calculateOtherModifiers(campaign);
         otherModifiers = otherModifiersMap.get("total");
 
-        // step eight: total everything
+        // step nine: total everything
         calculateTotalReputation();
         logger.info("TOTAL REPUTATION = {}", reputationRating);
     }
@@ -285,12 +342,20 @@ public class ReputationController {
         reputationRating += commanderRating;
         reputationRating += combatRecordRating;
         reputationRating += transportationRating;
+        reputationRating += supportRating;
         reputationRating += financialRating;
         reputationRating += crimeRating;
         reputationRating += otherModifiers;
     }
 
-    public String getDescription(Campaign campaign) {
+
+    /**
+     * Retrieves the report text for the given campaign.
+     *
+     * @param campaign the campaign for which to generate the report
+     * @return the report text as a string
+     */
+    public String getReportText(Campaign campaign) {
         StringBuilder description = new StringBuilder();
 
         description.append("<html><div style='font-size:11px;'>");
@@ -298,26 +363,26 @@ public class ReputationController {
         description.append("<html><font size='7'><b>Unit Reputation: ").append(reputationRating).append("</b></font><br><br>");
 
         // AVERAGE EXPERIENCE RATING
-        description.append(String.format("<b><font size='6'>Average Experience Rating: %s</font></b><br>", averageExperienceRating));
-        description.append(String.format("<b>     Experience Level: </b>%s<br><br>", averageSkillLevel.toString()));
+        description.append(String.format("<b><font size='6'>Average Experience Rating: %s</font></b>", averageExperienceRating));
+        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Experience Level: </b>%s<br><br>", averageSkillLevel.toString()));
 
         // COMMAND RATING
-        description.append(String.format("<b><font size='6'>Command Rating: %s</font></b><br>", commanderRating));
-        description.append(String.format("<b>     Leadership: </b>%s<br>", commanderMap.get("leadership")));
-        description.append(String.format("<b>     Tactics: </b>%s<br>", commanderMap.get("tactics")));
-        description.append(String.format("<b>     Strategy: </b>%s<br>", commanderMap.get("strategy")));
-        description.append(String.format("<b>     Negotiation: </b>%s<br>", commanderMap.get("negotiation")));
-        description.append(String.format("<b>     Traits: </b>%s <i>Not Implemented</i><br>", commanderMap.get("traits")));
+        description.append(String.format("<b><font size='6'>Command Rating: %s</font></b>", commanderRating));
+        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Leadership: </b>%s", commanderMap.get("leadership")));
+        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tactics: </b>%s", commanderMap.get("tactics")));
+        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Strategy: </b>%s", commanderMap.get("strategy")));
+        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negotiation: </b>%s", commanderMap.get("negotiation")));
+        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Traits: </b>%s <i>Not Implemented</i>", commanderMap.get("traits")));
 
         // TODO: this will also need to confirm that the option to enable personality modifiers is enabled
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            description.append(String.format("<b>     Personality: </b>%s<br>", commanderMap.get("personality"))).append("<br>");
+            description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Personality: </b>%s", commanderMap.get("personality"))).append("<br><br>");
         } else {
-            description.append("<br>");
+            description.append("<br><br>");
         }
 
         // COMBAT RECORD RATING
-        description.append(String.format("<b><font size='6'>Combat Record Rating: %s</font></b><br>", combatRecordRating));
+        description.append(String.format("<b><font size='6'>Combat Record Rating: %s</font></b>", combatRecordRating));
 
         description.append(getMissionString("successes", "Successes", 5));
         description.append(getMissionString("partialSuccesses", "Partial Successes", 0));
@@ -325,16 +390,16 @@ public class ReputationController {
         description.append(getMissionString("contractsBreached", "Contracts Breached", -25));
 
         if (campaign.getRetainerStartDate() != null) {
-            description.append(getMissionString("retainerDuration", "Retainer Duration", 5)).append("<br>");
+            description.append(getMissionString("retainerDuration", "Retainer Duration", 5)).append("<br><br>");
         } else {
-            description.append("<br>");
+            description.append("<br><br>");
         }
 
         // TRANSPORTATION RATING
-        description.append("<b><font size='6'>Transportation Rating: ").append(transportationRating).append("</font></b><br>");
+        description.append("<b><font size='6'>Transportation Rating: ").append(transportationRating).append("</font></b>");
 
         if (transportationCapacities.get("hasJumpShipOrWarShip") == 1) {
-            description.append("<b>     Has JumpShip or WarShip: </b>+10<br>");
+            description.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Has JumpShip or WarShip: </b>+10");
         }
 
         description.append(getDropShipString());
@@ -349,43 +414,95 @@ public class ReputationController {
         description.append(getTransportString("infantryCount", "infantryBays", "infantry", "Infantry", false));
         description.append("<i>* Lighter units will occupy spare bays</i><br><br>");
 
+        // SUPPORT RATING
+        description.append(String.format("<b><font size='6'>Support Rating: %d </font></b>", supportRating));
+
+        if (crewRequirements.get("crewRequirements") < 0) {
+            description.append("Partially Crewed Large Craft: -5<br>");
+        }
+
+        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Administration Requirements: </b>%d / %d (%d)<br>",
+                administrationRequirements.get("personnelCount"),
+                administrationRequirements.get("administratorCount"),
+                administrationRequirements.get("total")));
+
+        description.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Technician Requirements</b>");
+
+        description.append(appendTechnicianRequirement("mech"));
+        description.append(appendTechnicianRequirement("vehicle"));
+        description.append(appendTechnicianRequirement("aero"));
+        description.append(appendTechnicianRequirement("battleArmor"));
+
+        description.append("<br><br>");
+
         // FINANCIAL RATING
-        description.append(String.format("<b><font size='6'>Financial Rating: %s</font></b><br>", transportationRating));
+        description.append(String.format("<b><font size='6'>Financial Rating: %s</font></b>", transportationRating));
 
         if ((financialRatingMap.get("hasLoan") + financialRatingMap.get("inDebt")) > 0) {
-            description.append("<b>     Has Loan or Debt: -10</b><br><br>");
+            description.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Has Loan or Debt: -10</b><br><br>");
         } else {
-            description.append("<br>");
+            description.append("<br><br>");
         }
 
         // CRIME RATING
-        description.append(String.format("<b><font size='6'>Crime Rating: %s</font></b><br>", crimeRating));
+        description.append(String.format("<b><font size='6'>Crime Rating: %s</font></b>", crimeRating));
 
         if (crimeRating < 0) {
-            description.append(String.format("<b>     Date of Last Crime: </b>%s<br><br>", dateOfLastCrime));
+            description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date of Last Crime: </b>%s<br><br>", dateOfLastCrime));
         } else {
-            description.append("<br>");
+            description.append("<br><br>");
         }
 
         // OTHER MODIFIERS
-        description.append(String.format("<b><font size='6'>Other Modifiers: %s</font></b><br>", otherModifiers));
+        description.append(String.format("<b><font size='6'>Other Modifiers: %s</font></b>", otherModifiers));
 
         int inactiveYears = otherModifiersMap.get("inactiveYears");
 
         if (inactiveYears > 0) {
-            description.append(String.format("<b>     Inactivity: </b>%d<br>", -inactiveYears * 5));
+            description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Inactivity: </b>%d", -inactiveYears * 5));
         }
 
         int customModifier = otherModifiersMap.get("customModifier");
 
         if (customModifier != 0) {
             String modifier = String.format("(%+d)", customModifier);
-            description.append(String.format("<b>     Custom Modifier: </b>%s", modifier));
+            description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Custom Modifier: </b>%s", modifier));
         }
 
         description.append("</div></html>");
 
         return description.toString();
+    }
+
+    /**
+     * Appends the technician requirement information for the given type.
+     * If the technician requirement exceeds 0, it generates an HTML formatted string
+     * with the technician label and the current count and maximum count of technicians.
+     *
+     * @param type the type of technician requirement (mech, vehicle, aero, battleArmor)
+     * @return the generated technician requirement string in HTML format,
+     *         or an empty string if either technicianRequirement value is 0.
+     */
+    private String appendTechnicianRequirement(String type) {
+        List<Integer> technicianRequirement = technicianRequirements.get(type);
+
+        if ((technicianRequirement.get(0) > 0) || (technicianRequirement.get(1) > 0)) {
+            String label = switch (type) {
+                case "mech" -> "BattleMechs & ProtoMechs";
+                case "vehicle" -> "Vehicles";
+                case "aero" -> "Fighters & Small Craft";
+                case "battleArmor" -> "Battle Armor";
+                default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/rating/CamOpsReputation/ReputationController.java/appendTechnicianRequirement: "
+                        + type);
+            };
+
+            return String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s: </b>%d / %d<br>",
+                    label,
+                    technicianRequirement.get(1),
+                    technicianRequirement.get(0));
+        }
+
+        return "";
     }
 
     /**
@@ -395,13 +512,13 @@ public class ReputationController {
      * @param label      the label to be displayed in the mission string
      * @param multiplier the multiplier to apply to the count
      * @return the generated mission string, formatted as
-     * "<b>     label: </b>count (+multiplier)<br>", or null if the count is <= 0
+     * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>count (+multiplier)<br>", or null if the count is <= 0
      */
     private String getMissionString(String key, String label, int multiplier) {
         int count = combatRecordMap.get(key);
 
         if (count > 0) {
-            return String.format("<b>     %s: </b>%d (+%d)<br>",
+            return String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s: </b>%d (+%d)",
                     label,
                     count,
                     count * multiplier);
@@ -410,12 +527,11 @@ public class ReputationController {
         }
     }
 
-
     /**
      * Generates DropShip string information for the unit report
      *
      * @return the generated string in HTML format, formatted as
-     * "<b>     DropShips: </b>unitCount / bayCapacity Docking Collars (modifier)<br>"
+     * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DropShips: </b>unitCount / bayCapacity Docking Collars (modifier)<br>"
      */
     private String getDropShipString() {
         int unitCount = transportationRequirements.get("dropShipCount");
@@ -428,7 +544,7 @@ public class ReputationController {
             modifier = "+5";
         }
 
-        return String.format("<b>     DropShips: </b>%d / %d Docking Collars (%s)<br>",
+        return String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DropShips: </b>%d / %d Docking Collars (%s)<br>",
                 unitCount,
                 bayCapacity,
                 modifier);
@@ -443,7 +559,7 @@ public class ReputationController {
      * @param label           the label to be displayed in the transport string
      * @param displayAsterisk whether to display an asterisk in the transport string
      * @return the generated transport string in HTML format, formatted as
-     * "<b>     label: </b>unitCount / bayCount Bays* modifier<br>", or an empty string if unitCount and bayCount
+     * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>unitCount / bayCount Bays* modifier<br>", or an empty string if unitCount and bayCount
      *  are both 0
      */
     private String getTransportString(String unitKey, String bayKey, String valueKey, String label, boolean displayAsterisk) {
@@ -461,7 +577,7 @@ public class ReputationController {
                 modifier = String.format("(-%d)", rating);
             }
 
-            return String.format("<b>     %s: </b>%d / %d Bays%s %s<br>",
+            return String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s: </b>%d / %d Bays%s %s",
                     label,
                     unitCount,
                     bayCount,
