@@ -21,7 +21,6 @@ package mekhq.gui.view;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
-import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.SocioIndustrialData;
@@ -47,9 +46,6 @@ public class PlanetViewPanel extends JScrollablePanel {
     private Campaign campaign;
     private int planetPos;
 
-    private JPanel pnlSystem;
-    private JPanel pnlPlanet;
-
     private Image planetIcon = null;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel",
@@ -70,7 +66,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     private void initComponents() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        pnlSystem = getSystemPanel();
+        JPanel pnlSystem = getSystemPanel();
         pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(campaign.getLocalDate()) + ' ' + resourceMap.getString("system.text")));
         add(pnlSystem);
 
@@ -80,7 +76,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             planet = system.getPrimaryPlanet();
         }
         if (null != planet) {
-            pnlPlanet = getPlanetPanel(planet);
+            JPanel pnlPlanet = getPlanetPanel(planet);
             pnlPlanet.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(campaign.getLocalDate())));
             add(pnlPlanet);
         }
@@ -162,19 +158,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblPosition = new JLabel(resourceMap.getString("lblPosition.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPosition, gbcLabel);
-            String text = "?";
-            if (null != planet.getOrbitRadius()) {
-                if (planet.getPlanetType().equals("Asteroid Belt")) {
-                    text = String.format("%.3f AU",
-                            planet.getOrbitRadius());
-                } else {
-                    text = String.format("%s (%.3f AU)",
-                            planet.getDisplayableSystemPosition(), planet.getOrbitRadius());
-                }
-            } else {
-                text = planet.getDisplayableSystemPosition();
-            }
-            JLabel txtPosition = new JLabel(text);
+            JLabel txtPosition = getTxtPosition(planet);
             gbcText.gridy = infoRow;
             panel.add(txtPosition, gbcText);
             ++ infoRow;
@@ -261,7 +245,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             gbcLabel.gridy = infoRow;
             panel.add(lblTemp, gbcLabel);
             //Using Unicode for the degree symbol as it is required for proper display on certain systems
-            JLabel txtTemp = new JLabel(planet.getTemperature(currentDate) + "\u00B0" + 'C');
+            JLabel txtTemp = new JLabel(planet.getTemperature(currentDate) + "°" + 'C');
             gbcText.gridy = infoRow;
             panel.add(txtTemp, gbcText);
             ++ infoRow;
@@ -347,7 +331,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         // Academies
-        List<Academy> filteredAcademies = getFilteredAcademies();
+        List<Academy> filteredAcademies = system.getFilteredAcademies(campaign);
 
         if (!filteredAcademies.isEmpty()) {
             ++infoRow;
@@ -359,7 +343,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JTextPane txtAcademies = new JTextPane();
             txtAcademies.setEditable(false);
             txtAcademies.setContentType("text/html");
-            txtAcademies.setText(MarkdownRenderer.getRenderedHtml(getAcademiesForSystem(filteredAcademies)));
+            txtAcademies.setText(MarkdownRenderer.getRenderedHtml(system.getAcademiesForSystem(filteredAcademies)));
             ((DefaultCaret) txtAcademies.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -393,6 +377,23 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         return panel;
+    }
+
+    private static JLabel getTxtPosition(Planet planet) {
+        String text;
+        if (null != planet.getOrbitRadius()) {
+            if (planet.getPlanetType().equals("Asteroid Belt")) {
+                text = String.format("%.3f AU",
+                        planet.getOrbitRadius());
+            } else {
+                text = String.format("%s (%.3f AU)",
+                        planet.getDisplayableSystemPosition(), planet.getOrbitRadius());
+            }
+        } else {
+            text = planet.getDisplayableSystemPosition();
+        }
+        JLabel txtPosition = new JLabel(text);
+        return txtPosition;
     }
 
     private JPanel getSystemPanel() {
@@ -433,43 +434,5 @@ public class PlanetViewPanel extends JScrollablePanel {
         //TODO: maybe some other summary information, like best HPG and number of planetary systems
 
         return panel;
-    }
-
-    /**
-     * Retrieves a string representation of the prestigious academies available in the system.
-     *
-     * @return A string representation of the prestigious academies in the system.
-     */
-    private String getAcademiesForSystem(List<Academy> filteredAcademies) {
-        StringBuilder academyString = new StringBuilder();
-
-        for (Academy academy : filteredAcademies) { // there are not enough entries to justify a Stream
-            academyString.append("<b>").append(academy.getName()).append("</b><br>")
-                    .append(academy.getDescription()).append("<br><br>");
-        }
-
-        return academyString.toString();
-    }
-
-    /**
-     * Retrieves a filtered list of prestigious academies.
-     * <p>
-     * The method filters the academies based on the system, the current year, and academy availability.
-     *
-     * @return A List of Academy objects representing the prestigious academies that pass the filtering criteria.
-     */
-    private List<Academy> getFilteredAcademies() {
-        final String setName = "Prestigious Academies";
-        final LocalDate currentDate = campaign.getLocalDate();
-
-        return AcademyFactory.getInstance()
-                .getAllAcademiesForSet(setName).stream()
-                .filter(academy -> academy.getLocationSystems().contains(system.getId())
-                        && !academy.getName().contains("(Officer)")
-                        && currentDate.getYear() >= academy.getConstructionYear()
-                        && currentDate.getYear() < academy.getClosureYear()
-                        && currentDate.getYear() < academy.getDestructionYear())
-                .sorted()
-                .toList();
     }
 }
