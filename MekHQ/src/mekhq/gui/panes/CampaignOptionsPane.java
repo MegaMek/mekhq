@@ -644,8 +644,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
     private MMComboBox<SkillLevel> comboSkillLevel;
-    private JLabel lblAtbCamOpsDivision;
-    private JSpinner spnAtbCamOpsDivision;
 
     // unit administration
     private JCheckBox chkUseAero;
@@ -2948,17 +2946,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAutoconfigMunitions.setToolTipText(resources.getString("chkAutoconfigMunitions.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkAutoconfigMunitions, gridBagConstraints);
-
-        lblAtbCamOpsDivision = new JLabel(resources.getString("lblAtbCamOpsDivision.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = 1;
-        panSubAtBAdmin.add(lblAtbCamOpsDivision, gridBagConstraints);
-
-        spnAtbCamOpsDivision = new JSpinner(new SpinnerNumberModel(2.5, 1, 10, 0.1));
-        spnAtbCamOpsDivision.setToolTipText(resources.getString("lblAtbCamOpsDivision.toolTipText"));
-        gridBagConstraints.gridx = 1;
-        panSubAtBAdmin.add(spnAtbCamOpsDivision, gridBagConstraints);
 
         chkMercSizeLimited = new JCheckBox(resources.getString("chkMercSizeLimited.text"));
         chkMercSizeLimited.setToolTipText(resources.getString("chkMercSizeLimited.toolTipText"));
@@ -8611,7 +8598,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkClanVehicles.setSelected(options.isClanVehicles());
         chkAutoconfigMunitions.setSelected(options.isAutoconfigMunitions());
         chkMercSizeLimited.setSelected(options.isMercSizeLimited());
-        spnAtbCamOpsDivision.setValue(options.getAtbCamOpsDivision());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
         spnBonusPartExchangeValue.setValue(options.getBonusPartExchangeValue());
         spnBonusPartMaxExchangeCount.setValue(options.getBonusPartMaxExchangeCount());
@@ -9187,7 +9173,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
             options.setGenerateChases(chkGenerateChases.isSelected());
             options.setMercSizeLimited(chkMercSizeLimited.isSelected());
-            options.setAtbCamOpsDivision((Double) spnAtbCamOpsDivision.getValue());
             options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
             options.setBonusPartExchangeValue((Integer) spnBonusPartExchangeValue.getValue());
             options.setBonusPartMaxExchangeCount((Integer) spnBonusPartMaxExchangeCount.getValue());
