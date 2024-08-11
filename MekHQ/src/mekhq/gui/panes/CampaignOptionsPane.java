@@ -358,6 +358,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseDylansRandomXP;
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
     private JCheckBox chkUseRandomPersonalities;
+    private JCheckBox chkUseRandomPersonalityReputation;
 
     // Marriage
     private JCheckBox chkUseManualMarriages;
@@ -3470,14 +3471,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lifePathsPanel.add(createPersonnelRandomizationPanel(), gbc);
 
         gbc.gridx++;
-        lifePathsPanel.add(createAnniversaryPanel(), gbc);
+        lifePathsPanel.add(createRandomHistoriesPanel(), gbc);
 
         //
 
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = 2;
         lifePathsPanel.add(createFamilyPanel(), gbc);
+
+        gbc.gridx++;
+        lifePathsPanel.add(createAnniversaryPanel(), gbc);
 
         //
 
@@ -5020,12 +5023,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
-        randomOriginOptionsPanel = new RandomOriginOptionsPanel(getFrame(), campaign, comboFaction);
-
-        chkUseRandomPersonalities = new JCheckBox(resources.getString("chkUseRandomPersonalities.text"));
-        chkUseRandomPersonalities.setToolTipText(resources.getString("chkUseRandomPersonalities.toolTipText"));
-        chkUseRandomPersonalities.setName("chkUseRandomPersonalities");
-
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("personnelRandomizationPanel.title")));
@@ -5039,15 +5036,49 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseDylansRandomXP)
-                        .addComponent(randomOriginOptionsPanel)
-                        .addComponent(chkUseRandomPersonalities)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseDylansRandomXP)
+        );
+
+        return panel;
+    }
+
+    private JPanel createRandomHistoriesPanel() {
+        randomOriginOptionsPanel = new RandomOriginOptionsPanel(getFrame(), campaign, comboFaction);
+
+        chkUseRandomPersonalities = new JCheckBox(resources.getString("chkUseRandomPersonalities.text"));
+        chkUseRandomPersonalities.setToolTipText(resources.getString("chkUseRandomPersonalities.toolTipText"));
+        chkUseRandomPersonalities.setName("chkUseRandomPersonalities");
+
+        chkUseRandomPersonalityReputation = new JCheckBox(resources.getString("chkUseRandomPersonalityReputation.text"));
+        chkUseRandomPersonalityReputation.setToolTipText(resources.getString("chkUseRandomPersonalityReputation.toolTipText"));
+        chkUseRandomPersonalityReputation.setName("chkUseRandomPersonalityReputation");
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomHistoriesPanel.title")));
+        panel.setName("randomHistoriesPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
                         .addComponent(randomOriginOptionsPanel)
                         .addComponent(chkUseRandomPersonalities)
+                        .addComponent(chkUseRandomPersonalityReputation)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(randomOriginOptionsPanel)
+                        .addComponent(chkUseRandomPersonalities)
+                        .addComponent(chkUseRandomPersonalityReputation)
         );
 
         return panel;
@@ -8271,6 +8302,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
         randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
+        chkUseRandomPersonalityReputation.setSelected(options.isUseRandomPersonalityReputation());
 
         // Family
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
@@ -8975,6 +9007,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
             options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
             options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
+            options.setUseRandomPersonalityReputation(chkUseRandomPersonalityReputation.isSelected());
 
             // Family
             options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());

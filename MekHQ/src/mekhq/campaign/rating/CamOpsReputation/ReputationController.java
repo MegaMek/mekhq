@@ -380,8 +380,7 @@ public class ReputationController {
         description.append(String.format(resources.getString("negotiation.text"), commanderMap.get("negotiation")));
         description.append(String.format(resources.getString("traits.text"), commanderMap.get("traits")));
 
-        // TODO: this will also need to confirm that the option to enable personality modifiers is enabled
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        if (campaign.getCampaignOptions().isUseRandomPersonalities() && (campaign.getCampaignOptions().isUseRandomPersonalityReputation())) {
             description.append(String.format(resources.getString("personality.text"), commanderMap.get("personality"))).append("<br><br>");
         } else {
             description.append("<br><br>");

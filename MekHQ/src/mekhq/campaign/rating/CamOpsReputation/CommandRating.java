@@ -2,6 +2,7 @@ package mekhq.campaign.rating.CamOpsReputation;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression;
@@ -84,7 +85,9 @@ public class CommandRating {
             return 0;
         }
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseRandomPersonalityReputation()) {
             int personalityValue = 0;
             int modifier;
 
