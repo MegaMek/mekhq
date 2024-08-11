@@ -23,6 +23,7 @@ public class TransportationRating {
         // Calculate transportation capacities and requirements for the campaign
         Map<String, Integer> transportationCapacities = calculateTransportationCapacities(campaign);
         Map<String, Integer> transportationRequirements = calculateTransportRequirements(campaign);
+        Map<String, Integer> transportationValues = new HashMap<>();
 
         int transportationRating = 0;
 
@@ -34,7 +35,9 @@ public class TransportationRating {
         int requirements = transportationRequirements.get("smallCraftCount"); // Get the requirements for the entity
 
         // Add the rating adjustment to the total; We do this for each following entity
-        transportationRating += calculateRating(capacity, requirements);
+        int rating = calculateRating(capacity, requirements);
+        transportationValues.put("smallCraft", rating);
+        transportationRating += rating;
 
         // Calculate spare capacity if any.
         // Some entity types can use spare bays not used by other entities
@@ -46,19 +49,25 @@ public class TransportationRating {
         capacity = transportationCapacities.get("asfBays");
         requirements = Math.max(0, transportationRequirements.get("asfCount") - spareCapacity);
 
-        transportationRating += calculateRating(capacity, requirements);
+        rating = calculateRating(capacity, requirements);
+        transportationValues.put("asf", rating);
+        transportationRating += rating;
 
         // Mechs
         capacity = transportationCapacities.get("mechBays");
         requirements = transportationRequirements.get("mechCount");
 
-        transportationRating += calculateRating(capacity, requirements);
+        rating = calculateRating(capacity, requirements);
+        transportationValues.put("mech", rating);
+        transportationRating += rating;
 
         // Super Heavy Vehicles
         capacity = transportationCapacities.get("superHeavyVehicleBays");
         requirements = transportationRequirements.get("superHeavyVehicleCount");
 
-        transportationRating += calculateRating(capacity, requirements);
+        rating = calculateRating(capacity, requirements);
+        transportationValues.put("superHeavyVehicle", rating);
+        transportationRating += rating;
 
         spareCapacity = Math.max(0, capacity - requirements);
 
@@ -66,7 +75,9 @@ public class TransportationRating {
         capacity = transportationCapacities.get("heavyVehicleBays");
         requirements = Math.max(0, transportationRequirements.get("heavyVehicleCount") - spareCapacity);
 
-        transportationRating += calculateRating(capacity, requirements);
+        rating = calculateRating(capacity, requirements);
+        transportationValues.put("heavyVehicle", rating);
+        transportationRating += rating;
 
         // as this spare capacity can also be used by light vehicles,
         // we need to track the remaining spare capacity
@@ -77,25 +88,33 @@ public class TransportationRating {
         capacity = transportationCapacities.get("lightVehicleBays");
         requirements = Math.max(0, transportationRequirements.get("lightVehicleCount") - spareCapacity);
 
-        transportationRating += calculateRating(capacity, requirements);
+        rating = calculateRating(capacity, requirements);
+        transportationValues.put("lightVehicle", rating);
+        transportationRating += rating;
 
         // ProtoMechs
         capacity = transportationCapacities.get("protoMechBays");
         requirements = transportationRequirements.get("protoMechCount");
 
-        transportationRating += calculateRating(capacity, requirements);
+        rating = calculateRating(capacity, requirements);
+        transportationValues.put("protoMech", rating);
+        transportationRating += rating;
 
         // Battle Armor
         capacity = transportationCapacities.get("battleArmorBays");
         requirements = transportationRequirements.get("battleArmorCount");
 
-        transportationRating += calculateRating(capacity, requirements);
+        rating = calculateRating(capacity, requirements);
+        transportationValues.put("battleArmor", rating);
+        transportationRating += rating;
 
         // Infantry
         capacity = transportationCapacities.get("infantryBays");
         requirements = transportationRequirements.get("infantryCount");
 
-        transportationRating += calculateRating(capacity, requirements);
+        rating = calculateRating(capacity, requirements);
+        transportationValues.put("infantry", rating);
+        transportationRating += rating;
 
         // Support Personnel
         capacity = transportationCapacities.get("passengerCapacity");
@@ -103,9 +122,11 @@ public class TransportationRating {
 
         if ((capacity > 0) && (capacity >= requirements)) {
             transportationRating += 3;
+            transportationValues.put("passenger", 3);
             logger.info("Exceeding Support Personnel Transport Requirements: +3");
         } else if ((requirements > 0) && (transportationRating > 0)) {
             transportationRating -= 3;
+            transportationValues.put("passenger", -3);
             logger.info("Below Support Personnel Transport Requirements: -3");
         }
 
@@ -123,12 +144,17 @@ public class TransportationRating {
             logger.info("Exceeding docking collar requirements: +5");
         }
 
+        if (transportationRequirements.get("dropShipCount") == 0) {
+            transportationRating -= 5;
+            logger.info("No DropShip: -");
+        }
+
         // Finally, the calculated transportation rating is added to the map of transportation capacities
         transportationCapacities.put("total", transportationRating);
         logger.info("Transportation Rating = {}", transportationRating);
 
         // Return list of capacities and requirements
-        return List.of(transportationCapacities, transportationRequirements);
+        return List.of(transportationCapacities, transportationRequirements, transportationValues);
     }
 
     /**
@@ -138,7 +164,7 @@ public class TransportationRating {
      * @param requirements the transport bay usage
      * @return the rating calculated based on the capacity and requirements
      */
-    private static int calculateRating(int capacity, int requirements) {
+    protected static int calculateRating(int capacity, int requirements) {
         if (requirements > 0) {
             int usage = capacity - requirements;
 
