@@ -2,7 +2,7 @@
  * PlanetarySystem.java
  *
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2011-2022 - The MegaMek team. All Rights Reserved.
+ * Copyright (c) 2011-2024 - The MegaMek team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
