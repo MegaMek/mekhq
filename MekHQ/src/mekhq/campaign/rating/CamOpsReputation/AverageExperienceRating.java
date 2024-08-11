@@ -9,6 +9,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 
+import java.util.function.Consumer;
+
 public class AverageExperienceRating {
     private static final MMLogger logger = MMLogger.create(AverageExperienceRating.class);
 
@@ -189,31 +191,36 @@ public class AverageExperienceRating {
      * @return The average experience of the crew.
      */
     private static double calculateRegularExperience(Person person, Entity entity, Unit unit) {
-        int sumOfSkillLevels = 0;
-        int skillCount = 0;
+        /*
+         * skillData[0] represents sumOfSkillLevels
+         * skillData[1] represents skillCount
+         */
+        int[] skillData = new int[2];
+
+        Consumer<String> skillHandler = skillName -> {
+            if (person.hasSkill(skillName)) {
+                skillData[0] += person.getSkill(skillName).getTotalSkillLevel();
+                skillData[1]++;
+            }
+        };
 
         if (unit.isDriver(person)) {
-            String drivingSkill = SkillType.getDrivingSkillFor(entity);
-
-            if (person.hasSkill(drivingSkill)) {
-                sumOfSkillLevels += person.getSkill(drivingSkill).getTotalSkillLevel();
-                skillCount++;
-            }
+            skillHandler.accept(SkillType.getDrivingSkillFor(entity));
         }
 
         if (unit.isGunner(person)) {
-            String gunnerySkill = SkillType.getGunnerySkillFor(entity);
+            skillHandler.accept(SkillType.getGunnerySkillFor(entity));
+        }
 
-            if (person.hasSkill(gunnerySkill)) {
-                sumOfSkillLevels += person.getSkill(gunnerySkill).getTotalSkillLevel();
-                skillCount++;
+        if (skillData[1] != 0) {
+            if (person.getPrimaryRole().isVehicleCrew() &&
+                    (person.getSecondaryRole().isCivilian() || person.getSecondaryRole().isVehicleCrew())) {
+                if (person.hasSkill(SkillType.S_TECH_MECHANIC)) {
+                    return person.getSkill(SkillType.S_TECH_MECHANIC).getTotalSkillLevel();
+                }
             }
         }
 
-        if (sumOfSkillLevels > 0) {
-            return (double) sumOfSkillLevels / skillCount;
-        } else {
-            return 0;
-        }
+        return (skillData[0] > 0) ? (double) skillData[0] / skillData[1] : 0.0;
     }
 }
