@@ -649,20 +649,39 @@ public class PlanetarySystem {
         }
     }
 
+
     /**
-     * Retrieves a filtered list of prestigious academies.
-     * <p>
-     * The method filters the academies based on the system, the current year, and academy availability.
+     * Retrieves a list of filtered academies based on the given campaign.
      *
-     * @return A List of Academy objects representing the prestigious academies that pass the filtering criteria.
+     * @param campaign The campaign for filtering the academies.
+     * @return A list of filtered academies based on the campaign.
      */
     public List<Academy> getFilteredAcademies(Campaign campaign) {
-        final String setName = "Prestigious Academies";
         final LocalDate currentDate = campaign.getLocalDate();
+        AcademyFactory academyFactory = AcademyFactory.getInstance();
 
-        return AcademyFactory.getInstance()
-                .getAllAcademiesForSet(setName).stream()
+        List<String> excludedSets = List.of("Local Academies", "Unit Education");
+
+        return academyFactory.getAllSetNames().stream()
+                .filter(setName -> !excludedSets.contains(setName) // Excluding certain setNames
+                        && (!setName.equalsIgnoreCase("Prestigious Academies")
+                        || campaign.getCampaignOptions().isEnablePrestigiousAcademies())) // Additional condition for "Prestigious Academies"
+                .flatMap(setName -> getFilteredAcademiesForSet(currentDate, setName).stream())
+                .toList();
+    }
+
+    /**
+     * Retrieves a list of filtered academies for a given set and current date.
+     *
+     * @param currentDate The current date to filter the academies.
+     * @param setName     The set name to filter the academies.
+     * @return A list of filtered academies for the given set and current date.
+     */
+    private List<Academy> getFilteredAcademiesForSet(LocalDate currentDate, String setName) {
+        return AcademyFactory.getInstance().getAllAcademiesForSet(setName).stream()
                 .filter(academy -> academy.getLocationSystems().contains(this.getId())
+                        && !academy.isLocal()
+                        && !academy.isHomeSchool()
                         && !academy.getName().contains("(Officer)")
                         && currentDate.getYear() >= academy.getConstructionYear()
                         && currentDate.getYear() < academy.getClosureYear()
