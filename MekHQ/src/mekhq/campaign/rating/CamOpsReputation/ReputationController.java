@@ -441,7 +441,7 @@ public class ReputationController {
         description.append("<br>");
 
         // FINANCIAL RATING
-        description.append(String.format(resources.getString("financialRating.text"), transportationRating));
+        description.append(String.format(resources.getString("financialRating.text"), financialRating));
 
         if ((financialRatingMap.get("hasLoan") + financialRatingMap.get("inDebt")) > 0) {
             description.append(resources.getString("hasLoanOrDebt.text"));
@@ -544,12 +544,12 @@ public class ReputationController {
         String modifier = "0";
 
         if (unitCount == 0) {
-            modifier = "No DropShip: -5";
+            modifier = resources.getString("noDropShip.text");
         } else if (bayCapacity >= unitCount) {
             modifier = "+5";
         }
 
-        return String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DropShips: </b>%d / %d Docking Collars (%s)<br>",
+        return String.format(resources.getString("dropShipString.text"),
                 unitCount,
                 bayCapacity,
                 modifier);
@@ -579,10 +579,10 @@ public class ReputationController {
             if (rating > 0) {
                 modifier = String.format("(+%d)", rating);
             } else if (rating < 0) {
-                modifier = String.format("(-%d)", rating);
+                modifier = String.format("(%d)", rating);
             }
 
-            return String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s: </b>%d / %d Bays%s %s",
+            return String.format(resources.getString("transportString.text"),
                     label,
                     unitCount,
                     bayCount,
