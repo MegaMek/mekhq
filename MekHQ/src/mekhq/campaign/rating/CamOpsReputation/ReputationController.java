@@ -281,7 +281,7 @@ public class ReputationController {
      * This method updates the reputationRating variable.
      */
     private void calculateTotalReputation() {
-        reputationRating += averageExperienceRating;
+        reputationRating = averageExperienceRating;
         reputationRating += commanderRating;
         reputationRating += combatRecordRating;
         reputationRating += transportationRating;
