@@ -2,12 +2,14 @@ package mekhq.campaign.rating.CamOpsReputation;
 
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getAtBModifier;
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getReputationModifier;
@@ -21,7 +23,11 @@ import static mekhq.campaign.rating.CamOpsReputation.SupportRating.calculateSupp
 import static mekhq.campaign.rating.CamOpsReputation.TransportationRating.calculateTransportationRating;
 
 public class ReputationController {
+    // utilities
     private static final MMLogger logger = MMLogger.create(ReputationController.class);
+
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CamOpsReputation",
+            MekHQ.getMHQOptions().getLocale());
 
     // average experience rating
     private SkillLevel averageSkillLevel = SkillLevel.NONE;
@@ -360,113 +366,113 @@ public class ReputationController {
 
         description.append("<html><div style='font-size:11px;'>");
 
-        description.append("<html><font size='7'><b>Unit Reputation: ").append(reputationRating).append("</b></font><br><br>");
+        description.append(String.format(resources.getString("unitReputation.text"), reputationRating));
 
         // AVERAGE EXPERIENCE RATING
-        description.append(String.format("<b><font size='6'>Average Experience Rating: %s</font></b>", averageExperienceRating));
-        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Experience Level: </b>%s<br><br>", averageSkillLevel.toString()));
+        description.append(String.format(resources.getString("averageExperienceRating.text"), averageExperienceRating));
+        description.append(String.format(resources.getString("experienceLevel.text"), averageSkillLevel.toString()));
 
         // COMMAND RATING
-        description.append(String.format("<b><font size='6'>Command Rating: %s</font></b>", commanderRating));
-        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Leadership: </b>%s", commanderMap.get("leadership")));
-        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tactics: </b>%s", commanderMap.get("tactics")));
-        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Strategy: </b>%s", commanderMap.get("strategy")));
-        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Negotiation: </b>%s", commanderMap.get("negotiation")));
-        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Traits: </b>%s <i>Not Implemented</i>", commanderMap.get("traits")));
+        description.append(String.format(resources.getString("commandRating.text"), commanderRating));
+        description.append(String.format(resources.getString("leadership.text"), commanderMap.get("leadership")));
+        description.append(String.format(resources.getString("tactics.text"), commanderMap.get("tactics")));
+        description.append(String.format(resources.getString("strategy.text"), commanderMap.get("strategy")));
+        description.append(String.format(resources.getString("negotiation.text"), commanderMap.get("negotiation")));
+        description.append(String.format(resources.getString("traits.text"), commanderMap.get("traits")));
 
         // TODO: this will also need to confirm that the option to enable personality modifiers is enabled
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Personality: </b>%s", commanderMap.get("personality"))).append("<br><br>");
+            description.append(String.format(resources.getString("personality.text"), commanderMap.get("personality"))).append("<br><br>");
         } else {
             description.append("<br><br>");
         }
 
         // COMBAT RECORD RATING
-        description.append(String.format("<b><font size='6'>Combat Record Rating: %s</font></b>", combatRecordRating));
+        description.append(String.format(resources.getString("combatRecordRating.text"), combatRecordRating));
 
-        description.append(getMissionString("successes", "Successes", 5));
-        description.append(getMissionString("partialSuccesses", "Partial Successes", 0));
-        description.append(getMissionString("failures", "Failures", -10));
-        description.append(getMissionString("contractsBreached", "Contracts Breached", -25));
+        description.append(getMissionString("successes", resources.getString("successes.text"), 5));
+        description.append(getMissionString("partialSuccesses", resources.getString("partialSuccesses.text"), 0));
+        description.append(getMissionString("failures", resources.getString("failures.text"), -10));
+        description.append(getMissionString("contractsBreached", resources.getString("contractsBreached.text"), -25));
 
         if (campaign.getRetainerStartDate() != null) {
-            description.append(getMissionString("retainerDuration", "Retainer Duration", 5)).append("<br><br>");
+            description.append(getMissionString("retainerDuration", resources.getString("retainerDuration.text"), 5)).append("<br><br>");
         } else {
             description.append("<br><br>");
         }
 
         // TRANSPORTATION RATING
-        description.append("<b><font size='6'>Transportation Rating: ").append(transportationRating).append("</font></b>");
+        description.append(String.format(resources.getString("transportationRating.text"), transportationRating));
 
         if (transportationCapacities.get("hasJumpShipOrWarShip") == 1) {
-            description.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Has JumpShip or WarShip: </b>+10");
+            description.append(resources.getString("hasJumpShipOrWarShip.text"));
         }
 
         description.append(getDropShipString());
-        description.append(getTransportString("smallCraftCount", "smallCraftBays", "smallCraft", "Small Craft", true));
-        description.append(getTransportString("asfCount", "asfBays", "asf", "Fighters", false));
-        description.append(getTransportString("mechCount", "mechBays", "mech", "BattleMechs", false));
-        description.append(getTransportString("superHeavyVehicleCount", "superHeavyVehicleBays", "superHeavyVehicle", "Vehicles (Super Heavy)", true));
-        description.append(getTransportString("heavyVehicleCount", "heavyVehicleBays", "heavyVehicle", "Vehicles (Heavy)", true));
-        description.append(getTransportString("lightVehicleCount", "lightVehicleBays", "lightVehicle", "Vehicles (Light)", false));
-        description.append(getTransportString("protoMechCount", "protoMechBays", "protoMech", "ProtoMechs", false));
-        description.append(getTransportString("battleArmorCount", "battleArmorBays", "battleArmor", "Battle Armor", false));
-        description.append(getTransportString("infantryCount", "infantryBays", "infantry", "Infantry", false));
-        description.append("<i>* Lighter units will occupy spare bays</i><br><br>");
+        description.append(getTransportString("smallCraftCount", "smallCraftBays", "smallCraft", resources.getString("smallCraft.text"), true));
+        description.append(getTransportString("asfCount", "asfBays", "asf", resources.getString("fighters.text"), false));
+        description.append(getTransportString("mechCount", "mechBays", "mech", resources.getString("battleMechs.text"), false));
+        description.append(getTransportString("superHeavyVehicleCount", "superHeavyVehicleBays", "superHeavyVehicle", resources.getString("vehicleSuperHeavy.text"), true));
+        description.append(getTransportString("heavyVehicleCount", "heavyVehicleBays", "heavyVehicle", resources.getString("vehicleHeavy.text"), true));
+        description.append(getTransportString("lightVehicleCount", "lightVehicleBays", "lightVehicle", resources.getString("vehicleLight.text"), false));
+        description.append(getTransportString("protoMechCount", "protoMechBays", "protoMech", resources.getString("protoMechs.text"), false));
+        description.append(getTransportString("battleArmorCount", "battleArmorBays", "battleArmor", resources.getString("battleArmor.text"), false));
+        description.append(getTransportString("infantryCount", "infantryBays", "infantry", resources.getString("infantry.text"), false));
+        description.append(resources.getString("asterisk.text"));
 
         // SUPPORT RATING
-        description.append(String.format("<b><font size='6'>Support Rating: %d </font></b>", supportRating));
+        description.append(String.format(resources.getString("supportRating.text"), supportRating));
 
         if (crewRequirements.get("crewRequirements") < 0) {
-            description.append("Partially Crewed Large Craft: -5<br>");
+            description.append(resources.getString("crewRequirements.text"));
         }
 
-        description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Administration Requirements: </b>%d / %d (%d)<br>",
+        description.append(String.format(resources.getString("administrationRequirements.text"),
                 administrationRequirements.get("personnelCount"),
                 administrationRequirements.get("administratorCount"),
                 administrationRequirements.get("total")));
 
-        description.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Technician Requirements</b>");
+        description.append(resources.getString("technicianRequirements.text"));
 
-        description.append(appendTechnicianRequirement("mech"));
-        description.append(appendTechnicianRequirement("vehicle"));
-        description.append(appendTechnicianRequirement("aero"));
-        description.append(appendTechnicianRequirement("battleArmor"));
+        description.append(getTechnicianString("mech"));
+        description.append(getTechnicianString("vehicle"));
+        description.append(getTechnicianString("aero"));
+        description.append(getTechnicianString("battleArmor"));
 
         description.append("<br><br>");
 
         // FINANCIAL RATING
-        description.append(String.format("<b><font size='6'>Financial Rating: %s</font></b>", transportationRating));
+        description.append(String.format(resources.getString("financialRating.text"), transportationRating));
 
         if ((financialRatingMap.get("hasLoan") + financialRatingMap.get("inDebt")) > 0) {
-            description.append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Has Loan or Debt: -10</b><br><br>");
+            description.append(resources.getString("hasLoanOrDebt.text"));
         } else {
             description.append("<br><br>");
         }
 
         // CRIME RATING
-        description.append(String.format("<b><font size='6'>Crime Rating: %s</font></b>", crimeRating));
+        description.append(String.format(resources.getString("crimeRating.text"), crimeRating));
 
         if (crimeRating < 0) {
-            description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date of Last Crime: </b>%s<br><br>", dateOfLastCrime));
+            description.append(String.format(resources.getString("dateOfLastCrime.text"), dateOfLastCrime));
         } else {
             description.append("<br><br>");
         }
 
         // OTHER MODIFIERS
-        description.append(String.format("<b><font size='6'>Other Modifiers: %s</font></b>", otherModifiers));
+        description.append(String.format(resources.getString("otherModifiers.text"), otherModifiers));
 
         int inactiveYears = otherModifiersMap.get("inactiveYears");
 
         if (inactiveYears > 0) {
-            description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Inactivity: </b>%d", -inactiveYears * 5));
+            description.append(String.format(resources.getString("inactiveYears.text"), -inactiveYears * 5));
         }
 
         int customModifier = otherModifiersMap.get("customModifier");
 
         if (customModifier != 0) {
             String modifier = String.format("(%+d)", customModifier);
-            description.append(String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Custom Modifier: </b>%s", modifier));
+            description.append(String.format(resources.getString("customModifier.text"), modifier));
         }
 
         description.append("</div></html>");
@@ -483,20 +489,20 @@ public class ReputationController {
      * @return the generated technician requirement string in HTML format,
      *         or an empty string if either technicianRequirement value is 0.
      */
-    private String appendTechnicianRequirement(String type) {
+    private String getTechnicianString(String type) {
         List<Integer> technicianRequirement = technicianRequirements.get(type);
 
         if ((technicianRequirement.get(0) > 0) || (technicianRequirement.get(1) > 0)) {
             String label = switch (type) {
-                case "mech" -> "BattleMechs & ProtoMechs";
-                case "vehicle" -> "Vehicles";
-                case "aero" -> "Fighters & Small Craft";
-                case "battleArmor" -> "Battle Armor";
-                default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/rating/CamOpsReputation/ReputationController.java/appendTechnicianRequirement: "
+                case "mech" -> resources.getString("battleMechsAndProtoMechs.text");
+                case "vehicle" -> resources.getString("vehicles.text");
+                case "aero" -> resources.getString("fightersAndSmallCraft.text");
+                case "battleArmor" -> resources.getString("battleArmor.text");
+                default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/rating/CamOpsReputation/ReputationController.java/getTechnicianString: "
                         + type);
             };
 
-            return String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s: </b>%d / %d<br>",
+            return String.format(resources.getString("technicianString.text"),
                     label,
                     technicianRequirement.get(1),
                     technicianRequirement.get(0));
@@ -518,7 +524,7 @@ public class ReputationController {
         int count = combatRecordMap.get(key);
 
         if (count > 0) {
-            return String.format("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s: </b>%d (+%d)",
+            return String.format(resources.getString("mission.text"),
                     label,
                     count,
                     count * multiplier);
