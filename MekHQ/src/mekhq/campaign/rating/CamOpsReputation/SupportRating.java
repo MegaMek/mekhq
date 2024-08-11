@@ -47,7 +47,7 @@ public class SupportRating {
         // Add the total value into the supportRating map
         supportRating.put("total", Map.of("total", total));
 
-        logger.info("Support Rating = {}", total);
+        logger.debug("Support Rating = {}", total);
 
         // Return the final map containing the calculated values
         return supportRating;
@@ -89,7 +89,7 @@ public class SupportRating {
         int total = personnelCount > administratorCount ? -5 : 0;
         administrationRequirements.put("total", total);
 
-        logger.info("Administrator Requirements = {}",
+        logger.debug("Administrator Requirements = {}",
                 administrationRequirements.entrySet().stream()
                         .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
                         .collect(Collectors.joining()));
@@ -185,7 +185,7 @@ public class SupportRating {
         technicianRequirements.put("totals", List.of(totalRequirements, totalTechs));
         technicianRequirements.put("rating", List.of(calculateTechRating(percentage)));
 
-        logger.info("Technician Requirements = {}",
+        logger.debug("Technician Requirements = {}",
                 technicianRequirements.entrySet().stream()
                         .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
                         .collect(Collectors.joining()));

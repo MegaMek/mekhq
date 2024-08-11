@@ -59,7 +59,7 @@ public class AverageExperienceRating {
             case ELITE, HEROIC, LEGENDARY -> 40;
         };
 
-        logger.info("Reputation Rating = {}, +{}",
+        logger.debug("Reputation Rating = {}, +{}",
                 averageSkillLevel.toString(),
                 modifier);
 
@@ -155,7 +155,7 @@ public class AverageExperienceRating {
         // Log the details of the calculation to aid debugging,
         // and so the user can easily see if there is a mistake
         if (log) {
-        logger.info("Average Experience Rating: {} / {} = {}",
+        logger.debug("Average Experience Rating: {} / {} = {}",
                 totalExperience,
                 personnelCount,
                 averageExperienceRating);

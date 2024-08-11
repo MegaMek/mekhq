@@ -123,17 +123,17 @@ public class TransportationRating {
         if ((capacity > 0) && (capacity >= requirements)) {
             transportationRating += 3;
             transportationValues.put("passenger", 3);
-            logger.info("Exceeding Support Personnel Transport Requirements: +3");
+            logger.debug("Exceeding Support Personnel Transport Requirements: +3");
         } else if ((requirements > 0) && (transportationRating > 0)) {
             transportationRating -= 3;
             transportationValues.put("passenger", -3);
-            logger.info("Below Support Personnel Transport Requirements: -3");
+            logger.debug("Below Support Personnel Transport Requirements: -3");
         }
 
         // JumpShip & WarShip Presence
         if (transportationCapacities.get("hasJumpShipOrWarShip") > 0) {
             transportationRating += 10;
-            logger.info("Has JumpShip or WarShip: +10");
+            logger.debug("Has JumpShip or WarShip: +10");
         }
 
         // Docking Collar Requirements
@@ -141,17 +141,17 @@ public class TransportationRating {
 
         if ((dockingCollarCount > 0) && (dockingCollarCount >= transportationRequirements.get("dropShipCount"))) {
             transportationRating += 5;
-            logger.info("Exceeding docking collar requirements: +5");
+            logger.debug("Exceeding docking collar requirements: +5");
         }
 
         if (transportationRequirements.get("dropShipCount") == 0) {
             transportationRating -= 5;
-            logger.info("No DropShip: -");
+            logger.debug("No DropShip: -");
         }
 
         // Finally, the calculated transportation rating is added to the map of transportation capacities
         transportationCapacities.put("total", transportationRating);
-        logger.info("Transportation Rating = {}", transportationRating);
+        logger.debug("Transportation Rating = {}", transportationRating);
 
         // Return list of capacities and requirements
         return List.of(transportationCapacities, transportationRequirements, transportationValues);
@@ -264,7 +264,7 @@ public class TransportationRating {
         transportationCapacities.put("uncrewedUnits", uncrewedUnits);
 
         // log the stored information to aid debugging
-        logger.info("Transportation Capacities = {}",
+        logger.debug("Transportation Capacities = {}",
                 transportationCapacities.entrySet().stream()
                         .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
                         .collect(Collectors.joining()));
@@ -344,7 +344,7 @@ public class TransportationRating {
         transportRequirements.put("passengerCount", passengerCount);
 
         // Log the calculated transport requirements
-        logger.info("Transportation Requirements = {}",
+        logger.debug("Transportation Requirements = {}",
                 transportRequirements.entrySet().stream()
                         .map(entry -> entry.getKey() + ": " + entry.getValue() + '\n')
                         .collect(Collectors.joining()));

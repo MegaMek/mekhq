@@ -46,7 +46,7 @@ public class CommandRating {
 
         commandRating.put("total", commandRating.values().stream().mapToInt(rating -> rating).sum());
 
-        logger.info("Command Rating = {}",
+        logger.debug("Command Rating = {}",
                 commandRating.keySet().stream()
                         .map(key -> key + ": " + commandRating.get(key) + '\n')
                         .collect(Collectors.joining()));

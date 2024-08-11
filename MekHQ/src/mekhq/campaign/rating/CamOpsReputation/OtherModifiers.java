@@ -37,7 +37,7 @@ public class OtherModifiers {
         );
 
         // Log the calculated modifiers
-        logger.info("Other Modifiers = {}",
+        logger.debug("Other Modifiers = {}",
                 modifierMap.entrySet().stream()
                         .map(entry -> String.format("%s: %d\n", entry.getKey(), entry.getValue()))
                         .collect(Collectors.joining()));
@@ -66,7 +66,7 @@ public class OtherModifiers {
                 .orElse(today);
 
         // Calculate and return the number of years between the oldest mission date and today
-        return (int) ChronoUnit.YEARS.between(today, oldestMissionDate);
+        return Math.max(0, (int) ChronoUnit.YEARS.between(today, oldestMissionDate));
     }
 
     /**

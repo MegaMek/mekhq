@@ -38,6 +38,7 @@ public class CombatRecordRating {
             combatRecord.put("failures", 0);
             combatRecord.put("contractsBreached", 0);
             combatRecord.put("retainerDuration", 0);
+            combatRecord.put("total", 0);
             return combatRecord;
         }
 
@@ -74,7 +75,7 @@ public class CombatRecordRating {
         combatRecord.put("total", combatRecordRating);
 
         // post a log to aid debugging
-        logger.info("Combat Record Rating = {}",
+        logger.debug("Combat Record Rating = {}",
                 combatRecord.keySet().stream()
                         .map(key -> String.format("%s: %d", key, combatRecord.get(key)))
                         .collect(Collectors.joining("\n")));

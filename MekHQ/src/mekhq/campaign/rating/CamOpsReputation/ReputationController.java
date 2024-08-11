@@ -336,7 +336,7 @@ public class ReputationController {
 
         // step nine: total everything
         calculateTotalReputation();
-        logger.info("TOTAL REPUTATION = {}", reputationRating);
+        logger.debug("TOTAL REPUTATION = {}", reputationRating);
     }
 
     /**
@@ -431,14 +431,14 @@ public class ReputationController {
                 administrationRequirements.get("administratorCount"),
                 administrationRequirements.get("total")));
 
-        description.append(resources.getString("technicianRequirements.text"));
+        description.append(String.format(resources.getString("technicianRequirements.text"), technicianRequirements.get("rating").get(0)));
 
         description.append(getTechnicianString("mech"));
         description.append(getTechnicianString("vehicle"));
         description.append(getTechnicianString("aero"));
         description.append(getTechnicianString("battleArmor"));
 
-        description.append("<br><br>");
+        description.append("<br>");
 
         // FINANCIAL RATING
         description.append(String.format(resources.getString("financialRating.text"), transportationRating));
@@ -446,7 +446,7 @@ public class ReputationController {
         if ((financialRatingMap.get("hasLoan") + financialRatingMap.get("inDebt")) > 0) {
             description.append(resources.getString("hasLoanOrDebt.text"));
         } else {
-            description.append("<br><br>");
+            description.append("<br>");
         }
 
         // CRIME RATING
@@ -455,7 +455,7 @@ public class ReputationController {
         if (crimeRating < 0) {
             description.append(String.format(resources.getString("dateOfLastCrime.text"), dateOfLastCrime));
         } else {
-            description.append("<br><br>");
+            description.append("<br>");
         }
 
         // OTHER MODIFIERS
@@ -503,8 +503,8 @@ public class ReputationController {
 
             return String.format(resources.getString("technicianString.text"),
                     label,
-                    technicianRequirement.get(1),
-                    technicianRequirement.get(0));
+                    technicianRequirement.get(0),
+                    technicianRequirement.get(1));
         }
 
         return "";

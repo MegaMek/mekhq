@@ -25,7 +25,7 @@ public class FinancialRating {
                 "total", (hasLoan || inDebt) ? -10 : 0
         );
 
-        logger.info("Financial Rating = {}",
+        logger.debug("Financial Rating = {}",
                 financeMap.entrySet().stream()
                         .map(entry -> String.format("%s: %d\n", entry.getKey(), entry.getValue()))
                         .collect(Collectors.joining()));

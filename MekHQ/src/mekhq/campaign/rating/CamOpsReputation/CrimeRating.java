@@ -15,7 +15,7 @@ public class CrimeRating {
     protected static int calculateCrimeRating(Campaign campaign) {
         int crimeRating = campaign.getAdjustedCrimeRating();
 
-        logger.info("Crime Rating = {}", crimeRating);
+        logger.debug("Crime Rating = {}", crimeRating);
 
         return crimeRating;
     }
