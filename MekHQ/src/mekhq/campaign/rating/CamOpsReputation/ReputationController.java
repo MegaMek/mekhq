@@ -60,6 +60,7 @@ public class ReputationController {
 
     // crime rating
     private LocalDate dateOfLastCrime = null;
+    private Map<String, Integer> crimeRatingMap =  new HashMap<>();
     private int crimeRating = 0;
 
     // other modifiers
@@ -242,6 +243,16 @@ public class ReputationController {
     }
 
     @SuppressWarnings(value = "unused")
+    public Map<String, Integer> getCrimeRatingMap() {
+        return this.crimeRatingMap;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setCrimeRatingMap(final Map<String, Integer> crimeRatingMap) {
+        this.crimeRatingMap = crimeRatingMap;
+    }
+
+    @SuppressWarnings(value = "unused")
     public int getCrimeRating() {
         return this.crimeRating;
     }
@@ -327,8 +338,9 @@ public class ReputationController {
         financialRating = financialRatingMap.get("total");
 
         // step seven: calculate crime rating
+        crimeRatingMap = calculateCrimeRating(campaign);
+        crimeRating = crimeRatingMap.get("total");
         dateOfLastCrime = campaign.getDateOfLastCrime();
-        crimeRating = calculateCrimeRating(campaign);
 
         // step eight: calculate other modifiers
         otherModifiersMap = calculateOtherModifiers(campaign);
@@ -453,6 +465,16 @@ public class ReputationController {
         description.append(String.format(resources.getString("crimeRating.text"), crimeRating));
 
         if (crimeRating < 0) {
+            int piracy = crimeRatingMap.get("piracy");
+            if (piracy < 0) {
+                description.append(String.format(resources.getString("piracy.text"), piracy));
+            }
+
+            int otherCrimes = crimeRatingMap.get("other");
+            if (otherCrimes < 0) {
+                description.append(String.format(resources.getString("otherCrimes.text"), otherCrimes));
+            }
+
             description.append(String.format(resources.getString("dateOfLastCrime.text"), dateOfLastCrime));
         } else {
             description.append("<br>");

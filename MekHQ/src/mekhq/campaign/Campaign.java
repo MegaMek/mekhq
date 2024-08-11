@@ -254,6 +254,7 @@ public class Campaign implements ITechManager {
     private IUnitRating unitRating; // deprecated
     private ReputationController reputationController;
     private int crimeRating;
+    private int crimePirateModifier;
     private LocalDate dateOfLastCrime;
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
@@ -289,6 +290,7 @@ public class Campaign implements ITechManager {
         retainerStartDate = null;
         reputationController = null;
         crimeRating = 0;
+        crimePirateModifier = 0;
         dateOfLastCrime = null;
         setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
@@ -3794,6 +3796,7 @@ public class Campaign implements ITechManager {
     private void processUnitReputation() {
         if (faction.isPirate()) {
             dateOfLastCrime = currentDay;
+            crimePirateModifier = -100;
         }
 
         if (currentDay.getDayOfMonth() == 1) {
@@ -3801,8 +3804,17 @@ public class Campaign implements ITechManager {
 
             long yearsBetween = ChronoUnit.YEARS.between(currentDay, dateOfLastCrime);
 
+            int remainingCrimeChange = 2;
+
             if (yearsBetween >= 1) {
-                changeCrimeRating(2);
+                if (crimePirateModifier < 0) {
+                    remainingCrimeChange = Math.max(0, 2 + crimePirateModifier);
+                    changeCrimePirateModifier(2); // this is the amount of change specified by CamOps
+                }
+
+                if (crimeRating < 0 && remainingCrimeChange > 0) {
+                    changeCrimeRating(remainingCrimeChange);
+                }
             }
         }
     }
@@ -4412,16 +4424,6 @@ public class Campaign implements ITechManager {
         this.crimeRating = crimeRating;
     }
 
-    @SuppressWarnings(value = "unused")
-    public ReputationController getReputationController() {
-        return reputationController;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setReputationController(ReputationController reputationController) {
-        this.reputationController = reputationController;
-    }
-
     /**
      * Updates the crime rating by the specified change.
      * If improving crime rating, use a positive number, otherwise negative
@@ -4432,14 +4434,31 @@ public class Campaign implements ITechManager {
         this.crimeRating = Math.min(0, crimeRating + change);
     }
 
+    public int getCrimePirateModifier() {
+        return crimePirateModifier;
+    }
+
+    public void setCrimePirateModifier(int crimePirateModifier) {
+        this.crimePirateModifier = crimePirateModifier;
+    }
     /**
-     * @return the adjusted crime rating based on the faction type.
-     * <p>
-     * If the faction is a pirate, the crime rating is increased by 100.
-     * Otherwise, the crime rating remains unchanged.
+     * Updates the crime pirate modifier by the specified change.
+     * If improving the modifier, use a positive number, otherwise negative
+     *
+     * @param change the change to be applied to the crime modifier
+     */
+    public void changeCrimePirateModifier(int change) {
+        this.crimePirateModifier = Math.min(0, crimePirateModifier + change);
+    }
+
+    /**
+     * Calculates the adjusted crime rating by adding the crime rating
+     * with the pirate modifier.
+     *
+     * @return The adjusted crime rating.
      */
     public int getAdjustedCrimeRating() {
-        return faction.isPirate() ? crimeRating - 100 : crimeRating;
+        return crimeRating + crimePirateModifier;
     }
 
     public LocalDate getDateOfLastCrime() {
@@ -4448,6 +4467,16 @@ public class Campaign implements ITechManager {
 
     public void setDateOfLastCrime(LocalDate dateOfLastCrime) {
         this.dateOfLastCrime = dateOfLastCrime;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public ReputationController getReputationController() {
+        return reputationController;
+    }
+
+    @SuppressWarnings(value = "unused")
+    public void setReputationController(ReputationController reputationController) {
+        this.reputationController = reputationController;
     }
 
     private void addInMemoryLogHistory(LogEntry le) {
@@ -4613,11 +4642,12 @@ public class Campaign implements ITechManager {
             }
         }
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "crimeRating", crimeRating);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "crimePirateModifier", crimePirateModifier);
 
         // this handles <50.0 campaigns
         if (dateOfLastCrime != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dateOfLastCrime", dateOfLastCrime);
-        } else if (crimeRating < 0) {
+        } else if (getAdjustedCrimeRating() < 0) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dateOfLastCrime", currentDay);
         }
 
