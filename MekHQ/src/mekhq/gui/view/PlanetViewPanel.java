@@ -20,6 +20,8 @@ package mekhq.gui.view;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.SocioIndustrialData;
@@ -32,6 +34,7 @@ import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -68,7 +71,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         pnlSystem = getSystemPanel();
-        pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(campaign.getLocalDate()) + " " + resourceMap.getString("system.text")));
+        pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(campaign.getLocalDate()) + ' ' + resourceMap.getString("system.text")));
         add(pnlSystem);
 
         Planet planet = system.getPlanet(planetPos);
@@ -181,7 +184,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblJumpPoint = new JLabel(resourceMap.getString("lblJumpPoint1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblJumpPoint, gbcLabel);
-        JLabel txtJumpPoint = new JLabel(Double.toString(Math.round(100 * planet.getTimeToJumpPoint(1))/100.0) + " days");
+        JLabel txtJumpPoint = new JLabel(Math.round(100 * planet.getTimeToJumpPoint(1)) / 100.0 + " days");
         gbcText.gridy = infoRow;
         panel.add(txtJumpPoint, gbcText);
         ++ infoRow;
@@ -191,7 +194,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblYear = new JLabel(resourceMap.getString("lblYear1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblYear, gbcLabel);
-            JLabel txtYear = new JLabel(Double.toString(planet.getYearLength()) + " Terran years");
+            JLabel txtYear = new JLabel(planet.getYearLength() + " Terran years");
             gbcText.gridy = infoRow;
             panel.add(txtYear, gbcText);
             ++ infoRow;
@@ -202,7 +205,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblDay = new JLabel(resourceMap.getString("lblDay1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDay, gbcLabel);
-            JLabel txtDay = new JLabel(Double.toString(planet.getDayLength(currentDate)) + " hours");
+            JLabel txtDay = new JLabel(planet.getDayLength(currentDate) + " hours");
             gbcText.gridy = infoRow;
             panel.add(txtDay, gbcText);
             ++ infoRow;
@@ -258,7 +261,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             gbcLabel.gridy = infoRow;
             panel.add(lblTemp, gbcLabel);
             //Using Unicode for the degree symbol as it is required for proper display on certain systems
-            JLabel txtTemp = new JLabel(planet.getTemperature(currentDate) + "\u00B0" + "C");
+            JLabel txtTemp = new JLabel(planet.getTemperature(currentDate) + "\u00B0" + 'C');
             gbcText.gridy = infoRow;
             panel.add(txtTemp, gbcText);
             ++ infoRow;
@@ -343,6 +346,34 @@ public class PlanetViewPanel extends JScrollablePanel {
             ++ infoRow;
         }
 
+        // Academies
+        List<Academy> filteredAcademies = getFilteredAcademies();
+
+        if (!filteredAcademies.isEmpty()) {
+            ++infoRow;
+            JLabel lblAcademies = new JLabel(resourceMap.getString("lblAcademies.text"));
+            gbcLabel.gridx = 0;
+            gbcLabel.gridy = infoRow;
+            panel.add(lblAcademies, gbcLabel);
+
+            JTextPane txtAcademies = new JTextPane();
+            txtAcademies.setEditable(false);
+            txtAcademies.setContentType("text/html");
+            txtAcademies.setText(MarkdownRenderer.getRenderedHtml(getAcademiesForSystem(filteredAcademies)));
+            ((DefaultCaret) txtAcademies.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = infoRow;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            panel.add(txtAcademies, gridBagConstraints);
+            ++infoRow;
+        }
+
         if (null != planet.getDescription()) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setEditable(false);
@@ -386,7 +417,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblStarType = new JLabel(resourceMap.getString("lblStarType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblStarType, gbcLabel);
-        JLabel txtStarType = new JLabel(system.getSpectralTypeText() + " (" + system.getRechargeTimeText(currentDate) + ")");
+        JLabel txtStarType = new JLabel(system.getSpectralTypeText() + " (" + system.getRechargeTimeText(currentDate) + ')');
         gbcText.gridy = infoRow;
         panel.add(txtStarType, gbcText);
         ++ infoRow;
@@ -402,5 +433,43 @@ public class PlanetViewPanel extends JScrollablePanel {
         //TODO: maybe some other summary information, like best HPG and number of planetary systems
 
         return panel;
+    }
+
+    /**
+     * Retrieves a string representation of the prestigious academies available in the system.
+     *
+     * @return A string representation of the prestigious academies in the system.
+     */
+    private String getAcademiesForSystem(List<Academy> filteredAcademies) {
+        StringBuilder academyString = new StringBuilder();
+
+        for (Academy academy : filteredAcademies) { // there are not enough entries to justify a Stream
+            academyString.append("<b>").append(academy.getName()).append("</b><br>")
+                    .append(academy.getDescription()).append("<br><br>");
+        }
+
+        return academyString.toString();
+    }
+
+    /**
+     * Retrieves a filtered list of prestigious academies.
+     * <p>
+     * The method filters the academies based on the system, the current year, and academy availability.
+     *
+     * @return A List of Academy objects representing the prestigious academies that pass the filtering criteria.
+     */
+    private List<Academy> getFilteredAcademies() {
+        final String setName = "Prestigious Academies";
+        final LocalDate currentDate = campaign.getLocalDate();
+
+        return AcademyFactory.getInstance()
+                .getAllAcademiesForSet(setName).stream()
+                .filter(academy -> academy.getLocationSystems().contains(system.getId())
+                        && !academy.getName().contains("(Officer)")
+                        && currentDate.getYear() >= academy.getConstructionYear()
+                        && currentDate.getYear() < academy.getClosureYear()
+                        && currentDate.getYear() < academy.getDestructionYear())
+                .sorted()
+                .toList();
     }
 }
