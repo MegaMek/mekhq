@@ -108,7 +108,11 @@ public class SupportRating {
         int totalPersonnelCount = technicianRequirements;
 
         // Count personnel
-        for (Unit unit : campaign.getUnits()) {
+        for (Unit unit : campaign.getActiveUnits()) {
+            if (unit.isMothballed()) {
+                continue;
+            }
+
             Entity entity = unit.getEntity();
 
             if (entity.isMek() || entity.isAerospaceFighter() || entity.isConventionalFighter()) {
@@ -135,7 +139,7 @@ public class SupportRating {
         int crewRequirements = 0;
 
         // Iterate over all units in the campaign
-        for (Unit unit : campaign.getUnits()) {
+        for (Unit unit : campaign.getActiveUnits()) {
             Entity entity = unit.getEntity();
 
             // Check if the unit is a LargeCraft and is not fully crewed
@@ -201,7 +205,7 @@ public class SupportRating {
         int battleArmorCount = 0;
         int protoMechCount = 0;
 
-        for (Unit unit : campaign.getUnits()) {
+        for (Unit unit : campaign.getActiveUnits()) {
             Entity entity = unit.getEntity();
 
             if (entity.isBattleArmor()) {

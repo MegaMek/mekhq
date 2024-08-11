@@ -196,7 +196,7 @@ public class TransportationRating {
                 lightVehicleBays = 0, protoMechBays = 0, battleArmorBays = 0, infantryBays = 0, passengerCapacity = 0;
 
         // Iterating through each unit in the campaign
-        for (Unit unit : campaign.getUnits()) {
+        for (Unit unit : campaign.getActiveUnits()) {
             Entity entity = unit.getEntity();
 
             // Skip the unit if it doesn't meet the specific criteria
@@ -286,7 +286,7 @@ public class TransportationRating {
                 infantryCount = 0;
 
         // Iterate through each unit in the campaign
-        for (Unit unit : campaign.getUnits()) {
+        for (Unit unit : campaign.getActiveUnits()) {
             Entity entity = unit.getEntity();
 
             // Vehicles are handled separately based on their weight

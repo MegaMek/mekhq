@@ -1348,6 +1348,17 @@ public class Campaign implements ITechManager {
         return getHangar().getUnits();
     }
 
+    /**
+     * Retrieves a collection of units that are not mothballed or being salvaged.
+     *
+     * @return a collection of active units
+     */
+    public Collection<Unit> getActiveUnits() {
+        return getHangar().getUnits().stream()
+                .filter(unit -> !unit.isMothballed() && !unit.isSalvage())
+                .toList();
+    }
+
     public Collection<Unit> getLargeCraftAndWarShips() {
         return getHangar().getUnits().stream()
                 .filter(unit -> (unit.getEntity().isLargeCraft()) || (unit.getEntity().isWarShip()))
