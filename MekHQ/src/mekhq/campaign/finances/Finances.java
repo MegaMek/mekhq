@@ -427,7 +427,7 @@ public class Finances {
     private void payoutShares(Campaign campaign, Contract contract, LocalDate date) {
         if (campaign.getCampaignOptions().isUseAtB() && campaign.getCampaignOptions().isUseShareSystem()
                 && (contract instanceof AtBContract)) {
-            Money shares = contract.getMonthlyPayOut().multipliedBy(((AtBContract) contract).getSharesPct())
+            Money shares = contract.getMonthlyPayOut().multipliedBy(contract.getSharesPercent())
                     .dividedBy(100);
             if (debit(TransactionType.SALARIES, date, shares,
                     String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()))) {

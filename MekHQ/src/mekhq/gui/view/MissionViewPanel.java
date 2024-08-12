@@ -953,7 +953,7 @@ public class MissionViewPanel extends JScrollablePanel {
             pnlStats.add(lblSharePct, gridBagConstraints);
 
             txtSharePct.setName("txtSharePct");
-            txtSharePct.setText(contract.getSharesPct() + "%");
+            txtSharePct.setText(contract.getSharesPercent() + "%");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y++;
