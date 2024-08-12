@@ -140,9 +140,9 @@ public class MekLocation extends Part {
         }
 
         if (EquipmentType.T_STRUCTURE_ENDO_STEEL == structureType) {
-            this.name += " (" + EquipmentType.getStructureTypeName(structureType, clan) + ")";
+            this.name += " (" + EquipmentType.getStructureTypeName(structureType, clan) + ')';
         } else if (structureType != EquipmentType.T_STRUCTURE_STANDARD) {
-            this.name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
+            this.name += " (" + EquipmentType.getStructureTypeName(structureType) + ')';
         }
 
         if (tsm) {
@@ -218,11 +218,10 @@ public class MekLocation extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        if (!(part instanceof MekLocation)) {
+        if (!(part instanceof MekLocation other)) {
             return false;
         }
 
-        MekLocation other = (MekLocation) part;
         return (getLoc() == other.getLoc())
                 && (getUnitTonnage() == other.getUnitTonnage())
                 && (isTsm() == other.isTsm())
@@ -573,7 +572,7 @@ public class MekLocation extends Part {
             }
 
             if (components.length() > 0) {
-                toReturn += " [" + components + "]";
+                toReturn += " [" + components + ']';
             }
         }
 
@@ -844,7 +843,7 @@ public class MekLocation extends Part {
         if ((!isBreached() && !isBlownOff()) || isSalvaging()) {
             return super.getDesc();
         }
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font size='3'";
         String scheduled = "";
         if (getTech() != null) {
             scheduled = " (scheduled) ";
@@ -852,27 +851,32 @@ public class MekLocation extends Part {
 
         toReturn += ">";
         if (isBlownOff()) {
-            toReturn += "<b>Re-attach " + getName() + "</b><br/>";
+            toReturn += "<b>Re-attach " + getName();
+
         } else {
-            toReturn += "<b>Seal " + getName() + "</b><br/>";
+            toReturn += "<b>Seal " + getName();
+
         }
-        toReturn += getDetails() + "<br/>";
+
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</font>";
+            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</b></span>";
         } else {
+            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
+                    + "</span></b></b><br/>";
+        }
+
+        toReturn += getDetails() + "<br/>";
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
             toReturn += getTimeLeft() + " minutes" + scheduled;
             if (isBlownOff()) {
                 String bonus = getAllMods(null).getValueAsString();
                 if (getAllMods(null).getValue() > -1) {
                     bonus = '+' + bonus;
                 }
-                bonus = '(' + bonus + ')';
-                if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-                    toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
-                }
-                toReturn += ' ' + bonus;
+                toReturn += " <b>TN:</b> " + bonus;
                 if (getMode() != WorkTime.NORMAL) {
-                    toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+                    toReturn += " <i>" + getCurrentModeName() + "</i>";
                 }
             }
         }
