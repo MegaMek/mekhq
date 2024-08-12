@@ -5412,7 +5412,7 @@ public class Campaign implements ITechManager {
         }
 
         if (partWork.getUnit().getSite() < SITE_FACILITY_MAINTENANCE) {
-            if (getLocation().isOnPlanet()) {
+            if (getLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
                 Planet planet = getLocation().getPlanet();
                 Atmosphere atmosphere = planet.getAtmosphere(getLocalDate());
                 megamek.common.planetaryconditions.Atmosphere planetaryConditions = megamek.common.planetaryconditions.Atmosphere.getAtmosphere(planet.getPressure(getLocalDate()));
