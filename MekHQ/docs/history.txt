@@ -132,6 +132,7 @@ MEKHQ VERSION HISTORY:
 + PR #4596: Added Personality Characteristics and Loyalty to Personnel Tab
 + PR #4597: Updated Person View and Personnel Tab to Better Support Differing Screen Sizes
 + PR #4609: Integrated Academy Information into Interstellar Map Tab
++ FIX #3920: Fixed Shares Payouts for Early Contract End, Refactored Shares Percentage Fetching to Further Detach System from AtB
 
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
