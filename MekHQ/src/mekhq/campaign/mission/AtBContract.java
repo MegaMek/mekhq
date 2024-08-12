@@ -1107,11 +1107,20 @@ public class AtBContract extends Contract {
         this.moraleLevel = moraleLevel;
     }
 
-    public int getSharesPct() {
+
+    /**
+     * Retrieves the dynamic shares percentage for this contract.
+     * This method shouldn't be called directly,
+     * instead use contract.getSharesPercent()
+     *
+     *
+     * @return the dynamic shares percentage
+     */
+    public int getAtBSharesPercentage() {
         return sharesPct;
     }
 
-    public void setSharesPct(int pct) {
+    public void setAtBSharesPercent(int pct) {
         sharesPct = pct;
     }
 
