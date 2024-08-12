@@ -136,7 +136,7 @@
 		<variableTechLevel>false</variableTechLevel>
 		<factionIntroDate>false</factionIntroDate>
 		<useAmmoByType>false</useAmmoByType>
-		<waitingPeriod>7</waitingPeriod>
+		<waitingPeriod>1</waitingPeriod>
 		<acquisitionSkill>Tech</acquisitionSkill>
 		<acquisitionSupportStaffOnly>true</acquisitionSupportStaffOnly>
 		<techLevel>3</techLevel>
@@ -175,7 +175,7 @@
 		<useRandomUnitQualities>false</useRandomUnitQualities>
 		<useUnofficialMaintenance>false</useUnofficialMaintenance>
 		<checkMaintenance>true</checkMaintenance>
-		<maxAcquisitions>0</maxAcquisitions>
+		<maxAcquisitions>1</maxAcquisitions>
 		<useTactics>false</useTactics>
 		<useInitiativeBonus>false</useInitiativeBonus>
 		<useToughness>false</useToughness>
@@ -537,7 +537,7 @@
 		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
 		<planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
 		<planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
-		<usePortraitForType>true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
+		<usePortraitForType>true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true</usePortraitForType>
 	</campaignOptions>
 	<randomSkillPreferences>
 		<overallRecruitBonus>0</overallRecruitBonus>
