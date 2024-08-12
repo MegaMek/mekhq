@@ -3752,7 +3752,7 @@ public class Campaign implements ITechManager {
         processFatigueNewDay();
 
         if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
-            processUnitReputation();
+            updateCrimeRating();
         }
 
         if (campaignOptions.isUseEducationModule()) {
@@ -3794,7 +3794,10 @@ public class Campaign implements ITechManager {
         return true;
     }
 
-    private void processUnitReputation() {
+    /**
+     * Updates the campaign's crime rating based on specific conditions.
+     */
+    private void updateCrimeRating() {
         if (faction.isPirate()) {
             dateOfLastCrime = currentDay;
             crimePirateModifier = -100;
