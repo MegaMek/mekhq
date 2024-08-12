@@ -21,6 +21,31 @@
  */
 package mekhq;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.ObjectInputFilter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import javax.swing.InputMap;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.text.DefaultEditorKit;
+
+import org.apache.logging.log4j.LogManager;
+
 import io.sentry.Sentry;
 import megamek.MegaMek;
 import megamek.SuiteConstants;
@@ -32,9 +57,10 @@ import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
-import megamek.common.event.*;
-import megamek.server.GameManager;
 import megamek.server.Server;
+import megamek.common.event.*;
+import megamek.common.net.marshalling.SanityInputFilter;
+import megamek.server.GameManager;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -58,21 +84,6 @@ import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.text.DefaultEditorKit;
-import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * The main class of the application.
@@ -109,6 +120,7 @@ public class MekHQ implements GameListener {
 
     private final IAutosaveService autosaveService;
     // endregion Variable Declarations
+    private static final SanityInputFilter sanityInputFilter = new SanityInputFilter();
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -260,6 +272,8 @@ public class MekHQ implements GameListener {
      * Main method launching the application.
      */
     public static void main(String... args) {
+        ObjectInputFilter.Config.setSerialFilter(sanityInputFilter);
+
         // Configure Sentry with defaults. Although the client defaults to enabled, the
         // properties file is used to disable
         // it and additional configuration can be done inside of the sentry.properties
@@ -279,11 +293,9 @@ public class MekHQ implements GameListener {
             Sentry.captureException(t);
             LogManager.getLogger().error("Uncaught Exception Detected", t);
             final String name = t.getClass().getName();
-            JOptionPane.showMessageDialog(null,
-                    String.format(
-                            "Uncaught %s detected. Please open up an issue containing all logs, campaign save file, and customs at https://github.com/MegaMek/mekhq/issues",
-                            name),
-                    "Uncaught " + name, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, String.format(
+                    "Uncaught %s detected. Please open up an issue containing all logs, campaign save file, and customs at https://github.com/MegaMek/mekhq/issues",
+                    name), "Uncaught " + name, JOptionPane.ERROR_MESSAGE);
         });
 
         // Second, let's handle logging
@@ -554,7 +566,8 @@ public class MekHQ implements GameListener {
                 Person person = getCampaign().getPerson(personId);
 
                 if (person.getStatus() == PersonnelStatus.MIA && !control) {
-                    person.changeStatus(campaignGUI.getCampaign(), campaignGUI.getCampaign().getLocalDate(), PersonnelStatus.POW);
+                    person.changeStatus(campaignGUI.getCampaign(), campaignGUI.getCampaign().getLocalDate(),
+                            PersonnelStatus.POW);
                 }
             }
 

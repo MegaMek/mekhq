@@ -75,6 +75,8 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.parts.Part.*;
+
 /**
  * This is a wrapper class for entity, so that we can add some functionality to it
  *
@@ -1117,17 +1119,29 @@ public class Unit implements ITechnology {
     }
 
     public Money getSellValue() {
-        // we use an alternative method of getting sell value for infantry
-        if (entity instanceof Infantry) {
-            return Money.of(entity.getAlternateCost());
-        }
-
         Money partsValue = Money.zero();
 
         partsValue = partsValue
                 .plus(parts.stream()
                     .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
                     .collect(Collectors.toList()));
+
+        // we use an alternative method of getting sell value for infantry
+        if (entity instanceof Infantry) {
+            Money unitCost = Money.of(entity.getAlternateCost());
+            double[] usedPartPriceMultipliers = campaign.getCampaignOptions().getUsedPartPriceMultipliers();
+
+            return switch (this.getQuality()) {
+                case QUALITY_A -> unitCost.multipliedBy(usedPartPriceMultipliers[0]);
+                case QUALITY_B -> unitCost.multipliedBy(usedPartPriceMultipliers[1]);
+                case QUALITY_C -> unitCost.multipliedBy(usedPartPriceMultipliers[2]);
+                case QUALITY_D -> unitCost.multipliedBy(usedPartPriceMultipliers[3]);
+                case QUALITY_E -> unitCost.multipliedBy(usedPartPriceMultipliers[4]);
+                case QUALITY_F -> unitCost.multipliedBy(usedPartPriceMultipliers[5]);
+                default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/unit/Unit.java/getSellValue: "
+                        + this.getQuality());
+            };
+        }
 
         //We need to adjust this for equipment that doesn't show up as parts
         //Docking collars, Grav decks, KF Drive - Now parts
@@ -5024,7 +5038,7 @@ public class Unit implements ITechnology {
             }
         }
         if (nParts == 0) {
-            return Part.QUALITY_D;
+            return QUALITY_D;
         }
         return (int) Math.round((1.0 * sumQuality) / nParts);
     }
@@ -5669,11 +5683,11 @@ public class Unit implements ITechnology {
         );
 
         return switch (roll) {
-            case 2, 3, 4, 5 -> Part.QUALITY_A;
-            case 6, 7, 8 -> Part.QUALITY_B;
-            case 9, 10 -> Part.QUALITY_C;
-            case 11 -> Part.QUALITY_D;
-            case 12 -> Part.QUALITY_F;
+            case 2, 3, 4, 5 -> QUALITY_A;
+            case 6, 7, 8 -> QUALITY_B;
+            case 9, 10 -> QUALITY_C;
+            case 11 -> QUALITY_D;
+            case 12 -> QUALITY_F;
             default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
         };
     }
