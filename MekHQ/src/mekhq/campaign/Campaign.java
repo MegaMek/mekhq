@@ -3803,18 +3803,20 @@ public class Campaign implements ITechManager {
         if (currentDay.getDayOfMonth() == 1) {
             reputationController.initializeReputation(this);
 
-            long yearsBetween = ChronoUnit.YEARS.between(currentDay, dateOfLastCrime);
+            if (dateOfLastCrime != null) {
+                long yearsBetween = ChronoUnit.YEARS.between(currentDay, dateOfLastCrime);
 
-            int remainingCrimeChange = 2;
+                int remainingCrimeChange = 2;
 
-            if (yearsBetween >= 1) {
-                if (crimePirateModifier < 0) {
-                    remainingCrimeChange = Math.max(0, 2 + crimePirateModifier);
-                    changeCrimePirateModifier(2); // this is the amount of change specified by CamOps
-                }
+                if (yearsBetween >= 1) {
+                    if (crimePirateModifier < 0) {
+                        remainingCrimeChange = Math.max(0, 2 + crimePirateModifier);
+                        changeCrimePirateModifier(2); // this is the amount of change specified by CamOps
+                    }
 
-                if (crimeRating < 0 && remainingCrimeChange > 0) {
-                    changeCrimeRating(remainingCrimeChange);
+                    if (crimeRating < 0 && remainingCrimeChange > 0) {
+                        changeCrimeRating(remainingCrimeChange);
+                    }
                 }
             }
         }

@@ -539,16 +539,17 @@ public class ReputationController {
      * @param label      the label to be displayed in the mission string
      * @param multiplier the multiplier to apply to the count
      * @return the generated mission string, formatted as
-     * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>count (+multiplier)<br>", or null if the count is <= 0
+     * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>count (count * multiplier)<br>", or null if the count is <= 0
      */
     private String getMissionString(String key, String label, int multiplier) {
         int count = combatRecordMap.get(key);
+        int total = count * multiplier;
 
         if (count > 0) {
             return String.format(resources.getString("mission.text"),
                     label,
                     count,
-                    count * multiplier);
+                    String.format(total > 0 ? "+%d" : "%d", total));
         } else {
             return "";
         }
