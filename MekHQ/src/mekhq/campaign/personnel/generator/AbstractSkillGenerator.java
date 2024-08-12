@@ -178,7 +178,7 @@ public abstract class AbstractSkillGenerator {
         }
     }
 
-    protected static void addSkill(Person person, String skillName, int level, int bonus) {
+    public static void addSkill(Person person, String skillName, int level, int bonus) {
         person.addSkill(skillName, new Skill(skillName, level, bonus));
     }
 

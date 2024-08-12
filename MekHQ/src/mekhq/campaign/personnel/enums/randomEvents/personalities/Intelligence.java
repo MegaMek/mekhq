@@ -259,4 +259,13 @@ public enum Intelligence {
     public String toString() {
         return name;
     }
+
+    /**
+     * Evaluates 'intelligence score', an int representation of how intelligent a character is.
+     *
+     * @return The calculated intelligence score.
+     */
+    public int getIntelligenceScore() {
+        return this.ordinal() - (Intelligence.values().length / 2);
+    }
 }
