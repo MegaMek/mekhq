@@ -598,7 +598,7 @@ public class ReputationController {
                 } else {
                     try {
                         map.put(node.getNodeName(), Integer.parseInt(node.getTextContent()));
-                    } catch (NullPointerException ex) {
+                    } catch (Exception ex) {
                         logger.error("Could not parse {}: ", map, ex);
                     }
                 }
