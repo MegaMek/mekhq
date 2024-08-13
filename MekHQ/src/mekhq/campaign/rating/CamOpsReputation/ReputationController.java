@@ -1,15 +1,18 @@
 package mekhq.campaign.rating.CamOpsReputation;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getAtBModifier;
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getReputationModifier;
@@ -70,10 +73,6 @@ public class ReputationController {
     // total
     private int reputationRating = 0;
 
-    public ReputationController(Campaign campaign) {
-        initializeReputation(campaign);
-    }
-
     //region Getters and Setters
     public SkillLevel getAverageSkillLevel() {
         return this.averageSkillLevel;
@@ -89,10 +88,14 @@ public class ReputationController {
     //endregion Getters and Setters
 
     /**
+     * Initializes the ReputationController class with default values.
+     */
+    public ReputationController() {}
+
+    /**
      * Performs and stores all reputation calculations.
      *
      * @param campaign the campaign for which to initialize the reputation
-     * @return a ReputationRecord object containing all reputation calculations
      */
     @SuppressWarnings(value = "unchecked")
     public void initializeReputation(Campaign campaign) {
@@ -407,6 +410,193 @@ public class ReputationController {
                     modifier);
         } else {
             return "";
+        }
+    }
+
+    /**
+     * Writes the reputation ratings and values to an XML file.
+     *
+     * @param pw      the PrintWriter object used to write to XML
+     * @param indent  the number of spaces to indent the XML tags
+     */
+    public void writeReputationToXML(final PrintWriter pw, int indent) {
+        // average experience rating
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "averageSkillLevel", averageSkillLevel.toString());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "averageExperienceRating", averageExperienceRating);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atbModifier", atbModifier);
+
+        // command rating
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "commanderMap");
+        writeMapToXML(pw, indent, commanderMap);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "commanderMap");
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commanderRating", commanderRating);
+
+        // combat record rating
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "combatRecordMap");
+        writeMapToXML(pw, indent, combatRecordMap);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "combatRecordMap");
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatRecordRating", combatRecordRating);
+
+        // transportation rating
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "transportationCapacities");
+        writeMapToXML(pw, indent, transportationCapacities);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "transportationCapacities");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "transportationRequirements");
+        writeMapToXML(pw, indent, transportationRequirements);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "transportationRequirements");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "transportationValues");
+        writeMapToXML(pw, indent, transportationValues);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "transportationValues");
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportationRating", transportationRating);
+
+        // support rating
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "administrationRequirements");
+        writeMapToXML(pw, indent, administrationRequirements);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "administrationRequirements");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "crewRequirements");
+        writeMapToXML(pw, indent, crewRequirements);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "crewRequirements");
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "technicianRequirements");
+        writeMapToXML(pw, indent, technicianRequirements);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "technicianRequirements");
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportRating", supportRating);
+
+        // financial rating
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "financialRatingMap");
+        writeMapToXML(pw, indent, financialRatingMap);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "financialRatingMap");
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportRating", financialRating);
+
+        // crime rating
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dateOfLastCrime", dateOfLastCrime);
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "crimeRatingMap");
+        writeMapToXML(pw, indent, crimeRatingMap);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "crimeRatingMap");
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "crimeRating", crimeRating);
+
+        // other modifiers
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "otherModifiersMap");
+        writeMapToXML(pw, indent, otherModifiersMap);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "otherModifiersMap");
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "otherModifiers", otherModifiers);
+
+        // total
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reputationRating", reputationRating);
+    }
+
+    /**
+     * Writes a map to XML format.
+     *
+     * @param pw      the PrintWriter object used to write to XML
+     * @param indent  the number of spaces to indent the XML tags
+     * @param map     the map to write to XML, where the keys are strings, and the values can be any type
+     * @param <T>     the type of the values in the map
+     * @return the updated value of the indent parameter after writing the map to XML
+     */
+    private <T> void writeMapToXML(final PrintWriter pw, final int indent, final Map<String, T> map) {
+        for (String key : map.keySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, key, map.get(key).toString());
+        }
+    }
+
+    public ReputationController generateInstanceFromXML(final Node wn) {
+        NodeList nl = wn.getChildNodes();
+
+        try {
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+
+                if (wn2.getNodeName().equalsIgnoreCase("averageSkillLevel")) {
+                    this.averageSkillLevel = SkillLevel.valueOf(wn2.getTextContent().toUpperCase());
+                } else if (wn2.getNodeName().equalsIgnoreCase("averageExperienceRating")) {
+                    this.averageExperienceRating = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("atbModifier")) {
+                    this.atbModifier = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("commanderMap")) {
+                    this.parseSubNode(wn2, commanderMap, false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("commanderRating")) {
+                    this.commanderRating = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("combatRecordMap")) {
+                    this.parseSubNode(wn2, combatRecordMap, false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("combatRecordRating")) {
+                    this.combatRecordRating = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportationCapacities")) {
+                    this.parseSubNode(wn2, transportationCapacities, false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportationRequirements")) {
+                    this.parseSubNode(wn2, transportationRequirements, false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportationValues")) {
+                    this.parseSubNode(wn2, transportationValues, false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportationRating")) {
+                    this.transportationRating = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("administrationRequirements")) {
+                    this.parseSubNode(wn2, administrationRequirements, false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("crewRequirements")) {
+                    this.parseSubNode(wn2, crewRequirements, false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("technicianRequirements")) {
+                    this.parseSubNode(wn2, null, true);
+                } else if (wn2.getNodeName().equalsIgnoreCase("supportRating")) {
+                    this.supportRating = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("financialRatingMap")) {
+                    this.parseSubNode(wn2, financialRatingMap, false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("financialRating")) {
+                    this.financialRating = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("dateOfLastCrime")) {
+                    this.dateOfLastCrime = LocalDate.parse(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("crimeRatingMap")) {
+                    this.parseSubNode(wn2, crimeRatingMap, false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("crimeRating")) {
+                    this.crimeRating = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("otherModifiersMap")) {
+                    this.parseSubNode(wn2, otherModifiersMap, false);
+                } else if (wn2.getNodeName().equalsIgnoreCase("otherModifiers")) {
+                    this.otherModifiers = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("reputationRating")) {
+                    this.reputationRating = Integer.parseInt(wn2.getTextContent());
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Could not parse Reputation: ", ex);
+        }
+
+        return this;
+    }
+
+    /**
+     * Parses the sub-nodes of a given node and populates either a map or a technicianRequirements list based on the boolean flag.
+     *
+     * @param wn2 The node whose sub-nodes need to be parsed.
+     * @param map The map to populate with the sub-node data (null if technicianRequirements).
+     * @param isTechnicianRequirements Flag indicating whether to populate a technicianRequirements list.
+     */
+    private void parseSubNode(Node wn2, @Nullable Map<String, Integer> map, boolean isTechnicianRequirements) {
+        NodeList subNodeList = wn2.getChildNodes();
+
+        for (int i = 0; i < subNodeList.getLength(); i++) {
+            Node node = subNodeList.item(i);
+
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                if (isTechnicianRequirements) {
+                    String[] numbers = node.getTextContent().substring(1, node.getTextContent().length() - 1).split(",\\s*");
+                    List<Integer> list = Arrays.stream(numbers)
+                            .map(Integer::parseInt)
+                            .collect(Collectors.toList());
+                    technicianRequirements.put(node.getNodeName(), list);
+                } else {
+                    map.put(node.getNodeName(), Integer.parseInt(node.getTextContent()));
+                }
+            }
         }
     }
 }

@@ -28,6 +28,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignSummary;
 import mekhq.campaign.event.*;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -222,7 +223,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
             lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
         } else {
-            lblExperience.setText(getCampaign().getReputationController().getAverageSkillLevel().toString());
+            lblExperience.setText(getCampaign().getReputation().getAverageSkillLevel().toString());
         }
 
         lblExperienceHead.setLabelFor(lblExperience);
@@ -563,8 +564,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
             campaign.getUnitRating().reInitialize();
             lblExperience.setText(campaign.getUnitRating().getAverageExperience().toString());
         } else if (unitRatingMethod.isCampaignOperations()) {
-            campaign.getReputationController().initializeReputation(campaign);
-            lblExperience.setText(campaign.getReputationController().getAverageSkillLevel().toString());
+            if (campaign.getReputation() == null) {
+                ReputationController reputationController = new ReputationController();
+                reputationController.initializeReputation(campaign);
+                campaign.setReputation(reputationController);
+            }
+            lblExperience.setText(campaign.getReputation().getAverageSkillLevel().toString());
         }
 
         campaignSummary.updateInformation();

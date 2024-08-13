@@ -153,7 +153,9 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             autoAwardsController.ManualController(campaign, false);
         }
 
-        campaign.setReputationController(new ReputationController(campaign));
+        ReputationController reputationController = new ReputationController();
+        reputationController.initializeReputation(campaign);
+        campaign.setReputation(reputationController);
     }
 
     @Override

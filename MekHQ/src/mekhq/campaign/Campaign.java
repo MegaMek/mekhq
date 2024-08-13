@@ -253,7 +253,7 @@ public class Campaign implements ITechManager {
     private LocalDate shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator; // deprecated
     private IUnitRating unitRating; // deprecated
-    private ReputationController reputationController;
+    private ReputationController reputation;
     private int crimeRating;
     private int crimePirateModifier;
     private LocalDate dateOfLastCrime;
@@ -289,7 +289,7 @@ public class Campaign implements ITechManager {
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
         retainerStartDate = null;
-        reputationController = null;
+        reputation = null;
         crimeRating = 0;
         crimePirateModifier = 0;
         dateOfLastCrime = null;
@@ -4473,12 +4473,12 @@ public class Campaign implements ITechManager {
         this.dateOfLastCrime = dateOfLastCrime;
     }
 
-    public ReputationController getReputationController() {
-        return reputationController;
+    public ReputationController getReputation() {
+        return reputation;
     }
 
-    public void setReputationController(ReputationController reputationController) {
-        this.reputationController = reputationController;
+    public void setReputation(ReputationController reputation) {
+        this.reputation = reputation;
     }
 
     private void addInMemoryLogHistory(LogEntry le) {
@@ -4652,6 +4652,10 @@ public class Campaign implements ITechManager {
         } else if (getAdjustedCrimeRating() < 0) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dateOfLastCrime", currentDay);
         }
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "reputation");
+        reputation.writeReputationToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "reputation");
 
         // this handles campaigns that predate 49.20
         if (campaignStartDate == null) {
@@ -6206,7 +6210,7 @@ public class Campaign implements ITechManager {
         if (unitRatingMethod.isFMMR()) {
             return getUnitRating().getUnitRating();
         } else if (unitRatingMethod.isCampaignOperations()) {
-            int reputationRating = reputationController.getReputationRating();
+            int reputationRating = reputation.getReputationRating();
             int unitRatingMod = getUnitRatingMod();
 
             return String.format("%d (%+d)", reputationRating, unitRatingMod);
@@ -6229,7 +6233,7 @@ public class Campaign implements ITechManager {
         }
 
         return getCampaignOptions().getUnitRatingMethod().isFMMR() ?
-                getUnitRating().getUnitRatingAsInteger() : reputationController.getAtbModifier();
+                getUnitRating().getUnitRatingAsInteger() : reputation.getAtbModifier();
     }
 
     @Deprecated

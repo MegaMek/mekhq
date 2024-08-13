@@ -306,6 +306,11 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 if (optionsDialog.showDialog().isCancelled()) {
                     return null;
                 }
+
+                // initialize reputation
+                ReputationController reputationController = new ReputationController();
+                reputationController.initializeReputation(campaign);
+                campaign.setReputation(reputationController);
                 //endregion Progress 6
 
                 //region Progress 7
@@ -352,14 +357,19 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                     campaign.restore();
                     campaign.cleanUp();
                 }
-
-                campaign.setReputationController(new ReputationController(campaign));
                 //endregion Progress 6
 
                 //region Progress 7
                 setProgress(7);
                 // Make sure campaign options event handlers get their data
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+
+                // this is to handle pre-50.0 campaigns
+                if (campaign.getReputation() == null) {
+                    ReputationController reputationController = new ReputationController();
+                    reputationController.initializeReputation(campaign);
+                    campaign.setReputation(reputationController);
+                }
                 //endregion Progress 7
             }
             campaign.setApp(getApplication());

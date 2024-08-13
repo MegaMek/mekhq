@@ -56,6 +56,7 @@ import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
@@ -702,6 +703,8 @@ public class CampaignXmlParser {
                     retVal.setCrimePirateModifier(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("dateOfLastCrime")) {
                     retVal.setDateOfLastCrime(LocalDate.parse(wn.getTextContent()));
+                } else if (xn.equalsIgnoreCase("reputation")) {
+                    retVal.setReputation(new ReputationController().generateInstanceFromXML(wn));
                 } else if (xn.equalsIgnoreCase("rankSystem")) {
                     if (!wn.hasChildNodes()) { // we need there to be child nodes to parse from
                         continue;
