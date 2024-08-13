@@ -1326,22 +1326,28 @@ public class Person {
                 .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
-    public Integer getYearsInService(final Campaign campaign) {
+    /**
+     * @return how many years a character has spent employed in the campaign,
+     * factoring in date of death and retirement
+     *
+     * @param campaign the current Campaign
+     */
+    public long getYearsInService(final Campaign campaign) {
         // Get time in service based on year
         if (getRecruitment() == null) {
-            //use "" they haven't been recruited or are dependents
             return 0;
         }
 
         LocalDate today = campaign.getLocalDate();
 
-        // If the person is dead, we only care about how long they spent in service to the company
-        if (getDateOfDeath() != null) {
-            //use date of death instead of the current day
+        // If the person is dead or has left the unit, we only care about how long they spent in service to the company
+        if (getRetirement() != null) {
+            today = getRetirement();
+        } else if (getDateOfDeath() != null) {
             today = getDateOfDeath();
         }
 
-        return Math.toIntExact(ChronoUnit.YEARS.between(getRecruitment(), today));
+        return ChronoUnit.YEARS.between(getRecruitment(), today);
     }
 
     public @Nullable LocalDate getLastRankChangeDate() {
