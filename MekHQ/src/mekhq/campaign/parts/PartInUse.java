@@ -16,7 +16,6 @@ public class PartInUse {
     private int transferCount;
     private int plannedCount;
     private Money cost = Money.zero();
-    private int id = -1;
 
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails(false);
@@ -38,7 +37,6 @@ public class PartInUse {
         this.description = sb.toString();
         this.partToBuy = part.getAcquisitionWork();
         this.tonnagePerItem = part.getTonnage();
-        this.id = part.getId();
         // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
         // We redo the description based on that
         if (partToBuy instanceof AmmoStorage) {
@@ -134,10 +132,6 @@ public class PartInUse {
 
     public Money getCost() {
         return cost;
-    }
-
-    public int getId() {
-        return id;
     }
 
     @Override

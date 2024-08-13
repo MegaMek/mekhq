@@ -33,7 +33,10 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more
@@ -135,10 +138,11 @@ public class PartsReportDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
-                int partId = piu.getId();
-                if (partId >= 0) {
-                    Part part = campaign.getWarehouse().getPart(partId);
-                    campaign.getQuartermaster().sellPart(part, 1);
+                for (Part p : campaign.getWarehouse().getParts()) {
+                    if (Objects.equals(p.getName(), piu.getDescription()) && p.isSpare()) {
+                        campaign.getQuartermaster().sellPart(p, 1);
+                        break;
+                    }
                 }
                 refreshOverviewPartsInUse();
             }
@@ -149,18 +153,19 @@ public class PartsReportDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
-                int partId = piu.getId();
-                if (partId >= 0) {
-                    Part part = campaign.getWarehouse().getPart(partId);
-                    int quantity = 1;
-                    PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "Sell how many " + part.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
-                    pcd.setVisible(true);
-                    quantity = pcd.getValue();
-                    if (quantity <= 0) {
-                        return;
+                for (Part p : campaign.getWarehouse().getParts()) {
+                    if (Objects.equals(p.getName(), piu.getDescription()) && p.isSpare()) {
+                        int quantity = 1;
+                        PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                            "Sell how many " + p.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                        pcd.setVisible(true);
+                        quantity = pcd.getValue();
+                        if (quantity <= 0 || quantity > piu.getStoreCount()) {
+                            return;
+                        }
+                        campaign.getQuartermaster().sellPart(p, quantity);
+                        break;
                     }
-                    campaign.getQuartermaster().sellPart(part, quantity);
                 }
                 refreshOverviewPartsInUse();
             }
