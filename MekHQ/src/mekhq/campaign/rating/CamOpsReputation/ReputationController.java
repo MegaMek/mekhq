@@ -26,82 +26,66 @@ public class ReputationController {
     // utilities
     private static final MMLogger logger = MMLogger.create(ReputationController.class);
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CamOpsReputation",
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.CamOpsReputation",
             MekHQ.getMHQOptions().getLocale());
 
     // average experience rating
-    private SkillLevel averageSkillLevel = SkillLevel.NONE;
-    private int averageExperienceRating = 0;
-    private int atbModifier = 0;
+    private static SkillLevel averageSkillLevel = SkillLevel.NONE;
+    private static int averageExperienceRating = 0;
+    // while this can be converted to a local variable,
+    // I think it's useful to have all the associated variables in one place
+    private static int atbModifier = 0;
 
     // command rating
-    private Map<String, Integer> commanderMap = new HashMap<>();
-    private int commanderRating = 0;
+    private static Map<String, Integer> commanderMap = new HashMap<>();
+    private static int commanderRating = 0;
 
     // combat record rating
-    private Map<String, Integer> combatRecordMap = new HashMap<>();
-    private int combatRecordRating = 0;
+    private static Map<String, Integer> combatRecordMap = new HashMap<>();
+    private static int combatRecordRating = 0;
 
     // transportation rating
-    private Map<String, Integer> transportationCapacities =  new HashMap<>();
-    private Map<String, Integer> transportationRequirements =  new HashMap<>();
-    private Map<String, Integer> transportationValues =  new HashMap<>();
-    private int transportationRating = 0;
+    private static Map<String, Integer> transportationCapacities =  new HashMap<>();
+    private static Map<String, Integer> transportationRequirements =  new HashMap<>();
+    private static Map<String, Integer> transportationValues =  new HashMap<>();
+    private static int transportationRating = 0;
 
     // support rating
-    private Map<String, Integer> administrationRequirements =  new HashMap<>();
-    private Map<String, Integer> crewRequirements =  new HashMap<>();
-    private Map<String, List<Integer>> technicianRequirements =  new HashMap<>();
-    private int supportRating = 0;
+    private static Map<String, Integer> administrationRequirements =  new HashMap<>();
+    private static Map<String, Integer> crewRequirements =  new HashMap<>();
+    private static Map<String, List<Integer>> technicianRequirements =  new HashMap<>();
+    private static int supportRating = 0;
 
     // financial rating
-    private Map<String, Integer> financialRatingMap =  new HashMap<>();
-    private int financialRating = 0;
+    private static Map<String, Integer> financialRatingMap =  new HashMap<>();
+    private static int financialRating = 0;
 
     // crime rating
-    private LocalDate dateOfLastCrime = null;
-    private Map<String, Integer> crimeRatingMap =  new HashMap<>();
-    private int crimeRating = 0;
+    private static LocalDate dateOfLastCrime = null;
+    private static Map<String, Integer> crimeRatingMap =  new HashMap<>();
+    private static int crimeRating = 0;
 
     // other modifiers
-    private Map<String, Integer> otherModifiersMap =  new HashMap<>();
-    private int otherModifiers = 0;
+    private static Map<String, Integer> otherModifiersMap =  new HashMap<>();
+    private static int otherModifiers = 0;
 
     // total
-    private int reputationRating = 0;
-
-    public ReputationController(Campaign campaign) {
-        initializeReputation(campaign);
-    }
-
-    //region Getters and Setters
-    public SkillLevel getAverageSkillLevel() {
-        return this.averageSkillLevel;
-    }
-
-    public int getAtbModifier() {
-        return this.atbModifier;
-    }
-
-    public int getReputationRating() {
-        return this.reputationRating;
-    }
-    //endregion Getters and Setters
+    private static int reputationRating = 0;
 
     /**
      * Performs and stores all reputation calculations.
      *
      * @param campaign the campaign for which to initialize the reputation
+     * @return a ReputationRecord object containing all reputation calculations
      */
     @SuppressWarnings(value = "unchecked")
-    public void initializeReputation(Campaign campaign) {
+    public static ReputationRecord initializeReputation(Campaign campaign) {
         // step one: calculate average experience rating
         averageSkillLevel = getSkillLevel(campaign, true);
         averageExperienceRating = getReputationModifier(averageSkillLevel);
         atbModifier = getAtBModifier(campaign);
 
         // step two: calculate command rating
-        // TODO add a campaign option to disable personality rating
         commanderMap = calculateCommanderRating(campaign, campaign.getFlaggedCommander());
         commanderRating = commanderMap.get("total");
 
@@ -144,13 +128,38 @@ public class ReputationController {
         // step nine: total everything
         calculateTotalReputation();
         logger.debug("TOTAL REPUTATION = {}", reputationRating);
+
+        return new ReputationRecord (
+                averageSkillLevel,
+                averageExperienceRating,
+                atbModifier,
+                commanderMap,
+                commanderMap.get("total"),
+                combatRecordMap,
+                combatRecordRating,
+                transportationCapacities,
+                transportationRequirements,
+                transportationValues,
+                transportationRating,
+                administrationRequirements,
+                crewRequirements,
+                technicianRequirements,
+                supportRating,
+                financialRatingMap,
+                financialRating,
+                crimeRatingMap,
+                dateOfLastCrime,
+                crimeRating,
+                otherModifiersMap,
+                otherModifiers,
+                reputationRating);
     }
 
     /**
      * Calculates the total reputation by adding up various ratings and modifiers.
      * This method updates the reputationRating variable.
      */
-    private void calculateTotalReputation() {
+    private static void calculateTotalReputation() {
         reputationRating = averageExperienceRating;
         reputationRating += commanderRating;
         reputationRating += combatRecordRating;
@@ -167,7 +176,7 @@ public class ReputationController {
      * @param campaign the campaign for which to generate the report
      * @return the report text as a string
      */
-    public String getReportText(Campaign campaign) {
+    public static String getReportText(Campaign campaign) {
         StringBuilder description = new StringBuilder();
 
         description.append("<html><div style='font-size:11px;'>");
@@ -304,7 +313,7 @@ public class ReputationController {
      * @return the generated technician requirement string in HTML format,
      *         or an empty string if either technicianRequirement value is 0.
      */
-    private String getTechnicianString(String type) {
+    private static String getTechnicianString(String type) {
         List<Integer> technicianRequirement = technicianRequirements.get(type);
 
         if ((technicianRequirement.get(0) > 0) || (technicianRequirement.get(1) > 0)) {
@@ -335,7 +344,7 @@ public class ReputationController {
      * @return the generated mission string, formatted as
      * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>count (count * multiplier)<br>", or null if the count is <= 0
      */
-    private String getMissionString(String key, String label, int multiplier) {
+    private static String getMissionString(String key, String label, int multiplier) {
         int count = combatRecordMap.get(key);
         int total = count * multiplier;
 
@@ -355,7 +364,7 @@ public class ReputationController {
      * @return the generated string in HTML format, formatted as
      * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DropShips: </b>unitCount / bayCapacity Docking Collars (modifier)<br>"
      */
-    private String getDropShipString() {
+    private static String getDropShipString() {
         int unitCount = transportationRequirements.get("dropShipCount");
         int bayCapacity = transportationCapacities.get("dockingCollars");
         String modifier = "0";
@@ -384,7 +393,7 @@ public class ReputationController {
      * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>unitCount / bayCount Bays* modifier<br>", or an empty string if unitCount and bayCount
      *  are both 0
      */
-    private String getTransportString(String unitKey, String bayKey, String valueKey, String label, boolean displayAsterisk) {
+    private static String getTransportString(String unitKey, String bayKey, String valueKey, String label, boolean displayAsterisk) {
         int unitCount = transportationRequirements.get(unitKey);
         int bayCount = transportationCapacities.get(bayKey);
         int rating = transportationValues.get(valueKey);

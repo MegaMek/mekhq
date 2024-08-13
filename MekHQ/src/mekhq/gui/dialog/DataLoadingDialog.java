@@ -353,7 +353,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                     campaign.cleanUp();
                 }
 
-                campaign.setReputationController(new ReputationController(campaign));
+                campaign.setReputation(ReputationController.initializeReputation(campaign));
                 //endregion Progress 6
 
                 //region Progress 7

@@ -222,7 +222,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
             lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
         } else {
-            lblExperience.setText(getCampaign().getReputationController().getAverageSkillLevel().toString());
+            lblExperience.setText(getCampaign().getReputation().averageSkillLevel().toString());
         }
 
         lblExperienceHead.setLabelFor(lblExperience);
@@ -563,8 +563,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             campaign.getUnitRating().reInitialize();
             lblExperience.setText(campaign.getUnitRating().getAverageExperience().toString());
         } else if (unitRatingMethod.isCampaignOperations()) {
-            campaign.getReputationController().initializeReputation(campaign);
-            lblExperience.setText(campaign.getReputationController().getAverageSkillLevel().toString());
+            lblExperience.setText(campaign.getReputation().averageSkillLevel().toString());
         }
 
         campaignSummary.updateInformation();

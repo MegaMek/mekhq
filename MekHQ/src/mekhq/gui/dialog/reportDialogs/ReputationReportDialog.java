@@ -22,6 +22,8 @@ import mekhq.campaign.Campaign;
 
 import javax.swing.*;
 
+import static mekhq.campaign.rating.CamOpsReputation.ReputationController.getReportText;
+
 public class ReputationReportDialog extends AbstractReportDialog {
     //region Variable Declarations
     private final Campaign campaign;
@@ -46,7 +48,7 @@ public class ReputationReportDialog extends AbstractReportDialog {
 
         txtReport.setContentType("text/html");
 
-        txtReport.setText(String.format(getCampaign().getReputationController().getReportText(campaign)));
+        txtReport.setText(String.format(getReportText(campaign)));
 
         txtReport.setName("txtReport");
         txtReport.setEditable(false);

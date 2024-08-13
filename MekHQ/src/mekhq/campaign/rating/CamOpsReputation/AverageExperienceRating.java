@@ -146,6 +146,10 @@ public class AverageExperienceRating {
             }
         }
 
+        if (personnelCount == 0) {
+            return 7;
+        }
+
         // Calculate the average experience rating across all personnel. If there are no personnel, return 0
         double rawAverage = personnelCount > 0 ? (totalExperience / personnelCount) : 0;
 

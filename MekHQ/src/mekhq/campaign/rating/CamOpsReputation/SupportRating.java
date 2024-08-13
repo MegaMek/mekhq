@@ -182,6 +182,10 @@ public class SupportRating {
         int totalTechs = techCounts.values().stream().mapToInt(Integer::intValue).sum();
         int percentage = (int) ((float) totalTechs / totalRequirements * 100);
 
+        if (totalRequirements == 0) {
+            percentage = 100;
+        }
+
         technicianRequirements.put("totals", List.of(totalRequirements, totalTechs));
         technicianRequirements.put("rating", List.of(calculateTechRating(percentage)));
 
