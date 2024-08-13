@@ -79,7 +79,7 @@ public class EducationController {
                         campaign.getLocalDate(),
                         Money.of(tuition),
                         String.format(resources.getString("payment.text"),
-                                person.getHyperlinkedFullTitle()));
+                                person.getFullTitle()));
             }
         }
 
