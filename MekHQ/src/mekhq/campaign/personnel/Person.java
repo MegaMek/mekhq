@@ -4170,10 +4170,9 @@ public class Person {
 
             double intelligenceScore = getIntelligence().getIntelligenceScore() * intelligenceMultiplier;
 
-            intelligenceScore = intelligenceScore >= 0 ? intelligenceScore + 1 : Math.abs(intelligenceScore);
-
-            return intelligenceScore;
+            return intelligenceScore - 1;
         }
+
         return 1;
     }
 }
