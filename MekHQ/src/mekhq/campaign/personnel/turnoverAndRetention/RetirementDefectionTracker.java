@@ -966,15 +966,18 @@ public class RetirementDefectionTracker {
             // person was killed
             if (killed) {
                 payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
-            // person was sacked
-            } else if (sacked) {
-                payoutAmount = Money.of(0);
+            // person is getting medically discharged
+            } else if (!person.getPermanentInjuries().isEmpty()) {
+                payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
             // person is defecting
             } else if (isBreakingContract(person, campaign.getLocalDate(), campaign.getCampaignOptions().getServiceContractDuration())) {
                 payoutAmount = Money.of(0);
             // person is retiring
             } else if (person.getAge(campaign.getLocalDate()) >= 50) {
                 payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
+            // person was sacked
+            } else if (sacked) {
+                payoutAmount = Money.of(0);
             // person is resigning
             } else {
                 payoutAmount = getPayoutOrBonusValue(campaign, person);
