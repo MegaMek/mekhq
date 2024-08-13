@@ -779,7 +779,7 @@ public class AtBDynamicScenarioFactory {
         if (unitRatingMethod.isFMMR()) {
             unitRating = campaign.getUnitRating().getUnitRatingAsInteger();
         } else if (unitRatingMethod.isCampaignOperations()) {
-            unitRating = campaign.getReputation().atbModifier();
+            unitRating = campaign.getReputationController().getAtbModifier();
         }
         return unitRating;
     }

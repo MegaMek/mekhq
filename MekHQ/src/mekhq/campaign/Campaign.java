@@ -97,7 +97,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.rating.CamOpsReputation.ReputationRecord;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
@@ -141,7 +141,6 @@ import java.util.stream.Collectors;
 
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.rating.CamOpsReputation.ReputationController.initializeReputation;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
 
 /**
@@ -254,7 +253,7 @@ public class Campaign implements ITechManager {
     private LocalDate shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator; // deprecated
     private IUnitRating unitRating; // deprecated
-    private ReputationRecord reputation;
+    private ReputationController reputationController;
     private int crimeRating;
     private int crimePirateModifier;
     private LocalDate dateOfLastCrime;
@@ -290,7 +289,7 @@ public class Campaign implements ITechManager {
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
         retainerStartDate = null;
-        reputation = null;
+        reputationController = null;
         crimeRating = 0;
         crimePirateModifier = 0;
         dateOfLastCrime = null;
@@ -3754,10 +3753,6 @@ public class Campaign implements ITechManager {
 
         if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
             updateCrimeRating();
-
-            if (currentDay.getDayOfWeek() == DayOfWeek.MONDAY) {
-                setReputation(initializeReputation(this));
-            }
         }
 
         if (campaignOptions.isUseEducationModule()) {
@@ -4478,12 +4473,12 @@ public class Campaign implements ITechManager {
         this.dateOfLastCrime = dateOfLastCrime;
     }
 
-    public ReputationRecord getReputation() {
-        return reputation;
+    public ReputationController getReputationController() {
+        return reputationController;
     }
 
-    public void setReputation(ReputationRecord reputation) {
-        this.reputation = reputation;
+    public void setReputationController(ReputationController reputationController) {
+        this.reputationController = reputationController;
     }
 
     private void addInMemoryLogHistory(LogEntry le) {
@@ -6211,7 +6206,7 @@ public class Campaign implements ITechManager {
         if (unitRatingMethod.isFMMR()) {
             return getUnitRating().getUnitRating();
         } else if (unitRatingMethod.isCampaignOperations()) {
-            int reputationRating = reputation.reputationRating();
+            int reputationRating = reputationController.getReputationRating();
             int unitRatingMod = getUnitRatingMod();
 
             return String.format("%d (%+d)", reputationRating, unitRatingMod);
@@ -6234,7 +6229,7 @@ public class Campaign implements ITechManager {
         }
 
         return getCampaignOptions().getUnitRatingMethod().isFMMR() ?
-                getUnitRating().getUnitRatingAsInteger() : reputation.atbModifier();
+                getUnitRating().getUnitRatingAsInteger() : reputationController.getAtbModifier();
     }
 
     @Deprecated
