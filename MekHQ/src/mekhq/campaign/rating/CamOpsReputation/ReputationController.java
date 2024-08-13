@@ -588,13 +588,19 @@ public class ReputationController {
 
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 if (isTechnicianRequirements) {
-                    String[] numbers = node.getTextContent().substring(1, node.getTextContent().length() - 1).split(",\\s*");
-                    List<Integer> list = Arrays.stream(numbers)
-                            .map(Integer::parseInt)
-                            .collect(Collectors.toList());
-                    technicianRequirements.put(node.getNodeName(), list);
+                    try {
+                        String[] numbers = node.getTextContent().substring(1, node.getTextContent().length() - 1).split(",\\s*");
+                        List<Integer> list = Arrays.stream(numbers).map(Integer::parseInt).collect(Collectors.toList());
+                        technicianRequirements.put(node.getNodeName(), list);
+                    } catch (NumberFormatException ex) {
+                        logger.error("Could not parse TechnicianRequirements: ", ex);
+                    }
                 } else {
-                    map.put(node.getNodeName(), Integer.parseInt(node.getTextContent()));
+                    try {
+                        map.put(node.getNodeName(), Integer.parseInt(node.getTextContent()));
+                    } catch (NullPointerException ex) {
+                        logger.error("Could not parse {}: ", map, ex);
+                    }
                 }
             }
         }
