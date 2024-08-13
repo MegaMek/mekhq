@@ -4162,11 +4162,11 @@ public class Person {
     /**
      * @return the intelligence experience cost multiplier based on campaign options.
      *
-     * @param campaignOptions the campaign options object to determine the multiplier from
+     * @param campaignOptions the campaign options to determine whether to calculate the multiplier or to just return 1
      */
     public double getIntelligenceXpCostMultiplier(CampaignOptions campaignOptions) {
         if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseIntelligenceXpMultiplier()) {
-            double intelligenceMultiplier = 0.05; // each rank in Intelligence should adjust costs by 0.05%
+            double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
 
             double intelligenceScore = getIntelligence().getIntelligenceScore() * intelligenceMultiplier;
 
