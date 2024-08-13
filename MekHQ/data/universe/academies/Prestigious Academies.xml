@@ -2555,7 +2555,7 @@
         <destructionYear>2781</destructionYear>
         <tuition>36750</tuition>
         <durationDays>300</durationDays>
-        <facultySkill>4</facultySkill>
+        <facultySkill>3</facultySkill>
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
