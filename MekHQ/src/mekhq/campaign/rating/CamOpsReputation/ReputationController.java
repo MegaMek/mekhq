@@ -75,221 +75,16 @@ public class ReputationController {
     }
 
     //region Getters and Setters
-    @SuppressWarnings(value = "unused")
     public SkillLevel getAverageSkillLevel() {
         return this.averageSkillLevel;
     }
-    @SuppressWarnings(value = "unused")
-    public void setAverageSkillLevel(SkillLevel averageSkillLevel) {
-        this.averageSkillLevel = averageSkillLevel;
-    }
 
-    @SuppressWarnings(value = "unused")
-    public int getAverageExperienceRating() {
-        return this.averageExperienceRating;
-    }
-    @SuppressWarnings(value = "unused")
-    public void setAverageExperienceRating(final int rating) {
-        this.averageExperienceRating = rating;
-    }
-
-    @SuppressWarnings(value = "unused")
     public int getAtbModifier() {
         return this.atbModifier;
     }
-    @SuppressWarnings(value = "unused")
-    public void setAtbModifier(final int atbModifier) {
-        this.atbModifier = atbModifier;
-    }
 
-    @SuppressWarnings(value = "unused")
-    public Map<String, Integer> getCommanderMap() {
-        return this.commanderMap;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setCommanderMap(final Map<String, Integer> commanderMap) {
-        this.commanderMap = commanderMap;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public int getCommanderRating() {
-        return this.commanderRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setCommanderRating(final int commanderRating) {
-        this.commanderRating = commanderRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public Map<String, Integer> getCombatRecordMap() {
-        return this.combatRecordMap;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setCombatRecordMap(final Map<String, Integer> combatRecordMap) {
-        this.combatRecordMap = combatRecordMap;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public int getCombatRecordRating() {
-        return this.combatRecordRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setCombatRecordRating(final int combatRecordRating) {
-        this.combatRecordRating = combatRecordRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public Map<String, Integer> getTransportationCapacities() {
-        return this.transportationCapacities;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setTransportationCapacities(final Map<String, Integer> transportationCapacities) {
-        this.transportationCapacities = transportationCapacities;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public Map<String, Integer> getTransportationRequirements() {
-        return this.transportationRequirements;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setTransportationRequirements(final Map<String, Integer> transportationRequirements) {
-        this.transportationRequirements = transportationRequirements;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public int getTransportationRating() {
-        return this.transportationRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setTransportationRating(final int transportationRating) {
-        this.transportationRating = transportationRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public Map<String, Integer> getAdministrationRequirements() {
-        return this.administrationRequirements;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setAdministrationRequirements(final Map<String, Integer> administrationRequirements) {
-        this.administrationRequirements = administrationRequirements;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public Map<String, Integer> getCrewRequirements() {
-        return this.crewRequirements;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setCrewRequirements(final Map<String, Integer> crewRequirements) {
-        this.crewRequirements = crewRequirements;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public Map<String, List<Integer>> technicianRequirements() {
-        return this.technicianRequirements;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void technicianRequirements(final Map<String, List<Integer>> technicianRequirements) {
-        this.technicianRequirements = technicianRequirements;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public int supportRating() {
-        return this.supportRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void supportRating(final int supportRating) {
-        this.supportRating = supportRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public Map<String, Integer> getFinancialRatingMap() {
-        return this.financialRatingMap;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setFinancialRatingMap(final Map<String, Integer> financialRatingMap) {
-        this.financialRatingMap = financialRatingMap;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public int getFinancialRating() {
-        return this.financialRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setFinancialRating(final int financialRating) {
-        this.financialRating = financialRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public LocalDate getDateOfLastCrime() {
-        return this.dateOfLastCrime;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setDateOfLastCrime(final LocalDate dateOfLastCrime) {
-        this.dateOfLastCrime = dateOfLastCrime;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public Map<String, Integer> getCrimeRatingMap() {
-        return this.crimeRatingMap;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setCrimeRatingMap(final Map<String, Integer> crimeRatingMap) {
-        this.crimeRatingMap = crimeRatingMap;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public int getCrimeRating() {
-        return this.crimeRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setCrimeRating(final int crimeRating) {
-        this.crimeRating = crimeRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public Map<String, Integer> getOtherModifiersMap() {
-        return this.otherModifiersMap;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setOtherModifiersMap(final Map<String, Integer> otherModifiersMap) {
-        this.otherModifiersMap = otherModifiersMap;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public int getOtherModifiers() {
-        return this.otherModifiers;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setOtherModifiers(final int otherModifiers) {
-        this.otherModifiers = otherModifiers;
-    }
-
-    @SuppressWarnings(value = "unused")
     public int getReputationRating() {
         return this.reputationRating;
-    }
-
-    @SuppressWarnings(value = "unused")
-    public void setReputationRating(final int reputationRating) {
-        this.reputationRating = reputationRating;
     }
     //endregion Getters and Setters
 
@@ -365,7 +160,6 @@ public class ReputationController {
         reputationRating += crimeRating;
         reputationRating += otherModifiers;
     }
-
 
     /**
      * Retrieves the report text for the given campaign.
