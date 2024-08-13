@@ -1087,9 +1087,7 @@ public class Person {
         // release the commander flag.
         if ((isCommander()) && (status.isDepartedUnit())) {
             if ((!status.isResigned()) && (!status.isRetired())) {
-                if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                    leadershipMassChangeLoyalty(campaign);
-                }
+                leadershipMassChangeLoyalty(campaign);
             }
 
             setCommander(false);
@@ -1133,9 +1131,11 @@ public class Person {
             person.performRandomizedLoyaltyChange(campaign, false, false);
         }
 
-        campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                "</span>"));
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+                    "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                    "</span>"));
+        }
     }
 
     /**
@@ -1171,7 +1171,6 @@ public class Person {
         applyLoyaltyChange.accept(roll);
 
         if (isVerbose && originalLoyalty != loyalty) {
-
             reportLoyaltyChange(campaign, originalLoyalty);
         }
     }
@@ -1218,6 +1217,10 @@ public class Person {
      * @param originalLoyalty  The original loyalty value before the change.
      */
     private void reportLoyaltyChange(Campaign campaign, int originalLoyalty) {
+        if (!campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            return;
+        }
+
         StringBuilder changeString = new StringBuilder();
         String color;
 
