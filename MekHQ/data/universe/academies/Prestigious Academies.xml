@@ -2293,7 +2293,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>2720</qualificationStartYear>
+        <qualificationStartYear>2933</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -2330,7 +2330,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2720</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -3193,7 +3193,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2720</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6174,7 +6174,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2720</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6795,6 +6795,30 @@
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Special Armed Services Training Center</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Star League Special Armed Services Training Center (SASTC) is a highly prestigious and elite training center used by the SLDF to train its elite Special Forces. With rigorous qualification standards and expectations, only the best of the best graduate from its programs. Those who graduate find themselves part of the legendary Blackhearts.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Sabik</locationSystem>
+        <constructionYear>2525</constructionYear>
+        <destructionYear>2766</destructionYear>
+        <tuition>70875</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>2</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>SLDF Advanced Tactics Operative</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Small Arms, Tech/BA, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2718</qualificationStartYear>
+        <qualification>SLDF Special Forces Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>St. Ives Academy of Martial Sciences</name>
@@ -8033,7 +8057,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2720</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8063,7 +8087,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>2720</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -8516,7 +8540,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2720</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
