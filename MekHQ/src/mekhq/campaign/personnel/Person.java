@@ -4158,4 +4158,22 @@ public class Person {
 
         return effectiveFatigue;
     }
+
+    /**
+     * @return the intelligence experience cost multiplier based on campaign options.
+     *
+     * @param campaignOptions the campaign options object to determine the multiplier from
+     */
+    public double getIntelligenceXpCostMultiplier(CampaignOptions campaignOptions) {
+        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseIntelligenceXpMultiplier()) {
+            double intelligenceMultiplier = 0.05; // each rank in Intelligence should adjust costs by 0.05%
+
+            double intelligenceScore = getIntelligence().getIntelligenceScore() * intelligenceMultiplier;
+
+            intelligenceScore = intelligenceScore >= 0 ? intelligenceScore + 1 : Math.abs(intelligenceScore);
+
+            return intelligenceScore;
+        }
+        return 1;
+    }
 }

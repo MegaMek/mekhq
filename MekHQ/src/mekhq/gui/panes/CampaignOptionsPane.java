@@ -359,6 +359,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseDylansRandomXP;
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
     private JCheckBox chkUseRandomPersonalities;
+    private JCheckBox chkUseIntelligenceXpMultiplier;
 
     // Marriage
     private JCheckBox chkUseManualMarriages;
@@ -5053,6 +5054,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomPersonalities.setToolTipText(resources.getString("chkUseRandomPersonalities.toolTipText"));
         chkUseRandomPersonalities.setName("chkUseRandomPersonalities");
 
+        chkUseIntelligenceXpMultiplier = new JCheckBox(resources.getString("chkUseIntelligenceXpMultiplier.text"));
+        chkUseIntelligenceXpMultiplier.setToolTipText(resources.getString("chkUseIntelligenceXpMultiplier.toolTipText"));
+        chkUseIntelligenceXpMultiplier.setName("chkUseIntelligenceXpMultiplier");
+
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("personnelRandomizationPanel.title")));
@@ -5068,6 +5073,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseDylansRandomXP)
                         .addComponent(randomOriginOptionsPanel)
                         .addComponent(chkUseRandomPersonalities)
+                        .addComponent(chkUseIntelligenceXpMultiplier)
         );
 
         layout.setHorizontalGroup(
@@ -5075,6 +5081,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseDylansRandomXP)
                         .addComponent(randomOriginOptionsPanel)
                         .addComponent(chkUseRandomPersonalities)
+                        .addComponent(chkUseIntelligenceXpMultiplier)
         );
 
         return panel;
@@ -8299,6 +8306,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
         randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
+        chkUseIntelligenceXpMultiplier.setSelected(options.isUseIntelligenceXpMultiplier());
 
         // Family
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
@@ -9005,6 +9013,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
             options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
             options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
+            options.setUseIntelligenceXpMultiplier(chkUseIntelligenceXpMultiplier.isSelected());
 
             // Family
             options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());

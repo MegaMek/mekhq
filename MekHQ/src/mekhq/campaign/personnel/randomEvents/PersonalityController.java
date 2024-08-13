@@ -34,7 +34,7 @@ public class PersonalityController {
             person.setPersonalityQuirk(generatePersonalityQuirk());
         }
 
-        person.setIntelligence(generateIntelligence(Compute.randomInt(1000)));
+        person.setIntelligence(generateIntelligence(Compute.randomInt(8346)));
 
         // finally, write the description
         writeDescription(person);
@@ -168,56 +168,59 @@ public class PersonalityController {
      * @throws IllegalStateException if an unexpected value is rolled
      */
     private static Intelligence generateIntelligence(int roll) {
-        if (roll < 5) {
+        if (roll < 1) {
             return BRAIN_DEAD;
-        } else if (roll < 14) {
+        } else if (roll < 2) {
             return UNINTELLIGENT;
-        } else if (roll < 29) {
+        } else if (roll < 4) {
             return FOOLISH;
-        } else if (roll < 49) {
+        } else if (roll < 8) {
             return SIMPLE;
-        } else if (roll < 79) {
+        } else if (roll < 16) {
             return SLOW;
-        } else if (roll < 119) {
+        } else if (roll < 29) {
             return UNINSPIRED;
-        } else if (roll < 159) {
+        } else if (roll < 52) {
             return DULL;
-        } else if (roll < 199) {
+        } else if (roll < 92) {
             return DIMWITTED;
-        } else if (roll < 239) {
+        } else if (roll < 162) {
             return OBTUSE;
-        } else if (roll < 269) {
+        } else if (roll < 285) {
             return BELOW_AVERAGE;
-        } else if (roll < 309) {
+        } else if (roll < 501) {
             return UNDER_PERFORMING;
-        } else if (roll < 375) {
+        } else if (roll < 878) {
             return LIMITED_INSIGHT;
-        } else if (roll < 625) {
+        } else if (roll < 7028) {
             return AVERAGE;
-        } else if (roll < 691) {
+        } else if (roll < 7594) {
             return ABOVE_AVERAGE;
-        } else if (roll < 731) {
+        } else if (roll < 7917) {
             return STUDIOUS;
-        } else if (roll < 771) {
+        } else if (roll < 8102) {
             return DISCERNING;
-        } else if (roll < 811) {
+        } else if (roll < 8208) {
             return SHARP;
-        } else if (roll < 851) {
+        } else if (roll < 8268) {
             return QUICK_WITTED;
-        } else if (roll < 891) {
+        } else if (roll < 8302) {
             return PERCEPTIVE;
-        } else if (roll < 921) {
+        } else if (roll < 8322) {
             return BRIGHT;
-        } else if (roll < 951) {
+        } else if (roll < 8333) {
             return CLEVER;
-        } else if (roll < 971) {
+        } else if (roll < 8339) {
             return INTELLECTUAL;
-        } else if (roll < 986) {
+        } else if (roll < 8343) {
             return BRILLIANT;
-        } else if (roll < 995) {
+        } else if (roll < 8345) {
             return EXCEPTIONAL;
-        } else {
+        } else if (roll < 8346) {
             return GENIUS;
+        } else {
+            throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/randomEvents/PersonalityController.java/generateIntelligence: "
+                    + roll);
         }
     }
 }

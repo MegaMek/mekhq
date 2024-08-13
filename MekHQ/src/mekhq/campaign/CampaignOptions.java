@@ -276,6 +276,7 @@ public class CampaignOptions {
     private boolean useDylansRandomXP; // Unofficial
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
+    private boolean useIntelligenceXpMultiplier;
 
     // Retirement
     private boolean useRandomRetirement;
@@ -832,6 +833,7 @@ public class CampaignOptions {
         setUseDylansRandomXP(false);
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
+        setUseIntelligenceXpMultiplier(true);
 
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
@@ -1863,6 +1865,14 @@ public class CampaignOptions {
 
     public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
         this.useRandomPersonalities = useRandomPersonalities;
+    }
+
+    public boolean isUseIntelligenceXpMultiplier() {
+        return useIntelligenceXpMultiplier;
+    }
+
+    public void setUseIntelligenceXpMultiplier(final boolean useIntelligenceXpMultiplier) {
+        this.useIntelligenceXpMultiplier = useIntelligenceXpMultiplier;
     }
     //endregion Personnel Randomization
 
@@ -4712,6 +4722,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
         getRandomOriginOptions().writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useIntelligenceXpMultiplier", isUseIntelligenceXpMultiplier());
         //endregion Personnel Randomization
 
         //region Retirement
@@ -5466,6 +5477,8 @@ public class CampaignOptions {
                     retVal.setRandomOriginOptions(randomOriginOptions);
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalities")) {
                     retVal.setUseRandomPersonalities(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useIntelligenceXpMultiplier")) {
+                    retVal.setUseIntelligenceXpMultiplier(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Personnel Randomization
 
                     //region Family
