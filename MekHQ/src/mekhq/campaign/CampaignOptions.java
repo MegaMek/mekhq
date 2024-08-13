@@ -5124,6 +5124,8 @@ public class CampaignOptions {
                     retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adminWeeklyXP")) {
                     retVal.adminXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("adminXPPeriod")) {
+                    retVal.adminXPPeriod = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionXpFail")) {
                     retVal.missionXpFail = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionXpSuccess")) {
