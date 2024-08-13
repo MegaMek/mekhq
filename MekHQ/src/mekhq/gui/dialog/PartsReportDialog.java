@@ -136,12 +136,10 @@ public class PartsReportDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
-                for (Part p : campaign.getWarehouse().getParts()) {
-                    if (Objects.equals(p.getName(), piu.getDescription()) && p.isSpare()) {
-                        campaign.getQuartermaster().sellPart(p, 1);
-                        break;
-                    }
-                }
+                campaign.getWarehouse().getSpareParts().stream().filter(p ->
+                    Objects.equals(p.getName(), piu.getName()))
+                    .findFirst()
+                    .ifPresent(p -> campaign.getQuartermaster().sellPart(p, 1));
                 refreshOverviewPartsInUse();
             }
         };
