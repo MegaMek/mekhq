@@ -274,8 +274,11 @@ public class CampaignOptions {
     //region Life Paths Tab
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
+
+    // Random Histories
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
+    private boolean useRandomPersonalityReputation;
 
     // Retirement
     private boolean useRandomRetirement;
@@ -830,8 +833,11 @@ public class CampaignOptions {
         //region Life Paths Tab
         // Personnel Randomization
         setUseDylansRandomXP(false);
+
+        // Random Histories
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
+        setUseRandomPersonalityReputation(true);
 
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
@@ -1863,6 +1869,14 @@ public class CampaignOptions {
 
     public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
         this.useRandomPersonalities = useRandomPersonalities;
+    }
+
+    public boolean isUseRandomPersonalityReputation() {
+        return useRandomPersonalityReputation;
+    }
+
+    public void setUseRandomPersonalityReputation(final boolean useRandomPersonalityReputation) {
+        this.useRandomPersonalityReputation = useRandomPersonalityReputation;
     }
     //endregion Personnel Randomization
 
@@ -4712,6 +4726,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
         getRandomOriginOptions().writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalityReputation", isUseRandomPersonalityReputation());
         //endregion Personnel Randomization
 
         //region Retirement
@@ -5466,6 +5481,8 @@ public class CampaignOptions {
                     retVal.setRandomOriginOptions(randomOriginOptions);
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalities")) {
                     retVal.setUseRandomPersonalities(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalityReputation")) {
+                    retVal.setUseRandomPersonalityReputation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Personnel Randomization
 
                     //region Family

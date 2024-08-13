@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.Version;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import mekhq.utilities.MHQXMLUtility;
@@ -34,7 +33,7 @@ import java.io.PrintWriter;
  * As ov v0.1.9, we will be tracking a group of skills on the person. These skills will define
  * personnel rather than subtypes wrapped around pilots and teams. This will allow for considerably
  * more flexibility in the kinds of personnel available.
- *
+ * <p>
  * Four important characteristics will determine how each skill works
  * level - this is the level of the skill. By default this will go from 0 to 10, but the max will
  *         be customizable. These won't necessarily correspond to named levels (e.g. Green, Elite)
@@ -140,6 +139,15 @@ public class Skill {
         } else {
             return type.getTarget() - level - bonus;
         }
+    }
+
+    /**
+     * Calculates the total skill value by summing the level and bonus.
+     *
+     * @return The total skill value.
+     */
+    public int getTotalSkillLevel() {
+        return level + bonus;
     }
 
     public void improve() {

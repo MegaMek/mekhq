@@ -30,6 +30,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
@@ -151,6 +152,10 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
             autoAwardsController.ManualController(campaign, false);
         }
+
+        ReputationController reputationController = new ReputationController();
+        reputationController.initializeReputation(campaign);
+        campaign.setReputation(reputationController);
     }
 
     @Override

@@ -29,7 +29,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconContractDefinition;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.universe.Factions;
@@ -94,8 +93,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract = new AtBContract("New Contract");
         contract.calculateContract(campaign);
         ((AtBContract) contract).initContractDetails(campaign);
-        IUnitRating rating = campaign.getUnitRating();
-        dragoonRating = rating.getUnitRatingAsInteger();
+        dragoonRating = campaign.getUnitRatingMod();
         super.initComponents();
 
         updateEnemies();

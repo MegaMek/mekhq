@@ -38,6 +38,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.campaign.universe.Factions;
@@ -305,6 +306,11 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 if (optionsDialog.showDialog().isCancelled()) {
                     return null;
                 }
+
+                // initialize reputation
+                ReputationController reputationController = new ReputationController();
+                reputationController.initializeReputation(campaign);
+                campaign.setReputation(reputationController);
                 //endregion Progress 6
 
                 //region Progress 7
@@ -357,6 +363,13 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 setProgress(7);
                 // Make sure campaign options event handlers get their data
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+
+                // this is to handle pre-50.0 campaigns
+                if (campaign.getReputation() == null) {
+                    ReputationController reputationController = new ReputationController();
+                    reputationController.initializeReputation(campaign);
+                    campaign.setReputation(reputationController);
+                }
                 //endregion Progress 7
             }
             campaign.setApp(getApplication());
