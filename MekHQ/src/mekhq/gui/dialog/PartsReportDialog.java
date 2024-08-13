@@ -83,6 +83,8 @@ public class PartsReportDialog extends JDialog {
         // Don't sort the buttons
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY_BULK, false);
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_SELL, false);
+        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_SELL_BULK, false);
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD, false);
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD_BULK, false);
         // Numeric columns
@@ -127,6 +129,43 @@ public class PartsReportDialog extends JDialog {
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
+
+        Action sell = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = Integer.parseInt(e.getActionCommand());
+                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                int partId = piu.getId();
+                if (partId >= 0) {
+                    Part part = campaign.getWarehouse().getPart(partId);
+                    campaign.getQuartermaster().sellPart(part, 1);
+                }
+                refreshOverviewPartsInUse();
+            }
+        };
+
+        Action sellInBulk = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = Integer.parseInt(e.getActionCommand());
+                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                int partId = piu.getId();
+                if (partId >= 0) {
+                    Part part = campaign.getWarehouse().getPart(partId);
+                    int quantity = 1;
+                    PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                        "Sell how many " + part.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                    pcd.setVisible(true);
+                    quantity = pcd.getValue();
+                    if (quantity <= 0) {
+                        return;
+                    }
+                    campaign.getQuartermaster().sellPart(part, quantity);
+                }
+                refreshOverviewPartsInUse();
+            }
+        };
+
         @SuppressWarnings("serial")
         Action add = new AbstractAction() {
             @Override
@@ -161,6 +200,9 @@ public class PartsReportDialog extends JDialog {
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, buy, PartsInUseTableModel.COL_BUTTON_BUY);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, buyInBulk,
                 PartsInUseTableModel.COL_BUTTON_BUY_BULK);
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, sell, PartsInUseTableModel.COL_BUTTON_SELL);
+        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, sellInBulk,
+            PartsInUseTableModel.COL_BUTTON_SELL_BULK);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, add, PartsInUseTableModel.COL_BUTTON_GMADD);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, addInBulk,
                 PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
