@@ -136,11 +136,16 @@ public class PartsReportDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse partInUse = overviewPartsModel.getPartInUse(row);
-                campaign.getWarehouse().getSpareParts().stream().filter(p ->
-                    Objects.equals(p.getName(), partInUse.getName()))
-                    .findFirst()
-                    .ifPresent(p -> campaign.getQuartermaster().sellPart(p, 1));
+                Part part = campaign.getWarehouse().getPart(partInUse.getId());
+                if (part == null) {
+                    return;
+                }
+                Part spare = campaign.getWarehouse().checkForExistingSparePart(part);
+                if (spare != null) {
+                    campaign.getQuartermaster().sellPart(spare, 1);
+                }
                 refreshOverviewPartsInUse();
+
             }
         };
 
@@ -149,20 +154,22 @@ public class PartsReportDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse partInUse = overviewPartsModel.getPartInUse(row);
-                campaign.getWarehouse().getSpareParts().stream().filter(p ->
-                                Objects.equals(p.getName(), partInUse.getName()))
-                        .findFirst()
-                        .ifPresent(p -> {
-                            int quantity = 1;
-                            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(gui.getFrame(), true,
-                                    "Sell how many " + p.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
-                            popupValueChoiceDialog.setVisible(true);
-                            quantity = popupValueChoiceDialog.getValue();
-                            if (quantity <= 0) {
-                                return;
-                            }
-                            campaign.getQuartermaster().sellPart(p, quantity);
-                        });
+                Part part = campaign.getWarehouse().getPart(partInUse.getId());
+                if (part == null) {
+                    return;
+                }
+                Part spare = campaign.getWarehouse().checkForExistingSparePart(part);
+                if (spare != null) {
+                    int quantity = 1;
+                    PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(gui.getFrame(), true,
+                        "Sell how many " + spare.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                    popupValueChoiceDialog.setVisible(true);
+                    quantity = popupValueChoiceDialog.getValue();
+                    if (quantity <= 0) {
+                        return;
+                    }
+                    campaign.getQuartermaster().sellPart(spare, quantity);
+                }
                 refreshOverviewPartsInUse();
             }
         };
