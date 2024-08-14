@@ -149,20 +149,20 @@ public class PartsReportDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
-                for (Part p : campaign.getWarehouse().getParts()) {
-                    if (Objects.equals(p.getName(), piu.getDescription()) && p.isSpare()) {
-                        int quantity = 1;
-                        PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                            "Sell how many " + p.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
-                        pcd.setVisible(true);
-                        quantity = pcd.getValue();
-                        if (quantity <= 0 || quantity > piu.getStoreCount()) {
-                            return;
-                        }
-                        campaign.getQuartermaster().sellPart(p, quantity);
-                        break;
-                    }
-                }
+                campaign.getWarehouse().getSpareParts().stream().filter(p ->
+                                Objects.equals(p.getName(), piu.getName()))
+                        .findFirst()
+                        .ifPresent(p -> {
+                            int quantity = 1;
+                            PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                                    "Sell how many " + p.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                            pcd.setVisible(true);
+                            quantity = pcd.getValue();
+                            if (quantity <= 0) {
+                                return;
+                            }
+                            campaign.getQuartermaster().sellPart(p, quantity);
+                        });
                 refreshOverviewPartsInUse();
             }
         };
