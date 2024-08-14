@@ -46,6 +46,7 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -213,6 +214,7 @@ public class Person {
     private int eduEducationTime;
     private int eduDaysOfTravel;
     private List<UUID> eduTagAlongs;
+    private List<Academy> eduFailedApplications;
     //endregion Education
 
     //region Personality
@@ -374,6 +376,7 @@ public class Person {
         eduEducationTime = 0;
         eduDaysOfTravel = 0;
         eduTagAlongs = new ArrayList<>();
+        eduFailedApplications = new ArrayList<>();
         eduAcademySet = null;
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
@@ -1613,6 +1616,16 @@ public class Person {
 
     public void addEduTagAlong(final UUID tagAlong) {
         this.eduTagAlongs.add(tagAlong);
+    }
+
+    public List<Academy> getEduFailedApplications() {
+        return eduFailedApplications;
+    }
+
+    public void addEduFailedApplications(final Academy eduFailedApplications) {
+        if (!this.eduFailedApplications.contains(eduFailedApplications)) {
+            this.eduFailedApplications.add(eduFailedApplications);
+        }
     }
 
     /**

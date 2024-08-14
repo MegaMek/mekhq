@@ -832,6 +832,16 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
+     * Checks if a person has a rejected application for a specific academy.
+     *
+     * @param person  the person for whom to check the rejected applications
+     * @return true if the person has a rejected application for the given academy, false otherwise
+     */
+    public boolean hasRejectedApplication(Person person) {
+        return person.getEduFailedApplications().contains(this);
+    }
+
+    /**
      * Calculates the education level of a qualification based on the applicant's highest prior education level and
      * the range of education levels offered by the academy.
      *
