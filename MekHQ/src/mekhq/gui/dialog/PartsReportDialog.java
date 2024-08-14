@@ -34,7 +34,6 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
-import java.util.Objects;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more
