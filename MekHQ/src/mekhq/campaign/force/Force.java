@@ -75,6 +75,7 @@ public class Force {
     private final Vector<UUID> units;
     private int scenarioId;
     private UUID forceCommanderID;
+    private UUID overrideForceCommanderID;
     protected UUID techId;
 
 
@@ -418,6 +419,14 @@ public class Force {
         forceCommanderID = commanderID;
     }
 
+    public UUID getOverrideForceCommanderID() {
+        return overrideForceCommanderID;
+    }
+
+    public void setOverrideForceCommanderID(UUID overrideForceCommanderID) {
+        this.overrideForceCommanderID = overrideForceCommanderID;
+    }
+
     /**
      * Returns a list of unit or force commanders eligible to be considered for the position of force commander.
      *
@@ -453,7 +462,22 @@ public class Force {
         List<UUID> eligibleCommanders = getEligibleCommanders(campaign);
 
         if (eligibleCommanders.isEmpty()) {
+            overrideForceCommanderID = null;
             return;
+        }
+
+        if (overrideForceCommanderID != null) {
+            if (eligibleCommanders.contains(overrideForceCommanderID)) {
+                forceCommanderID = overrideForceCommanderID;
+
+                if (getParentForce() != null) {
+                    getParentForce().updateCommander(campaign);
+                }
+
+                return;
+            } else {
+                overrideForceCommanderID = null;
+            }
         }
 
         Collections.shuffle(eligibleCommanders);
