@@ -2539,12 +2539,12 @@ public class Person {
             }
 
             if ((edge != null) && !edge.isBlank()) {
-                List<String> edgeOptionList = getEdgeOptionList();
+                List<String> edgeOptionList = getEdgeTriggersList();
                 // this prevents an error caused by the Option Group name being included in the list of options for that group
                 edgeOptionList.remove(0);
 
                 updateOptions(edge, retVal, edgeOptionList);
-                removeUnusedEdges(retVal, edgeOptionList);
+                removeUnusedEdgeTriggers(retVal, edgeOptionList);
             }
 
             if ((implants != null) && !implants.isBlank()) {
@@ -2648,7 +2648,12 @@ public class Person {
         }
     }
 
-    private static List<String> getEdgeOptionList() {
+    /**
+     * Retrieves a list of edge triggers from PilotOptions.
+     *
+     * @return a List of edge triggers. If no edge triggers are found, an empty List is returned.
+     */
+    private static List<String> getEdgeTriggersList() {
         Enumeration<IOptionGroup> groups = new PilotOptions().getGroups();
 
         while (groups.hasMoreElements()) {
@@ -2662,24 +2667,37 @@ public class Person {
         return new ArrayList<>();
     }
 
-    private static void updateOptions(String edge, Person retVal, List<String> edgeOptionList) {
-        StringTokenizer st = new StringTokenizer(edge, "::");
+    /**
+     * Updates the status of Edge Triggers based on those stored in edgeTriggers
+     *
+     * @param edgeTriggers     the string containing edge triggers delimited by "::"
+     * @param retVal           the person to update
+     * @param edgeOptionList   the list of edge triggers to remove
+     */
+    private static void updateOptions(String edgeTriggers, Person retVal, List<String> edgeOptionList) {
+        StringTokenizer st = new StringTokenizer(edgeTriggers, "::");
 
         while (st.hasMoreTokens()) {
-            String adv = st.nextToken();
-            String advName = Crew.parseAdvantageName(adv);
-            Object value = Crew.parseAdvantageValue(adv);
+            String trigger = st.nextToken();
+            String triggerName = Crew.parseAdvantageName(trigger);
+            Object value = Crew.parseAdvantageValue(trigger);
 
             try {
-                retVal.getOptions().getOption(advName).setValue(value);
-                edgeOptionList.remove(advName);
+                retVal.getOptions().getOption(triggerName).setValue(value);
+                edgeOptionList.remove(triggerName);
             } catch (Exception e) {
-                logger.error("Error restoring edge trigger: {}", adv);
+                logger.error("Error restoring edge trigger: {}", trigger);
             }
         }
     }
 
-    private static void removeUnusedEdges(Person retVal, List<String> edgeOptionList) {
+    /**
+     * Explicitly disables unused Edge triggers
+     *
+     * @param retVal          the person for whom the triggers are disabled
+     * @param edgeOptionList  the list of edge triggers to be processed
+     */
+    private static void removeUnusedEdgeTriggers(Person retVal, List<String> edgeOptionList) {
         for (String edgeTrigger : edgeOptionList) {
             logger.info(edgeTrigger);
             String advName = Crew.parseAdvantageName(edgeTrigger);
