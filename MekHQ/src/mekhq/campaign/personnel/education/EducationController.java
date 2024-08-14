@@ -42,13 +42,12 @@ import java.util.*;
 public class EducationController {
 
     private static final MMLogger logger = MMLogger.create(EducationController.class);
-    public static final int BASE_TARGET_NUMBER = 7;
-    public static final int DEFAULT_FACULTY_SKILL = 7;
+    public static final int BASE_TARGET_NUMBER = 14;
 
     /**
      * Checks eligibility for enrollment in an academy.
      *
-     * @param campaignOptions the campaign options
+     * @param campaign the current options
      * @param person the person applying for enrollment
      * @param academySet the set of academies to search for the desired academy
      * @param academyNameInSet the name of the desired academy within the set
@@ -85,7 +84,7 @@ public class EducationController {
         }
 
         // Calculate target number based on base target number and faculty skill
-        int targetNumber = BASE_TARGET_NUMBER + (DEFAULT_FACULTY_SKILL - academy.getFacultySkill());
+        int targetNumber = BASE_TARGET_NUMBER - academy.getFacultySkill();
 
         // If roll meets the target number, the application is successful
         if (roll >= targetNumber) {
