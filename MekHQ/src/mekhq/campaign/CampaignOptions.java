@@ -5898,7 +5898,12 @@ public class CampaignOptions {
                     //region Markets Tab
                     //region Personnel Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
-                    retVal.setPersonnelMarketName(wn2.getTextContent().trim());
+                    String marketName = wn2.getTextContent().trim();
+                    // Backwards compatibility with saves from before these rules moved to Camops
+                    if (marketName.equals("Strat Ops")) {
+                        marketName = "Campaign Ops";
+                    }
+                    retVal.setPersonnelMarketName(marketName);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
                     retVal.setPersonnelMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRemovalTargets")) {

@@ -51,7 +51,7 @@ public class PersonnelMarket {
     public static final int TYPE_RANDOM = 0;
     public static final int TYPE_DYLANS = 1;
     public static final int TYPE_FMMR = 2;
-    public static final int TYPE_STRAT_OPS = 3;
+    public static final int TYPE_CAMPAIGN_OPS = 3;
     public static final int TYPE_ATB = 4;
     public static final int TYPE_NONE = 5;
     public static final int TYPE_NUM = 6;
@@ -327,8 +327,8 @@ public class PersonnelMarket {
                 return "Dylan's Method";
             case TYPE_FMMR:
                 return "FM: Mercenaries Revised";
-            case TYPE_STRAT_OPS:
-                return "Strat Ops";
+            case TYPE_CAMPAIGN_OPS:
+                return "Campaign Ops";
             case TYPE_ATB:
                 return "Against the Bot";
             case TYPE_NONE:
