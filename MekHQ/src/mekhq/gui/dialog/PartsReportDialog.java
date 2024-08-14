@@ -135,9 +135,9 @@ public class PartsReportDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 campaign.getWarehouse().getSpareParts().stream().filter(p ->
-                    Objects.equals(p.getName(), piu.getName()))
+                    Objects.equals(p.getName(), partInUse.getName()))
                     .findFirst()
                     .ifPresent(p -> campaign.getQuartermaster().sellPart(p, 1));
                 refreshOverviewPartsInUse();
@@ -148,16 +148,16 @@ public class PartsReportDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
+                PartInUse partInUse = overviewPartsModel.getPartInUse(row);
                 campaign.getWarehouse().getSpareParts().stream().filter(p ->
-                                Objects.equals(p.getName(), piu.getName()))
+                                Objects.equals(p.getName(), partInUse.getName()))
                         .findFirst()
                         .ifPresent(p -> {
                             int quantity = 1;
-                            PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(gui.getFrame(), true,
                                     "Sell how many " + p.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
-                            pcd.setVisible(true);
-                            quantity = pcd.getValue();
+                            popupValueChoiceDialog.setVisible(true);
+                            quantity = popupValueChoiceDialog.getValue();
                             if (quantity <= 0) {
                                 return;
                             }
