@@ -418,52 +418,59 @@ public class Force {
         forceCommanderID = commanderID;
     }
 
-    public List<UUID> getEligibleCommanders(Campaign c) {
-        List<UUID> people = new ArrayList<>();
-        Person highestRankPerson = c.getPerson(getForceCommanderID());
+    /**
+     * Returns a list of unit or force commanders eligible to be considered for the position of force commander.
+     *
+     * @param campaign the campaign to get eligible commanders from
+     * @return a list of UUIDs representing the eligible commanders
+     */
+    public List<UUID> getEligibleCommanders(Campaign campaign) {
+        List<UUID> eligibleCommanders = getUnits().stream()
+                .map(unitId -> campaign.getUnit(unitId).getCommander().getId())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
-        // safety check: if the person is no longer assigned to a unit or the force,
-        // then they're not really the highest ranked person in the force.
-        if ((highestRankPerson != null) &&
-                ((highestRankPerson.getUnit() == null) ||
-                (!getUnits().contains(highestRankPerson.getUnit().getId())))) {
-            highestRankPerson = null;
-        }
+        // this means the force contains no Units, so we check against the leaders of the sub-forces
+        if (eligibleCommanders.isEmpty()) {
+            for (Force force : getSubForces()) {
+                UUID forceCommander = force.getForceCommanderID();
 
-        for (UUID uid : getUnits()) {
-            Unit u = c.getUnit(uid);
-            if (null != u) {
-                Person p = u.getCommander();
-                if (null != p) {
-                    // if we found someone with a higher rank, clear everything out and start again with the new highest rank person
-                    if (p.outRanks(highestRankPerson)) {
-                        people.clear();
-                        people.add(p.getId());
-                        highestRankPerson = p;
-                    // if we are looking at someone with a lower rank, ignore them and move on
-                    } else if ((highestRankPerson != null) && highestRankPerson.outRanks(p)) {
-                        continue;
-                    // someone with an equivalent rank can be commander
-                    } else {
-                        people.add(p.getId());
-                    }
+                if (forceCommander != null) {
+                    eligibleCommanders.add(forceCommander);
                 }
             }
         }
 
-        return people;
+        return eligibleCommanders;
     }
 
     /**
-     * Automatically update the force's commander
+     * Updates the commander for a force based on the ranking of eligible commanders.
+     *
+     * @param campaign the current campaign
      */
-    public void updateCommander(Campaign c) {
-        List<UUID> eligibleCommanders = getEligibleCommanders(c);
+    public void updateCommander(Campaign campaign) {
+        List<UUID> eligibleCommanders = getEligibleCommanders(campaign);
 
-        // logic: if we found someone eligible who is a higher rank, the first one of those becomes the new commander
-        // otherwise, the existing commander remains the commander
-        if (!eligibleCommanders.contains(getForceCommanderID()) && (!eligibleCommanders.isEmpty())) {
-            forceCommanderID = eligibleCommanders.get(0);
+        if (eligibleCommanders.isEmpty()) {
+            return;
+        }
+
+        Collections.shuffle(eligibleCommanders);
+        Person highestRankedPerson = campaign.getPerson(eligibleCommanders.get(0));
+
+        for (UUID eligibleCommanderId : eligibleCommanders) {
+            Person eligibleCommander = campaign.getPerson(eligibleCommanderId);
+
+            if (eligibleCommander.outRanksUsingSkillTiebreaker(campaign, highestRankedPerson)) {
+                highestRankedPerson = eligibleCommander;
+            }
+        }
+
+        forceCommanderID = highestRankedPerson.getId();
+
+        if (getParentForce() != null) {
+            getParentForce().updateCommander(campaign);
         }
     }
 

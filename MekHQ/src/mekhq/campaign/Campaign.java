@@ -860,6 +860,8 @@ public class Campaign implements ITechManager {
                 lances.put(id, new Lance(force.getId(), this));
             }
         }
+
+        force.updateCommander(this);
     }
 
     public void moveForce(Force force, Force superForce) {
