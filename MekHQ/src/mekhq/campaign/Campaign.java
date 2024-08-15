@@ -236,7 +236,7 @@ public class Campaign implements ITechManager {
     private ShoppingList shoppingList;
 
     private PersonnelMarket personnelMarket;
-    private IContractMarket contractMarket;
+    private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
     private transient AbstractDeath death;
@@ -461,11 +461,11 @@ public class Campaign implements ITechManager {
         this.personnelMarket = personnelMarket;
     }
 
-    public IContractMarket getContractMarket() {
+    public AbstractContractMarket getContractMarket() {
         return contractMarket;
     }
 
-    public void setContractMarket(final IContractMarket contractMarket) {
+    public void setContractMarket(final AbstractContractMarket contractMarket) {
         this.contractMarket = contractMarket;
     }
 

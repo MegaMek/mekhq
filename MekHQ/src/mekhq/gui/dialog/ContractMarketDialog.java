@@ -46,7 +46,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.market.IContractMarket;
+import mekhq.campaign.market.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Factions;
@@ -72,7 +72,7 @@ public class ContractMarketDialog extends JDialog {
     private static int sharePct = 20;
 
     private Campaign campaign;
-    private IContractMarket contractMarket;
+    private AbstractContractMarket contractMarket;
     private Contract selectedContract = null;
     private List<String> possibleRetainerContracts;
 

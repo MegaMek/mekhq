@@ -19,10 +19,7 @@
 package mekhq.campaign.market.enums;
 
 import mekhq.MekHQ;
-import mekhq.campaign.market.AtbMonthlyContractMarket;
-import mekhq.campaign.market.CamOpsContractMarket;
-import mekhq.campaign.market.DisabledContractMarket;
-import mekhq.campaign.market.IContractMarket;
+import mekhq.campaign.market.*;
 
 import java.util.ResourceBundle;
 
@@ -67,7 +64,7 @@ public enum ContractMarketMethod {
     }
     //endregion Boolean Comparison Methods
 
-    public IContractMarket getContractMarket() {
+    public AbstractContractMarket getContractMarket() {
         return switch (this) {
             case ATB_MONTHLY -> new AtbMonthlyContractMarket();
             case CAM_OPS -> new CamOpsContractMarket();
