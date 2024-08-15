@@ -65,13 +65,6 @@ import mekhq.campaign.universe.Systems;
  * @author Neoancient
  */
 public class AtbMonthlyContractMarket extends AbstractContractMarket {
-    public AtbMonthlyContractMarket() {
-        contracts = new ArrayList<>();
-        contractIds = new HashMap<>();
-        clauseMods = new HashMap<>();
-        followupContracts = new HashMap<>();
-    }
-
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
         AtBContract c = generateAtBContract(campaign, campaign.getAtBUnitRatingMod());

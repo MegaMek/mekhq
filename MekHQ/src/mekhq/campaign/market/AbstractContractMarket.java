@@ -15,6 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,10 +27,10 @@ public abstract class AbstractContractMarket {
     public static final int CLAUSE_TRANSPORT = 3;
     public static final int CLAUSE_NUM = 4;
 
-    protected List<Contract> contracts;
+    protected List<Contract> contracts = new ArrayList<>();
     protected int lastId = 0;
-    protected Map<Integer, Contract> contractIds;
-    protected Map<Integer, ClauseMods> clauseMods;
+    protected Map<Integer, Contract> contractIds = new HashMap<>();
+    protected Map<Integer, ClauseMods> clauseMods = new HashMap<>();
 
     /**
      * An arbitrary maximum number of attempts to generate a contract.
@@ -43,7 +44,7 @@ public abstract class AbstractContractMarket {
      * key: followup id
      * value: main contract id
      */
-    protected HashMap<Integer, Integer> followupContracts;
+    protected HashMap<Integer, Integer> followupContracts = new HashMap<>();
 
     /**
      * An arbitrary maximum number of attempts to find a random employer faction that
