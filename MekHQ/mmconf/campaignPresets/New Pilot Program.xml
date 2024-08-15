@@ -461,7 +461,7 @@
 		<sharesForAll>false</sharesForAll>
 		<useTaxes>false</useTaxes>
 		<taxesPercentage>30</taxesPercentage>
-		<personnelMarketName>Strat Ops</personnelMarketName>
+		<personnelMarketName>Campaign Ops</personnelMarketName>
 		<personnelMarketReportRefresh>true</personnelMarketReportRefresh>
 		<personnelMarketRandomRemovalTargets>
 			<ULTRA_GREEN>4</ULTRA_GREEN>
