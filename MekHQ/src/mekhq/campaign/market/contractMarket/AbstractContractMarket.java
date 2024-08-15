@@ -3,6 +3,7 @@ package mekhq.campaign.market.contractMarket;
 import megamek.Version;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
@@ -16,10 +17,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class AbstractContractMarket {
     public static final int CLAUSE_COMMAND = 0;
@@ -191,6 +189,7 @@ public abstract class AbstractContractMarket {
 
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "method", method.toString());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastId", lastId);
         for (final Contract contract : contracts) {
             contract.writeToXML(pw, indent);
@@ -213,9 +212,7 @@ public abstract class AbstractContractMarket {
         AbstractContractMarket retVal = null;
 
         try {
-            // Instantiate the correct child class, and call its parsing function.
-            retVal = new AtbMonthlyContractMarket();
-
+            retVal = parseMarketMethod(wn);
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
 
@@ -227,7 +224,6 @@ public abstract class AbstractContractMarket {
                 if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
                 }
-
                 if (wn2.getNodeName().equalsIgnoreCase("lastId")) {
                     retVal.lastId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
@@ -274,6 +270,35 @@ public abstract class AbstractContractMarket {
         }
 
         return retVal;
+    }
+
+    private static AbstractContractMarket parseMarketMethod(Node xmlNode) {
+        AbstractContractMarket market = null;
+        NodeList nodeList = xmlNode.getChildNodes();
+        for (int x = 0; x < nodeList.getLength(); x++) {
+            Node childNode = nodeList.item(x);
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            if (childNode.getNodeName().equalsIgnoreCase("method")) {
+                String name = childNode.getTextContent();
+                if (Objects.equals(name, ContractMarketMethod.CAM_OPS.toString())) {
+                    market = new CamOpsContractMarket();
+                    break;
+                } else if (Objects.equals(name, ContractMarketMethod.NONE.toString())) {
+                    market = new DisabledContractMarket();
+                    break;
+                } else {
+                    market = new AtbMonthlyContractMarket();
+                    break;
+                }
+            }
+        }
+        if (market == null) {
+            LogManager.getLogger().warn("No Contract Market method found in XML...falling back to AtB_Monthly");
+            market = new AtbMonthlyContractMarket();
+        }
+        return market;
     }
 
     /* Keep track of how many rerolls remain for each contract clause
