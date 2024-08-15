@@ -1,6 +1,7 @@
 package mekhq.campaign.personnel.randomEvents;
 
 import megamek.common.Compute;
+import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
@@ -88,19 +89,23 @@ public class PersonalityController {
         StringBuilder personalityDescription = new StringBuilder();
 
         String firstName = person.getFirstName();
-        String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(person.getGender());
+        String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(Gender.OTHER_FEMALE); // this will always return the gender-neutral 'they'
+
         String forward;
+        String plural;
 
         for (int index = 0; index < traitDescriptions.size(); index++) {
             forward = pronoun;
+            plural = "";
 
             if ((index == 0) || (index == 3) || (index == 6)) {
                 forward = firstName;
+                plural = "s";
             } else {
                 personalityDescription.append(' ');
             }
 
-            personalityDescription.append(String.format(traitDescriptions.get(index), forward));
+            personalityDescription.append(String.format(traitDescriptions.get(index), forward, plural));
         }
 
         // finally, we set the description in place
