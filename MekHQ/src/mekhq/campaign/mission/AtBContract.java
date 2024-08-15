@@ -397,6 +397,7 @@ public class AtBContract extends Contract {
 
         Faction enemyFaction = Factions.getInstance().getFaction(enemyCode);
         setEnemyBotName(enemyFaction.getFullName(today.getYear()));
+        enemyName = ""; // wipe the old enemy name
         getEnemyName(today.getYear()); // we use this to update enemyName
     }
 
