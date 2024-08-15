@@ -10,6 +10,7 @@ import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.
 import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.MiddleWordCorporate;
 import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.MiddleWordMercenary;
 
+import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 public class BackgroundsController {
@@ -36,22 +37,25 @@ public class BackgroundsController {
                 yield name + ' ' + newWordSuggestion;
             }
             case 1 -> { // Mercenary - Vanity 1
-                String name = getCommanderName(commander);
+                String name = getCommanderName(commander) + "'s ";
 
                 String newWordSuggestion = getNewWord(name, EndWordMercenary::getRandomWord);
 
-                yield name + ' ' + newWordSuggestion;
+                yield name + newWordSuggestion;
             }
             case 2 -> { // Mercenary - Vanity 2
-                String name = getCommanderName(commander);
+                String name = getCommanderName(commander) + "'s ";
 
-                name += "'s " + getNewWord(name, MiddleWordMercenary::getRandomWord);
+                name += getNewWord(name, MiddleWordMercenary::getRandomWord) + ' ';
                 String newWordSuggestion = getNewWord(name, EndWordMercenary::getRandomWord);
 
-                yield name + ' ' + newWordSuggestion;
+                yield name + newWordSuggestion;
             }
             case 3, 4, 5, 6 -> { // Mercenary
-                String name = MiddleWordMercenary.getRandomWord();
+                final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
+
+                String name = resources.getString("definiteArticle.text");
+                name += ' ' + MiddleWordMercenary.getRandomWord();
                 String newWordSuggestion = getNewWord(name, EndWordMercenary::getRandomWord);
 
                 yield name + ' ' + newWordSuggestion;
@@ -73,7 +77,8 @@ public class BackgroundsController {
         if (commander == null) {
             return RandomCallsignGenerator.getWeightedCallsigns().randomItem();
         } else {
-            return commander.getCallsign().isBlank() ? commander.getSurname() : commander.getCallsign();
+            String name = commander.getCallsign().isBlank() ? commander.getSurname() : commander.getCallsign();
+            return name.isBlank() ? commander.getFirstName() : name;
         }
     }
 
