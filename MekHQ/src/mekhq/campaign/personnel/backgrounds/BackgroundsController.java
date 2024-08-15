@@ -5,10 +5,7 @@ import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.EndWordCorporate;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.EndWordMercenary;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.MiddleWordCorporate;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.MiddleWordMercenary;
+import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.*;
 
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
@@ -27,23 +24,23 @@ public class BackgroundsController {
      * @throws IllegalStateException if an unexpected value is encountered during the generation process.
      */
     public static String randomMercenaryCompanyNameGenerator(@Nullable Person commander) {
-        int roll = Compute.randomInt(7);
+        int roll = Compute.d6(1);
 
         return switch (roll) {
-            case 0 -> { // Corporate
+            case 1 -> { // Corporate
                 String name = MiddleWordCorporate.getRandomWord();
                 String newWordSuggestion = getNewWord(name, EndWordCorporate::getRandomWord);
 
                 yield name + ' ' + newWordSuggestion;
             }
-            case 1 -> { // Mercenary - Vanity 1
+            case 2 -> { // Mercenary - Vanity 1
                 String name = getCommanderName(commander) + "'s ";
 
                 String newWordSuggestion = getNewWord(name, EndWordMercenary::getRandomWord);
 
                 yield name + newWordSuggestion;
             }
-            case 2 -> { // Mercenary - Vanity 2
+            case 3 -> { // Mercenary - Vanity 2
                 String name = getCommanderName(commander) + "'s ";
 
                 name += getNewWord(name, MiddleWordMercenary::getRandomWord) + ' ';
@@ -51,7 +48,7 @@ public class BackgroundsController {
 
                 yield name + newWordSuggestion;
             }
-            case 3, 4, 5, 6 -> { // Mercenary
+            case 4 -> { // Mercenary - Generic
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
 
                 String name = resources.getString("definiteArticle.text");
@@ -59,6 +56,15 @@ public class BackgroundsController {
                 String newWordSuggestion = getNewWord(name, EndWordMercenary::getRandomWord);
 
                 yield name + ' ' + newWordSuggestion;
+            }
+            case 5 -> { // Pre-Fab
+                final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
+
+                yield resources.getString("definiteArticle.text") + ' ' + PreFabHumorous.getRandomWord();
+            }
+            case 6 -> { // Pre-Fab - Vanity
+                String name = getCommanderName(commander) + "'s ";
+                yield name + PreFabHumorous.getRandomWord();
             }
             default -> throw new IllegalStateException(
                     "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/randomMercenaryCompanyNameGenerator: "
