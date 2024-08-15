@@ -4,11 +4,11 @@ import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 
 import java.util.*;
 
-import static mekhq.campaign.personnel.enums.randomEvents.personalities.Intelligence.*;
+import static mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence.*;
 
 public class PersonalityController {
     public static void generatePersonality(Person person) {
