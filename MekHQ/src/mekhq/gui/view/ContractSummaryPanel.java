@@ -390,8 +390,43 @@ public class ContractSummaryPanel extends JPanel {
         JLabel txtSalvageRights = new JLabel(contract.getSalvagePct() + "%"
                 + (contract.isSalvageExchange() ? " (Exchange)" : ""));
         txtSalvageRights.setName("txtSalvageRights");
-        gridBagConstraintsText.gridy = y;
-        mainPanel.add(txtSalvageRights, gridBagConstraintsText);
+
+        if (!hasSalvageRerolls()) {
+            // just add it to the main panel, can't use a reroll
+            gridBagConstraintsText.gridy = y;
+            mainPanel.add(txtSalvageRights, gridBagConstraintsText);
+        } else {
+            gridBagConstraintsButtons.gridy = y;
+            gridBagConstraintsButtons.gridx = TEXT_COLUMN;
+            mainPanel.add(txtSalvageRights, gridBagConstraintsButtons);
+            JButton btnSalvage = new JButton();
+            setSalvageRerollButtonText(btnSalvage);
+
+            btnSalvage.addActionListener(ev -> {
+                JButton btn = null;
+                if (ev.getSource() instanceof JButton) {
+                    btn = (JButton) ev.getSource();
+                }
+                if (null == btn) {
+                    return;
+                }
+                if (contract instanceof AtBContract) {
+                    campaign.getContractMarket().rerollClause((AtBContract) contract,
+                        ContractMarket.CLAUSE_SALVAGE, campaign);
+                    setSalvageRerollButtonText((JButton) ev.getSource());
+                    txtSalvageRights.setText(contract.getSalvagePct() + "%"
+                        + (contract.isSalvageExchange() ? " (Exchange)" : ""));
+                    if (campaign.getContractMarket().getRerollsUsed(contract,
+                        ContractMarket.CLAUSE_SALVAGE) >= logRerolls) {
+                        btn.setEnabled(false);
+                    }
+                    refreshAmounts();
+                }
+            });
+
+            gridBagConstraintsButtons.gridx = BUTTON_COLUMN;
+            mainPanel.add(btnSalvage, gridBagConstraintsButtons);
+        }
 
         JLabel lblStraightSupport = new JLabel(resourceMap.getString("lblStraightSupport.text"));
         lblStraightSupport.setName("lblStraightSupport");
@@ -481,6 +516,11 @@ public class ContractSummaryPanel extends JPanel {
                     ContractMarket.CLAUSE_COMMAND) < cmdRerolls);
     }
 
+    private boolean hasSalvageRerolls() {
+        return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
+            ContractMarket.CLAUSE_SALVAGE) < logRerolls);
+    }
+
     private boolean hasSupportRerolls() {
         return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
                 ContractMarket.CLAUSE_SUPPORT) < logRerolls);
@@ -495,6 +535,12 @@ public class ContractSummaryPanel extends JPanel {
     private void setTransportRerollButtonText(JButton rerollButton) {
         int rerolls = (tranRerolls - campaign.getContractMarket().getRerollsUsed(contract,
                 ContractMarket.CLAUSE_TRANSPORT));
+        rerollButton.setText(generateRerollText(rerolls));
+    }
+
+    private void setSalvageRerollButtonText(JButton rerollButton) {
+        int rerolls = (logRerolls - campaign.getContractMarket().getRerollsUsed(contract,
+            ContractMarket.CLAUSE_SALVAGE));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
