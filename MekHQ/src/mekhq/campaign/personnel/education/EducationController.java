@@ -22,6 +22,7 @@ import megamek.common.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -42,7 +43,6 @@ import java.util.*;
 public class EducationController {
 
     private static final MMLogger logger = MMLogger.create(EducationController.class);
-    public static final int BASE_TARGET_NUMBER = 14;
 
     /**
      * Checks eligibility for enrollment in an academy.
@@ -77,14 +77,16 @@ public class EducationController {
             return false;
         }
 
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
         // Calculate the roll based on Intelligence if necessary
         int roll = Compute.d6(2);
-        if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
+        if (campaignOptions.isUseRandomPersonalities()) {
             roll += (person.getIntelligence().getIntelligenceScore() / 4);
         }
 
         // Calculate target number based on base target number and faculty skill
-        int targetNumber = BASE_TARGET_NUMBER - academy.getFacultySkill();
+        int targetNumber = campaignOptions.getEntranceExamBaseTargetNumber() - academy.getFacultySkill();
 
         // If roll meets the target number, the application is successful
         if (roll >= targetNumber) {
