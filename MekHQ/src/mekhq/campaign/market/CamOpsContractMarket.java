@@ -10,7 +10,7 @@ import java.util.List;
 public class CamOpsContractMarket extends AbstractContractMarket {
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
-
+        return null;
     }
 
     @Override
