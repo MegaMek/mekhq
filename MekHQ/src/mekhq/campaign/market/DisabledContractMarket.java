@@ -7,8 +7,7 @@ import mekhq.campaign.mission.Contract;
 import java.io.PrintWriter;
 import java.util.List;
 
-public class EmptyContractMarket implements IContractMarket {
-
+public class DisabledContractMarket implements IContractMarket {
     @Override
     public void generateContractOffers(Campaign campaign) {
 
@@ -33,6 +32,7 @@ public class EmptyContractMarket implements IContractMarket {
     public void removeContract(Contract c) {
 
     }
+
 
     @Override
     public List<Contract> getContracts() {

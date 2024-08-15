@@ -386,7 +386,7 @@ public class ContractMarketDialog extends JDialog {
         btnGenerate.setText(resourceMap.getString("btnGenerate.text"));
         btnGenerate.setName("btnGenerate");
         btnGenerate.addActionListener(evt -> {
-            AtBContract c = contractMarket.addContract(campaign);
+            AtBContract c = contractMarket.addAtBContract(campaign);
 
             if (c == null) {
                 campaign.addReport(resourceMap.getString("report.UnableToGMContract"));

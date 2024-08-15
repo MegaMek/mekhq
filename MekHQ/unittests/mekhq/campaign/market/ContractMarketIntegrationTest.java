@@ -88,7 +88,7 @@ public class ContractMarketIntegrationTest {
 
         // Simulate clicking GM Add on the contract market three times
         for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ii++) {
-            market.addContract(campaign);
+            market.addAtBContract(campaign);
         }
 
         assertFalse(market.getContracts().isEmpty());
@@ -118,7 +118,7 @@ public class ContractMarketIntegrationTest {
 
         // Simulate clicking GM Add on the contract market three times
         for (int ii = 0; ii < 3; ii++) {
-            market.addContract(campaign);
+            market.addAtBContract(campaign);
         }
 
         assertFalse(market.getContracts().isEmpty());
@@ -209,7 +209,7 @@ public class ContractMarketIntegrationTest {
 
         // Simulate clicking GM Add on the contract market three times
         for (int ii = 0; ii < 3; ii++) {
-            market.addContract(campaign);
+            market.addAtBContract(campaign);
         }
 
         assertFalse(market.getContracts().isEmpty());
