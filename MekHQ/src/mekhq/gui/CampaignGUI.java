@@ -1550,10 +1550,8 @@ public class CampaignGUI extends JPanel {
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
             miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         }
-
-        //ContractMarketMethod contractMarketMethod = getCampaign().getCampaignOptions().getContractMarketMethod();
+        
         AbstractContractMarket contractMarket = getCampaign().getContractMarket();
-        Campaign foo = getCampaign();
         if (contractMarket.getMethod() != newOptions.getContractMarketMethod()) {
             getCampaign().setContractMarket(newOptions.getContractMarketMethod().getContractMarket());
         }
