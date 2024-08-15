@@ -51,12 +51,15 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
+
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 
 public class GMToolsDialog extends AbstractMHQDialog {
     //region Variable Declarations
@@ -103,6 +106,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private JLabel lblCurrentCallsign;
     private JTextArea txtCallsignsGenerated;
     private String lastGeneratedCallsign;
+
+    // Company Name Panel
+    private JLabel lblCurrentCompany;
+    private JTextArea txtCompanyNamesGenerated;
+    private String lastGeneratedCompanyName;
 
     // Bloodname Panel
     private MMComboBox<ClanDisplay> comboOriginClan;
@@ -364,6 +372,30 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
     public void setLastGeneratedCallsign(final @Nullable String lastGeneratedCallsign) {
         this.lastGeneratedCallsign = lastGeneratedCallsign;
+    }
+
+    public JLabel getLblCurrentCompanyName() {
+        return lblCurrentCompany;
+    }
+
+    public void setLblCurrentCompanyName(JLabel lblCurrentCompany) {
+        this.lblCurrentCompany = lblCurrentCompany;
+    }
+
+    public JTextArea getTxtCompanyNamesGenerated() {
+        return txtCompanyNamesGenerated;
+    }
+
+    public void setTxtCompanyNamesGenerated(final JTextArea txtCompanyNamesGenerated) {
+        this.txtCompanyNamesGenerated = txtCompanyNamesGenerated;
+    }
+
+    public @Nullable String getLastGeneratedCompanyName() {
+        return lastGeneratedCompanyName;
+    }
+
+    public void setLastGeneratedCompanyName(final @Nullable String lastGeneratedCompanyName) {
+        this.lastGeneratedCompanyName = lastGeneratedCompanyName;
     }
 
     public MMComboBox<ClanDisplay> getComboOriginClan() {
@@ -726,6 +758,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         final JPanel callsignPanel = createCallsignPanel();
 
+        final JPanel companyNamePanel = createCompanyName();
+
         final JPanel bloodnamePanel = createBloodnamePanel();
 
         // Layout the Panel
@@ -740,6 +774,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
                 layout.createSequentialGroup()
                         .addComponent(namePanel)
                         .addComponent(callsignPanel)
+                        .addComponent(companyNamePanel)
                         .addComponent(bloodnamePanel)
         );
 
@@ -747,6 +782,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(namePanel)
                         .addComponent(callsignPanel)
+                        .addComponent(companyNamePanel)
                         .addComponent(bloodnamePanel)
         );
 
@@ -956,6 +992,100 @@ public class GMToolsDialog extends AbstractMHQDialog {
         lblCallsignGenerated.setLabelFor(getTxtCallsignsGenerated());
 
         return panel;
+    }
+
+    private void addComponent(JPanel panel, Component component, GridBagConstraints constraints, int x, int y) {
+        constraints.gridx = x;
+        constraints.gridy = y;
+        panel.add(component, constraints);
+    }
+
+    /**
+     * Creates and returns a JPanel containing components related to the generation of random company names.
+     */
+    private JPanel createCompanyName() {
+        // Create the Panel
+        final JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("companyNamePanel.title")));
+        panel.setName("companyNamePanel");
+
+        // Create the Constraints
+        final GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(0, 3, 0, 3);
+
+        JLabel lblCurrentCompanyName = new JLabel(resources.getString("lblCurrentCompanyName.text"));
+        lblCurrentCompanyName.setName("lblCurrentCompanyName");
+        addComponent(panel, lblCurrentCompanyName, gridBagConstraints, 0, 0);
+
+        JLabel lblCurrentCompanyNameValue = new JLabel(gui.getCampaign().getName());
+        lblCurrentCompanyNameValue.setName("lblCurrentCompanyName");
+        lblCurrentCompanyName.setLabelFor(lblCurrentCompanyNameValue);
+        addComponent(panel, lblCurrentCompanyNameValue, gridBagConstraints, 1, 0);
+
+        JLabel lblCompanyNameGenerated = new JLabel(resources.getString("lblCompanyNameGenerated.text"));
+        lblCompanyNameGenerated.setName("lblCompanyNameGenerated");
+        addComponent(panel, lblCompanyNameGenerated, gridBagConstraints, 0, 1);
+
+        JTextArea txtCompanyNamesGenerated = new JTextArea(gui.getCampaign().getName());
+        txtCompanyNamesGenerated.setName("txtCompanyNamesGenerated");
+        addComponent(panel, txtCompanyNamesGenerated, gridBagConstraints, 1, 1);
+        lblCompanyNameGenerated.setLabelFor(txtCompanyNamesGenerated);
+
+        JButton btnGenerateCompanyName = createGenerateNameButton(txtCompanyNamesGenerated);
+        addComponent(panel, btnGenerateCompanyName, gridBagConstraints, 0, 2);
+
+        JButton btnAssignCompanyName = createAssignCompanyNameButton();
+        addComponent(panel, btnAssignCompanyName, gridBagConstraints, 1, 2);
+
+        return panel;
+    }
+
+    /**
+     * Creates a MMButton object that generates a company name and updates the appropriate JTextArea with the generated name.
+     *
+     * @param txtCompanyNamesGenerated the JTextArea to update with the generated company name
+     * @return a MMButton object that generates a company name and updates the given JTextArea
+     */
+    private MMButton createGenerateNameButton(JTextArea txtCompanyNamesGenerated) {
+        return new MMButton("btnGenerateCompanyName",
+                resources,
+                "btnGenerateCompanyName.text",
+                "btnGenerateCompanyName.toolTipText",
+                evt -> {
+            lastGeneratedCompanyName = randomMercenaryCompanyNameGenerator(gui.getCampaign().getFlaggedCommander());
+            txtCompanyNamesGenerated.setText(lastGeneratedCompanyName);}
+        );
+    }
+
+    /**
+     * Creates an instance of MMButton with the label "btnAssignCompanyName" and sets the resource bundle,
+     * text key, tooltip text key, and event handler for the button.
+     *
+     * @return an instance of MMButton with the specified properties
+     */
+    private MMButton createAssignCompanyNameButton() {
+        return new MMButton(
+                "btnAssignCompanyName",
+                resources,
+                "btnAssignCompanyName.text",
+                "btnAssignCompanyName.toolTipText",
+                this::assignCompanyName
+        );
+    }
+
+    /**
+     * Assigns the company name to the campaign and origin force based on certain conditions.
+     *
+     * @param evt the ActionEvent associated with the button click
+     */
+    private void assignCompanyName(ActionEvent evt) {
+        if (gui.getCampaign().getForce(0).getName().equals(gui.getCampaign().getName())) {
+            gui.getCampaign().getForce(0).setName(lastGeneratedCompanyName);
+        }
+        gui.getCampaign().setName(lastGeneratedCompanyName);
+        gui.refreshAllTabs();
     }
 
     private JPanel createBloodnamePanel() {
