@@ -97,6 +97,9 @@ public class EducationController {
                     "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
                     "</span>",
                     academy.getName()));
+
+            ServiceLogger.eduFailedApplication(person, campaign.getLocalDate(), person.getEduAcademyName());
+
             return false;
         }
     }
