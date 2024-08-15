@@ -37,6 +37,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.market.AbstractContractMarket;
 import mekhq.campaign.market.AtbMonthlyContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
@@ -271,7 +272,7 @@ public class CampaignXmlParser {
                     foundPersonnelMarket = true;
                 } else if (xn.equalsIgnoreCase("contractMarket")) {
                     // CAW: implicit DEPENDS-ON to the <missions> node
-                    retVal.setContractMarket(AtbMonthlyContractMarket.generateInstanceFromXML(wn, retVal, version));
+                    retVal.setContractMarket(AbstractContractMarket.generateInstanceFromXML(wn, retVal, version));
                     foundContractMarket = true;
                 } else if (xn.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes

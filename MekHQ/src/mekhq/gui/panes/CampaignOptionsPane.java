@@ -2952,8 +2952,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         ? ContractMarketMethod.ATB_MONTHLY
                         : ContractMarketMethod.NONE);
                 contractMarketPanel.setEnabled(enabled);
-                comboContractMarketMethod.setEnabled(false); // TODO : AbstractContractMarket : Remove
-                                                             // line
+                comboContractMarketMethod.setEnabled(true);
             }
         });
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -8131,7 +8130,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkContractMarketReportRefresh.setEnabled(enabled);
             spnContractMaxSalvagePercentage.setEnabled(enabled);
         });
-        comboContractMarketMethod.setEnabled(false); // TODO : AbstractContractMarket : Remove line
+        comboContractMarketMethod.setEnabled(true);
 
         lblContractSearchRadius.setText(resources.getString("lblContractSearchRadius.text"));
         lblContractSearchRadius.setToolTipText(resources.getString("lblContractSearchRadius.toolTipText"));

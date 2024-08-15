@@ -198,7 +198,7 @@ public abstract class AbstractContractMarket {
     }
 
     public static AbstractContractMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        AtbMonthlyContractMarket retVal = null;
+        AbstractContractMarket retVal = null;
 
         try {
             // Instantiate the correct child class, and call its parsing function.
