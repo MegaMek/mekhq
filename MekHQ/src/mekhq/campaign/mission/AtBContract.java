@@ -37,6 +37,7 @@ import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
@@ -87,6 +88,7 @@ public class AtBContract extends Contract {
 
     protected String employerCode;
     protected String enemyCode;
+    protected String enemyName;
 
     protected AtBContractType contractType;
     protected SkillLevel allySkill;
@@ -139,6 +141,7 @@ public class AtBContract extends Contract {
         super(name, "Independent");
         employerCode = "IND";
         enemyCode = "IND";
+        enemyName = "Independent";
 
         parentContract = null;
         mercSubcontract = false;
@@ -394,6 +397,7 @@ public class AtBContract extends Contract {
 
         Faction enemyFaction = Factions.getInstance().getFaction(enemyCode);
         setEnemyBotName(enemyFaction.getFullName(today.getYear()));
+        getEnemyName(today.getYear()); // we use this to update enemyName
     }
 
     public int getRepairLocation(final int unitRating) {
@@ -782,6 +786,7 @@ public class AtBContract extends Contract {
         indent = super.writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyName", marshallEnemyName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allySkill", getAllySkill().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
@@ -850,6 +855,8 @@ public class AtBContract extends Contract {
                     employerCode = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyCode")) {
                     enemyCode = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("enemyName")) {
+                    enemyName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractType")
                         || wn2.getNodeName().equalsIgnoreCase("missionType")) { // Mission Type is Legacy - 0.49.2 removal
                     setContractType(AtBContractType.parseFromString(wn2.getTextContent().trim()));
@@ -986,12 +993,36 @@ public class AtBContract extends Contract {
         return enemyCode;
     }
 
-    public String getEnemyName(int year) {
-        return Factions.getInstance().getFaction(enemyCode).getFullName(year);
-    }
-
     public void setEnemyCode(String enemyCode) {
         this.enemyCode = enemyCode;
+    }
+
+    /**
+     * Retrieves the enemy name of the contract for marshaling.
+     * While this can be used to retrieve 'enemyName' directly,
+     * due to how AtB works its best to use 'getEnemyName',
+     * instead unless you are sure 'enemyName' has been set
+     *
+     * @return the enemy name
+     */
+    public String marshallEnemyName() {
+        return enemyName;
+    }
+
+    public String getEnemyName(int year) {
+        if (enemyName.isBlank()) {
+            if (getEnemy().isMercenary()) {
+                setEnemyName(BackgroundsController.randomMercenaryCompanyNameGenerator(null));
+            } else {
+                Factions.getInstance().getFaction(getEnemy().getShortName()).getFullName(year);
+            }
+        }
+
+        return enemyName;
+    }
+
+    public void setEnemyName(final String enemyName) {
+        this.enemyName = enemyName;
     }
 
     public AtBContractType getContractType() {
