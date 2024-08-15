@@ -1,13 +1,13 @@
-package mekhq.campaign.market;
+package mekhq.campaign.market.contractMarket;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-
-import java.io.PrintWriter;
-import java.util.List;
 
 public class CamOpsContractMarket extends AbstractContractMarket {
+    public CamOpsContractMarket() {
+        super(ContractMarketMethod.CAM_OPS);
+    }
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
         return null;

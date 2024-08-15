@@ -44,6 +44,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
@@ -1548,6 +1549,13 @@ public class CampaignGUI extends JPanel {
             getCampaign().setUnitMarket(newOptions.getUnitMarketMethod().getUnitMarket());
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
             miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
+        }
+
+        //ContractMarketMethod contractMarketMethod = getCampaign().getCampaignOptions().getContractMarketMethod();
+        AbstractContractMarket contractMarket = getCampaign().getContractMarket();
+        Campaign foo = getCampaign();
+        if (contractMarket.getMethod() != newOptions.getContractMarketMethod()) {
+            getCampaign().setContractMarket(newOptions.getContractMarketMethod().getContractMarket());
         }
 
         if (atb != newOptions.isUseAtB()) {

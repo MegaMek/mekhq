@@ -19,7 +19,10 @@
 package mekhq.campaign.market.enums;
 
 import mekhq.MekHQ;
-import mekhq.campaign.market.*;
+import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
+import mekhq.campaign.market.contractMarket.CamOpsContractMarket;
+import mekhq.campaign.market.contractMarket.DisabledContractMarket;
 
 import java.util.ResourceBundle;
 

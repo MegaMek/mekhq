@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.market;
+package mekhq.campaign.market.contractMarket;
 
 import java.io.PrintWriter;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +40,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
@@ -65,6 +66,10 @@ import mekhq.campaign.universe.Systems;
  * @author Neoancient
  */
 public class AtbMonthlyContractMarket extends AbstractContractMarket {
+    public AtbMonthlyContractMarket() {
+        super(ContractMarketMethod.ATB_MONTHLY);
+    }
+
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
         AtBContract c = generateAtBContract(campaign, campaign.getAtBUnitRatingMod());

@@ -1,9 +1,10 @@
-package mekhq.campaign.market;
+package mekhq.campaign.market.contractMarket;
 
 import megamek.Version;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -52,10 +53,21 @@ public abstract class AbstractContractMarket {
      */
     protected final static int MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER = 20;
 
+    private final ContractMarketMethod method;
+
+
     abstract public AtBContract addAtBContract(Campaign campaign);
     abstract public void generateContractOffers(Campaign campaign, boolean newCampaign);
     abstract public void addFollowup(Campaign campaign, AtBContract contract);
     abstract protected void setAtBContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign);
+
+    protected AbstractContractMarket(final ContractMarketMethod method) {
+        this.method = method;
+    }
+
+    public ContractMarketMethod getMethod() {
+        return method;
+    }
 
     public void removeContract(Contract c) {
         contracts.remove(c);

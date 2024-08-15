@@ -2947,13 +2947,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
 
             // TODO : AbstractContractMarket : Delink more from AtB
-            if (contractMarketPanel.isEnabled() != enabled) {
-                comboContractMarketMethod.setSelectedItem(enabled
-                        ? ContractMarketMethod.ATB_MONTHLY
+//            if (contractMarketPanel.isEnabled() != enabled) {
+//                comboContractMarketMethod.setSelectedItem(enabled
+//                        ? ContractMarketMethod.ATB_MONTHLY
                         : ContractMarketMethod.NONE);
-                contractMarketPanel.setEnabled(enabled);
-                comboContractMarketMethod.setEnabled(true);
-            }
+//                contractMarketPanel.setEnabled(enabled);
+//                comboContractMarketMethod.setEnabled(true);
+//            }
         });
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
