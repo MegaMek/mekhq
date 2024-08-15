@@ -80,12 +80,16 @@ public class BackgroundsController {
      * @return The name of the commander. If the commander is null, a random callsign from a weighted list will be returned.
      */
     private static String getCommanderName(@Nullable Person commander) {
-        if (commander == null) {
-            return RandomCallsignGenerator.getWeightedCallsigns().randomItem();
-        } else {
-            String name = commander.getCallsign().isBlank() ? commander.getSurname() : commander.getCallsign();
-            return name.isBlank() ? commander.getFirstName() : name;
-        }
+        try { // this allows us to use getCampaign() in tests without needing to also mock RandomCallsignGenerator
+            if (commander == null) {
+                return RandomCallsignGenerator.getWeightedCallsigns().randomItem();
+            } else {
+                String name = commander.getCallsign().isBlank() ? commander.getSurname() : commander.getCallsign();
+                return name.isBlank() ? commander.getFirstName() : name;
+            }
+        } catch (NullPointerException ignored) {}
+
+        return "";
     }
 
     /**
