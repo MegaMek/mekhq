@@ -135,6 +135,7 @@ MEKHQ VERSION HISTORY:
 + FIX #3920: Fixed Shares Payouts for Early Contract End, Refactored Shares Percentage Fetching to Further Detach System from AtB
 + FIX #4615: Added Missing Maintenance Planetary Modifier Text
 + FIX #4605: Overhauled CamOps Unit Reputation Calculations and Report
++ FIX #4618: Added Sale Buttons to Parts in Use Dialog
 
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
