@@ -38,9 +38,10 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -55,7 +56,6 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
-import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -64,39 +64,24 @@ import mekhq.utilities.MHQXMLUtility;
  *
  * @author Neoancient
  */
-public class ContractMarket {
+public class AtbMonthlyContractMarket implements IContractMarket {
     private static final MMLogger logger = MMLogger.create(ContractMarket.class);
 
-    // TODO: Implement a method that rolls each day to see whether a new contract
-    // appears or an offer disappears
+    protected List<Contract> contracts;
+    protected int lastId = 0;
+    protected Map<Integer, Contract> contractIds;
 
-    public final static int CLAUSE_COMMAND = 0;
-    public final static int CLAUSE_SALVAGE = 1;
-    public final static int CLAUSE_SUPPORT = 2;
-    public final static int CLAUSE_TRANSPORT = 3;
-    public final static int CLAUSE_NUM = 4;
+    private ContractMarketMethod method;
+
+    // TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears
+    private Map<Integer, AtbMonthlyContractMarket.ClauseMods> clauseMods;
 
     /**
      * An arbitrary maximum number of attempts to generate a contract.
      */
     private final static int MAXIMUM_GENERATION_RETRIES = 3;
 
-    /**
-     * An arbitrary maximum number of attempts to find a random employer faction
-     * that
-     * is not a Mercenary.
-     */
-    private final static int MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER = 20;
-
-    private ContractMarketMethod method = ContractMarketMethod.ATB_MONTHLY;
-
-    private List<Contract> contracts;
-    private int lastId = 0;
-    private Map<Integer, Contract> contractIds;
-    private Map<Integer, ClauseMods> clauseMods;
-
-    /*
-     * It is possible to call addFollowup more than once for the
+    /* It is possible to call addFollowup more than once for the
      * same contract by canceling the dialog and running it again;
      * this is the easiest place to track it to prevent
      * multiple followup contracts.
@@ -105,17 +90,20 @@ public class ContractMarket {
      */
     private HashMap<Integer, Integer> followupContracts;
 
-    public ContractMarket() {
+    /**
+     * An arbitrary maximum number of attempts to find a random employer faction that
+     * is not a Mercenary.
+     */
+    private final static int MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER = 20;
+
+    public AtbMonthlyContractMarket() {
         contracts = new ArrayList<>();
         contractIds = new HashMap<>();
         clauseMods = new HashMap<>();
         followupContracts = new HashMap<>();
     }
 
-    public List<Contract> getContracts() {
-        return contracts;
-    }
-
+    @Override
     public void removeContract(Contract c) {
         contracts.remove(c);
         contractIds.remove(c.getId());
@@ -131,6 +119,7 @@ public class ContractMarket {
         return c;
     }
 
+    @Override
     public int getRerollsUsed(Contract c, int clause) {
         if (null != clauseMods.get(c.getId())) {
             return clauseMods.get(c.getId()).rerollsUsed[clause];
@@ -138,6 +127,11 @@ public class ContractMarket {
         return 0;
     }
 
+    public List<Contract> getContracts() {
+        return contracts;
+    }
+
+    @Override
     public void rerollClause(AtBContract c, int clause, Campaign campaign) {
         if (null != clauseMods.get(c.getId())) {
             switch (clause) {
@@ -160,13 +154,14 @@ public class ContractMarket {
         }
     }
 
+    @Override
     public void generateContractOffers(Campaign campaign) {
         generateContractOffers(campaign, false);
     }
 
+    @Override
     public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-        if (((method == ContractMarketMethod.ATB_MONTHLY) && (campaign.getLocalDate().getDayOfMonth() == 1))
-                || newCampaign) {
+        if (((campaign.getLocalDate().getDayOfMonth() == 1)) || newCampaign) {
             // need to copy to prevent concurrent modification errors
             new ArrayList<>(contracts).forEach(this::removeContract);
 
@@ -187,8 +182,7 @@ public class ContractMarket {
 
             boolean inBackwater = true;
             if (currentFactions.size() > 1) {
-                // More than one faction, if any is *not* periphery, we're not in backwater
-                // either
+                // More than one faction, if any is *not* periphery, we're not in backwater either
                 for (Faction f : currentFactions) {
                     if (!f.isPeriphery()) {
                         inBackwater = false;
@@ -198,8 +192,7 @@ public class ContractMarket {
                 // Just one faction. Are there any others nearby?
                 Faction onlyFaction = currentFactions.iterator().next();
                 if (!onlyFaction.isPeriphery()) {
-                    for (PlanetarySystem key : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(),
-                            30)) {
+                    for (PlanetarySystem key : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
                         for (Faction f : key.getFactionSet(campaign.getLocalDate())) {
                             if (!onlyFaction.equals(f)) {
                                 inBackwater = false;
@@ -240,16 +233,12 @@ public class ContractMarket {
                     }
                 }
             } else {
-                /*
-                 * Per IOps Beta, government units determine number of contracts as on a system
-                 * with a great hall
-                 */
+                /* Per IOps Beta, government units determine number of contracts as on a system with a great hall */
                 numContracts++;
             }
 
             /*
-             * If located on a faction's capital (interpreted as the starting planet for
-             * that faction),
+             * If located on a faction's capital (interpreted as the starting planet for that faction),
              * generate one contract offer for that faction.
              */
             for (Faction f : campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate())) {
@@ -305,8 +294,7 @@ public class ContractMarket {
 
     /*
      * If no suitable planet can be found or no jump path to the planet can be
-     * calculated after
-     * the indicated number of retries, this will return null.
+     * calculated after the indicated number of retries, this will return null.
      */
     private @Nullable AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
         if (campaign.getFaction().isMercenary()) {
@@ -332,8 +320,7 @@ public class ContractMarket {
         return generateAtBContract(campaign, employer, unitRatingMod, MAXIMUM_GENERATION_RETRIES);
     }
 
-    private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod,
-            int retries) {
+    private @Nullable AtBContract generateAtBContract(Campaign campaign, @Nullable String employer, int unitRatingMod, int retries) {
         if (employer == null) {
             logger.warn("Could not generate an AtB Contract because there was no employer!");
             return null;
@@ -444,9 +431,8 @@ public class ContractMarket {
 
         contract.setName(String.format("%s - %s - %s %s",
                 contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
-                        .withLocale(MekHQ.getMHQOptions().getDateLocale())),
-                employer,
-                contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale())), employer,
+                        contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
         return contract;
     }
@@ -484,8 +470,7 @@ public class ContractMarket {
          */
 
         // TODO : When MekHQ gets the capability of splitting the unit to different
-        // locations, this
-        // TODO : restriction can be lessened or lifted.
+        // locations, this restriction can be lessened or lifted.
         if (!contract.getEnemy().isRebelOrPirate()) {
             boolean factionValid = false;
             for (PlanetarySystem p : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
@@ -539,13 +524,13 @@ public class ContractMarket {
 
         contract.setName(String.format("%s - %s - %s Subcontract %s",
                 contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
-                        .withLocale(MekHQ.getMHQOptions().getDateLocale())),
-                contract.getEmployer(),
+                        .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
                 contract.getSystem().getName(parent.getStartDate()), contract.getContractType()));
 
         return contract;
     }
 
+    @Override
     public void addFollowup(Campaign campaign,
             AtBContract contract) {
         if (followupContracts.containsValue(contract.getId())) {
@@ -706,18 +691,12 @@ public class ContractMarket {
          * the highest admin skill, or higher negotiation if the admin
          * skills are equal.
          */
-        Person adminCommand = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_ADMIN,
-                SkillType.S_NEG);
-        Person adminTransport = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_TRANSPORT, SkillType.S_ADMIN,
-                SkillType.S_NEG);
-        Person adminLogistics = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN,
-                SkillType.S_NEG);
-        int adminCommandExp = (adminCommand == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminCommand.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        int adminTransportExp = (adminTransport == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminTransport.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-        int adminLogisticsExp = (adminLogistics == null) ? SkillType.EXP_ULTRA_GREEN
-                : adminLogistics.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        Person adminCommand = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_ADMIN, SkillType.S_NEG);
+        Person adminTransport = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_TRANSPORT, SkillType.S_ADMIN, SkillType.S_NEG);
+        Person adminLogistics = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN, SkillType.S_NEG);
+        int adminCommandExp = (adminCommand == null) ? SkillType.EXP_ULTRA_GREEN : adminCommand.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        int adminTransportExp = (adminTransport == null) ? SkillType.EXP_ULTRA_GREEN : adminTransport.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        int adminLogisticsExp = (adminLogistics == null) ? SkillType.EXP_ULTRA_GREEN : adminLogistics.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 
         /* Treat government units like merc units that have a retainer contract */
         if ((!campaign.getFaction().isMercenary() && !campaign.getFaction().isPirate())
@@ -870,6 +849,7 @@ public class ContractMarket {
         }
     }
 
+    @Override
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastId", lastId);
@@ -890,12 +870,12 @@ public class ContractMarket {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "contractMarket");
     }
 
-    public static ContractMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
-        ContractMarket retVal = null;
+    public static AtbMonthlyContractMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
+        AtbMonthlyContractMarket retVal = null;
 
         try {
             // Instantiate the correct child class, and call its parsing function.
-            retVal = new ContractMarket();
+            retVal = new AtbMonthlyContractMarket();
 
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();

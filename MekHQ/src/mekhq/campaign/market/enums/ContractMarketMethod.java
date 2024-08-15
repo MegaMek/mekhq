@@ -19,13 +19,18 @@
 package mekhq.campaign.market.enums;
 
 import mekhq.MekHQ;
+import mekhq.campaign.market.AtbMonthlyContractMarket;
+import mekhq.campaign.market.CamOpsContractMarket;
+import mekhq.campaign.market.EmptyContractMarket;
+import mekhq.campaign.market.IContractMarket;
 
 import java.util.ResourceBundle;
 
 public enum ContractMarketMethod {
     //region Enum Declarations
     NONE("ContractMarketMethod.NONE.text", "ContractMarketMethod.NONE.toolTipText"),
-    ATB_MONTHLY("ContractMarketMethod.ATB_MONTHLY.text", "ContractMarketMethod.ATB_MONTHLY.toolTipText");
+    ATB_MONTHLY("ContractMarketMethod.ATB_MONTHLY.text", "ContractMarketMethod.ATB_MONTHLY.toolTipText"),
+    CAM_OPS("ContractMarketMethod.CAM_OPS.text", "ContractMarketMethod.CAM_OPS.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -56,20 +61,23 @@ public enum ContractMarketMethod {
     public boolean isAtBMonthly() {
         return this == ATB_MONTHLY;
     }
+
+    public boolean isCamOps() {
+        return this == CAM_OPS;
+    }
     //endregion Boolean Comparison Methods
 
-    // TODO : AbstractContractMarket : Uncomment
-/*
-    public AbstractContractMarket getContractMarket() {
+    public IContractMarket getContractMarket() {
         switch (this) {
             case ATB_MONTHLY:
-                return new AtBMonthlyContractMarket();
+                return new AtbMonthlyContractMarket();
+            case CAM_OPS:
+                return new CamOpsContractMarket();
             case NONE:
             default:
                 return new EmptyContractMarket();
         }
     }
-*/
 
     @Override
     public String toString() {

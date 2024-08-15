@@ -23,6 +23,7 @@ import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.*;
@@ -150,7 +151,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        assertNotNull(new ContractMarket().addAtBContract(campaign));
+        assertNotNull(new AtbMonthlyContractMarket().addAtBContract(campaign));
     }
 
     @ParameterizedTest
@@ -252,7 +253,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -357,7 +358,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -463,7 +464,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -572,7 +573,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -608,7 +609,7 @@ public class ContractMarketAtBGenerationTests {
         // Return "MERC" every time
         when(rfg.getEmployer()).thenReturn("MERC");
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNull(contract);
@@ -713,7 +714,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -810,7 +811,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(false).when(hints).isNeutral(eq(enemyFaction));
         when(rfg.getFactionHints()).thenReturn(hints);
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNull(contract);
@@ -915,7 +916,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(null).doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1014,7 +1015,7 @@ public class ContractMarketAtBGenerationTests {
         // Fail to find a jump path
         doReturn(null).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNull(contract);
@@ -1118,7 +1119,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1223,7 +1224,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1328,7 +1329,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1433,7 +1434,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1538,7 +1539,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1643,7 +1644,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1748,7 +1749,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);
@@ -1853,7 +1854,7 @@ public class ContractMarketAtBGenerationTests {
         doReturn(jumpPath).when(campaign).calculateJumpPath(eq(currentSystem), eq(targetSystem));
         doReturn(Money.of(1)).when(campaign).calculateCostPerJump(anyBoolean(), anyBoolean());
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         AtBContract contract = market.addAtBContract(campaign);
         assertNotNull(contract);

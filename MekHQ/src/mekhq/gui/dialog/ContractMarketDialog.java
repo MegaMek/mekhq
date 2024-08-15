@@ -46,7 +46,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.market.ContractMarket;
+import mekhq.campaign.market.IContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Factions;
@@ -72,7 +72,7 @@ public class ContractMarketDialog extends JDialog {
     private static int sharePct = 20;
 
     private Campaign campaign;
-    private ContractMarket contractMarket;
+    private IContractMarket contractMarket;
     private Contract selectedContract = null;
     private List<String> possibleRetainerContracts;
 
@@ -386,7 +386,7 @@ public class ContractMarketDialog extends JDialog {
         btnGenerate.setText(resourceMap.getString("btnGenerate.text"));
         btnGenerate.setName("btnGenerate");
         btnGenerate.addActionListener(evt -> {
-            AtBContract c = contractMarket.addAtBContract(campaign);
+            AtBContract c = contractMarket.addContract(campaign);
 
             if (c == null) {
                 campaign.addReport(resourceMap.getString("report.UnableToGMContract"));

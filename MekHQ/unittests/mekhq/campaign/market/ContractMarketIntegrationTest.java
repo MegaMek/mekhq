@@ -84,11 +84,11 @@ public class ContractMarketIntegrationTest {
 
     @Test
     public void addAtBContractMercsTest() {
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate clicking GM Add on the contract market three times
         for (int ii = 0; ii < REASONABLE_GENERATION_ATTEMPTS; ii++) {
-            market.addAtBContract(campaign);
+            market.addContract(campaign);
         }
 
         assertFalse(market.getContracts().isEmpty());
@@ -96,7 +96,7 @@ public class ContractMarketIntegrationTest {
 
     @Test
     public void generateContractOffersMercsTest() {
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate three months of contract generation ...
         boolean foundContract = false;
@@ -114,11 +114,11 @@ public class ContractMarketIntegrationTest {
     public void addAtBContractMercRetainerTest() {
         campaign.setRetainerEmployerCode("LA");
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate clicking GM Add on the contract market three times
         for (int ii = 0; ii < 3; ii++) {
-            market.addAtBContract(campaign);
+            market.addContract(campaign);
         }
 
         assertFalse(market.getContracts().isEmpty());
@@ -128,7 +128,7 @@ public class ContractMarketIntegrationTest {
     public void generateContractOffersMercRetainerTest() {
         campaign.setRetainerEmployerCode("CS");
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate three months of contract generation ...
         boolean foundContract = false;
@@ -158,7 +158,7 @@ public class ContractMarketIntegrationTest {
         when(existing.getCommandRights()).thenReturn(ContractCommandRights.INDEPENDENT);
         campaign.importMission(existing);
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         SecureRandom realRng = new SecureRandom();
         MMRandom rng = mock(MMRandom.class);
@@ -205,11 +205,11 @@ public class ContractMarketIntegrationTest {
     public void addAtBContractHouseTest() {
         campaign.setFactionCode("DC");
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate clicking GM Add on the contract market three times
         for (int ii = 0; ii < 3; ii++) {
-            market.addAtBContract(campaign);
+            market.addContract(campaign);
         }
 
         assertFalse(market.getContracts().isEmpty());
@@ -219,7 +219,7 @@ public class ContractMarketIntegrationTest {
     public void generateContractOffersHouseTest() {
         campaign.setFactionCode("FS");
 
-        ContractMarket market = new ContractMarket();
+        AtbMonthlyContractMarket market = new AtbMonthlyContractMarket();
 
         // Simulate three months of contract generation ...
         boolean foundContract = false;

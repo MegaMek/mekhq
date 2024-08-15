@@ -59,10 +59,7 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.market.ContractMarket;
-import mekhq.campaign.market.PartsStore;
-import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.ShoppingList;
+import mekhq.campaign.market.*;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
@@ -210,8 +207,7 @@ public class Campaign implements ITechManager {
 
     private Boolean fieldKitchenWithinCapacity;
 
-    // this is updated and used per gaming session, it is enabled/disabled via the
-    // Campaign options
+    // this is updated and used per gaming session, it is enabled/disabled via the Campaign options
     // we're re-using the LogEntry class that is used to store Personnel entries
     public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
 
@@ -240,7 +236,7 @@ public class Campaign implements ITechManager {
     private ShoppingList shoppingList;
 
     private PersonnelMarket personnelMarket;
-    private ContractMarket contractMarket; // AtB
+    private IContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
     private transient AbstractDeath death;
@@ -319,7 +315,7 @@ public class Campaign implements ITechManager {
         shoppingList = new ShoppingList();
         news = new News(getGameYear(), id.getLeastSignificantBits());
         setPersonnelMarket(new PersonnelMarket());
-        setContractMarket(new ContractMarket());
+        setContractMarket(new AtbMonthlyContractMarket());
         setUnitMarket(new DisabledUnitMarket());
         setDeath(new DisabledRandomDeath(getCampaignOptions(), false));
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
@@ -465,13 +461,11 @@ public class Campaign implements ITechManager {
         this.personnelMarket = personnelMarket;
     }
 
-    // TODO : AbstractContractMarket : Swap to AbstractContractMarket
-    public ContractMarket getContractMarket() {
+    public IContractMarket getContractMarket() {
         return contractMarket;
     }
 
-    // TODO : AbstractContractMarket : Swap to AbstractContractMarket
-    public void setContractMarket(final ContractMarket contractMarket) {
+    public void setContractMarket(final IContractMarket contractMarket) {
         this.contractMarket = contractMarket;
     }
 
@@ -1662,8 +1656,7 @@ public class Campaign implements ITechManager {
      * appropriate to the person's phenotype and the player's faction.
      *
      * @param person     The Bloodname candidate
-     * @param ignoreDice If true, skips the random roll and assigns a Bloodname
-     *                   automatically
+     * @param ignoreDice If true, skips the random roll and assigns a Bloodname automatically
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
         // if person is non-clan or does not have a phenotype
@@ -1671,8 +1664,7 @@ public class Campaign implements ITechManager {
             return;
         }
 
-        // Person already has a bloodname, we open up the dialog to ask if they want to
-        // keep the
+        // Person already has a bloodname, we open up the dialog to ask if they want to keep the
         // current bloodname or assign a new one
         if (!person.getBloodname().isEmpty()) {
             int result = JOptionPane.showConfirmDialog(null,
@@ -3512,7 +3504,7 @@ public class Campaign implements ITechManager {
     }
 
     private void processNewDayATB() {
-        contractMarket.generateContractOffers(this); // TODO : AbstractContractMarket : Remove
+        contractMarket.generateContractOffers(this);
 
         if ((getShipSearchExpiration() != null) && !getShipSearchExpiration().isAfter(getLocalDate())) {
             setShipSearchExpiration(null);
@@ -7560,8 +7552,7 @@ public class Campaign implements ITechManager {
                 LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (join == null) {
-                        // If by some nightmare there is no date from the below, just use the first
-                        // entry.
+                        // If by some nightmare there is no date from the below, just use the first entry.
                         join = e.getDate();
                     }
 
@@ -7571,8 +7562,7 @@ public class Campaign implements ITechManager {
                     }
                 }
 
-                // For that one in a billion chance the log is empty. Clone today's date and
-                // subtract a year
+                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 p.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
@@ -7684,8 +7674,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Checks if a turnover prompt should be displayed based on campaign options and
-     * current date.
+     * Checks if a turnover prompt should be displayed based on campaign options and current date.
      *
      * @return An integer representing the user's choice:
      *         -1 if turnover prompt should not be displayed.
@@ -7747,7 +7736,8 @@ public class Campaign implements ITechManager {
                 JOptionPane.INFORMATION_MESSAGE,
                 null,
                 options,
-                options[0]);
+                options[0]
+        );
     }
 
     /**
