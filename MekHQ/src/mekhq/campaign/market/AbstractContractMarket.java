@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractContractMarket {
-    public static int CLAUSE_COMMAND = 0;
-    public static int CLAUSE_SALVAGE = 1;
-    public static int CLAUSE_SUPPORT = 2;
-    public static int CLAUSE_TRANSPORT = 3;
-    public static int CLAUSE_NUM = 4;
+    public static final int CLAUSE_COMMAND = 0;
+    public static final int CLAUSE_SALVAGE = 1;
+    public static final int CLAUSE_SUPPORT = 2;
+    public static final int CLAUSE_TRANSPORT = 3;
+    public static final int CLAUSE_NUM = 4;
 
     protected List<Contract> contracts;
     protected int lastId = 0;
@@ -52,7 +52,6 @@ public abstract class AbstractContractMarket {
     protected final static int MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER = 20;
 
     abstract public AtBContract addAtBContract(Campaign campaign);
-    abstract public void rerollClause(AtBContract c, int clause, Campaign campaign);
     abstract public void generateContractOffers(Campaign campaign, boolean newCampaign);
     abstract public void addFollowup(Campaign campaign, AtBContract contract);
     abstract protected void setAtBContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign);
@@ -62,6 +61,20 @@ public abstract class AbstractContractMarket {
         contractIds.remove(c.getId());
         clauseMods.remove(c.getId());
         followupContracts.remove(c.getId());
+    }
+
+    public void rerollClause(AtBContract c, int clause, Campaign campaign) {
+        if (null != clauseMods.get(c.getId())) {
+            switch (clause) {
+                case CLAUSE_COMMAND -> rollCommandClause(c, clauseMods.get(c.getId()).mods[clause]);
+                case CLAUSE_SALVAGE ->
+                    rollSalvageClause(c, clauseMods.get(c.getId()).mods[clause], campaign.getCampaignOptions().getContractMaxSalvagePercentage());
+                case CLAUSE_TRANSPORT -> rollTransportClause(c, clauseMods.get(c.getId()).mods[clause]);
+                case CLAUSE_SUPPORT -> rollSupportClause(c, clauseMods.get(c.getId()).mods[clause]);
+            }
+            clauseMods.get(c.getId()).rerollsUsed[clause]++;
+            c.calculateContract(campaign);
+        }
     }
 
     public int getRerollsUsed(Contract c, int clause) {
@@ -254,7 +267,7 @@ public abstract class AbstractContractMarket {
      * based on the admin's negotiation skill. Also track bonuses, as
      * the random clause bonuses should be persistent.
      */
-    public static class ClauseMods {
+    protected static class ClauseMods {
         public int[] rerollsUsed = {0, 0, 0, 0};
         public int[] mods = {0, 0, 0, 0};
     }

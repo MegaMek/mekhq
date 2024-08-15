@@ -38,18 +38,19 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.universe.*;
+import org.apache.logging.log4j.LogManager;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -78,29 +79,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             contracts.add(c);
         }
         return c;
-    }
-
-    @Override
-    public void rerollClause(AtBContract c, int clause, Campaign campaign) {
-        if (null != clauseMods.get(c.getId())) {
-            switch (clause) {
-                case CLAUSE_COMMAND:
-                    rollCommandClause(c, clauseMods.get(c.getId()).mods[clause]);
-                    break;
-                case CLAUSE_SALVAGE:
-                    rollSalvageClause(c, clauseMods.get(c.getId()).mods[clause],
-                            campaign.getCampaignOptions().getContractMaxSalvagePercentage());
-                    break;
-                case CLAUSE_TRANSPORT:
-                    rollTransportClause(c, clauseMods.get(c.getId()).mods[clause]);
-                    break;
-                case CLAUSE_SUPPORT:
-                    rollSupportClause(c, clauseMods.get(c.getId()).mods[clause]);
-                    break;
-            }
-            clauseMods.get(c.getId()).rerollsUsed[clause]++;
-            c.calculateContract(campaign);
-        }
     }
 
     @Override
@@ -311,10 +289,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
          * (ComStar, Mercs not under contract) are more likely to have garrison-type
          * contracts and less likely to have battle-type contracts unless at war.
          */
-        if (RandomFactionGenerator.getInstance().getFactionHints()
-                .isNeutral(Factions.getInstance().getFaction(employer)) &&
-                !RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(
-                        Factions.getInstance().getFaction(employer),
+        if (RandomFactionGenerator.getInstance().getFactionHints().isNeutral(Factions.getInstance().getFaction(employer)) &&
+                !RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(Factions.getInstance().getFaction(employer),
                         Factions.getInstance().getFaction(contract.getEnemyCode()), campaign.getLocalDate())) {
             if (contract.getContractType().isPlanetaryAssault()) {
                 contract.setContractType(AtBContractType.GARRISON_DUTY);
