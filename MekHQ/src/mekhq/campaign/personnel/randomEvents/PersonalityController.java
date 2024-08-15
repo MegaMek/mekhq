@@ -100,10 +100,8 @@ public class PersonalityController {
             String forward = ((index % 2) == 0) ? firstName : pronoun;
             String plural = ((index % 2) == 0) ? "s" : "";
 
-            if ((index % 2) != 0) {
-                // We only append a space between descriptions, not at the start.
-                personalityDescription.append(' ');
-            }
+            // We only append a space between descriptions, not at the start.
+            personalityDescription.append(' ');
 
             personalityDescription.append(String.format(traitDescriptions.get(index), forward, plural));
         }
