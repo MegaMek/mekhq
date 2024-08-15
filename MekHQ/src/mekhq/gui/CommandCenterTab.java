@@ -46,6 +46,7 @@ import mekhq.service.enums.MRMSMode;
 import mekhq.service.mrms.MRMSService;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -559,6 +560,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final UnitRatingMethod unitRatingMethod = campaignOptions.getUnitRatingMethod();
         final CampaignSummary campaignSummary = campaign.getCampaignSummary();
+
+        if (panInfo.getBorder() instanceof TitledBorder titledBorder) {
+            titledBorder.setTitle(getCampaign().getName());
+            panInfo.repaint();
+        }
 
         if (unitRatingMethod.isFMMR()) {
             campaign.getUnitRating().reInitialize();
