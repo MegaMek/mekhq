@@ -412,12 +412,12 @@ public class ContractSummaryPanel extends JPanel {
                 }
                 if (contract instanceof AtBContract) {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
-                        ContractMarket.CLAUSE_SALVAGE, campaign);
+                        AbstractContractMarket.CLAUSE_SALVAGE, campaign);
                     setSalvageRerollButtonText((JButton) ev.getSource());
                     txtSalvageRights.setText(contract.getSalvagePct() + "%"
                         + (contract.isSalvageExchange() ? " (Exchange)" : ""));
                     if (campaign.getContractMarket().getRerollsUsed(contract,
-                        ContractMarket.CLAUSE_SALVAGE) >= logRerolls) {
+                        AbstractContractMarket.CLAUSE_SALVAGE) >= logRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
@@ -518,7 +518,7 @@ public class ContractSummaryPanel extends JPanel {
 
     private boolean hasSalvageRerolls() {
         return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
-            ContractMarket.CLAUSE_SALVAGE) < logRerolls);
+            AbstractContractMarket.CLAUSE_SALVAGE) < logRerolls);
     }
 
     private boolean hasSupportRerolls() {
@@ -540,7 +540,7 @@ public class ContractSummaryPanel extends JPanel {
 
     private void setSalvageRerollButtonText(JButton rerollButton) {
         int rerolls = (logRerolls - campaign.getContractMarket().getRerollsUsed(contract,
-            ContractMarket.CLAUSE_SALVAGE));
+            AbstractContractMarket.CLAUSE_SALVAGE));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
