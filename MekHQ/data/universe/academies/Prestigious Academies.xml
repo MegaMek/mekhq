@@ -157,7 +157,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -206,7 +206,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -235,7 +235,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -310,7 +310,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -334,7 +334,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Armored Infantry Technician</qualification>
         <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -372,7 +372,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -396,7 +396,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -494,7 +494,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -521,7 +521,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -547,7 +547,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -573,7 +573,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -802,7 +802,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -895,7 +895,7 @@
         <ageMin>16</ageMin>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -1131,7 +1131,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -1158,7 +1158,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Armored Infantry Technician</qualification>
         <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -1196,7 +1196,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -1223,7 +1223,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -1522,7 +1522,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -1548,7 +1548,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -1705,7 +1705,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -1743,7 +1743,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -1781,7 +1781,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -1819,10 +1819,10 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -2159,7 +2159,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -2198,7 +2198,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -2259,7 +2259,7 @@
         <qualificationStartYear>3081</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2293,7 +2293,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2933</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -2330,7 +2330,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -2369,7 +2369,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -2399,7 +2399,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Armored Infantry Technician</qualification>
         <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -2438,7 +2438,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -2468,7 +2468,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -2555,7 +2555,7 @@
         <destructionYear>2781</destructionYear>
         <tuition>36750</tuition>
         <durationDays>300</durationDays>
-        <facultySkill>4</facultySkill>
+        <facultySkill>3</facultySkill>
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
@@ -2927,7 +2927,7 @@
         <ageMin>16</ageMin>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -3193,7 +3193,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -3342,7 +3342,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -3384,7 +3384,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -3425,7 +3425,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -3466,7 +3466,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -4076,7 +4076,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -4124,7 +4124,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -4195,7 +4195,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -4222,7 +4222,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -4260,7 +4260,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -4287,7 +4287,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -4411,7 +4411,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -4479,7 +4479,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -4509,7 +4509,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -4547,7 +4547,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Administration</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Administration, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -4642,7 +4642,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -4660,7 +4660,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Armored Infantry Technician</qualification>
         <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -4695,7 +4695,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -4713,7 +4713,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -4745,7 +4745,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -5080,7 +5080,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, XP</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, XP, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -5148,7 +5148,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -5183,7 +5183,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -5218,7 +5218,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -5230,7 +5230,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -5265,7 +5265,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Strategy, Tactics, Small Arms</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Strategy, Tactics, Small Arms, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -5306,7 +5306,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership, Small Arms</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -5462,7 +5462,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -5504,7 +5504,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -5546,7 +5546,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -6099,7 +6099,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Astech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Astech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6137,7 +6137,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership, Astech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Astech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6174,7 +6174,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6297,7 +6297,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6324,7 +6324,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Armored Infantry Technician</qualification>
         <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -6362,7 +6362,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6389,7 +6389,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -6428,7 +6428,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6509,7 +6509,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6686,7 +6686,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6707,7 +6707,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Armored Infantry Technician</qualification>
         <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6745,7 +6745,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>High Path - Armored Infantry</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>High Path - Infantry</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6766,7 +6766,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>High Path - Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>High Path - Administrator</qualification>
         <curriculum>Negotiation, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6790,11 +6790,35 @@
         <ageMin>16</ageMin>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Special Armed Services Training Center</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Star League Special Armed Services Training Center (SASTC) is a highly prestigious and elite training center used by the SLDF to train its elite Special Forces. With rigorous qualification standards and expectations, only the best of the best graduate from its programs. Those who graduate find themselves part of the legendary Blackhearts.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Sabik</locationSystem>
+        <constructionYear>2525</constructionYear>
+        <destructionYear>2766</destructionYear>
+        <tuition>70875</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>2</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>SLDF Advanced Tactics Operative</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Small Arms, Tech/BA, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2718</qualificationStartYear>
+        <qualification>SLDF Special Forces Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>St. Ives Academy of Martial Sciences</name>
@@ -6829,7 +6853,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6876,7 +6900,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6920,7 +6944,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6958,7 +6982,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Strategy</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Strategy</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -6999,7 +7023,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7087,7 +7111,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7178,7 +7202,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7208,7 +7232,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -7247,7 +7271,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7277,7 +7301,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -7336,7 +7360,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7354,7 +7378,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Armored Infantry Technician</qualification>
         <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -7389,7 +7413,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7407,7 +7431,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -7442,7 +7466,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7480,7 +7504,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7518,7 +7542,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7556,7 +7580,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7838,7 +7862,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -7856,7 +7880,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Armored Infantry Technician</qualification>
         <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -8033,7 +8057,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8063,7 +8087,7 @@
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -8125,7 +8149,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -8152,7 +8176,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
@@ -8222,7 +8246,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry WarriorGraduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8247,7 +8271,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8273,7 +8297,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8298,7 +8322,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8323,7 +8347,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8349,7 +8373,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8375,7 +8399,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8401,7 +8425,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8427,7 +8451,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8452,7 +8476,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8478,7 +8502,7 @@
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8516,7 +8540,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2935</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -8554,7 +8578,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
