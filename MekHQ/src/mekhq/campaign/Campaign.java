@@ -740,7 +740,9 @@ public class Campaign implements ITechManager {
                     boolean wasSacked = getRetirementDefectionTracker().getPayout(pid).isWasSacked();
 
                     if ((!wasKilled) && (!wasSacked)) {
-                        if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
+                        if (!person.getPermanentInjuries().isEmpty()) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
+                        } if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
                             if (!getActiveContracts().isEmpty()) {
                                 int roll = Compute.randomInt(20);
 
@@ -762,7 +764,11 @@ public class Campaign implements ITechManager {
                     }
 
                     if (wasSacked) {
-                        person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
+                        if (person.getPermanentInjuries().isEmpty()) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
+                        } else {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
+                        }
                     }
 
                     // civilian spouses follow their partner in departing
@@ -3753,7 +3759,7 @@ public class Campaign implements ITechManager {
         processFatigueNewDay();
 
         if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
-            updateCrimeRating();
+            processReputationChanges();
         }
 
         if (campaignOptions.isUseEducationModule()) {
@@ -3795,10 +3801,11 @@ public class Campaign implements ITechManager {
         return true;
     }
 
+
     /**
-     * Updates the campaign's crime rating based on specific conditions.
+     * Processes reputation changes based on various conditions.
      */
-    private void updateCrimeRating() {
+    private void processReputationChanges() {
         if (faction.isPirate()) {
             dateOfLastCrime = currentDay;
             crimePirateModifier = -100;
@@ -3821,6 +3828,10 @@ public class Campaign implements ITechManager {
                     }
                 }
             }
+        }
+
+        if (currentDay.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
+            reputation.initializeReputation(this);
         }
     }
 

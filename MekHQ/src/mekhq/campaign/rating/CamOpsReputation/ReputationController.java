@@ -511,59 +511,59 @@ public class ReputationController {
         }
     }
 
-    public ReputationController generateInstanceFromXML(final Node wn) {
-        NodeList nl = wn.getChildNodes();
+    public ReputationController generateInstanceFromXML(final Node workingNode) {
+        NodeList newLine = workingNode.getChildNodes();
 
         try {
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
+            for (int i = 0; i < newLine.getLength(); i++) {
+                Node workingNode2 = newLine.item(i);
 
-                if (wn2.getNodeName().equalsIgnoreCase("averageSkillLevel")) {
-                    this.averageSkillLevel = SkillLevel.valueOf(wn2.getTextContent().toUpperCase());
-                } else if (wn2.getNodeName().equalsIgnoreCase("averageExperienceRating")) {
-                    this.averageExperienceRating = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("atbModifier")) {
-                    this.atbModifier = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("commanderMap")) {
-                    this.parseSubNode(wn2, commanderMap, false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("commanderRating")) {
-                    this.commanderRating = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("combatRecordMap")) {
-                    this.parseSubNode(wn2, combatRecordMap, false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("combatRecordRating")) {
-                    this.combatRecordRating = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("transportationCapacities")) {
-                    this.parseSubNode(wn2, transportationCapacities, false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("transportationRequirements")) {
-                    this.parseSubNode(wn2, transportationRequirements, false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("transportationValues")) {
-                    this.parseSubNode(wn2, transportationValues, false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("transportationRating")) {
-                    this.transportationRating = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("administrationRequirements")) {
-                    this.parseSubNode(wn2, administrationRequirements, false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("crewRequirements")) {
-                    this.parseSubNode(wn2, crewRequirements, false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("technicianRequirements")) {
-                    this.parseSubNode(wn2, null, true);
-                } else if (wn2.getNodeName().equalsIgnoreCase("supportRating")) {
-                    this.supportRating = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("financialRatingMap")) {
-                    this.parseSubNode(wn2, financialRatingMap, false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("financialRating")) {
-                    this.financialRating = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("dateOfLastCrime")) {
-                    this.dateOfLastCrime = LocalDate.parse(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("crimeRatingMap")) {
-                    this.parseSubNode(wn2, crimeRatingMap, false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("crimeRating")) {
-                    this.crimeRating = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("otherModifiersMap")) {
-                    this.parseSubNode(wn2, otherModifiersMap, false);
-                } else if (wn2.getNodeName().equalsIgnoreCase("otherModifiers")) {
-                    this.otherModifiers = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("reputationRating")) {
-                    this.reputationRating = Integer.parseInt(wn2.getTextContent());
+                if (workingNode2.getNodeName().equalsIgnoreCase("averageSkillLevel")) {
+                    this.averageSkillLevel = SkillLevel.valueOf(workingNode2.getTextContent().toUpperCase());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("averageExperienceRating")) {
+                    this.averageExperienceRating = Integer.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("atbModifier")) {
+                    this.atbModifier = Integer.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("commanderMap")) {
+                    this.parseSubNode(workingNode2, commanderMap, false);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("commanderRating")) {
+                    this.commanderRating = Integer.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("combatRecordMap")) {
+                    this.parseSubNode(workingNode2, combatRecordMap, false);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("combatRecordRating")) {
+                    this.combatRecordRating = Integer.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("transportationCapacities")) {
+                    this.parseSubNode(workingNode2, transportationCapacities, false);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("transportationRequirements")) {
+                    this.parseSubNode(workingNode2, transportationRequirements, false);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("transportationValues")) {
+                    this.parseSubNode(workingNode2, transportationValues, false);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("transportationRating")) {
+                    this.transportationRating = Integer.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("administrationRequirements")) {
+                    this.parseSubNode(workingNode2, administrationRequirements, false);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("crewRequirements")) {
+                    this.parseSubNode(workingNode2, crewRequirements, false);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("technicianRequirements")) {
+                    this.parseSubNode(workingNode2, null, true);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("supportRating")) {
+                    this.supportRating = Integer.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("financialRatingMap")) {
+                    this.parseSubNode(workingNode2, financialRatingMap, false);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("financialRating")) {
+                    this.financialRating = Integer.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("dateOfLastCrime")) {
+                    this.dateOfLastCrime = LocalDate.parse(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("crimeRatingMap")) {
+                    this.parseSubNode(workingNode2, crimeRatingMap, false);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("crimeRating")) {
+                    this.crimeRating = Integer.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("otherModifiersMap")) {
+                    this.parseSubNode(workingNode2, otherModifiersMap, false);
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("otherModifiers")) {
+                    this.otherModifiers = Integer.parseInt(workingNode2.getTextContent());
+                } else if (workingNode2.getNodeName().equalsIgnoreCase("reputationRating")) {
+                    this.reputationRating = Integer.parseInt(workingNode2.getTextContent());
                 }
             }
         } catch (Exception ex) {
@@ -576,12 +576,12 @@ public class ReputationController {
     /**
      * Parses the sub-nodes of a given node and populates either a map or a technicianRequirements list based on the boolean flag.
      *
-     * @param wn2 The node whose sub-nodes need to be parsed.
+     * @param workingNode The node whose sub-nodes need to be parsed.
      * @param map The map to populate with the sub-node data (null if technicianRequirements).
      * @param isTechnicianRequirements Flag indicating whether to populate a technicianRequirements list.
      */
-    private void parseSubNode(Node wn2, @Nullable Map<String, Integer> map, boolean isTechnicianRequirements) {
-        NodeList subNodeList = wn2.getChildNodes();
+    private void parseSubNode(Node workingNode, @Nullable Map<String, Integer> map, boolean isTechnicianRequirements) {
+        NodeList subNodeList = workingNode.getChildNodes();
 
         for (int i = 0; i < subNodeList.getLength(); i++) {
             Node node = subNodeList.item(i);

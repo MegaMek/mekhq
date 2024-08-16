@@ -9,6 +9,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartInUse {
     private String description;
+    private int id;
     private IAcquisitionWork partToBuy;
     private int useCount;
     private int storeCount;
@@ -34,6 +35,7 @@ public class PartInUse {
             appendDetails(sb, part);
         }
         part.setUnit(u);
+        this.id = part.getId();
         this.description = sb.toString();
         this.partToBuy = part.getAcquisitionWork();
         this.tonnagePerItem = part.getTonnage();
@@ -72,6 +74,10 @@ public class PartInUse {
 
     public String getDescription() {
         return description;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public IAcquisitionWork getPartToBuy() {

@@ -35,12 +35,12 @@ import mekhq.module.api.PersonnelMarketMethod;
 /**
  * Method for personnel market generation given in the repair and maintenance section of Strategic Operations
  */
-public class PersonnelMarketStratOps implements PersonnelMarketMethod {
+public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
     private int daysSinceRolled = 0;
 
     @Override
     public String getModuleName() {
-        return "Strat Ops";
+        return "Campaign Ops";
     }
 
     @Override

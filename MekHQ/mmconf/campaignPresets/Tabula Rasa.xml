@@ -136,7 +136,7 @@
 		<variableTechLevel>false</variableTechLevel>
 		<factionIntroDate>false</factionIntroDate>
 		<useAmmoByType>false</useAmmoByType>
-		<waitingPeriod>7</waitingPeriod>
+		<waitingPeriod>1</waitingPeriod>
 		<acquisitionSkill>Automatic Success</acquisitionSkill>
 		<acquisitionSupportStaffOnly>false</acquisitionSupportStaffOnly>
 		<techLevel>3</techLevel>

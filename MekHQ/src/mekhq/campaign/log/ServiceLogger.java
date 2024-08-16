@@ -114,6 +114,10 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduFailed.text"), institution, course)));
     }
 
+    public static void eduFailedApplication(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduFailedApplication.text"), institution)));
+    }
+
     public static void recoveredMia(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredMia.text")));
     }

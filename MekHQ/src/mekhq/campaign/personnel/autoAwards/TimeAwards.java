@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 public class TimeAwards {
     /**
@@ -21,7 +20,7 @@ public class TimeAwards {
     public static Map<Integer, List<Object>> TimeAwardsProcessor(Campaign campaign, UUID person, List<Award> awards) {
         int requiredYearsOfService;
         boolean isCumulative;
-        int yearsOfService;
+        long yearsOfService;
 
         List<Award> eligibleAwards = new ArrayList<>();
         List<Award> eligibleAwardsBestable = new ArrayList<>();
@@ -46,14 +45,10 @@ public class TimeAwards {
 
             if (award.canBeAwarded(campaign.getPerson(person))) {
                 try {
-                    yearsOfService = Integer.parseInt(Pattern.compile("\\s+")
-                            .splitAsStream(campaign.getPerson(person).getTimeInService(campaign))
-                            .findFirst()
-                            .orElseThrow());
+                    yearsOfService = campaign.getPerson(person).getYearsInService(campaign);
                 } catch (Exception e) {
-                    LogManager.getLogger().error("Unable to parse yearsOfService for {} while processing Award {} from the [{}] set." +
-                                    " This can be ignored if {} has 0 years Time in Service.",
-                            campaign.getPerson(person).getFullName(), award.getName(), award.getSet(), campaign.getPerson(person).getFullName());
+                    LogManager.getLogger().error("Unable to parse yearsOfService for {} while processing Award {} from the [{}] set.",
+                            campaign.getPerson(person).getFullName(), award.getName(), award.getSet());
                     continue;
                 }
 

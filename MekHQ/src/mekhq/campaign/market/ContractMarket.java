@@ -691,7 +691,7 @@ public class ContractMarket {
         }
 
         mods.mods[CLAUSE_COMMAND] = adminCommandExp - SkillType.EXP_REGULAR;
-        mods.mods[CLAUSE_SALVAGE] = 0;
+        mods.mods[CLAUSE_SALVAGE] = adminLogisticsExp - SkillType.EXP_REGULAR;
         mods.mods[CLAUSE_TRANSPORT] = adminTransportExp - SkillType.EXP_REGULAR;
         mods.mods[CLAUSE_SUPPORT] = adminLogisticsExp - SkillType.EXP_REGULAR;
         if (unitRatingMod >= IUnitRating.DRAGOON_A) {

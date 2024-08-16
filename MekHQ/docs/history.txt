@@ -135,6 +135,25 @@ MEKHQ VERSION HISTORY:
 + FIX #3920: Fixed Shares Payouts for Early Contract End, Refactored Shares Percentage Fetching to Further Detach System from AtB
 + FIX #4615: Added Missing Maintenance Planetary Modifier Text
 + FIX #4605: Overhauled CamOps Unit Reputation Calculations and Report
++ FIX #4618: Added Sale Buttons to Parts in Use Dialog
++ FIX #4637: Fixed Text Placeholders in CamOpsReputation.properties
++ FIX #4636: Renamed StratOps Personnel Market to Campaign Ops to Reflect Rulebook Reorganization
++ FIX #4611: Minor Preset Updates
++ PR #4614: Updated BA Qualification Start Years
++ PR #4616: Added Intelligence-based XP Cost Multiplier
++ PR #4617: Added Support for Handling Medical Discharge
++ FIX #4619: Restored adminXPPeriod Option Parsing
++ PR #4620: Fix hyperlink issue in payment text
++ FIX #4624: Refactored Years of Service Calculation for autoAwards Time Awards
++ FIX #4625: Removed Loyalty Change Notifications for Campaigns with Loyalty Disabled
++ PR #4631: Added Entrance Exams for Prestigious Academies, Updated Education Module Documentation
++ PR #4634: Refactored Unit getCommander() Method
++ PR #4638: Adjusted Objectives Pane to Use Client Theme Colors and Added Normal Play Usage
++ PR #4639: Fixed Grammar in Personality Characteristic Descriptions
++ PR #4641: Implement negotiation for salvage terms
++ FIX #4645: Fixed Weekly Reputation Recalculations
++ FIX #4643: Fixed Copy-Paste Error in End Mission Prisoner Nag
++ PR #4650: Removed unused import of LogManager and corrected the import path for Intelligence
 
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)

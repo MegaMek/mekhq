@@ -28,6 +28,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignSummary;
 import mekhq.campaign.event.*;
+import mekhq.campaign.finances.FinancialReport;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
@@ -52,7 +55,9 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.ResourceBundle;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.*;
 
 /**
  * Collates important information about the campaign and displays it, along with some actionable buttons
@@ -77,7 +82,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     // objectives panel
     private JPanel panObjectives;
-    List listObjectives;
+    JList<String> listObjectives;
 
     // daily report
     private DailyReportLogPanel panLog;
@@ -358,11 +363,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private void initObjectivesPanel() {
         panObjectives = new JPanel(new BorderLayout());
         panObjectives.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panObjectives.title")));
-        listObjectives = new List();
-        for (String objective : getCampaign().getCurrentObjectives()) {
-            listObjectives.add(objective);
-        }
-        panObjectives.add(listObjectives, BorderLayout.CENTER);
+
+        listObjectives = new JList<>();
+
+        listObjectives.setModel(new DefaultListModel<>());
+        refreshObjectives();
+
+        panObjectives.add(new JScrollPane(listObjectives), BorderLayout.CENTER);
     }
 
     /**
@@ -601,10 +608,78 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     private void refreshObjectives() {
-        listObjectives.removeAll();
-        for (String objective : getCampaign().getCurrentObjectives()) {
-            listObjectives.add(objective);
+        // Define the DefaultListModel
+        DefaultListModel<String> model = new DefaultListModel<>();
+
+        // Add items to the model
+        if (getCampaign().getStoryArc() != null) {
+            for (String objective : getCampaign().getCurrentObjectives()) {
+                model.addElement(objective);
+            }
+        } else {
+            for (String report : getAbridgedFinancialReport()) {
+                model.addElement(String.format(report));
+            }
+
+            for (Mission mission : getCampaign().getActiveMissions(false)) {
+                List<Scenario> scenarios = mission.getScenarios();
+
+                scenarios.sort(Comparator.comparing(Scenario::getDate));
+                Collections.reverse(scenarios);
+
+                if (!scenarios.isEmpty()) {
+                    model.addElement(String.format("<html><b>" + mission.getName() + "</b></html>"));
+
+                    for (Scenario scenario : scenarios) {
+
+                        if (scenario.getStatus().isCurrent()) {
+                            model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
+                                    + "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                                    + ChronoUnit.DAYS.between(getCampaign().getLocalDate(), scenario.getDate())) + " days</font</html>");
+                        } else {
+                            if (scenario.getStatus().isOverallVictory()) {
+                                model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
+                                        + "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                                        + scenario.getStatus().toString()
+                                        + "</font></html>"));
+                            } else {
+                                model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
+                                        + "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                        + scenario.getStatus().toString()
+                                        + "</font></html>"));
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        // Set the model to the list
+        listObjectives.setModel(model);
+    }
+
+
+    /**
+     * @return a {@code List<String>} containing the abridged financial report entries.
+     */
+    public List<String> getAbridgedFinancialReport() {
+        List<String> reportString = new ArrayList<>();
+
+        FinancialReport report = FinancialReport.calculate(getCampaign());
+
+        String formatted = "%ss";
+
+        reportString.add("<html><b>Net Worth:</b> "
+                + String.format(formatted, report.getNetWorth().toAmountAndSymbolString())
+                + "</html>");
+
+        reportString.add("<html><b>Monthly Profit:</b> "
+                + String.format(formatted, report.getMonthlyIncome().minus(report.getMonthlyExpenses()).toAmountAndSymbolString())
+                + "</html>");
+
+        reportString.add("<html><br></html>");
+
+        return reportString;
     }
 
     /**
