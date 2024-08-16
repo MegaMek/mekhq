@@ -1,13 +1,14 @@
 package mekhq.campaign.personnel.randomEvents;
 
 import megamek.common.Compute;
+import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 
 import java.util.*;
 
-import static mekhq.campaign.personnel.enums.randomEvents.personalities.Intelligence.*;
+import static mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence.*;
 
 public class PersonalityController {
     public static void generatePersonality(Person person) {
@@ -78,32 +79,33 @@ public class PersonalityController {
      * @param person         the person whose personality description will be set
      */
     public static void writeDescription(Person person) {
-        // first, we gather the personality trait descriptions and place them in a list
         List<String> traitDescriptions = getTraitDescriptions(person);
 
-        // we shuffle the order so the elements are not always printed in the same order
+        // It is beneficial to shuffle descriptions for variety.
         Collections.shuffle(traitDescriptions);
 
-        // next, we build a string that contains all the descriptions
         StringBuilder personalityDescription = new StringBuilder();
 
         String firstName = person.getFirstName();
-        String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(person.getGender());
-        String forward;
+
+        // The use of capitalized gender-neutral 'they'.
+        String pronoun = GenderDescriptors.HE_SHE_THEY.getDescriptorCapitalized(Gender.OTHER_FEMALE);
 
         for (int index = 0; index < traitDescriptions.size(); index++) {
-            forward = pronoun;
 
-            if ((index == 0) || (index == 3) || (index == 6)) {
-                forward = firstName;
-            } else {
-                personalityDescription.append(' ');
-            }
+            // Define "forward" and "plural" based on the index value.
+            // If the index is an even number, use first name; otherwise use pronoun.
+            // The alternation between first name and pronoun adds variety to the descriptions.
+            // The "plural" string is only used when the first name is used.
+            String forward = ((index % 2) == 0) ? firstName : pronoun;
+            String plural = ((index % 2) == 0) ? "s" : "";
 
-            personalityDescription.append(String.format(traitDescriptions.get(index), forward));
+            // We only append a space between descriptions, not at the start.
+            personalityDescription.append(' ');
+
+            personalityDescription.append(String.format(traitDescriptions.get(index), forward, plural));
         }
 
-        // finally, we set the description in place
         person.setPersonalityDescription(personalityDescription.toString());
     }
 

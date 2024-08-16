@@ -32,6 +32,8 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.enums.randomEvents.personalities.Intelligence;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
 import java.util.*;
@@ -41,7 +43,6 @@ import java.util.*;
  * It provides methods to begin the education process, calculate education level, and enroll a person into an academy.
  */
 public class EducationController {
-
     private static final MMLogger logger = MMLogger.create(EducationController.class);
 
     /**
