@@ -519,7 +519,6 @@ public class AtBConfiguration {
                         HiringHallLevel level = HiringHallLevel.NONE;
                         if (wn2.getAttributes().getNamedItem("level") != null) {
                             try {
-                                String text = wn2.getAttributes().getNamedItem("level").getTextContent().toUpperCase();
                                 level = HiringHallLevel.valueOf(wn2.getAttributes().getNamedItem("level").getTextContent().toUpperCase());
                             } catch (IllegalArgumentException e) {
                                 LogManager.getLogger().warn("Invalid value for Hiring Hall level, falling back to NONE: " + e);
