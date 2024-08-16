@@ -2215,6 +2215,18 @@ public class Campaign implements ITechManager {
         return findBestInRole(role, skill, null);
     }
 
+    public @Nullable Person findBestAtSkill(String skill) {
+        Person person = null;
+        int highest = 0;
+        for (Person p : getActivePersonnel()) {
+            if (p.getSkill(skill) != null && p.getSkill(skill).getLevel() > highest) {
+                highest = p.getSkill(skill).getLevel();
+                person = p;
+            }
+        }
+        return person;
+    }
+
     /**
      * @return The list of all active {@link Person}s who qualify as technicians
      *         ({@link Person#isTech()}));
@@ -6493,6 +6505,14 @@ public class Campaign implements ITechManager {
 
         return getCampaignOptions().getUnitRatingMethod().isFMMR() ? getUnitRating().getUnitRatingAsInteger()
                 : reputation.getAtbModifier();
+    }
+
+    public int getReputationFactor() {
+        return switch (campaignOptions.getUnitRatingMethod()) {
+            case NONE -> 5;
+            case FLD_MAN_MERCS_REV -> getUnitRatingMod() * 2;
+            case CAMPAIGN_OPS -> (int) ((getReputation().getReputationRating() * 0.2) + 0.5);
+        };
     }
 
     @Deprecated
