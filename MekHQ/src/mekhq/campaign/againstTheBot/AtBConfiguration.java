@@ -25,6 +25,10 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.universe.HiringHall;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
@@ -77,7 +81,7 @@ public class AtBConfiguration {
     private HashMap<String, List<WeightedTable<String>>> botLanceTables = new HashMap<>();
 
     /* Contract generation */
-    private ArrayList<DatedRecord<String>> hiringHalls;
+    private HashMap<String, HiringHall> hiringHalls = new HashMap<>();
 
     /* Personnel and unit markets */
     private Money shipSearchCost;
@@ -93,7 +97,6 @@ public class AtBConfiguration {
             MekHQ.getMHQOptions().getLocale());
 
     private AtBConfiguration() {
-        hiringHalls = new ArrayList<>();
         dsTable = new WeightedTable<>();
         jsTable = new WeightedTable<>();
         shipSearchCost = Money.of(100000);
@@ -166,10 +169,16 @@ public class AtBConfiguration {
                 case "hiringHalls":
                     for (String entry : property.split("\\|")) {
                         String[] fields = entry.split(",");
-                        hiringHalls.add(new DatedRecord<>(
-                                !fields[0].isBlank() ? MHQXMLUtility.parseDate(fields[0]) : null,
-                                !fields[1].isBlank() ? MHQXMLUtility.parseDate(fields[1]) : null,
-                                fields[2]));
+                        LocalDate startDate = !fields[0].isBlank() ? MHQXMLUtility.parseDate(fields[0]) : null;
+                        LocalDate endDate = !fields[1].isBlank() ? MHQXMLUtility.parseDate(fields[1]) : null;
+                        HiringHallLevel level = null;
+                        try {
+                            level = HiringHallLevel.valueOf(fields[2].toUpperCase());
+                        } catch (IllegalArgumentException ex) {
+                            level = HiringHallLevel.GREAT;
+                        }
+                        String name = fields[3];
+                        hiringHalls.put(name, new HiringHall(level, startDate, endDate, name));
                     }
                     break;
                 case "shipSearchCost":
@@ -315,8 +324,16 @@ public class AtBConfiguration {
     }
 
     public boolean isHiringHall(String planet, LocalDate date) {
-        return hiringHalls.stream().anyMatch(rec -> rec.getValue().equals(planet)
-                && rec.fitsDate(date));
+        HiringHall hall = hiringHalls.get(planet);
+        return hall != null && hall.isActive(date);
+    }
+
+    public HiringHallLevel getHiringHallLevel(String planet, LocalDate date) {
+        HiringHall hall = hiringHalls.get(planet);
+        if (hall != null && hall.isActive(date)) {
+            return hall.getLevel();
+        }
+        return HiringHallLevel.NONE;
     }
 
     public Money getShipSearchCost() {
@@ -499,7 +516,20 @@ public class AtBConfiguration {
                         if (wn2.getAttributes().getNamedItem("end") != null) {
                             end = MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("end").getTextContent());
                         }
-                        hiringHalls.add(new DatedRecord<>(start, end, wn2.getTextContent()));
+                        HiringHallLevel level = HiringHallLevel.NONE;
+                        if (wn2.getAttributes().getNamedItem("level") != null) {
+                            try {
+                                String text = wn2.getAttributes().getNamedItem("level").getTextContent().toUpperCase();
+                                level = HiringHallLevel.valueOf(wn2.getAttributes().getNamedItem("level").getTextContent().toUpperCase());
+                            } catch (IllegalArgumentException e) {
+                                LogManager.getLogger().warn("Invalid value for Hiring Hall level, falling back to NONE: " + e);
+                            }
+                        } else {
+                            // Backwards compatibility--hiring halls in atbconfig.xml should default to GREAT
+                            level = HiringHallLevel.GREAT;
+                        }
+                        String planetName = wn2.getTextContent();
+                        hiringHalls.put(planetName, new HiringHall(level, start, end, planetName));
                     }
                 }
             }
