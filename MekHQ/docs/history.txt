@@ -144,9 +144,11 @@ MEKHQ VERSION HISTORY:
 + PR #4617: Added Support for Handling Medical Discharge
 + FIX #4619: Restored adminXPPeriod Option Parsing
 + PR #4620: Fix hyperlink issue in payment text
++ PR #4621: Improved Edge Trigger Unmarshalling
 + FIX #4624: Refactored Years of Service Calculation for autoAwards Time Awards
 + FIX #4625: Removed Loyalty Change Notifications for Campaigns with Loyalty Disabled
 + PR #4631: Added Entrance Exams for Prestigious Academies, Updated Education Module Documentation
++ PR #4633: Refactored Force Commander Logic & TOE Information Display
 + PR #4634: Refactored Unit getCommander() Method
 + PR #4638: Adjusted Objectives Pane to Use Client Theme Colors and Added Normal Play Usage
 + PR #4639: Fixed Grammar in Personality Characteristic Descriptions
