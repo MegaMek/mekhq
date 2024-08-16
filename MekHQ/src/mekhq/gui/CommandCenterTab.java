@@ -624,7 +624,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             for (Mission mission : getCampaign().getActiveMissions(false)) {
                 List<Scenario> scenarios = mission.getScenarios();
 
-                scenarios.sort(Comparator.comparing(Scenario::getDate));
+                scenarios.sort(Comparator.comparing(Scenario::getDate, Comparator.nullsFirst(Comparator.naturalOrder())));
                 Collections.reverse(scenarios);
 
                 if (!scenarios.isEmpty()) {
@@ -633,9 +633,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
                     for (Scenario scenario : scenarios) {
 
                         if (scenario.getStatus().isCurrent()) {
-                            model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
-                                    + "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                                    + ChronoUnit.DAYS.between(getCampaign().getLocalDate(), scenario.getDate())) + " days</font</html>");
+                            // StratCon facility contacts that haven't yet been discovered are stored as scenarios with null start dates
+                            if (scenario.getDate() != null) {
+                                model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
+                                        + "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                                        + ChronoUnit.DAYS.between(getCampaign().getLocalDate(), scenario.getDate())) + " days</font</html>");
+                            }
                         } else {
                             if (scenario.getStatus().isOverallVictory()) {
                                 model.addElement(String.format("<html><b>" + scenario.getName() + ":</b> "
