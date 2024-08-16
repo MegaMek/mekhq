@@ -3892,6 +3892,12 @@ public class Person {
         return new ArrayList<>(injuries);
     }
 
+    public List<Injury> getPermanentInjuries() {
+        return injuries.stream()
+                .filter(Injury::isPermanent)
+                .collect(Collectors.toList());
+    }
+
     public void clearInjuries() {
         injuries.clear();
 

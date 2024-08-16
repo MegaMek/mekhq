@@ -739,7 +739,9 @@ public class Campaign implements ITechManager {
                     boolean wasSacked = getRetirementDefectionTracker().getPayout(pid).isWasSacked();
 
                     if ((!wasKilled) && (!wasSacked)) {
-                        if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
+                        if (!person.getPermanentInjuries().isEmpty()) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
+                        } if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
                             if (!getActiveContracts().isEmpty()) {
                                 int roll = Compute.randomInt(20);
 
@@ -761,7 +763,11 @@ public class Campaign implements ITechManager {
                     }
 
                     if (wasSacked) {
-                        person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
+                        if (person.getPermanentInjuries().isEmpty()) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
+                        } else {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
+                        }
                     }
 
                     // civilian spouses follow their partner in departing
