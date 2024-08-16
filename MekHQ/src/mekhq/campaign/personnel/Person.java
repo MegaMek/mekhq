@@ -80,6 +80,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.lang.Math.abs;
+
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @author Justin "Windchild" Bowen
@@ -1170,7 +1172,7 @@ public class Person {
 
         // if this is a major change, we use whichever result is furthest from the midpoint (9)
         if (isMajor) {
-            roll = Math.abs(roll - 9) > Math.abs(secondRoll - 9) ? roll : secondRoll;
+            roll = abs(roll - 9) > abs(secondRoll - 9) ? roll : secondRoll;
         }
 
         applyLoyaltyChange.accept(roll);
@@ -4267,9 +4269,14 @@ public class Person {
         if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseIntelligenceXpMultiplier()) {
             double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
 
-            double intelligenceScore = getIntelligence().getIntelligenceScore() * intelligenceMultiplier;
+            int intelligence = getIntelligence().getIntelligenceScore();
+            double intelligenceScore = intelligence * intelligenceMultiplier;
 
-            return intelligenceScore - 1;
+            if (intelligenceScore == 0) {
+                return 1;
+            } else {
+                return 1 - intelligenceScore;
+            }
         }
 
         return 1;

@@ -1823,9 +1823,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (!spa.isEligible(person)) {
                         continue;
                     }
-                    cost = (int) (spa.getCost()
+                    cost = (int) Math.round((spa.getCost()
                             * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
-                            * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
+                            * gui.getCampaign().getCampaignOptions().getXpCostMultiplier()));
                     String costDesc;
                     if (cost < 0) {
                         costDesc = resources.getString("costNotPossible.text");
@@ -2072,8 +2072,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             for (int i = 0; i < SkillType.getSkillList().length; i++) {
                 String type = SkillType.getSkillList()[i];
                 int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove() : SkillType.getType(type).getCost(0);
-                cost *= (int) (person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
+                cost = (int) Math.round(cost * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
                         * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
+
                 if (cost >= 0) {
                     String desc = String.format(resources.getString("skillDesc.format"), type, cost);
                     menuItem = new JMenuItem(desc);
@@ -2093,7 +2094,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Edge Purchasing
             if (gui.getCampaign().getCampaignOptions().isUseEdge()) {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
-                int cost = (int) (gui.getCampaign().getCampaignOptions().getEdgeCost()
+                int cost = (int) Math.round(gui.getCampaign().getCampaignOptions().getEdgeCost()
                         * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
                         * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
 
