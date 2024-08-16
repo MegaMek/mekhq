@@ -158,6 +158,7 @@ MEKHQ VERSION HISTORY:
 + PR #4648: Refactored AutoAwardsController and Fixed Scenario Awards Support
 + PR #4650: Removed unused import of LogManager and corrected the import path for Intelligence
 + PR #4640: Implemented Random Mercenary Company Name Generator
++ FIX #4654: Added Checks for Scenarios with Null Start Dates within Objectives Panel
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
