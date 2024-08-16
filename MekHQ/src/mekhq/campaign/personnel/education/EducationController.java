@@ -31,9 +31,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Intelligence;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
-import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
 import java.util.*;
