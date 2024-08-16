@@ -139,6 +139,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
@@ -282,7 +283,7 @@ public class Campaign implements ITechManager {
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
-        name = "My Campaign";
+        name = randomMercenaryCompanyNameGenerator(null);
         overtime = false;
         gmMode = false;
         setFaction(Factions.getInstance().getDefaultFaction());
@@ -739,7 +740,9 @@ public class Campaign implements ITechManager {
                     boolean wasSacked = getRetirementDefectionTracker().getPayout(pid).isWasSacked();
 
                     if ((!wasKilled) && (!wasSacked)) {
-                        if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
+                        if (!person.getPermanentInjuries().isEmpty()) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
+                        } if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
                             if (!getActiveContracts().isEmpty()) {
                                 int roll = Compute.randomInt(20);
 
@@ -761,7 +764,11 @@ public class Campaign implements ITechManager {
                     }
 
                     if (wasSacked) {
-                        person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
+                        if (person.getPermanentInjuries().isEmpty()) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
+                        } else {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
+                        }
                     }
 
                     // civilian spouses follow their partner in departing
@@ -860,6 +867,8 @@ public class Campaign implements ITechManager {
                 lances.put(id, new Lance(force.getId(), this));
             }
         }
+
+        force.updateCommander(this);
     }
 
     public void moveForce(Force force, Force superForce) {

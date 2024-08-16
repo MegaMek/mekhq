@@ -61,12 +61,12 @@ public class AutoAwardsController {
     /**
      * The controller for the manual-automatic processing of Awards
      *
-     * @param c                    the campaign to be processed
+     * @param campaign                    the campaign to be processed
      */
-    public void ManualController(Campaign c, boolean isManualPrompt) {
+    public void ManualController(Campaign campaign, boolean isManualPrompt) {
         logger.info("autoAwards (Manual) has started");
 
-        campaign = c;
+        this.campaign = campaign;
         mission = null;
 
         buildAwardLists(0);
@@ -95,12 +95,12 @@ public class AutoAwardsController {
     /**
      * The controller for the processing of awards prompted by a change in rank
      *
-     * @param c                    the campaign to be processed
+     * @param campaign                    the campaign to be processed
      */
-    public void PromotionController(Campaign c, boolean isManualPrompt) {
+    public void PromotionController(Campaign campaign, boolean isManualPrompt) {
         logger.info("autoAwards (Promotion) has started");
 
-        campaign = c;
+        this.campaign = campaign;
         mission = null;
 
         buildAwardLists(4);
@@ -121,15 +121,15 @@ public class AutoAwardsController {
     /**
      * The primary controller for the automatic processing of Awards
      *
-     * @param c                    the campaign to be processed
-     * @param m                    the mission just completed
+     * @param campaign                    the campaign to be processed
+     * @param mission                    the mission just completed
      * @param missionWasSuccessful true if the Mission was a complete Success, otherwise false
      */
-    public void PostMissionController(Campaign c, Mission m, Boolean missionWasSuccessful) {
+    public void PostMissionController(Campaign campaign, Mission mission, Boolean missionWasSuccessful) {
         logger.info("autoAwards (Mission Conclusion) has started");
 
-        campaign = c;
-        mission = m;
+        this.campaign = campaign;
+        this.mission = mission;
 
         buildAwardLists(1);
 
@@ -149,15 +149,15 @@ public class AutoAwardsController {
     /**
      * Processes awards after a scenario is concluded.
      *
-     * @param c the campaign
+     * @param campaign the campaign
      * @param personnel the personnel involved in the scenario, mapped by their UUID
      * @param scenarioKills the kills made during the scenario, mapped by personnel UUID
      * @param wasCivilianHelp whether the scenario (if any) was AtB Scenario CIVILIANHELP
      */
-    public void PostScenarioController(Campaign c, HashMap<UUID, Integer> personnel, HashMap<UUID, List<Kill>>scenarioKills, boolean wasCivilianHelp) {
+    public void PostScenarioController(Campaign campaign, HashMap<UUID, Integer> personnel, HashMap<UUID, List<Kill>>scenarioKills, boolean wasCivilianHelp) {
         logger.info("autoAwards (Scenario Conclusion) has started");
 
-        campaign = c;
+        this.campaign = campaign;
 
         buildAwardLists(2);
 
@@ -205,7 +205,7 @@ public class AutoAwardsController {
         }
 
         if (!allAwardData.isEmpty()) {
-            AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
+            AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(this.campaign, allAwardData, 0);
             autoAwardsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
             autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
             autoAwardsDialog.setVisible(true);
@@ -219,12 +219,12 @@ public class AutoAwardsController {
     /**
      * The primary controller for the automatic processing of Training Awards
      *
-     * @param c                    the campaign to be processed
+     * @param campaign                    the campaign to be processed
      */
-    public void PostGraduationController(Campaign c, List<UUID> personnel, HashMap<UUID, List<Object>> academyAttributes) {
+    public void PostGraduationController(Campaign campaign, List<UUID> personnel, HashMap<UUID, List<Object>> academyAttributes) {
         logger.info("autoAwards (Education Conclusion) has started");
 
-        campaign = c;
+        this.campaign = campaign;
 
         buildAwardLists(3);
 
@@ -516,6 +516,13 @@ public class AutoAwardsController {
                                             ignoredAwards.add(award);
                                         }
                                         break;
+                                    case "scenario":
+                                        if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                                            scenarioAwards.add(award);
+                                        } else {
+                                            ignoredAwards.add(award);
+                                        }
+                                        break;
                                     default:
                                         ignoredAwards.add(award);
                                 }
@@ -524,6 +531,7 @@ public class AutoAwardsController {
                             logger.info("autoAwards found {} Scenario Kill Awards (excluding Mission & Lifetime Kill Awards)", killAwards.size());
                             logger.info("autoAwards found {} Injury Awards", injuryAwards.size());
                             logger.info("autoAwards found {} Misc Awards", miscAwards.size());
+                            logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
                             logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;

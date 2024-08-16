@@ -5,10 +5,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Aggression;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Ambition;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Greed;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Social;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Aggression;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Ambition;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Greed;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Social;
 
 import java.util.HashMap;
 import java.util.Map;
