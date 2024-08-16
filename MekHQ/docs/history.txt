@@ -153,6 +153,7 @@ MEKHQ VERSION HISTORY:
 + PR #4641: Implement negotiation for salvage terms
 + FIX #4645: Fixed Weekly Reputation Recalculations
 + FIX #4643: Fixed Copy-Paste Error in End Mission Prisoner Nag
++ PR #4650: Removed unused import of LogManager and corrected the import path for Intelligence
 
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
