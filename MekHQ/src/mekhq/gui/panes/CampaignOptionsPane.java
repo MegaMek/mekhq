@@ -57,6 +57,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Factions;
@@ -780,6 +781,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         txtName.setPreferredSize(new Dimension(500, 30));
         gridBagConstraints.gridx = gridx--;
         panGeneral.add(txtName, gridBagConstraints);
+
+        JButton lblNameGenerator = new JButton(resources.getString("lblNameGenerator.text"));
+        lblNameGenerator.setName("lblNameGenerator");
+        lblNameGenerator.addActionListener(e -> txtName.setText(BackgroundsController.randomMercenaryCompanyNameGenerator(campaign.getFlaggedCommander())));
+        gridBagConstraints = new GridBagConstraints();
+        panGeneral.add(lblNameGenerator, gridBagConstraints);
 
         JLabel lblFaction = new JLabel(resources.getString("lblFaction.text"));
         lblFaction.setName("lblFaction");

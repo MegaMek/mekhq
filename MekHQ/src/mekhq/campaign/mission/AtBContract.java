@@ -24,6 +24,7 @@ package mekhq.campaign.mission;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
@@ -37,6 +38,7 @@ import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
@@ -87,6 +89,7 @@ public class AtBContract extends Contract {
 
     protected String employerCode;
     protected String enemyCode;
+    protected String enemyName;
 
     protected AtBContractType contractType;
     protected SkillLevel allySkill;
@@ -139,6 +142,7 @@ public class AtBContract extends Contract {
         super(name, "Independent");
         employerCode = "IND";
         enemyCode = "IND";
+        enemyName = "Independent";
 
         parentContract = null;
         mercSubcontract = false;
@@ -394,6 +398,8 @@ public class AtBContract extends Contract {
 
         Faction enemyFaction = Factions.getInstance().getFaction(enemyCode);
         setEnemyBotName(enemyFaction.getFullName(today.getYear()));
+        enemyName = ""; // wipe the old enemy name
+        getEnemyName(today.getYear()); // we use this to update enemyName
     }
 
     public int getRepairLocation(final int unitRating) {
@@ -782,6 +788,7 @@ public class AtBContract extends Contract {
         indent = super.writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyName", getEnemyName(0));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allySkill", getAllySkill().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
@@ -850,6 +857,8 @@ public class AtBContract extends Contract {
                     employerCode = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyCode")) {
                     enemyCode = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("enemyName")) {
+                    enemyName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractType")
                         || wn2.getNodeName().equalsIgnoreCase("missionType")) { // Mission Type is Legacy - 0.49.2 removal
                     setContractType(AtBContractType.parseFromString(wn2.getTextContent().trim()));
@@ -986,12 +995,48 @@ public class AtBContract extends Contract {
         return enemyCode;
     }
 
-    public String getEnemyName(int year) {
-        return Factions.getInstance().getFaction(enemyCode).getFullName(year);
-    }
-
     public void setEnemyCode(String enemyCode) {
         this.enemyCode = enemyCode;
+    }
+
+    /**
+     * Retrieves the name of the enemy for this contract.
+     * If enemyName is not set, it generates and sets the name.
+     *
+     * @param year the year for which to retrieve the enemy faction's full name (or 0, if year is unknown)
+     * @return the name of the enemy
+     */
+    public String getEnemyName(int year) {
+        if (enemyName.isBlank()) {
+            generateEnemyName(year);
+        }
+
+        return enemyName;
+    }
+
+    public void setEnemyName(final String enemyName) {
+        this.enemyName = enemyName;
+    }
+
+    /**
+     * Generates the name of the enemy for this contract.
+     * If the enemy is a mercenary, a random mercenary company name is generated.
+     * Otherwise, the full name of the enemy faction is retrieved based on the given year.
+     * If the enemy or faction cannot be found, the short name of the enemy is used as a fallback.
+     *
+     * @param year the year for which to retrieve the enemy faction's full name (or 0, if year is unknown)
+     */
+    public void generateEnemyName(@Nullable int year) {
+        try {
+            if (getEnemy().isMercenary()) {
+                enemyName = BackgroundsController.randomMercenaryCompanyNameGenerator(null);
+            } else if (year != 0) {
+                enemyName = Factions.getInstance().getFaction(getEnemy().getShortName()).getFullName(year);
+            }
+        // this is a fallback to ensure we don't end up with a null enemyName
+        } catch (NullPointerException e) {
+            enemyName = getEnemy().getShortName();
+        }
     }
 
     public AtBContractType getContractType() {
@@ -1250,7 +1295,7 @@ public class AtBContract extends Contract {
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
         allyBotName = getEmployerName(campaign.getGameYear());
-        enemyBotName = getEnemyName(campaign.getGameYear());
+        enemyBotName = getEnemyName(campaign.getGameYear()); // we set enemyName here, too
     }
 
     /**
