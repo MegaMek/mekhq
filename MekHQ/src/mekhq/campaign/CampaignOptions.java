@@ -395,6 +395,7 @@ public class CampaignOptions {
     private boolean enableUnitEducation;
     private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
+    private int entranceExamBaseTargetNumber;
     private Double facultyXpRate;
     private boolean enableBonuses;
     private Integer adultDropoutChance;
@@ -549,7 +550,6 @@ public class CampaignOptions {
     private boolean useAero;
     private boolean useVehicles;
     private boolean clanVehicles;
-    private double atbCamOpsDivision;
 
     // Contract Operations
     private boolean mercSizeLimited;
@@ -923,6 +923,7 @@ public class CampaignOptions {
         setEnableUnitEducation(true);
         setEnableOverrideRequirements(false);
         setEnableShowIneligibleAcademies(true);
+        setEntranceExamBaseTargetNumber(14);
         setFacultyXpRate(1.00);
         setEnableBonuses(true);
         setAdultDropoutChance(1000);
@@ -1172,7 +1173,6 @@ public class CampaignOptions {
         useAero = false;
         useVehicles = true;
         clanVehicles = false;
-        atbCamOpsDivision = 2.5;
 
         // Contract Operations
         mercSizeLimited = false;
@@ -2828,7 +2828,6 @@ public class CampaignOptions {
     public void setEnableOverrideRequirements(boolean enableOverrideRequirements) {
         this.enableOverrideRequirements = enableOverrideRequirements;
     }
-
     public boolean isEnableShowIneligibleAcademies() {
         return enableShowIneligibleAcademies;
     }
@@ -2837,6 +2836,13 @@ public class CampaignOptions {
         this.enableShowIneligibleAcademies = enableShowIneligibleAcademies;
     }
 
+    public int getEntranceExamBaseTargetNumber() {
+        return entranceExamBaseTargetNumber;
+    }
+
+    public void setEntranceExamBaseTargetNumber(int entranceExamBaseTargetNumber) {
+        this.entranceExamBaseTargetNumber = entranceExamBaseTargetNumber;
+    }
     public Double getFacultyXpRate() {
         return facultyXpRate;
     }
@@ -4186,14 +4192,6 @@ public class CampaignOptions {
         this.clanVehicles = clanVehicles;
     }
 
-    public double getAtbCamOpsDivision() {
-        return atbCamOpsDivision;
-    }
-
-    public void setAtbCamOpsDivision(final double atbCamOpsDivision) {
-        this.atbCamOpsDivision = atbCamOpsDivision;
-    }
-
     public boolean isDoubleVehicles() {
         return doubleVehicles;
     }
@@ -4868,6 +4866,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableUnitEducation", isEnableUnitEducation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableOverrideRequirements", isEnableOverrideRequirements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entranceExamBaseTargetNumber", getEntranceExamBaseTargetNumber());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "facultyXpRate", getFacultyXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableBonuses", isEnableBonuses());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adultDropoutChance", getAdultDropoutChance());
@@ -4994,7 +4993,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAero", useAero);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVehicles", useVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanVehicles", clanVehicles);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atbCamOpsDivision", atbCamOpsDivision);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doubleVehicles", doubleVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPlayerVehicles", adjustPlayerVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMechs", getOpForLanceTypeMechs());
@@ -5655,6 +5653,8 @@ public class CampaignOptions {
                     retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
                     retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("entranceExamBaseTargetNumber")) {
+                    retVal.setEntranceExamBaseTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("facultyXpRate")) {
                     retVal.setFacultyXpRate(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableBonuses")) {
@@ -6004,8 +6004,6 @@ public class CampaignOptions {
                     retVal.useVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanVehicles")) {
                     retVal.clanVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("atbCamOpsDivision")) {
-                    retVal.atbCamOpsDivision = Double.parseDouble(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doubleVehicles")) {
                     retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {

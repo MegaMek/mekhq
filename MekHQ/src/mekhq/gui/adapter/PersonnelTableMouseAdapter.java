@@ -78,8 +78,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
+import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -385,15 +387,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_BEGIN_EDUCATION_ENROLLMENT: {
-                for (Person person : people) {
-                    EducationController.performEducationPreEnrollmentActions(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5], false);
-                }
+                processApplication(people, data, false);
                 break;
             }
             case CMD_BEGIN_EDUCATION_RE_ENROLLMENT: {
-                for (Person person : people) {
-                    EducationController.performEducationPreEnrollmentActions(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5], true);
-                }
+                processApplication(people, data, true);
                 break;
             }
             case CMD_COMPLETE_STAGE: {
@@ -1190,6 +1188,41 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             default: {
                 break;
             }
+        }
+    }
+
+    /**
+     * Private method to process a list of applications to education academies.
+     *
+     * @param people           an array of Person objects representing the applicants
+     * @param data             an array of String objects representing the command data
+     * @param isReEnrollment   a boolean indicating if the application is for re-enrollment
+     */
+    private void processApplication(Person[] people, String[] data, boolean isReEnrollment) {
+        boolean applicationFailed = false;
+
+        for (Person person : people) {
+            if (makeEnrollmentCheck(gui.getCampaign(), person, data[1], data[2])) {
+                EducationController.performEducationPreEnrollmentActions(
+                        gui.getCampaign(),
+                        person,
+                        data[1],
+                        data[2],
+                        Integer.parseInt(data[3]),
+                        data[4],
+                        data[5],
+                        isReEnrollment
+                );
+            } else {
+                applicationFailed = true;
+            }
+        }
+
+        if (applicationFailed) {
+            JOptionPane.showMessageDialog(null,
+                    wordWrap(resources.getString("eduFailedApplication.text")),
+                    resources.getString("eduFailedApplication.title"),
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -2827,7 +2860,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      */
     private void buildEducationMenusSingleton(Campaign campaign, Person person, Academy academy, JMenu militaryMenu, JMenu civilianMenu) {
         boolean showIneligibleAcademies = campaign.getCampaignOptions().isEnableShowIneligibleAcademies();
-        // has the academy been constructed, is still standing, & has not closed?
         if (campaign.getCampaignOptions().isEnableOverrideRequirements()) {
             JMenu academyOption = new JMenu(academy.getName());
 
@@ -2853,6 +2885,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             return;
         }
 
+        // has the academy been constructed, is still standing, & has not closed?
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {
@@ -2880,11 +2913,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
                 }
-                // is the applicant qualified?
+            // is the applicant qualified?
             } else if (!academy.isQualified(person)) {
                 if (showIneligibleAcademies) {
                     JMenuItem academyOption = new JMenuItem("<html>" + academy.getName()
                             + String.format(resources.getString("eduUnqualified.text"), academy.getEducationLevelMin()));
+                    educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
+                }
+            } else if (academy.hasRejectedApplication(person)) {
+                if (showIneligibleAcademies) {
+                    JMenuItem academyOption = new JMenuItem("<html>" + academy.getName()
+                            + String.format(resources.getString("eduRejected.text"), academy.getEducationLevelMin()));
                     educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
                 }
             } else if (academy.isLocal()) {
@@ -2999,7 +3038,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             boolean arePersonnelEligible = personnel.stream()
                     .allMatch(person -> person.getAge(campaign.getLocalDate()) < academy.getAgeMax()
                             && person.getAge(campaign.getLocalDate()) >= academy.getAgeMin()
-                            && academy.isQualified(person));
+                            && academy.isQualified(person)
+                            && !academy.hasRejectedApplication(person));
 
             // if one or more people are not eligible to attend the academy,
             // there is no point doing any further processes
@@ -3118,11 +3158,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                     courses.addActionListener(this);
                     academyOption.add(courses);
-                } else {
-                    courses = new JMenuItem(resources.getString("eduNoQualificationsOffered.text"));
-                    academyOption.add(courses);
                 }
             }
+        } else {
+            courses = new JMenuItem(resources.getString("eduNoQualificationsOffered.text"));
+            academyOption.add(courses);
         }
     }
 
