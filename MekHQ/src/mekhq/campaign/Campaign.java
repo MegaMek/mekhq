@@ -3758,7 +3758,7 @@ public class Campaign implements ITechManager {
         processFatigueNewDay();
 
         if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
-            updateCrimeRating();
+            processReputationChanges();
         }
 
         if (campaignOptions.isUseEducationModule()) {
@@ -3800,10 +3800,11 @@ public class Campaign implements ITechManager {
         return true;
     }
 
+
     /**
-     * Updates the campaign's crime rating based on specific conditions.
+     * Processes reputation changes based on various conditions.
      */
-    private void updateCrimeRating() {
+    private void processReputationChanges() {
         if (faction.isPirate()) {
             dateOfLastCrime = currentDay;
             crimePirateModifier = -100;
@@ -3826,6 +3827,10 @@ public class Campaign implements ITechManager {
                     }
                 }
             }
+        }
+
+        if (currentDay.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
+            reputation.initializeReputation(this);
         }
     }
 
