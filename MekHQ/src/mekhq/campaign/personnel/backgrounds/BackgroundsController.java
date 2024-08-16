@@ -11,6 +11,8 @@ import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 public class BackgroundsController {
+    final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
+
     public static void generateBackground(Campaign campaign, Person person) {
         if (campaign.getCampaignOptions().isUseToughness()) {
             Toughness.generateToughness(person);
@@ -24,52 +26,64 @@ public class BackgroundsController {
      * @throws IllegalStateException if an unexpected value is encountered during the generation process.
      */
     public static String randomMercenaryCompanyNameGenerator(@Nullable Person commander) {
-        int roll = Compute.d6(1);
+        return getPrefix(commander) + ' ' + getNameBody();
+    }
+
+    /**
+     * Returns the body of the generated name.
+     *
+     * @return the name body as a String.
+     * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
+     */
+    private static String getNameBody() {
+        String name = "";
+        int roll = Compute.randomInt(4);
 
         return switch (roll) {
-            case 1 -> { // Corporate
-                String name = MiddleWordCorporate.getRandomWord();
+            // Corporate
+            case 0 -> {
+                name = MiddleWordCorporate.getRandomWord();
                 String newWordSuggestion = getNewWord(name, EndWordCorporate::getRandomWord);
 
                 yield name + ' ' + newWordSuggestion;
             }
-            case 2 -> { // Mercenary - Vanity 1
-                String name = getCommanderName(commander) + "'s ";
-
+            // Mercenary
+            case 1 -> getNewWord(name, EndWordMercenary::getRandomWord);
+            case 2 -> {
+                name = getNewWord(name, MiddleWordMercenary::getRandomWord) + ' ';
                 String newWordSuggestion = getNewWord(name, EndWordMercenary::getRandomWord);
 
                 yield name + newWordSuggestion;
             }
-            case 3 -> { // Mercenary - Vanity 2
-                String name = getCommanderName(commander) + "'s ";
-
-                name += getNewWord(name, MiddleWordMercenary::getRandomWord) + ' ';
-                String newWordSuggestion = getNewWord(name, EndWordMercenary::getRandomWord);
-
-                yield name + newWordSuggestion;
-            }
-            case 4 -> { // Mercenary - Generic
-                final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
-
-                String name = resources.getString("definiteArticle.text");
-                name += ' ' + MiddleWordMercenary.getRandomWord();
-                String newWordSuggestion = getNewWord(name, EndWordMercenary::getRandomWord);
-
-                yield name + ' ' + newWordSuggestion;
-            }
-            case 5 -> { // Pre-Fab
-                final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
-
-                yield resources.getString("definiteArticle.text") + ' ' + PreFabHumorous.getRandomWord();
-            }
-            case 6 -> { // Pre-Fab - Vanity
-                String name = getCommanderName(commander) + "'s ";
-                yield name + PreFabHumorous.getRandomWord();
-            }
+            // Pre-Fab
+            case 3 -> PreFabHumorous.getRandomWord();
             default -> throw new IllegalStateException(
-                    "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/randomMercenaryCompanyNameGenerator: "
+                    "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/randomMercenaryCompanyNameGenerator 1 of 2: "
                     + roll
             );
+        };
+    }
+
+    /**
+     * Retrieves the prefix for generating a random mercenary company name.
+     *
+     * @param commander The person object representing the commander. Can be null.
+     * @return The prefix for generating a random mercenary company name.
+     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     */
+    private static String getPrefix(Person commander) {
+        int roll = Compute.randomInt(4);
+
+        return switch (roll) {
+            // Numerical
+            case 0 -> resources.getString("definiteArticle.text") + ' ' + getNumericalNameStart();
+            // Vanity
+            case 1 -> getCommanderName(commander) + "'s";
+            // 'The'
+            case 2, 3 -> resources.getString("definiteArticle.text");
+            default -> throw new IllegalStateException(
+                    "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/randomMercenaryCompanyNameGenerator 2 of 2: "
+                            + roll);
         };
     }
 
@@ -116,11 +130,33 @@ public class BackgroundsController {
      * @param suggestedAddition   the suggested addition to the name
      * @return true if the start of the suggested addition is not present in the current name, otherwise false
      */
-    public static boolean checkIfNameContains(String currentName, String suggestedAddition) {
+    private static boolean checkIfNameContains(String currentName, String suggestedAddition) {
         int checkLength = suggestedAddition.length() - 2;
 
         String startOfSecondString = suggestedAddition.substring(0, checkLength);
 
         return currentName.contains(startOfSecondString);
+    }
+
+    /**
+     * Generates a numerical name using a random number and a suffix based on the number's modulo.
+     */
+    private static String getNumericalNameStart() {
+        int number = Compute.randomInt(30) + 1;
+
+        int modulo100 = number % 100;
+        int modulo10 = number % 10;
+
+        if (modulo100 >= 11 && modulo100 <= 13) {
+            return number + resources.getString("suffixTh.text");
+        } else if (modulo10 == 1) {
+            return number + resources.getString("suffixSt.text");
+        } else if (modulo10 == 2) {
+            return number + resources.getString("suffixNd.text");
+        } else if (modulo10 == 3) {
+            return number + resources.getString("suffixRd.text");
+        } else {
+            return number + resources.getString("suffixTh.text");
+        }
     }
 }
