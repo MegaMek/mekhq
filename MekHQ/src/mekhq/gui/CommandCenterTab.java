@@ -24,7 +24,12 @@ import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.CampaignSummary;
 import mekhq.campaign.event.*;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -213,7 +218,14 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblExperienceHead, gridBagConstraints);
-        lblExperience = new JLabel(getCampaign().getUnitRating().getAverageExperience().toString());
+
+        lblExperience = new JLabel();
+        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
+            lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
+        } else {
+            lblExperience.setText(getCampaign().getReputation().getAverageSkillLevel().toString());
+        }
+
         lblExperienceHead.setLabelFor(lblExperience);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -512,8 +524,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         btnUnitRating = new JButton(resourceMap.getString("btnUnitRating.text"));
         btnUnitRating.setVisible(getCampaign().getCampaignOptions().getUnitRatingMethod().isEnabled());
-        btnUnitRating.addActionListener(evt -> new UnitRatingReportDialog(getCampaignGui().getFrame(),
-                getCampaign()).setVisible(true));
+
+        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
+            btnUnitRating.addActionListener(evt -> new UnitRatingReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true));
+        } else {
+            btnUnitRating.addActionListener(evt -> new ReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true));
+        }
         panReports.add(btnUnitRating);
 
         panReports.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panReports.title")));
@@ -539,26 +555,41 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * refresh the basic info panel with campaign information
      */
     private void refreshBasicInfo() {
-        getCampaign().getUnitRating().reInitialize();
-        getCampaign().getCampaignSummary().updateInformation();
-        lblRating.setText(getCampaign().getUnitRatingText());
-        lblPersonnel.setText(getCampaign().getCampaignSummary().getPersonnelReport());
-        lblMissionSuccess.setText(getCampaign().getCampaignSummary().getMissionSuccessReport());
-        lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
-        lblComposition.setText(getCampaign().getCampaignSummary().getForceCompositionReport());
-        lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport().toString());
-        lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());
-        lblTransportCapacity.setText(getCampaign().getCampaignSummary().getTransportCapacity());
+        final Campaign campaign = getCampaign();
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        final UnitRatingMethod unitRatingMethod = campaignOptions.getUnitRatingMethod();
+        final CampaignSummary campaignSummary = campaign.getCampaignSummary();
 
-        if (getCampaign().getCampaignOptions().isUseAdministrativeStrain()) {
+        if (unitRatingMethod.isFMMR()) {
+            campaign.getUnitRating().reInitialize();
+            lblExperience.setText(campaign.getUnitRating().getAverageExperience().toString());
+        } else if (unitRatingMethod.isCampaignOperations()) {
+            if (campaign.getReputation() == null) {
+                ReputationController reputationController = new ReputationController();
+                reputationController.initializeReputation(campaign);
+                campaign.setReputation(reputationController);
+            }
+            lblExperience.setText(campaign.getReputation().getAverageSkillLevel().toString());
+        }
+
+        campaignSummary.updateInformation();
+        lblRating.setText(campaign.getUnitRatingText());
+        lblPersonnel.setText(campaignSummary.getPersonnelReport());
+        lblMissionSuccess.setText(campaignSummary.getMissionSuccessReport());
+        lblComposition.setText(campaignSummary.getForceCompositionReport());
+        lblCargoSummary.setText(campaignSummary.getCargoCapacityReport().toString());
+        lblRepairStatus.setText(campaignSummary.getForceRepairReport());
+        lblTransportCapacity.setText(campaignSummary.getTransportCapacity());
+
+        if (campaignOptions.isUseAdministrativeStrain()) {
             try {
-                lblAdminstrativeCapacity.setText(getCampaign().getCampaignSummary().getAdministrativeCapacityReport(getCampaign()));
+                lblAdminstrativeCapacity.setText(campaignSummary.getAdministrativeCapacityReport(campaign));
             } catch (Exception ignored) {}
         }
 
-        if (getCampaign().getCampaignOptions().isUseFatigue()) {
+        if (campaignOptions.isUseFatigue()) {
             try {
-                lblFacilityCapacities.setText(getCampaign().getCampaignSummary().getFacilityReport());
+                lblFacilityCapacities.setText(campaignSummary.getFacilityReport());
             } catch (Exception ignored) {}
         }
     }

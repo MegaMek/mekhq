@@ -274,8 +274,11 @@ public class CampaignOptions {
     //region Life Paths Tab
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
+
+    // Random Histories
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
+    private boolean useRandomPersonalityReputation;
     private boolean useIntelligenceXpMultiplier;
 
     // Retirement
@@ -831,8 +834,11 @@ public class CampaignOptions {
         //region Life Paths Tab
         // Personnel Randomization
         setUseDylansRandomXP(false);
+
+        // Random Histories
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
+        setUseRandomPersonalityReputation(true);
         setUseIntelligenceXpMultiplier(true);
 
         // Family
@@ -1865,6 +1871,14 @@ public class CampaignOptions {
 
     public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
         this.useRandomPersonalities = useRandomPersonalities;
+    }
+
+    public boolean isUseRandomPersonalityReputation() {
+        return useRandomPersonalityReputation;
+    }
+
+    public void setUseRandomPersonalityReputation(final boolean useRandomPersonalityReputation) {
+        this.useRandomPersonalityReputation = useRandomPersonalityReputation;
     }
 
     public boolean isUseIntelligenceXpMultiplier() {
@@ -4722,6 +4736,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
         getRandomOriginOptions().writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalityReputation", isUseRandomPersonalityReputation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useIntelligenceXpMultiplier", isUseIntelligenceXpMultiplier());
         //endregion Personnel Randomization
 
@@ -5477,6 +5492,8 @@ public class CampaignOptions {
                     retVal.setRandomOriginOptions(randomOriginOptions);
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalities")) {
                     retVal.setUseRandomPersonalities(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalityReputation")) {
+                    retVal.setUseRandomPersonalityReputation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useIntelligenceXpMultiplier")) {
                     retVal.setUseIntelligenceXpMultiplier(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Personnel Randomization
@@ -5894,7 +5911,12 @@ public class CampaignOptions {
                     //region Markets Tab
                     //region Personnel Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
-                    retVal.setPersonnelMarketName(wn2.getTextContent().trim());
+                    String marketName = wn2.getTextContent().trim();
+                    // Backwards compatibility with saves from before these rules moved to Camops
+                    if (marketName.equals("Strat Ops")) {
+                        marketName = "Campaign Ops";
+                    }
+                    retVal.setPersonnelMarketName(marketName);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
                     retVal.setPersonnelMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRemovalTargets")) {

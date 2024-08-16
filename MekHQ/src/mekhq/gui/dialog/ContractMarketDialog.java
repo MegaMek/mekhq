@@ -320,6 +320,7 @@ public class ContractMarketDialog extends JDialog {
         btnEndRetainer.setVisible(null != campaign.getRetainerEmployerCode());
         btnEndRetainer.addActionListener(ev -> {
             campaign.setRetainerEmployerCode(null);
+            campaign.setRetainerStartDate(null);
             lblCurrentRetainer.setVisible(false);
             lblRetainerEmployer.setVisible(false);
             btnEndRetainer.setVisible(false);

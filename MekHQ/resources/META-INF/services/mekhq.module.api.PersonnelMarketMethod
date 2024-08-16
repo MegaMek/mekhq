@@ -1,6 +1,6 @@
 mekhq.campaign.market.PersonnelMarketRandom
 mekhq.campaign.market.PersonnelMarketFMMr
-mekhq.campaign.market.PersonnelMarketStratOps
+mekhq.campaign.market.PersonnelMarketCampaignOps
 mekhq.campaign.market.PersonnelMarketDylan
 mekhq.campaign.market.PersonnelMarketDisabled
 mekhq.module.atb.PersonnelMarketAtB

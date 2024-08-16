@@ -359,6 +359,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseDylansRandomXP;
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
     private JCheckBox chkUseRandomPersonalities;
+    private JCheckBox chkUseRandomPersonalityReputation;
     private JCheckBox chkUseIntelligenceXpMultiplier;
 
     // Marriage
@@ -646,8 +647,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
     private MMComboBox<SkillLevel> comboSkillLevel;
-    private JLabel lblAtbCamOpsDivision;
-    private JSpinner spnAtbCamOpsDivision;
 
     // unit administration
     private JCheckBox chkUseAero;
@@ -2964,17 +2963,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkAutoconfigMunitions, gridBagConstraints);
 
-        lblAtbCamOpsDivision = new JLabel(resources.getString("lblAtbCamOpsDivision.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = 1;
-        panSubAtBAdmin.add(lblAtbCamOpsDivision, gridBagConstraints);
-
-        spnAtbCamOpsDivision = new JSpinner(new SpinnerNumberModel(2.5, 1, 10, 0.1));
-        spnAtbCamOpsDivision.setToolTipText(resources.getString("lblAtbCamOpsDivision.toolTipText"));
-        gridBagConstraints.gridx = 1;
-        panSubAtBAdmin.add(spnAtbCamOpsDivision, gridBagConstraints);
-
         chkMercSizeLimited = new JCheckBox(resources.getString("chkMercSizeLimited.text"));
         chkMercSizeLimited.setToolTipText(resources.getString("chkMercSizeLimited.toolTipText"));
         gridBagConstraints.gridx = 0;
@@ -3498,14 +3486,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lifePathsPanel.add(createPersonnelRandomizationPanel(), gbc);
 
         gbc.gridx++;
-        lifePathsPanel.add(createAnniversaryPanel(), gbc);
+        lifePathsPanel.add(createRandomHistoriesPanel(), gbc);
 
         //
 
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = 2;
         lifePathsPanel.add(createFamilyPanel(), gbc);
+
+        gbc.gridx++;
+        lifePathsPanel.add(createAnniversaryPanel(), gbc);
 
         //
 
@@ -5048,16 +5038,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
-        randomOriginOptionsPanel = new RandomOriginOptionsPanel(getFrame(), campaign, comboFaction);
-
-        chkUseRandomPersonalities = new JCheckBox(resources.getString("chkUseRandomPersonalities.text"));
-        chkUseRandomPersonalities.setToolTipText(resources.getString("chkUseRandomPersonalities.toolTipText"));
-        chkUseRandomPersonalities.setName("chkUseRandomPersonalities");
-
-        chkUseIntelligenceXpMultiplier = new JCheckBox(resources.getString("chkUseIntelligenceXpMultiplier.text"));
-        chkUseIntelligenceXpMultiplier.setToolTipText(resources.getString("chkUseIntelligenceXpMultiplier.toolTipText"));
-        chkUseIntelligenceXpMultiplier.setName("chkUseIntelligenceXpMultiplier");
-
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("personnelRandomizationPanel.title")));
@@ -5071,16 +5051,54 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseDylansRandomXP)
-                        .addComponent(randomOriginOptionsPanel)
-                        .addComponent(chkUseRandomPersonalities)
-                        .addComponent(chkUseIntelligenceXpMultiplier)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseDylansRandomXP)
+        );
+
+        return panel;
+    }
+
+    private JPanel createRandomHistoriesPanel() {
+        randomOriginOptionsPanel = new RandomOriginOptionsPanel(getFrame(), campaign, comboFaction);
+
+        chkUseRandomPersonalities = new JCheckBox(resources.getString("chkUseRandomPersonalities.text"));
+        chkUseRandomPersonalities.setToolTipText(resources.getString("chkUseRandomPersonalities.toolTipText"));
+        chkUseRandomPersonalities.setName("chkUseRandomPersonalities");
+
+        chkUseRandomPersonalityReputation = new JCheckBox(resources.getString("chkUseRandomPersonalityReputation.text"));
+        chkUseRandomPersonalityReputation.setToolTipText(resources.getString("chkUseRandomPersonalityReputation.toolTipText"));
+        chkUseRandomPersonalityReputation.setName("chkUseRandomPersonalityReputation");
+
+        chkUseIntelligenceXpMultiplier = new JCheckBox(resources.getString("chkUseIntelligenceXpMultiplier.text"));
+        chkUseIntelligenceXpMultiplier.setToolTipText(resources.getString("chkUseIntelligenceXpMultiplier.toolTipText"));
+        chkUseIntelligenceXpMultiplier.setName("chkUseIntelligenceXpMultiplier");
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomHistoriesPanel.title")));
+        panel.setName("randomHistoriesPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
                         .addComponent(randomOriginOptionsPanel)
                         .addComponent(chkUseRandomPersonalities)
+                        .addComponent(chkUseRandomPersonalityReputation)
+                        .addComponent(chkUseIntelligenceXpMultiplier)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(randomOriginOptionsPanel)
+                        .addComponent(chkUseRandomPersonalities)
+                        .addComponent(chkUseRandomPersonalityReputation)
                         .addComponent(chkUseIntelligenceXpMultiplier)
         );
 
@@ -8306,6 +8324,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
         randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
+        chkUseRandomPersonalityReputation.setSelected(options.isUseRandomPersonalityReputation());
         chkUseIntelligenceXpMultiplier.setSelected(options.isUseIntelligenceXpMultiplier());
 
         // Family
@@ -8634,7 +8653,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkClanVehicles.setSelected(options.isClanVehicles());
         chkAutoconfigMunitions.setSelected(options.isAutoconfigMunitions());
         chkMercSizeLimited.setSelected(options.isMercSizeLimited());
-        spnAtbCamOpsDivision.setValue(options.getAtbCamOpsDivision());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
         spnBonusPartExchangeValue.setValue(options.getBonusPartExchangeValue());
         spnBonusPartMaxExchangeCount.setValue(options.getBonusPartMaxExchangeCount());
@@ -9013,6 +9031,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
             options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
             options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
+            options.setUseRandomPersonalityReputation(chkUseRandomPersonalityReputation.isSelected());
             options.setUseIntelligenceXpMultiplier(chkUseIntelligenceXpMultiplier.isSelected());
 
             // Family
@@ -9212,7 +9231,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
             options.setGenerateChases(chkGenerateChases.isSelected());
             options.setMercSizeLimited(chkMercSizeLimited.isSelected());
-            options.setAtbCamOpsDivision((Double) spnAtbCamOpsDivision.getValue());
             options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
             options.setBonusPartExchangeValue((Integer) spnBonusPartExchangeValue.getValue());
             options.setBonusPartMaxExchangeCount((Integer) spnBonusPartMaxExchangeCount.getValue());

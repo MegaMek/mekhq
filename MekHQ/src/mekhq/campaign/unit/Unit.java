@@ -4780,6 +4780,13 @@ public class Unit implements ITechnology {
     }
 
     /**
+     * @return true if the unit is fully crewed, false otherwise.
+     */
+    public boolean isFullyCrewed() {
+        return getActiveCrew().size() == getFullCrewSize();
+    }
+
+    /**
      * Prototype TSM makes a unit harder to repair and maintain.
      *
      * @return Whether the unit has prototype TSM
