@@ -136,7 +136,7 @@
 		<variableTechLevel>true</variableTechLevel>
 		<factionIntroDate>false</factionIntroDate>
 		<useAmmoByType>false</useAmmoByType>
-		<waitingPeriod>7</waitingPeriod>
+		<waitingPeriod>1</waitingPeriod>
 		<acquisitionSkill>Negotiation</acquisitionSkill>
 		<acquisitionSupportStaffOnly>true</acquisitionSupportStaffOnly>
 		<techLevel>3</techLevel>
@@ -211,6 +211,7 @@
 		<minimumHitsForVehicles>1</minimumHitsForVehicles>
 		<useRandomHitsForVehicles>false</useRandomHitsForVehicles>
 		<tougherHealing>false</tougherHealing>
+        <maximumPatients>25</maximumPatients>
 		<prisonerCaptureStyle>ATB</prisonerCaptureStyle>
 		<defaultPrisonerStatus>PRISONER</defaultPrisonerStatus>
 		<prisonerBabyStatus>true</prisonerBabyStatus>
@@ -254,7 +255,7 @@
 		<enableTimeAwards>true</enableTimeAwards>
 		<enableTrainingAwards>true</enableTrainingAwards>
 		<enableMiscAwards>true</enableMiscAwards>
-        <awardSetFilterList></awardSetFilterList>
+		<awardSetFilterList></awardSetFilterList>
 		<useDylansRandomXP>true</useDylansRandomXP>
 		<randomOriginOptions>
 			<randomizeOrigin>true</randomizeOrigin>
@@ -461,7 +462,7 @@
 		<sharesForAll>false</sharesForAll>
 		<useTaxes>false</useTaxes>
 		<taxesPercentage>30</taxesPercentage>
-		<personnelMarketName>Strat Ops</personnelMarketName>
+		<personnelMarketName>Campaign Ops</personnelMarketName>
 		<personnelMarketReportRefresh>true</personnelMarketReportRefresh>
 		<personnelMarketRandomRemovalTargets>
 			<ULTRA_GREEN>4</ULTRA_GREEN>

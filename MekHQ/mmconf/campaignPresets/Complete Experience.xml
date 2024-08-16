@@ -109,7 +109,7 @@
 		<assignedTechFirst>false</assignedTechFirst>
 		<resetToFirstTech>false</resetToFirstTech>
 		<useQuirks>true</useQuirks>
-        <xpCostMultiplier>1</xpCostMultiplier>
+		<xpCostMultiplier>1.0</xpCostMultiplier>
 		<scenarioXP>0</scenarioXP>
 		<killsForXP>0</killsForXP>
 		<killXPAward>0</killXPAward>
@@ -136,7 +136,7 @@
 		<variableTechLevel>true</variableTechLevel>
 		<factionIntroDate>false</factionIntroDate>
 		<useAmmoByType>false</useAmmoByType>
-		<waitingPeriod>7</waitingPeriod>
+		<waitingPeriod>1</waitingPeriod>
 		<acquisitionSkill>Negotiation</acquisitionSkill>
 		<acquisitionSupportStaffOnly>true</acquisitionSupportStaffOnly>
 		<techLevel>3</techLevel>
@@ -175,7 +175,7 @@
 		<useRandomUnitQualities>true</useRandomUnitQualities>
 		<useUnofficialMaintenance>true</useUnofficialMaintenance>
 		<checkMaintenance>true</checkMaintenance>
-		<maxAcquisitions>3</maxAcquisitions>
+		<maxAcquisitions>1</maxAcquisitions>
 		<useTactics>false</useTactics>
 		<useInitiativeBonus>false</useInitiativeBonus>
 		<useToughness>true</useToughness>
@@ -211,6 +211,7 @@
 		<minimumHitsForVehicles>1</minimumHitsForVehicles>
 		<useRandomHitsForVehicles>true</useRandomHitsForVehicles>
 		<tougherHealing>true</tougherHealing>
+		<maximumPatients>25</maximumPatients>
 		<prisonerCaptureStyle>ATB</prisonerCaptureStyle>
 		<defaultPrisonerStatus>PRISONER</defaultPrisonerStatus>
 		<prisonerBabyStatus>true</prisonerBabyStatus>
@@ -230,10 +231,10 @@
 			<HEROIC>6.4</HEROIC>
 			<NONE>0.5</NONE>
 			<GREEN>0.6</GREEN>
+            <REGULAR>1.0</REGULAR>
 			<VETERAN>1.6</VETERAN>
 			<ELITE>3.2</ELITE>
 			<LEGENDARY>12.8</LEGENDARY>
-			<REGULAR>1.0</REGULAR>
 		</salaryXPMultipliers>
 		<salaryTypeBase>1500 CSB,2250 CSB,900 CSB,900 CSB,900 CSB,900 CSB,900 CSB,1500 CSB,900 CSB,960 CSB,960 CSB,750 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
 		<awardBonusStyle>BOTH</awardBonusStyle>
@@ -254,7 +255,7 @@
 		<enableTimeAwards>true</enableTimeAwards>
 		<enableTrainingAwards>true</enableTrainingAwards>
 		<enableMiscAwards>true</enableMiscAwards>
-        <awardSetFilterList></awardSetFilterList>
+		<awardSetFilterList></awardSetFilterList>
 		<useDylansRandomXP>true</useDylansRandomXP>
 		<randomOriginOptions>
 			<randomizeOrigin>true</randomizeOrigin>
@@ -461,24 +462,24 @@
 		<sharesForAll>false</sharesForAll>
 		<useTaxes>false</useTaxes>
 		<taxesPercentage>30</taxesPercentage>
-		<personnelMarketName>Strat Ops</personnelMarketName>
+		<personnelMarketName>Campaign Ops</personnelMarketName>
 		<personnelMarketReportRefresh>true</personnelMarketReportRefresh>
 		<personnelMarketRandomRemovalTargets>
 			<ULTRA_GREEN>4</ULTRA_GREEN>
 			<HEROIC>11</HEROIC>
 			<NONE>3</NONE>
 			<GREEN>4</GREEN>
+            <REGULAR>6</REGULAR>
 			<VETERAN>8</VETERAN>
 			<ELITE>10</ELITE>
 			<LEGENDARY>11</LEGENDARY>
-			<REGULAR>6</REGULAR>
 		</personnelMarketRandomRemovalTargets>
 		<personnelMarketDylansWeight>0.3</personnelMarketDylansWeight>
 		<usePersonnelHireHiringHallOnly>false</usePersonnelHireHiringHallOnly>
 		<unitMarketMethod>ATB_MONTHLY</unitMarketMethod>
 		<unitMarketRegionalMechVariations>true</unitMarketRegionalMechVariations>
 		<unitMarketSpecialUnitChance>30</unitMarketSpecialUnitChance>
-        <unitMarketRarityModifier>0</unitMarketRarityModifier>
+		<unitMarketRarityModifier>0</unitMarketRarityModifier>
 		<instantUnitMarketDelivery>true</instantUnitMarketDelivery>
 		<unitMarketReportRefresh>true</unitMarketReportRefresh>
 		<contractMarketMethod>ATB_MONTHLY</contractMarketMethod>

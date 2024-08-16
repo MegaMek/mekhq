@@ -360,6 +360,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
     private JCheckBox chkUseRandomPersonalities;
     private JCheckBox chkUseRandomPersonalityReputation;
+    private JCheckBox chkUseIntelligenceXpMultiplier;
 
     // Marriage
     private JCheckBox chkUseManualMarriages;
@@ -468,6 +469,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEnableUnitEducation;
     private JCheckBox chkShowIneligibleAcademies;
     private JCheckBox chkEnableOverrideRequirements;
+    private JLabel lblEntranceExamBaseTargetNumber;
+    private JSpinner spnEntranceExamBaseTargetNumber;
     private JCheckBox chkEnableBonuses;
     private JLabel lblFacultyXpMultiplier;
     private JSpinner spnFacultyXpMultiplier;
@@ -5071,6 +5074,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomPersonalityReputation.setToolTipText(resources.getString("chkUseRandomPersonalityReputation.toolTipText"));
         chkUseRandomPersonalityReputation.setName("chkUseRandomPersonalityReputation");
 
+        chkUseIntelligenceXpMultiplier = new JCheckBox(resources.getString("chkUseIntelligenceXpMultiplier.text"));
+        chkUseIntelligenceXpMultiplier.setToolTipText(resources.getString("chkUseIntelligenceXpMultiplier.toolTipText"));
+        chkUseIntelligenceXpMultiplier.setName("chkUseIntelligenceXpMultiplier");
+
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomHistoriesPanel.title")));
@@ -5086,6 +5093,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(randomOriginOptionsPanel)
                         .addComponent(chkUseRandomPersonalities)
                         .addComponent(chkUseRandomPersonalityReputation)
+                        .addComponent(chkUseIntelligenceXpMultiplier)
         );
 
         layout.setHorizontalGroup(
@@ -5093,6 +5101,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(randomOriginOptionsPanel)
                         .addComponent(chkUseRandomPersonalities)
                         .addComponent(chkUseRandomPersonalityReputation)
+                        .addComponent(chkUseIntelligenceXpMultiplier)
         );
 
         return panel;
@@ -6295,9 +6304,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkShowIneligibleAcademies = new JCheckBox(resources.getString("chkShowIneligibleAcademies.text"));
         chkShowIneligibleAcademies.setToolTipText(resources.getString("chkShowIneligibleAcademies.toolTip"));
         chkShowIneligibleAcademies.setName("chkShowIneligibleAcademies");
+
         chkEnableOverrideRequirements = new JCheckBox(resources.getString("chkEnableOverrideRequirements.text"));
         chkEnableOverrideRequirements.setToolTipText(resources.getString("chkEnableOverrideRequirements.toolTip"));
         chkEnableOverrideRequirements.setName("chkEnableOverrideRequirements");
+
+        // Entrance Exams
+        lblEntranceExamBaseTargetNumber = new JLabel(resources.getString("lblEntranceExamBaseTargetNumber.text"));
+        lblEntranceExamBaseTargetNumber.setToolTipText(wordWrap(resources.getString("lblEntranceExamBaseTargetNumber.toolTip")));
+        lblEntranceExamBaseTargetNumber.setName("lblEntranceExamBaseTargetNumber");
+
+        spnEntranceExamBaseTargetNumber = new JSpinner(new SpinnerNumberModel(14, 0, 20, 1));
+        spnEntranceExamBaseTargetNumber.setToolTipText(wordWrap(resources.getString("lblEntranceExamBaseTargetNumber.toolTip")));
+        spnEntranceExamBaseTargetNumber.setName("spnEntranceExamBaseTargetNumber");
 
         // XP & Skill Bonuses
         final JPanel xpAndSkillBonusesPanel = createXpAndSkillBonusesPanel();
@@ -6329,6 +6348,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkEnableOverrideRequirements.setEnabled(isEnabled);
             chkShowIneligibleAcademies.setEnabled(isEnabled);
 
+            lblEntranceExamBaseTargetNumber.setEnabled(isEnabled);
+            spnEntranceExamBaseTargetNumber.setEnabled(isEnabled);
+
             xpAndSkillBonusesPanel.setEnabled(isEnabled);
             chkEnableBonuses.setEnabled(isEnabled);
             lblFacultyXpMultiplier.setEnabled(isEnabled);
@@ -6356,6 +6378,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         enableStandardSetsPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         chkEnableOverrideRequirements.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         chkShowIneligibleAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblEntranceExamBaseTargetNumber.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblEntranceExamBaseTargetNumber.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         xpAndSkillBonusesPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         dropoutChancePanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         accidentsAndEventsPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
@@ -6384,6 +6408,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(enableStandardSetsPanel)
                         .addComponent(chkEnableOverrideRequirements)
                         .addComponent(chkShowIneligibleAcademies)
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                .addComponent(lblEntranceExamBaseTargetNumber)
+                                .addComponent(spnEntranceExamBaseTargetNumber))
                         .addComponent(xpAndSkillBonusesPanel)
                         .addComponent(dropoutChancePanel)
                         .addComponent(accidentsAndEventsPanel)
@@ -6403,6 +6430,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(enableStandardSetsPanel)
                         .addComponent(chkEnableOverrideRequirements)
                         .addComponent(chkShowIneligibleAcademies)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblEntranceExamBaseTargetNumber)
+                                .addComponent(spnEntranceExamBaseTargetNumber))
                         .addComponent(xpAndSkillBonusesPanel)
                         .addComponent(dropoutChancePanel)
                         .addComponent(accidentsAndEventsPanel)
@@ -8318,6 +8348,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
         chkUseRandomPersonalityReputation.setSelected(options.isUseRandomPersonalityReputation());
+        chkUseIntelligenceXpMultiplier.setSelected(options.isUseIntelligenceXpMultiplier());
 
         // Family
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
@@ -8413,6 +8444,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableUnitEducation.setSelected(options.isEnableUnitEducation());
         chkEnableOverrideRequirements.setSelected(options.isEnableOverrideRequirements());
         chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
+        spnEntranceExamBaseTargetNumber.setValue(options.getEntranceExamBaseTargetNumber());
         spnFacultyXpMultiplier.setValue(options.getFacultyXpRate());
         chkEnableBonuses.setSelected(options.isEnableBonuses());
         spnAdultDropoutChance.setValue(options.getAdultDropoutChance());
@@ -9024,6 +9056,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
             options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
             options.setUseRandomPersonalityReputation(chkUseRandomPersonalityReputation.isSelected());
+            options.setUseIntelligenceXpMultiplier(chkUseIntelligenceXpMultiplier.isSelected());
 
             // Family
             options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
@@ -9094,6 +9127,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setEnableUnitEducation(chkEnableUnitEducation.isSelected());
             options.setEnableOverrideRequirements(chkEnableOverrideRequirements.isSelected());
             options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
+            options.setEntranceExamBaseTargetNumber((int) spnEntranceExamBaseTargetNumber.getValue());
             options.setFacultyXpRate((Double) spnFacultyXpMultiplier.getValue());
             options.setEnableBonuses(chkEnableBonuses.isSelected());
             options.setAdultDropoutChance((Integer) spnAdultDropoutChance.getValue());

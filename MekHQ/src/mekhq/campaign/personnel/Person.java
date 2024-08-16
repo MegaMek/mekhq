@@ -46,6 +46,7 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
@@ -213,6 +214,7 @@ public class Person {
     private int eduEducationTime;
     private int eduDaysOfTravel;
     private List<UUID> eduTagAlongs;
+    private List<Academy> eduFailedApplications;
     //endregion Education
 
     //region Personality
@@ -374,6 +376,7 @@ public class Person {
         eduEducationTime = 0;
         eduDaysOfTravel = 0;
         eduTagAlongs = new ArrayList<>();
+        eduFailedApplications = new ArrayList<>();
         eduAcademySet = null;
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
@@ -1087,9 +1090,7 @@ public class Person {
         // release the commander flag.
         if ((isCommander()) && (status.isDepartedUnit())) {
             if ((!status.isResigned()) && (!status.isRetired())) {
-                if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                    leadershipMassChangeLoyalty(campaign);
-                }
+                leadershipMassChangeLoyalty(campaign);
             }
 
             setCommander(false);
@@ -1133,9 +1134,11 @@ public class Person {
             person.performRandomizedLoyaltyChange(campaign, false, false);
         }
 
-        campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                "</span>"));
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+                    "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                    "</span>"));
+        }
     }
 
     /**
@@ -1171,7 +1174,6 @@ public class Person {
         applyLoyaltyChange.accept(roll);
 
         if (isVerbose && originalLoyalty != loyalty) {
-
             reportLoyaltyChange(campaign, originalLoyalty);
         }
     }
@@ -1218,6 +1220,10 @@ public class Person {
      * @param originalLoyalty  The original loyalty value before the change.
      */
     private void reportLoyaltyChange(Campaign campaign, int originalLoyalty) {
+        if (!campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            return;
+        }
+
         StringBuilder changeString = new StringBuilder();
         String color;
 
@@ -1326,22 +1332,28 @@ public class Person {
                 .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
-    public Integer getYearsInService(final Campaign campaign) {
+    /**
+     * @return how many years a character has spent employed in the campaign,
+     * factoring in date of death and retirement
+     *
+     * @param campaign the current Campaign
+     */
+    public long getYearsInService(final Campaign campaign) {
         // Get time in service based on year
         if (getRecruitment() == null) {
-            //use "" they haven't been recruited or are dependents
             return 0;
         }
 
         LocalDate today = campaign.getLocalDate();
 
-        // If the person is dead, we only care about how long they spent in service to the company
-        if (getDateOfDeath() != null) {
-            //use date of death instead of the current day
+        // If the person is dead or has left the unit, we only care about how long they spent in service to the company
+        if (getRetirement() != null) {
+            today = getRetirement();
+        } else if (getDateOfDeath() != null) {
             today = getDateOfDeath();
         }
 
-        return Math.toIntExact(ChronoUnit.YEARS.between(getRecruitment(), today));
+        return ChronoUnit.YEARS.between(getRecruitment(), today);
     }
 
     public @Nullable LocalDate getLastRankChangeDate() {
@@ -1613,6 +1625,16 @@ public class Person {
 
     public void addEduTagAlong(final UUID tagAlong) {
         this.eduTagAlongs.add(tagAlong);
+    }
+
+    public List<Academy> getEduFailedApplications() {
+        return eduFailedApplications;
+    }
+
+    public void addEduFailedApplications(final Academy eduFailedApplications) {
+        if (!this.eduFailedApplications.contains(eduFailedApplications)) {
+            this.eduFailedApplications.add(eduFailedApplications);
+        }
     }
 
     /**
@@ -3892,6 +3914,12 @@ public class Person {
         return new ArrayList<>(injuries);
     }
 
+    public List<Injury> getPermanentInjuries() {
+        return injuries.stream()
+                .filter(Injury::isPermanent)
+                .collect(Collectors.toList());
+    }
+
     public void clearInjuries() {
         injuries.clear();
 
@@ -4172,5 +4200,22 @@ public class Person {
         }
 
         return effectiveFatigue;
+    }
+
+    /**
+     * @return the intelligence experience cost multiplier based on campaign options.
+     *
+     * @param campaignOptions the campaign options to determine whether to calculate the multiplier or to just return 1
+     */
+    public double getIntelligenceXpCostMultiplier(CampaignOptions campaignOptions) {
+        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseIntelligenceXpMultiplier()) {
+            double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
+
+            double intelligenceScore = getIntelligence().getIntelligenceScore() * intelligenceMultiplier;
+
+            return intelligenceScore - 1;
+        }
+
+        return 1;
     }
 }
