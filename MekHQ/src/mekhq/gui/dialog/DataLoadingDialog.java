@@ -37,6 +37,7 @@ import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
@@ -241,6 +242,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
             setProgress(2);
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();
+            RandomCompanyNameGenerator.getInstance();
             Bloodname.loadBloodnameData();
             //endregion Progress 2
 

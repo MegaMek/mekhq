@@ -1028,7 +1028,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         lblCompanyNameGenerated.setName("lblCompanyNameGenerated");
         addComponent(panel, lblCompanyNameGenerated, gridBagConstraints, 0, 1);
 
-        JTextArea txtCompanyNamesGenerated = new JTextArea(gui.getCampaign().getName());
+        txtCompanyNamesGenerated = new JTextArea(gui.getCampaign().getName());
         txtCompanyNamesGenerated.setName("txtCompanyNamesGenerated");
         addComponent(panel, txtCompanyNamesGenerated, gridBagConstraints, 1, 1);
         lblCompanyNameGenerated.setLabelFor(txtCompanyNamesGenerated);
@@ -1044,8 +1044,6 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
     /**
      * Creates a MMButton object that generates a company name and updates the appropriate JTextArea with the generated name.
-     *
-     * @return a MMButton object that generates a company name and updates the given JTextArea
      */
     private MMButton createGenerateNameButton() {
         return new MMButton("btnGenerateCompanyName",
