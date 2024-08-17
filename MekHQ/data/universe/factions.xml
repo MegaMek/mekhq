@@ -525,6 +525,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>periphery,playable</tags>
         <start>2413</start>
         <end>3083</end>
+        <successor>RA</successor>
     </faction>
     <faction>
         <shortname>ABN</shortname>
@@ -734,6 +735,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>clan,major,playable</tags>
         <start>2807</start>
         <end>3103</end>
+        <successor>RD</successor>
     </faction>
     <faction>
         <shortname>CGS</shortname>
@@ -750,6 +752,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3080</end>
+        <successor>CEI</successor>
     </faction>
     <faction>
         <shortname>CHH</shortname>
@@ -781,6 +784,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3074</end>
+        <successor>CGS</successor>
     </faction>
     <faction>
         <shortname>CJF</shortname>
@@ -810,6 +814,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>2868</end>
+        <successor>CSJ</successor>
     </faction>
     <faction>
         <shortname>CNC</shortname>
@@ -826,6 +831,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3143</end>
+        <successor>CP</successor>
     </faction>
     <faction>
         <shortname>CSJ</shortname>
@@ -858,6 +864,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>clan,minor,playable</tags>
         <start>2807</start>
         <end>3083</end>
+        <successor>RA</successor>
     </faction>
     <faction>
         <shortname>CSA</shortname>
@@ -916,6 +923,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>clan,minor</tags>
         <start>2807</start>
         <end>2834</end>
+        <successor>CW</successor>
     </faction>
     <faction>
         <shortname>CW</shortname>
@@ -932,6 +940,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>clan,major,playable</tags>
         <start>2807</start>
         <end>3142</end>
+        <successor>CWE</successor>
     </faction>
     <faction>
         <shortname>CWE</shortname>
@@ -959,6 +968,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <layeredForceIconLogoFilename>Clan Wolf-in-Exile.png</layeredForceIconLogoFilename>
         <tags>clan,small</tags>
         <start>3057</start>
+        <end>3151</end>
+        <successor>CWE</successor>
     </faction>
     <faction>
         <shortname>CWOV</shortname>
@@ -1014,6 +1025,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3079</start>
         <end>3082</end>
+        <successor>MSC</successor>
     </faction>
     <faction>
         <shortname>DO</shortname>
@@ -1026,6 +1038,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3079</start>
         <end>3086</end>
+        <successor>OP</successor>
     </faction>
     <faction>
         <shortname>DoO</shortname>
@@ -1038,6 +1051,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3079</start>
         <end>3086</end>
+        <successor>OP</successor>
     </faction>
     <faction>
         <shortname>DS</shortname>
@@ -1050,6 +1064,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3058</start>
         <end>3066</end>
+        <successor>FS</successor>
     </faction>
     <faction>
         <shortname>DTA</shortname>
@@ -1066,6 +1081,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3078</start>
         <end>3139</end>
+        <successor>FWL</successor>
     </faction>
     <faction>
         <shortname>DT</shortname>
@@ -1077,6 +1093,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3071</start>
         <end>3078</end>
+        <successor>DTA</successor>
     </faction>
     <faction>
         <shortname>EF</shortname>
@@ -1120,6 +1137,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,super,playable</tags>
         <start>3028</start>
         <end>3068</end>
+        <successor>FS</successor>
     </faction>
     <faction>
         <shortname>FVC</shortname>
@@ -1151,6 +1169,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor,playable</tags>
         <start>3034</start>
         <end>3103</end>
+        <successor>RD</successor>
     </faction>
     <faction>
         <shortname>FWLR</shortname>
@@ -1199,6 +1218,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>deep_periphery,playable</tags>
         <start>2891</start>
         <end>3141</end>
+        <successor>CEI</successor>
     </faction>
     <faction>
         <shortname>IP</shortname>
@@ -1213,6 +1233,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>periphery</tags>
         <start>2350</start>
         <end>3063</end>
+        <successor>MH</successor>
     </faction>
     <faction>
         <shortname>IND</shortname>
@@ -1239,7 +1260,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <fullname>Khwarazm Empire</fullname>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
         <colorRGB>80,80,80</colorRGB>
-        <tags>deep_periphery</tags>
+        <tags>deep_periphery,minor</tags>
     </faction>
     <faction>
         <shortname>KP</shortname>
@@ -1249,7 +1270,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <colorRGB>224,126,39</colorRGB>
         <tags>is,minor</tags>
         <start>3073</start>
-        <end>3080</end>
+        <end>3081</end>
+        <successor>ROS</successor>
     </faction>
     <faction>
         <shortname>LR</shortname>
@@ -1269,7 +1291,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <colorRGB>255,140,0</colorRGB>
         <layeredForceIconLogoCategory>Periphery/</layeredForceIconLogoCategory>
         <layeredForceIconLogoFilename>Lothian League.png</layeredForceIconLogoFilename>
-        <tags>periphery</tags>
+        <tags>periphery,minor</tags>
         <start>2691</start>
     </faction>
     <faction>
@@ -1283,6 +1305,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>periphery</tags>
         <start>3073</start>
         <end>3079</end>
+        <successor>FS</successor>
     </faction>
     <faction>
         <shortname>MH</shortname>
@@ -1308,6 +1331,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is</tags>
         <start>2241</start>
         <end>3082</end>
+        <successor>MSC</successor>
     </faction>
     <faction>
         <shortname>MSC</shortname>
@@ -1323,6 +1347,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is</tags>
         <start>3082</start>
         <end>3139</end>
+        <successor>FWL</successor>
     </faction>
     <faction>
         <shortname>MERC</shortname>
@@ -1346,6 +1371,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>periphery</tags>
         <start>3021</start>
         <end>3028</end>
+        <successor>GV</successor>
     </faction>
     <faction>
         <shortname>BoS</shortname>
@@ -1365,6 +1391,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3079</start>
         <end>3081</end>
+        <successor>DA</successor>
     </faction>
     <faction>
         <shortname>NCR</shortname>
@@ -1376,6 +1403,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>periphery</tags>
         <start>3057</start>
         <end>3066</end>
+        <successor>FR</successor>
     </faction>
     <faction>
         <shortname>NC</shortname>
@@ -1390,6 +1418,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>deep_periphery,playable</tags>
         <start>2392</start>
         <end>3080</end>
+        <successor>CEI</successor>
     </faction>
     <faction>
         <shortname>OC</shortname>
@@ -1424,6 +1453,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3079</start>
         <end>3081</end>
+        <successor>ROS</successor>
     </faction>
     <faction>
         <shortname>OP</shortname>
@@ -1440,6 +1470,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3086</start>
         <end>3139</end>
+        <successor>FWL</successor>
     </faction>
     <faction>
         <shortname>PG</shortname>
@@ -1451,6 +1482,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <colorRGB>250,250,250</colorRGB>
         <tags>is,minor</tags>
         <start>3079</start>
+        <end>3086</end>
+        <successor>RF</successor>
     </faction>
     <faction>
         <shortname>PR</shortname>
@@ -1463,6 +1496,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>2247</start>
         <end>3086</end>
+        <successor>RF</successor>
     </faction>
     <faction>
         <shortname>RD</shortname>
@@ -1507,6 +1541,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <layeredForceIconLogoFilename>Regulan Fiefs.png</layeredForceIconLogoFilename>
         <tags>is,minor</tags>
         <start>3086</start>
+        <end>3148</end>
+        <successor>FWL</successor>
     </faction>
     <faction>
         <shortname>RFS</shortname>
@@ -1532,6 +1568,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <layeredForceIconLogoFilename>Republic of the Sphere.png</layeredForceIconLogoFilename>
         <tags>is,major,playable</tags>
         <start>3081</start>
+        <end>3151</end>
     </faction>
     <faction>
         <shortname>Stone</shortname>
@@ -1558,6 +1595,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <colorRGB>95,158,160</colorRGB>
         <tags>periphery,small</tags>
         <start>3048</start>
+        <end>3148</end>
+        <successor>TiC</successor>
     </faction>
     <faction>
         <shortname>RCM</shortname>
@@ -1573,6 +1612,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>periphery</tags>
         <start>3075</start>
         <end>3139</end>
+        <successor>FWL</successor>
     </faction>
     <faction>
         <shortname>RT</shortname>
@@ -1594,6 +1634,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3057</start>
         <end>3068</end>
+        <successor>WOB</successor>
     </faction>
     <faction>
         <shortname>SP</shortname>
@@ -1610,6 +1651,9 @@ successor - unimplemented tag describing another faction code as the specified f
         <nameGenerator>CC</nameGenerator>
         <colorRGB>145,166,242</colorRGB>
         <tags>is,minor</tags>
+        <start>2250</start>
+        <end>2310</end>
+        <successor>CCom</successor>
     </faction>
     <faction>
         <shortname>SHC</shortname>
@@ -1635,6 +1679,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor,playable</tags>
         <start>3029</start>
         <end>3063</end>
+        <successor>CC</successor>
     </faction>
     <faction>
         <shortname>SL</shortname>
@@ -1671,6 +1716,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>2259</start>
         <end>3082</end>
+        <successor>MSC</successor>
     </faction>
     <faction>
         <shortname>SKC</shortname>
@@ -1683,6 +1729,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3058</start>
         <end>3067</end>
+        <successor>SKP</successor>
     </faction>
     <faction>
         <shortname>SKP</shortname>
@@ -1704,6 +1751,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3058</start>
         <end>3067</end>
+        <successor>WOB</successor>
     </faction>
     <faction>
         <shortname>TB</shortname>
@@ -1723,6 +1771,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <colorRGB>255,51,51</colorRGB>
         <tags>is,minor</tags>
         <start>3079</start>
+        <end>3120</end>
+        <successor>OP</successor>
     </faction>
     <faction>
         <shortname>TFR</shortname>
@@ -1735,6 +1785,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3029</start>
         <end>3031</end>
+        <successor>FS</successor>
     </faction>
     <faction>
         <shortname>TD</shortname>
@@ -1770,6 +1821,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <layeredForceIconLogoFilename>Word of Blake.png</layeredForceIconLogoFilename>
         <tags>is,minor,playable</tags>
         <start>3052</start>
+        <end>3081</end>
     </faction>
     <faction>
         <shortname>CLAN</shortname>
@@ -1825,6 +1877,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3135</start>
         <end>3142</end>
+        <successor>AA</successor>
     </faction>
     <faction>
         <shortname>AA</shortname>
@@ -1846,6 +1899,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <colorRGB>153,153,51</colorRGB>
         <tags>is,minor</tags>
         <start>3136</start>
+        <end>3145</end>
+        <successor>CC</successor>
     </faction>
     <faction>
         <shortname>ShA</shortname>
@@ -1857,6 +1912,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <colorRGB>97,26,92</colorRGB>
         <tags>is,minor</tags>
         <start>3135</start>
+        <end>3136</end>
+        <successor>RR</successor>
     </faction>
     <faction>
         <shortname>CvW</shortname>
@@ -1868,6 +1925,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <colorRGB>102,51,51</colorRGB>
         <tags>is,minor</tags>
         <start>3137</start>
+        <end>3139</end>
+        <successor>FWL</successor>
     </faction>
     <faction>
         <shortname>PC</shortname>
@@ -1878,6 +1937,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <colorRGB>51,51,102</colorRGB>
         <tags>is,minor</tags>
         <start>3136</start>
+        <end>3139</end>
+        <successor>FWL</successor>
     </faction>
     <faction>
         <shortname>MiC</shortname>
@@ -1888,6 +1949,10 @@ successor - unimplemented tag describing another faction code as the specified f
         <nameGenerator>FWL</nameGenerator>
         <colorRGB>255,0,51</colorRGB>
         <tags>is,minor</tags>
+        <!-- Dates are not certain -->
+        <start>3137</start>
+        <end>3144</end>
+        <successor>CWE</successor>
     </faction>
     <faction>
         <shortname>CP</shortname>
@@ -1909,6 +1974,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <colorRGB>128,40,0</colorRGB>
         <tags>is,minor</tags>
         <start>3135</start>
+        <end>3149</end>
+        <successor>ROS</successor>
     </faction>
     <faction>
         <shortname>PIR</shortname>
@@ -1933,6 +2000,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>deep_periphery</tags>
         <start>2830</start>
         <end>3080</end>
+        <successor>CEI</successor>
     </faction>
     <faction>
         <shortname>REB</shortname>
@@ -2015,13 +2083,15 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>FCo</shortname>
         <fullname>Ferris Collective</fullname>
+        <startingPlanet>Ferris</startingPlanet>
         <colorRGB>191,171,120</colorRGB>
-        <tags>minor</tags>
+        <tags>periphery,minor</tags>
         <start>3087</start>
     </faction>
     <faction>
         <shortname>FFR</shortname>
         <fullname>Finmark Free Republic</fullname>
+        <startingPlanet>Finmark</startingPlanet>
         <colorRGB>191,171,120</colorRGB>
         <tags>periphery,minor</tags>
         <start>2779</start>
@@ -2057,6 +2127,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <layeredForceIconLogoFilename>Aurigan Coalition.png</layeredForceIconLogoFilename>
         <tags>periphery,minor,playable</tags>
         <start>2910</start>
+        <!-- May have collapsed sooner, but no later than start of Fourth Succession War -->
+        <end>3028</end>
     </faction>
     <faction>
         <shortname>ARD</shortname>
@@ -2107,7 +2179,7 @@ successor - unimplemented tag describing another faction code as the specified f
     </faction>
     <faction>
         <shortname>ARL</shortname>
-        <fullname>Arc Royal Liberty Coalition</fullname>
+        <fullname>Arc-Royal Liberty Coalition</fullname>
         <startingPlanet>Arc-Royal</startingPlanet>
         <colorRGB>39,212,200</colorRGB>
         <tags>is,minor</tags>
