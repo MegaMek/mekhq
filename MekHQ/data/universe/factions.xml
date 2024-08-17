@@ -26,7 +26,7 @@ altNames - A list of alternate names for a faction, 'also known as' type of name
 alternativeFactionCodes - A list of alternativeFactionCodes used as a fallback when using RATs.
 startingPlanet - Identifies the starting planet if you begin a new campaign with this faction. The name of the planet must be the name as it is recognized in MekHQ. If left out, then this defaults to Terra.
 changePlanet - Identifies the starting planet after the given year. Format: <changePlanet year='XXXX'>Planet name</changePlanet>. Years given in this first revision are best guesses.
-eraMods - A comma-separated 9-item list of optional modifiers to repair/replacement rolls as per Strat Ops. If left out, then this defaults to 0 for all eras.
+eraMods - A comma-separated 11-item list of optional modifiers to repair/replacement rolls as per the fourth printing of Campaign Operations. If left out, then this defaults to 0 for all eras.
 nameGenerator - The name of the faction name generator that should be used for this faction. If left out, then this defaults to "General."
 colorRGB - a comma-separated 3-item list defining the RGB codes for the color used on the map for this faction. Defaults to light gray if missing.
 currencyCode - partially implemented (likely buggy) currency code value used by the faction.
@@ -34,7 +34,7 @@ layeredForceIconBackgroundCategory - the category of the faction's background pi
 layeredForceIconBackgroundFilename - the filename of the faction's background piece
 layeredForceIconLogoCategory - the category of the faction's logo piece
 layeredForceIconLogoFilename - the filename of the faction's logo piece
-tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery", "deep_periphery", "clan", "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos", "playable"
+tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery", "deep_periphery", "clan", "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos", "playable", "super"
 start - the founding date of the faction
 end - the date the faction ceases to exist
 successor - unimplemented tag describing another faction code as the specified faction's successor
