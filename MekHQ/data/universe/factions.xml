@@ -100,9 +100,12 @@ successor - unimplemented tag describing another faction code as the specified f
     </faction>
     <faction>
         <shortname>Alf</shortname>
-        <fullname>Alfik</fullname>
+        <fullname>Alfirk</fullname>
+        <startingPlanet>Alfirk</startingPlanet>
+        <!-- Using era modifiers of Periphery (Other) -->
+        <eraMods>+1,+1,+1,+1,+2,+3,+3,+2,+1,+2,+2</eraMods>
         <colorRGB>103,169,57</colorRGB>
-        <tags>is,minor</tags>
+        <tags>deep_periphery,minor</tags>
         <start>2200</start> <!-- estimated -->
     </faction>
     <!-- Major Inner Sphere Factions -->
