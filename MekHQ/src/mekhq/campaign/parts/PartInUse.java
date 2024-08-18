@@ -9,7 +9,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartInUse {
     private String description;
-    private int id;
+    private String name;
     private IAcquisitionWork partToBuy;
     private int useCount;
     private int storeCount;
@@ -35,13 +35,14 @@ public class PartInUse {
             appendDetails(sb, part);
         }
         part.setUnit(u);
-        this.id = part.getId();
+        this.name = part.getName();
         this.description = sb.toString();
         this.partToBuy = part.getAcquisitionWork();
         this.tonnagePerItem = part.getTonnage();
         // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
         // We redo the description based on that
         if (partToBuy instanceof AmmoStorage) {
+            this.name = ((AmmoStorage) partToBuy).getName();
             sb.setLength(0);
             sb.append(((AmmoStorage) partToBuy).getName());
             appendDetails(sb, (Part) ((AmmoStorage) partToBuy).getAcquisitionWork());
@@ -76,8 +77,8 @@ public class PartInUse {
         return description;
     }
 
-    public int getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
     public IAcquisitionWork getPartToBuy() {
