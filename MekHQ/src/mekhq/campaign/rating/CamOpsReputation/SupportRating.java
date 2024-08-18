@@ -77,9 +77,8 @@ public class SupportRating {
                 .count();
 
         // Calculate personnel count based on campaign faction
-        int personnelCount = totalPersonnelCount - administratorCount;
-        double divisor = campaign.getFaction().isPirate() || campaign.getFaction().isMercenary() ? 10.0 : 5.0;
-        personnelCount = (int) Math.ceil(personnelCount / divisor);
+        double divisor = campaign.getFaction().isPirate() || campaign.getFaction().isMercenary() ? 10 : 20;
+        int personnelCount = (int) Math.ceil(totalPersonnelCount / divisor);
 
         administrationRequirements.put("totalPersonnelCount", totalPersonnelCount);
         administrationRequirements.put("administratorCount", administratorCount);
