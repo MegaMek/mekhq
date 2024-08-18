@@ -997,6 +997,7 @@ public class AtBContract extends Contract {
 
     public void setEnemyCode(String enemyCode) {
         this.enemyCode = enemyCode;
+        this.enemyName = ""; // better reset it if we're changing the enemy code
     }
 
     /**
