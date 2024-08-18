@@ -159,6 +159,12 @@ MEKHQ VERSION HISTORY:
 + PR #4650: Removed unused import of LogManager and corrected the import path for Intelligence
 + PR #4640: Implemented Random Mercenary Company Name Generator
 + FIX #4654: Added Checks for Scenarios with Null Start Dates within Objectives Panel
++ FIX #4651: Fixed Support Rating Administration Requirements Calculations
++ FIX #4656: Fixed Intelligence XP Cost Calculations and Minor Logic Issues
++ FIX #4660: Added missing angle bracket in Independent Command Rights tooltip text
++ FIX #4663: Reverted change to find parts by name when selling from parts in use
++ FIX #4664: Added clearance of enemy name, when changing enemy code
++ FIX #4666: Added Check for Null Crew When Determining Force Leader
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
