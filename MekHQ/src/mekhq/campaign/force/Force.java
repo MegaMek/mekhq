@@ -435,7 +435,8 @@ public class Force {
      */
     public List<UUID> getEligibleCommanders(Campaign campaign) {
         List<UUID> eligibleCommanders = getUnits().stream()
-                .map(unitId -> campaign.getUnit(unitId).getCommander().getId())
+                .map(unitId -> campaign.getUnit(unitId).getCommander() != null ?
+                		campaign.getUnit(unitId).getCommander().getId() : null)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
