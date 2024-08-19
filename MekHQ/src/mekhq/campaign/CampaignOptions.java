@@ -119,6 +119,7 @@ public class CampaignOptions {
     private boolean useQualityMaintenance;
     private boolean reverseQualityNames;
     private boolean useRandomUnitQualities;
+    private boolean usePlanetaryModifiers;
     private boolean useUnofficialMaintenance;
     private boolean logMaintenance;
 
@@ -278,6 +279,9 @@ public class CampaignOptions {
     // Random Histories
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
+    private boolean useRandomPersonalityReputation;
+    private boolean useIntelligenceXpMultiplier;
+    private boolean useSimulatedRelationships;
     private boolean useSimulatedRelationships;
 
 
@@ -348,6 +352,7 @@ public class CampaignOptions {
     private boolean enableUnitEducation;
     private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
+    private int entranceExamBaseTargetNumber;
     private Double facultyXpRate;
     private boolean enableBonuses;
     private Integer adultDropoutChance;
@@ -552,7 +557,6 @@ public class CampaignOptions {
     private boolean useAero;
     private boolean useVehicles;
     private boolean clanVehicles;
-    private double atbCamOpsDivision;
 
     // Contract Operations
     private boolean mercSizeLimited;
@@ -623,6 +627,7 @@ public class CampaignOptions {
         useQualityMaintenance = true;
         reverseQualityNames = false;
         setUseRandomUnitQualities(true);
+        setUsePlanetaryModifiers(true);
         useUnofficialMaintenance = false;
         logMaintenance = false;
 
@@ -837,10 +842,12 @@ public class CampaignOptions {
         // Personnel Randomization
         setUseDylansRandomXP(false);
         setNonBinaryDiceSize(60);
-        setRandomOriginOptions(new RandomOriginOptions(true));
 
         // Random Histories
+        setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
+        setUseRandomPersonalityReputation(true);
+        setUseIntelligenceXpMultiplier(true);
         setUseSimulatedRelationships(false);
 
         // Family
@@ -926,6 +933,7 @@ public class CampaignOptions {
         setEnableUnitEducation(true);
         setEnableOverrideRequirements(false);
         setEnableShowIneligibleAcademies(true);
+        setEntranceExamBaseTargetNumber(14);
         setFacultyXpRate(1.00);
         setEnableBonuses(true);
         setAdultDropoutChance(1000);
@@ -1175,7 +1183,6 @@ public class CampaignOptions {
         useAero = false;
         useVehicles = true;
         clanVehicles = false;
-        atbCamOpsDivision = 2.5;
 
         // Contract Operations
         mercSizeLimited = false;
@@ -1298,6 +1305,14 @@ public class CampaignOptions {
 
     public void setUseRandomUnitQualities(final boolean useRandomUnitQualities) {
         this.useRandomUnitQualities = useRandomUnitQualities;
+    }
+
+    public boolean isUsePlanetaryModifiers() {
+        return usePlanetaryModifiers;
+    }
+
+    public void setUsePlanetaryModifiers(final boolean usePlanetaryModifiers) {
+        this.usePlanetaryModifiers = usePlanetaryModifiers;
     }
 
     public boolean isUseUnofficialMaintenance() {
@@ -1875,6 +1890,22 @@ public class CampaignOptions {
 
     public void setUseRandomPersonalities(final boolean useRandomPersonalities) {
         this.useRandomPersonalities = useRandomPersonalities;
+    }
+
+    public boolean isUseRandomPersonalityReputation() {
+        return useRandomPersonalityReputation;
+    }
+
+    public void setUseRandomPersonalityReputation(final boolean useRandomPersonalityReputation) {
+        this.useRandomPersonalityReputation = useRandomPersonalityReputation;
+    }
+
+    public boolean isUseIntelligenceXpMultiplier() {
+        return useIntelligenceXpMultiplier;
+    }
+
+    public void setUseIntelligenceXpMultiplier(final boolean useIntelligenceXpMultiplier) {
+        this.useIntelligenceXpMultiplier = useIntelligenceXpMultiplier;
     }
 
     public boolean isUseSimulatedRelationships() {
@@ -2843,13 +2874,20 @@ public class CampaignOptions {
     public void setEnableOverrideRequirements(boolean enableOverrideRequirements) {
         this.enableOverrideRequirements = enableOverrideRequirements;
     }
-
     public boolean isEnableShowIneligibleAcademies() {
         return enableShowIneligibleAcademies;
     }
 
     public void setEnableShowIneligibleAcademies(boolean enableShowIneligibleAcademies) {
         this.enableShowIneligibleAcademies = enableShowIneligibleAcademies;
+    }
+
+    public int getEntranceExamBaseTargetNumber() {
+        return entranceExamBaseTargetNumber;
+    }
+
+    public void setEntranceExamBaseTargetNumber(int entranceExamBaseTargetNumber) {
+        this.entranceExamBaseTargetNumber = entranceExamBaseTargetNumber;
     }
 
     public Double getFacultyXpRate() {
@@ -4201,14 +4239,6 @@ public class CampaignOptions {
         this.clanVehicles = clanVehicles;
     }
 
-    public double getAtbCamOpsDivision() {
-        return atbCamOpsDivision;
-    }
-
-    public void setAtbCamOpsDivision(final double atbCamOpsDivision) {
-        this.atbCamOpsDivision = atbCamOpsDivision;
-    }
-
     public boolean isDoubleVehicles() {
         return doubleVehicles;
     }
@@ -4637,6 +4667,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQualityMaintenance", useQualityMaintenance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reverseQualityNames", reverseQualityNames);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomUnitQualities", isUseRandomUnitQualities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryModifiers", isUsePlanetaryModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnofficialMaintenance", isUseUnofficialMaintenance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMaintenance", checkMaintenance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxAcquisitions", maxAcquisitions);
@@ -4754,6 +4785,8 @@ public class CampaignOptions {
         //region Random Histories
         getRandomOriginOptions().writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalityReputation", isUseRandomPersonalityReputation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useIntelligenceXpMultiplier", isUseIntelligenceXpMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSimulatedRelationships", isUseSimulatedRelationships());
         //endregion Random Histories
 
@@ -4886,6 +4919,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableUnitEducation", isEnableUnitEducation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableOverrideRequirements", isEnableOverrideRequirements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entranceExamBaseTargetNumber", getEntranceExamBaseTargetNumber());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "facultyXpRate", getFacultyXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableBonuses", isEnableBonuses());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adultDropoutChance", getAdultDropoutChance());
@@ -5012,7 +5046,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAero", useAero);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVehicles", useVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanVehicles", clanVehicles);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atbCamOpsDivision", atbCamOpsDivision);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doubleVehicles", doubleVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPlayerVehicles", adjustPlayerVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMechs", getOpForLanceTypeMechs());
@@ -5090,6 +5123,8 @@ public class CampaignOptions {
                     retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomUnitQualities")) {
                     retVal.setUseRandomUnitQualities(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePlanetaryModifiers")) {
+                    retVal.setUsePlanetaryModifiers(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialMaintenance")
                         || wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) { // Legacy, 0.49.12 Removal
                     retVal.setUseUnofficialMaintenance(Boolean.parseBoolean(wn2.getTextContent()));
@@ -5166,6 +5201,8 @@ public class CampaignOptions {
                     retVal.contractNegotiationXP = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adminWeeklyXP")) {
                     retVal.adminXP = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("adminXPPeriod")) {
+                    retVal.adminXPPeriod = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionXpFail")) {
                     retVal.missionXpFail = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionXpSuccess")) {
@@ -5513,6 +5550,10 @@ public class CampaignOptions {
                     retVal.setRandomOriginOptions(randomOriginOptions);
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalities")) {
                     retVal.setUseRandomPersonalities(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPersonalityReputation")) {
+                    retVal.setUseRandomPersonalityReputation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useIntelligenceXpMultiplier")) {
+                    retVal.setUseIntelligenceXpMultiplier(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useSimulatedRelationships")) {
                     retVal.setUseSimulatedRelationships(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Random Histories
@@ -5678,6 +5719,8 @@ public class CampaignOptions {
                     retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
                     retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("entranceExamBaseTargetNumber")) {
+                    retVal.setEntranceExamBaseTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("facultyXpRate")) {
                     retVal.setFacultyXpRate(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableBonuses")) {
@@ -5936,7 +5979,12 @@ public class CampaignOptions {
                     //region Markets Tab
                     //region Personnel Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
-                    retVal.setPersonnelMarketName(wn2.getTextContent().trim());
+                    String marketName = wn2.getTextContent().trim();
+                    // Backwards compatibility with saves from before these rules moved to Camops
+                    if (marketName.equals("Strat Ops")) {
+                        marketName = "Campaign Ops";
+                    }
+                    retVal.setPersonnelMarketName(marketName);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
                     retVal.setPersonnelMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRemovalTargets")) {
@@ -6022,8 +6070,6 @@ public class CampaignOptions {
                     retVal.useVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanVehicles")) {
                     retVal.clanVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("atbCamOpsDivision")) {
-                    retVal.atbCamOpsDivision = Double.parseDouble(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doubleVehicles")) {
                     retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {

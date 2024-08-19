@@ -875,8 +875,11 @@ public class CampaignGUI extends JPanel {
         JMenuItem miDragoonsRating = new JMenuItem(resourceMap.getString("miDragoonsRating.text"));
         miDragoonsRating.setMnemonic(KeyEvent.VK_U);
         miDragoonsRating.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_DOWN_MASK));
-        miDragoonsRating
-                .addActionListener(evt -> new UnitRatingReportDialog(getFrame(), getCampaign()).setVisible(true));
+        if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
+            miDragoonsRating.addActionListener(evt -> new UnitRatingReportDialog(getFrame(), getCampaign()).setVisible(true));
+        } else {
+            miDragoonsRating.addActionListener(evt -> new ReputationReportDialog(getFrame(), getCampaign()).setVisible(true));
+        }
         menuReports.add(miDragoonsRating);
 
         JMenuItem miPersonnelReport = new JMenuItem(resourceMap.getString("miPersonnelReport.text"));

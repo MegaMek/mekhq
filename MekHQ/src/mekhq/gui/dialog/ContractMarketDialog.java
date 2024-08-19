@@ -168,7 +168,7 @@ public class ContractMarketDialog extends JDialog {
                 if (campaign.getCampaignOptions().isUseAtB()
                         && campaign.getCampaignOptions().isUseShareSystem()
                         && c instanceof AtBContract) {
-                    ((AtBContract) c).setSharesPct(sharePct);
+                    ((AtBContract) c).setAtBSharesPercent(sharePct);
                     c.calculateContract(campaign);
                 }
             }
@@ -215,12 +215,11 @@ public class ContractMarketDialog extends JDialog {
         Vector<Vector<String>> data = new Vector<>();
         for (Contract c : contractMarket.getContracts()) {
             // Changes in rating or force size since creation can alter some details
-            if (c instanceof AtBContract) {
-                final AtBContract atbContract = (AtBContract) c;
+            if (c instanceof AtBContract atbContract) {
                 atbContract.initContractDetails(campaign);
                 atbContract.calculatePaymentMultiplier(campaign);
                 atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculatePartsAvailabilityLevel());
-                atbContract.setSharesPct(campaign.getCampaignOptions().isUseShareSystem()
+                atbContract.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem()
                         ? (Integer) spnSharePct.getValue() : 0);
             }
             c.setStartDate(null);
@@ -321,6 +320,7 @@ public class ContractMarketDialog extends JDialog {
         btnEndRetainer.setVisible(null != campaign.getRetainerEmployerCode());
         btnEndRetainer.addActionListener(ev -> {
             campaign.setRetainerEmployerCode(null);
+            campaign.setRetainerStartDate(null);
             lblCurrentRetainer.setVisible(false);
             lblRetainerEmployer.setVisible(false);
             btnEndRetainer.setVisible(false);
@@ -378,7 +378,7 @@ public class ContractMarketDialog extends JDialog {
 
             c.initContractDetails(campaign);
             c.setPartsAvailabilityLevel(c.getContractType().calculatePartsAvailabilityLevel());
-            c.setSharesPct(campaign.getCampaignOptions().isUseShareSystem()
+            c.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem()
                     ? (Integer) spnSharePct.getValue() : 0);
             c.setStartDate(null);
             c.setMRBCFee(payMRBC);

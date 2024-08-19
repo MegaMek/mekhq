@@ -86,7 +86,6 @@ public class PersonViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-        GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
         getAccessibleContext().setAccessibleName("Details for " + person.getFullName());
@@ -101,7 +100,7 @@ public class PersonViewPanel extends JScrollablePanel {
         add(pnlPortrait, gbc_pnlPortrait);
 
         JPanel pnlInfo = fillInfo();
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
@@ -561,16 +560,14 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblTimeServed1 = new JLabel();
         JLabel lblTimeServed2 = new JLabel();
 
-        GridBagConstraints gridBagConstraints;
-
-        int firsty = 0, secondy = 0;
+        int y = 0;
 
         lblType.setName("lblType");
         lblType.setText(String.format(resourceMap.getString("format.italic"), person.getRoleDesc()));
         lblType.getAccessibleContext().setAccessibleName("Role: " + person.getRoleDesc());
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -578,13 +575,13 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblType, gridBagConstraints);
-        firsty++;
+        y++;
 
         lblStatus1.setName("lblStatus1");
         lblStatus1.setText(resourceMap.getString("lblStatus1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblStatus1, gridBagConstraints);
@@ -594,21 +591,21 @@ public class PersonViewPanel extends JScrollablePanel {
         lblStatus1.setLabelFor(lblStatus2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblStatus2, gridBagConstraints);
-        firsty++;
+        y++;
 
         if (campaign.getCampaignOptions().isShowOriginFaction()) {
             lblOrigin1.setName("lblOrigin1");
             lblOrigin1.setText(resourceMap.getString("lblOrigin1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblOrigin1, gridBagConstraints);
@@ -639,14 +636,14 @@ public class PersonViewPanel extends JScrollablePanel {
             }
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblOrigin2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
         if (!person.getCallsign().equals("-") && !person.getCallsign().isBlank()) {
@@ -654,7 +651,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblCall1.setText(resourceMap.getString("lblCall1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblCall1, gridBagConstraints);
@@ -664,21 +661,21 @@ public class PersonViewPanel extends JScrollablePanel {
             lblCall1.setLabelFor(lblCall2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 3;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblCall2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
         lblAge1.setName("lblAge1");
         lblAge1.setText(resourceMap.getString("lblAge1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblAge1, gridBagConstraints);
@@ -688,20 +685,19 @@ public class PersonViewPanel extends JScrollablePanel {
         lblAge1.setLabelFor(lblAge2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblAge2, gridBagConstraints);
-        firsty++;
-        secondy = firsty;
+        y++;
 
         lblGender1.setName("lblGender1");
         lblGender1.setText(resourceMap.getString("lblGender1.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblGender1, gridBagConstraints);
@@ -711,20 +707,20 @@ public class PersonViewPanel extends JScrollablePanel {
         lblGender1.setLabelFor(lblGender2);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = firsty;
+        gridBagConstraints.gridy = y;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblGender2, gridBagConstraints);
-        firsty++;
+        y++;
 
         if (person.isPregnant()) {
             lblDueDate1.setName("lblDueDate1");
             lblDueDate1.setText(resourceMap.getString("lblDueDate1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate1, gridBagConstraints);
@@ -734,13 +730,13 @@ public class PersonViewPanel extends JScrollablePanel {
             lblDueDate1.setLabelFor(lblDueDate2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblDueDate2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
         if (person.getRetirement() != null) {
@@ -748,7 +744,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblRetirement1.setName("lblRetirement1");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRetirement1, gridBagConstraints);
@@ -758,13 +754,13 @@ public class PersonViewPanel extends JScrollablePanel {
             lblRetirement1.setLabelFor(lblRetirement2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRetirement2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
         // We show the following if track total earnings is on for a free person or if the
@@ -775,7 +771,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTotalEarnings1.setName("lblTotalEarnings1");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalEarnings1, gridBagConstraints);
@@ -785,13 +781,13 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTotalEarnings1.setLabelFor(lblTotalEarnings2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalEarnings2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
         // We show the following if track total xp earnings is on for a free person or if the
@@ -802,7 +798,7 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTotalXPEarnings1.setName("lblTotalXPEarnings1");
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalXPEarnings1, gridBagConstraints);
@@ -812,21 +808,21 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTotalXPEarnings1.setLabelFor(lblTotalXPEarnings2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTotalXPEarnings2, gridBagConstraints);
-            firsty++;
+            y++;
         }
 
         if (person.getRecruitment() != null) {
             lblRecruited1.setName("lblRecruited1");
             lblRecruited1.setText(resourceMap.getString("lblRecruited1.text"));
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRecruited1, gridBagConstraints);
@@ -835,20 +831,20 @@ public class PersonViewPanel extends JScrollablePanel {
             lblRecruited2.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment()));
             lblRecruited1.setLabelFor(lblRecruited2);
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblRecruited2, gridBagConstraints);
-            secondy++;
+            y++;
 
             lblTimeServed1.setName("lblTimeServed1");
             lblTimeServed1.setText(resourceMap.getString("lblTimeServed1.text"));
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTimeServed1, gridBagConstraints);
@@ -857,22 +853,22 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTimeServed2.setText(person.getTimeInService(campaign));
             lblTimeServed1.setLabelFor(lblTimeServed2);
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTimeServed2, gridBagConstraints);
-            secondy++;
+            y++;
         }
 
         if (person.getLastRankChangeDate() != null) {
             JLabel lblLastRankChangeDate1 = new JLabel(resourceMap.getString("lblLastRankChangeDate1.text"));
             lblLastRankChangeDate1.setName("lblLastRankChangeDate1");
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblLastRankChangeDate1, gridBagConstraints);
@@ -881,20 +877,20 @@ public class PersonViewPanel extends JScrollablePanel {
             lblLastRankChangeDate2.setName("lblLastRankChangeDate2");
             lblLastRankChangeDate1.setLabelFor(lblLastRankChangeDate2);
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblLastRankChangeDate2, gridBagConstraints);
-            secondy++;
+            y++;
 
             JLabel lblTimeInRank1 = new JLabel(resourceMap.getString("lblTimeInRank1.text"));
             lblTimeInRank1.setName("lblTimeInRank1");
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTimeInRank1, gridBagConstraints);
@@ -903,14 +899,13 @@ public class PersonViewPanel extends JScrollablePanel {
             lblTimeInRank2.setName("lblTimeInRank2");
             lblTimeInRank1.setLabelFor(lblTimeInRank2);
             gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = secondy;
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlInfo.add(lblTimeInRank2, gridBagConstraints);
-            secondy++;
         }
 
         return pnlInfo;
@@ -1655,8 +1650,6 @@ public class PersonViewPanel extends JScrollablePanel {
                         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                         pnlSkills.add(lblEducationDays2, gridBagConstraints);
 
-                        firsty++;
-
                         break;
                     case JOURNEY_TO_CAMPUS:
                     case JOURNEY_FROM_CAMPUS:
@@ -1694,12 +1687,11 @@ public class PersonViewPanel extends JScrollablePanel {
                         gridBagConstraints.fill = GridBagConstraints.NONE;
                         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                         pnlSkills.add(lblEducationJourneyDays2, gridBagConstraints);
-
-                        firsty++;
                         break;
                     case GRADUATING:
                     case DROPPING_OUT:
                     case NONE:
+
                         break;
                 }
             }
@@ -1826,11 +1818,9 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblAdvancedMedical1 = new JLabel();
         JLabel lblAdvancedMedical2 = new JLabel();
 
-        GridBagConstraints gridBagConstraints;
-
         lblAdvancedMedical1.setName("lblAdvancedMedical1");
         lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text"));
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;

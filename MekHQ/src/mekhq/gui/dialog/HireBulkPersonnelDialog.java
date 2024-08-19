@@ -25,9 +25,11 @@ import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.IOption;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
@@ -49,6 +51,9 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.ResourceBundle;
+
+import static mekhq.campaign.personnel.SkillType.*;
+import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
 
 /**
  * @author Jay Lawson
@@ -333,12 +338,12 @@ public class HireBulkPersonnelDialog extends JDialog {
         while (number > 0) {
             Person person = campaign.newPerson(selectedItem.getRole());
 
-            // while this isn't the most efficient way of doing this, we don't currently have a way
-            // to generate personnel at specific skill levels
             if ((useSkill) && (!selectedItem.getRole().isCivilian()) && (!selectedItem.getRole().isAssistant())) {
-                while (person.getSkillLevel(campaign, false) != skillLevel.getSelectedItem()) {
-                    person = campaign.newPerson(selectedItem.getRole());
-                }
+                overrideSkills(
+                        person,
+                        selectedItem.getRole(),
+                        Objects.requireNonNull(skillLevel.getSelectedItem()).ordinal()
+                );
             }
 
             person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
@@ -389,6 +394,125 @@ public class HireBulkPersonnelDialog extends JDialog {
                 number--;
             }
         }
+    }
+
+    /**
+     * Replaces the skills for a {@link Person} based on their primary role and desired experience level.
+     * @param person The {@link Person} to add default skills.
+     * @param primaryRole The primary role of the person
+     * @param expLvl The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
+     */
+    protected void overrideSkills(Person person, PersonnelRole primaryRole, int expLvl) {
+        switch (primaryRole) {
+            case MECHWARRIOR:
+                addSkillFixedExperienceLevel(person, S_PILOT_MECH, expLvl);
+                addSkillFixedExperienceLevel(person, S_GUN_MECH, expLvl);
+                break;
+            case LAM_PILOT:
+                addSkillFixedExperienceLevel(person, S_PILOT_MECH, expLvl);
+                addSkillFixedExperienceLevel(person, S_GUN_MECH, expLvl);
+                addSkillFixedExperienceLevel(person, S_PILOT_AERO, expLvl);
+                addSkillFixedExperienceLevel(person, S_GUN_AERO, expLvl);
+                break;
+            case GROUND_VEHICLE_DRIVER:
+                addSkillFixedExperienceLevel(person, S_PILOT_GVEE, expLvl);
+                addSkillFixedExperienceLevel(person, S_GUN_VEE, expLvl);
+                break;
+            case NAVAL_VEHICLE_DRIVER:
+                addSkillFixedExperienceLevel(person, S_PILOT_NVEE, expLvl);
+                addSkillFixedExperienceLevel(person, S_GUN_VEE, expLvl);
+                break;
+            case VTOL_PILOT:
+                addSkillFixedExperienceLevel(person, S_PILOT_VTOL, expLvl);
+                addSkillFixedExperienceLevel(person, S_GUN_VEE, expLvl);
+                break;
+            case VEHICLE_GUNNER:
+                addSkillFixedExperienceLevel(person, S_GUN_VEE, expLvl);
+                break;
+            case VEHICLE_CREW, MECHANIC:
+                addSkillFixedExperienceLevel(person, S_TECH_MECHANIC, expLvl);
+                break;
+            case AEROSPACE_PILOT:
+                addSkillFixedExperienceLevel(person, S_PILOT_AERO, expLvl);
+                addSkillFixedExperienceLevel(person, S_GUN_AERO, expLvl);
+                break;
+            case CONVENTIONAL_AIRCRAFT_PILOT:
+                addSkillFixedExperienceLevel(person, S_PILOT_JET, expLvl);
+                addSkillFixedExperienceLevel(person, S_GUN_JET, expLvl);
+                break;
+            case PROTOMECH_PILOT:
+                addSkillFixedExperienceLevel(person, S_GUN_PROTO, expLvl);
+                break;
+            case BATTLE_ARMOUR:
+                addSkillFixedExperienceLevel(person, S_GUN_BA, expLvl);
+                addSkillFixedExperienceLevel(person, S_ANTI_MECH, expLvl);
+                addSkillFixedExperienceLevel(person, S_SMALL_ARMS, expLvl);
+                break;
+            case SOLDIER:
+                addSkillFixedExperienceLevel(person, S_SMALL_ARMS, expLvl);
+                if (Utilities.rollProbability(new RandomSkillPreferences().getAntiMekProb())) {
+                    addSkillFixedExperienceLevel(person, S_ANTI_MECH, expLvl);
+                }
+                break;
+            case VESSEL_PILOT:
+                addSkillFixedExperienceLevel(person, S_PILOT_SPACE, expLvl);
+                break;
+            case VESSEL_GUNNER:
+                addSkillFixedExperienceLevel(person, S_GUN_SPACE, expLvl);
+                break;
+            case VESSEL_CREW:
+                addSkillFixedExperienceLevel(person, S_TECH_VESSEL, expLvl);
+                break;
+            case VESSEL_NAVIGATOR:
+                addSkillFixedExperienceLevel(person, S_NAV, expLvl);
+                break;
+            case MECH_TECH:
+                addSkillFixedExperienceLevel(person, S_TECH_MECH, expLvl);
+                break;
+            case AERO_TECH:
+                addSkillFixedExperienceLevel(person, S_TECH_AERO, expLvl);
+                break;
+            case BA_TECH:
+                addSkillFixedExperienceLevel(person, S_TECH_BA, expLvl);
+                break;
+            case DOCTOR:
+                addSkillFixedExperienceLevel(person, S_DOCTOR, expLvl);
+                break;
+            case ADMINISTRATOR_COMMAND:
+            case ADMINISTRATOR_LOGISTICS:
+            case ADMINISTRATOR_TRANSPORT:
+            case ADMINISTRATOR_HR:
+                addSkillFixedExperienceLevel(person, S_ADMIN, expLvl);
+
+                if (campaign.getCampaignOptions().isAdminsHaveNegotiation()) {
+                    addSkillFixedExperienceLevel(person, S_NEG, expLvl);
+                }
+
+                if (campaign.getCampaignOptions().isAdminsHaveScrounge()) {
+                    addSkillFixedExperienceLevel(person, S_SCROUNGE, expLvl);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Adds a skill to a person with a fixed experience level.
+     * If the person already has the specified skill, the bonus value will be retained.
+     *
+     * @param person The Person to add the skill to.
+     * @param skill The name of the skill to add.
+     * @param experienceLvl The experience level for the skill.
+     */
+    private static void addSkillFixedExperienceLevel(Person person, String skill, int experienceLvl) {
+        int bonus = 0;
+
+        if (person.hasSkill(skill)) {
+            bonus = person.getSkill(skill).getBonus();
+        }
+
+        addSkill(person, skill, experienceLvl, bonus);
     }
 
     private void refreshRanksCombo() {

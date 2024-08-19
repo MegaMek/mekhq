@@ -2,7 +2,7 @@
  * PlanetarySystem.java
  *
  * Copyright (c) 2011 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2011-2022 - The MegaMek team. All Rights Reserved.
+ * Copyright (c) 2011-2024 - The MegaMek team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,13 +30,16 @@ import megamek.common.EquipmentType;
 import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.DateAdapter;
 import mekhq.adapter.SpectralClassAdapter;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 
 import java.time.LocalDate;
 import java.util.*;
 
 /**
- * This is a PlanetarySystem object which will contain information
+ * This is a PlanetarySystem object that will contain information
  * about the system as well as an ArrayList of the Planet objects
  * that make up the system
  *
@@ -89,21 +92,21 @@ public class PlanetarySystem {
     private Double y;
 
     // Base data
-    @SuppressWarnings("unused")
+    @SuppressWarnings(value = "unused")
     private UUID uniqueIdentifier;
     private String id;
     private String name;
 
     //Star data (to be factored out)
     private String spectralType;
-    @XmlJavaTypeAdapter(SpectralClassAdapter.class)
+    @XmlJavaTypeAdapter(value = SpectralClassAdapter.class)
     private Integer spectralClass;
     private Double subtype;
     private String luminosity;
 
-    @XmlJavaTypeAdapter(BooleanValueAdapter.class)
+    @XmlJavaTypeAdapter(value = BooleanValueAdapter.class)
     private Boolean nadirCharge;
-    @XmlJavaTypeAdapter(BooleanValueAdapter.class)
+    @XmlJavaTypeAdapter(value = BooleanValueAdapter.class)
     private Boolean zenithCharge;
 
     // tree map of planets sorted by system position
@@ -118,7 +121,7 @@ public class PlanetarySystem {
     private int primarySlot;
 
     /** Marker for "please delete this system" */
-    @XmlJavaTypeAdapter(BooleanValueAdapter.class)
+    @XmlJavaTypeAdapter(value = BooleanValueAdapter.class)
     public Boolean delete;
 
     /**
@@ -204,7 +207,7 @@ public class PlanetarySystem {
         return pop;
     }
 
-    /** highest socio-industrial ratings among all planets in system for the map **/
+    /** highest socio-industrial ratings among all planets in-system for the map **/
     public SocioIndustrialData getSocioIndustrial(LocalDate when) {
         int tech = EquipmentType.RATING_X;
         int industry = EquipmentType.RATING_X;
@@ -360,16 +363,12 @@ public class PlanetarySystem {
             return "unknown";
         }
         if (spectralType.startsWith("Q")) {
-            switch (spectralType) {
-                case "QB":
-                    return "black hole";
-                case "QN":
-                    return "neutron star";
-                case "QP":
-                    return "pulsar";
-                default:
-                    return "unknown";
-            }
+            return switch (spectralType) {
+                case "QB" -> "black hole";
+                case "QN" -> "neutron star";
+                case "QP" -> "pulsar";
+                default -> "unknown";
+            };
         }
         return spectralType;
     }
@@ -391,15 +390,15 @@ public class PlanetarySystem {
     }
 
     /**
-     * @return the planet object identified by the primary slot. If no primary slot is given then
-     * this function will return the first planet
+     * @return the planet object identified by the primary slot.
+     * If no primary slot is given, then this function will return the first planet
      */
     public Planet getPrimaryPlanet() {
         return planets.get(getPrimaryPlanetPosition());
     }
 
     public int getPrimaryPlanetPosition() {
-        // if no primary slot (uninhabited system) just return first planet
+        // if no primary slot (i.e., an uninhabited system) then return the first planet
         return Math.max(primarySlot, 1);
     }
 
@@ -426,22 +425,15 @@ public class PlanetarySystem {
 
 
     public String getIcon() {
-        switch (getSpectralClass()) {
-            case SPECTRAL_B:
-                return "B_" + luminosity;
-            case SPECTRAL_A:
-                return  "A_" + luminosity;
-            case SPECTRAL_F:
-                return "F_" + luminosity;
-            case SPECTRAL_G:
-                return "G_" + luminosity;
-            case SPECTRAL_K:
-                return "K_" + luminosity;
-            case SPECTRAL_M:
-                return "M_" + luminosity;
-            default:
-                return "default";
-        }
+        return switch (getSpectralClass()) {
+            case SPECTRAL_B -> "B_" + luminosity;
+            case SPECTRAL_A -> "A_" + luminosity;
+            case SPECTRAL_F -> "F_" + luminosity;
+            case SPECTRAL_G -> "G_" + luminosity;
+            case SPECTRAL_K -> "K_" + luminosity;
+            case SPECTRAL_M -> "M_" + luminosity;
+            default -> "default";
+        };
     }
 
     @Override
@@ -527,8 +519,8 @@ public class PlanetarySystem {
         luminosity = scDef.luminosity;
     }
 
-    // JAXB marshalling support
-    @SuppressWarnings({ "unused" })
+    // JAXB marshaling support
+    @SuppressWarnings(value = "unused")
     private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
         if (null == id) {
             id = name;
@@ -566,7 +558,7 @@ public class PlanetarySystem {
         eventList = null;
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings(value = "unused")
     private boolean beforeMarshal(Marshaller marshaller) {
         // Fill up our event list from the internal data type
         eventList = new ArrayList<>(events.values());
@@ -630,7 +622,7 @@ public class PlanetarySystem {
     /** A class representing some event, possibly changing planetary information */
     @XmlRootElement(name="event")
     public static final class PlanetarySystemEvent {
-        @XmlJavaTypeAdapter(DateAdapter.class)
+        @XmlJavaTypeAdapter(value = DateAdapter.class)
         public LocalDate date;
         public Boolean nadirCharge;
         public Boolean zenithCharge;
@@ -655,5 +647,62 @@ public class PlanetarySystem {
         public boolean isEmpty() {
             return (null == nadirCharge) && (null == zenithCharge);
         }
+    }
+
+
+    /**
+     * Retrieves a list of filtered academies based on the given campaign.
+     *
+     * @param campaign The campaign for filtering the academies.
+     * @return A list of filtered academies based on the campaign.
+     */
+    public List<Academy> getFilteredAcademies(Campaign campaign) {
+        final LocalDate currentDate = campaign.getLocalDate();
+        AcademyFactory academyFactory = AcademyFactory.getInstance();
+
+        List<String> excludedSets = List.of("Local Academies", "Unit Education");
+
+        return academyFactory.getAllSetNames().stream()
+                .filter(setName -> !excludedSets.contains(setName) // Excluding certain setNames
+                        && (!setName.equalsIgnoreCase("Prestigious Academies")
+                        || campaign.getCampaignOptions().isEnablePrestigiousAcademies())) // Additional condition for "Prestigious Academies"
+                .flatMap(setName -> getFilteredAcademiesForSet(currentDate, setName).stream())
+                .toList();
+    }
+
+    /**
+     * Retrieves a list of filtered academies for a given set and current date.
+     *
+     * @param currentDate The current date to filter the academies.
+     * @param setName     The set name to filter the academies.
+     * @return A list of filtered academies for the given set and current date.
+     */
+    private List<Academy> getFilteredAcademiesForSet(LocalDate currentDate, String setName) {
+        return AcademyFactory.getInstance().getAllAcademiesForSet(setName).stream()
+                .filter(academy -> academy.getLocationSystems().contains(this.getId())
+                        && !academy.isLocal()
+                        && !academy.isHomeSchool()
+                        && !academy.getName().contains("(Officer)")
+                        && currentDate.getYear() >= academy.getConstructionYear()
+                        && currentDate.getYear() < academy.getClosureYear()
+                        && currentDate.getYear() < academy.getDestructionYear())
+                .sorted()
+                .toList();
+    }
+
+    /**
+     * Retrieves a string representation of the prestigious academies available in the system.
+     *
+     * @return A string representation of the prestigious academies in the system.
+     */
+    public String getAcademiesForSystem(List<Academy> filteredAcademies) {
+        StringBuilder academyString = new StringBuilder();
+
+        for (Academy academy : filteredAcademies) { // there are not enough entries to justify a Stream
+            academyString.append("<b>").append(academy.getName()).append("</b><br>")
+                    .append(academy.getDescription()).append("<br><br>");
+        }
+
+        return academyString.toString();
     }
 }

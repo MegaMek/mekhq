@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2009-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,6 +20,7 @@ package mekhq.gui.view;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.SocioIndustrialData;
@@ -32,6 +33,7 @@ import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -43,9 +45,6 @@ public class PlanetViewPanel extends JScrollablePanel {
     private PlanetarySystem system;
     private Campaign campaign;
     private int planetPos;
-
-    private JPanel pnlSystem;
-    private JPanel pnlPlanet;
 
     private Image planetIcon = null;
 
@@ -67,8 +66,8 @@ public class PlanetViewPanel extends JScrollablePanel {
     private void initComponents() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        pnlSystem = getSystemPanel();
-        pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(campaign.getLocalDate()) + " " + resourceMap.getString("system.text")));
+        JPanel pnlSystem = getSystemPanel();
+        pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(campaign.getLocalDate()) + ' ' + resourceMap.getString("system.text")));
         add(pnlSystem);
 
         Planet planet = system.getPlanet(planetPos);
@@ -77,7 +76,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             planet = system.getPrimaryPlanet();
         }
         if (null != planet) {
-            pnlPlanet = getPlanetPanel(planet);
+            JPanel pnlPlanet = getPlanetPanel(planet);
             pnlPlanet.setBorder(BorderFactory.createTitledBorder(planet.getPrintableName(campaign.getLocalDate())));
             add(pnlPlanet);
         }
@@ -159,19 +158,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblPosition = new JLabel(resourceMap.getString("lblPosition.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblPosition, gbcLabel);
-            String text = "?";
-            if (null != planet.getOrbitRadius()) {
-                if (planet.getPlanetType().equals("Asteroid Belt")) {
-                    text = String.format("%.3f AU",
-                            planet.getOrbitRadius());
-                } else {
-                    text = String.format("%s (%.3f AU)",
-                            planet.getDisplayableSystemPosition(), planet.getOrbitRadius());
-                }
-            } else {
-                text = planet.getDisplayableSystemPosition();
-            }
-            JLabel txtPosition = new JLabel(text);
+            JLabel txtPosition = getTxtPosition(planet);
             gbcText.gridy = infoRow;
             panel.add(txtPosition, gbcText);
             ++ infoRow;
@@ -181,7 +168,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblJumpPoint = new JLabel(resourceMap.getString("lblJumpPoint1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblJumpPoint, gbcLabel);
-        JLabel txtJumpPoint = new JLabel(Double.toString(Math.round(100 * planet.getTimeToJumpPoint(1))/100.0) + " days");
+        JLabel txtJumpPoint = new JLabel(Math.round(100 * planet.getTimeToJumpPoint(1)) / 100.0 + " days");
         gbcText.gridy = infoRow;
         panel.add(txtJumpPoint, gbcText);
         ++ infoRow;
@@ -191,7 +178,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblYear = new JLabel(resourceMap.getString("lblYear1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblYear, gbcLabel);
-            JLabel txtYear = new JLabel(Double.toString(planet.getYearLength()) + " Terran years");
+            JLabel txtYear = new JLabel(planet.getYearLength() + " Terran years");
             gbcText.gridy = infoRow;
             panel.add(txtYear, gbcText);
             ++ infoRow;
@@ -202,7 +189,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             JLabel lblDay = new JLabel(resourceMap.getString("lblDay1.text"));
             gbcLabel.gridy = infoRow;
             panel.add(lblDay, gbcLabel);
-            JLabel txtDay = new JLabel(Double.toString(planet.getDayLength(currentDate)) + " hours");
+            JLabel txtDay = new JLabel(planet.getDayLength(currentDate) + " hours");
             gbcText.gridy = infoRow;
             panel.add(txtDay, gbcText);
             ++ infoRow;
@@ -258,7 +245,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             gbcLabel.gridy = infoRow;
             panel.add(lblTemp, gbcLabel);
             //Using Unicode for the degree symbol as it is required for proper display on certain systems
-            JLabel txtTemp = new JLabel(planet.getTemperature(currentDate) + "\u00B0" + "C");
+            JLabel txtTemp = new JLabel(planet.getTemperature(currentDate) + "°" + 'C');
             gbcText.gridy = infoRow;
             panel.add(txtTemp, gbcText);
             ++ infoRow;
@@ -343,6 +330,34 @@ public class PlanetViewPanel extends JScrollablePanel {
             ++ infoRow;
         }
 
+        // Academies
+        List<Academy> filteredAcademies = system.getFilteredAcademies(campaign);
+
+        if (!filteredAcademies.isEmpty()) {
+            ++infoRow;
+            JLabel lblAcademies = new JLabel(resourceMap.getString("lblAcademies.text"));
+            gbcLabel.gridx = 0;
+            gbcLabel.gridy = infoRow;
+            panel.add(lblAcademies, gbcLabel);
+
+            JTextPane txtAcademies = new JTextPane();
+            txtAcademies.setEditable(false);
+            txtAcademies.setContentType("text/html");
+            txtAcademies.setText(MarkdownRenderer.getRenderedHtml(system.getAcademiesForSystem(filteredAcademies)));
+            ((DefaultCaret) txtAcademies.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = infoRow;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            gridBagConstraints.insets = new Insets(0, 0, 5, 0);
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            panel.add(txtAcademies, gridBagConstraints);
+            ++infoRow;
+        }
+
         if (null != planet.getDescription()) {
             JTextPane txtDesc = new JTextPane();
             txtDesc.setEditable(false);
@@ -362,6 +377,23 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         return panel;
+    }
+
+    private static JLabel getTxtPosition(Planet planet) {
+        String text;
+        if (null != planet.getOrbitRadius()) {
+            if (planet.getPlanetType().equals("Asteroid Belt")) {
+                text = String.format("%.3f AU",
+                        planet.getOrbitRadius());
+            } else {
+                text = String.format("%s (%.3f AU)",
+                        planet.getDisplayableSystemPosition(), planet.getOrbitRadius());
+            }
+        } else {
+            text = planet.getDisplayableSystemPosition();
+        }
+        JLabel txtPosition = new JLabel(text);
+        return txtPosition;
     }
 
     private JPanel getSystemPanel() {
@@ -386,7 +418,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JLabel lblStarType = new JLabel(resourceMap.getString("lblStarType1.text"));
         gbcLabel.gridy = infoRow;
         panel.add(lblStarType, gbcLabel);
-        JLabel txtStarType = new JLabel(system.getSpectralTypeText() + " (" + system.getRechargeTimeText(currentDate) + ")");
+        JLabel txtStarType = new JLabel(system.getSpectralTypeText() + " (" + system.getRechargeTimeText(currentDate) + ')');
         gbcText.gridy = infoRow;
         panel.add(txtStarType, gbcText);
         ++ infoRow;

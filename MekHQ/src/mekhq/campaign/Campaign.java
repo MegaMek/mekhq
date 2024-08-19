@@ -94,7 +94,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
-import mekhq.campaign.rating.CampaignOpsReputation;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
@@ -135,8 +135,10 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -193,6 +195,7 @@ public class Campaign implements ITechManager {
     private Faction faction;
     private int techFactionCode;
     private String retainerEmployerCode; // AtB
+    private LocalDate retainerStartDate; // AtB
     private RankSystem rankSystem;
 
     private final ArrayList<String> currentReport;
@@ -247,8 +250,12 @@ public class Campaign implements ITechManager {
     private int shipSearchType;
     private String shipSearchResult; //AtB
     private LocalDate shipSearchExpiration; //AtB
-    private IUnitGenerator unitGenerator;
-    private IUnitRating unitRating;
+    private IUnitGenerator unitGenerator; // deprecated
+    private IUnitRating unitRating; // deprecated
+    private ReputationController reputation;
+    private int crimeRating;
+    private int crimePirateModifier;
+    private LocalDate dateOfLastCrime;
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
@@ -274,12 +281,17 @@ public class Campaign implements ITechManager {
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
-        name = "My Campaign";
+        name = randomMercenaryCompanyNameGenerator(null);
         overtime = false;
         gmMode = false;
         setFaction(Factions.getInstance().getDefaultFaction());
         techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
+        retainerStartDate = null;
+        reputation = null;
+        crimeRating = 0;
+        crimePirateModifier = 0;
+        dateOfLastCrime = null;
         setRankSystemDirect(Ranks.getRankSystemFromCode(Ranks.DEFAULT_SYSTEM_CODE));
         forces = new Force(name);
         forceIds.put(0, forces);
@@ -726,7 +738,9 @@ public class Campaign implements ITechManager {
                     boolean wasSacked = getRetirementDefectionTracker().getPayout(pid).isWasSacked();
 
                     if ((!wasKilled) && (!wasSacked)) {
-                        if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
+                        if (!person.getPermanentInjuries().isEmpty()) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
+                        } if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
                             if (!getActiveContracts().isEmpty()) {
                                 int roll = Compute.randomInt(20);
 
@@ -748,7 +762,11 @@ public class Campaign implements ITechManager {
                     }
 
                     if (wasSacked) {
-                        person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
+                        if (person.getPermanentInjuries().isEmpty()) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
+                        } else {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
+                        }
                     }
 
                     // civilian spouses follow their partner in departing
@@ -847,6 +865,8 @@ public class Campaign implements ITechManager {
                 lances.put(id, new Lance(force.getId(), this));
             }
         }
+
+        force.updateCommander(this);
     }
 
     public void moveForce(Force force, Force superForce) {
@@ -1338,6 +1358,17 @@ public class Campaign implements ITechManager {
         return getHangar().getUnits();
     }
 
+    /**
+     * Retrieves a collection of units that are not mothballed or being salvaged.
+     *
+     * @return a collection of active units
+     */
+    public Collection<Unit> getActiveUnits() {
+        return getHangar().getUnits().stream()
+                .filter(unit -> !unit.isMothballed() && !unit.isSalvage())
+                .toList();
+    }
+
     public Collection<Unit> getLargeCraftAndWarShips() {
         return getHangar().getUnits().stream()
                 .filter(unit -> (unit.getEntity().isLargeCraft()) || (unit.getEntity().isWarShip()))
@@ -1823,12 +1854,9 @@ public class Campaign implements ITechManager {
                     break;
                 }
             }
-            // Higher rated units are more likely to have Bloodnamed
+            // Higher-rated units are more likely to have Bloodnamed
             if (getCampaignOptions().getUnitRatingMethod().isEnabled()) {
-                IUnitRating rating = getUnitRating();
-                bloodnameTarget += IUnitRating.DRAGOON_C - (getCampaignOptions().getUnitRatingMethod().equals(
-                        UnitRatingMethod.FLD_MAN_MERCS_REV)
-                        ? rating.getUnitRatingAsInteger() : rating.getModifier());
+                bloodnameTarget += IUnitRating.DRAGOON_C - getUnitRatingMod();
             }
 
             // Reavings diminish the number of available Bloodrights in later eras
@@ -3548,8 +3576,10 @@ public class Campaign implements ITechManager {
             /*
              * First of the month; roll Morale.
              */
-            IUnitRating rating = getUnitRating();
-            rating.reInitialize();
+            if (campaignOptions.getUnitRatingMethod().isFMMR()) {
+                IUnitRating rating = getUnitRating();
+                rating.reInitialize();
+            }
 
             for (AtBContract contract : getActiveAtBContracts()) {
                 contract.checkMorale(getLocalDate(), getUnitRatingMod());
@@ -3898,6 +3928,10 @@ public class Campaign implements ITechManager {
 
         processFatigueNewDay();
 
+        if (campaignOptions.getUnitRatingMethod().isCampaignOperations()) {
+            processReputationChanges();
+        }
+
         if (campaignOptions.isUseEducationModule()) {
             processEducationNewDay();
         }
@@ -3939,6 +3973,40 @@ public class Campaign implements ITechManager {
         }
 
         return true;
+    }
+
+
+    /**
+     * Processes reputation changes based on various conditions.
+     */
+    private void processReputationChanges() {
+        if (faction.isPirate()) {
+            dateOfLastCrime = currentDay;
+            crimePirateModifier = -100;
+        }
+
+        if (currentDay.getDayOfMonth() == 1) {
+            if (dateOfLastCrime != null) {
+                long yearsBetween = ChronoUnit.YEARS.between(currentDay, dateOfLastCrime);
+
+                int remainingCrimeChange = 2;
+
+                if (yearsBetween >= 1) {
+                    if (crimePirateModifier < 0) {
+                        remainingCrimeChange = Math.max(0, 2 + crimePirateModifier);
+                        changeCrimePirateModifier(2); // this is the amount of change specified by CamOps
+                    }
+
+                    if (crimeRating < 0 && remainingCrimeChange > 0) {
+                        changeCrimeRating(remainingCrimeChange);
+                    }
+                }
+            }
+        }
+
+        if (currentDay.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
+            reputation.initializeReputation(this);
+        }
     }
 
     /**
@@ -4627,6 +4695,75 @@ public class Campaign implements ITechManager {
         retainerEmployerCode = code;
     }
 
+    public LocalDate getRetainerStartDate() {
+        return retainerStartDate;
+    }
+
+    public void setRetainerStartDate(LocalDate retainerStartDate) {
+        this.retainerStartDate = retainerStartDate;
+    }
+
+    public int getRawCrimeRating() {
+        return crimeRating;
+    }
+
+    public void setCrimeRating(int crimeRating) {
+        this.crimeRating = crimeRating;
+    }
+
+    /**
+     * Updates the crime rating by the specified change.
+     * If improving crime rating, use a positive number, otherwise negative
+     *
+     * @param change the change to be applied to the crime rating
+     */
+    public void changeCrimeRating(int change) {
+        this.crimeRating = Math.min(0, crimeRating + change);
+    }
+
+    public int getCrimePirateModifier() {
+        return crimePirateModifier;
+    }
+
+    public void setCrimePirateModifier(int crimePirateModifier) {
+        this.crimePirateModifier = crimePirateModifier;
+    }
+    /**
+     * Updates the crime pirate modifier by the specified change.
+     * If improving the modifier, use a positive number, otherwise negative
+     *
+     * @param change the change to be applied to the crime modifier
+     */
+    public void changeCrimePirateModifier(int change) {
+        this.crimePirateModifier = Math.min(0, crimePirateModifier + change);
+    }
+
+    /**
+     * Calculates the adjusted crime rating by adding the crime rating
+     * with the pirate modifier.
+     *
+     * @return The adjusted crime rating.
+     */
+    public int getAdjustedCrimeRating() {
+        return crimeRating + crimePirateModifier;
+    }
+
+    public LocalDate getDateOfLastCrime() {
+        return dateOfLastCrime;
+    }
+
+    public void setDateOfLastCrime(LocalDate dateOfLastCrime) {
+        this.dateOfLastCrime = dateOfLastCrime;
+    }
+
+    public ReputationController getReputation() {
+        return reputation;
+    }
+
+    public void setReputation(ReputationController reputation) {
+        this.reputation = reputation;
+    }
+
     private void addInMemoryLogHistory(LogEntry le) {
         if (!inMemoryLogHistory.isEmpty()) {
             while (ChronoUnit.DAYS.between(inMemoryLogHistory.get(0).getDate(), le.getDate()) > MHQConstants.MAX_HISTORICAL_LOG_DAYS) {
@@ -4781,7 +4918,27 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", getFaction().getShortName());
         if (retainerEmployerCode != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerEmployerCode", retainerEmployerCode);
+
+            if (retainerStartDate == null) {
+                // this handles <50.0 campaigns
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerStartDate", currentDay);
+            } else {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerStartDate", retainerStartDate);
+            }
         }
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "crimeRating", crimeRating);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "crimePirateModifier", crimePirateModifier);
+
+        // this handles <50.0 campaigns
+        if (dateOfLastCrime != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dateOfLastCrime", dateOfLastCrime);
+        } else if (getAdjustedCrimeRating() < 0) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dateOfLastCrime", currentDay);
+        }
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "reputation");
+        reputation.writeReputationToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "reputation");
 
         // this handles campaigns that predate 49.20
         if (campaignStartDate == null) {
@@ -5679,6 +5836,37 @@ public class Campaign implements ITechManager {
             target.addModifier(getFaction().getEraMod(getGameYear()), "era");
         }
 
+        if (partWork.getUnit().getSite() < SITE_FACILITY_MAINTENANCE) {
+            if (getLocation().isOnPlanet() && campaignOptions.isUsePlanetaryModifiers()) {
+                Planet planet = getLocation().getPlanet();
+                Atmosphere atmosphere = planet.getAtmosphere(getLocalDate());
+                megamek.common.planetaryconditions.Atmosphere planetaryConditions = megamek.common.planetaryconditions.Atmosphere.getAtmosphere(planet.getPressure(getLocalDate()));
+                int temperature = planet.getTemperature(getLocalDate());
+
+                if (planet.getGravity() < 0.8) {
+                    target.addModifier(2, "Low Gravity");
+                } else if (planet.getGravity() >= 2.0) {
+                    target.addModifier(4, "Very High Gravity");
+                } else if (planet.getGravity() > 1.2) {
+                    target.addModifier(1, "High Gravity");
+                }
+
+                if (atmosphere.isTainted() || atmosphere.isToxic()) {
+                    target.addModifier(2, "Tainted or Toxic Atmosphere");
+                } else if (planetaryConditions.isVacuum()) {
+                    target.addModifier(2, "Vacuum");
+                }
+
+                if (planetaryConditions.isTrace() || planetaryConditions.isVeryHigh()) {
+                    target.addModifier(1, "Trace or Very High Pressure Atmosphere");
+                }
+
+                if (temperature < -30 || temperature > 50) {
+                    target.addModifier(1, "Extreme Temperature");
+                }
+            }
+        }
+
         if (null != partWork.getUnit() && null != tech) {
             // we have no official rules for what happens when a tech is only
             // assigned
@@ -6291,33 +6479,49 @@ public class Campaign implements ITechManager {
         });
     }
 
+    /**
+     * Returns the text representation of the unit rating based on the selected unit rating method.
+     * If the unit rating method is FMMR, the unit rating value is returned.
+     * If the unit rating method is Campaign Operations, the reputation rating and unit rating modification are combined and returned.
+     * If the unit rating method is neither FMMR nor Campaign Operations, "N/A" is returned.
+     *
+     * @return The text representation of the unit rating
+     */
     public String getUnitRatingText() {
-        return getUnitRating().getUnitRating();
+        UnitRatingMethod unitRatingMethod = campaignOptions.getUnitRatingMethod();
+
+        if (unitRatingMethod.isFMMR()) {
+            return getUnitRating().getUnitRating();
+        } else if (unitRatingMethod.isCampaignOperations()) {
+            int reputationRating = reputation.getReputationRating();
+            int unitRatingMod = getUnitRatingMod();
+
+            return String.format("%d (%+d)", reputationRating, unitRatingMod);
+        } else {
+            return "N/A";
+        }
     }
 
     /**
-     * Against the Bot Calculates and returns dragoon rating if that is the chosen
-     * method; for IOps method, returns unit reputation / 10. If the player chooses
-     * not to use unit rating at all, use a default value of C. Note that the AtB
-     * system is designed for use with FMMerc dragoon rating, and use of the IOps
-     * Beta system may have unsatisfactory results, but we follow the options set by
-     * the user here.
+     * Retrieves the unit rating modifier based on campaign options.
+     * If the unit rating method is not enabled, it returns the default value of IUnitRating.DRAGOON_C.
+     * If the unit rating method uses FMMR, it returns the unit rating as an integer.
+     * Otherwise, it calculates the modifier using the getAtBModifier method.
+     *
+     * @return The unit rating modifier based on the campaign options.
      */
     public int getUnitRatingMod() {
         if (!getCampaignOptions().getUnitRatingMethod().isEnabled()) {
             return IUnitRating.DRAGOON_C;
         }
-        IUnitRating rating = getUnitRating();
-        return getCampaignOptions().getUnitRatingMethod().isFMMR() ? rating.getUnitRatingAsInteger()
-                : (int) MathUtility.clamp((rating.getModifier() / campaignOptions.getAtbCamOpsDivision()), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
+
+        return getCampaignOptions().getUnitRatingMethod().isFMMR() ?
+                getUnitRating().getUnitRatingAsInteger() : reputation.getAtbModifier();
     }
 
-    /**
-     * This is a better method for pairing AtB with IOpts with regards to Prisoner Capture
-     */
+    @Deprecated
     public int getUnitRatingAsInteger() {
-        return getCampaignOptions().getUnitRatingMethod().isEnabled()
-                ? getUnitRating().getUnitRatingAsInteger() : IUnitRating.DRAGOON_C;
+        return getUnitRatingMod();
     }
 
     public RandomSkillPreferences getRandomSkillPreferences() {
@@ -6806,7 +7010,7 @@ public class Campaign implements ITechManager {
             Money remainingMoney = Money.zero();
             // check for money in escrow
             // According to FMM(r) pg 179, both failure and breach lead to no
-            // further payment even though this seems stupid
+            // further payment even though this seems foolish
             if ((contract.getStatus().isSuccess())
                     && (contract.getMonthsLeft(getLocalDate()) > 0)) {
                 remainingMoney = contract.getMonthlyPayOut()
@@ -6814,7 +7018,7 @@ public class Campaign implements ITechManager {
             }
 
             // If overage repayment is enabled, we first need to check if the salvage percent is
-            // under 100. 100 means you cannot have a overage.
+            // under 100. 100 means you cannot have an overage.
             // Then, we check if the salvage percent is less than the percent salvaged by the
             // unit in question. If it is, then they owe the assigner some cash
             if (getCampaignOptions().isOverageRepaymentInFinalPayment()
@@ -6825,6 +7029,33 @@ public class Campaign implements ITechManager {
                     final Money amountToRepay = contract.getSalvagedByUnit().minus(maxSalvage);
                     remainingMoney = remainingMoney.minus(amountToRepay);
                     contract.subtractSalvageByUnit(amountToRepay);
+                }
+            }
+
+            if (getCampaignOptions().isUseShareSystem()) {
+                ResourceBundle financeResources = ResourceBundle.getBundle("mekhq.resources.Finances",
+                        MekHQ.getMHQOptions().getLocale());
+
+                Money shares = remainingMoney.multipliedBy(contract.getSharesPercent()).dividedBy(100);
+                remainingMoney = remainingMoney.minus(shares);
+
+                if (getFinances().debit(TransactionType.SALARIES, getLocalDate(), shares,
+                        String.format(financeResources.getString("ContractSharePayment.text"), contract.getName()))) {
+                    addReport(financeResources.getString("DistributedShares.text"), shares.toAmountAndSymbolString());
+
+                    if (getCampaignOptions().isTrackTotalEarnings()) {
+                        boolean sharesForAll = getCampaignOptions().isSharesForAll();
+
+                        int numberOfShares = getActivePersonnel().stream()
+                                .mapToInt(person -> person.getNumShares(this, sharesForAll))
+                                .sum();
+
+                        Money singleShare = shares.dividedBy(numberOfShares);
+
+                        for (Person person : getActivePersonnel()) {
+                            person.payPersonShares(this, singleShare, sharesForAll);
+                        }
+                    }
                 }
             }
 
@@ -7515,6 +7746,7 @@ public class Campaign implements ITechManager {
      * Returns the type of rating method as selected in the Campaign Options dialog.
      * Lazy-loaded for performance. Default is CampaignOpsReputation
      */
+    @Deprecated
     public IUnitRating getUnitRating() {
         // if we switched unit rating methods,
         if (unitRating != null && (unitRating.getUnitRatingMethod() != getCampaignOptions().getUnitRatingMethod())) {
@@ -7526,8 +7758,6 @@ public class Campaign implements ITechManager {
 
             if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(method)) {
                 unitRating = new FieldManualMercRevDragoonsRating(this);
-            } else {
-                unitRating = new CampaignOpsReputation(this);
             }
         }
 

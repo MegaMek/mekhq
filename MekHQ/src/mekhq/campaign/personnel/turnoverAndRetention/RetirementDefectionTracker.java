@@ -209,7 +209,7 @@ public class RetirementDefectionTracker {
 
                     if (!atbContracts.isEmpty()) {
                         for (AtBContract atbContract : atbContracts) {
-                            if ((contract == null) || (contract.getSharesPct() < atbContract.getSharesPct())) {
+                            if ((contract == null) || (contract.getSharesPercent() > atbContract.getSharesPercent())) {
                                 contract = atbContract;
                             }
                         }
@@ -217,7 +217,7 @@ public class RetirementDefectionTracker {
                 }
 
                 if (contract != null) {
-                    targetNumber.addModifier(- Math.max(0, ((contract.getSharesPct() / 10) - 2)), resources.getString("shares.text"));
+                    targetNumber.addModifier(- Math.max(0, ((contract.getSharesPercent() / 10) - 2)), resources.getString("shares.text"));
                 }
             }
 
@@ -966,15 +966,18 @@ public class RetirementDefectionTracker {
             // person was killed
             if (killed) {
                 payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
-            // person was sacked
-            } else if (sacked) {
-                payoutAmount = Money.of(0);
+            // person is getting medically discharged
+            } else if (!person.getPermanentInjuries().isEmpty()) {
+                payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
             // person is defecting
             } else if (isBreakingContract(person, campaign.getLocalDate(), campaign.getCampaignOptions().getServiceContractDuration())) {
                 payoutAmount = Money.of(0);
             // person is retiring
             } else if (person.getAge(campaign.getLocalDate()) >= 50) {
                 payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
+            // person was sacked
+            } else if (sacked) {
+                payoutAmount = Money.of(0);
             // person is resigning
             } else {
                 payoutAmount = getPayoutOrBonusValue(campaign, person);

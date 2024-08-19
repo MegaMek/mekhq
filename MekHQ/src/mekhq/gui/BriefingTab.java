@@ -496,7 +496,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             if (!defectors.isEmpty()) {
                 // will return true if the prompt is canceled
-                if (prisonerPrompt(prisoners, "ransomDefectorsQ.format", resources)) {
+                if (prisonerPrompt(defectors, "ransomDefectorsQ.format", resources)) {
                     return;
                 }
             }

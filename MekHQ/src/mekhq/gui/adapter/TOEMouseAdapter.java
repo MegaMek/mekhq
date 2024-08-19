@@ -281,7 +281,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.contains(TOEMouseAdapter.SET_LANCE_COMMANDER)) {
             if (null != singleForce) {
-                singleForce.setForceCommanderID(UUID.fromString(target));
+                singleForce.setOverrideForceCommanderID(UUID.fromString(target));
+                singleForce.updateCommander(gui.getCampaign());
                 gui.getTOETab().refreshForceView();
             }
         } else if (command.contains(TOEMouseAdapter.ASSIGN_TO_SHIP)) {
@@ -436,7 +437,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(
                             null,
                             "Are you sure you want to delete "
-                                    + force.getFullName() + "?",
+                                    + force.getFullName() + '?',
                                     "Delete Force?", JOptionPane.YES_NO_OPTION)) {
                         return;
                     }
@@ -662,7 +663,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             Force force = forces.get(0);
             StringBuilder forceIds = new StringBuilder("" + force.getId());
             for (int i = 1; i < forces.size(); i++) {
-                forceIds.append("|").append(forces.get(i).getId());
+                forceIds.append('|').append(forces.get(i).getId());
             }
 
             if (!multipleSelection) {
@@ -775,8 +776,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 }
                             }
 
-                            menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
-                            menuItem.setActionCommand(COMMAND_ADD_LANCE_TECH + tech.getId() + "|" + forceIds);
+                            menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ')');
+                            menuItem.setActionCommand(COMMAND_ADD_LANCE_TECH + tech.getId() + '|' + forceIds);
                             menuItem.addActionListener(this);
 
                             switch (tech.getSkillLevel(gui.getCampaign(), !tech.getPrimaryRole().isTech())) {
@@ -819,7 +820,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                 } else {
                     menuItem = new JMenuItem("Remove Tech from Force");
-                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_LANCE_TECH + force.getTechID() + "|" + forceIds);
+                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_LANCE_TECH + force.getTechID() + '|' + forceIds);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
                 }
@@ -845,7 +846,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                         int weightClass = EntityWeightClass.getWeightClass(tonnage, unittype);
                         String displayname2 = EntityWeightClass.getClassName(weightClass, unittype, false);
-                        String weightClassMenuName = unittype + "_"
+                        String weightClassMenuName = unittype + '_'
                                 + EntityWeightClass.getClassName(weightClass, unittype, false);
                         weightClassForUnitType.put(weightClassMenuName, new JMenu(displayname2));
                         weightClassForUnitType.get(weightClassMenuName).setName(weightClassMenuName);
@@ -858,7 +859,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     for (int ut : svTypes) {
                         String typeName = UnitType.getTypeName(ut);
                         String wcName = EntityWeightClass.getClassName(wc, typeName, true);
-                        String menuName = typeName + "_" + wcName;
+                        String menuName = typeName + '_' + wcName;
                         JMenu m = new JMenu(wcName);
                         m.setName(menuName);
                         m.setEnabled(false);
@@ -878,12 +879,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         Person p = u.getCommander();
                         if (p.getStatus().isActive() && (u.getForceId() < 1) && u.isPresent()) {
                             JMenuItem menuItem0 = new JMenuItem(p.getFullTitle() + ", " + u.getName());
-                            menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
+                            menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + '|' + forceIds);
                             menuItem0.addActionListener(this);
                             menuItem0.setEnabled(u.isAvailable());
-                            if (null != weightClassForUnitType.get(type + "_" + className)) {
-                                weightClassForUnitType.get(type + "_" + className).add(menuItem0);
-                                weightClassForUnitType.get(type + "_" + className).setEnabled(true);
+                            if (null != weightClassForUnitType.get(type + '_' + className)) {
+                                weightClassForUnitType.get(type + '_' + className).add(menuItem0);
+                                weightClassForUnitType.get(type + '_' + className).setEnabled(true);
                             } else {
                                 unsorted.add(menuItem0);
                             }
@@ -894,12 +895,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (u.getEntity() instanceof GunEmplacement) {
                         if (u.getForceId() < 1 && u.isPresent()) {
                             JMenuItem menuItem0 = new JMenuItem("AutoTurret, " + u.getName());
-                            menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + "|" + forceIds);
+                            menuItem0.setActionCommand(TOEMouseAdapter.COMMAND_ADD_UNIT + u.getId() + '|' + forceIds);
                             menuItem0.addActionListener(this);
                             menuItem0.setEnabled(u.isAvailable());
-                            if (null != weightClassForUnitType.get(type + "_" + className)) {
-                                weightClassForUnitType.get(type + "_" + className).add(menuItem0);
-                                weightClassForUnitType.get(type + "_" + className).setEnabled(true);
+                            if (null != weightClassForUnitType.get(type + '_' + className)) {
+                                weightClassForUnitType.get(type + '_' + className).add(menuItem0);
+                                weightClassForUnitType.get(type + '_' + className).setEnabled(true);
                             } else {
                                 unsorted.add(menuItem0);
                             }
@@ -920,7 +921,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             }
 
                             int weightClass = EntityWeightClass.getWeightClass(tonnage, unittype);
-                            JMenu tmp2 = weightClassForUnitType.get(unittype + "_"
+                            JMenu tmp2 = weightClassForUnitType.get(unittype + '_'
                                     + EntityWeightClass.getClassName(weightClass, unittype, false));
                             if (tmp2.isEnabled()) {
                                 tmp.add(tmp2);
@@ -936,7 +937,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (tmp.isEnabled()) {
                         for (int wc = EntityWeightClass.WEIGHT_SMALL_SUPPORT;
                              wc <= EntityWeightClass.WEIGHT_LARGE_SUPPORT; wc++) {
-                            JMenu tmp2 = weightClassForUnitType.get(unittype + "_"
+                            JMenu tmp2 = weightClassForUnitType.get(unittype + '_'
                                     + EntityWeightClass.getClassName(wc, unittype, true));
                             if (tmp2.isEnabled()) {
                                 tmp.add(tmp2);
@@ -956,8 +957,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     for (UUID personID : eligibleCommanders) {
                         Person person = gui.getCampaign().getPerson(personID);
 
-                        JMenuItem commanderOption = new JMenuItem(person.getFullTitle() + " (" + person.getRoleDesc() + ")");
-                        commanderOption.setActionCommand(COMMAND_SET_LANCE_COMMANDER + personID + "|" + forceIds);
+                        JMenuItem commanderOption = new JMenuItem(person.getFullTitle() + " (" + person.getRoleDesc() + ')');
+                        commanderOption.setActionCommand(COMMAND_SET_LANCE_COMMANDER + personID + '|' + forceIds);
                         commanderOption.addActionListener(this);
                         menuItem.add(commanderOption);
                     }
@@ -1025,7 +1026,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             continue;
                         }
                         menuItem = new JMenuItem(scenario.getName());
-                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_FORCE + scenario.getId() + "|" + forceIds);
+                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_FORCE + scenario.getId() + '|' + forceIds);
                         menuItem.addActionListener(this);
                         missionMenu.add(menuItem);
                     }
@@ -1098,7 +1099,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                             if (capacity > 0) {
                                 JMenuItem shipMenuItem = new JMenuItem(ship.getName() + " , Space available: " + capacity);
-                                shipMenuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + "|" + unitIds);
+                                shipMenuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + '|' + unitIds);
                                 shipMenuItem.addActionListener(this);
                                 shipMenuItem.setEnabled(true);
                                 singleUnitMenu.add(shipMenuItem);
@@ -1202,7 +1203,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (nodesFree >= units.size()) {
                         menuItem = new JMenuItem(network[2] + ": " + network[1] + " nodes free");
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_SLAVE
-                                + network[0] + "|" + unitIds);
+                                + network[0] + '|' + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
                         availMenu.add(menuItem);
@@ -1230,7 +1231,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (nodesFree >= units.size()) {
                         menuItem = new JMenuItem(network[2] + ": " + network[1] + " nodes free");
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_SLAVE
-                                + network[0] + "|" + unitIds);
+                                + network[0] + '|' + unitIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
                         availMenu.add(menuItem);
@@ -1279,7 +1280,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         if (nodesFree >= units.size()) {
                             menuItem = new JMenuItem(network[0] + ": " + network[1] + " nodes free");
                             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_TO_NETWORK
-                                    + network[0] + "|" + unitIds);
+                                    + network[0] + '|' + unitIds);
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(true);
                             availMenu.add(menuItem);
@@ -1328,7 +1329,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         if (nodesFree >= units.size()) {
                             menuItem = new JMenuItem(network[0] + ": " + network[1] + " nodes free");
                             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ADD_TO_NETWORK
-                                    + network[0] + "|" + unitIds);
+                                    + network[0] + '|' + unitIds);
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(true);
                             availMenu.add(menuItem);
@@ -1372,7 +1373,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         }
                         menuItem = new JMenuItem(scenario.getName());
                         menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_UNIT
-                                + scenario.getId() + "|" + unitIds);
+                                + scenario.getId() + '|' + unitIds);
                         menuItem.addActionListener(this);
                         missionMenu.add(menuItem);
                     }
@@ -1424,7 +1425,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                             if (capacity > 0) {
                                 JMenuItem shipMenuItem = new JMenuItem(ship.getName() + " , Space available: " + capacity);
-                                shipMenuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + "|" + unitIds);
+                                shipMenuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + '|' + unitIds);
                                 shipMenuItem.addActionListener(this);
                                 shipMenuItem.setEnabled(true);
                                 singleUnitMenu.add(shipMenuItem);
@@ -1604,7 +1605,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
     private JMenuItem transportMenuItem(String shipName, UUID shipId, String unitIds, double capacity) {
         JMenuItem menuItem = new JMenuItem(shipName + " , Space available: " + capacity);
-        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + shipId + "|" + unitIds);
+        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + shipId + '|' + unitIds);
         menuItem.addActionListener(this);
 
         return menuItem;

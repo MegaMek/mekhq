@@ -3457,51 +3457,51 @@ public class Unit implements ITechnology {
         }
     }
 
+
     /**
-     * Determines which crew member is considered the unit commander. For solo-piloted units there is
-     * only one option, but units with multiple crew (vehicles, aerospace vessels, infantry) use the following
-     * criteria:
-     * 1. The highest rank.
-     * 2. If there is more than one with the highest rank, select according to the following order, from
-     *    highest to lowest priority:
-     *    a. vessel crew
-     *    b. gunners
-     *    c. pilots/drivers
-     *    d. hyperspace navigator.
-     * 3. If there is still a tie, take the first one in the crew list.
+     * Returns the commander of the entity.
+     * <p>
+     * The commander is determined based on the merged list of all crew members, prioritizing certain roles over others.
+     * The commander is initialized as the first person in the merged list and then updated by iterating over all crew members
+     * and comparing their rank with the current commander.
+     * If a crew member outranks the current commander or has the same rank, they are considered as the new commander.
      *
-     * @return The unit commander, or null if the unit has no crew.
+     * @return the commander of the entity, or null if the entity is null or if there are no crew members
      */
     public @Nullable Person getCommander() {
-        // take first by rank
-        // if rank is tied, take gunners over drivers
-        // if two of the same type are tie rank, take the first one
+        // quick safety check
         if (entity == null) {
             return null;
         }
 
-        Person commander = null;
+        // Merge all crew into a single list,
+        // lists retain the order in which elements are added to them,
+        // so this allows us to prioritize certain roles over others
+        List<Person> allCrew = new ArrayList<>();
+        allCrew.addAll(vesselCrew);
+        allCrew.addAll(gunners);
+        allCrew.addAll(drivers);
 
-        for (Person p : vesselCrew) {
-            if (p.outRanks(commander)) {
-                commander = p;
-            }
-        }
-        for (Person p : gunners) {
-            if (p.outRanks(commander)) {
-                commander = p;
-            }
-        }
-        for (Person p : drivers) {
-            if (p.outRanks(commander)) {
-                commander = p;
-            }
-        }
         if (navigator != null) {
-            if (navigator.outRanks(commander)) {
-                commander = navigator;
+            allCrew.add(navigator);
+        }
+
+        if (allCrew.isEmpty()) {
+            return null;
+        }
+
+        // Initialize the commander as the first person
+        Person commander = allCrew.get(0);
+
+        // Iterate over all crew
+        for (Person person : allCrew) {
+            // Compare person with the current commander
+            if (person.outRanks(commander) || (person.getRankNumeric() == commander.getRankNumeric())) {
+                commander = person;
             }
         }
+
+        // Return the final commander
         return commander;
     }
 
@@ -4777,6 +4777,13 @@ public class Unit implements ITechnology {
             crew.add(techOfficer);
         }
         return crew;
+    }
+
+    /**
+     * @return true if the unit is fully crewed, false otherwise.
+     */
+    public boolean isFullyCrewed() {
+        return getActiveCrew().size() == getFullCrewSize();
     }
 
     /**
