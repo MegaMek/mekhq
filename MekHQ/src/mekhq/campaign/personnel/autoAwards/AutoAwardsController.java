@@ -83,10 +83,12 @@ public class AutoAwardsController {
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
                     MekHQ.getMHQOptions().getLocale());
 
-            JOptionPane.showMessageDialog(null,
-                    resources.getString("txtNoneEligible.text"),
-                    resources.getString("AutoAwardsDialog.title"),
-                    JOptionPane.INFORMATION_MESSAGE);
+            if (isManualPrompt) {
+                JOptionPane.showMessageDialog(null,
+                        resources.getString("txtNoneEligible.text"),
+                        resources.getString("AutoAwardsDialog.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         }
 
         logger.info("autoAwards (Manual) has finished");
