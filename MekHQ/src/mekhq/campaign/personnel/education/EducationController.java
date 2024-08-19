@@ -19,8 +19,10 @@
 package mekhq.campaign.personnel.education;
 
 import megamek.common.Compute;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -29,8 +31,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.Intelligence;
-import org.apache.logging.log4j.LogManager;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
 
 import java.time.DayOfWeek;
 import java.util.*;
@@ -40,6 +41,88 @@ import java.util.*;
  * It provides methods to begin the education process, calculate education level, and enroll a person into an academy.
  */
 public class EducationController {
+    private static final MMLogger logger = MMLogger.create(EducationController.class);
+
+    /**
+     * Checks eligibility for enrollment in an academy.
+     *
+     * @param campaign the current options
+     * @param person the person applying for enrollment
+     * @param academySet the set of academies to search for the desired academy
+     * @param academyNameInSet the name of the desired academy within the set
+     * @return true if the person is eligible for enrollment, false otherwise
+     */
+    public static boolean makeEnrollmentCheck(Campaign campaign, Person person, String academySet, String academyNameInSet) {
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
+
+        Academy academy = findAcademyInSet(academySet, academyNameInSet);
+
+        if (academy == null) {
+            return false;
+        }
+
+        // these academies always accept applicants so personnel aren't locked out of education
+        if (academy.isLocal() || academy.isHomeSchool()) {
+            return true;
+        }
+
+        // has the character already failed to apply to this academy?
+        if (person.getEduFailedApplications().contains(academy)) {
+            campaign.addReport(String.format(resources.getString("secondApplication.text"),
+                    person.getHyperlinkedFullTitle()),
+                    academy.getName(),
+                    "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                    "</span>");
+            return false;
+        }
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        // Calculate the roll based on Intelligence if necessary
+        int roll = Compute.d6(2);
+        if (campaignOptions.isUseRandomPersonalities()) {
+            roll += (person.getIntelligence().getIntelligenceScore() / 4);
+        }
+
+        // Calculate target number based on base target number and faculty skill
+        int targetNumber = campaignOptions.getEntranceExamBaseTargetNumber() - academy.getFacultySkill();
+
+        // If roll meets the target number, the application is successful
+        if (roll >= targetNumber) {
+            return true;
+        } else {
+            // Mark the academy in the person's list of failed applications preventing re-application
+            person.addEduFailedApplications(academy);
+            campaign.addReport(String.format(resources.getString("applicationFailure.text"),
+                    person.getHyperlinkedFullTitle(),
+                    "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                    "</span>",
+                    academy.getName()));
+
+            ServiceLogger.eduFailedApplication(person, campaign.getLocalDate(), person.getEduAcademyName());
+
+            return false;
+        }
+    }
+
+    /**
+     * Finds the academy with the given name in the provided academy set.
+     *
+     * @param academySet The academy set to search in.
+     * @param academyNameInSet The name of the academy to find.
+     * @return The academy with the given name, or null if not found.
+     */
+    private static Academy findAcademyInSet(String academySet, String academyNameInSet) {
+        Academy academy = getAcademy(academySet, academyNameInSet);
+
+        if (academy == null) {
+            logger.error("No academy found with name {} in set {}", academyNameInSet, academySet);
+            return null;
+        }
+
+        return academy;
+    }
+
     /**
      * Begins the education process for a Person in a Campaign.
      *
@@ -56,10 +139,9 @@ public class EducationController {
                                                             String campus, String faction, boolean isReEnrollment) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
-        Academy academy = getAcademy(academySet, academyNameInSet);
+        Academy academy = findAcademyInSet(academySet, academyNameInSet);
 
         if (academy == null) {
-            LogManager.getLogger().error("No academy found with name {} in set {}", academyNameInSet, academySet);
             return;
         }
 
@@ -79,7 +161,7 @@ public class EducationController {
                         campaign.getLocalDate(),
                         Money.of(tuition),
                         String.format(resources.getString("payment.text"),
-                                person.getHyperlinkedFullTitle()));
+                                person.getFullTitle()));
             }
         }
 
@@ -139,6 +221,13 @@ public class EducationController {
             } else {
                 person.setEduJourneyTime(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
                 person.setEduAcademySystem(campus);
+            }
+
+            for (Person child : person.getGenealogy().getChildren()) {
+                if ((child.getStatus().isActive()) && (child.isChild(campaign.getLocalDate()))) {
+                    person.addEduTagAlong(child.getId());
+                    child.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ON_LEAVE);
+                }
             }
         }
 
@@ -343,7 +432,7 @@ public class EducationController {
             return false;
         }
 
-        LogManager.getLogger().error("Failed to process education stage: {}", educationStage);
+        logger.error("Failed to process education stage: {}", educationStage);
         return false;
     }
 
@@ -487,6 +576,10 @@ public class EducationController {
         // has the person arrived home?
         if (person.getEduDaysOfTravel() >= person.getEduJourneyTime()) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+
+            for (UUID tagAlong : person.getEduTagAlongs()) {
+                campaign.getPerson(tagAlong).changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+            }
         }
     }
 
@@ -881,7 +974,7 @@ public class EducationController {
         }
 
         if (campaign.getCampaignOptions().isUseRandomPersonalities()) {
-            graduationRoll += Intelligence.parseToInt(person.getIntelligence()) - 12;
+            graduationRoll += person.getIntelligence().getIntelligenceScore();
         }
 
         // qualification failed
@@ -975,10 +1068,6 @@ public class EducationController {
 
             processGraduation(campaign, person, academy, 2, resources);
 
-            if (!academy.isMilitary()) {
-                reportMastersOrDoctorateGain(campaign, person, academy, resources);
-            }
-
             person.setEduEducationStage(EducationStage.GRADUATING);
 
             person.changeLoyalty(academy.getDurationDays() / 300);
@@ -1034,10 +1123,6 @@ public class EducationController {
 
             processGraduation(campaign, person, academy, 1, resources);
 
-            if (!academy.isMilitary()) {
-                reportMastersOrDoctorateGain(campaign, person, academy, resources);
-            }
-
             person.setEduEducationStage(EducationStage.GRADUATING);
 
             person.changeLoyalty(academy.getDurationDays() / 300);
@@ -1086,10 +1171,6 @@ public class EducationController {
 
         processGraduation(campaign, person, academy, 0, resources);
 
-        if (!academy.isMilitary()) {
-            reportMastersOrDoctorateGain(campaign, person, academy, resources);
-        }
-
         person.setEduEducationStage(EducationStage.GRADUATING);
 
         person.changeLoyalty(academy.getDurationDays() / 300);
@@ -1100,33 +1181,52 @@ public class EducationController {
     /**
      * This method generates a report for individuals who have completed either a Master's or Doctorate degree.
      *
-     * @param campaign   the campaign to add the report to
-     * @param person     the person who completed the degree
-     * @param resources  the resource bundle containing localized strings
+     * @param campaign       the campaign to add the report to
+     * @param person         the person who completed the degree
+     * @param education the education level taught by the academy
+     * @param resources      the resource bundle containing localized strings
      */
-    private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int education = academy.getEducationLevel(person) - 1; // we reduce by 1 to account for the +1 level from graduating
-
+    private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy,
+                                                     int education, ResourceBundle resources) {
         EducationLevel educationLevel = EducationLevel.parseFromInt(education);
 
         String qualification = academy.getQualifications().get(person.getEduCourseIndex());
         String personName = person.getHyperlinkedFullTitle();
 
-        String graduationLevel = "";
-
         if (educationLevel.isPostGraduate()) {
-            graduationLevel = resources.getString("graduatedMasters.text");
+            ServiceLogger.eduGraduatedMasters(
+                    person,
+                    campaign.getLocalDate(),
+                    person.getEduAcademyName(),
+                    qualification
+            );
 
-            ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName(), qualification);
+            generatePostGradGraduationReport(
+                    campaign,
+                    personName,
+                    resources.getString("graduatedMasters.text"),
+                    qualification,
+                    resources
+            );
+
         } else if (educationLevel.isDoctorate()) {
-            graduationLevel = resources.getString("graduatedDoctorate.text");
-
-            ServiceLogger.eduGraduatedDoctorate(person, campaign.getLocalDate(), person.getEduAcademyName(), qualification);
+            ServiceLogger.eduGraduatedDoctorate(
+                    person,
+                    campaign.getLocalDate(),
+                    person.getEduAcademyName(),
+                    qualification
+            );
 
             person.setPreNominal("Dr");
-        }
 
-        generatePostGradGraduationReport(campaign, personName, graduationLevel, qualification, resources);
+            generatePostGradGraduationReport(
+                    campaign,
+                    personName,
+                    resources.getString("graduatedDoctorate.text"),
+                    qualification,
+                    resources
+            );
+        }
     }
 
     /**
@@ -1141,7 +1241,7 @@ public class EducationController {
                                                          String graduationText, String qualification, ResourceBundle resources) {
         campaign.addReport(String.format(resources.getString("graduatedPostGradReport.text"),
                 personName,
-                "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
+                "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
                 graduationText,
                 "</span>",
                 qualification));
@@ -1246,7 +1346,6 @@ public class EducationController {
         int educationLevel = academy.getEducationLevel(person);
 
         if (EducationLevel.parseToInt(person.getEduHighestEducation()) < educationLevel) {
-            LogManager.getLogger().info(educationLevel);
             person.setEduHighestEducation(EducationLevel.parseFromInt(educationLevel));
         }
 
@@ -1267,6 +1366,10 @@ public class EducationController {
             person.setLoyalty(rolls.get(1) + rolls.get(2) + rolls.get(3));
         } else {
             adjustLoyalty(person);
+        }
+
+        if (!academy.isMilitary()) {
+            reportMastersOrDoctorateGain(campaign, person, academy, educationLevel, resources);
         }
     }
 
@@ -1293,9 +1396,6 @@ public class EducationController {
         }
 
         for (String skill : curriculum) {
-            LogManager.getLogger().info(skill);
-            LogManager.getLogger().info(educationLevel);
-
             if (skill.equalsIgnoreCase("none")) {
                 return;
             }

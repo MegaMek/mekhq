@@ -115,10 +115,9 @@ public class Armor extends Part implements IAcquisitionWork {
         }
         String bonus = getAllMods(null).getValueAsString();
         if (getAllMods(null).getValue() > -1) {
-            bonus = "+" + bonus;
+            bonus = '+' + bonus;
         }
-        bonus = "(" + bonus + ")";
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font size='3'";
 
         String scheduled = "";
         if (getTech() != null) {
@@ -126,20 +125,27 @@ public class Armor extends Part implements IAcquisitionWork {
         }
 
         toReturn += ">";
-        toReturn += "<b>Replace " + getName() + "</b><br/>";
+        toReturn += "<b>Replace " + getName();
+
+        if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+            toReturn += " - <b><span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
+                    + "</span></b></b><br/>";
+        } else {
+            toReturn += "</b><br/>";
+        }
+
         toReturn += getDetails() + "<br/>";
         if (getAmountAvailable() > 0) {
-            toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-            if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-                toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
-            }
-            toReturn += " " + bonus;
+            toReturn += getTimeLeft() + " minutes" + scheduled;
+            toReturn += " <b>TN:</b> " + bonus;
         }
         if (getMode() != WorkTime.NORMAL) {
-            toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+            toReturn += " <i>" + getCurrentModeName() + "</i>";
         }
         toReturn += "</font></html>";
         return toReturn;
+
     }
 
     @Override
@@ -504,7 +510,7 @@ public class Armor extends Part implements IAcquisitionWork {
         //availability mod
         int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ')');
         return target;
     }
 
@@ -580,9 +586,9 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String getQuantityName(int quan) {
         double totalTon = quan * getTonnage();
-        String report = "" + DecimalFormat.getInstance().format(totalTon) + " tons of " + getName();
+        String report = DecimalFormat.getInstance().format(totalTon) + " tons of " + getName();
         if (totalTon == 1.0) {
-            report = "" + DecimalFormat.getInstance().format(totalTon) + " ton of " + getName();
+            report = DecimalFormat.getInstance().format(totalTon) + " ton of " + getName();
         }
         return report;
     }

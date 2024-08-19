@@ -30,6 +30,8 @@ import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
+import megamek.common.options.PilotOptions;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -46,11 +48,12 @@ import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
-import mekhq.campaign.personnel.enums.randomEvents.personalities.*;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -65,7 +68,6 @@ import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.io.migration.FactionMigrator;
 import mekhq.io.migration.PersonMigrator;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -77,6 +79,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static java.lang.Math.abs;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -212,6 +216,8 @@ public class Person {
     private int eduJourneyTime;
     private int eduEducationTime;
     private int eduDaysOfTravel;
+    private List<UUID> eduTagAlongs;
+    private List<Academy> eduFailedApplications;
     //endregion Education
 
     //region Personality
@@ -242,6 +248,7 @@ public class Person {
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
+    private static final MMLogger logger = MMLogger.create(Person.class);
 
     // initializes the AtB ransom values
     static {
@@ -372,6 +379,8 @@ public class Person {
         eduJourneyTime = 0;
         eduEducationTime = 0;
         eduDaysOfTravel = 0;
+        eduTagAlongs = new ArrayList<>();
+        eduFailedApplications = new ArrayList<>();
         eduAcademySet = null;
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
@@ -1085,9 +1094,7 @@ public class Person {
         // release the commander flag.
         if ((isCommander()) && (status.isDepartedUnit())) {
             if ((!status.isResigned()) && (!status.isRetired())) {
-                if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-                    leadershipMassChangeLoyalty(campaign);
-                }
+                leadershipMassChangeLoyalty(campaign);
             }
 
             setCommander(false);
@@ -1104,6 +1111,12 @@ public class Person {
         this.setEduEducationTime(0);
         this.setEduJourneyTime(0);
         this.setEduDaysOfTravel(0);
+
+        for (UUID tagAlongId : eduTagAlongs) {
+            Person tagAlong = campaign.getPerson(tagAlongId);
+            tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+        }
+        this.setEduTagAlongs(new ArrayList<>());
 
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }
@@ -1125,9 +1138,11 @@ public class Person {
             person.performRandomizedLoyaltyChange(campaign, false, false);
         }
 
-        campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
-                "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                "</span>"));
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
+                    "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
+                    "</span>"));
+        }
     }
 
     /**
@@ -1157,13 +1172,12 @@ public class Person {
 
         // if this is a major change, we use whichever result is furthest from the midpoint (9)
         if (isMajor) {
-            roll = Math.abs(roll - 9) > Math.abs(secondRoll - 9) ? roll : secondRoll;
+            roll = abs(roll - 9) > abs(secondRoll - 9) ? roll : secondRoll;
         }
 
         applyLoyaltyChange.accept(roll);
 
         if (isVerbose && originalLoyalty != loyalty) {
-
             reportLoyaltyChange(campaign, originalLoyalty);
         }
     }
@@ -1210,6 +1224,10 @@ public class Person {
      * @param originalLoyalty  The original loyalty value before the change.
      */
     private void reportLoyaltyChange(Campaign campaign, int originalLoyalty) {
+        if (!campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            return;
+        }
+
         StringBuilder changeString = new StringBuilder();
         String color;
 
@@ -1318,22 +1336,28 @@ public class Person {
                 .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
-    public Integer getYearsInService(final Campaign campaign) {
+    /**
+     * @return how many years a character has spent employed in the campaign,
+     * factoring in date of death and retirement
+     *
+     * @param campaign the current Campaign
+     */
+    public long getYearsInService(final Campaign campaign) {
         // Get time in service based on year
         if (getRecruitment() == null) {
-            //use "" they haven't been recruited or are dependents
             return 0;
         }
 
         LocalDate today = campaign.getLocalDate();
 
-        // If the person is dead, we only care about how long they spent in service to the company
-        if (getDateOfDeath() != null) {
-            //use date of death instead of the current day
+        // If the person is dead or has left the unit, we only care about how long they spent in service to the company
+        if (getRetirement() != null) {
+            today = getRetirement();
+        } else if (getDateOfDeath() != null) {
             today = getDateOfDeath();
         }
 
-        return Math.toIntExact(ChronoUnit.YEARS.between(getRecruitment(), today));
+        return ChronoUnit.YEARS.between(getRecruitment(), today);
     }
 
     public @Nullable LocalDate getLastRankChangeDate() {
@@ -1593,6 +1617,28 @@ public class Person {
 
     public void setEduDaysOfTravel(final int eduDaysOfTravel) {
         this.eduDaysOfTravel = eduDaysOfTravel;
+    }
+
+    public List<UUID> getEduTagAlongs() {
+        return eduTagAlongs;
+    }
+
+    public void setEduTagAlongs(final List<UUID> eduTagAlongs) {
+        this.eduTagAlongs = eduTagAlongs;
+    }
+
+    public void addEduTagAlong(final UUID tagAlong) {
+        this.eduTagAlongs.add(tagAlong);
+    }
+
+    public List<Academy> getEduFailedApplications() {
+        return eduFailedApplications;
+    }
+
+    public void addEduFailedApplications(final Academy eduFailedApplications) {
+        if (!this.eduFailedApplications.contains(eduFailedApplications)) {
+            this.eduFailedApplications.add(eduFailedApplications);
+        }
     }
 
     /**
@@ -2020,6 +2066,16 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravel", eduDaysOfTravel);
             }
 
+            if (!eduTagAlongs.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "eduTagAlongs");
+
+                for (UUID tagAlong : eduTagAlongs) {
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tagAlong", tagAlong.toString());
+                }
+
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "eduTagAlongs");
+            }
+
             if (eduAcademySystem != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
             }
@@ -2112,7 +2168,7 @@ public class Person {
                 extraData.writeToXml(pw);
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to write " + getFullName() + " to the XML File", ex);
+            logger.error("Failed to write {} to the XML File", getFullName(), ex);
             throw ex; // we want to rethrow to ensure that the save fails
         }
 
@@ -2167,7 +2223,7 @@ public class Person {
                         }
                         retVal.originPlanet = p;
                     } catch (NullPointerException e) {
-                        LogManager.getLogger().error("Error loading originPlanet for {}, {}", systemId, planetId, e);
+                        logger.error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
@@ -2301,7 +2357,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in techUnitIds nodes: {}", wn3.getNodeName());
                             continue;
                         }
                         retVal.addTechUnit(new PersonUnitRef(UUID.fromString(wn3.getTextContent())));
@@ -2316,7 +2372,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in personnel log nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -2336,7 +2392,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in scenario log nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in scenario log nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -2355,7 +2411,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in personnel log nodes: {}", wn3.getNodeName());
                             continue;
                         }
 
@@ -2372,7 +2428,7 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in injury nodes: {}", wn3.getNodeName());
                             continue;
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -2392,6 +2448,22 @@ public class Person {
                     retVal.eduJourneyTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravel")) {
                     retVal.eduDaysOfTravel = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduTagAlongs")) {
+                    if (wn2.getNodeName().equalsIgnoreCase("eduTagAlongs")) {
+                        NodeList uuidNodes = wn2.getChildNodes();
+
+                        for (int j = 0; j < uuidNodes.getLength(); j++) {
+                            Node uuidNode = uuidNodes.item(j);
+
+                            if (uuidNode.getNodeName().equalsIgnoreCase("tagAlong")) {
+                                String uuidString = uuidNode.getTextContent();
+
+                                UUID uuid = UUID.fromString(uuidString);
+
+                                retVal.eduTagAlongs.add(uuid);
+                            }
+                        }
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
                     retVal.eduAcademySystem = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyName")) {
@@ -2485,24 +2557,18 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring advantage: {}", adv);
+                        logger.error("Error restoring advantage: {}", adv);
                     }
                 }
             }
 
             if ((edge != null) && !edge.isBlank()) {
-                StringTokenizer st = new StringTokenizer(edge, "::");
-                while (st.hasMoreTokens()) {
-                    String adv = st.nextToken();
-                    String advName = Crew.parseAdvantageName(adv);
-                    Object value = Crew.parseAdvantageValue(adv);
+                List<String> edgeOptionList = getEdgeTriggersList();
+                // this prevents an error caused by the Option Group name being included in the list of options for that group
+                edgeOptionList.remove(0);
 
-                    try {
-                        retVal.getOptions().getOption(advName).setValue(value);
-                    } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring edge: {}", adv);
-                    }
-                }
+                updateOptions(edge, retVal, edgeOptionList);
+                removeUnusedEdgeTriggers(retVal, edgeOptionList);
             }
 
             if ((implants != null) && !implants.isBlank()) {
@@ -2515,7 +2581,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring implants: {}", adv);
+                        logger.error("Error restoring implants: {}", adv);
                     }
                 }
             }
@@ -2531,7 +2597,7 @@ public class Person {
                 retVal.setRecruitment(c.getLocalDate());
             }
         } catch (Exception e) {
-            LogManager.getLogger().error("Failed to read person {} from file", retVal.getFullName(), e);
+            logger.error("Failed to read person {} from file", retVal.getFullName(), e);
             retVal = null;
         }
 
@@ -2603,6 +2669,68 @@ public class Person {
             return primaryBase.plus(secondaryBase).multipliedBy(getRank().getPayMultiplier());
         } else {
             return primaryBase.plus(secondaryBase);
+        }
+    }
+
+    /**
+     * Retrieves a list of edge triggers from PilotOptions.
+     *
+     * @return a List of edge triggers. If no edge triggers are found, an empty List is returned.
+     */
+    private static List<String> getEdgeTriggersList() {
+        Enumeration<IOptionGroup> groups = new PilotOptions().getGroups();
+
+        while (groups.hasMoreElements()) {
+            IOptionGroup group = groups.nextElement();
+
+            if (group.getKey().equals(PilotOptions.EDGE_ADVANTAGES)) {
+                return Collections.list(group.getOptionNames());
+            }
+        }
+
+        return new ArrayList<>();
+    }
+
+    /**
+     * Updates the status of Edge Triggers based on those stored in edgeTriggers
+     *
+     * @param edgeTriggers     the string containing edge triggers delimited by "::"
+     * @param retVal           the person to update
+     * @param edgeOptionList   the list of edge triggers to remove
+     */
+    private static void updateOptions(String edgeTriggers, Person retVal, List<String> edgeOptionList) {
+        StringTokenizer st = new StringTokenizer(edgeTriggers, "::");
+
+        while (st.hasMoreTokens()) {
+            String trigger = st.nextToken();
+            String triggerName = Crew.parseAdvantageName(trigger);
+            Object value = Crew.parseAdvantageValue(trigger);
+
+            try {
+                retVal.getOptions().getOption(triggerName).setValue(value);
+                edgeOptionList.remove(triggerName);
+            } catch (Exception e) {
+                logger.error("Error restoring edge trigger: {}", trigger);
+            }
+        }
+    }
+
+    /**
+     * Explicitly disables unused Edge triggers
+     *
+     * @param retVal          the person for whom the triggers are disabled
+     * @param edgeOptionList  the list of edge triggers to be processed
+     */
+    private static void removeUnusedEdgeTriggers(Person retVal, List<String> edgeOptionList) {
+        for (String edgeTrigger : edgeOptionList) {
+            logger.info(edgeTrigger);
+            String advName = Crew.parseAdvantageName(edgeTrigger);
+
+            try {
+                retVal.getOptions().getOption(advName).setValue(false);
+            } catch (Exception e) {
+                logger.error("Error disabling edge trigger: {}", edgeTrigger);
+            }
         }
     }
 
@@ -2734,7 +2862,7 @@ public class Person {
         // Prisoner Status Modifications
         rankName = rankName.equalsIgnoreCase("None")
                 ? getPrisonerStatus().getTitleExtension()
-                : getPrisonerStatus().getTitleExtension() + rankName;
+                : getPrisonerStatus().getTitleExtension() + ' ' + rankName;
 
         // We have our name, return it
         return rankName.trim();
@@ -2917,7 +3045,7 @@ public class Person {
                         return SkillType.EXP_NONE;
                     }
                 }
-            case VEHICLE_CREW:
+            case VEHICLE_CREW, MECHANIC:
                 return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() : SkillType.EXP_NONE;
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
@@ -2984,8 +3112,6 @@ public class Person {
                 return hasSkill(SkillType.S_NAV) ? getSkill(SkillType.S_NAV).getExperienceLevel() : SkillType.EXP_NONE;
             case MECH_TECH:
                 return hasSkill(SkillType.S_TECH_MECH) ? getSkill(SkillType.S_TECH_MECH).getExperienceLevel() : SkillType.EXP_NONE;
-            case MECHANIC:
-                return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() : SkillType.EXP_NONE;
             case AERO_TECH:
                 return hasSkill(SkillType.S_TECH_AERO) ? getSkill(SkillType.S_TECH_AERO).getExperienceLevel() : SkillType.EXP_NONE;
             case BA_TECH:
@@ -3611,16 +3737,31 @@ public class Person {
     }
 
     public boolean isTech() {
-        //type must be correct and you must be more than ultra-green in the skill
-        boolean isMechTech = hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-        boolean isAeroTech = hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-        boolean isMechanic = hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-        boolean isBATech = hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-        // At some point we may want to re-write things to include this
-        /*boolean isEngineer = hasSkill(SkillType.S_TECH_VESSEL) && getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN
-                && campaign.getUnit(getUnitId()).getEngineer() != null
-                && campaign.getUnit(getUnitId()).getEngineer().equals(this);*/
-        return (getPrimaryRole().isTech() || getSecondaryRole().isTechSecondary()) && (isMechTech || isAeroTech || isMechanic || isBATech);
+        return isTechMech() || isTechAero() || isTechMechanic() || isTechBA();
+    }
+
+    public boolean isTechMech() {
+        boolean hasSkill = hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+
+        return hasSkill && (getPrimaryRole().isMechTech() || getSecondaryRole().isMechTech());
+    }
+
+    public boolean isTechAero() {
+        boolean hasSkill = hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+
+        return hasSkill && (getPrimaryRole().isAeroTech() || getSecondaryRole().isAeroTech());
+    }
+
+    public boolean isTechMechanic() {
+        boolean hasSkill = hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+
+        return hasSkill && (getPrimaryRole().isMechanic() || getSecondaryRole().isMechanic());
+    }
+
+    public boolean isTechBA() {
+        boolean hasSkill = hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+
+        return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
     }
 
     public boolean isAdministrator() {
@@ -3831,6 +3972,12 @@ public class Person {
         return new ArrayList<>(injuries);
     }
 
+    public List<Injury> getPermanentInjuries() {
+        return injuries.stream()
+                .filter(Injury::isPermanent)
+                .collect(Collectors.toList());
+    }
+
     public void clearInjuries() {
         injuries.clear();
 
@@ -4036,7 +4183,7 @@ public class Person {
             final UUID id = unit.getId();
             unit = campaign.getUnit(id);
             if (unit == null) {
-                LogManager.getLogger().error(String.format("Person %s ('%s') references missing unit %s",
+                logger.error(String.format("Person %s ('%s') references missing unit %s",
                         getId(), getFullName(), id));
             }
         }
@@ -4048,7 +4195,7 @@ public class Person {
                 if (realUnit != null) {
                     techUnits.set(ii, realUnit);
                 } else {
-                    LogManager.getLogger().error(String.format("Person %s ('%s') techs missing unit %s",
+                    logger.error(String.format("Person %s ('%s') techs missing unit %s",
                             getId(), getFullName(), techUnit.getId()));
                     techUnits.remove(ii);
                 }
@@ -4111,5 +4258,27 @@ public class Person {
         }
 
         return effectiveFatigue;
+    }
+
+    /**
+     * @return the intelligence experience cost multiplier based on campaign options.
+     *
+     * @param campaignOptions the campaign options to determine whether to calculate the multiplier or to just return 1
+     */
+    public double getIntelligenceXpCostMultiplier(CampaignOptions campaignOptions) {
+        if (campaignOptions.isUseRandomPersonalities() && campaignOptions.isUseIntelligenceXpMultiplier()) {
+            double intelligenceMultiplier = 0.025; // each rank in Intelligence should adjust costs by 2.5%
+
+            int intelligence = getIntelligence().getIntelligenceScore();
+            double intelligenceScore = intelligence * intelligenceMultiplier;
+
+            if (intelligenceScore == 0) {
+                return 1;
+            } else {
+                return 1 - intelligenceScore;
+            }
+        }
+
+        return 1;
     }
 }

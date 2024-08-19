@@ -29,6 +29,7 @@ import megamek.common.containers.MunitionTree;
 import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Kill;
@@ -58,7 +59,6 @@ import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -75,19 +75,13 @@ import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
  * Displays Mission/Contract and Scenario details.
  */
 public final class BriefingTab extends CampaignGuiTab {
-    private JPanel panMission;
-    private JPanel panScenario;
     private LanceAssignmentView panLanceAssignment;
     private JSplitPane splitScenario;
-    private JSplitPane splitBrief;
     private JTable scenarioTable;
     private MMComboBox<Mission> comboMission;
     private JScrollPane scrollMissionView;
     private JScrollPane scrollScenarioView;
-    private JPanel panMissionButtons;
-    private JPanel panScenarioButtons;
     private JButton btnAddScenario;
-    private JButton btnAddMission;
     private JButton btnEditMission;
     private JButton btnCompleteMission;
     private JButton btnDeleteMission;
@@ -101,9 +95,10 @@ public final class BriefingTab extends CampaignGuiTab {
     private JButton btnResolveScenario;
 
     private ScenarioTableModel scenarioModel;
-    private TableRowSorter<ScenarioTableModel> scenarioSorter;
 
     public int selectedScenario;
+
+    private static final MMLogger logger = MMLogger.create(BriefingTab.class);
 
     //region Constructors
     public BriefingTab(CampaignGUI gui, String tabName) {
@@ -128,7 +123,7 @@ public final class BriefingTab extends CampaignGuiTab {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
                 MekHQ.getMHQOptions().getLocale());
 
-        panMission = new JPanel(new GridBagLayout());
+        JPanel panMission = new JPanel(new GridBagLayout());
 
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -150,7 +145,7 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panMission.add(comboMission, gridBagConstraints);
 
-        panMissionButtons = new JPanel(new GridLayout(2, 3));
+        JPanel panMissionButtons = new JPanel(new GridLayout(2, 3));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -160,7 +155,7 @@ public final class BriefingTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 0.0;
         panMission.add(panMissionButtons, gridBagConstraints);
 
-        btnAddMission = new JButton(resourceMap.getString("btnAddMission.text"));
+        JButton btnAddMission = new JButton(resourceMap.getString("btnAddMission.text"));
         btnAddMission.setToolTipText(resourceMap.getString("btnAddMission.toolTipText"));
         btnAddMission.addActionListener(ev -> addMission());
         panMissionButtons.add(btnAddMission);
@@ -208,7 +203,7 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable = new JTable(scenarioModel);
         scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        scenarioSorter = new TableRowSorter<>(scenarioModel);
+        TableRowSorter<ScenarioTableModel> scenarioSorter = new TableRowSorter<>(scenarioModel);
         scenarioSorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
         scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
         scenarioTable.setRowSorter(scenarioSorter);
@@ -222,9 +217,9 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(ev -> refreshScenarioView());
 
-        panScenario = new JPanel(new GridBagLayout());
+        JPanel panScenario = new JPanel(new GridBagLayout());
 
-        panScenarioButtons = new JPanel(new GridLayout(3, 3));
+        JPanel panScenarioButtons = new JPanel(new GridLayout(3, 3));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -299,7 +294,7 @@ public final class BriefingTab extends CampaignGuiTab {
         splitScenario.setOneTouchExpandable(true);
         splitScenario.setResizeWeight(1.0);
 
-        splitBrief = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMission, splitScenario);
+        JSplitPane splitBrief = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMission, splitScenario);
         splitBrief.setOneTouchExpandable(true);
         splitBrief.setResizeWeight(0.5);
         splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
@@ -488,41 +483,35 @@ public final class BriefingTab extends CampaignGuiTab {
         // prompt enemy prisoner ransom & freeing
         // this should always be placed after autoAwards, so that prisoners are not factored into autoAwards
         if (getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()) {
-            List<Person> prisoners = getCampaign().getCurrentPrisoners();
+            List<Person> defectors = new ArrayList<>();
+            List<Person> prisoners = new ArrayList<>();
+
+            for (Person prisoner : getCampaign().getActivePersonnel()) {
+                if (prisoner.getPrisonerStatus().isPrisoner()) {
+                    prisoners.add(prisoner);
+                } else if (prisoner.getPrisonerStatus().isPrisonerDefector()) {
+                    defectors.add(prisoner);
+                }
+            }
+
+            if (!defectors.isEmpty()) {
+                // will return true if the prompt is canceled
+                if (prisonerPrompt(defectors, "ransomDefectorsQ.format", resources)) {
+                    return;
+                }
+            }
 
             if (!prisoners.isEmpty()) {
-                Money total = Money.zero();
-                total = total.plus(prisoners.stream()
-                        .map(person -> person.getRansomValue(getCampaign()))
-                        .collect(Collectors.toList()));
-
-                int optionSelected = JOptionPane.showConfirmDialog(
-                        null,
-                        String.format(resources.getString("ransomQ.format"),
-                                prisoners.size(),
-                                total.toAmountAndSymbolString()),
-                        resources.getString("ransom.text"),
-                        JOptionPane.YES_NO_CANCEL_OPTION);
-
-                switch (optionSelected) {
-                    case JOptionPane.YES_OPTION -> {
-                        getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
-                                prisoners.size(),
-                                total.toAmountAndSymbolString()));
-                        getCampaign().addFunds(TransactionType.RANSOM,
-                                total,
-                                resources.getString("ransom.text"));
-                        prisoners.forEach(prisoner -> getCampaign().removePerson(prisoner, false));
-                    }
-                    case JOptionPane.NO_OPTION -> {}
-                    default -> {
-                        return;
-                    }
+                if (prisonerPrompt(prisoners, "ransomQ.format", resources)) {
+                    return;
                 }
             }
         }
 
-        List<Person> prisoners = getCampaign().getCurrentPrisoners();
+        // we have to rebuild the list, so we can factor in any prisoners that have been ransomed.
+        List<Person> prisoners = getCampaign().getActivePersonnel().stream()
+                .filter(prisoner -> prisoner.getPrisonerStatus().isPrisoner())
+                .toList();
 
         if (!prisoners.isEmpty()) {
             String title = (prisoners.size() == 1) ? prisoners.get(0).getFullTitle()
@@ -547,6 +536,46 @@ public final class BriefingTab extends CampaignGuiTab {
 
         final List<Mission> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+    }
+
+    /**
+     * Displays a prompt asking the user if they want to ransom their prisoners or defectors.
+     *
+     * @param prisoners    The list of prisoners to be ransomed.
+     * @param resourceName The name of the resource bundle key for the prompt message.
+     * @param resources    The resource bundle containing the string resources.
+     * @return true if the user selects the "Cancel" option, false otherwise.
+     */
+    private boolean prisonerPrompt(List<Person> prisoners, String resourceName, ResourceBundle resources) {
+        Money total = Money.zero();
+        total = total.plus(prisoners.stream()
+                .map(person -> person.getRansomValue(getCampaign()))
+                .collect(Collectors.toList()));
+
+        int optionSelected = JOptionPane.showConfirmDialog(
+                null,
+                String.format(resources.getString(resourceName),
+                        prisoners.size(),
+                        total.toAmountAndSymbolString()),
+                resources.getString("ransom.text"),
+                JOptionPane.YES_NO_CANCEL_OPTION);
+
+        switch (optionSelected) {
+            case JOptionPane.YES_OPTION -> {
+                getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
+                        prisoners.size(),
+                        total.toAmountAndSymbolString()));
+                getCampaign().addFunds(TransactionType.RANSOM,
+                        total,
+                        resources.getString("ransom.text"));
+                prisoners.forEach(prisoner -> getCampaign().removePerson(prisoner, false));
+            }
+            case JOptionPane.NO_OPTION -> {}
+            default -> {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -605,10 +634,10 @@ public final class BriefingTab extends CampaignGuiTab {
     private void deleteMission() {
         final Mission mission = comboMission.getSelectedItem();
         if (mission == null) {
-            LogManager.getLogger().error("Cannot remove null mission");
+            logger.error("Cannot remove null mission");
             return;
         }
-        LogManager.getLogger().debug("Attempting to Delete Mission, Mission ID: " + mission.getId());
+        logger.debug("Attempting to Delete Mission, Mission ID: {}", mission.getId());
         if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this mission?", "Delete mission?",
                 JOptionPane.YES_NO_OPTION)) {
             return;
@@ -1060,7 +1089,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // Save the player's entities to the file.
             EntityListFile.saveTo(file, chosen);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         final Mission mission = comboMission.getSelectedItem();
@@ -1075,7 +1104,7 @@ public final class BriefingTab extends CampaignGuiTab {
                     // Save the player's allied entities to the file.
                     EntityListFile.saveTo(file, chosen);
                 } catch (Exception ex) {
-                    LogManager.getLogger().error("", ex);
+                    logger.error("", ex);
                 }
             }
         }
@@ -1093,7 +1122,7 @@ public final class BriefingTab extends CampaignGuiTab {
                     // Save the bot force's entities to the file.
                     EntityListFile.saveTo(file, chosen);
                 } catch (Exception ex) {
-                    LogManager.getLogger().error("", ex);
+                    logger.error("", ex);
                 }
             }
         }
@@ -1221,10 +1250,10 @@ public final class BriefingTab extends CampaignGuiTab {
         scenarioTable.setFillsViewportHeight(true);
     }
 
-    private ActionScheduler scenarioDataScheduler = new ActionScheduler(this::refreshScenarioTableData);
-    private ActionScheduler scenarioViewScheduler = new ActionScheduler(this::refreshScenarioView);
-    private ActionScheduler missionsScheduler = new ActionScheduler(this::refreshMissions);
-    private ActionScheduler lanceAssignmentScheduler = new ActionScheduler(this::refreshLanceAssignments);
+    private final ActionScheduler scenarioDataScheduler = new ActionScheduler(this::refreshScenarioTableData);
+    private final ActionScheduler scenarioViewScheduler = new ActionScheduler(this::refreshScenarioView);
+    private final ActionScheduler missionsScheduler = new ActionScheduler(this::refreshMissions);
+    private final ActionScheduler lanceAssignmentScheduler = new ActionScheduler(this::refreshLanceAssignments);
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
@@ -1236,7 +1265,7 @@ public final class BriefingTab extends CampaignGuiTab {
     public void handle(ScenarioChangedEvent evt) {
         final Mission mission = comboMission.getSelectedItem();
         if ((evt.getScenario() != null)
-                && (mission == null ? evt.getScenario().getMissionId() == -1 : evt.getScenario().getMissionId() == mission.getId())) {
+                && (evt.getScenario().getMissionId() == (mission == null ? -1 : mission.getId()))) {
             scenarioTable.repaint();
             if (evt.getScenario().getId() == selectedScenario) {
                 scenarioViewScheduler.schedule();

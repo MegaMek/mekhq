@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel.enums.randomEvents.personalities;
+package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
 import mekhq.MekHQ;
 
@@ -26,7 +26,7 @@ public enum Aggression {
     //region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
     AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.description", false, false),
-    ASSERTIVE("Aggression.ASSERTIVE.text", "Aggression.ASSERTIVE.description", false, false),
+    ASSERTIVE("Aggression.ASSERTIVE.text", "Aggression.ASSERTIVE.description", true, false),
     BELLIGERENT("Aggression.BELLIGERENT.text", "Aggression.BELLIGERENT.description", false, false),
     BLOODTHIRSTY("Aggression.BLOODTHIRSTY.text", "Aggression.BLOODTHIRSTY.description", false, true),
     BOLD("Aggression.BOLD.text", "Aggression.BOLD.description", true, false),

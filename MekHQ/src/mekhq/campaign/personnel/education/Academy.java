@@ -808,7 +808,8 @@ public class Academy implements Comparable<Academy> {
                 if (faction.equals(originFaction) || faction.equals(campaignFaction)) {
                     return faction.getShortName();
                 }
-                continue;
+
+                return null;
             }
 
             if (!hints.isAtWarWith(originFaction, faction, campaign.getLocalDate())
@@ -828,6 +829,16 @@ public class Academy implements Comparable<Academy> {
      */
     public boolean isQualified(Person person) {
         return EducationLevel.parseToInt(person.getEduHighestEducation()) >= EducationLevel.parseToInt(educationLevelMin);
+    }
+
+    /**
+     * Checks if a person has a rejected application for a specific academy.
+     *
+     * @param person  the person for whom to check the rejected applications
+     * @return true if the person has a rejected application for the given academy, false otherwise
+     */
+    public boolean hasRejectedApplication(Person person) {
+        return person.getEduFailedApplications().contains(this);
     }
 
     /**

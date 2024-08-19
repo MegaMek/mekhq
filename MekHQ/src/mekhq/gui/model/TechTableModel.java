@@ -52,8 +52,8 @@ public class TechTableModel extends DataTableModel {
         return tab.getCampaign();
     }
 
-    public TechTableModel.Renderer getRenderer() {
-        return new TechTableModel.Renderer();
+    public Renderer getRenderer() {
+        return new Renderer();
     }
 
     public class Renderer extends BasicInfo implements TableCellRenderer {
@@ -83,7 +83,7 @@ public class TechTableModel extends DataTableModel {
 
     public String getTechDesc(Person tech, boolean overtimeAllowed, IPartWork part) {
         StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font size='2'");
+        toReturn.append("<html><font size='3'");
         if ((null != part) && (null != part.getUnit()) && tech.getTechUnits().contains(part.getUnit())) {
             toReturn.append(" color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b>@");
         }
@@ -102,7 +102,7 @@ public class TechTableModel extends DataTableModel {
             }
 
             toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()));
-            toReturn.append(" ").append(skillName);
+            toReturn.append(' ').append(skillName);
             first = false;
         }
 

@@ -78,8 +78,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.education.Academy.skillParser;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
+import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -385,15 +387,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_BEGIN_EDUCATION_ENROLLMENT: {
-                for (Person person : people) {
-                    EducationController.performEducationPreEnrollmentActions(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5], false);
-                }
+                processApplication(people, data, false);
                 break;
             }
             case CMD_BEGIN_EDUCATION_RE_ENROLLMENT: {
-                for (Person person : people) {
-                    EducationController.performEducationPreEnrollmentActions(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5], true);
-                }
+                processApplication(people, data, true);
                 break;
             }
             case CMD_COMPLETE_STAGE: {
@@ -1194,6 +1192,41 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
+     * Private method to process a list of applications to education academies.
+     *
+     * @param people           an array of Person objects representing the applicants
+     * @param data             an array of String objects representing the command data
+     * @param isReEnrollment   a boolean indicating if the application is for re-enrollment
+     */
+    private void processApplication(Person[] people, String[] data, boolean isReEnrollment) {
+        boolean applicationFailed = false;
+
+        for (Person person : people) {
+            if (makeEnrollmentCheck(gui.getCampaign(), person, data[1], data[2])) {
+                EducationController.performEducationPreEnrollmentActions(
+                        gui.getCampaign(),
+                        person,
+                        data[1],
+                        data[2],
+                        Integer.parseInt(data[3]),
+                        data[4],
+                        data[5],
+                        isReEnrollment
+                );
+            } else {
+                applicationFailed = true;
+            }
+        }
+
+        if (applicationFailed) {
+            JOptionPane.showMessageDialog(null,
+                    wordWrap(resources.getString("eduFailedApplication.text")),
+                    resources.getString("eduFailedApplication.title"),
+                    JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    /**
      * This method processes a prisoner resolution command.
      *
      * @param prisoners          an array of Person objects representing the prisoners
@@ -1622,13 +1655,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         //endregion Awards Menu
 
         //region Education Menu
-        // TODO remove this once we have the Personnel Histories module
-        // this tells mhq that all characters over 16 have completed high school.
-        // this helps grandfather in existing campaign personnel.
-        if ((person.getAge(gui.getCampaign().getLocalDate()) >= 16) && (EducationLevel.parseToInt(person.getEduHighestEducation()) < 1)) {
-            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-        }
-
         if (gui.getCampaign().getCampaignOptions().isUseEducationModule()) {
             JMenu academyMenu = new JMenu(resources.getString("eduEducation.text"));
 
@@ -1636,53 +1662,55 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             Campaign campaign = gui.getCampaign();
 
             if (StaticChecks.areAllActive(selected)) {
-                // this next block preps variables for use by the menu & tooltip
-                List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
-                Collections.sort(academySetNames);
+                if (Arrays.stream(selected).noneMatch(prospectiveStudent -> person.needsFixing())) {
+                    // this next block preps variables for use by the menu & tooltip
+                    List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
+                    Collections.sort(academySetNames);
 
-                // this filters out any academy sets that are disabled in Campaign Options,
-                // or not applicable for the current campaign faction
-                if (academySetNames.contains("Local Academies")) {
-                    if (!campaign.getCampaignOptions().isEnableLocalAcademies()) {
-                        academySetNames.remove("Local Academies");
-                    }
-                }
-
-                if (academySetNames.contains("Prestigious Academies")) {
-                    if (!campaign.getCampaignOptions().isEnablePrestigiousAcademies()) {
-                        academySetNames.remove("Prestigious Academies");
-                    }
-                }
-
-                if (academySetNames.contains("Unit Education")) {
-                    if (!campaign.getCampaignOptions().isEnableUnitEducation()) {
-                        academySetNames.remove("Unit Education");
-                    }
-                }
-
-                // We then start processing the remaining academy sets
-                for (String setName : academySetNames) {
-                    JMenu setAcademyMenu = new JMenu(setName);
-
-                    // we filter each academy into one of these three categories
-                    JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
-                    JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
-
-                    setAcademyMenu.add(civilianMenu);
-                    setAcademyMenu.add(militaryMenu);
-
-                    List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
-                    Collections.sort(academiesOfSet);
-
-                    for (Academy academy : academiesOfSet) {
-                        // time to start filtering the academies
-                        if (oneSelected) {
-                            buildEducationMenusSingleton(campaign, person, academy, militaryMenu, civilianMenu);
-                        } else {
-                            buildEducationMenusMassEnroll(campaign, Arrays.asList(selected), academy, militaryMenu, civilianMenu);
+                    // this filters out any academy sets that are disabled in Campaign Options,
+                    // or not applicable for the current campaign faction
+                    if (academySetNames.contains("Local Academies")) {
+                        if (!campaign.getCampaignOptions().isEnableLocalAcademies()) {
+                            academySetNames.remove("Local Academies");
                         }
                     }
-                    academyMenu.add(setAcademyMenu);
+
+                    if (academySetNames.contains("Prestigious Academies")) {
+                        if (!campaign.getCampaignOptions().isEnablePrestigiousAcademies()) {
+                            academySetNames.remove("Prestigious Academies");
+                        }
+                    }
+
+                    if (academySetNames.contains("Unit Education")) {
+                        if (!campaign.getCampaignOptions().isEnableUnitEducation()) {
+                            academySetNames.remove("Unit Education");
+                        }
+                    }
+
+                    // We then start processing the remaining academy sets
+                    for (String setName : academySetNames) {
+                        JMenu setAcademyMenu = new JMenu(setName);
+
+                        // we filter each academy into one of these three categories
+                        JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
+                        JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
+
+                        setAcademyMenu.add(civilianMenu);
+                        setAcademyMenu.add(militaryMenu);
+
+                        List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
+                        Collections.sort(academiesOfSet);
+
+                        for (Academy academy : academiesOfSet) {
+                            // time to start filtering the academies
+                            if (oneSelected) {
+                                buildEducationMenusSingleton(campaign, person, academy, militaryMenu, civilianMenu);
+                            } else {
+                                buildEducationMenusMassEnroll(campaign, Arrays.asList(selected), academy, militaryMenu, civilianMenu);
+                            }
+                        }
+                        academyMenu.add(setAcademyMenu);
+                    }
                 }
             }
 
@@ -1711,7 +1739,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     // here we check that the person will benefit from re-enrollment
                                     int improvementPossible = 0;
 
-                                    if (academy.getFilteredFaction(campaign, person, List.of(person.getEduAcademyFaction())) != null) {
+                                    String filteredFaction = academy.getFilteredFaction(campaign, person, List.of(person.getEduAcademyFaction()));
+
+                                    if (filteredFaction != null) {
                                         int educationLevel = academy.getEducationLevel(person);
 
                                         String[] skills = academy.getCurriculums().get(person.getEduCourseIndex()).split(",");
@@ -1732,29 +1762,31 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                                                 if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() < educationLevel)) {
                                                     improvementPossible++;
+                                                } else if (!person.hasSkill(skillParsed)) {
+                                                    improvementPossible++;
                                                 }
                                             }
                                         }
+
+                                        JMenuItem reEnroll;
+
+                                        if (improvementPossible > 0) {
+                                            reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
+                                            reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
+                                            reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT,
+                                                    academy.getSet(),
+                                                    academy.getName(),
+                                                    String.valueOf(person.getEduCourseIndex()),
+                                                    person.getEduAcademySystem(),
+                                                    person.getEduAcademyFaction()));
+                                            reEnroll.addActionListener(this);
+                                        } else {
+                                            reEnroll = new JMenuItem(resources.getString("eduReEnrollImpossible.text"));
+                                            reEnroll.setToolTipText(resources.getString("eduReEnrollImpossible.toolTip"));
+                                        }
+
+                                        academyMenu.add(reEnroll);
                                     }
-
-                                    JMenuItem reEnroll;
-
-                                    if (improvementPossible > 0) {
-                                        reEnroll = new JMenuItem(resources.getString("eduReEnroll.text"));
-                                        reEnroll.setToolTipText(resources.getString("eduReEnroll.toolTip"));
-                                        reEnroll.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION_RE_ENROLLMENT,
-                                                academy.getSet(),
-                                                academy.getName(),
-                                                String.valueOf(person.getEduCourseIndex()),
-                                                person.getEduAcademySystem(),
-                                                person.getEduAcademyFaction()));
-                                        reEnroll.addActionListener(this);
-                                    } else {
-                                        reEnroll = new JMenuItem(resources.getString("eduReEnrollImpossible.text"));
-                                        reEnroll.setToolTipText(resources.getString("eduReEnrollImpossible.toolTip"));
-                                    }
-
-                                    academyMenu.add(reEnroll);
                                 }
                             }
                         }
@@ -1791,7 +1823,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (!spa.isEligible(person)) {
                         continue;
                     }
-                    cost = (int) (spa.getCost() * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
+                    cost = (int) Math.round((spa.getCost()
+                            * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
+                            * gui.getCampaign().getCampaignOptions().getXpCostMultiplier()));
                     String costDesc;
                     if (cost < 0) {
                         costDesc = resources.getString("costNotPossible.text");
@@ -2038,7 +2072,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             for (int i = 0; i < SkillType.getSkillList().length; i++) {
                 String type = SkillType.getSkillList()[i];
                 int cost = person.hasSkill(type) ? person.getSkill(type).getCostToImprove() : SkillType.getType(type).getCost(0);
-                cost *= (int) gui.getCampaign().getCampaignOptions().getXpCostMultiplier();
+                cost = (int) Math.round(cost * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
+                        * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
+
                 if (cost >= 0) {
                     String desc = String.format(resources.getString("skillDesc.format"), type, cost);
                     menuItem = new JMenuItem(desc);
@@ -2058,7 +2094,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // Edge Purchasing
             if (gui.getCampaign().getCampaignOptions().isUseEdge()) {
                 JMenu edgeMenu = new JMenu(resources.getString("edge.text"));
-                int cost = (int) (gui.getCampaign().getCampaignOptions().getEdgeCost() * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
+                int cost = (int) Math.round(gui.getCampaign().getCampaignOptions().getEdgeCost()
+                        * person.getIntelligenceXpCostMultiplier(gui.getCampaign().getCampaignOptions())
+                        * gui.getCampaign().getCampaignOptions().getXpCostMultiplier());
 
                 if ((cost >= 0) && (person.getXP() >= cost)) {
                     menuItem = new JMenuItem(String.format(resources.getString("spendOnEdge.text"), cost));
@@ -2823,7 +2861,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      */
     private void buildEducationMenusSingleton(Campaign campaign, Person person, Academy academy, JMenu militaryMenu, JMenu civilianMenu) {
         boolean showIneligibleAcademies = campaign.getCampaignOptions().isEnableShowIneligibleAcademies();
-        // has the academy been constructed, is still standing, & has not closed?
         if (campaign.getCampaignOptions().isEnableOverrideRequirements()) {
             JMenu academyOption = new JMenu(academy.getName());
 
@@ -2849,6 +2886,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             return;
         }
 
+        // has the academy been constructed, is still standing, & has not closed?
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {
@@ -2876,11 +2914,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
                 }
-                // is the applicant qualified?
+            // is the applicant qualified?
             } else if (!academy.isQualified(person)) {
                 if (showIneligibleAcademies) {
                     JMenuItem academyOption = new JMenuItem("<html>" + academy.getName()
                             + String.format(resources.getString("eduUnqualified.text"), academy.getEducationLevelMin()));
+                    educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
+                }
+            } else if (academy.hasRejectedApplication(person)) {
+                if (showIneligibleAcademies) {
+                    JMenuItem academyOption = new JMenuItem("<html>" + academy.getName()
+                            + String.format(resources.getString("eduRejected.text"), academy.getEducationLevelMin()));
                     educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
                 }
             } else if (academy.isLocal()) {
@@ -2995,7 +3039,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             boolean arePersonnelEligible = personnel.stream()
                     .allMatch(person -> person.getAge(campaign.getLocalDate()) < academy.getAgeMax()
                             && person.getAge(campaign.getLocalDate()) >= academy.getAgeMin()
-                            && academy.isQualified(person));
+                            && academy.isQualified(person)
+                            && !academy.hasRejectedApplication(person));
 
             // if one or more people are not eligible to attend the academy,
             // there is no point doing any further processes
@@ -3020,7 +3065,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     JMenu academyOption = new JMenu(academy.getName());
                     educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
 
-                    buildEducationSubMenus(campaign, academy, personnel, academyOption, campaign.getCurrentSystem().getId(), String.valueOf(suitableFaction));
+                    buildEducationSubMenus(campaign, academy, personnel, academyOption, campaign.getCurrentSystem().getId(), suitableFaction.get());
                 }
             } else if (academy.isHomeSchool()) {
                 JMenu academyOption = new JMenu(academy.getName());
@@ -3052,7 +3097,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             JMenu academyOption = new JMenu(academy.getName());
                             educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
 
-                            buildEducationSubMenus(campaign, academy, personnel, academyOption, nearestCampus, String.valueOf(suitableFaction));
+                            buildEducationSubMenus(campaign, academy, personnel, academyOption, nearestCampus, suitableFaction.get());
                         }
                     }
                 }
@@ -3114,11 +3159,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                     courses.addActionListener(this);
                     academyOption.add(courses);
-                } else {
-                    courses = new JMenuItem(resources.getString("eduNoQualificationsOffered.text"));
-                    academyOption.add(courses);
                 }
             }
+        } else {
+            courses = new JMenuItem(resources.getString("eduNoQualificationsOffered.text"));
+            academyOption.add(courses);
         }
     }
 

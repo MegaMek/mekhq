@@ -5,96 +5,33 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
-  schedule:
-    - cron: "24 16 * * 4"
+    paths-ignore:
+      - "**/*.mtf"
+      - "**/*.blk"
+      - "**/*.pdf"
+      - "**/*.xml"
 
 jobs:
   analyze:
     name: Analyze
-    runs-on: ${{ matrix.os }}
-
-    outputs:
-      mmRepo: ${{ steps.find_mm.outputs.mmRepo }}
-      mmBranch: ${{ steps.find_mm.outputs.mmBranch }}
-      mmlRepo: ${{ steps.find_mml.outputs.mmRepo }}
-      mmlBranch: ${{ steps.find_mml.outputs.mmBranch }}
-
     strategy:
       matrix:
         os: [ubuntu-latest]
-        language: ["java"]
         java-distribution: [temurin]
         java-version: [17]
       fail-fast: false
+    runs-on: [ubuntu-latest]
 
     steps:
-      - name: Checkout out MekHQ
+      - name: "Check out MekHQ"
         uses: actions/checkout@v4
-        with:
-          path: mekhq
-
-      - name: Find the Right MegaMek Branch
-        id: find_mm
-        shell: bash {0}
-        run: |
-          git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megamek.git ${{ github.event.pull_request.head.ref }}
-          if [ "$?" == "0" ]
-          then
-            echo "mmRepo=${{ github.event.pull_request.head.repo.owner.login }}/megamek" >> $GITHUB_OUTPUT
-            echo "mmBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
-          else
-            echo "mmRepo=MegaMek/megamek" >> $GITHUB_OUTPUT
-            echo "mmBranch=master" >> $GITHUB_OUTPUT
-          fi
-          exit 0
-
-      - name: Checkout MegaMek
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ steps.find_mm.outputs.mmRepo }}
-          ref: ${{ steps.find_mm.outputs.mmBranch }}
-          path: megamek
-
-      - name: Find the Right MegaMekLab Branch
-        id: find_mml
-        shell: bash {0}
-        run: |
-          git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megameklab.git ${{ github.event.pull_request.head.ref }}
-          if [ "$?" == "0" ]
-          then
-            echo "mmlRepo=${{ github.event.pull_request.head.repo.owner.login }}/megameklab" >> $GITHUB_OUTPUT
-            echo "mmlBranch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
-          else
-            echo "mmlRepo=MegaMek/megameklab" >> $GITHUB_OUTPUT
-            echo "mmlBranch=master" >> $GITHUB_OUTPUT
-          fi
-          exit 0
-
-      - name: Checkout MegaMekLab
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ steps.find_mml.outputs.mmlRepo }}
-          ref: ${{ steps.find_mml.outputs.mmlBranch }}
-          path: megameklab
-
-      - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v4
-        with:
-          distribution: ${{ matrix.java-distribution }}
-          java-version: ${{ matrix.java-version }}
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: ${{ matrix.language }}
-          queries: +security-and-quality
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Build with Gradle
-        working-directory: megameklab
-        run: ./gradlew jar
+          languages: java-kotlin
+          build-mode: none
+          queries: security-and-quality
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

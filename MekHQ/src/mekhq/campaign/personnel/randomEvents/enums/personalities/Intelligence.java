@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel.enums.randomEvents.personalities;
+package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
 import mekhq.MekHQ;
 
@@ -258,5 +258,14 @@ public enum Intelligence {
     @Override
     public String toString() {
         return name;
+    }
+
+    /**
+     * Evaluates 'intelligence score', an int representation of how intelligent a character is.
+     *
+     * @return The calculated intelligence score.
+     */
+    public int getIntelligenceScore() {
+        return this.ordinal() - (Intelligence.values().length / 2);
     }
 }

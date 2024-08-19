@@ -111,7 +111,7 @@
     <award>
         <name>Prisoner of War</name>
         <description>Taken prisoner during combat.</description>
-        <group>Manual Awards</group>
+        <group>Personal Awards</group>
         <medal>POWM.png</medal>
         <ribbon>3-01-1-PrisonerOfWar.png</ribbon>
         <xp>1</xp>
