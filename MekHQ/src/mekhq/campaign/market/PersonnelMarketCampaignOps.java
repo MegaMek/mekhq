@@ -33,7 +33,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.module.api.PersonnelMarketMethod;
 
 /**
- * Method for personnel market generation given in the repair and maintenance section of Strategic Operations
+ * Method for personnel market generation given in the replacement personnel section of Campaign Operations
  */
 public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
     private int daysSinceRolled = 0;
@@ -49,7 +49,7 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
             final List<PersonnelRole> techRoles = PersonnelRole.getTechRoles();
             final List<PersonnelRole> vesselRoles = PersonnelRole.getVesselRoles();
 
-            Person p;
+            Person p = null;
             int roll = Compute.d6(2);
             if (roll == 2) { // Medical
                 p = c.newPerson(PersonnelRole.DOCTOR);
@@ -71,11 +71,12 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
                 p = c.newPerson(techRoles.get(Compute.randomInt(techRoles.size())));
             } else if (roll == 12) { // Vessel Crew
                 p = c.newPerson(vesselRoles.get(Compute.randomInt(vesselRoles.size())));
-            } else {
-                p = c.newPerson(PersonnelRole.NONE);
             }
             daysSinceRolled = 0;
-            return Collections.singletonList(p);
+            if (p != null)  {
+                return Collections.singletonList(p);
+            }
+            return null;
         } else {
             daysSinceRolled++;
             return null;
