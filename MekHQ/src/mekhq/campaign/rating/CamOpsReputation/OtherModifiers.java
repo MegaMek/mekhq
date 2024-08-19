@@ -65,6 +65,10 @@ public class OtherModifiers {
                 .min(LocalDate::compareTo)
                 .orElse(today);
 
+        if (oldestMissionDate == null) {
+            oldestMissionDate = today;
+        }
+
         // Calculate and return the number of years between the oldest mission date and today
         return Math.max(0, (int) ChronoUnit.YEARS.between(today, oldestMissionDate));
     }
