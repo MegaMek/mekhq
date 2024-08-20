@@ -269,13 +269,13 @@ public class AbstractMarriageTest {
 
         when(mockMarriage.canMarry(any(), any(), anyBoolean())).thenReturn("Married");
         mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockMarriage, times(0)).randomMarriage(any());
+        verify(mockMarriage, times(0)).randomMarriage();
         verify(mockMarriage, times(0)).marryRandomSpouse(any(), any(), any(), anyBoolean(), anyBoolean(), anyBoolean());
 
         when(mockMarriage.canMarry(any(), any(), anyBoolean())).thenReturn(null);
-        when(mockMarriage.randomMarriage(any())).thenReturn(true);
+        when(mockMarriage.randomMarriage()).thenReturn(true);
         mockMarriage.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockMarriage, times(1)).randomMarriage(any());
+        verify(mockMarriage, times(1)).randomMarriage();
         verify(mockMarriage, times(1)).marryRandomSpouse(any(), any(), any(), anyBoolean(), anyBoolean(), anyBoolean());
     }
 

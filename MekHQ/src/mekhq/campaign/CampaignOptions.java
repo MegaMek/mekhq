@@ -282,7 +282,6 @@ public class CampaignOptions {
     private boolean useRandomPersonalityReputation;
     private boolean useIntelligenceXpMultiplier;
     private boolean useSimulatedRelationships;
-    private boolean useSimulatedRelationships;
 
 
     // Family

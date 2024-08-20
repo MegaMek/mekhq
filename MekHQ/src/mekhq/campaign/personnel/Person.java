@@ -30,7 +30,6 @@ import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
-import megamek.logging.MMLogger;
 import megamek.common.options.PilotOptions;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -250,8 +249,6 @@ public class Person {
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    private static final MMLogger logger = MMLogger.create(Person.class);
-
     private static final MMLogger logger = MMLogger.create(Person.class);
 
     // initializes the AtB ransom values

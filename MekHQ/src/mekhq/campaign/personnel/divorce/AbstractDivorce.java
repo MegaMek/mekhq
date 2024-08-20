@@ -344,7 +344,7 @@ public abstract class AbstractDivorce {
             return;
         }
 
-        if (randomDivorce(person)) {
+        if (randomDivorce()) {
             if (isBackground) {
                 backgroundDivorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
             } else {
@@ -356,10 +356,9 @@ public abstract class AbstractDivorce {
     //region Random Divorce
     /**
      * This determines if a person will randomly divorce their spouse
-     * @param person the person to determine if they are to randomly divorce their spouse
      * @return true if the person is to randomly divorce
      */
-    protected abstract boolean randomDivorce(final Person person);
+    protected abstract boolean randomDivorce();
     //endregion Random Divorce
     //endregion New Day
 }

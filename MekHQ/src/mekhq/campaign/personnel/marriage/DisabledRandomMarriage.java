@@ -19,7 +19,6 @@
 package mekhq.campaign.personnel.marriage;
 
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
 public class DisabledRandomMarriage extends AbstractMarriage {
@@ -30,7 +29,7 @@ public class DisabledRandomMarriage extends AbstractMarriage {
     //endregion Constructors
 
     @Override
-    protected boolean randomMarriage(final Person person) {
+    protected boolean randomMarriage() {
         return false;
     }
 }

@@ -271,7 +271,7 @@ public abstract class AbstractMarriage {
             return;
         }
 
-        if (randomMarriage(person)) {
+        if (randomMarriage()) {
             boolean isSameSex = false;
 
             int sameSexDiceSize = campaign.getCampaignOptions().getRandomSameSexMarriageDiceSize();
@@ -308,7 +308,7 @@ public abstract class AbstractMarriage {
             return;
         }
 
-        if (randomMarriage(person)) {
+        if (randomMarriage()) {
             boolean isSameSex = false;
 
             int sameSexDiceSize = campaign.getCampaignOptions().getRandomSameSexMarriageDiceSize();
@@ -326,10 +326,9 @@ public abstract class AbstractMarriage {
     //region Random Marriage
     /**
      * This determines if a person will randomly marry an opposite sex spouse.
-     * @param person the person to determine if they are getting randomly married
      * @return true if the person is to randomly marry
      */
-    protected abstract boolean randomMarriage(final Person person);
+    protected abstract boolean randomMarriage();
 
     /**
      * This finds a random spouse and marries them to the provided person.

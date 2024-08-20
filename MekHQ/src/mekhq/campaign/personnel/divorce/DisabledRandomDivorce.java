@@ -19,7 +19,6 @@
 package mekhq.campaign.personnel.divorce;
 
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 
 public class DisabledRandomDivorce extends AbstractDivorce {
@@ -30,7 +29,7 @@ public class DisabledRandomDivorce extends AbstractDivorce {
     //endregion Constructors
 
     @Override
-    protected boolean randomDivorce(final Person person) {
+    protected boolean randomDivorce() {
         return false;
     }
 }

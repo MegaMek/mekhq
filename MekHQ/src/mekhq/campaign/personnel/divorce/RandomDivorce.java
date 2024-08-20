@@ -20,7 +20,6 @@ package mekhq.campaign.personnel.divorce;
 
 import megamek.common.Compute;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 
 public class RandomDivorce extends AbstractDivorce {
@@ -48,7 +47,7 @@ public class RandomDivorce extends AbstractDivorce {
     //endregion Getters/Setters
 
     @Override
-    protected boolean randomDivorce(final Person person) {
+    protected boolean randomDivorce() {
         if (divorceDiceSize == 0) {
             return false;
         } else if (divorceDiceSize == 1) {

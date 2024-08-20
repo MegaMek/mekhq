@@ -58,9 +58,9 @@ public class PercentageRandomMarriageTest {
 
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
             compute.when(() -> Compute.randomInt(diceSize)).thenReturn(0);
-            assertTrue(randomMarriage.randomMarriage(mockPerson));
+            assertTrue(randomMarriage.randomMarriage());
             compute.when(() -> Compute.randomInt(diceSize)).thenReturn(1);
-            assertFalse(randomMarriage.randomMarriage(mockPerson));
+            assertFalse(randomMarriage.randomMarriage());
         }
     }
 }

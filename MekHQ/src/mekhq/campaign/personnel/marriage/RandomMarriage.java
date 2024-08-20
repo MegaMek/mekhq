@@ -20,7 +20,6 @@ package mekhq.campaign.personnel.marriage;
 
 import megamek.common.Compute;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 
 public class RandomMarriage extends AbstractMarriage {
@@ -49,7 +48,7 @@ public class RandomMarriage extends AbstractMarriage {
     //endregion Getters/Setters
 
     @Override
-    protected boolean randomMarriage(final Person person) {
+    protected boolean randomMarriage() {
         if (marriageDiceSize == 0) {
             return false;
         } else if (marriageDiceSize == 1) {

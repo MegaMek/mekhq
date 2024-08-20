@@ -49,6 +49,6 @@ public class DisabledRandomDivorceTest {
 
     @Test
     public void testRandomDivorce() {
-        assertFalse(new DisabledRandomDivorce(mockOptions).randomDivorce(mockPerson));
+        assertFalse(new DisabledRandomDivorce(mockOptions).randomDivorce());
     }
 }
