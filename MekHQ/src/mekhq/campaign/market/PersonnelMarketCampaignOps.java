@@ -76,11 +76,10 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
             if (p != null)  {
                 return Collections.singletonList(p);
             }
-            return null;
         } else {
             daysSinceRolled++;
-            return null;
         }
+        return null;
     }
 
     @Override
