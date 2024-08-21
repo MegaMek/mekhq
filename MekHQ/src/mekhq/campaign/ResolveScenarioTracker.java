@@ -368,12 +368,11 @@ public class ResolveScenarioTracker {
                 if (control) {
                     double dropShipBonusPercentage = (double) campaign.getCampaignOptions().getDropShipBonusPercentage() / 100;
 
-                    if ((e.isDropShip())
-                            && (dropShipBonusPercentage > 0)
-                            && (scenario.getBoardType() == Scenario.T_GROUND)) {
-                        dropShipBonus = dropShipBonus.plus(
-                                generateNewTestUnit(e).getSellValue().multipliedBy(dropShipBonusPercentage)
-                        );
+                    if ((e.isDropShip()) && (scenario.getBoardType() == Scenario.T_GROUND)) {
+                        if (dropShipBonusPercentage > 0) {
+                            dropShipBonus = dropShipBonus.plus(
+                                    generateNewTestUnit(e).getSellValue().multipliedBy(dropShipBonusPercentage));
+                        }
                     } else {
                         TestUnit nu = generateNewTestUnit(e);
                         UnitStatus us = new UnitStatus(nu);
