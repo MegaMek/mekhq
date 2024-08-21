@@ -172,6 +172,7 @@ MEKHQ VERSION HISTORY:
 + PR #4679: Refactored DropShip Bonus Calculation Logic
 + Fix #4608: Relocate some methods and remove bad Part casting
 + PR #4684: Refactored Personality Generation and Education Level Assignment
++ PR #4685: Fixed NPE in AutoAwardsController
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
