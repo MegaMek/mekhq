@@ -165,6 +165,13 @@ MEKHQ VERSION HISTORY:
 + FIX #4663: Reverted change to find parts by name when selling from parts in use
 + FIX #4664: Added clearance of enemy name, when changing enemy code
 + FIX #4666: Added Check for Null Crew When Determining Force Leader
++ PR #4673: Added Conditional Check Before Showing 0 Personnel Eligible autoAwards Dialog
++ PR #4674: Fixed NPE in CamOps Mission Date Calculation
++ PR #4677: Update CamOps Personnel Market to Properly Not Generate Personnel on a roll of 7
++ PR #4678: Fixed Incorrect Variable in Education Failed Application Report
++ PR #4679: Refactored DropShip Bonus Calculation Logic
++ Fix #4608: Relocate some methods and remove bad Part casting
++ PR #4684: Refactored Personality Generation and Education Level Assignment
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
