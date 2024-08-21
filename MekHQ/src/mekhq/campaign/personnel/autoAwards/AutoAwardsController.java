@@ -838,7 +838,7 @@ public class AutoAwardsController {
         // prep the kill award data so that we only have to process it once
         Map<Integer, List<Kill>> missionKillData = personnel.stream()
                 .flatMap(person -> campaign.getKillsFor(person).stream())
-                .filter(kill -> kill.getMissionId() == mission.getId())
+                .filter(kill -> mission != null && (kill.getMissionId() == mission.getId()))
                 .collect(Collectors.groupingBy(Kill::getForceId));
 
         // process the award data, checking for award eligibility
