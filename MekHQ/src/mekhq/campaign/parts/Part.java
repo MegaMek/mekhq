@@ -245,12 +245,6 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     /**
-     * Sticker price is the value of the part according to the rulebooks
-     * @return the part's sticker price
-     */
-    public abstract Money getStickerPrice();
-
-    /**
      * This is the value of the part that may be affected by characteristics and campaign options
      * @return the part's actual value
      */
