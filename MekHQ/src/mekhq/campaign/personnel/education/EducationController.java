@@ -70,7 +70,7 @@ public class EducationController {
         if (person.getEduFailedApplications().contains(academy)) {
             campaign.addReport(String.format(resources.getString("secondApplication.text"),
                     person.getHyperlinkedFullTitle()),
-                    academy.getName(),
+                    academyNameInSet,
                     "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
                     "</span>");
             return false;
@@ -97,9 +97,9 @@ public class EducationController {
                     person.getHyperlinkedFullTitle(),
                     "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
                     "</span>",
-                    academy.getName()));
+                    academyNameInSet));
 
-            ServiceLogger.eduFailedApplication(person, campaign.getLocalDate(), person.getEduAcademyName());
+            ServiceLogger.eduFailedApplication(person, campaign.getLocalDate(), academyNameInSet);
 
             return false;
         }
