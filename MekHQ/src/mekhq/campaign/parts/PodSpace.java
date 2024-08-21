@@ -23,6 +23,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
@@ -497,5 +498,27 @@ public class PodSpace implements IPartWork {
     @Override
     public PartRepairType getRepairPartType() {
         return PartRepairType.POD_SPACE;
+    }
+
+
+    /**
+     * Sticker price is the value of the part according to the rulebooks
+     * @return the part's sticker price
+     */
+    public Money getStickerPrice(){
+        return Money.of(0.0);
+    }
+
+    /**
+     * This is the value of the part that may be affected by characteristics and campaign options
+     * (Note: Pod Space, an abstraction, does not have value or price.
+     * @return the part's actual value
+     */
+    public Money getActualValue() {
+        return Money.of(0.0);
+    }
+
+    public boolean isPriceAdjustedForAmount(){
+        return false;
     }
 }
