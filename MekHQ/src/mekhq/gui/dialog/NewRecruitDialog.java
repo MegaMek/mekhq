@@ -26,6 +26,7 @@ import megamek.common.enums.Gender;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.view.PersonViewPanel;
@@ -218,6 +219,7 @@ public class NewRecruitDialog extends JDialog {
                 person.getGender(), person.isClanPersonnel(), factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
+        PersonalityController.writeDescription(person);
         refreshView();
     }
 

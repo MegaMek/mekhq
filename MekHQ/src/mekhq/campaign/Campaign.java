@@ -83,7 +83,6 @@ import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
@@ -91,7 +90,6 @@ import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
@@ -1404,14 +1402,6 @@ public class Campaign implements ITechManager {
                     Gender.RANDOMIZE);
         }
 
-        if (person.getAge(getLocalDate()) < 16) {
-            person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-        } else {
-            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-        }
-
-        PersonalityController.generatePersonality(person);
-
         return person;
     }
 
@@ -1502,13 +1492,6 @@ public class Campaign implements ITechManager {
         if (getCampaignOptions().isUsePortraitForRole(primaryRole)) {
             assignRandomPortraitFor(person);
         }
-
-        // TODO remove this once we have the Personnel Histories module
-        if (person.getAge(getLocalDate()) >= 16) {
-            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-        }
-
-        PersonalityController.generatePersonality(person);
 
         return person;
     }

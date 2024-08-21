@@ -32,7 +32,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import org.apache.logging.log4j.LogManager;
@@ -368,8 +367,6 @@ public class HireBulkPersonnelDialog extends JDialog {
             } else {
                 person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
             }
-
-            PersonalityController.generatePersonality(person);
 
             if (!campaign.recruitPerson(person, isGmHire)) {
                 number = 0;

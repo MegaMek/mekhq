@@ -33,7 +33,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -136,7 +135,7 @@ public abstract class AbstractProcreation {
     /**
      * This method determines the duration for a pregnancy, with a variance determined through a
      * Gaussian distribution with a maximum spread of approximately six weeks.
-     *
+     * <p>
      * TODO : Swap me to instead use a distribution function that generates an overall length,
      * TODO : Including pre-term and post-term births
      *
@@ -357,9 +356,6 @@ public abstract class AbstractProcreation {
 
             // set loyalty
             baby.setLoyalty(Compute.d6(4, 3));
-
-            // set baby's personality
-            PersonalityController.generatePersonality(baby);
 
             // Recruit the baby
             campaign.recruitPerson(baby, prisonerStatus, true, true);

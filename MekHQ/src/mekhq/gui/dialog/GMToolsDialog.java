@@ -37,6 +37,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
@@ -1561,6 +1562,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             getLblCurrentName().setText((getLastGeneratedName()[0] + ' ' + getLastGeneratedName()[1]).trim());
             getPerson().setGivenName(getLastGeneratedName()[0]);
             getPerson().setSurname(getLastGeneratedName()[1]);
+            PersonalityController.writeDescription(person);
             MekHQ.triggerEvent(new PersonChangedEvent(getPerson()));
         }
     }
