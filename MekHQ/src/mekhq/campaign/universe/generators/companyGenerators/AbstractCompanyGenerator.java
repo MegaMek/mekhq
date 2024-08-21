@@ -46,7 +46,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
-import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -80,19 +79,19 @@ import java.util.stream.Stream;
  * Second Panel: Presets, Date, Starting Faction, Starting Planet, AtB
  * Third Panel: Campaign Options
  * Fifth Panel: Start of the Company Generator
- *
+ * <p>
  * Ideas:
  * First panel is the options panel
  * Second panel is the generated personnel panel, where you can customize and reroll personnel
  * Third panel is the generated units panel, where you can customize applicable units
  * Fourth panel is the parts list, which is customizable
  * Fifth panel is a view generated pairings, and allows the reorder of the preset lances
- *
+ * <p>
  * Second to Last panel of the dialog should be the contract market when coming from quickstart, to select starting contract
  * Final panel is the starting finances overview
- *
+ * <p>
  * Button that lets you pop out the options panel with everything disabled
- *
+ * <p>
  * TODO - Wave 3:
  *      Contract Market Pane
  *      Campaign Options Pane, Campaign Options Dialog Base Validation
@@ -377,13 +376,13 @@ public abstract class AbstractCompanyGenerator {
 
     /**
      * This generates an officer based on the provided options.
-     *
+     * <p>
      * Custom addition for larger generation:
      * For every company (with a mercenary company command lance) or for every company
      * after the first (as the mercenary company commander is the leader of that company) you
      * generate a O4 - Captain, provided that captain generation is enabled. These get
      * two officer skill boosts instead of 1, and the rank of O4 - Captain instead of O3 - Lieutenant.
-     *
+     * <p>
      * An Officer gets:
      * 1) An increase of one to either the highest or lowest skill of gunnery or piloting, depending
      * on the set options
@@ -610,8 +609,6 @@ public abstract class AbstractCompanyGenerator {
             } else {
                 tracker.getPerson().setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
             }
-
-            PersonalityController.generatePersonality(tracker.getPerson());
         }
 
         if (getOptions().isRunStartingSimulation()) {
