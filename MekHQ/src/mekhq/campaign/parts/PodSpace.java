@@ -505,6 +505,7 @@ public class PodSpace implements IPartWork {
      * Sticker price is the value of the part according to the rulebooks
      * @return the part's sticker price
      */
+    @Override
     public Money getStickerPrice(){
         return Money.of(0.0);
     }
@@ -514,10 +515,12 @@ public class PodSpace implements IPartWork {
      * (Note: Pod Space, an abstraction, does not have value or price.
      * @return the part's actual value
      */
+    @Override
     public Money getActualValue() {
         return Money.of(0.0);
     }
 
+    @Override
     public boolean isPriceAdjustedForAmount(){
         return false;
     }
