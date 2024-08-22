@@ -168,7 +168,7 @@ public class ContractTest {
 
         when(mockCampaign.calculateJumpPath(nullable(PlanetarySystem.class), nullable(PlanetarySystem.class))).thenReturn(mockJumpPath);
         when(mockCampaign.calculateCostPerJump(anyBoolean(), anyBoolean())).thenReturn(jumpCost);
-        when(mockCampaign.getUnitRatingMod()).thenReturn(10);
+        when(mockCampaign.getAtBUnitRatingMod()).thenReturn(10);
         when(mockCampaign.getAccountant()).thenReturn(mockAccountant);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));

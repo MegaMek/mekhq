@@ -26,7 +26,6 @@ import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -40,6 +39,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.*;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -110,7 +110,7 @@ public class ContractMarket {
     }
 
     public AtBContract addAtBContract(Campaign campaign) {
-        AtBContract c = generateAtBContract(campaign, campaign.getUnitRatingMod());
+        AtBContract c = generateAtBContract(campaign, campaign.getAtBUnitRatingMod());
         if (c != null) {
             contracts.add(c);
         }
@@ -155,7 +155,7 @@ public class ContractMarket {
             // need to copy to prevent concurrent modification errors
             new ArrayList<>(contracts).forEach(this::removeContract);
 
-            int unitRatingMod = campaign.getUnitRatingMod();
+            int unitRatingMod = campaign.getAtBUnitRatingMod();
 
             for (AtBContract contract : campaign.getActiveAtBContracts()) {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
@@ -534,7 +534,7 @@ public class ContractMarket {
         followup.setEnemySkill(contract.getEnemySkill());
         followup.setEnemyQuality(contract.getEnemyQuality());
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
-        setAtBContractClauses(followup, campaign.getUnitRatingMod(), campaign);
+        setAtBContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
 
         followup.calculatePaymentMultiplier(campaign);
 
@@ -894,8 +894,7 @@ public class ContractMarket {
 
             // Restore any parent contract references
             for (Contract contract : retVal.contracts) {
-                if (contract instanceof AtBContract) {
-                    final AtBContract atbContract = (AtBContract) contract;
+                if (contract instanceof AtBContract atbContract) {
                     atbContract.restore(c);
                 }
             }

@@ -655,7 +655,7 @@ public class Campaign implements ITechManager {
                 report.append("<br/>Search successful. ");
 
                 MechSummary ms = getUnitGenerator().generate(getFactionCode(), shipSearchType, -1,
-                        getGameYear(), getUnitRatingMod());
+                        getGameYear(), getAtBUnitRatingMod());
 
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
@@ -1720,7 +1720,7 @@ public class Campaign implements ITechManager {
             }
             // Higher-rated units are more likely to have Bloodnamed
             if (getCampaignOptions().getUnitRatingMethod().isEnabled()) {
-                bloodnameTarget += IUnitRating.DRAGOON_C - getUnitRatingMod();
+                bloodnameTarget += IUnitRating.DRAGOON_C - getAtBUnitRatingMod();
             }
 
             // Reavings diminish the number of available Bloodrights in later eras
@@ -3276,7 +3276,7 @@ public class Campaign implements ITechManager {
             }
 
             if (getLocalDate().equals(contract.getStartDate())) {
-                getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation(getUnitRatingMod())));
+                getUnits().forEach(unit -> unit.setSite(contract.getRepairLocation(getAtBUnitRatingMod())));
             }
 
             if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -3398,7 +3398,7 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            final int roll = MathUtility.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
+            final int roll = MathUtility.clamp(Compute.d6(2) + getAtBUnitRatingMod() - 2, 2, 12);
 
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
@@ -3434,7 +3434,7 @@ public class Campaign implements ITechManager {
             }
 
             for (AtBContract contract : getActiveAtBContracts()) {
-                contract.checkMorale(getLocalDate(), getUnitRatingMod());
+                contract.checkMorale(getLocalDate(), getAtBUnitRatingMod());
                 addReport("Enemy Morale is now " + contract.getMoraleLevel()
                         + " on contract " + contract.getName());
             }
@@ -5872,7 +5872,7 @@ public class Campaign implements ITechManager {
         final int modifier = experienceLevel - SkillType.EXP_REGULAR;
 
         if (reportBuilder != null) {
-            reportBuilder.append(getUnitRatingMod()).append("(unit rating)");
+            reportBuilder.append(getAtBUnitRatingMod()).append("(unit rating)");
             if (person != null) {
                 reportBuilder.append(modifier).append('(').append(person.getFullName()).append(", logistics admin)");
             } else {
@@ -5880,7 +5880,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        return getUnitRatingMod() + modifier;
+        return getAtBUnitRatingMod() + modifier;
     }
 
     public void resetAstechMinutes() {
@@ -6225,7 +6225,7 @@ public class Campaign implements ITechManager {
             return getUnitRating().getUnitRating();
         } else if (unitRatingMethod.isCampaignOperations()) {
             int reputationRating = reputation.getReputationRating();
-            int unitRatingMod = getUnitRatingMod();
+            int unitRatingMod = getAtBUnitRatingMod();
 
             return String.format("%d (%+d)", reputationRating, unitRatingMod);
         } else {
@@ -6241,7 +6241,7 @@ public class Campaign implements ITechManager {
      *
      * @return The unit rating modifier based on the campaign options.
      */
-    public int getUnitRatingMod() {
+    public int getAtBUnitRatingMod() {
         if (!getCampaignOptions().getUnitRatingMethod().isEnabled()) {
             return IUnitRating.DRAGOON_C;
         }
@@ -6252,7 +6252,7 @@ public class Campaign implements ITechManager {
 
     @Deprecated
     public int getUnitRatingAsInteger() {
-        return getUnitRatingMod();
+        return getAtBUnitRatingMod();
     }
 
     public RandomSkillPreferences getRandomSkillPreferences() {

@@ -94,7 +94,7 @@ public class AtBEventProcessor {
                 break;
         }
 
-        mod += campaign.getUnitRatingMod() - IUnitRating.DRAGOON_C;
+        mod += campaign.getAtBUnitRatingMod() - IUnitRating.DRAGOON_C;
         if (campaign.getFinances().isInDebt()) {
             mod -= 3;
         }
