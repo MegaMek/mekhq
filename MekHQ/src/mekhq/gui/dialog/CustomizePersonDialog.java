@@ -1088,8 +1088,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             }
         }
 
-        setMinimumSize(new Dimension(1100, 500));
-
         return factionsModel;
     }
 
