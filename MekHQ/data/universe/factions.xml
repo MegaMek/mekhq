@@ -64,7 +64,7 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>TA</shortname>
         <fullname>Terran Alliance</fullname>
-        <colorRGB>207,119,57</colorRGB>
+        <colorRGB>40,25,55</colorRGB>
         <tags>is,major</tags>
         <start>2086</start>
         <end>2315</end>
@@ -952,7 +952,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <!-- Using era modifiers of Clans -->
         <eraMods>0,0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
-        <colorRGB>207,114,58</colorRGB>
+        <colorRGB>130,79,54</colorRGB>
         <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
         <layeredForceIconBackgroundFilename>Clan Wolf.png</layeredForceIconBackgroundFilename>
         <layeredForceIconLogoCategory>Clan/</layeredForceIconLogoCategory>
@@ -970,7 +970,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <!-- Using era modifiers of Clans -->
         <eraMods>0,0,0,0,0,0,0,0,0,0,0</eraMods>
         <nameGenerator>Clan</nameGenerator>
-        <colorRGB>207,114,58</colorRGB>
+        <colorRGB>130,79,54</colorRGB>
         <layeredForceIconBackgroundCategory>Clan/</layeredForceIconBackgroundCategory>
         <layeredForceIconBackgroundFilename>Wolf Empire.png</layeredForceIconBackgroundFilename>
         <tags>clan,minor</tags>
@@ -1623,7 +1623,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <fullname>Republic of the Sphere</fullname>
         <startingPlanet>Terra</startingPlanet>
         <eraMods>0,0,0,0,0,0,0,0,0,-1</eraMods>
-        <colorRGB>207,119,57</colorRGB>
+        <colorRGB>40,25,55</colorRGB>
         <layeredForceIconBackgroundCategory>Inner Sphere/</layeredForceIconBackgroundCategory>
         <layeredForceIconBackgroundFilename>Republic of the Sphere.png</layeredForceIconBackgroundFilename>
         <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
@@ -1636,7 +1636,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <shortname>Stone</shortname>
         <fullname>Stone's Coalition</fullname>
         <altNames>Coalition Forces</altNames>
-        <colorRGB>207,119,57</colorRGB>
+        <colorRGB>40,25,55</colorRGB>
         <tags>is,minor</tags>
         <start>3073</start>
         <end>3081</end>
@@ -1646,7 +1646,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <fullname>Republic Territories</fullname>
         <!-- Using era modifiers of Republic of the Sphere -->
         <eraMods>0,0,0,0,0,0,0,0,0,-1</eraMods>
-        <colorRGB>207,119,57</colorRGB>
+        <colorRGB>40,25,55</colorRGB>
         <tags>is</tags>
     </faction>
     <faction>
@@ -2064,7 +2064,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <startingPlanet>Callison</startingPlanet>
         <!-- Using era modifiers of Republic of the Sphere -->
         <eraMods>0,0,0,0,0,0,0,0,0,-1</eraMods>
-        <colorRGB>128,40,0</colorRGB>
+        <colorRGB>40,25,55</colorRGB>
         <tags>is,minor</tags>
         <start>3135</start>
         <end>3149</end>
