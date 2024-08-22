@@ -19,30 +19,10 @@
  */
 package mekhq;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.function.Consumer;
-
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
 import io.sentry.Sentry;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
@@ -62,6 +42,22 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 public class Utilities {
     private Utilities() {
@@ -346,19 +342,25 @@ public class Utilities {
         return true;
     }
 
+    /**
+     * Generates an experience level based on a 2d6 roll modified by the bonus value.
+     *
+     * @param bonus the bonus value to be added to the roll
+     * @return the generated experience level
+     * @throws IllegalStateException if the roll is not within the expected range
+     */
     public static int generateExpLevel(int bonus) {
-        int roll = Compute.d6(2) + bonus;
-        if (roll <= 2) {
-            return SkillType.EXP_ULTRA_GREEN;
-        } else if (roll < 6) {
-            return SkillType.EXP_GREEN;
-        } else if (roll < 10) {
-            return SkillType.EXP_REGULAR;
-        } else if (roll < 12) {
-            return SkillType.EXP_VETERAN;
-        } else {
-            return SkillType.EXP_ELITE;
-        }
+        int roll = MathUtility.clamp(Compute.d6(2) + bonus, 1, 12);
+
+        return switch (roll) {
+            case 1 -> SkillType.EXP_ULTRA_GREEN;
+            case 2, 3, 4, 5 -> SkillType.EXP_GREEN;
+            case 6, 7, 8, 9 -> SkillType.EXP_REGULAR;
+            case 10, 11 -> SkillType.EXP_VETERAN;
+            case 12 -> SkillType.EXP_ELITE;
+            default -> throw new IllegalStateException("Unexpected value in mekhq/Utilities.java/generateExpLevel: "
+                    + roll);
+        };
     }
 
     /**
@@ -902,28 +904,15 @@ public class Utilities {
     }
 
     public static int getSimpleTechLevel(int level) {
-        switch (level) {
-            case TechConstants.T_IS_TW_NON_BOX:
-            case TechConstants.T_CLAN_TW:
-            case TechConstants.T_IS_TW_ALL:
-            case TechConstants.T_TW_ALL:
-                return CampaignOptions.TECH_STANDARD;
-            case TechConstants.T_IS_ADVANCED:
-            case TechConstants.T_CLAN_ADVANCED:
-                return CampaignOptions.TECH_ADVANCED;
-            case TechConstants.T_IS_EXPERIMENTAL:
-            case TechConstants.T_CLAN_EXPERIMENTAL:
-                return CampaignOptions.TECH_EXPERIMENTAL;
-            case TechConstants.T_IS_UNOFFICIAL:
-            case TechConstants.T_CLAN_UNOFFICIAL:
-                return CampaignOptions.TECH_UNOFFICIAL;
-            case TechConstants.T_TECH_UNKNOWN:
-                return CampaignOptions.TECH_UNKNOWN;
-            case TechConstants.T_ALLOWED_ALL:
-            case TechConstants.T_INTRO_BOXSET:
-            default:
-                return CampaignOptions.TECH_INTRO;
-        }
+        return switch (level) {
+            case TechConstants.T_IS_TW_NON_BOX, TechConstants.T_CLAN_TW, TechConstants.T_IS_TW_ALL, TechConstants.T_TW_ALL ->
+                    CampaignOptions.TECH_STANDARD;
+            case TechConstants.T_IS_ADVANCED, TechConstants.T_CLAN_ADVANCED -> CampaignOptions.TECH_ADVANCED;
+            case TechConstants.T_IS_EXPERIMENTAL, TechConstants.T_CLAN_EXPERIMENTAL -> CampaignOptions.TECH_EXPERIMENTAL;
+            case TechConstants.T_IS_UNOFFICIAL, TechConstants.T_CLAN_UNOFFICIAL -> CampaignOptions.TECH_UNOFFICIAL;
+            case TechConstants.T_TECH_UNKNOWN -> CampaignOptions.TECH_UNKNOWN;
+            default -> CampaignOptions.TECH_INTRO;
+        };
     }
 
     /**
@@ -1059,21 +1048,21 @@ public class Utilities {
     public static Map<String, Integer> sortMapByValue(Map<String, Integer> unsortMap, boolean highFirst) {
 
         // Convert Map to List
-        List<Map.Entry<String, Integer>> list = new LinkedList<>(unsortMap.entrySet());
+        List<Entry<String, Integer>> list = new LinkedList<>(unsortMap.entrySet());
 
         // Sort list with comparator, to compare the Map values
-        list.sort(Map.Entry.comparingByValue());
+        list.sort(Entry.comparingByValue());
 
         // Convert sorted map back to a Map
         Map<String, Integer> sortedMap = new LinkedHashMap<>();
         if (highFirst) {
-            ListIterator<Map.Entry<String, Integer>> li = list.listIterator(list.size());
+            ListIterator<Entry<String, Integer>> li = list.listIterator(list.size());
             while (li.hasPrevious()) {
-                Map.Entry<String, Integer> entry = li.previous();
+                Entry<String, Integer> entry = li.previous();
                 sortedMap.put(entry.getKey(), entry.getValue());
             }
         } else {
-            for (Map.Entry<String, Integer> entry : list) {
+            for (Entry<String, Integer> entry : list) {
                 sortedMap.put(entry.getKey(), entry.getValue());
             }
         }
@@ -1350,7 +1339,7 @@ public class Utilities {
 
         // I need to change the new entity to the one from the mtf file now, so that
         // equipment numbers will match
-        MechSummary summary = cacheInstance.getMech(newE.getFullChassis() + " " + newE.getModel());
+        MechSummary summary = cacheInstance.getMech(newE.getFullChassis() + ' ' + newE.getModel());
 
         if (null == summary) {
             // Attempt to deal with new naming convention directly
@@ -1392,7 +1381,7 @@ public class Utilities {
      * @return A character string
      */
     public static String getDeploymentString(Player player) {
-        StringBuilder result = new StringBuilder("");
+        StringBuilder result = new StringBuilder();
 
         if (player.getStartingPos() >= 0
                 && player.getStartingPos() <= IStartingPositions.START_LOCATION_NAMES.length) {
@@ -1405,14 +1394,14 @@ public class Utilities {
             int SEx = player.getStartingAnySEx() + 1;
             int SEy = player.getStartingAnySEy() + 1;
             if ((NWx + NWy + SEx + SEy) > 0) {
-                result.append(" (" + NWx + ", " + NWy + ")-(" + SEx + ", " + SEy + ")");
+                result.append(" (").append(NWx).append(", ").append(NWy).append(")-(").append(SEx).append(", ").append(SEy).append(')');
             }
         }
         int so = player.getStartOffset();
         int sw = player.getStartWidth();
         if ((so != 0) || (sw != 3)) {
-            result.append(", " + so);
-            result.append(", " + sw);
+            result.append(", ").append(so);
+            result.append(", ").append(sw);
         }
 
         return result.toString();
