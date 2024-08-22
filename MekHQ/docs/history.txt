@@ -173,6 +173,7 @@ MEKHQ VERSION HISTORY:
 + Fix #4608: Relocate some methods and remove bad Part casting
 + PR #4684: Refactored Personality Generation and Education Level Assignment
 + PR #4685: Fixed NPE in AutoAwardsController
++ PR #4688: Temporarily hide sell buttons from parts in use dialog (work in progress not ready for release)
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
