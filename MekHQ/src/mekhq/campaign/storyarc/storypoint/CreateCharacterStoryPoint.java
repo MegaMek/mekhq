@@ -24,8 +24,6 @@ import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.MekHQ;
-import mekhq.gui.dialog.CreateCharacterDialog.NameRestrictions;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.PersonNewEvent;
@@ -33,15 +31,20 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.CreateCharacterDialog;
+import mekhq.gui.dialog.CreateCharacterDialog.NameRestrictions;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -126,12 +129,14 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     }
 
     public Person createPerson() {
+        Campaign campaign = getCampaign();
+
         if (null == faction) {
-            faction = getCampaign().getFaction();
+            faction = campaign.getFaction();
         }
-        Person p = new Person(getCampaign(), faction.getShortName());
+        Person p = new Person(campaign, faction.getShortName());
         if (null != primaryRole) {
-            p.setPrimaryRole(getCampaign(), primaryRole);
+            p.setPrimaryRole(campaign, primaryRole);
         }
         p.setClanPersonnel(clan);
         if (p.isClanPersonnel() && null != phenotype) {
@@ -172,6 +177,20 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         skillGenerator.generateSkills(getCampaign(), p, SkillType.EXP_ULTRA_GREEN);
 
         p.setBirthday(getCampaign().getLocalDate().minusYears(age));
+
+
+        // set education
+        if (p.getAge(getCampaign().getLocalDate()) < 16) {
+            p.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+        } else {
+            p.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
+        }
+
+        // generate background
+        BackgroundsController.generateBackground(campaign, p);
+
+        // generate personality
+        PersonalityController.generatePersonality(p);
 
         return p;
     }

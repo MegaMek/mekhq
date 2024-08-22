@@ -83,10 +83,12 @@ public class AutoAwardsController {
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
                     MekHQ.getMHQOptions().getLocale());
 
-            JOptionPane.showMessageDialog(null,
-                    resources.getString("txtNoneEligible.text"),
-                    resources.getString("AutoAwardsDialog.title"),
-                    JOptionPane.INFORMATION_MESSAGE);
+            if (isManualPrompt) {
+                JOptionPane.showMessageDialog(null,
+                        resources.getString("txtNoneEligible.text"),
+                        resources.getString("AutoAwardsDialog.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         }
 
         logger.info("autoAwards (Manual) has finished");
@@ -838,7 +840,7 @@ public class AutoAwardsController {
         // prep the kill award data so that we only have to process it once
         Map<Integer, List<Kill>> missionKillData = personnel.stream()
                 .flatMap(person -> campaign.getKillsFor(person).stream())
-                .filter(kill -> kill.getMissionId() == mission.getId())
+                .filter(kill -> mission != null && (kill.getMissionId() == mission.getId()))
                 .collect(Collectors.groupingBy(Kill::getForceId));
 
         // process the award data, checking for award eligibility

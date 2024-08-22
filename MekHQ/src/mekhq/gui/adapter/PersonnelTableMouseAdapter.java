@@ -1111,6 +1111,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             person.getGender(), person.isClanPersonnel(), person.getOriginFaction().getShortName());
                     person.setGivenName(name[0]);
                     person.setSurname(name[1]);
+                    PersonalityController.writeDescription(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
