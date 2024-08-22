@@ -791,26 +791,26 @@ public enum PersonnelTableModelColumn {
                 Aggression aggression = person.getAggression();
                 sign = aggression.isTraitPositive() ? "+" : "-";
 
-                return '(' + (aggression.isTraitMajor() ? sign + sign : sign) + ") " + aggression;
+                return aggression + " (" + (aggression.isTraitMajor() ? sign + sign : sign) + ')';
             case AMBITION:
                 Ambition ambition = person.getAmbition();
                 sign = ambition.isTraitPositive() ? "+" : "-";
 
-                return '(' + (ambition.isTraitMajor() ? sign + sign : sign) + ") " + ambition;
+                return  ambition + " (" + (ambition.isTraitMajor() ? sign + sign : sign) + ')';
             case GREED:
                 Greed greed = person.getGreed();
                 sign = greed.isTraitPositive() ? "+" : "-";
 
-                return '(' + (greed.isTraitMajor() ? sign + sign : sign) + ") " + greed;
+                return greed + " (" + (greed.isTraitMajor() ? sign + sign : sign) + ')';
             case SOCIAL:
                 Social social = person.getSocial();
                 sign = social.isTraitPositive() ? "+" : "-";
 
-                return '(' + (social.isTraitMajor() ? sign + sign : sign) + ") " + social;
+                return social + " (" + (social.isTraitMajor() ? sign + sign : sign) + ')';
             case INTELLIGENCE:
                 Intelligence intelligence = person.getIntelligence();
 
-                return '(' + String.valueOf(intelligence.ordinal()) + ") " + intelligence;
+                return String.valueOf(intelligence.ordinal());
             default:
                 return "UNIMPLEMENTED";
         }
@@ -950,7 +950,7 @@ public enum PersonnelTableModelColumn {
             case MEK, GROUND_VEHICLE, NAVAL_VEHICLE, VTOL, AEROSPACE, CONVENTIONAL_AIRCRAFT, VESSEL, BATTLE_ARMOUR, SMALL_ARMS, ANTI_MEK,
                  ARTILLERY, TACTICS, STRATEGY, LEADERSHIP, TECH_MEK, TECH_AERO, TECH_MECHANIC, TECH_BA, TECH_VESSEL, MEDICAL,
                  ADMINISTRATION, NEGOTIATION, SCROUNGE -> new BonusSorter();
-            case INJURIES, KILLS, XP, TOUGHNESS, EDGE, SPA_COUNT, IMPLANT_COUNT, LOYALTY -> new IntegerStringSorter();
+            case INJURIES, KILLS, XP, TOUGHNESS, EDGE, SPA_COUNT, IMPLANT_COUNT, LOYALTY, INTELLIGENCE -> new IntegerStringSorter();
             case SALARY -> new FormattedNumberSorter();
             default -> new NaturalOrderComparator();
         };
