@@ -82,8 +82,7 @@ public class AverageExperienceRating {
             case GREEN -> 1;
             case REGULAR -> 2;
             case VETERAN -> 3;
-            case ELITE -> 4;
-            case HEROIC, LEGENDARY -> 5;
+            case ELITE, HEROIC, LEGENDARY -> 4;
         };
     }
 
