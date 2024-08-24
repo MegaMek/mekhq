@@ -21,6 +21,7 @@ package mekhq.gui.adapter;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.EntityWeightClass;
@@ -1046,19 +1047,30 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_EDIT_SALARY: {
-                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                int originalSalary = selectedPerson.getSalary(gui.getCampaign()).getAmount().intValue();
+
+                PopupValueChoiceDialog salaryDialog = new PopupValueChoiceDialog(
+                        gui.getFrame(),
+                        true,
                         resources.getString("changeSalary.text"),
-                        selectedPerson.getSalary(gui.getCampaign()).getAmount().intValue(),
-                        -1, 100000);
-                pcvd.setVisible(true);
-                int salary = pcvd.getValue();
-                if (salary < -1) {
+                        MathUtility.clamp(originalSalary, -1, 1000000000),
+                        -1,
+                        1000000000
+                );
+
+                salaryDialog.setVisible(true);
+
+                int newSalary = salaryDialog.getValue();
+
+                if (newSalary < -1) {
                     return;
                 }
+
                 for (Person person : people) {
-                    person.setSalary(Money.of(salary));
+                    person.setSalary(Money.of(newSalary));
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
+
                 break;
             }
             case CMD_GIVE_PAYMENT: {
