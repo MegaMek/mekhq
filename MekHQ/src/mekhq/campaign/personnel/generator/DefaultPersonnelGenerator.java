@@ -23,8 +23,8 @@ import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -108,11 +108,7 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
         person.setDaysToWaitForHealing(campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
 
         // set education
-        if (person.getAge(campaign.getLocalDate()) < 16) {
-            person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-        } else {
-            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-        }
+        EducationController.setInitialEducation(campaign, person);
 
         // generate background
         BackgroundsController.generateBackground(campaign, person);

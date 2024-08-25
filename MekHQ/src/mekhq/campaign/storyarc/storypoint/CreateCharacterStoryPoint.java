@@ -32,9 +32,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.randomEvents.PersonalityController;
@@ -180,11 +180,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
 
 
         // set education
-        if (p.getAge(getCampaign().getLocalDate()) < 16) {
-            p.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-        } else {
-            p.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-        }
+        EducationController.setInitialEducation(campaign, p);
 
         // generate background
         BackgroundsController.generateBackground(campaign, p);

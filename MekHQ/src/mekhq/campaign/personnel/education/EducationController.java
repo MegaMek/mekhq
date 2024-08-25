@@ -28,12 +28,14 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -1535,6 +1537,46 @@ public class EducationController {
         Collections.shuffle(graduationEventTable);
 
         return graduationEventTable.get(Compute.randomInt(graduationEventTable.size()));
+    }
+
+    /**
+     * Sets the initial education level for a person based on their age and experience level.
+     *
+     * @param campaign the current campaign
+     * @param person the person whose education level needs to be set
+     */
+    public static void setInitialEducation(Campaign campaign, Person person) {
+        LocalDate today = campaign.getLocalDate();
+
+        // If the person is younger than 16, set their highest education as early childhood
+        if (person.getAge(today) < 16) {
+            person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+            return;
+        }
+
+        int experienceLevel = person.getExperienceLevel(campaign, false);
+
+        // If the person's primary role is support
+        if (person.getPrimaryRole().isSupport(true)) {
+            if (experienceLevel == SkillType.EXP_VETERAN) {
+                // If experience level is Veteran, set Education level as Post Graduate
+                person.setEduHighestEducation(EducationLevel.POST_GRADUATE);
+                return;
+            } else if (experienceLevel == SkillType.EXP_ELITE) {
+                // If experience level is Elite, assign Doctorate level qualification and prefix Dr.
+                person.setEduHighestEducation(EducationLevel.DOCTORATE);
+                person.setPreNominal("Dr");
+                return;
+            }
+        }
+
+        // If the person's experience level is above Ultra-Green, assign College level education
+        // Else, assign them High School level education
+        if (experienceLevel > SkillType.EXP_ULTRA_GREEN) {
+            person.setEduHighestEducation(EducationLevel.COLLEGE);
+        } else {
+            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
+        }
     }
 
     /**
