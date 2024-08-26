@@ -79,7 +79,6 @@ public class AtBDynamicScenarioFactory {
      */
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    private static final int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
     // target number for 2d6 roll of infantry being upgraded to battle armor, indexed by dragoons rating
     private static final int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
 
@@ -517,6 +516,9 @@ public class AtBDynamicScenarioFactory {
         boolean stopGenerating = false;
         String currentLanceWeightString = "";
 
+        // how close to the BV allowance do we want to get?
+        int targetPercentage = 100 + ((Compute.randomInt(8) - 3) * 5);
+
         // Generate a tactical formation (lance/star/etc.) until the BV or unit count limits are exceeded
         while (!stopGenerating) {
             List<Entity> generatedLance;
@@ -716,12 +718,9 @@ public class AtBDynamicScenarioFactory {
             if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
                 // Check random number vs. percentage of the BV budget already generated, with the
                 // percentage chosen based on unit rating
-                int roll = Compute.randomInt(100);
-                double rollTarget = ((double) forceBV / forceBVBudget) * 100;
+                double currentPercentage = ((double) forceBV / forceBVBudget) * 100;
 
-                int unitRating = getUnitRating(campaign);
-
-                stopGenerating = rollTarget > minimumBVPercentage[unitRating] && roll < rollTarget;
+                stopGenerating = currentPercentage > targetPercentage;
             } else {
                 // For generation methods other than scaled BV, compare to the overall budget
                 stopGenerating = generatedEntities.size() >= forceUnitBudget;
@@ -733,6 +732,14 @@ public class AtBDynamicScenarioFactory {
         // If over budget for both BV and unit count, pull units until it works
         while (forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
             generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
+        }
+
+        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+            while (((forceBV / forceBVBudget * 100) > targetPercentage) && (generatedEntities.size() > 1)) {
+                int targetEntity = Compute.randomInt(generatedEntities.size());
+                forceBV -= generatedEntities.get(targetEntity).calculateBattleValue();
+                generatedEntities.remove(targetEntity);
+            }
         }
 
         // Units with infantry bays get conventional infantry or battle armor added
