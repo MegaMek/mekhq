@@ -173,6 +173,7 @@
 		<useQualityMaintenance>true</useQualityMaintenance>
 		<reverseQualityNames>false</reverseQualityNames>
 		<useRandomUnitQualities>false</useRandomUnitQualities>
+        <usePlanetaryModifiers>false</usePlanetaryModifiers>
 		<useUnofficialMaintenance>true</useUnofficialMaintenance>
 		<checkMaintenance>true</checkMaintenance>
 		<maxAcquisitions>0</maxAcquisitions>
@@ -205,11 +206,11 @@
 		<adminsHaveScrounge>false</adminsHaveScrounge>
 		<adminExperienceLevelIncludeNegotiation>false</adminExperienceLevelIncludeNegotiation>
 		<adminExperienceLevelIncludeScrounge>false</adminExperienceLevelIncludeScrounge>
-		<useAdvancedMedical>false</useAdvancedMedical>
+		<useAdvancedMedical>true</useAdvancedMedical>
 		<healWaitingPeriod>1</healWaitingPeriod>
 		<naturalHealingWaitingPeriod>15</naturalHealingWaitingPeriod>
 		<minimumHitsForVehicles>1</minimumHitsForVehicles>
-		<useRandomHitsForVehicles>false</useRandomHitsForVehicles>
+		<useRandomHitsForVehicles>true</useRandomHitsForVehicles>
 		<tougherHealing>false</tougherHealing>
         <maximumPatients>25</maximumPatients>
 		<prisonerCaptureStyle>ATB</prisonerCaptureStyle>
@@ -267,8 +268,10 @@
 			<extraRandomOrigin>true</extraRandomOrigin>
 		</randomOriginOptions>
 		<useRandomPersonalities>true</useRandomPersonalities>
+        <useRandomPersonalityReputation>true</useRandomPersonalityReputation>
+        <useIntelligenceXpMultiplier>true</useIntelligenceXpMultiplier>
 		<useRandomRetirement>true</useRandomRetirement>
-		<turnoverBaseTn>2</turnoverBaseTn>
+		<turnoverBaseTn>1</turnoverBaseTn>
 		<turnoverFrequency>MONTHLY</turnoverFrequency>
 		<aeroRecruitsHaveUnits>true</aeroRecruitsHaveUnits>
 		<trackOriginalUnit>false</trackOriginalUnit>
@@ -381,6 +384,7 @@
 		<enableUnitEducation>true</enableUnitEducation>
 		<enableOverrideRequirements>false</enableOverrideRequirements>
 		<enableShowIneligibleAcademies>false</enableShowIneligibleAcademies>
+		<entranceExamBaseTargetNumber>14</entranceExamBaseTargetNumber>
 		<facultyXpRate>1.0</facultyXpRate>
 		<enableBonuses>true</enableBonuses>
 		<adultDropoutChance>1000</adultDropoutChance>
