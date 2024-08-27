@@ -181,6 +181,9 @@ MEKHQ VERSION HISTORY:
 + PR #4705: Remove unnecessary faction era modifier warning
 + PR #4716: Updated Campaign Presets
 + PR #4718: Added StratCon Introduction Promo on Campaign Start
++ FIX #3769: Fixed Skill Level Retrieval Method in AtBDynamicScenario
++ FIX #4709: Fixed Maintenance Interval Calculations
++ PR #4715: Updated Default Repair Sites
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
