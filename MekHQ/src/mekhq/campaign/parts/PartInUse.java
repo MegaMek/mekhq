@@ -83,16 +83,6 @@ public class PartInUse {
         }
     }
 
-    public PartInUse(String description, IAcquisitionWork partToBuy, Money cost) {
-        this.description = Objects.requireNonNull(description);
-        this.partToBuy = Objects.requireNonNull(partToBuy);
-        this.cost = cost;
-    }
-
-    public PartInUse(String description, IAcquisitionWork partToBuy) {
-        this(description, partToBuy, partToBuy.getBuyCost());
-    }
-
     public String getDescription() {
         return description;
     }
