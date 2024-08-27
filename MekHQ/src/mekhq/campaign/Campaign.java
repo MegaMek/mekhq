@@ -7005,7 +7005,7 @@ public class Campaign implements ITechManager {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutesUsed);
             astechPoolMinutes -= astechsUsed * minutesUsed;
         }
-        u.incrementDaysSinceMaintenance(maintained, astechsUsed);
+        u.incrementDaysSinceMaintenance(this, maintained, astechsUsed);
 
         int ruggedMultiplier = 1;
         if (u.getEntity().hasQuirk(OptionsConstants.QUIRK_POS_RUGGED_1)) {
