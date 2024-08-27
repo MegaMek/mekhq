@@ -5003,6 +5003,7 @@ public class Unit implements ITechnology {
             }
 
             timeIncrease = 1;
+            break;
         }
 
         daysSinceMaintenance += timeIncrease;
@@ -5036,7 +5037,7 @@ public class Unit implements ITechnology {
     }
 
     public int getAstechsMaintained() {
-        return (int) Math.floor((astechDaysMaintained) / daysSinceMaintenance);
+        return (int) Math.floor(astechDaysMaintained / daysSinceMaintenance);
     }
 
     public int getMaintenanceMultiplier() {
