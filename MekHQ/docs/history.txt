@@ -184,6 +184,11 @@ MEKHQ VERSION HISTORY:
 + FIX #3769: Fixed Skill Level Retrieval Method in AtBDynamicScenario
 + FIX #4709: Fixed Maintenance Interval Calculations
 + PR #4715: Updated Default Repair Sites
++ FIX #4622: Set Minimum Size for CustomizePersonDialog UI elemen
++ FIX #4713: Fixed Recursive Node Reader in Force.java
++ FIX #4728: Safety getBay, add unit test, turn down logging in one location
++ FIX #4729: Simplified NullPointerException Message in DataLoadingDialog
++ FIX #4738: Fixed NPE in getEligibleCommanders
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
