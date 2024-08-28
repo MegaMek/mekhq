@@ -436,7 +436,7 @@ public class Force {
     public List<UUID> getEligibleCommanders(Campaign campaign) {
         List<UUID> eligibleCommanders = getUnits().stream()
                 .map(unitId -> campaign.getUnit(unitId).getCommander() != null ?
-                                campaign.getUnit(unitId).getCommander().getId() : null)
+                		campaign.getUnit(unitId).getCommander().getId() : null)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
@@ -521,10 +521,16 @@ public class Force {
      */
     public List<LayeredForceIconOperationalStatus> updateForceIconOperationalStatus(final Campaign campaign) {
         // First, update all subForces, collecting their unit statuses into a single list
-        final List<LayeredForceIconOperationalStatus> statuses = getSubForces().stream().flatMap(subForce -> subForce.updateForceIconOperationalStatus(campaign).stream()).collect(Collectors.toList());
+        final List<LayeredForceIconOperationalStatus> statuses = getSubForces().stream()
+                .flatMap(subForce -> subForce.updateForceIconOperationalStatus(campaign).stream())
+                .collect(Collectors.toList());
 
         // Then, Add the units assigned to this force
-        statuses.addAll(getUnits().stream().map(campaign::getUnit).filter(Objects::nonNull).map(LayeredForceIconOperationalStatus::determineLayeredForceIconOperationalStatus).toList());
+        statuses.addAll(getUnits().stream()
+                .map(campaign::getUnit)
+                .filter(Objects::nonNull)
+                .map(LayeredForceIconOperationalStatus::determineLayeredForceIconOperationalStatus)
+                .toList());
 
         // Can only update the icon for LayeredForceIcons, but still need to return the processed
         // units for parent force updates
@@ -541,7 +547,12 @@ public class Force {
             final int index = (int) Math.round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
             final LayeredForceIconOperationalStatus status = LayeredForceIconOperationalStatus.values()[index];
             ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER, new ArrayList<>());
-            ((LayeredForceIcon) getForceIcon()).getPieces().get(LayeredForceIconLayer.SPECIAL_MODIFIER).add(new ForcePieceIcon(LayeredForceIconLayer.SPECIAL_MODIFIER, MekHQ.getMHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(), status.getFilename()));
+            ((LayeredForceIcon) getForceIcon()).getPieces().get(LayeredForceIconLayer.SPECIAL_MODIFIER)
+                    .add(new ForcePieceIcon(
+                            LayeredForceIconLayer.SPECIAL_MODIFIER,
+                            MekHQ.getMHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
+                            status.getFilename())
+                    );
         }
 
         return statuses;
@@ -697,7 +708,8 @@ public class Force {
                 }
             }
         }
-        units.sort((u1, u2) -> ((Comparable<Integer>) u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric()));
+        units.sort((u1, u2) -> ((Comparable<Integer>) u2.getCommander().getRankNumeric())
+                .compareTo(u1.getCommander().getRankNumeric()));
 
         children.addAll(units);
         children.addAll(unmannedUnits);
