@@ -161,6 +161,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
+        setMinimumSize(new Dimension(1100, 500));
 
         JPanel panDemog = new JPanel(new GridBagLayout());
         JTabbedPane tabStats = new JTabbedPane();
