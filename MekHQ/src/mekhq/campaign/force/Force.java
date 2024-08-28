@@ -434,11 +434,16 @@ public class Force {
      * @return a list of UUIDs representing the eligible commanders
      */
     public List<UUID> getEligibleCommanders(Campaign campaign) {
-        List<UUID> eligibleCommanders = getUnits().stream()
-                .map(unitId -> campaign.getUnit(unitId).getCommander() != null ?
-                		campaign.getUnit(unitId).getCommander().getId() : null)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        List<UUID> eligibleCommanders = new ArrayList<>();
+
+        // don't use a stream here, it's not worth the added risk of an NPE
+        for (UUID unitId : getUnits()) {
+            Unit unit = campaign.getUnit(unitId);
+
+            if ((unit != null) && (unit.getCommander() != null)) {
+                eligibleCommanders.add(unit.getCommander().getId());
+            }
+        }
 
         // this means the force contains no Units, so we check against the leaders of the sub-forces
         if (eligibleCommanders.isEmpty()) {
