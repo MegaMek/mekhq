@@ -2034,7 +2034,6 @@ public class Unit implements ITechnology {
             }
         } catch (Exception ex) {
             LogManager.getLogger().error("Could not parse unit {}", idNode.getTextContent().trim(), ex);
-            return null;
         }
 
         if (version.isLowerThan("0.49.3")) {
