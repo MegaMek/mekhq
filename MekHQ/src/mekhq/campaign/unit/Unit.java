@@ -1943,7 +1943,7 @@ public class Unit implements ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysActivelyMaintained")) {
                     retVal.daysActivelyMaintained = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysSinceMaintenance")) {
-                    retVal.daysSinceMaintenance = Integer.parseInt(wn2.getTextContent());
+                    retVal.daysSinceMaintenance = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballTime")) {
                     retVal.mothballTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("astechDaysMaintained")) {
