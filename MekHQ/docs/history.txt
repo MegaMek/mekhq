@@ -190,6 +190,7 @@ MEKHQ VERSION HISTORY:
 + FIX #4729: Simplified NullPointerException Message in DataLoadingDialog
 + FIX #4738: Fixed NPE in getEligibleCommanders
 + FIX #4742: Fixed Unmarshalling of daysSinceMaintenance
++ PR #4758: MHQ side of fix for MHQ 4755: NPE when opfor has no faction code
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
