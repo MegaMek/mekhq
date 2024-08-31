@@ -927,8 +927,10 @@ public final class BriefingTab extends CampaignGuiTab {
         Game cGame = getCampaign().getGame();
         boolean groundMap = scenario.getBoardType() == AtBScenario.T_GROUND;
         boolean spaceMap = scenario.getBoardType() == AtBScenario.T_SPACE;
+        ArrayList<Entity> alliedEntities = new ArrayList<>();
 
         ArrayList<String> allyFactionCodes = new ArrayList<>();
+        ArrayList<String> opforFactionCodes = new ArrayList<>();
         String opforFactionCode = "IS";
         String allyFaction = "IS";
         int opforQuality = RATING_5;
@@ -938,12 +940,15 @@ public final class BriefingTab extends CampaignGuiTab {
         // This had better be an AtB contract...
         final Mission mission = comboMission.getSelectedItem();
         if (mission instanceof AtBContract atbc) {
-            opforFactionCode = atbc.getEnemyCode();
+            opforFactionCode = (atbc.getEnemyCode().isBlank()) ? opforFactionCode : atbc.getEnemyCode();
             opforQuality = atbc.getEnemyQuality();
             allyFactionCodes.add(atbc.getEmployerCode());
             allyFaction = atbc.getEmployerName(allowedYear);
+        } else {
+            allyFactionCodes.add(allyFaction);
         }
         Faction opforFaction = Factions.getInstance().getFaction(opforFactionCode);
+        opforFactionCodes.add(opforFactionCode);
         boolean isPirate = opforFaction.isRebelOrPirate();
 
         // Collect player units to use as configuration fodder
@@ -958,6 +963,7 @@ public final class BriefingTab extends CampaignGuiTab {
             if (botForce.getName().contains(allyFaction)) {
                 // Stuff with our employer's name should be with us.
                 playerEntities.addAll(botForce.getFixedEntityList());
+                alliedEntities.addAll(botForce.getFixedEntityList());
             } else {
                 int botTeam = botForce.getTeam();
                 if (!botTeamMappings.containsKey(botTeam)) {
@@ -967,10 +973,11 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
+        // Configure generated units with appropriate munitions (for BV calcs)
+        TeamLoadoutGenerator tlg = new TeamLoadoutGenerator(cGame);
+
         // Reconfigure each group separately so they only consider their own capabilities
         for (ArrayList<Entity> entityList: botTeamMappings.values()) {
-            // Configure generated units with appropriate munitions (for BV calcs)
-            TeamLoadoutGenerator tlg = new TeamLoadoutGenerator(cGame);
             // bin fill ratio will be adjusted by the loadout generator based on piracy and quality
             ReconfigurationParameters rp = TeamLoadoutGenerator.generateParameters(
                     cGame,
@@ -988,6 +995,26 @@ public final class BriefingTab extends CampaignGuiTab {
             MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, entityList, "");
             tlg.reconfigureEntities(entityList, opforFactionCode, mt, rp);
         }
+
+        // Finally, reconfigure all allies (but not player entities) as one organization
+        ArrayList<Entity> allEnemyEntities = new ArrayList<>();
+        botTeamMappings.values().stream().forEach(x -> allEnemyEntities.addAll(x));
+        ReconfigurationParameters rp = TeamLoadoutGenerator.generateParameters(
+                cGame,
+                cGame.getOptions(),
+                alliedEntities,
+                allyFactionCodes.get(0),
+                allEnemyEntities,
+                opforFactionCodes,
+                opforQuality,
+                (getCampaign().getFaction().isPirate()) ? TeamLoadoutGenerator.UNSET_FILL_RATIO : 1.0f
+        );
+        rp.isPirate = getCampaign().getFaction().isPirate();
+        rp.groundMap = groundMap;
+        rp.spaceEnvironment = spaceMap;
+        MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, alliedEntities, "");
+        tlg.reconfigureEntities(alliedEntities, allyFactionCodes.get(0), mt, rp);
+
     }
 
     private void joinScenario() {
