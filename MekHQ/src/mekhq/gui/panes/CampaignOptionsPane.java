@@ -277,7 +277,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private final JPanel turnoverAndRetentionSettingsPanel = new JPanel();
     private JLabel lblTurnoverFixedTargetNumber;
     private JSpinner spnTurnoverFixedTargetNumber;
-    private JLabel lblTurnoverFrequency;
     private MMComboBox<TurnoverFrequency> comboTurnoverFrequency;
     private JCheckBox chkUseContractCompletionRandomRetirement;
     private JCheckBox chkUseRandomFounderTurnover;
@@ -285,9 +284,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkAeroRecruitsHaveUnits;
     private JCheckBox chkTrackOriginalUnit;
     private JCheckBox chkUseSubContractSoldiers;
-    private JLabel lblServiceContractDuration;
     private JSpinner spnServiceContractDuration;
-    private JLabel lblServiceContractModifier;
     private JSpinner spnServiceContractModifier;
     private JCheckBox chkPayBonusDefault;
     private JLabel lblPayBonusDefaultThreshold;
@@ -311,11 +308,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // Payout
     private final JPanel turnoverAndRetentionPayoutPanel = new JPanel();
-    private JLabel lblPayoutRateOfficer;
     private JSpinner spnPayoutRateOfficer;
-    private JLabel lblPayoutRateEnlisted;
     private JSpinner spnPayoutRateEnlisted;
-    private JLabel lblPayoutRetirementMultiplier;
     private JSpinner spnPayoutRetirementMultiplier;
     private JCheckBox chkUsePayoutServiceBonus;
 
@@ -344,14 +338,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseFatigue;
 
     private final JPanel fatigueSubPanel = new JPanel();
-    private JLabel lblFatigueWarning;
-    private JLabel lblFatigueRate;
     private JSpinner spnFatigueRate;
     private JCheckBox chkUseInjuryFatigue;
-    private JLabel lblFieldKitchenCapacity;
     private JSpinner spnFieldKitchenCapacity;
     private JCheckBox chkFieldKitchenIgnoreNonCombatants;
-    private JLabel lblFatigueLeaveThreshold;
     private JSpinner spnFatigueLeaveThreshold;
     //endregion Turnover and Retention Tab
 
@@ -519,10 +509,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // Taxes
     private JCheckBox chkUseTaxes;
     private JPanel taxesSubPanel = new JPanel();
-    private JLabel lblTaxesPercentage;
     private JSpinner spnTaxesPercentage;
 
-    private JPanel sharesPanel;
     private JCheckBox chkUseShareSystem;
     private JPanel sharesSubPanel;
     private JCheckBox chkSharesForAll;
@@ -660,9 +648,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // contract operations
     private JCheckBox chkMercSizeLimited;
     private JCheckBox chkRestrictPartsByMission;
-    private JLabel lblBonusPartExchangeValue;
     private JSpinner spnBonusPartExchangeValue;
-    private JLabel lblBonusPartMaxExchangeCount;
     private JSpinner spnBonusPartMaxExchangeCount;
     private JCheckBox chkLimitLanceWeight;
     private JCheckBox chkLimitLanceNumUnits;
@@ -2466,12 +2452,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final AbstractMHQScrollablePanel panRandomSkill = new DefaultMHQScrollablePanel(getFrame(),
                 "skillRandomizationPanel", new GridBagLayout());
 
-        JPanel panRollTable = new JPanel(new GridLayout(8, 3, 5, 0));
+        JPanel panRollTable = new JPanel(new GridLayout(6, 3, 5, 0));
         panRollTable.add(new JLabel("<html><b>Value</b></html>"));
         panRollTable.add(new JLabel("<html><b>Level</b></html>"));
-        panRollTable.add(new JLabel("<html><b># Abils</b></html>"));
+        panRollTable.add(new JLabel("<html><b># Random SPAs</b></html>"));
         panRollTable.add(new JLabel("less than 2"));
-        JLabel lblUltraGreen = new JLabel("Ultra-Green/None");
+        JLabel lblUltraGreen = new JLabel(SkillLevel.ULTRA_GREEN.toString());
         lblUltraGreen.setToolTipText(resources.getString("lblUltraGreen.toolTipText"));
         panRollTable.add(lblUltraGreen);
         panRollTable.add(new JLabel("0"));
@@ -2487,12 +2473,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panRollTable.add(new JLabel("12 or more"));
         panRollTable.add(new JLabel(SkillLevel.ELITE.toString()));
         panRollTable.add(new JLabel("2"));
-        panRollTable.add(new JLabel("N/A"));
-        panRollTable.add(new JLabel(SkillLevel.HEROIC.toString()));
-        panRollTable.add(new JLabel("N/A"));
-        panRollTable.add(new JLabel("N/A"));
-        panRollTable.add(new JLabel(SkillLevel.LEGENDARY.toString()));
-        panRollTable.add(new JLabel("N/A"));
         panRollTable.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("2d6 + Bonus"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -2986,7 +2966,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkRestrictPartsByMission, gridBagConstraints);
 
-        lblBonusPartExchangeValue = new JLabel(resources.getString("lblBonusPartExchangeValue.text"));
+        JLabel lblBonusPartExchangeValue = new JLabel(resources.getString("lblBonusPartExchangeValue.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
@@ -2998,7 +2978,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridy = 4;
         panSubAtBContract.add(spnBonusPartExchangeValue, gridBagConstraints);
 
-        lblBonusPartMaxExchangeCount = new JLabel(resources.getString("lblBonusPartMaxExchangeCount.text"));
+        JLabel lblBonusPartMaxExchangeCount = new JLabel(resources.getString("lblBonusPartMaxExchangeCount.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 1;
@@ -3692,11 +3672,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private void createFatigueSubPanel() {
-        lblFatigueWarning = new JLabel(resources.getString("lblFatigueWarning.text"));
+        JLabel lblFatigueWarning = new JLabel(resources.getString("lblFatigueWarning.text"));
         lblFatigueWarning.setName("lblFatigueWarning");
         lblFatigueWarning.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
-        lblFatigueRate = new JLabel(resources.getString("lblFatigueRate.text"));
+        JLabel lblFatigueRate = new JLabel(resources.getString("lblFatigueRate.text"));
         lblFatigueRate.setToolTipText(resources.getString("lblFatigueRate.toolTipText"));
         lblFatigueRate.setName("lblFatigueRate");
         lblFatigueRate.setEnabled(campaign.getCampaignOptions().isUseFatigue());
@@ -3711,7 +3691,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseInjuryFatigue.setName("chkUseInjuryFatigue");
         chkUseInjuryFatigue.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
-        lblFieldKitchenCapacity = new JLabel(resources.getString("lblFieldKitchenCapacity.text"));
+        JLabel lblFieldKitchenCapacity = new JLabel(resources.getString("lblFieldKitchenCapacity.text"));
         lblFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
         lblFieldKitchenCapacity.setName("lblFieldKitchenCapacity");
         lblFieldKitchenCapacity.setEnabled(campaign.getCampaignOptions().isUseFatigue());
@@ -3726,7 +3706,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkFieldKitchenIgnoreNonCombatants.setName("chkFieldKitchenIgnoreNonCombatants");
         chkFieldKitchenIgnoreNonCombatants.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
-        lblFatigueLeaveThreshold = new JLabel(resources.getString("lblFatigueLeaveThreshold.text"));
+        JLabel lblFatigueLeaveThreshold = new JLabel(resources.getString("lblFatigueLeaveThreshold.text"));
         lblFatigueLeaveThreshold.setToolTipText(resources.getString("lblFatigueLeaveThreshold.toolTipText"));
         lblFatigueLeaveThreshold.setName("lblFatigueLeaveThreshold");
         lblFatigueLeaveThreshold.setEnabled(campaign.getCampaignOptions().isUseFatigue());
@@ -4462,7 +4442,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblTurnoverFixedTargetNumber.setName("lblTurnoverFixedTargetNumber");
         lblTurnoverFixedTargetNumber.setEnabled(isUseTurnover);
 
-        lblTurnoverFrequency = new JLabel(resources.getString("lblTurnoverFrequency.text"));
+        JLabel lblTurnoverFrequency = new JLabel(resources.getString("lblTurnoverFrequency.text"));
         lblTurnoverFrequency.setToolTipText(resources.getString("lblTurnoverFrequency.toolTipText"));
         lblTurnoverFrequency.setName("lblTurnoverFrequency");
         lblTurnoverFrequency.setEnabled(isUseTurnover);
@@ -4513,7 +4493,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseSubContractSoldiers.setName("chkUseSubContractSoldiers");
         chkUseSubContractSoldiers.setEnabled(isUseTurnover);
 
-        lblServiceContractDuration = new JLabel(resources.getString("lblServiceContractDuration.text"));
+        JLabel lblServiceContractDuration = new JLabel(resources.getString("lblServiceContractDuration.text"));
         lblServiceContractDuration.setToolTipText(resources.getString("lblServiceContractDuration.toolTipText"));
         lblServiceContractDuration.setName("lblServiceContractDuration");
         lblServiceContractDuration.setEnabled(isUseTurnover);
@@ -4523,7 +4503,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnServiceContractDuration.setName("spnServiceContractDuration");
         spnServiceContractDuration.setEnabled(isUseTurnover);
 
-        lblServiceContractModifier = new JLabel(resources.getString("lblServiceContractModifier.text"));
+        JLabel lblServiceContractModifier = new JLabel(resources.getString("lblServiceContractModifier.text"));
         lblServiceContractModifier.setToolTipText(resources.getString("lblServiceContractModifier.toolTipText"));
         lblServiceContractModifier.setName("lblServiceContractModifier");
         lblServiceContractModifier.setEnabled(isUseTurnover);
@@ -4754,7 +4734,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel createTurnoverAndRetentionPayoutPanel() {
         boolean isUseTurnover = campaign.getCampaignOptions().isUseRandomRetirement();
 
-        lblPayoutRateOfficer = new JLabel(resources.getString("lblPayoutRateOfficer.text"));
+        JLabel lblPayoutRateOfficer = new JLabel(resources.getString("lblPayoutRateOfficer.text"));
         lblPayoutRateOfficer.setToolTipText(resources.getString("lblPayoutRateOfficer.toolTipText"));
         lblPayoutRateOfficer.setName("lblPayoutRateOfficer");
         lblPayoutRateOfficer.setEnabled(isUseTurnover);
@@ -4764,7 +4744,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPayoutRateOfficer.setName("spnPayoutRateOfficer");
         spnPayoutRateOfficer.setEnabled(isUseTurnover);
 
-        lblPayoutRateEnlisted = new JLabel(resources.getString("lblPayoutRateEnlisted.text"));
+        JLabel lblPayoutRateEnlisted = new JLabel(resources.getString("lblPayoutRateEnlisted.text"));
         lblPayoutRateEnlisted.setToolTipText(resources.getString("lblPayoutRateEnlisted.toolTipText"));
         lblPayoutRateEnlisted.setName("lblPayoutRateEnlisted");
         lblPayoutRateEnlisted.setEnabled(isUseTurnover);
@@ -4774,7 +4754,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPayoutRateEnlisted.setName("lblPayoutRateEnlisted");
         spnPayoutRateEnlisted.setEnabled(isUseTurnover);
 
-        lblPayoutRetirementMultiplier = new JLabel(resources.getString("lblPayoutRetirementMultiplier.text"));
+        JLabel lblPayoutRetirementMultiplier = new JLabel(resources.getString("lblPayoutRetirementMultiplier.text"));
         lblPayoutRetirementMultiplier.setToolTipText(resources.getString("lblPayoutRetirementMultiplier.toolTipText"));
         lblPayoutRetirementMultiplier.setName("lblPayoutRetirementMultiplier");
         lblPayoutRetirementMultiplier.setEnabled(isUseTurnover);
@@ -7435,7 +7415,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel createTaxesSubPanel() {
         boolean isEnabled = campaign.getCampaignOptions().isUseTaxes();
 
-        lblTaxesPercentage = new JLabel();
+        JLabel lblTaxesPercentage = new JLabel();
         lblTaxesPercentage.setText(resources.getString("lblTaxesPercentage.text"));
         lblTaxesPercentage.setToolTipText(resources.getString("lblTaxesPercentage.toolTipText"));
         lblTaxesPercentage.setName("lblTaxesPercentage");
@@ -7478,7 +7458,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         sharesSubPanel = createSharesSubPanel();
 
-        sharesPanel = new JDisableablePanel("sharesPanel");
+        JPanel sharesPanel = new JDisableablePanel("sharesPanel");
         sharesPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("sharesPanel.title")));
 
         final GroupLayout layout = new GroupLayout(sharesPanel);
