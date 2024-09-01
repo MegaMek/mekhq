@@ -1,6 +1,6 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.0-SNAPSHOT (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
+0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
 + PR #4344: Update Payout Calculation for KIA Personnel
 + PR #4345: Updated fatigue display logic in PersonViewPanel
