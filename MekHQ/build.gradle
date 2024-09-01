@@ -326,6 +326,7 @@ tasks.register("packagePrepWork") {
 
 distTar {
     description = 'Creates *nix distribution packaged as a tar ball'
+    duplicatesStrategy = 'exclude'
     dependsOn packagePrepWork
     archiveExtension = 'tar.gz'
     compression = Compression.GZIP
