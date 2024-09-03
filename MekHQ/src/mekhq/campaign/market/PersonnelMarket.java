@@ -130,15 +130,15 @@ public class PersonnelMarket {
 
         if (updated && c.getCampaignOptions().isPersonnelMarketReportRefresh()) {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
+            stringBuilder.append("<a href='PERSONNEL_MARKET'>Personnel market updated:</a>");
             if (c.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops") && !personnel.isEmpty()) {
                 Person person = personnel.get(0);
                 String expLevel = SkillType.getExperienceLevelName(person.getExperienceLevel(c, false));
                 stringBuilder.append("<br><br>A ")
                     .append("<b> ")
-                    .append(person.getExperienceLevel(c, false))
-                    .append(' ')
                     .append(expLevel)
+                    .append(' ')
+                    .append(person.getPrimaryRole().toString())
                     .append("</b>")
                     .append(" named ")
                     .append(person.getFullName())
