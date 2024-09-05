@@ -2104,6 +2104,7 @@ public class Campaign implements ITechManager {
         } else {
             if (p.isPresent()) {
                 piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
+                piu.addSpare(p);
             } else {
                 piu.setTransferCount(piu.getTransferCount() + getQuantity(p));
             }
