@@ -1333,6 +1333,10 @@ public abstract class Part implements IPartWork, ITechnology {
         return quantity;
     }
 
+    public int getSellableQuantity() {
+        return getQuantity();
+    }
+
     /**
      * Increments the number of parts in stock by one.
      */
