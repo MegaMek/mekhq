@@ -47,6 +47,8 @@ import mekhq.campaign.event.UnitArrivedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.ServiceLogger;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.*;
@@ -135,9 +137,9 @@ public class Unit implements ITechnology {
     private int mothballTime;
     private boolean mothballed;
 
-    private int daysSinceMaintenance;
-    private int daysActivelyMaintained;
-    private int astechDaysMaintained;
+    private double daysSinceMaintenance;
+    private double daysActivelyMaintained;
+    private double astechDaysMaintained;
     private int maintenanceMultiplier;
 
     private Campaign campaign;
@@ -1939,13 +1941,13 @@ public class Unit implements ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
                     retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysActivelyMaintained")) {
-                    retVal.daysActivelyMaintained = Integer.parseInt(wn2.getTextContent());
+                    retVal.daysActivelyMaintained = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysSinceMaintenance")) {
-                    retVal.daysSinceMaintenance = Integer.parseInt(wn2.getTextContent());
+                    retVal.daysSinceMaintenance = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballTime")) {
                     retVal.mothballTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("astechDaysMaintained")) {
-                    retVal.astechDaysMaintained = Integer.parseInt(wn2.getTextContent());
+                    retVal.astechDaysMaintained = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceMultiplier")) {
                     retVal.maintenanceMultiplier = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
@@ -4989,11 +4991,25 @@ public class Unit implements ITechnology {
         return retVal * getMaintenanceMultiplier();
     }
 
-    public void incrementDaysSinceMaintenance(boolean maintained, int astechs) {
-        daysSinceMaintenance++;
-        astechDaysMaintained += astechs;
+    public void incrementDaysSinceMaintenance(Campaign campaign, boolean maintained, int astechs) {
+        List<Mission> activeMissions = campaign.getActiveMissions(false);
+        double timeIncrease = 0.25;
+
+        for (Mission mission: activeMissions) {
+            if (mission instanceof AtBContract) {
+                if (((AtBContract) mission).getContractType().isGarrisonDuty()) {
+                    continue;
+                }
+            }
+
+            timeIncrease = 1;
+            break;
+        }
+
+        daysSinceMaintenance += timeIncrease;
+        astechDaysMaintained += astechs * timeIncrease;
         if (maintained) {
-            daysActivelyMaintained++;
+            daysActivelyMaintained += timeIncrease;
         }
     }
 
@@ -5003,7 +5019,7 @@ public class Unit implements ITechnology {
         astechDaysMaintained = 0;
     }
 
-    public int getDaysSinceMaintenance() {
+    public double getDaysSinceMaintenance() {
         return daysSinceMaintenance;
     }
 
@@ -5013,7 +5029,7 @@ public class Unit implements ITechnology {
     //also we will take the average rounded down of the number of astechs to figure out
     //shorthanded penalty
     public double getMaintainedPct() {
-        return (daysActivelyMaintained / (double) daysSinceMaintenance);
+        return (daysActivelyMaintained / daysSinceMaintenance);
     }
 
     public boolean isFullyMaintained() {
@@ -5021,7 +5037,7 @@ public class Unit implements ITechnology {
     }
 
     public int getAstechsMaintained() {
-        return (int) Math.floor((1.0 * astechDaysMaintained) / daysSinceMaintenance);
+        return (int) Math.floor(astechDaysMaintained / daysSinceMaintenance);
     }
 
     public int getMaintenanceMultiplier() {

@@ -402,21 +402,30 @@ public class AtBContract extends Contract {
         getEnemyName(today.getYear()); // we use this to update enemyName
     }
 
+    /**
+     * Retrieves the repair location based on the unit rating and contract type.
+     *
+     * @param unitRating The rating of the unit.
+     * @return The repair location.
+     */
     public int getRepairLocation(final int unitRating) {
-        int repairLocation;
-        if (getContractType().isGuerrillaWarfare() || getContractType().isRaidType()) {
+        int repairLocation = Unit.SITE_FACILITY_BASIC;
+
+        AtBContractType contractType = getContractType();
+
+        if (contractType.isGuerrillaWarfare()) {
             repairLocation = Unit.SITE_IMPROVISED;
-        } else if (!getContractType().isGarrisonType()) {
+        } else if (contractType.isRaidType()) {
             repairLocation = Unit.SITE_FIELD_WORKSHOP;
-        } else {
-            repairLocation = Unit.SITE_FACILITY_BASIC;
+        } else if (contractType.isGarrisonType()) {
+            repairLocation = Unit.SITE_FACILITY_MAINTENANCE;
         }
 
         if (unitRating >= IUnitRating.DRAGOON_B) {
             repairLocation++;
         }
 
-        return Math.min(repairLocation, Unit.SITE_FACILITY_BASIC);
+        return Math.min(repairLocation, Unit.SITE_FACTORY_CONDITIONS);
     }
 
     public void addMoraleMod(int mod) {

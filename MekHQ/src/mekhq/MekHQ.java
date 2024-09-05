@@ -60,7 +60,7 @@ import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.server.Server;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
-import megamek.server.GameManager;
+import megamek.server.totalwarfare.TWGameManager;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -406,7 +406,7 @@ public class MekHQ implements GameListener {
         hostDialog.dispose();
 
         try {
-            myServer = new Server(password, port, new GameManager(), register, metaserver);
+            myServer = new Server(password, port, new TWGameManager(), register, metaserver);
             if (loadSavegame) {
                 FileDialog f = new FileDialog(campaignGUI.getFrame(), "Load Savegame");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");

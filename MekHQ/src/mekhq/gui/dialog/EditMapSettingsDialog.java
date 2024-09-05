@@ -25,7 +25,7 @@ import megamek.common.BoardDimensions;
 import megamek.common.Configuration;
 import megamek.common.MapSettings;
 import megamek.common.util.fileUtils.MegaMekFile;
-import megamek.server.GameManager;
+import megamek.server.totalwarfare.TWGameManager;
 import megamek.server.ServerBoardHelper;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.Scenario;
@@ -147,7 +147,7 @@ public class EditMapSettingsDialog extends JDialog {
         panSizeRandom.add(spnMapY);
 
         comboMapSize = new JComboBox<>();
-        for (BoardDimensions size : GameManager.getBoardSizes()) {
+        for (BoardDimensions size : TWGameManager.getBoardSizes()) {
             comboMapSize.addItem(size);
         }
         if (mapSizeX > 0 & mapSizeY > 0) {

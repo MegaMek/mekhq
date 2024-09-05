@@ -368,6 +368,7 @@ public class CampaignXmlParser {
         timestamp = System.currentTimeMillis();
 
         // Process parts...
+        // Note: Units must have their Entities set prior to reaching this point!
         postProcessParts(retVal, version);
 
         LogManager.getLogger().info(String.format("[Campaign Load] Parts processed in %dms",

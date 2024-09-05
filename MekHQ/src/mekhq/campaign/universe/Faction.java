@@ -372,10 +372,6 @@ public class Faction {
             }
         }
 
-        if ((retVal.eraMods != null) && (retVal.eraMods.length < 9)) {
-            LogManager.getLogger().warn("{} faction did not have a long enough eraMods vector", retVal.fullName);
-        }
-
         return retVal;
     }
 
