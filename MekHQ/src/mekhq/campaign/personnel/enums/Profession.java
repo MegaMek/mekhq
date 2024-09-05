@@ -226,7 +226,7 @@ public enum Profession {
             case "--CIVILIAN":
                 return CIVILIAN;
             default:
-                LogManager.getLogger().error("Cannot get alternate profession for unknown alternative "
+                LogManager.getLogger().debug("Cannot get alternate profession for unknown alternative "
                         + name + " returning MECHWARRIOR.");
                 return MECHWARRIOR;
         }

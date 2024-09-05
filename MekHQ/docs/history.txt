@@ -1,6 +1,8 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.50.0-SNAPSHOT (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
+0.50.01-SNAPSHOT
+
+0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
 + PR #4344: Update Payout Calculation for KIA Personnel
 + PR #4345: Updated fatigue display logic in PersonViewPanel
@@ -177,6 +179,22 @@ MEKHQ VERSION HISTORY:
 + PR #4610: Added Faction Event Changes from Shattered Fortress
 + PR #4686: Adjusted CamOps Personnel Market to Refresh Daily
 + PR #4692: Updated Map Colors to Match Official Colors Where Known
++ PR #4696: Add current edge total to the tech information
++ PR #4705: Remove unnecessary faction era modifier warning
++ PR #4716: Updated Campaign Presets
++ PR #4718: Added StratCon Introduction Promo on Campaign Start
++ FIX #3769: Fixed Skill Level Retrieval Method in AtBDynamicScenario
++ FIX #4709: Fixed Maintenance Interval Calculations
++ PR #4715: Updated Default Repair Sites
++ FIX #4622: Set Minimum Size for CustomizePersonDialog UI elemen
++ FIX #4713: Fixed Recursive Node Reader in Force.java
++ FIX #4728: Safety getBay, add unit test, turn down logging in one location
++ FIX #4729: Simplified NullPointerException Message in DataLoadingDialog
++ FIX #4738: Fixed NPE in getEligibleCommanders
++ FIX #4742: Fixed Unmarshalling of daysSinceMaintenance
++ PR #4758: MHQ side of fix for MHQ 4755: NPE when opfor has no faction code
++ FIX #4697: Refactor salary editing logic and prevent NPE
++ PR #4690: Corrected Experience Generation Logic and Refined Campaign Options GUI
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
