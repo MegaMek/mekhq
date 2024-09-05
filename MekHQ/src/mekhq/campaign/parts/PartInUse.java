@@ -109,10 +109,6 @@ public class PartInUse {
         spares.add(part);
     }
 
-    public void removeSpare(Part part) {
-        spares.remove(part);
-    }
-
     public IAcquisitionWork getPartToBuy() {
         return partToBuy;
     }
