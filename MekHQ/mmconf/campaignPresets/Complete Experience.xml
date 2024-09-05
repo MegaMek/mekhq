@@ -173,6 +173,7 @@
 		<useQualityMaintenance>true</useQualityMaintenance>
 		<reverseQualityNames>false</reverseQualityNames>
 		<useRandomUnitQualities>true</useRandomUnitQualities>
+		<usePlanetaryModifiers>true</usePlanetaryModifiers>
 		<useUnofficialMaintenance>true</useUnofficialMaintenance>
 		<checkMaintenance>true</checkMaintenance>
 		<maxAcquisitions>1</maxAcquisitions>
@@ -267,6 +268,8 @@
 			<extraRandomOrigin>true</extraRandomOrigin>
 		</randomOriginOptions>
 		<useRandomPersonalities>true</useRandomPersonalities>
+        <useRandomPersonalityReputation>true</useRandomPersonalityReputation>
+        <useIntelligenceXpMultiplier>true</useIntelligenceXpMultiplier>
 		<useRandomRetirement>true</useRandomRetirement>
 		<turnoverBaseTn>3</turnoverBaseTn>
 		<turnoverFrequency>MONTHLY</turnoverFrequency>
@@ -381,6 +384,7 @@
 		<enableUnitEducation>true</enableUnitEducation>
 		<enableOverrideRequirements>false</enableOverrideRequirements>
 		<enableShowIneligibleAcademies>false</enableShowIneligibleAcademies>
+		<entranceExamBaseTargetNumber>14</entranceExamBaseTargetNumber>
 		<facultyXpRate>1.0</facultyXpRate>
 		<enableBonuses>true</enableBonuses>
 		<adultDropoutChance>1000</adultDropoutChance>
@@ -479,7 +483,7 @@
 		<unitMarketMethod>ATB_MONTHLY</unitMarketMethod>
 		<unitMarketRegionalMechVariations>true</unitMarketRegionalMechVariations>
 		<unitMarketSpecialUnitChance>30</unitMarketSpecialUnitChance>
-		<unitMarketRarityModifier>0</unitMarketRarityModifier>
+        <unitMarketRarityModifier>0</unitMarketRarityModifier>
 		<instantUnitMarketDelivery>true</instantUnitMarketDelivery>
 		<unitMarketReportRefresh>true</unitMarketReportRefresh>
 		<contractMarketMethod>ATB_MONTHLY</contractMarketMethod>
@@ -512,9 +516,9 @@
 		<playerControlsAttachedUnits>true</playerControlsAttachedUnits>
 		<atbBattleChance>0,0,0,0</atbBattleChance>
 		<generateChases>false</generateChases>
-		<useWeatherConditions>false</useWeatherConditions>
-		<useLightConditions>false</useLightConditions>
-		<usePlanetaryConditions>false</usePlanetaryConditions>
+		<useWeatherConditions>true</useWeatherConditions>
+		<useLightConditions>true</useLightConditions>
+		<usePlanetaryConditions>true</usePlanetaryConditions>
 		<useStrategy>true</useStrategy>
 		<baseStrategyDeployment>3</baseStrategyDeployment>
 		<additionalStrategyDeployment>1</additionalStrategyDeployment>

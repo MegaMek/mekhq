@@ -31,6 +31,7 @@ import mekhq.gui.panes.CampaignOptionsPane;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
 
 /**
@@ -97,7 +98,7 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
         final JPanel panel = new JPanel(new GridLayout(1, 0));
 
         panel.add(new MMButton("btnOkay", resources, "Confirm.text", null,
-                this::okButtonActionPerformed));
+                this::okButtonPerformedShowStratConNotice));
 
         panel.add(new MMButton("btnSavePreset", resources, "btnSavePreset.text",
                 "btnSavePreset.toolTipText", evt -> btnSaveActionPerformed()));
@@ -114,6 +115,55 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
                 this::cancelActionPerformed));
 
         return panel;
+    }
+
+    /**
+     * Performs the action when the Ok button is clicked, which includes invoking the
+     * {@link #okButtonActionPerformed(ActionEvent)} method and then the {@link #showStratConNotice()} method.
+     *
+     * @param e the ActionEvent triggering this method
+     */
+    private void okButtonPerformedShowStratConNotice(ActionEvent e) {
+        okButtonActionPerformed(e);
+        showStratConNotice();
+    }
+
+    /**
+     * Displays a promo introducing users to StratCon.
+     * This method shows the promo only when the Campaign Options pane is closed
+     * and the current day is the first day of the campaign.
+     */
+    private void showStratConNotice() {
+        // we don't store whether this dialog has previously appeared,
+        // instead we just have it appear only when Campaign Options is closed,
+        // the current day is the first day of the campaign, and StratCon is enabled
+        if (!campaign.getCampaignOptions().isUseStratCon() || !campaign.getLocalDate().equals(campaign.getCampaignStartDate())) {
+            return;
+        }
+
+        ImageIcon imageIcon = new ImageIcon("data/images/stratcon/stratConPromo.png");
+        JLabel imageLabel = new JLabel(imageIcon);
+        JPanel imagePanel = new JPanel(new GridBagLayout());
+        imagePanel.add(imageLabel);
+
+        String title = resources.getString("stratConPromo.title");
+
+        String message = resources.getString("stratConPromo.message");
+        JLabel messageLabel = new JLabel(message);
+        JPanel messagePanel = new JPanel(new GridBagLayout());
+        messagePanel.add(messageLabel);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(imagePanel);
+        panel.add(messagePanel);
+
+        Object[] options = {
+                resources.getString("stratConPromo.button")
+        };
+
+        JOptionPane.showOptionDialog(null, panel, title, JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
     }
 
     @Override

@@ -3,6 +3,7 @@ package mekhq.gui.model;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IPartWork;
@@ -106,8 +107,17 @@ public class TechTableModel extends DataTableModel {
             first = false;
         }
 
-        toReturn.append(String.format(" (%d XP)<br/>", tech.getXP()))
-                .append(String.format("%d minutes left", tech.getMinutesLeft()));
+        toReturn.append(String.format(" (%d XP", tech.getXP()));
+        // if Edge usage is allowed for techs, display remaining edge in the dialogue
+        if (getCampaign().getCampaignOptions().isUseSupportEdge()
+            && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)) {
+                toReturn.append(String.format(", %d Edge)", tech.getCurrentEdge()));
+        } else {
+            toReturn.append(")");
+        }
+        toReturn.append("<br/>");
+
+        toReturn.append(String.format("%d minutes left", tech.getMinutesLeft()));
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", tech.getOvertimeLeft()));
         }
