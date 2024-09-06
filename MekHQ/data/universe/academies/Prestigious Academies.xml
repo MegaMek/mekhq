@@ -323,7 +323,7 @@
         <qualification>JumpShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -385,7 +385,7 @@
         <qualification>JumpShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -956,7 +956,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Scrounge, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Scrounge</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -1147,7 +1147,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -1212,7 +1212,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -1382,7 +1382,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -1403,7 +1403,7 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -1426,7 +1426,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -1449,7 +1449,7 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -1558,7 +1558,7 @@
         <name>Dieron Warriors' Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Dieron Warriors Academy on Shimonita annually produces skilled MechWarriors. Graduates are favored for recruitment into the renowned Dieron Regulars, showcasing the academy's pivotal role in regional military development. All five BattleMech regiment commanders have roots in both the Dieron draft and Sun Zhang MechWarrior Academy, highlighting the DWA's lasting influence.</description>
+        <description>The Dieron Warriors Academy on Shimonita annually produces skilled MechWarriors. Graduates are favored for recruitment into the renowned Dieron Regulars, showcasing the academy's pivotal role in regional military development. All five BattleMek regiment commanders have roots in both the Dieron draft and Sun Zhang MechWarrior Academy, highlighting the DWA's lasting influence.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Shimonita</locationSystem>
@@ -1596,7 +1596,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -2388,7 +2388,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -2457,7 +2457,7 @@
         <qualification>Senior Medical Technician</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -2525,7 +2525,7 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Goshen BattleMech Academy</name>
+        <name>Goshen BattleMek Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The War College of Goshen, founded by Generals Alexander and Truscott, is a renowned private military academy in the Federated Suns, celebrated for its production of capable combat leaders.</description>
@@ -2586,7 +2586,7 @@
         <name>Hachiman Technical Institute</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Hachiman Technical Institute specializes in battlefield repair and technical training, focusing on maintaining BattleMechs, aerospace fighters, and DropShips. It admits candidates rejected by other Draconis Combine military academies, as well as select trade school graduates.</description>
+        <description>The Hachiman Technical Institute specializes in battlefield repair and technical training, focusing on maintaining BattleMeks, aerospace fighters, and DropShips. It admits candidates rejected by other Draconis Combine military academies, as well as select trade school graduates.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Hachiman</locationSystem>
@@ -2600,7 +2600,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Technician</qualification>
@@ -2615,7 +2615,7 @@
         <name>Hero Training Institute [Cap Rouge]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Situated on Sillery's continent, the Hero Training Institute - Cap Rouge provides training programs for aspiring BattleMech and aerospace fighter pilots.</description>
+        <description>Situated on Sillery's continent, the Hero Training Institute - Cap Rouge provides training programs for aspiring BattleMek and aerospace fighter pilots.</description>
         <locationSystem>Cap Rouge</locationSystem>
         <constructionYear>3072</constructionYear>
         <tuition>35000</tuition>
@@ -2705,7 +2705,7 @@
         <name>Hero Training Institute [Sterling]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Hero Training Institute's Sterling campus sits near Starlight on the Graham continent, offering training for BattleMech and aerospace fighter pilots. Sterling is among several new HTI campuses established to meet the heightened demand for military training.</description>
+        <description>The Hero Training Institute's Sterling campus sits near Starlight on the Graham continent, offering training for BattleMek and aerospace fighter pilots. Sterling is among several new HTI campuses established to meet the heightened demand for military training.</description>
         <locationSystem>Sterling</locationSystem>
         <constructionYear>3074</constructionYear>
         <tuition>35000</tuition>
@@ -3110,7 +3110,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Technician</qualification>
@@ -3148,7 +3148,7 @@
         <qualification>Senior Medical Technician</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Aerospace Technician</qualification>
@@ -3197,7 +3197,7 @@
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -3660,10 +3660,10 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Malinovsky BattleMech and Tank Academy</name>
+        <name>Malinovsky BattleMek and Tank Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Specializing in armored warfare, the Malinovsky Academy is a formidable institution that combines the proud heritage of Russian military engineering with the advanced technology of BattleMechs. Its cadets are rigorously trained in both theoretical knowledge and practical application, making them highly sought after for their expertise in handling the heavy metal titans on the battlefield.</description>
+        <description>Specializing in armored warfare, the Malinovsky Academy is a formidable institution that combines the proud heritage of Russian military engineering with the advanced technology of BattleMeks. Its cadets are rigorously trained in both theoretical knowledge and practical application, making them highly sought after for their expertise in handling the heavy metal titans on the battlefield.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
@@ -3691,10 +3691,10 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Malinovsky BattleMech and Tank Academy (Officer)</name>
+        <name>Malinovsky BattleMek and Tank Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Specializing in armored warfare, the Malinovsky Academy is a formidable institution that combines the proud heritage of Russian military engineering with the advanced technology of BattleMechs. Its cadets are rigorously trained in both theoretical knowledge and practical application, making them highly sought after for their expertise in handling the heavy metal titans on the battlefield.</description>
+        <description>Specializing in armored warfare, the Malinovsky Academy is a formidable institution that combines the proud heritage of Russian military engineering with the advanced technology of BattleMeks. Its cadets are rigorously trained in both theoretical knowledge and practical application, making them highly sought after for their expertise in handling the heavy metal titans on the battlefield.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
@@ -3725,7 +3725,7 @@
         <name>Marshalry Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Marshalry Academy trains Marshals in the Fronc Reaches. Since 3075, instruction has taken place in Freedom's Ring, with equal emphasis on law enforcement and combat training. Due to a lack of simulators, cadets learn using the BattleMechs of the instructing Marshals. This hands-on approach ensures that graduates are well-versed in both maintaining order and engaging in combat within the Reaches.</description>
+        <description>The Marshalry Academy trains Marshals in the Fronc Reaches. Since 3075, instruction has taken place in Freedom's Ring, with equal emphasis on law enforcement and combat training. Due to a lack of simulators, cadets learn using the BattleMeks of the instructing Marshals. This hands-on approach ensures that graduates are well-versed in both maintaining order and engaging in combat within the Reaches.</description>
         <locationSystem>Fronc</locationSystem>
         <constructionYear>3075</constructionYear>
         <tuition>13125</tuition>
@@ -3743,7 +3743,7 @@
         <name>Marshalry Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Marshalry Academy trains Marshals in the Fronc Reaches. Since 3075, instruction has taken place in Freedom's Ring, with equal emphasis on law enforcement and combat training. Due to a lack of simulators, cadets learn using the BattleMechs of the instructing Marshals. This hands-on approach ensures that graduates are well-versed in both maintaining order and engaging in combat within the Reaches.</description>
+        <description>The Marshalry Academy trains Marshals in the Fronc Reaches. Since 3075, instruction has taken place in Freedom's Ring, with equal emphasis on law enforcement and combat training. Due to a lack of simulators, cadets learn using the BattleMeks of the instructing Marshals. This hands-on approach ensures that graduates are well-versed in both maintaining order and engaging in combat within the Reaches.</description>
         <locationSystem>Fronc</locationSystem>
         <constructionYear>3075</constructionYear>
         <tuition>13125</tuition>
@@ -4047,7 +4047,7 @@
         <name>Military Academy of Somerset</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Military Academy of Somerset, a small institution focused on BattleMech and aerospace fighter training.</description>
+        <description>The Military Academy of Somerset, a small institution focused on BattleMek and aerospace fighter training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Somerset</locationSystem>
@@ -4095,7 +4095,7 @@
         <name>Military Academy of Somerset (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Military Academy of Somerset, a small institution focused on BattleMech and aerospace fighter training.</description>
+        <description>The Military Academy of Somerset, a small institution focused on BattleMek and aerospace fighter training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Somerset</locationSystem>
@@ -4211,7 +4211,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -4276,7 +4276,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -4314,7 +4314,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Technician</qualification>
@@ -4430,7 +4430,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -4498,7 +4498,7 @@
         <qualification>Senior Medical Technician</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -4649,7 +4649,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -4702,7 +4702,7 @@
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -4800,7 +4800,7 @@
         <name>Osaka Fields Proving Grounds</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Osaka Fields Proving Grounds stands as the largest of its kind in the Draconis Combine. Spread across every district and prefecture capital, these facilities offer entry into the DCMS for individuals beyond the noble classes. Osaka Fields encompasses an abandoned military base from the Succession Wars era, untamed wilderness, and three live-fire ranges tailored for BattleMech training.</description>
+        <description>The Osaka Fields Proving Grounds stands as the largest of its kind in the Draconis Combine. Spread across every district and prefecture capital, these facilities offer entry into the DCMS for individuals beyond the noble classes. Osaka Fields encompasses an abandoned military base from the Succession Wars era, untamed wilderness, and three live-fire ranges tailored for BattleMek training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Benjamin</locationSystem>
@@ -4919,7 +4919,7 @@
         <qualification>300-Grade Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>300-Grade BattleMech Technician</qualification>
+        <qualification>300-Grade BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>300-Grade Advanced Vehicle Technician</qualification>
@@ -4988,7 +4988,7 @@
         <qualification>400-Grade Medical Technician</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>400-Grade BattleMech Technician</qualification>
+        <qualification>400-Grade BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>400-Grade Vehicle Technician</qualification>
@@ -5012,7 +5012,7 @@
         <name>Pacifica Training School</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Pacifica Training School stands as one of the Lyran Commonwealth’s foremost MechWarrior training centers. Cadets engage in a series of solo cockpit missions, with each mission increasing in difficulty. They pilot full-size, fully operational BattleMechs within a specially designed arena, which replicates genuine battlefield conditions.</description>
+        <description>Pacifica Training School stands as one of the Lyran Commonwealth’s foremost MechWarrior training centers. Cadets engage in a series of solo cockpit missions, with each mission increasing in difficulty. They pilot full-size, fully operational BattleMeks within a specially designed arena, which replicates genuine battlefield conditions.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Chara (Pacifica)</locationSystem>
@@ -5114,7 +5114,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -5346,7 +5346,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Technician</qualification>
@@ -5388,7 +5388,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Aerospace Technician</qualification>
@@ -5587,7 +5587,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -5639,7 +5639,7 @@
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -5691,7 +5691,7 @@
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -5743,7 +5743,7 @@
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -5795,7 +5795,7 @@
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -5846,7 +5846,7 @@
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -5898,7 +5898,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -5950,7 +5950,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -6002,7 +6002,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -6053,7 +6053,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -6313,7 +6313,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -6378,7 +6378,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -6696,7 +6696,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -6755,7 +6755,7 @@
         <qualification>High Path - Medical</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>High Path - BattleMech Technician</qualification>
+        <qualification>High Path - BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>High Path - Vehicle Technician</qualification>
@@ -7082,7 +7082,7 @@
         <name>Tancredi War College</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Tancredi War College offers specialized courses in infantry, artillery, BattleMech, and aerospace disciplines, with a strong focus on infantry and artillery training. These programs are designed to enhance combat skills and physical prowess, reflecting Tancredi IV’s martial culture.</description>
+        <description>The Tancredi War College offers specialized courses in infantry, artillery, BattleMek, and aerospace disciplines, with a strong focus on infantry and artillery training. These programs are designed to enhance combat skills and physical prowess, reflecting Tancredi IV’s martial culture.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Tancredi IV</locationSystem>
@@ -7221,7 +7221,7 @@
         <qualification>Senior Medical Technician</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -7290,7 +7290,7 @@
         <qualification>Senior Medical Technician</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -7311,7 +7311,7 @@
         <name>The War College of Goshen</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The War College of Goshen, initially established as the Goshen BattleMech Academy, is a prestigious private military academy in the Federated Suns. Situated on Goshen's Tiberian continent, the college expanded its curriculum within a decade to incorporate aerospace programs, prompting a name change to reflect its comprehensive military training offerings.</description>
+        <description>The War College of Goshen, initially established as the Goshen BattleMek Academy, is a prestigious private military academy in the Federated Suns. Situated on Goshen's Tiberian continent, the college expanded its curriculum within a decade to incorporate aerospace programs, prompting a name change to reflect its comprehensive military training offerings.</description>
         <locationSystem>Goshen</locationSystem>
         <constructionYear>2960</constructionYear>
         <tuition>8750</tuition>
@@ -7367,7 +7367,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -7420,7 +7420,7 @@
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -7633,7 +7633,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Technician</qualification>
@@ -7674,7 +7674,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Aerospace Technician</qualification>
@@ -7872,7 +7872,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Technician</qualification>
@@ -8014,7 +8014,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Astech</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Astech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Vehicle Technician</qualification>
@@ -8076,7 +8076,7 @@
         <qualification>Senior Medical Technician</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
+        <qualification>Senior BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
@@ -8117,7 +8117,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor, Astech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
+        <qualification>BattleMek Technician</qualification>
         <curriculum>Tech/Mech, Astech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Technician</qualification>
@@ -8132,7 +8132,7 @@
         <name>War College of Tamar</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The War College of Tamar is renowned for producing adept tacticians, strategists, and outstanding administrators. While the academy's curriculum emphasizes leadership and administrative skills over combat, it also offers training in BattleMech and aerospace operations.</description>
+        <description>The War College of Tamar is renowned for producing adept tacticians, strategists, and outstanding administrators. While the academy's curriculum emphasizes leadership and administrative skills over combat, it also offers training in BattleMek and aerospace operations.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Tamar</locationSystem>
@@ -8159,7 +8159,7 @@
         <name>War College of Tamar [3025]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The War College of Tamar is renowned for producing adept tacticians, strategists, and outstanding administrators. While the academy's curriculum emphasizes leadership and administrative skills over combat, it also provides training in BattleMech and aerospace operations. Destroyed by the DCMS in 2915, it was later rebuilt under the initiative of Archon Katrina Steiner.</description>
+        <description>The War College of Tamar is renowned for producing adept tacticians, strategists, and outstanding administrators. While the academy's curriculum emphasizes leadership and administrative skills over combat, it also provides training in BattleMek and aerospace operations. Destroyed by the DCMS in 2915, it was later rebuilt under the initiative of Archon Katrina Steiner.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Tamar</locationSystem>

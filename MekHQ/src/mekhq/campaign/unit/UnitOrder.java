@@ -210,7 +210,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         //TODO: support vehicles
         if (entity instanceof Mech) {
             if (!((Mech) entity).isIndustrial()) {
-                target.addModifier(0, "BattleMech");
+                target.addModifier(0, "BattleMek");
             } else {
                 target.addModifier(-1, "IndustrialMech");
             }

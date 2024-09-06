@@ -1023,7 +1023,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>New power in Marik</headline> <!-- Source: House Marik (The Free Worlds League) -->
         <date>2484</date>
-        <desc><![CDATA[<p>Pounding its way onto the battlefield in Marik Guard colors is the newest BattleMech force outside of the Terran Hegemony's control.</p>]]></desc>
+        <desc><![CDATA[<p>Pounding its way onto the battlefield in Marik Guard colors is the newest BattleMek force outside of the Terran Hegemony's control.</p>]]></desc>
         <service>IMI</service>
         <location>Marik</location>
     </newsItem>
@@ -1088,7 +1088,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>SLDF fields new technology</headline> <!-- Source: MUL online -->
         <date>2630</date>
-        <desc><![CDATA[<p>A new era of war-fighting is upon us as one of the most technologically advanced BattleMechs has completed field-testing on Terra. The <em>Exterminator</em> has several new advances integrated that are still listed as classified. While several reports indicate that it will bring about a change in doctrine for several decades, the secrecy lends one to believe that the SLDF has a special mission in mind for this new 'Mek.</p>]]></desc>
+        <desc><![CDATA[<p>A new era of war-fighting is upon us as one of the most technologically advanced BattleMeks has completed field-testing on Terra. The <em>Exterminator</em> has several new advances integrated that are still listed as classified. While several reports indicate that it will bring about a change in doctrine for several decades, the secrecy lends one to believe that the SLDF has a special mission in mind for this new 'Mek.</p>]]></desc>
         <service>TNN</service>
         <location>Terra</location>
     </newsItem>
@@ -1130,7 +1130,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Replacement for aging bugs revealed to military commanders</headline> <!-- Source: Technical Readout: 2750 -->
         <date>2742</date>
-        <desc><![CDATA[<p>An announcement by Mitchell Vehicles has generated mixed feelings about their newest BattleMech chassis. The <em>Mercury</em> was designed to replace older models of the <em>Wasp</em> and <em>Stinger</em> and has left some force commanders wondering if it can stand up to its promises. While the specifics of the new chassis are still being revealed, a press meeting with Mitchell representatives was less than forthcoming stating only that "Mitchell has invested significant resources and technical expertise in the development of this new BattleMech."</p>]]></desc>
+        <desc><![CDATA[<p>An announcement by Mitchell Vehicles has generated mixed feelings about their newest BattleMek chassis. The <em>Mercury</em> was designed to replace older models of the <em>Wasp</em> and <em>Stinger</em> and has left some force commanders wondering if it can stand up to its promises. While the specifics of the new chassis are still being revealed, a press meeting with Mitchell representatives was less than forthcoming stating only that "Mitchell has invested significant resources and technical expertise in the development of this new BattleMek."</p>]]></desc>
         <service>TNN</service>
         <location>Terra</location>
     </newsItem>
@@ -1139,7 +1139,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Factories destroyed on Caph, General Systems in trouble</headline> <!-- Source: Technical Readout: 3050 Upgrade -->
         <date>2793</date>
-        <desc><![CDATA[<p>The General Systems factories on Caph are the latest casualties of the ongoing hostilities gripping the Inner Sphere. Material losses are reported to be catastrophic while the human cost is currently being calculated. Forces from several Successor States were involved in a battle that leveled the production facility and the surrounding areas. Bombardments from all sides have turned several populated areas into ruins over the last few months. Capellan forces have since taken the remaining facilities. This facility was the only producer of the <em>Exterminator</em> BattleMech in the Inner Sphere.</p>]]></desc>
+        <desc><![CDATA[<p>The General Systems factories on Caph are the latest casualties of the ongoing hostilities gripping the Inner Sphere. Material losses are reported to be catastrophic while the human cost is currently being calculated. Forces from several Successor States were involved in a battle that leveled the production facility and the surrounding areas. Bombardments from all sides have turned several populated areas into ruins over the last few months. Capellan forces have since taken the remaining facilities. This facility was the only producer of the <em>Exterminator</em> BattleMek in the Inner Sphere.</p>]]></desc>
         <service>FNS</service>
         <location>Caph</location>
     </newsItem>
@@ -1153,7 +1153,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Mercury refits for longer life</headline> <!-- Source: Technical Readout: 2750 -->
         <date>2810</date>
-        <desc><![CDATA[<p>The <em>Mercury</em> BattleMech, a staple design since 2742 has been the most recent candidate for refits based on the increasing rarity of the original parts. Several systems have been replaced to more common models which has allowed the <em>MCY-98</em> to increase its armor protection. Unfortunately, these downgrades are removing some of the most prominent features of the speedy 'Mek and leaves pilots relying on that additional protection from enemies they would normally out run."</p>]]></desc>
+        <desc><![CDATA[<p>The <em>Mercury</em> BattleMek, a staple design since 2742 has been the most recent candidate for refits based on the increasing rarity of the original parts. Several systems have been replaced to more common models which has allowed the <em>MCY-98</em> to increase its armor protection. Unfortunately, these downgrades are removing some of the most prominent features of the speedy 'Mek and leaves pilots relying on that additional protection from enemies they would normally out run."</p>]]></desc>
         <service>TNN</service>
         <location>Terra</location>
     </newsItem>
@@ -1211,14 +1211,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Kalidasa's 'Mek Factory Assaulted</headline> <!-- Source: TBD -->
         <date>3000-02</date>
-        <desc><![CDATA[<p>Filed 23 January 3000</p> <p>In a daring raid, persons unknown attacked Kalidasa’s 'Mek Factory today. The attackers struck before dawn with unknown intent, however attempts to steal BattleMechs coming off the production line failed when security forces overran the primary hostile force.</p>]]></desc>
+        <desc><![CDATA[<p>Filed 23 January 3000</p> <p>In a daring raid, persons unknown attacked Kalidasa’s 'Mek Factory today. The attackers struck before dawn with unknown intent, however attempts to steal BattleMeks coming off the production line failed when security forces overran the primary hostile force.</p>]]></desc>
         <service>CNB</service>
         <location>Kalidasa</location>
     </newsItem>
     <newsItem>
         <headline>Hesperus II under attack</headline> <!-- Source: House Steiner (The Lyran Commonwealth) --> <!-- No canon date -->
         <date>3000-04-02</date>
-        <desc><![CDATA[<p>Filed 28 March 3000</p> <p>Three days ago, House Kurita was able to push through the aerospace coverage of Hesperus II and land one BattleMech regiment and its support elements. Since that time, they have made periodic raids of defenders here on the starport hoping to push the ELH out...<em>*muffled scream from off-camera* "INCOMING"</em>... of the starport leaving the way for more Kurita reinforcements, that we hear are inbound. This is Sylvia Denzel for <em>*explosions rips through the concourse where the reporter is*</em></p>]]></desc>
+        <desc><![CDATA[<p>Filed 28 March 3000</p> <p>Three days ago, House Kurita was able to push through the aerospace coverage of Hesperus II and land one BattleMek regiment and its support elements. Since that time, they have made periodic raids of defenders here on the starport hoping to push the ELH out...<em>*muffled scream from off-camera* "INCOMING"</em>... of the starport leaving the way for more Kurita reinforcements, that we hear are inbound. This is Sylvia Denzel for <em>*explosions rips through the concourse where the reporter is*</em></p>]]></desc>
         <service>TBC</service>
         <location>Hesperus II</location>
     </newsItem>
@@ -1379,7 +1379,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Javelins of the Fourth Deneb Light Cavalry strike from the depths, decimating Kurita force and forcing retreat from planet Cylene II</headline> <!-- Source: Technical Readout: 3025 Revised -->
         <date>3003-03</date>
-        <desc><![CDATA[<p>Last year, on Cylene II, a daring and unexpected attack was carried out by the Fourth Deneb Light Cavalry against a passing force of the Kurita. The Cavalry had concealed their BattleMechs in a recreational lake known as Waterhole Number Nine, remaining undetected as the enemy focused on a nearby defensive line. As the Kurita force passed by, the Cavalry emerged from the lake and launched a surprise attack from behind, using their <em>Javelins</em> to inflict heavy losses on the enemy. The disorganized and confused Kurita were forced to retreat and evacuate the planet shortly after the battle.</p>]]></desc>
+        <desc><![CDATA[<p>Last year, on Cylene II, a daring and unexpected attack was carried out by the Fourth Deneb Light Cavalry against a passing force of the Kurita. The Cavalry had concealed their BattleMeks in a recreational lake known as Waterhole Number Nine, remaining undetected as the enemy focused on a nearby defensive line. As the Kurita force passed by, the Cavalry emerged from the lake and launched a surprise attack from behind, using their <em>Javelins</em> to inflict heavy losses on the enemy. The disorganized and confused Kurita were forced to retreat and evacuate the planet shortly after the battle.</p>]]></desc>
         <service>NANS</service>
         <location>New Avalon</location>
     </newsItem>
@@ -1652,7 +1652,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Solaris City's newest sensation: Ishiyama "Stone Mountain" arena opens its doors for high-stakes Mech battles!</headline> <!-- Source: TBD --> <!-- May not be correct as the entry for the arena states a construction date of 2785 -->
         <date>3007</date>
-        <desc><![CDATA[<p>Ladies and gentlemen, hold onto your seats because the newest and most thrilling arena is coming to Solaris City! The Ishiyama "Stone Mountain" arena, located in the heart of the Kobe District, will be the premier destination for all your gladiatorial needs. With state-of-the-art technology and the ability to host up to 34,000 spectators, the Ishiyama arena promises to be the ultimate destination for all BattleMech enthusiasts.</p> <p>From the famous one-on-one duels, to the all-out free-for-all brawls, the Ishiyama arena has something for everyone. And with the best pilots and 'Meks from across the Inner Sphere competing, you can be sure that every match will be a nail-biting experience.</p> <p>So mark your calendars and get ready for the experience of a lifetime. The Ishiyama "Stone Mountain" arena is the place to be for all your BattleMech action needs. See you in the stands!</p>]]></desc>
+        <desc><![CDATA[<p>Ladies and gentlemen, hold onto your seats because the newest and most thrilling arena is coming to Solaris City! The Ishiyama "Stone Mountain" arena, located in the heart of the Kobe District, will be the premier destination for all your gladiatorial needs. With state-of-the-art technology and the ability to host up to 34,000 spectators, the Ishiyama arena promises to be the ultimate destination for all BattleMek enthusiasts.</p> <p>From the famous one-on-one duels, to the all-out free-for-all brawls, the Ishiyama arena has something for everyone. And with the best pilots and 'Meks from across the Inner Sphere competing, you can be sure that every match will be a nail-biting experience.</p> <p>So mark your calendars and get ready for the experience of a lifetime. The Ishiyama "Stone Mountain" arena is the place to be for all your BattleMek action needs. See you in the stands!</p>]]></desc>
         <service>Solaris VII News Network</service>
         <location>Solaris VII</location>
     </newsItem>
@@ -1673,7 +1673,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Kallon Industries Teases Revolutionary New Project</headline> <!-- Source: Technical Readout: 3058 Upgrade -->
         <date>3007</date>
-        <desc><![CDATA[<p>Kallon Industries, the premier manufacturer of BattleMechs and aerospace fighters, has announced that they are working on a special project that is set to revolutionize the way we think about warfare. While details are scarce at this time, the company promises that the project will be revealed later in the year and will be a game changer for military forces across the Inner Sphere.</p> <p>Industry experts are already speculating about what the project could be, with some suggesting that it could be a new type of BattleMech, while others believe it could be a new aerospace fighter design. Whatever it is, one thing is for sure: Kallon Industries is pushing the boundaries of technology and the military world will be watching closely when the project is revealed. Stay tuned for more updates as they become available.</p>]]></desc>
+        <desc><![CDATA[<p>Kallon Industries, the premier manufacturer of BattleMeks and aerospace fighters, has announced that they are working on a special project that is set to revolutionize the way we think about warfare. While details are scarce at this time, the company promises that the project will be revealed later in the year and will be a game changer for military forces across the Inner Sphere.</p> <p>Industry experts are already speculating about what the project could be, with some suggesting that it could be a new type of BattleMek, while others believe it could be a new aerospace fighter design. Whatever it is, one thing is for sure: Kallon Industries is pushing the boundaries of technology and the military world will be watching closely when the project is revealed. Stay tuned for more updates as they become available.</p>]]></desc>
         <service>Irian News Interstellar</service>
         <location>Thermopolis</location>
     </newsItem>
@@ -1785,7 +1785,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>House Davion, Mercenaries Attack New Aragon</headline> <!-- Source: Wolf's Dragoons -->
         <date>3008-03-30</date>
-        <desc><![CDATA[<p>Yesterday ten BattleMech regiments, along with more than twice that in conventional forces, from the Federated Suns attacked the Capellan world of New Aragon. The Capellan Confederation Armed Forces, long expecting the attack, had already gathered eight BattleMech regiments to repulse them.<p>Half the Suns forces are the elite and mysterious Wolf's Dragoons mercenaries who have made such a name for themselves along the Capellan border for the last several years. The Dragoons, who have founded what seems a feud with the Capellan-employed mercenaries known as McCarron's Armored Calvary, are heavily involved in the initial attacks.</p> <p>Speaking from New Avalon, First Prince Ian Davion cheered the no-doubt coordinated assault, calling New Aragon "the crown jewel of the Sarna Commonality" and a keystone in the Capellan defense strategy.</p> <p>Capellan military spokespersons have refused comment, but the fact that our Blessed Order's representatives were able to speak to Crucis Lancer officers on-planet certainly suggest the Davion landings were successful.</p>]]></desc>
+        <desc><![CDATA[<p>Yesterday ten BattleMek regiments, along with more than twice that in conventional forces, from the Federated Suns attacked the Capellan world of New Aragon. The Capellan Confederation Armed Forces, long expecting the attack, had already gathered eight BattleMek regiments to repulse them.<p>Half the Suns forces are the elite and mysterious Wolf's Dragoons mercenaries who have made such a name for themselves along the Capellan border for the last several years. The Dragoons, who have founded what seems a feud with the Capellan-employed mercenaries known as McCarron's Armored Calvary, are heavily involved in the initial attacks.</p> <p>Speaking from New Avalon, First Prince Ian Davion cheered the no-doubt coordinated assault, calling New Aragon "the crown jewel of the Sarna Commonality" and a keystone in the Capellan defense strategy.</p> <p>Capellan military spokespersons have refused comment, but the fact that our Blessed Order's representatives were able to speak to Crucis Lancer officers on-planet certainly suggest the Davion landings were successful.</p>]]></desc>
         <service>CNB</service>
         <location>New Aragon</location>
     </newsItem>
@@ -1855,7 +1855,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Dragoons New Mystery 'Mek</headline> <!-- Source: Wolf's Dragoons (sourcebook); Edited date in-line with information from  Wolf's Dragoons (sourcebook)-->
         <date>3010</date>
-        <desc><![CDATA[<p>When the Wolf's Dragoons returned to New Valencia in December 3009, they returned with more new, pristine war machines that no one had seen in centuries. Or in several cases, ever before.<p>One such case is a massive, slow assault 'Mek we've heard is called an <em>Annihilator</em>. This beast stumps around with no hands and four deadly autocannons, each of them equal to the guns carried by Davion <em>Enforcer</em> or <em>Centurion</em> BattleMechs. None of the Dragoons are willing to tell us where these and other 'Mek came from, where they were built, or how many more of them there might be.</p> <p>Once again, the mysterious Dragoons pose more questions than they can answer.</p>]]></desc>
+        <desc><![CDATA[<p>When the Wolf's Dragoons returned to New Valencia in December 3009, they returned with more new, pristine war machines that no one had seen in centuries. Or in several cases, ever before.<p>One such case is a massive, slow assault 'Mek we've heard is called an <em>Annihilator</em>. This beast stumps around with no hands and four deadly autocannons, each of them equal to the guns carried by Davion <em>Enforcer</em> or <em>Centurion</em> BattleMeks. None of the Dragoons are willing to tell us where these and other 'Mek came from, where they were built, or how many more of them there might be.</p> <p>Once again, the mysterious Dragoons pose more questions than they can answer.</p>]]></desc>
         <service>FSNS</service>
         <location>New Valencia</location>
     </newsItem>
@@ -1918,7 +1918,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Merlin's debut</headline> <!-- Source: MUL Online -->
         <date>3010-05-15</date>
-        <desc><![CDATA[<p>The military community was shocked earlier this month to learn that the Mountain Wolf BattleMechs (MWBM) factory on Alpheratz was rebuilt in secret by the Outworld's Alliance and just recently produced its first new BattleMech. Even more surprising was the news that the 'Mek was of a brand new design, dubbed the <em>Merlin</em> by MWBM, it is a sturdy heavy 'Mek that uses parts common throughout the Inner Sphere and Periphery. The news of a new 'Mek has the military community quite excited as this is the first entirely new design in over 100 years. MWBM is reported to already have a line of customers interested in purchasing the new 'Meks just as quickly as they can make them.</p>]]></desc>
+        <desc><![CDATA[<p>The military community was shocked earlier this month to learn that the Mountain Wolf BattleMeks (MWBM) factory on Alpheratz was rebuilt in secret by the Outworld's Alliance and just recently produced its first new BattleMek. Even more surprising was the news that the 'Mek was of a brand new design, dubbed the <em>Merlin</em> by MWBM, it is a sturdy heavy 'Mek that uses parts common throughout the Inner Sphere and Periphery. The news of a new 'Mek has the military community quite excited as this is the first entirely new design in over 100 years. MWBM is reported to already have a line of customers interested in purchasing the new 'Meks just as quickly as they can make them.</p>]]></desc>
         <service>CNB</service>
         <location>Alpheratz</location>
     </newsItem>
@@ -2317,7 +2317,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Mysterious Green Warhammer Spotted with Wolf's Dragoons on Nova Roma</headline> <!-- Source: Historical: Brush Wars -->
         <date>3014-08</date>
-        <desc><![CDATA[<p>Reports have been flooding in from the front lines of Nova Roma, where a green Warhammer BattleMech has been seen operating alongside the legendary mercenary unit, Wolf's Dragoons. The question on everyone's mind is whether this is the infamous Bounty Hunter or just another copycat trying to capitalize on the notorious mercenary's reputation.</p> <p>The Bounty Hunter is well-known for bringing in high-value targets, usually dead. With a civil war raging in the Marik Commonwealth, the appearance of a BattleMech with such a notorious reputation is sure to cause a stir. Many are speculating on what kind of trouble this enigmatic mercenary is looking to stir up on Nova Roma.</p> <p>For now, the identity of the pilot behind the controls of the green Warhammer remains a mystery. But, as the Marik Civil War continues to escalate, all eyes are on Nova Roma and the potential impact the Bounty Hunter may have on the outcome of the conflict.</p>]]></desc>
+        <desc><![CDATA[<p>Reports have been flooding in from the front lines of Nova Roma, where a green Warhammer BattleMek has been seen operating alongside the legendary mercenary unit, Wolf's Dragoons. The question on everyone's mind is whether this is the infamous Bounty Hunter or just another copycat trying to capitalize on the notorious mercenary's reputation.</p> <p>The Bounty Hunter is well-known for bringing in high-value targets, usually dead. With a civil war raging in the Marik Commonwealth, the appearance of a BattleMek with such a notorious reputation is sure to cause a stir. Many are speculating on what kind of trouble this enigmatic mercenary is looking to stir up on Nova Roma.</p> <p>For now, the identity of the pilot behind the controls of the green Warhammer remains a mystery. But, as the Marik Civil War continues to escalate, all eyes are on Nova Roma and the potential impact the Bounty Hunter may have on the outcome of the conflict.</p>]]></desc>
         <service>Mercenaries Today</service>
         <location>Nova Roma</location>
     </newsItem>
@@ -2366,7 +2366,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Mystery Surrounds Disappearance of Black Widow: Rumors Abound of Defeat by the Infamous Bounty Hunter</headline> <!-- Source: Historical: Wolf's Dragoons -->
         <date>3014-09</date>
-        <desc><![CDATA[<p>The mercenary world is buzzing with rumors of a major defeat for legendary warrior Natasha Kerensky, known as the "Black Widow." Reports have surfaced of a green Marauder-class BattleMech operating in the vicinity of recent conflicts in the Marik Civil War, sparking speculation that the legendary Bounty Hunter has claimed yet another high-value target.</p> <p>While there have been no confirmed witnesses to the alleged defeat of Kerensky, her absence from the battlefield has many in the Inner Sphere questioning her fate. With a reputation for being one of the deadliest MechWarriors in the galaxy, the notion that she has fallen in combat is causing a stir among military and mercenary circles alike.</p> <p>Adding fuel to the rumors is the recent increase in sightings of a green Marauder in Marik space, a Mech model often associated with the Wolf's Dragoons mechwarrior. Some experts believe that the Bounty Hunter may be responsible for Kerensky's disappearance, although there is no concrete evidence to support the claim.</p> <p>Regardless of the truth behind these rumors, it is clear that the mercenary world is on the edge of their seats as they await further developments in this mysterious and intriguing case.</p>]]></desc>
+        <desc><![CDATA[<p>The mercenary world is buzzing with rumors of a major defeat for legendary warrior Natasha Kerensky, known as the "Black Widow." Reports have surfaced of a green Marauder-class BattleMek operating in the vicinity of recent conflicts in the Marik Civil War, sparking speculation that the legendary Bounty Hunter has claimed yet another high-value target.</p> <p>While there have been no confirmed witnesses to the alleged defeat of Kerensky, her absence from the battlefield has many in the Inner Sphere questioning her fate. With a reputation for being one of the deadliest MechWarriors in the galaxy, the notion that she has fallen in combat is causing a stir among military and mercenary circles alike.</p> <p>Adding fuel to the rumors is the recent increase in sightings of a green Marauder in Marik space, a Mech model often associated with the Wolf's Dragoons mechwarrior. Some experts believe that the Bounty Hunter may be responsible for Kerensky's disappearance, although there is no concrete evidence to support the claim.</p> <p>Regardless of the truth behind these rumors, it is clear that the mercenary world is on the edge of their seats as they await further developments in this mysterious and intriguing case.</p>]]></desc>
         <service>Mercenaries Today</service>
         <location>Galatea</location>
     </newsItem>
@@ -2406,9 +2406,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>New Home</location>
     </newsItem>
     <newsItem>
-        <headline>Light BattleMech gets additional firepower</headline> <!-- Source: MUL Online -->
+        <headline>Light BattleMek gets additional firepower</headline> <!-- Source: MUL Online -->
         <date>3015</date>
-        <desc><![CDATA[<p>Engineers at Coventry Metal works recently finished testing a new variant of the venerable <em>Commando</em> BattleMech. Taking a lesson from field reports and history, the hard-hitting short range firepower was modified to incorporate a single large laser. This harkens back to the original model introduced in 2463 and has shown promise in keeping the lightly armored scout in the field longer by reducing the need for resupply and keeping it further from combat.</p>]]></desc>
+        <desc><![CDATA[<p>Engineers at Coventry Metal works recently finished testing a new variant of the venerable <em>Commando</em> BattleMek. Taking a lesson from field reports and history, the hard-hitting short range firepower was modified to incorporate a single large laser. This harkens back to the original model introduced in 2463 and has shown promise in keeping the lightly armored scout in the field longer by reducing the need for resupply and keeping it further from combat.</p>]]></desc>
         <service>DBC</service>
         <location>Coventry</location>
     </newsItem>
@@ -2632,7 +2632,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>New Weapon in the Lyran Arsenal: Defiance Industries' SturmFeur Tank Passes Tests with Flying Colors</headline> <!-- Source: Technical Readout: 3026 Revised -->
         <date>3018</date>
-        <desc><![CDATA[<p>Defiance Industries, the renowned BattleMech and military vehicle manufacturer, has announced that their latest creation, the <em>SturmFeur Heavy Tank</em>, has been successfully tested and accepted into service by the Lyran Commonwealth Armed Forces (LCAF).</p> <p>The <em>SturmFeur Heavy Tank</em> is a powerful missile platform that provides both direct and indirect support to LCAF forces. Designed to withstand even the toughest combat conditions, the <em>SturmFeur</em> has proven its capabilities in various simulations and live-fire tests.</p> <p>"We're thrilled to see the <em>SturmFeur</em> receive such a warm welcome from the Lyran Commonwealth Armed Forces," said a Defiance Industries spokesperson. "The <em>SturmFeur</em> is the result of years of research and development, and we're confident that it will be a valuable asset to the LCAF in their ongoing efforts to maintain peace and security."</p> <p>The LCAF has praised the <em>SturmFeur</em> for its versatility and reliability, and have already begun integrating it into their armored formations. The addition of the <em>SturmFeur</em> Heavy Tank to the LCAF's arsenal is expected to significantly enhance their overall combat capabilities.</p> <p>Defiance Industries is a trusted supplier of military hardware to the Lyran Commonwealth and other states, and has a reputation for delivering cutting-edge technology to support the defense of their clients. With the successful testing and acceptance of the <em>SturmFeur</em> Heavy Tank, Defiance Industries continues to live up to their reputation as a leading producer of military hardware.</p> <p>In a statement, the LCAF expressed their appreciation for Defiance Industries' continued support and dedication to providing the best possible equipment for their troops. "The em>SturmFeur Heavy Tank</em> is a welcome addition to our arsenal," the statement read. "We look forward to putting it to use in the defense of the Lyran Commonwealth."</p>]]></desc>
+        <desc><![CDATA[<p>Defiance Industries, the renowned BattleMek and military vehicle manufacturer, has announced that their latest creation, the <em>SturmFeur Heavy Tank</em>, has been successfully tested and accepted into service by the Lyran Commonwealth Armed Forces (LCAF).</p> <p>The <em>SturmFeur Heavy Tank</em> is a powerful missile platform that provides both direct and indirect support to LCAF forces. Designed to withstand even the toughest combat conditions, the <em>SturmFeur</em> has proven its capabilities in various simulations and live-fire tests.</p> <p>"We're thrilled to see the <em>SturmFeur</em> receive such a warm welcome from the Lyran Commonwealth Armed Forces," said a Defiance Industries spokesperson. "The <em>SturmFeur</em> is the result of years of research and development, and we're confident that it will be a valuable asset to the LCAF in their ongoing efforts to maintain peace and security."</p> <p>The LCAF has praised the <em>SturmFeur</em> for its versatility and reliability, and have already begun integrating it into their armored formations. The addition of the <em>SturmFeur</em> Heavy Tank to the LCAF's arsenal is expected to significantly enhance their overall combat capabilities.</p> <p>Defiance Industries is a trusted supplier of military hardware to the Lyran Commonwealth and other states, and has a reputation for delivering cutting-edge technology to support the defense of their clients. With the successful testing and acceptance of the <em>SturmFeur</em> Heavy Tank, Defiance Industries continues to live up to their reputation as a leading producer of military hardware.</p> <p>In a statement, the LCAF expressed their appreciation for Defiance Industries' continued support and dedication to providing the best possible equipment for their troops. "The em>SturmFeur Heavy Tank</em> is a welcome addition to our arsenal," the statement read. "We look forward to putting it to use in the defense of the Lyran Commonwealth."</p>]]></desc>
         <service>BattleTechnology News Service</service>
         <location>Hesperus II</location>
     </newsItem>
@@ -2644,9 +2644,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>New Samarkand</location>
     </newsItem>
     <newsItem>
-        <headline>The Free Worlds League's new BattleMech, the Liberator, doomed, reputation damaged and contracts cancelled</headline> <!-- Source: MUL -->
+        <headline>The Free Worlds League's new BattleMek, the Liberator, doomed, reputation damaged and contracts cancelled</headline> <!-- Source: MUL -->
         <date>3018-10</date>
-        <desc><![CDATA[<p>The Free Worlds League's new BattleMech, the <em>Liberator</em>, was doomed by a severe flaw in its cooling system, according to a recent report. The development of the <em>Liberator</em> was sparked by evidence that the Lyran Commonwealth and Capellan Confederation were both working on new 'Meks of their own. The <em>Liberator</em> was intended to be the first produced by the League in centuries, but its revolutionary torso design ultimately led to the failure of its cooling system. The flaws were revealed at the first public unveiling earlier this year, leading to the cancellation of the marketing and contracts and damaging the reputation of Kali Yama Industries.</p>]]></desc>
+        <desc><![CDATA[<p>The Free Worlds League's new BattleMek, the <em>Liberator</em>, was doomed by a severe flaw in its cooling system, according to a recent report. The development of the <em>Liberator</em> was sparked by evidence that the Lyran Commonwealth and Capellan Confederation were both working on new 'Meks of their own. The <em>Liberator</em> was intended to be the first produced by the League in centuries, but its revolutionary torso design ultimately led to the failure of its cooling system. The flaws were revealed at the first public unveiling earlier this year, leading to the cancellation of the marketing and contracts and damaging the reputation of Kali Yama Industries.</p>]]></desc>
         <service>CNB</service>
         <location>Kalidasa</location>
     </newsItem>
@@ -2668,7 +2668,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Truth Massacre</headline> <!-- Source: House Liao (The Capellan Confederation) -->
         <date>3020-09-22</date>
-        <desc><![CDATA[<p>Capellan Confederation media reports that mercenaries have attacked Truth and butchered the population. Initial estimates indicate that as many as 50,000 people were killed, some dragged from their homes and executed, others fired upon by the mercenary BattleMechs as they fled. So far there has been no official response from the Capellan government. ComStar has denounced the mercenaries and branded them rogue.</p>]]></desc>
+        <desc><![CDATA[<p>Capellan Confederation media reports that mercenaries have attacked Truth and butchered the population. Initial estimates indicate that as many as 50,000 people were killed, some dragged from their homes and executed, others fired upon by the mercenary BattleMeks as they fled. So far there has been no official response from the Capellan government. ComStar has denounced the mercenaries and branded them rogue.</p>]]></desc>
         <service>CNB</service>
         <location>Truth</location>
     </newsItem>
@@ -2708,9 +2708,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Galatea</location>
     </newsItem>
     <newsItem>
-        <headline>BattleMech defeated by lone hovertank in test runs</headline> <!-- Source: Technical Readout: 3026 (Revised) -->
+        <headline>BattleMek defeated by lone hovertank in test runs</headline> <!-- Source: Technical Readout: 3026 (Revised) -->
         <date>3025</date>
-        <desc><![CDATA[<p>S.L. Lewis Incorporated has recently released test footage of their new product dubbed the <em>Savannah Master</em>. This footage shows a lone sample of the hovertank disabling a light BattleMech. Several prominent MechWarriors have already stated that this is less an indication of efficiency and more a flaw in their choice of test pilot. The <em>Savannah Master</em> is equipped with a single medium laser but has a top speed in excess of 200 kph making it one of the fastest ground vehicles ever manufactured. This speed coupled with the fusion engine and energy weapon ensure that this vehicle can spend several days in the field with only driver fatigue as an issue. Several corporations are reportedly interested in purchasing the new vehicle for quick response security forces.</p>]]></desc>
+        <desc><![CDATA[<p>S.L. Lewis Incorporated has recently released test footage of their new product dubbed the <em>Savannah Master</em>. This footage shows a lone sample of the hovertank disabling a light BattleMek. Several prominent MechWarriors have already stated that this is less an indication of efficiency and more a flaw in their choice of test pilot. The <em>Savannah Master</em> is equipped with a single medium laser but has a top speed in excess of 200 kph making it one of the fastest ground vehicles ever manufactured. This speed coupled with the fusion engine and energy weapon ensure that this vehicle can spend several days in the field with only driver fatigue as an issue. Several corporations are reportedly interested in purchasing the new vehicle for quick response security forces.</p>]]></desc>
         <service>CNB</service>
         <location>Carlisle</location>
     </newsItem>
@@ -2736,9 +2736,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>New Earth</location>
     </newsItem>
     <newsItem>
-        <headline>New BattleMech astonishes crowd in CCAF parade</headline> <!-- Source: MUL online -->
+        <headline>New BattleMek astonishes crowd in CCAF parade</headline> <!-- Source: MUL online -->
         <date>3025</date>
-        <desc><![CDATA[<p>The Capellan Confederation military once again proves its superiority over the other Successor States with the development of an entirely new BattleMech. The <em>Cataphract</em> will crush the enemies of the Chancellor and help in returning the seat of the Star League to its destined owner. The people of the Confederation will reclaim what is rightfully theirs.</p>]]></desc>
+        <desc><![CDATA[<p>The Capellan Confederation military once again proves its superiority over the other Successor States with the development of an entirely new BattleMek. The <em>Cataphract</em> will crush the enemies of the Chancellor and help in returning the seat of the Star League to its destined owner. The people of the Confederation will reclaim what is rightfully theirs.</p>]]></desc>
         <service>CBS</service>
         <location>Grand Base</location>
     </newsItem>
@@ -2759,7 +2759,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>ComStar Publishing releases new technical readout files</headline> <!-- Source: Technical Readout: 3025 Revised -->
         <date>3025-07</date>
-        <desc><![CDATA[<p>Filed 05 June 3025</p> <p>ComStar Publishing has released a new technical readout showcasing many of the more common BattleMech designs. While this is no way complete, the Order hopes that readers will find these data collections useful in the field. Blessed is the Word of Blake.</p>]]></desc>
+        <desc><![CDATA[<p>Filed 05 June 3025</p> <p>ComStar Publishing has released a new technical readout showcasing many of the more common BattleMek designs. While this is no way complete, the Order hopes that readers will find these data collections useful in the field. Blessed is the Word of Blake.</p>]]></desc>
         <service>CNB</service>
         <location>Terra</location>
     </newsItem>
@@ -2773,7 +2773,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>AFFS Announced Operation Galahad</headline>
         <date>3026-08-10</date>
-        <desc><![CDATA[<p>The Armed Forces of the Federated Suns announced Operation Galahad today. These wargames will be some of the largest ever conducted, involving ten regiments of AFFS BattleMechs and more than 100 infantry and armor regiments.</p> <p>According the AFFS spokespersons, Galahad is "intended to increase our vigilance by rehearsing defensive troop movements so that if one of our enemies dares attack us, we can make a devastating retaliation."</p> <p>Pundits have called the exercises expensive, disruptive and controversial, but as ever, House Davion's military follows the orders of the First Prince.</p>]]></desc>
+        <desc><![CDATA[<p>The Armed Forces of the Federated Suns announced Operation Galahad today. These wargames will be some of the largest ever conducted, involving ten regiments of AFFS BattleMeks and more than 100 infantry and armor regiments.</p> <p>According the AFFS spokespersons, Galahad is "intended to increase our vigilance by rehearsing defensive troop movements so that if one of our enemies dares attack us, we can make a devastating retaliation."</p> <p>Pundits have called the exercises expensive, disruptive and controversial, but as ever, House Davion's military follows the orders of the First Prince.</p>]]></desc>
         <service>FSNS</service>
         <location>New Avalon</location>
     </newsItem>
@@ -2801,7 +2801,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>AFFS Announced Operation Galahad '27</headline>
         <date>3027-01</date>
-        <desc><![CDATA[<p>The Armed Forces of the Federated Suns announced a repetition of last year's Operation Galahad, named Galahad 3027. These wargames will be some even larger than last year's, involving 30 regiments of AFFS BattleMechs and more than 200 infantry and armor regiments.</p> <p>In order to make these massive troop movements, the Davion government announced sweeping plans to briefly nationalize a number of the nation's merchant marine hulls. The exact numbers of JumpShips and DropShips requisitioned was not released, but sources say the number is "substantial."</p> <p>Pundits have repeated calls that the exercises are expensive, disruptive, and have condemned the unquestionably effect this will have on the Suns' domestic economy.</p> <p>Our Lyran bureaus are reporting that the LCAF is running a similar exercise in Steiner space, called Operation Thor.</p>]]></desc>
+        <desc><![CDATA[<p>The Armed Forces of the Federated Suns announced a repetition of last year's Operation Galahad, named Galahad 3027. These wargames will be some even larger than last year's, involving 30 regiments of AFFS BattleMeks and more than 200 infantry and armor regiments.</p> <p>In order to make these massive troop movements, the Davion government announced sweeping plans to briefly nationalize a number of the nation's merchant marine hulls. The exact numbers of JumpShips and DropShips requisitioned was not released, but sources say the number is "substantial."</p> <p>Pundits have repeated calls that the exercises are expensive, disruptive, and have condemned the unquestionably effect this will have on the Suns' domestic economy.</p> <p>Our Lyran bureaus are reporting that the LCAF is running a similar exercise in Steiner space, called Operation Thor.</p>]]></desc>
         <service>FSNS</service>
         <location>New Avalon</location>
     </newsItem>
@@ -2855,9 +2855,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Tharkad</location>
     </newsItem>
     <newsItem>
-        <headline>TharHes Industries reveals new light BattleMech</headline> <!-- Source: MUL Online -->
+        <headline>TharHes Industries reveals new light BattleMek</headline> <!-- Source: MUL Online -->
         <date>3028-02-21</date>
-        <desc><![CDATA[<p>The Public Information Office at TharHes Industries on Tharkad has issued a press release with details of their newest light BattleMech model. Designated the <em>Wolfhound</em>, it is designed to operate for long periods away from supply lines. While much of the information regarding the new chassis is still classified, the spokesperson stated that the simulations have proven the capabilities of the machine. The LCAF will be receiving the majority of the first runs and combat trials are expected to begin on several planets.</p>]]></desc>
+        <desc><![CDATA[<p>The Public Information Office at TharHes Industries on Tharkad has issued a press release with details of their newest light BattleMek model. Designated the <em>Wolfhound</em>, it is designed to operate for long periods away from supply lines. While much of the information regarding the new chassis is still classified, the spokesperson stated that the simulations have proven the capabilities of the machine. The LCAF will be receiving the majority of the first runs and combat trials are expected to begin on several planets.</p>]]></desc>
         <service>TBC</service>
         <location>Tharkad</location>
     </newsItem>
@@ -2871,7 +2871,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Gray Death Legion commits war crimes</headline> <!-- Source: The Price of Glory -->
         <date>3028-04-24</date>
-        <desc><![CDATA[<p>ComStar has issued a declaration stating that the mercenary unit, the Gray Death Legion, commanded by Grayson Carlyle is now listed as Wanted and all remaining assets not with the unit have been frozen or seized. Reports indicate that a lance of Legion BattleMechs destroyed a biosphere habitat on Sirius V causing the death of over 12-million civilians. Officials from the Free Worlds League has called for a formal inquiry of the unit as well as an immediate annulment of their contract. Bounties are expected to be issued in the next few weeks on Grayson Carlyle and his forces.</p>]]></desc>
+        <desc><![CDATA[<p>ComStar has issued a declaration stating that the mercenary unit, the Gray Death Legion, commanded by Grayson Carlyle is now listed as Wanted and all remaining assets not with the unit have been frozen or seized. Reports indicate that a lance of Legion BattleMeks destroyed a biosphere habitat on Sirius V causing the death of over 12-million civilians. Officials from the Free Worlds League has called for a formal inquiry of the unit as well as an immediate annulment of their contract. Bounties are expected to be issued in the next few weeks on Grayson Carlyle and his forces.</p>]]></desc>
         <service>CNB</service>
         <location>Sirius V</location>
     </newsItem>
@@ -2976,7 +2976,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>"Toothpuller" sighted with Sorenson's Sabres</headline> <!-- Source: Sword and Dragon -->
         <date>3038</date>
-        <desc><![CDATA[<p>The personal BattleMech of Melinda Carlyle, "Toothpuller" is rumored to now be in the hands of Sorenson's Sabres. Carlyle was featured as a notable <em>Panther</em> pilot in the ComStar published Technical Readout: 3025. Witnesses claim the BattleMech was severely damaged and that it appeared the cockpit was destroyed. No word from Hansen's Roughriders has announced the death of Carlyle and at this time the DCMS has refused to comment on any actions on Delacruz.</p>]]></desc>
+        <desc><![CDATA[<p>The personal BattleMek of Melinda Carlyle, "Toothpuller" is rumored to now be in the hands of Sorenson's Sabres. Carlyle was featured as a notable <em>Panther</em> pilot in the ComStar published Technical Readout: 3025. Witnesses claim the BattleMek was severely damaged and that it appeared the cockpit was destroyed. No word from Hansen's Roughriders has announced the death of Carlyle and at this time the DCMS has refused to comment on any actions on Delacruz.</p>]]></desc>
         <service>MercNet</service>
         <location>Galatea</location>
     </newsItem>
@@ -3074,14 +3074,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Rumors stirring of new <em>Phoenix Hawks</em> in Federated Commonwealth</headline> <!-- Source: MUL Online -->
         <date>3043</date>
-        <desc><![CDATA[<p>Several sources on contested planets near the Federated Commonwealth border have indicated that a new model of <em>Phoenix Hawk</em> have been sighted. An ancient design, unmistakable BattleMech has rumored to be packing more of a punch than usual while staying out of range of its opponents. The AFFC media liaison has not returned any requests for verification of this information so we can only speculate on what this means.</p>]]></desc>
+        <desc><![CDATA[<p>Several sources on contested planets near the Federated Commonwealth border have indicated that a new model of <em>Phoenix Hawk</em> have been sighted. An ancient design, unmistakable BattleMek has rumored to be packing more of a punch than usual while staying out of range of its opponents. The AFFC media liaison has not returned any requests for verification of this information so we can only speculate on what this means.</p>]]></desc>
         <service>FBC</service>
         <location>Outreach</location>
     </newsItem>
     <newsItem>
         <headline>New aerospace fighter launched</headline> <!-- Source: MUL Online -->
         <date>3044</date>
-        <desc><![CDATA[<p>Glory to the Dragon! The Draconis Combine again proves its mastery over the fraudulent and corrupt Successor States who claim to have a right to the Star League. Death will rain from the heavens in the newest variant of the <em>Slayer</em>, a true marvel of engineering from Wakazashi Enterprises. Technological advancements have made this the most deadly fighter of its class and will defeat many times its weight in BattleMechs.</p>]]></desc>
+        <desc><![CDATA[<p>Glory to the Dragon! The Draconis Combine again proves its mastery over the fraudulent and corrupt Successor States who claim to have a right to the Star League. Death will rain from the heavens in the newest variant of the <em>Slayer</em>, a true marvel of engineering from Wakazashi Enterprises. Technological advancements have made this the most deadly fighter of its class and will defeat many times its weight in BattleMeks.</p>]]></desc>
         <service>VotD</service>
         <location>Dover</location>
     </newsItem>
@@ -3109,14 +3109,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>New technologies for aging industries</headline> <!-- Source: TechManual -->
         <date>3045</date>
-        <desc><![CDATA[<p>IndustrialMech manufacturing companies across the Inner Sphere are being upgraded with a recently developed form of myomer. This myomer allows for heavier loads to be transported as it increases the strength of the IndustrialMech exponentially. There are already massive orders for this new equipment and stock prices for companies proven to be suppliers of the myomer have risen significantly. Several Solaris VII stables are reportedly purchasing large quantities of this enhanced myomer, since there are no current events for IndustrialMechs one can only assume that they will be attempting to modify it for BattleMechs.</p>]]></desc>
+        <desc><![CDATA[<p>IndustrialMech manufacturing companies across the Inner Sphere are being upgraded with a recently developed form of myomer. This myomer allows for heavier loads to be transported as it increases the strength of the IndustrialMech exponentially. There are already massive orders for this new equipment and stock prices for companies proven to be suppliers of the myomer have risen significantly. Several Solaris VII stables are reportedly purchasing large quantities of this enhanced myomer, since there are no current events for IndustrialMechs one can only assume that they will be attempting to modify it for BattleMeks.</p>]]></desc>
         <service>CNB</service>
         <location>Outreach</location>
     </newsItem>
     <newsItem>
-        <headline>Venerable command BattleMech gets facelift</headline> <!-- Source: MUL Online -->
+        <headline>Venerable command BattleMek gets facelift</headline> <!-- Source: MUL Online -->
         <date>3045</date>
-        <desc><![CDATA[<p>The <em>Cyclops</em>, a common command BattleMech, has been fielded with a new variant, the CP-11-A. Sacrificing some of the short-range power of the Zeus-36 autocannon, the new model is equipped with a Zeus Slingshot Gauss Rifle which has an incredible range of 660 meters. While slightly less powerful, this new weapon system allows a commander or other pilot to engage enemies from ranges that many 'Meks will struggle to effectively return fire from. This upgrade is also one of many produced locally within the Free Worlds League by Irian BattleMechs Unlimited.</p>]]></desc>
+        <desc><![CDATA[<p>The <em>Cyclops</em>, a common command BattleMek, has been fielded with a new variant, the CP-11-A. Sacrificing some of the short-range power of the Zeus-36 autocannon, the new model is equipped with a Zeus Slingshot Gauss Rifle which has an incredible range of 660 meters. While slightly less powerful, this new weapon system allows a commander or other pilot to engage enemies from ranges that many 'Meks will struggle to effectively return fire from. This upgrade is also one of many produced locally within the Free Worlds League by Irian BattleMeks Unlimited.</p>]]></desc>
         <service>INI</service>
         <location>Irian</location>
     </newsItem>
@@ -3130,14 +3130,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Fox's Teeth take a bite out of "Big Mac"</headline> <!-- Source: Historical: War of 3039 -->
         <date>3045-07-19</date>
-        <desc><![CDATA[<p>In response to an attack last year, the forces of McKinnon's Raiders have devastated McCarron's Armored Cavalry on Menke. The attack is said to have damaged several facilities belonging to the MAC and the Capellan government has announced that they will be funding the rebuilding of the unit in response to the Davion aggression. Casualty reports are incomplete but it is reported that at least a company of BattleMechs and several dozen vehicles were destroyed along with Fort McCarron. Forces on both sides of the border are at a heightened state of alert as the fallout from this revenge attack settles into diplomacy.</p>]]></desc>
+        <desc><![CDATA[<p>In response to an attack last year, the forces of McKinnon's Raiders have devastated McCarron's Armored Cavalry on Menke. The attack is said to have damaged several facilities belonging to the MAC and the Capellan government has announced that they will be funding the rebuilding of the unit in response to the Davion aggression. Casualty reports are incomplete but it is reported that at least a company of BattleMeks and several dozen vehicles were destroyed along with Fort McCarron. Forces on both sides of the border are at a heightened state of alert as the fallout from this revenge attack settles into diplomacy.</p>]]></desc>
         <service>CNB</service>
         <location>Menke</location>
     </newsItem>
     <newsItem>
         <headline>Davion forces attack Pinard!</headline> <!-- Source: TBD -->
         <date>3045-08-22</date>
-        <desc><![CDATA[<p>Davion employed mercenaries have raided a supply depot on Pinard owned by Vandenburg Mechanized Industries (VMI). During the raid several civilians were killed as the BattleMech forces assaulted the main complex. An announcement by Protector Calderon has stated that this raid and the recent increase in Davion forces along the border indicated that the Federated Commonwealth has already initiated a state of war between the two nations. Mercenary units along both sides of the border are warned that no official response from Davion media outlets or diplomatic decrees have verified this statement.</p>]]></desc>
+        <desc><![CDATA[<p>Davion employed mercenaries have raided a supply depot on Pinard owned by Vandenburg Mechanized Industries (VMI). During the raid several civilians were killed as the BattleMek forces assaulted the main complex. An announcement by Protector Calderon has stated that this raid and the recent increase in Davion forces along the border indicated that the Federated Commonwealth has already initiated a state of war between the two nations. Mercenary units along both sides of the border are warned that no official response from Davion media outlets or diplomatic decrees have verified this statement.</p>]]></desc>
         <service>CNB</service>
         <location>Pinard</location>
     </newsItem>
@@ -3151,7 +3151,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Hunchback receives facelift</headline> <!-- Source: Technical Readout: 3050 Upgrade -->
         <date>3046</date>
-        <desc><![CDATA[<p>The venerable <em>Hunchback</em> has received its first official upgrade with Helm technologies. The design designation HBK-5M has undergone a complete redesign of its cooling system and adds a little more firepower with a Sunglow pulse laser. Kali Yama executives are limiting the production of this BattleMech for the first six-months to units of the FWLM and mercenaries loyal to House Marik. Further information about this new variant can be found on MercNet or by contacting Kali Yama Weapons Industries Incorporated directly.</p>]]></desc>
+        <desc><![CDATA[<p>The venerable <em>Hunchback</em> has received its first official upgrade with Helm technologies. The design designation HBK-5M has undergone a complete redesign of its cooling system and adds a little more firepower with a Sunglow pulse laser. Kali Yama executives are limiting the production of this BattleMek for the first six-months to units of the FWLM and mercenaries loyal to House Marik. Further information about this new variant can be found on MercNet or by contacting Kali Yama Weapons Industries Incorporated directly.</p>]]></desc>
         <service>CNB</service>
         <location>Kalidasa</location>
     </newsItem>
@@ -3172,7 +3172,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Ancient factory resumes production</headline> <!-- Source: Field Manual: Mercenaries -->
         <date>3046</date>
-        <desc><![CDATA[<p>The newest company on the block, Norse-Storm Technologies Incorporated, have recently held a ribbon-cutting ceremony at the restored Loxley production facility. As a former mercenary unit the company has been working on rebuilding the facility for some time. Investors are wary that the company may not have the financial or corporate capability to maintain this new facility with technologies rapidly advancing in the BattleMech market.</p>]]></desc>
+        <desc><![CDATA[<p>The newest company on the block, Norse-Storm Technologies Incorporated, have recently held a ribbon-cutting ceremony at the restored Loxley production facility. As a former mercenary unit the company has been working on rebuilding the facility for some time. Investors are wary that the company may not have the financial or corporate capability to maintain this new facility with technologies rapidly advancing in the BattleMek market.</p>]]></desc>
         <service>FNS</service>
         <location>Loxley</location>
     </newsItem>
@@ -3186,7 +3186,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Recovered technology heralds new Jenners</headline> <!-- Source: Technical Readout: 3050 Upgrade -->
         <date>3046</date>
-        <desc><![CDATA[<p>The <em>Jenner</em> BattleMech is once again in production! After nearly two centuries, recent discoveries have allowed for new <em>Jenners</em> to be produced by Luthien Armor Works. Long associated with the Draconis Combine this totem BattleMech has been going extinct faster than replacement parts could be found or salvaged. This and other breakthroughs in 'Mek development have increased the survivability of these ancient designs.</p>]]></desc>
+        <desc><![CDATA[<p>The <em>Jenner</em> BattleMek is once again in production! After nearly two centuries, recent discoveries have allowed for new <em>Jenners</em> to be produced by Luthien Armor Works. Long associated with the Draconis Combine this totem BattleMek has been going extinct faster than replacement parts could be found or salvaged. This and other breakthroughs in 'Mek development have increased the survivability of these ancient designs.</p>]]></desc>
         <service>CNB</service>
         <location>Luthien</location>
     </newsItem>
@@ -3207,7 +3207,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>New aerospace fighter enters production</headline> <!-- Source: MUL Online -->
         <date>3046</date>
-        <desc><![CDATA[<p>Wangker Aerospace has recently announced the availability of a new fighter design, the <em>Banshee</em>. Pilots and critics everywhere are wondering about the naming of this new fighter after a BattleMech with such a spotty reputation for being under-armed and outclassed by some BattleMechs half its weight. The new fighter has several technologies based around comfort for pilots during combat maneuvers and the CEO of Wangker stated that it is one of the most advanced fighters currently available.</p>]]></desc>
+        <desc><![CDATA[<p>Wangker Aerospace has recently announced the availability of a new fighter design, the <em>Banshee</em>. Pilots and critics everywhere are wondering about the naming of this new fighter after a BattleMek with such a spotty reputation for being under-armed and outclassed by some BattleMeks half its weight. The new fighter has several technologies based around comfort for pilots during combat maneuvers and the CEO of Wangker stated that it is one of the most advanced fighters currently available.</p>]]></desc>
         <service>CNB</service>
         <location>Axton</location>
     </newsItem>
@@ -3228,21 +3228,21 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Pingree attacked, defenders rally</headline> <!-- Source: Field Manual: Free Worlds League -->
         <date>3047-03-01</date>
-        <desc><![CDATA[<p>The FWLM repulsed an attack earlier this year by the AFFC. The 5th Fusiliers of Oriente commander spoke to media outlets indicating his respect for the men and women that gave their lives to maintain control of the planet and to state that while bloodied they are still more than capable of repelling any further aggression from the Federated Commonwealth. This attack is yet another indication of the instability of the political climate in the region. Reports from sources on the planet are also indicating that several BattleMech designs that have not previously been seen were part of the success of the Fusilier defense. No official announcements have been made regarding this rumor at this time.</p>]]></desc>
+        <desc><![CDATA[<p>The FWLM repulsed an attack earlier this year by the AFFC. The 5th Fusiliers of Oriente commander spoke to media outlets indicating his respect for the men and women that gave their lives to maintain control of the planet and to state that while bloodied they are still more than capable of repelling any further aggression from the Federated Commonwealth. This attack is yet another indication of the instability of the political climate in the region. Reports from sources on the planet are also indicating that several BattleMek designs that have not previously been seen were part of the success of the Fusilier defense. No official announcements have been made regarding this rumor at this time.</p>]]></desc>
         <service>CNB</service>
         <location>Pingree</location>
     </newsItem>
     <newsItem>
         <headline>More Centurions on the way</headline> <!-- Source: Technical Readout: 3050 Upgrade -->
         <date>3047</date>
-        <desc><![CDATA[<p>An agreement between Corean Enterprises and Jalastar Aerospace has recently gone public for the production of <em>Centurion</em> BattleMechs. This agreement has both companies increasing their production lines ensuring that many more of the medium 'Meks will be produced in the future. Current pilots have to be excited as parts for the older models were becoming more and more difficult to find as the machines were lost.</p>]]></desc>
+        <desc><![CDATA[<p>An agreement between Corean Enterprises and Jalastar Aerospace has recently gone public for the production of <em>Centurion</em> BattleMeks. This agreement has both companies increasing their production lines ensuring that many more of the medium 'Meks will be produced in the future. Current pilots have to be excited as parts for the older models were becoming more and more difficult to find as the machines were lost.</p>]]></desc>
         <service>CNB</service>
         <location>New Avalon</location>
     </newsItem>
     <newsItem>
-        <headline>Achernar revisits ancient BattleMech</headline> <!-- Source: Technical Readout: 3050 Revised -->
+        <headline>Achernar revisits ancient BattleMek</headline> <!-- Source: Technical Readout: 3050 Revised -->
         <date>3047</date>
-        <desc><![CDATA[<p>Recently announcing the update of the venerable <em>Dervish</em> BattleMech, Achernar BattleMechs has increased their stock holdings by an order of magnitude. Designated the <em>DV-7D</em>, several new technologies have been used to improve on a rather lackluster base model. The change in both the internal structure materials as well as the new armor has several technical companies offering to retrain technicians to repair these rediscovered components. Additional safety measures and ammunition efficiency technologies have also been added to help keep the machines on the field longer than previous variants.</p>]]></desc>
+        <desc><![CDATA[<p>Recently announcing the update of the venerable <em>Dervish</em> BattleMek, Achernar BattleMeks has increased their stock holdings by an order of magnitude. Designated the <em>DV-7D</em>, several new technologies have been used to improve on a rather lackluster base model. The change in both the internal structure materials as well as the new armor has several technical companies offering to retrain technicians to repair these rediscovered components. Additional safety measures and ammunition efficiency technologies have also been added to help keep the machines on the field longer than previous variants.</p>]]></desc>
         <service>CNB</service>
         <location>New Avalon</location>
     </newsItem>
@@ -3284,12 +3284,12 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Kali Yama Industries facilities damaged during raid</headline> <!-- Source: Field Manual: Free Worlds League -->
         <date>3047</date>
-        <desc><![CDATA[<p>Reports from Kalidasa media indicate that a siege of the Kali Yama facilities occurred late last week. The announcement by the company of advanced technical discoveries and the improvement of several BattleMech chassis is believed to have been the reason for this attack. The raid lasted for several hours as the Silver Hawk Irregulars attempted to take the facility back from Harlock's Warriors. Ground crews are working to repair damage to the facility while technical and legal staff work to discover what was taken. Sources indicate that several crates of equipment were taken from the facility and loaded onto vehicles before the defending units could mobilize to engage them. Officials in the FWLM are rumored to be looking at replacing the local commander in light of this raid.</p>]]></desc>
+        <desc><![CDATA[<p>Reports from Kalidasa media indicate that a siege of the Kali Yama facilities occurred late last week. The announcement by the company of advanced technical discoveries and the improvement of several BattleMek chassis is believed to have been the reason for this attack. The raid lasted for several hours as the Silver Hawk Irregulars attempted to take the facility back from Harlock's Warriors. Ground crews are working to repair damage to the facility while technical and legal staff work to discover what was taken. Sources indicate that several crates of equipment were taken from the facility and loaded onto vehicles before the defending units could mobilize to engage them. Officials in the FWLM are rumored to be looking at replacing the local commander in light of this raid.</p>]]></desc>
         <service>CNB</service>
         <location>Kalidasa</location>
     </newsItem>
     <newsItem>
-        <headline>Archenar BattleMechs specs leak for new variant of classic design</headline> <!-- Source: MUL Online -->
+        <headline>Archenar BattleMeks specs leak for new variant of classic design</headline> <!-- Source: MUL Online -->
         <date>3048</date>
         <desc><![CDATA[<p>The Helm Memory core has allowed another design to become even more effective. The latest variant of the <em>Phoenix Hawk</em> is flush with new bells and whistles that would make General Kerensky himself envious. Details are still coming in but a source has leaked that the new <em>PXH-3D</em> has not only incredible range for its weaponry, but that is also has been redesigned from the ground up to be more effective as a medium scout far from supply lines.</p>]]></desc>
         <service>FCNS</service>
@@ -3298,7 +3298,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Axman unveiled</headline> <!-- Source: MUL Online -->
         <date>3048</date>
-        <desc><![CDATA[<p>Today the Federated Commonwealth unveiled a brand new design, developed by Team Banzai and the NAIS, the new <em>Axman</em> is the follow up to the iconic <em>Hatchetman</em> BattleMech. The new <em>Axman</em> weighs significantly more than its predecessor but is otherwise very similar. Both 'Meks wield massive hatchets and are armed with large-bore autocannons for destroying other 'Meks and both designs have a top speed of nearly 65 km/h and jump jets. The biggest difference between the <em>Axman</em> and the <em>Hatchetman</em>, other than their size, is the inclusion of rediscovered Lostech on the <em>Axman</em>.</p>]]></desc>
+        <desc><![CDATA[<p>Today the Federated Commonwealth unveiled a brand new design, developed by Team Banzai and the NAIS, the new <em>Axman</em> is the follow up to the iconic <em>Hatchetman</em> BattleMek. The new <em>Axman</em> weighs significantly more than its predecessor but is otherwise very similar. Both 'Meks wield massive hatchets and are armed with large-bore autocannons for destroying other 'Meks and both designs have a top speed of nearly 65 km/h and jump jets. The biggest difference between the <em>Axman</em> and the <em>Hatchetman</em>, other than their size, is the inclusion of rediscovered Lostech on the <em>Axman</em>.</p>]]></desc>
         <service>FBC</service>
         <location>New Avalon</location>
     </newsItem>
@@ -3331,9 +3331,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Marcus</location>
     </newsItem>
     <newsItem>
-        <headline>New BattleMech variant unveiled</headline> <!-- Source: MUL Online -->
+        <headline>New BattleMek variant unveiled</headline> <!-- Source: MUL Online -->
         <date>3049</date>
-        <desc><![CDATA[<p>A new variant of the <em>Axeman</em> BattleMech has been demonstrated to the top brass of the AFFC. The new variant changes the entire tactical purpose of the 'Mek more inline with standoff fighters such as the <em>Trebuchet</em>. Long range missile systems are added in place of the devastating heavy autocannon which can literally tear many 'Meks to scrap before the massive hand-to-hand weapon can be used to finish them off. Many veteran MechWarriors are leery though of having the heavier weapon removed in favor of such a long-range focused design. Time and experience will tell if they are proven to be valid concerns.</p>]]></desc>
+        <desc><![CDATA[<p>A new variant of the <em>Axeman</em> BattleMek has been demonstrated to the top brass of the AFFC. The new variant changes the entire tactical purpose of the 'Mek more inline with standoff fighters such as the <em>Trebuchet</em>. Long range missile systems are added in place of the devastating heavy autocannon which can literally tear many 'Meks to scrap before the massive hand-to-hand weapon can be used to finish them off. Many veteran MechWarriors are leery though of having the heavier weapon removed in favor of such a long-range focused design. Time and experience will tell if they are proven to be valid concerns.</p>]]></desc>
         <service>FNS</service>
         <location>Furillo</location>
     </newsItem>
@@ -3362,7 +3362,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Cats coughing up furballs after facing dragons and hounds</headline> <!-- Source: Luthien -->
         <date>3052-02</date>
-        <desc><![CDATA[<p>Filed 07 January 3052</p> <p>Clan forces attempted to take the heart of the Draconis Combine but were repelled with heavy losses by a combined mercenary and DCMS force. Reports from embedded correspondents indicate that two Clans, the Smoke Jaguars and the Nova Cats dropped hundreds of BattleMech and powered infantry forces. The defenders, DCMS and famed units such as the Kell Hounds and Wolf's Dragoons along with several other attached companies stalled and then routed the Clan forces in what could prove to be one of the bloodiest battles in the invasion so far. Casualties on all sides are estimated to be in the thousands as numbers come in from the front. On both sides of the field, several new chassis have been recorded in action and DCMS forces have reportedly salvaged a significant number of Clan BattleMechs.</p> <p>The mercenaries involved were last recorded to be employed by the Federated Commonwealth and no word has yet been made as to the continued status of that contract or the addition of a new contract for the typically anti-Dragoons Combine.</p>]]></desc>
+        <desc><![CDATA[<p>Filed 07 January 3052</p> <p>Clan forces attempted to take the heart of the Draconis Combine but were repelled with heavy losses by a combined mercenary and DCMS force. Reports from embedded correspondents indicate that two Clans, the Smoke Jaguars and the Nova Cats dropped hundreds of BattleMek and powered infantry forces. The defenders, DCMS and famed units such as the Kell Hounds and Wolf's Dragoons along with several other attached companies stalled and then routed the Clan forces in what could prove to be one of the bloodiest battles in the invasion so far. Casualties on all sides are estimated to be in the thousands as numbers come in from the front. On both sides of the field, several new chassis have been recorded in action and DCMS forces have reportedly salvaged a significant number of Clan BattleMeks.</p> <p>The mercenaries involved were last recorded to be employed by the Federated Commonwealth and no word has yet been made as to the continued status of that contract or the addition of a new contract for the typically anti-Dragoons Combine.</p>]]></desc>
         <service>MercNet</service>
         <location>Luthien</location>
     </newsItem>
@@ -3542,9 +3542,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Skye</location>
     </newsItem>
     <newsItem>
-        <headline>Commando BattleMech updated</headline>
+        <headline>Commando BattleMek updated</headline>
         <date>3058-01-18</date>
-        <desc><![CDATA[<p>Today officials from the Lyran Alliance Armed Forces announced the release of the latest variant of the venerable <em>Commando</em> BattleMech line, the new COM-7S, which utilizes cutting edge technology to improve the survivability and firepower of the mainstay light 'Mek of the LAAF.</p>]]></desc>
+        <desc><![CDATA[<p>Today officials from the Lyran Alliance Armed Forces announced the release of the latest variant of the venerable <em>Commando</em> BattleMek line, the new COM-7S, which utilizes cutting edge technology to improve the survivability and firepower of the mainstay light 'Mek of the LAAF.</p>]]></desc>
         <service>TBC</service>
         <location>Tharkad</location>
     </newsItem>
@@ -3586,14 +3586,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Formation of 2nd Janissaries Brigade announced</headline>
         <date>3060-06-01</date>
-        <desc><![CDATA[<p>Today, the St. Ives Compact celebrates the creation of the 2nd Janissaries Brigade. The 2nd Janissaries are a combined arms brigade formed along the principles of the Federated Suns' regimental combat teams with a regiment of BattleMechs supported by multiple regiments of conventional armor, infantry, artillery, and aerospace forces. The 2nd Janissaries mean a safer St. Ives and a more secure future for our Compact.</p>]]></desc>
+        <desc><![CDATA[<p>Today, the St. Ives Compact celebrates the creation of the 2nd Janissaries Brigade. The 2nd Janissaries are a combined arms brigade formed along the principles of the Federated Suns' regimental combat teams with a regiment of BattleMeks supported by multiple regiments of conventional armor, infantry, artillery, and aerospace forces. The 2nd Janissaries mean a safer St. Ives and a more secure future for our Compact.</p>]]></desc>
         <service>SIBC</service>
         <location>St. Ives</location>
     </newsItem>
     <newsItem>
         <headline>New Diverse Optics factory opens</headline>
         <date>3060-06-28</date>
-        <desc><![CDATA[<p>Today the Combine celebrates not only the continued success of the Draconis Combine Mustered Soldiery and our allies fighting valiantly to destroy the threat of the evil Smoke Jaguars forever, but also the improvement of our great nation's powerful defense industries. Earlier today Irian BattleMechs Unlimited officially opened a new branch of Diverse Optics on the planet of Kessel. Diverse Optics are one of the Inner Sphere's premier creators of all types of laser weaponry and the new plant on Kessel will be making top of the line models, ensuring our warriors have only the best tools to defend the Dragon.</p>]]></desc>
+        <desc><![CDATA[<p>Today the Combine celebrates not only the continued success of the Draconis Combine Mustered Soldiery and our allies fighting valiantly to destroy the threat of the evil Smoke Jaguars forever, but also the improvement of our great nation's powerful defense industries. Earlier today Irian BattleMeks Unlimited officially opened a new branch of Diverse Optics on the planet of Kessel. Diverse Optics are one of the Inner Sphere's premier creators of all types of laser weaponry and the new plant on Kessel will be making top of the line models, ensuring our warriors have only the best tools to defend the Dragon.</p>]]></desc>
         <service>VotD</service>
         <location>Kessel</location>
     </newsItem>
@@ -3719,7 +3719,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>8th Free Worlds Legionnaires commissioned</headline>
         <date>3061-06-17</date>
-        <desc><![CDATA[<p>Today the Free Worlds League Military officially commissioned the 8th Free Worlds Legionnaires, a new BattleMech regiment with air, armor and infantry support units. As with the other Legionnaires regiments, the 8th were recruited from all over the League and the new unit will bolster the defenses along the Federated Commonwealth border.</p>]]></desc>
+        <desc><![CDATA[<p>Today the Free Worlds League Military officially commissioned the 8th Free Worlds Legionnaires, a new BattleMek regiment with air, armor and infantry support units. As with the other Legionnaires regiments, the 8th were recruited from all over the League and the new unit will bolster the defenses along the Federated Commonwealth border.</p>]]></desc>
         <service>GP</service>
         <location>Atreus</location>
     </newsItem>
@@ -3875,7 +3875,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Hanson's Roughriders spoil pirate drop</headline> <!-- Source: MechWarrior 2: Mercenaries --> <!-- Apocryphal -->
         <date>3044-08</date>
-        <desc><![CDATA[<p>Filed 01 July 3044</p> <p>Mercenaries from Hanson's Roughriders on a training mission were surprised when a pirate force attempted to raid Venaria. The recruits and veteran MechWarriors were able to destroy a majority of the pirate BattleMechs before the others surrendered. Debriefings from the field indicated that none of the trainees were injured and that there was no actual risk to the citizens of Venaria as the pirate force was poorly equipped and dropped almost right onto the training area.</p>]]></desc>
+        <desc><![CDATA[<p>Filed 01 July 3044</p> <p>Mercenaries from Hanson's Roughriders on a training mission were surprised when a pirate force attempted to raid Venaria. The recruits and veteran MechWarriors were able to destroy a majority of the pirate BattleMeks before the others surrendered. Debriefings from the field indicated that none of the trainees were injured and that there was no actual risk to the citizens of Venaria as the pirate force was poorly equipped and dropped almost right onto the training area.</p>]]></desc>
         <service>MercNet</service>
         <location>Vanaria</location>
     </newsItem>
@@ -3917,7 +3917,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Ice Ship attacked! Mercenaries prevent catastrophic outcome</headline> <!-- Source: MechWarrior 2: Mercenaries --> <!-- Apocryphal -->
         <date>3047-05</date>
-        <desc><![CDATA[<p>The mercenary units aboard the Liezen Ice Ship prevented an event that would have cost the lives of tens of thousands of people on the surface of Liezen. An unknown force attacked the Ice Ship with several aerospace fighters and BattleMechs attempting to disable the engines and cause the ship to crash into the surface of the planet. While the mercenaries held off the attackers their JumpShip and DropShips fled the system leaving no indication as to the allegiance of the force. The governor of Liezen announced that the mercenaries will receive a large bonus from the thankful populace as well as several days of complementary arrangements on the surface.</p>]]></desc>
+        <desc><![CDATA[<p>The mercenary units aboard the Liezen Ice Ship prevented an event that would have cost the lives of tens of thousands of people on the surface of Liezen. An unknown force attacked the Ice Ship with several aerospace fighters and BattleMeks attempting to disable the engines and cause the ship to crash into the surface of the planet. While the mercenaries held off the attackers their JumpShip and DropShips fled the system leaving no indication as to the allegiance of the force. The governor of Liezen announced that the mercenaries will receive a large bonus from the thankful populace as well as several days of complementary arrangements on the surface.</p>]]></desc>
         <service>CNB</service>
         <location>Liezen</location>
     </newsItem>

@@ -743,9 +743,9 @@ public abstract class AbstractCompanyGenerator {
      * @param tracker the tracker to roll based on
      * @param initialRoll if this isn't the initial roll, then we need to cap the Entity Weight
      *                    Class at EntityWeightClass.WEIGHT_ASSAULT
-     * @return the weight to use in generating the BattleMech, which may be
-     * EntityWeightClass.WEIGHT_NONE to not generate a BattleMech or
-     * EntityWeightClass.WEIGHT_SUPER_HEAVY to generate a Star League BattleMech
+     * @return the weight to use in generating the BattleMek which may be
+     * EntityWeightClass.WEIGHT_NONE to not generate a BattleMek or
+     * EntityWeightClass.WEIGHT_SUPER_HEAVY to generate a Star League BattleMek
      */
     private int rollBattleMechWeight(final CompanyGenerationPersonTracker tracker,
                                      final boolean initialRoll) {
@@ -756,7 +756,7 @@ public abstract class AbstractCompanyGenerator {
 
     /**
      * @param tracker the tracker to roll based on
-     * @return the quality to use in generating the BattleMech
+     * @return the quality to use in generating the BattleMek
      */
     private int rollBattleMechQuality(final CompanyGenerationPersonTracker tracker) {
         return getBattleMechQualityGenerator().generate(

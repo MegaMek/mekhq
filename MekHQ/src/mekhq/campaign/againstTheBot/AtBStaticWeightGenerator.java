@@ -54,7 +54,7 @@ public class AtBStaticWeightGenerator {
     }
 
     /**
-     * @return the generated weight for a BattleMech
+     * @return the generated weight for a BattleMek
      */
     private static int getRandomMechWeight() {
         final int roll = Compute.randomInt(10);
@@ -70,8 +70,8 @@ public class AtBStaticWeightGenerator {
     }
 
     /**
-     * @param faction the faction to determine the regional BattleMech weight for
-     * @return the generated weight for a BattleMech
+     * @param faction the faction to determine the regional BattleMek weight for
+     * @return the generated weight for a BattleMek
      */
     private static int getRegionalMechWeight(final Faction faction) {
         final int roll = Compute.randomInt(100);
