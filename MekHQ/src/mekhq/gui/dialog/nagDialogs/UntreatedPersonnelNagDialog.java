@@ -26,10 +26,10 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 import javax.swing.*;
 
 public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
-    private static boolean isUntreatedInjury (Campaign campaign) {
+    static boolean isUntreatedInjury(Campaign campaign) {
         return campaign.getActivePersonnel().stream()
                 .filter(p -> (p.needsFixing()) && (p.getDoctorId() == null))
-                .anyMatch(p -> !p.getPrisonerStatus().isPrisoner());
+                .anyMatch(p -> !p.getPrisonerStatus().isCurrentPrisoner());
     }
 
     //region Constructors
