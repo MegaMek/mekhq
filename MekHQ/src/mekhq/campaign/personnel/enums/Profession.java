@@ -157,7 +157,7 @@ public enum Profession {
      * @return whether the profession is empty or not
      */
     public boolean isEmptyProfession(final RankSystem rankSystem) {
-        // MechWarrior profession cannot be empty
+        // MekWarrior profession cannot be empty
         // TODO : I should be allowed to be empty, and have my default replaced by another column,
         // TODO : albeit with the validator properly run before to ensure the rank system is valid.
         // TODO : The default return for getAlternativeProfession would not need to change in this case

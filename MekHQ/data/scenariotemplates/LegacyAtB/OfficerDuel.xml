@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Special Scenario: Officer Duel</name>
     <shortBriefing></shortBriefing>
-    <detailedBriefing>One of your officer MechWarriors has been challenged to a duel by an officer from the opposing force. Destroy the enemy Mech or force it to withdraw.</detailedBriefing>
+    <detailedBriefing>One of your officer MekWarriors has been challenged to a duel by an officer from the opposing force. Destroy the enemy Mech or force it to withdraw.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

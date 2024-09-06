@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Special Scenario: Ambush</name>
     <shortBriefing></shortBriefing>
-    <detailedBriefing>One of your MechWarriors has been ambushed by hostile forces. Destroy them.</detailedBriefing>
+    <detailedBriefing>One of your MekWarriors has been ambushed by hostile forces. Destroy them.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

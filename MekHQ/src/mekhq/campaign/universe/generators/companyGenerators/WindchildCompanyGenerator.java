@@ -44,7 +44,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
      * Set based on greater than instead of the greater than or equal to of AtB
      * @param faction the faction to use in generating the commanding officer's rank
      * @param tracker the commanding officer's tracker
-     * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
+     * @param numMechWarriors the number of MekWarriors in their force, used to determine their rank
      */
     @Override
     protected void generateCommandingOfficerRank(final Faction faction,

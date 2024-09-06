@@ -89,7 +89,7 @@ MEKHQ VERSION HISTORY:
 + PR #4508: Added autoAwards Support for the Final Three Awards from the Standard Set
 + PR #4509: Removed Turnover Target Number Method Configuration
 + PR #4510: Updated Turnover & Retention Module.pdf
-+ PR #4489: Refactored Personality Characteristic Generation Logic 
++ PR #4489: Refactored Personality Characteristic Generation Logic
 + PR #4493: Added Ability to Tell autoAwards to Ignore Individual Custom Award Sets
 + PR #4497: Updated Prisoner Resolution Messages
 + PR #4498: Added AToW Mission Completion XP Awards, Added Global XP Cost Multiplier Option
@@ -614,7 +614,7 @@ MEKHQ VERSION HISTORY:
 + Issue #3097: Adding Medical Dialog Handwriting Font Selection Option
 + PR #3137: Fixing the final two LGTM issues
 + PR #3113: AbstractIcon: MekHQ's Preferences Now Write to MekHQ's File
-+ PR #3123: Company Generator: Adding MechWarrior Callsign Generation Option
++ PR #3123: Company Generator: Adding MekWarrior Callsign Generation Option
 + Issue #3132: Adding Entity Generation Null Protection for Officer Duel Scenario
 + PR #3105: Base Components: CompleteMissionDialog Rewrite
 + Issue #2877: Part XML File I/O using MHQXMLUtility
@@ -767,7 +767,7 @@ MEKHQ VERSION HISTORY:
 + Issue #2825: Individual Camouflage Bulk Assignment from Same Original Camouflage
 + Issue #2521: Star League Caches No Longer Generate in Pre-Spaceflight, Early Spaceflight, and Age of War Eras
 + Issue #2838: Turrets now generate with the proper faction and thus names
-+ Issue #2841: Properly hide the MechWarriors grouping when using individual role filters
++ Issue #2841: Properly hide the MekWarriors grouping when using individual role filters
 + Issue #2747: Fixing StratCon Scenario Template Path Capitalization
 + PR #2847: Preventing Null Force Template Addition
 + PR #2849, 2846: Addressed multiple errors resulting in failure to generate aerospace scenarios
@@ -904,7 +904,7 @@ MEKHQ VERSION HISTORY:
 
 0.49.1 (2021-05-23 1630 UTC)
 + Data: Fixing Aerospace Tech Portrait Folder Names
-+ PR #2571: Fixing MechWarrior Salary
++ PR #2571: Fixing MekWarrior Salary
 + Issue #2569: Adding userdata to the build script
 + Issue #2574: Fixing Experience Tab Custom Skill Costs Formatting Type
 + PR #2584: MekHQ Options: New Day: Auto-hiring Pool Options
@@ -1015,7 +1015,7 @@ MEKHQ VERSION HISTORY:
 + Issue #2317: Ensure Person::idleMonths defaults to 0
 + PR #2324: Restrict removing, salvaging, or scrapping certain locations with avionics and landing gear on LAMs
 + Issues #2325 #2328: Do not throw NPE on missing equipment when unscrambling equipment numbers
-+ PR #2330: Fix capitalization of MechWarrior portrait folder
++ PR #2330: Fix capitalization of MekWarrior portrait folder
 + Issue #2332: Delete refit file if unable to read it back when saving
 + PR #2294: Add contract market tests and add setters for static singletons (e.g. Systems and RandomFactionGenerator)
 + Issues #1727 and #2318: Colour Camouflage and Camouflage Selector Standardization
@@ -1564,7 +1564,7 @@ v0.45.2 (2018-11-18 0200 UTC)
 + PR #971: Feature allowing grouping personnel by their unit on the Personnel tab
 + Issue #865: Changing Award Date Does Not Update Award Tooltip
 + Issue #973: No contracts are offered at the start of an AtB campaign.
-+ Issue #949: MechWarrior KO'ed at beginning of battle
++ Issue #949: MekWarrior KO'ed at beginning of battle
 + Issue #981: Fixed bug where refits overcharged for armor or would perform excess moves
 
 v0.45.1 (2018-09-03 2300 UTC)
@@ -1773,7 +1773,7 @@ v0.43.6 (2017-12-22 10:00 UTC)
 
 v0.43.5 (2017-12-17 11:00 UTC)
 + Issue #490: NPE with campaign.universe.RandomFactionGenerator.addBorderEnemy
-+ Issue #494: Regenerate LAM Pilot selects from the MechWarrior pool.
++ Issue #494: Regenerate LAM Pilot selects from the MekWarrior pool.
 + Issue #488: Select bombs throws "index out of bounds" errors in particular campaign file
 + Feature #280: Role folders now supported for random portrait assignment
 + PR #440: Track & report time in service
@@ -2130,7 +2130,7 @@ v0.3.20 (2015-10-12 00:11 UTC)
 + Bug [#845]: [ATB] Employer offers follow up contract, but follow up contract has incorrect employer
 + Bug [#860]: [ATB] Special missions still generating gravity even if "use planetary conditions" is turned off
 + Bug [#861]: [ATB] 100 ton ASF being classified as "Medium" in the unit market
-+ Bug [#858]: Personnel market : MechWarrior's unit is a tank
++ Bug [#858]: Personnel market : MekWarrior's unit is a tank
 + Bug [#864]: [ATB] Uses Highest Strategy not "Deployed" Strategy
 + Bug [#870]: JumpShips getting assigned to battles in AtB
 + Updated MegaMek.jar to 0.41.10
@@ -2156,7 +2156,7 @@ v0.3.19 (2014-09-14 01:25 UTC)
 + Bug [#571]: Experience Error With Late Deployment
 + sort personnel and prisoners in ResolveScenarioWizard by unit name
 + Bug: when no mul file is loaded, pilot resolution is skipped
-+ Bug [#928]: Picked up MechWarriors are not shown in Post Battle Resolution
++ Bug [#928]: Picked up MekWarriors are not shown in Post Battle Resolution
 + Bug [#657]: Units incorrectly listed as escaped at end of the battle
 + Bug [#945]: Personnel tab, Fluff Information view - cannot sort by kills
 + Bug [#930]: Name of Tab different between MHQ and MML
@@ -2305,7 +2305,7 @@ v0.3.14 (2015-05-31 18:15 UTC)
 + Patch [patches:#49]: Refit: Tech Time Management
 + Patch [patches:#45]: Marriage bugfix - Can marry the dead
 + Patch [patches:#43]: Higher-precision quality averaging
-+ Bug [#140]: MechWarrior Quality Bug
++ Bug [#140]: MekWarrior Quality Bug
 + Patch [patches:#42]: Show required lances for AtB contracts in market
 + Patch [patches:#41]: Don't auto-deploy when force under repair
 + Bug [#804]: [ATB] Scheduled repair tasks automatically fail if the mech is auto deployed to a pending battle
@@ -2922,7 +2922,7 @@ v0.3.4 (2014-04-26)
 + Bug: Custom rank systems not working correctly on reload
 + Bug [#467]: Structural Integrity showing in Warehouse
 + Bug [#130]: Daedalus with damaged leg remain crippled after repair
-+ Bug [#471]: Captured MechWarriors, Escaped Salvages??
++ Bug [#471]: Captured MekWarriors, Escaped Salvages??
 + Bug [#426]: Aerospace fighters showing "undamaged" after combat; ferro-aluminum armor missing
     To fix this bug I dumped the MekHQ versions of undamaged, light damage, heavy damage, and crippled
     and instead pulled them in from Entity & it's subclasses to let them handle all the work
@@ -3059,7 +3059,7 @@ v0.3.1 (2013-09-5)
 + Changed how the Individual Camo option is displayed.
 + Bug 369: Removing / Paying Off Loans
 + Added more bank names for the loan randomization
-+ Removed arbitrary secondary role limitation - Many of my techs are also (albeit poor ones) MechWarriors.
++ Removed arbitrary secondary role limitation - Many of my techs are also (albeit poor ones) MekWarriors.
 + Make Male/Female portrait folders so they can be embedded inside other folders.
     Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Added four Canon banks to the array for randomizing the bank name for Loans
@@ -3789,7 +3789,7 @@ v0.1.10 (2011-12-05)
 + Bug 3380632: Mechs with Destroyed Head never Usable
 + Bug 3430515: Cannot Load Campaign
 + Bug 3403476: Using Ampersand In Scenario/Mission Description Causes Issue
-+ Bug 3401092: Loading a save with "MechWarrior" units crashes MekHQ
++ Bug 3401092: Loading a save with "MekWarrior" units crashes MekHQ
 + Bug 3398514: JumpShips inoperable
 + Bug 3371755: Medic Count
 + Bug 3369530: Infantry
@@ -4555,7 +4555,7 @@ v0.1.1 (2009-09-29)
 + wounded personnel will heal on their own in 15 cycles
 + make MekHQ compilable in Eclipse
 + native-looking menus for Mac OSX
-+ Bug 2854866: MechWarrior with 1 hit unable to be healed by medic team
++ Bug 2854866: MekWarrior with 1 hit unable to be healed by medic team
 + double-click for view of pilot personnel
 + updated mechfiles
 + GM mode options

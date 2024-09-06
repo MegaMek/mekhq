@@ -49,7 +49,7 @@
         <facultySkill>9</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Apprenticeship</qualification>
+        <qualification>MekWarrior Apprenticeship</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Mechanized Apprenticeship</qualification>
@@ -127,7 +127,7 @@
         <durationDays>150</durationDays>
         <facultySkill>9</facultySkill>
         <ageMin>16</ageMin>
-        <qualification>Basic MechWarrior Training</qualification>
+        <qualification>Basic MekWarrior Training</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Basic Aerospace Training</qualification>

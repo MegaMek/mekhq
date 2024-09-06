@@ -328,7 +328,7 @@ public abstract class AbstractCompanyGenerator {
      *
      * @param campaign the campaign to use in generating the commanding officer
      * @param tracker the commanding officer's tracker
-     * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
+     * @param numMechWarriors the number of MekWarriors in their force, used to determine their rank
      */
     private void generateCommandingOfficer(final Campaign campaign,
                                            final CompanyGenerationPersonTracker tracker,
@@ -349,7 +349,7 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @param faction the faction to use in generating the commanding officer's rank
      * @param tracker the commanding officer's tracker
-     * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
+     * @param numMechWarriors the number of MekWarriors in their force, used to determine their rank
      */
     protected abstract void generateCommandingOfficerRank(final Faction faction,
                                                           final CompanyGenerationPersonTracker tracker,
@@ -473,9 +473,9 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
-     * Sets up standard MechWarriors from the provided trackers
+     * Sets up standard MekWarrior from the provided trackers
      *
-     * @param campaign the campaign to generate the MechWarriors based on
+     * @param campaign the campaign to generate the MekWarriors based on
      * @param trackers the list of all generated trackers
      */
     private void generateStandardMechWarriors(final Campaign campaign,
@@ -490,11 +490,11 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
-     * This sets up a standard MechWarrior
+     * This sets up a standard MekWarrior
      * 1) Assigns rank of E12 - Sergeant, or E4 for Clan, WoB, and ComStar
      *
-     * @param campaign the campaign to generate the MechWarrior based on
-     * @param tracker the MechWarrior tracker to set up
+     * @param campaign the campaign to generate the MekWarrior based on
+     * @param tracker the MekWarrior tracker to set up
      */
     private void generateStandardMechWarrior(final Campaign campaign,
                                              final CompanyGenerationPersonTracker tracker) {
@@ -787,7 +787,7 @@ public abstract class AbstractCompanyGenerator {
     private List<CompanyGenerationPersonTracker> sortPersonnelIntoLances(
             final List<CompanyGenerationPersonTracker> trackers) {
         // We start by creating the return list, the Captains list, the Lieutenants list
-        // and the MechWarriors list
+        // and the MekWarriors list
         final List<CompanyGenerationPersonTracker> sortedTrackers = new ArrayList<>();
         final List<CompanyGenerationPersonTracker> captains = trackers.stream().filter(tracker ->
                 tracker.getPersonType().isMechWarriorCaptain()).collect(Collectors.toList());
@@ -827,7 +827,7 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @param sortedTrackers the list to add the now sorted lance to
      * @param officer the officer to lead the lance
-     * @param standardMechWarriors the list of normal MechWarriors who can be assigned to this lance.
+     * @param standardMechWarriors the list of normal MekWarriors who can be assigned to this lance.
      */
     private void organizeTrackersIntoLance(final List<CompanyGenerationPersonTracker> sortedTrackers,
                                            final CompanyGenerationPersonTracker officer,

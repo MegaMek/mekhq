@@ -25,7 +25,7 @@ When the AtB rules are enabled, MekHQ will fill in whatever default values are n
 I did not write any unit creation code. MekHQ will keep track of the original unit of any Mechwarrior hired through the Personnel Market, but those hired through the Hire menu who start with a 'Mek will need to be edited as above. Alternatively, you can wait until after creating the unit to enable the AtB rules and MekHQ will fill those values in as it converts the campaign to use the AtB rules (or disable then reenable AtB).
 
 2.2 Recruits
-The Personnel Market now includes Against the Bot as an option, but the AtB rules can be used with any of the market types. If playing with AtB rules, any infantry recruit represents a platoon/point/BA squad and MechWarriors and ProtoMech pilots (and optionally ASF pilots) have a chance of already having a unit. If using the employer/employee system, half the cost of the unit will need to be paid to hire the person.
+The Personnel Market now includes Against the Bot as an option, but the AtB rules can be used with any of the market types. If playing with AtB rules, any infantry recruit represents a platoon/point/BA squad and MekWarriors and ProtoMech pilots (and optionally ASF pilots) have a chance of already having a unit. If using the employer/employee system, half the cost of the unit will need to be paid to hire the person.
 
 The Personnel Market is also used when not in contract for paid recruitment rolls and Dropship/Jumpship searches. The search will be made according to whatever values are set when advancing from Sunday to Monday.
 

@@ -141,7 +141,7 @@
         <name>Aitutaki Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
+        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MekWarriorand Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aitutaki</locationSystem>
@@ -152,7 +152,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -170,7 +170,7 @@
         <name>Aitutaki Academy (Year One)</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
+        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MekWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aitutaki</locationSystem>
@@ -190,7 +190,7 @@
         <name>Aitutaki Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
+        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MekWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aitutaki</locationSystem>
@@ -201,7 +201,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -219,7 +219,7 @@
         <name>Aitutaki Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
+        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MekWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aitutaki</locationSystem>
@@ -230,7 +230,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
@@ -293,7 +293,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -355,7 +355,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -438,10 +438,10 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Allison MechWarrior Institute</name>
+        <name>Allison MekWarrior Institute</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Allison MechWarrior Institute stands as a premier training facility for MechWarriors, adjacent to the Lloyd Marik-Stanley Aerospace School. Producing 375 MechWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets, characterized by athletic contests and pranks that occasionally escalate into conflicts. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed Mechwarriors to uphold loyalty.</description>
+        <description>The Allison MekWarrior Institute stands as a premier training facility for MekWarriors, adjacent to the Lloyd Marik-Stanley Aerospace School. Producing 375 MekWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets, characterized by athletic contests and pranks that occasionally escalate into conflicts. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed Mechwarriors to uphold loyalty.</description>
         <locationSystem>New Olympia</locationSystem>
         <constructionYear>2465</constructionYear>
         <tuition>5250</tuition>
@@ -450,16 +450,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Allison MechWarrior Institute (Officer)</name>
+        <name>Allison MekWarrior Institute (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Allison MechWarrior Institute stands as a premier training facility for MechWarriors, adjacent to the Lloyd Marik-Stanley Aerospace School. Producing 375 MechWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets, characterized by athletic contests and pranks that occasionally escalate into conflicts. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed Mechwarriors to uphold loyalty.</description>
+        <description>The Allison MekWarrior Institute stands as a premier training facility for MekWarriors, adjacent to the Lloyd Marik-Stanley Aerospace School. Producing 375 MekWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets, characterized by athletic contests and pranks that occasionally escalate into conflicts. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed Mechwarriors to uphold loyalty.</description>
         <locationSystem>New Olympia</locationSystem>
         <constructionYear>2465</constructionYear>
         <tuition>13125</tuition>
@@ -468,7 +468,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -477,7 +477,7 @@
         <name>An Ting University</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The An Ting University is a renowned military academy historically dedicated to training MechWarriors. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence.</description>
+        <description>The An Ting University is a renowned military academy historically dedicated to training MekWarriors. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>An Ting</locationSystem>
@@ -489,7 +489,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -504,7 +504,7 @@
         <name>An Ting University (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The An Ting University is a renowned military academy historically dedicated to training MechWarriors. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence.</description>
+        <description>The An Ting University is a renowned military academy historically dedicated to training MekWarriors. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>An Ting</locationSystem>
@@ -516,7 +516,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
@@ -531,7 +531,7 @@
         <name>An Ting University [3055]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The An Ting University, a renowned military academy historically dedicated to training MechWarriors, faced significant damage from both external attacks and internal strife in 3015 from Sun Zhang Cadre alumni. The academy remained shuttered until 3055 when it reopened with advancements from the Helm Memory Core. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence. Despite past conflicts, it now produces capable graduates, reaffirming its status alongside prestigious institutions like the Sun Zhang MechWarrior Academy.</description>
+        <description>The An Ting University, a renowned military academy historically dedicated to training MekWarriors, faced significant damage from both external attacks and internal strife in 3015 from Sun Zhang Cadre alumni. The academy remained shuttered until 3055 when it reopened with advancements from the Helm Memory Core. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence. Despite past conflicts, it now produces capable graduates, reaffirming its status alongside prestigious institutions like the Sun Zhang MekWarrior Academy.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>An Ting</locationSystem>
@@ -542,7 +542,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -557,7 +557,7 @@
         <name>An Ting University (Officer) [3055]</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The An Ting University, a renowned military academy historically dedicated to training MechWarriors, faced significant damage from both external attacks and internal strife in 3015 from Sun Zhang Cadre alumni. The academy remained shuttered until 3055 when it reopened with advancements from the Helm Memory Core. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence. Despite past conflicts, it now produces capable graduates, reaffirming its status alongside prestigious institutions like the Sun Zhang MechWarrior Academy.</description>
+        <description>The An Ting University, a renowned military academy historically dedicated to training MekWarriors, faced significant damage from both external attacks and internal strife in 3015 from Sun Zhang Cadre alumni. The academy remained shuttered until 3055 when it reopened with advancements from the Helm Memory Core. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence. Despite past conflicts, it now produces capable graduates, reaffirming its status alongside prestigious institutions like the Sun Zhang MekWarrior Academy.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>An Ting</locationSystem>
@@ -568,7 +568,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
@@ -707,7 +707,7 @@
         <name>Apollo Military Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Esteemed as the premier military institution of the Rim Worlds Republic, the Apollo Military Academy is located on the capital world of the Republic. Known for its rigorous standards and distinguished graduates, AMA excels in producing MechWarriors of superior leadership and combat skills, rivaling those from the most prestigious academies in the Inner Sphere.</description>
+        <description>Esteemed as the premier military institution of the Rim Worlds Republic, the Apollo Military Academy is located on the capital world of the Republic. Known for its rigorous standards and distinguished graduates, AMA excels in producing MekWarriors of superior leadership and combat skills, rivaling those from the most prestigious academies in the Inner Sphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Apollo</locationSystem>
@@ -719,7 +719,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -746,7 +746,7 @@
         <name>Apollo Military Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Esteemed as the premier military institution of the Rim Worlds Republic, the Apollo Military Academy is located on the capital world of the Republic. Known for its rigorous standards and distinguished graduates, AMA excels in producing MechWarriors of superior leadership and combat skills, rivaling those from the most prestigious academies in the Inner Sphere.</description>
+        <description>Esteemed as the premier military institution of the Rim Worlds Republic, the Apollo Military Academy is located on the capital world of the Republic. Known for its rigorous standards and distinguished graduates, AMA excels in producing MekWarriors of superior leadership and combat skills, rivaling those from the most prestigious academies in the Inner Sphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Apollo</locationSystem>
@@ -758,7 +758,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -797,7 +797,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -935,7 +935,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Scrounge, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -980,7 +980,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -1001,7 +1001,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -1010,7 +1010,7 @@
         <name>Canopian Institute of War</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MechWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MechWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MekWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MekWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
@@ -1022,7 +1022,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -1034,7 +1034,7 @@
         <name>Canopian Institute of War (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MechWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MechWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MekWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MekWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
@@ -1045,7 +1045,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
@@ -1057,7 +1057,7 @@
         <name>Canopian Institute of War [3080]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MechWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MechWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MekWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MekWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
@@ -1068,7 +1068,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -1080,7 +1080,7 @@
         <name>Canopian Institute of War (Officer) [3080]</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MechWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MechWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MekWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MekWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
@@ -1091,7 +1091,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
@@ -1114,7 +1114,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -1179,7 +1179,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -1279,7 +1279,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -1312,7 +1312,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -1379,7 +1379,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
@@ -1400,7 +1400,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior BattleMek Technician</qualification>
@@ -1412,7 +1412,7 @@
         <name>Coventry Military Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Originally focused solely on training MechWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMech training.</description>
+        <description>Originally focused solely on training MekWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMech training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Coventry</locationSystem>
@@ -1423,7 +1423,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>BattleMek Technician</qualification>
@@ -1435,7 +1435,7 @@
         <name>Coventry Military Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Originally focused solely on training MechWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMech training.</description>
+        <description>Originally focused solely on training MekWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMech training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Coventry</locationSystem>
@@ -1446,7 +1446,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior BattleMek Technician</qualification>
@@ -1458,7 +1458,7 @@
         <name>Dieron District Gymnasium</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mek training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District.</description>
+        <description>The Dieron District Gymnasium shapes MekWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mek training, accelerating student advancement. Graduating fifteen to twenty MekWarriors annually, the DDG is vital to the Dieron Military District.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dieron</locationSystem>
@@ -1470,7 +1470,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
@@ -1482,7 +1482,7 @@
         <name>Dieron District Gymnasium (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mek training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District.</description>
+        <description>The Dieron District Gymnasium shapes MekWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mek training, accelerating student advancement. Graduating fifteen to twenty MekWarriors annually, the DDG is vital to the Dieron Military District.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dieron</locationSystem>
@@ -1494,7 +1494,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
@@ -1506,7 +1506,7 @@
         <name>Dieron District Gymnasium [3078]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mek training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068; it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
+        <description>The Dieron District Gymnasium shapes MekWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mek training, accelerating student advancement. Graduating fifteen to twenty MekWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068; it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dieron</locationSystem>
@@ -1517,7 +1517,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -1532,7 +1532,7 @@
         <name>Dieron District Gymnasium (Officer) [3078]</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mek training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068; it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
+        <description>The Dieron District Gymnasium shapes MekWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mek training, accelerating student advancement. Graduating fifteen to twenty MekWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068; it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dieron</locationSystem>
@@ -1543,7 +1543,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
@@ -1558,7 +1558,7 @@
         <name>Dieron Warriors' Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Dieron Warriors Academy on Shimonita annually produces skilled MechWarriors. Graduates are favored for recruitment into the renowned Dieron Regulars, showcasing the academy's pivotal role in regional military development. All five BattleMek regiment commanders have roots in both the Dieron draft and Sun Zhang MechWarrior Academy, highlighting the DWA's lasting influence.</description>
+        <description>The Dieron Warriors Academy on Shimonita annually produces skilled MekWarriors. Graduates are favored for recruitment into the renowned Dieron Regulars, showcasing the academy's pivotal role in regional military development. All five BattleMek regiment commanders have roots in both the Dieron draft and Sun Zhang MekWarrior Academy, highlighting the DWA's lasting influence.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Shimonita</locationSystem>
@@ -1570,7 +1570,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -1579,7 +1579,7 @@
         <name>Dover Institute for Higher Learning</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Dover Institute for Higher Learning rose from the ashes of the People's Reconstruction Effort University of Ashio, destroyed during the Shadow War of 2865. Established in 2910 under Coordinator Shinjiro Kurita's patronage, it prioritizes scientific, technical education, and MechWarrior training. Enrollment is open to all meeting basic criteria, with a rigorous five-month basic training followed by a four-year curriculum exposing cadets to diverse combat scenarios.</description>
+        <description>The Dover Institute for Higher Learning rose from the ashes of the People's Reconstruction Effort University of Ashio, destroyed during the Shadow War of 2865. Established in 2910 under Coordinator Shinjiro Kurita's patronage, it prioritizes scientific, technical education, and MekWarrior training. Enrollment is open to all meeting basic criteria, with a rigorous five-month basic training followed by a four-year curriculum exposing cadets to diverse combat scenarios.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dover</locationSystem>
@@ -1590,7 +1590,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Medical Technician</qualification>
@@ -1605,7 +1605,7 @@
         <name>Ecole Militaire</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The École Militaire stands as the most renowned academy in the Taurian Concordat, offering courses covering almost every form of modern warfare. Renowned for producing elite MechWarriors, armor, and infantry units, the academy admits foreign applicants with a preference for Taurians. </description>
+        <description>The École Militaire stands as the most renowned academy in the Taurian Concordat, offering courses covering almost every form of modern warfare. Renowned for producing elite MekWarriors, armor, and infantry units, the academy admits foreign applicants with a preference for Taurians. </description>
         <locationSystem>Taurus</locationSystem>
         <constructionYear>2500</constructionYear>
         <destructionYear>3078</destructionYear>
@@ -1615,7 +1615,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -1642,7 +1642,7 @@
         <name>Ecole Militaire [3130]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Devastated during the Jihad, the Ecole Militaire now relies on wounded troops as temporary instructors, reminding cadets of its loss. Renowned for producing elite MechWarriors, armor, and infantry units, the academy admits foreign applicants with a preference for Taurians. Rigorous basic training precedes specialization in armor, infantry, or MechWarrior tracks, emphasizing leadership and offering Officer Candidate School slots upon graduation.</description>
+        <description>Devastated during the Jihad, the Ecole Militaire now relies on wounded troops as temporary instructors, reminding cadets of its loss. Renowned for producing elite MekWarriors, armor, and infantry units, the academy admits foreign applicants with a preference for Taurians. Rigorous basic training precedes specialization in armor, infantry, or MekWarrior tracks, emphasizing leadership and offering Officer Candidate School slots upon graduation.</description>
         <locationSystem>Taurus</locationSystem>
         <constructionYear>3130</constructionYear>
         <tuition>9625</tuition>
@@ -1650,7 +1650,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -1688,7 +1688,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -1726,7 +1726,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -1764,7 +1764,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -1802,7 +1802,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -2067,7 +2067,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -2103,7 +2103,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -2142,7 +2142,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -2181,7 +2181,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -2239,7 +2239,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>3081</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -2276,7 +2276,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -2313,7 +2313,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -2352,7 +2352,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -2421,7 +2421,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -2478,7 +2478,7 @@
         <name>Gershwin Academy of Combat</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The esteemed Gershwin Academy of Combat, a private institution founded by the Gershwin Mining Collective, specializes in honing the skills of MechWarriors and armored cavalry. Graduates emerge well-equipped for diverse combat scenarios, instilled with discipline and strategic prowess. Aspiring warriors flock to GAC for its distinguished legacy and commitment to producing elite combat personnel.</description>
+        <description>The esteemed Gershwin Academy of Combat, a private institution founded by the Gershwin Mining Collective, specializes in honing the skills of MekWarrior and armored cavalry. Graduates emerge well-equipped for diverse combat scenarios, instilled with discipline and strategic prowess. Aspiring warriors flock to GAC for its distinguished legacy and commitment to producing elite combat personnel.</description>
         <locationSystem>Zollikofen</locationSystem>
         <constructionYear>3130</constructionYear>
         <tuition>15750</tuition>
@@ -2487,7 +2487,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -2538,7 +2538,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -2559,7 +2559,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -2577,7 +2577,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -2624,7 +2624,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -2636,7 +2636,7 @@
         <name>Hero Training Institute [Maxwell]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Hero Training Institute offers an unconventional route to becoming a MechWarrior, bypassing traditional credentials. Known for its high fees and extensive advertising, HTI provides subpar training with limited hands-on experience. Nonetheless, it allows graduates to enter mercenary units or non-commissioned positions in the Free Worlds League Military.</description>
+        <description>The Hero Training Institute offers an unconventional route to becoming a MekWarrior, bypassing traditional credentials. Known for its high fees and extensive advertising, HTI provides subpar training with limited hands-on experience. Nonetheless, it allows graduates to enter mercenary units or non-commissioned positions in the Free Worlds League Military.</description>
         <locationSystem>Maxwell</locationSystem>
         <constructionYear>2989</constructionYear>
         <tuition>52500</tuition>
@@ -2645,7 +2645,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -2672,7 +2672,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -2693,7 +2693,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -2714,7 +2714,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -2734,7 +2734,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -2757,7 +2757,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -2778,7 +2778,7 @@
         <name>Humphreys Training Academy (Semester One)</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MechWarriors, providing comprehensive classes instructed by experienced lecturers.</description>
+        <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MekWarriors, providing comprehensive classes instructed by experienced lecturers.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Andurien</locationSystem>
@@ -2799,7 +2799,7 @@
         <name>Humphreys Training Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MechWarriors, providing comprehensive classes instructed by experienced lecturers.</description>
+        <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MekWarriors, providing comprehensive classes instructed by experienced lecturers.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Andurien</locationSystem>
@@ -2811,7 +2811,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
@@ -2847,7 +2847,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -2937,7 +2937,7 @@
         <name>Irian Academy of Combative Science</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Irian Academy trains MechWarriors and is highly regarded among schools. Students undergo instruction in history and combat, including live fire training in the Radner Proving Grounds.</description>
+        <description>The Irian Academy trains MekWarriors and is highly regarded among schools. Students undergo instruction in history and combat, including live fire training in the Radner Proving Grounds.</description>
         <locationSystem>Irian</locationSystem>
         <constructionYear>3130</constructionYear>
         <tuition>4375</tuition>
@@ -2946,7 +2946,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
@@ -3030,7 +3030,7 @@
         <name>Kensai Kami [Aix-la-Chapelle]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Kensai Kami is a graduate school for elite MechWarriors of the Draconis Combine Mustered Soldiery, modeled after the Star League's Gunslinger Program. It challenges top DCMS MechWarriors against instructors and peers to reach new heights of excellence.</description>
+        <description>The Kensai Kami is a graduate school for elite MekWarriors of the Draconis Combine Mustered Soldiery, modeled after the Star League's Gunslinger Program. It challenges top DCMS MekWarriors against instructors and peers to reach new heights of excellence.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aix-la-Chapelle</locationSystem>
@@ -3041,7 +3041,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -3050,7 +3050,7 @@
         <name>Kensai Kami [Luthien]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Kensai Kami is a graduate school for elite MechWarriors of the Draconis Combine Mustered Soldiery, modeled after the Star League's Gunslinger Program. It challenges top DCMS MechWarriors against instructors and peers to reach new heights of excellence.</description>
+        <description>The Kensai Kami is a graduate school for elite MekWarriors of the Draconis Combine Mustered Soldiery, modeled after the Star League's Gunslinger Program. It challenges top DCMS MekWarriors against instructors and peers to reach new heights of excellence.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Luthien</locationSystem>
@@ -3061,7 +3061,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -3070,7 +3070,7 @@
         <name>Kensai Kami [McAlister]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Kensai Kami is a graduate school for elite MechWarriors of the Draconis Combine Mustered Soldiery, modeled after the Star League's Gunslinger Program. It challenges top DCMS MechWarriors against instructors and peers to reach new heights of excellence.</description>
+        <description>The Kensai Kami is a graduate school for elite MekWarriors of the Draconis Combine Mustered Soldiery, modeled after the Star League's Gunslinger Program. It challenges top DCMS MekWarriors against instructors and peers to reach new heights of excellence.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>McAlister</locationSystem>
@@ -3081,7 +3081,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarriorGraduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -3101,7 +3101,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -3139,7 +3139,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
@@ -3176,7 +3176,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -3271,7 +3271,7 @@
         <name>Legionary Training Academy (Semester One)</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MechWarriors, providing comprehensive classes instructed by experienced lecturers. Following the Andurien Secession, the Humphreys Training Academy became the Legionary Training Academy under the Free Worlds League.</description>
+        <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MekWarriors, providing comprehensive classes instructed by experienced lecturers. Following the Andurien Secession, the Humphreys Training Academy became the Legionary Training Academy under the Free Worlds League.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Andurien</locationSystem>
@@ -3292,7 +3292,7 @@
         <name>Legionary Training Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MechWarriors, providing comprehensive classes instructed by experienced lecturers. Following the Andurien Secession, the Humphreys Training Academy became the Legionary Training Academy under the Free Worlds League.</description>
+        <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MekWarriors, providing comprehensive classes instructed by experienced lecturers. Following the Andurien Secession, the Humphreys Training Academy became the Legionary Training Academy under the Free Worlds League.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Andurien</locationSystem>
@@ -3304,7 +3304,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
@@ -3325,7 +3325,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -3367,7 +3367,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -3408,7 +3408,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -3449,7 +3449,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -3643,7 +3643,7 @@
         <name>Magistracy Military Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Magistracy Military Academy came into being following the separation of the Magistracy Armed Forces from the Star League Defense Force. The MMA's primary emphasis lies in MechWarrior training, serving both fresh recruits and existing MAF personnel. While it doesn't function as a combined arms academy, the MMA occasionally hosts seminars covering other branches of service, thereby offering a more comprehensive military education.</description>
+        <description>The Magistracy Military Academy came into being following the separation of the Magistracy Armed Forces from the Star League Defense Force. The MMA's primary emphasis lies in MekWarrior training, serving both fresh recruits and existing MAF personnel. While it doesn't function as a combined arms academy, the MMA occasionally hosts seminars covering other branches of service, thereby offering a more comprehensive military education.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
@@ -3654,7 +3654,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, XP</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -3673,7 +3673,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -3704,7 +3704,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -3734,7 +3734,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Small Arms, Administration</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
@@ -3752,7 +3752,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Small Arms, Strategy, Administration, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
@@ -3805,7 +3805,7 @@
         <name>Meistmorn Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Meistmorn Academy is a renowned military academy known for training MechWarriors for the Armed Forces of the Federated Suns.</description>
+        <description>Meistmorn Academy is a renowned military academy known for training MekWarriors for the Armed Forces of the Federated Suns.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Doneval II</locationSystem>
@@ -3816,7 +3816,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -3836,7 +3836,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>3067</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -3875,7 +3875,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -3908,7 +3908,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
@@ -4059,7 +4059,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -4107,7 +4107,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -4154,7 +4154,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>3060</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
@@ -4178,7 +4178,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -4232,7 +4232,7 @@
         <name>NAIS College of Military Science [3079]</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Founded in 2614, the New Avalon Military Academy emerged to train officers for the Armed Forces of the Federated Suns after the Albion Military Academy became exclusive to the Star League Defense Force. NAMA swiftly rivaled AMA in training quality, emphasizing political loyalty to the First Prince. Despite challenges, NAIS persists in producing top MechWarriors and officers, with graduates often joining mercenary units or returning to their home nations.</description>
+        <description>Founded in 2614, the New Avalon Military Academy emerged to train officers for the Armed Forces of the Federated Suns after the Albion Military Academy became exclusive to the Star League Defense Force. NAMA swiftly rivaled AMA in training quality, emphasizing political loyalty to the First Prince. Despite challenges, NAIS persists in producing top MekWarriors and officers, with graduates often joining mercenary units or returning to their home nations.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Avalon</locationSystem>
@@ -4243,7 +4243,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -4308,7 +4308,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -4394,7 +4394,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -4462,7 +4462,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -4519,7 +4519,7 @@
         <name>New Hope Military Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The New Hope Military Academy specializes in training conventional forces while also providing MechWarrior and aerospace pilot programs. The curriculum, developed by senior commanders of the First Taurian Pride, includes practical 'Mek instruction, even in the absence of simulators, and places a strong emphasis on tactical classroom instruction.</description>
+        <description>The New Hope Military Academy specializes in training conventional forces while also providing MekWarrior and aerospace pilot programs. The curriculum, developed by senior commanders of the First Taurian Pride, includes practical 'Mek instruction, even in the absence of simulators, and places a strong emphasis on tactical classroom instruction.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Erod's Escape</locationSystem>
@@ -4530,7 +4530,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Administration, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -4625,7 +4625,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -4678,7 +4678,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -4791,7 +4791,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -4811,7 +4811,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -4883,7 +4883,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>300-Grade MechWarrior Graduate</qualification>
+        <qualification>300-Grade MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>300-Grade Armored Graduate</qualification>
@@ -4952,7 +4952,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>400-Grade MechWarrior Graduate</qualification>
+        <qualification>400-Grade MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>400-Grade Armored Graduate</qualification>
@@ -5012,7 +5012,7 @@
         <name>Pacifica Training School</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Pacifica Training School stands as one of the Lyran Commonwealth’s foremost MechWarrior training centers. Cadets engage in a series of solo cockpit missions, with each mission increasing in difficulty. They pilot full-size, fully operational BattleMeks within a specially designed arena, which replicates genuine battlefield conditions.</description>
+        <description>Pacifica Training School stands as one of the Lyran Commonwealth’s foremost MekWarrior training centers. Cadets engage in a series of solo cockpit missions, with each mission increasing in difficulty. They pilot full-size, fully operational BattleMeks within a specially designed arena, which replicates genuine battlefield conditions.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Chara (Pacifica)</locationSystem>
@@ -5023,7 +5023,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Small Arms, Astech, Medtech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -5063,7 +5063,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, XP, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -5248,7 +5248,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Strategy, Tactics, Small Arms, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -5289,7 +5289,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Small Arms, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -5331,7 +5331,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -5373,7 +5373,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
@@ -5445,7 +5445,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -5487,7 +5487,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -5529,7 +5529,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -5563,7 +5563,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -5615,7 +5615,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -5667,7 +5667,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -5719,7 +5719,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -5771,7 +5771,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -5822,7 +5822,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -5874,7 +5874,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -5926,7 +5926,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -5978,7 +5978,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -6029,7 +6029,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -6082,7 +6082,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Astech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -6120,7 +6120,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Astech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -6157,7 +6157,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -6196,7 +6196,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -6234,7 +6234,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -6257,7 +6257,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
@@ -6280,7 +6280,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -6345,7 +6345,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -6411,7 +6411,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -6451,7 +6451,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -6492,7 +6492,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -6532,7 +6532,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -6568,7 +6568,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -6606,7 +6606,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Negotiation</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -6626,7 +6626,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Negotiation</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -6669,7 +6669,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -6728,7 +6728,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>High Path - MechWarrior</qualification>
+        <qualification>High Path - MekWarrior</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>High Path - Cavalry</qualification>
@@ -6836,7 +6836,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -6883,7 +6883,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -6965,7 +6965,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -7006,7 +7006,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -7033,10 +7033,10 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Sun Zhang MechWarrior Academy</name>
+        <name>Sun Zhang MekWarrior Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Sun Zhang MechWarrior Academy emphasizes bushido, and its graduates receive a daishō as a symbol of their honor. The Academy trains over four hundred MechWarriors annually, using abandoned cities for urban combat training.</description>
+        <description>The Sun Zhang MekWarrior Academy emphasizes bushido, and its graduates receive a daishō as a symbol of their honor. The Academy trains over four hundred MekWarriors annually, using abandoned cities for urban combat training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Samarkand</locationSystem>
@@ -7047,7 +7047,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -7056,10 +7056,10 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Sun Zhang MechWarrior Academy (Officer)</name>
+        <name>Sun Zhang MekWarrior Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Sun Zhang MechWarrior Academy emphasizes bushido, and its graduates receive a daishō as a symbol of their honor. The Academy trains over four hundred MechWarriors annually, using abandoned cities for urban combat training.</description>
+        <description>The Sun Zhang MekWarrior Academy emphasizes bushido, and its graduates receive a daishō as a symbol of their honor. The Academy trains over four hundred MekWarriors annually, using abandoned cities for urban combat training.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Samarkand</locationSystem>
@@ -7070,7 +7070,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
@@ -7094,7 +7094,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -7185,7 +7185,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -7254,7 +7254,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -7320,7 +7320,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -7332,7 +7332,7 @@
         <name>The Warrior's Hall</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Warrior's Hall started as an officers' club and evolved into a comprehensive military academy by 2765. Though it lacks the most advanced technology, the academy produces some of the finest MechWarriors in the AFFS. It is known for its emphasis on military skills, often at the expense of academic subjects.</description>
+        <description>The Warrior's Hall started as an officers' club and evolved into a comprehensive military academy by 2765. Though it lacks the most advanced technology, the academy produces some of the finest MekWarriors in the AFFS. It is known for its emphasis on military skills, often at the expense of academic subjects.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Syrtis</locationSystem>
@@ -7343,7 +7343,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -7385,7 +7385,7 @@
         <name>The Warrior's Hall (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Warrior's Hall started as an officers' club and evolved into a comprehensive military academy by 2765. Though it lacks the most advanced technology, the academy produces some of the finest MechWarriors in the AFFS. It is known for its emphasis on military skills, often at the expense of academic subjects.</description>
+        <description>The Warrior's Hall started as an officers' club and evolved into a comprehensive military academy by 2765. Though it lacks the most advanced technology, the academy produces some of the finest MekWarriors in the AFFS. It is known for its emphasis on military skills, often at the expense of academic subjects.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Syrtis</locationSystem>
@@ -7396,7 +7396,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -7449,7 +7449,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -7487,7 +7487,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -7525,7 +7525,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -7563,7 +7563,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -7598,7 +7598,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
@@ -7618,7 +7618,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -7659,7 +7659,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
@@ -7857,7 +7857,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -7996,7 +7996,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Astech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Graduate</qualification>
@@ -8040,7 +8040,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -8097,7 +8097,7 @@
         <name>War College of Buena</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The War College of Buena initially focused on technician courses and MechWarrior training. Over time, it expanded significantly, producing highly competent technicians, MechWarriors, and aerospace pilots. Training emphasizes practical experience, with cadets spending six months in the Buena Training Battalion engaged in live-fire exercises and anti-pirate missions.</description>
+        <description>The War College of Buena initially focused on technician courses and MekWarrior training. Over time, it expanded significantly, producing highly competent technicians, MekWarriors, and aerospace pilots. Training emphasizes practical experience, with cadets spending six months in the Buena Training Battalion engaged in live-fire exercises and anti-pirate missions.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Buena</locationSystem>
@@ -8108,7 +8108,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Astech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -8144,7 +8144,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -8171,7 +8171,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -8183,10 +8183,10 @@
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Warner MechWarrior Academy</name>
+        <name>Warner MekWarrior Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Warner MechWarrior Academy on Solaris VII is a small and informal training school for aspiring MechWarriors, founded by the second-rate arena fighter and con man Clease Vanderholf. Training is conducted using four poorly maintained Chameleons.</description>
+        <description>The Warner MekWarrior Academy on Solaris VII is a small and informal training school for aspiring MekWarriors, founded by the second-rate arena fighter and con man Clease Vanderholf. Training is conducted using four poorly maintained Chameleons.</description>
         <locationSystem>Solaris</locationSystem>
         <constructionYear>3000</constructionYear>
         <destructionYear>3068</destructionYear>
@@ -8196,7 +8196,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-2</baseAcademicSkillLevel>
@@ -8215,7 +8215,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8241,7 +8241,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry WarriorGraduate</qualification>
@@ -8266,7 +8266,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8292,7 +8292,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8317,7 +8317,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8342,7 +8342,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8368,7 +8368,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8394,7 +8394,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8420,7 +8420,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8446,7 +8446,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8471,7 +8471,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8497,7 +8497,7 @@
         <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MekWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Warrior Graduate</qualification>
@@ -8523,7 +8523,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>
@@ -8561,7 +8561,7 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
+        <qualification>MekWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Cavalry Command Graduate</qualification>

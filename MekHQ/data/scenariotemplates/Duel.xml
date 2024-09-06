@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
     <name>Duel</name>
-    <shortBriefing>A duel between two MechWarriors.</shortBriefing>
+    <shortBriefing>A duel between two MekWarriors.</shortBriefing>
     <detailedBriefing></detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>

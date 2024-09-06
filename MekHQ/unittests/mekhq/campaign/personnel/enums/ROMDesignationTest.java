@@ -220,7 +220,7 @@ public class ROMDesignationTest {
         when(mockPerson.getUnit()).thenReturn(mockUnit);
 
         // No ROM Designations nor Secondary Role
-        // MechWarrior - Expect " Epsilon"
+        // MekWarrior- Expect " Epsilon"
         when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
         assertEquals(" " + ROMDesignation.EPSILON, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
@@ -332,7 +332,7 @@ public class ROMDesignationTest {
         when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.DEPENDENT);
         assertEquals(" ", ROMDesignation.getComStarBranchDesignation(mockPerson));
 
-        // MechWarrior / Administrator (Command) - Expect " Epsilon Chi"
+        // MekWarrior / Administrator (Command) - Expect " Epsilon Chi"
         when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
         when(mockPerson.getSecondaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_COMMAND);
         assertEquals(" " + ROMDesignation.EPSILON + ' ' + ROMDesignation.CHI,

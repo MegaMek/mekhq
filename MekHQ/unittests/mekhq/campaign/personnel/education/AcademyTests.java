@@ -61,11 +61,11 @@ class AcademyTests {
 
     @Test
     void testAcademyCreationAllFields() {
-        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", "College", true,
-                false, true, "Top level MechWarrior Training", 20, true,
+        Academy academy = new Academy("MekWarrior", "MekWarrior Academy", "College", true,
+                false, true, "Top level MekWarrior Training", 20, true,
                 Arrays.asList("Sol", "Terra"), false, false,3045,
                 3089, 3099, 2000, 365, 10,
-                EducationLevel.EARLY_CHILDHOOD, EducationLevel.DOCTORATE, 18, 35, Arrays.asList("MechWarrior", "Leadership"),
+                EducationLevel.EARLY_CHILDHOOD, EducationLevel.DOCTORATE, 18, 35, Arrays.asList("MekWarrior", "Leadership"),
                 Arrays.asList("Combat", "Strategy"), Arrays.asList(3050, 3055), 5, 101);
 
         assertEquals("MekWarrior Academy", academy.getName());

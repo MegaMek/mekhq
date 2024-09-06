@@ -152,7 +152,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RANSOM = "RANSOM";
     private static final String CMD_RANSOM_FRIENDLY = "RANSOM_FRIENDLY";
 
-    // MechWarrior Edge Options
+    // MekWarrior Edge Options
     private static final String OPT_EDGE_MASC_FAILURE = "edge_when_masc_fails";
     private static final String OPT_EDGE_EXPLOSION = "edge_when_explosion";
     private static final String OPT_EDGE_KO = "edge_when_ko";
@@ -2127,7 +2127,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menu = new JMenu(resources.getString("setEdgeTriggers.text"));
 
                 //Start of Edge reroll options
-                //MechWarriors
+                //MekWarriors
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerHeadHits.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_HEADHIT));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT));

@@ -372,7 +372,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Academy</qualification>
+        <qualification>MekWarrior Academy</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Mechanized Academy</qualification>

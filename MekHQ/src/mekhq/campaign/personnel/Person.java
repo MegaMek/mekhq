@@ -4114,7 +4114,7 @@ public class Person {
      * This is used to get the number of shares the person has
      * @param campaign the campaign the person is a part of
      * @param sharesForAll true if all combat and support personnel have shares, otherwise false if
-     *                     just MechWarriors have shares
+     *                     just MekWarriors have shares
      * @return the number of shares the person has
      */
     public int getNumShares(final Campaign campaign, final boolean sharesForAll) {
@@ -4166,7 +4166,7 @@ public class Person {
      * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context
      */
     public Money getRansomValue(final Campaign campaign) {
-        // MechWarriors and aero pilots are worth more than the other types of scrubs
+        // MekWarriors and aero pilots are worth more than the other types of scrubs
         return (getPrimaryRole().isMechWarriorGrouping() || getPrimaryRole().isAerospacePilot()
                 ? MECHWARRIOR_AERO_RANSOM_VALUES : OTHER_RANSOM_VALUES)
                 .get(getExperienceLevel(campaign, false));

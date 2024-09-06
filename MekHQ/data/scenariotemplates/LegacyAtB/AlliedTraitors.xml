@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Special Scenario: Allied Traitors</name>
     <shortBriefing></shortBriefing>
-    <detailedBriefing>One of your officer MechWarriors has been isolated and must conduct operations on their own.</detailedBriefing>
+    <detailedBriefing>One of your officer MekWarriors has been isolated and must conduct operations on their own.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
