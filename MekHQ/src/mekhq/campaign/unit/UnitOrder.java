@@ -212,7 +212,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
             if (!((Mech) entity).isIndustrial()) {
                 target.addModifier(0, "BattleMek");
             } else {
-                target.addModifier(-1, "IndustrialMech");
+                target.addModifier(-1, "IndustrialMek");
             }
             switch (entity.getWeightClass()) {
                 case EntityWeightClass.WEIGHT_LIGHT:

@@ -2862,7 +2862,7 @@
         <name>Illiushin Taurian Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Illiushin Taurian Academy is a small academy within the Taurian Concordat that trains conventional troops, alongside a program of IndustrialMech training.</description>
+        <description>The Illiushin Taurian Academy is a small academy within the Taurian Concordat that trains conventional troops, alongside a program of IndustrialMek training.</description>
         <locationSystem>Illiushin</locationSystem>
         <constructionYear>3130</constructionYear>
         <tuition>8750</tuition>
