@@ -30,11 +30,11 @@ import java.util.List;
 
 /**
  * The Rules for this Generator:
- * 1) Remove all non-'Mech Units
+ * 1) Remove all non-'Mek Units
  * 2) Start with Triple Parts
  * 3) Remove all Engines
  * 3) All Heat Sinks are capped at 30 per type
- * 4) All 'Mech Heads [Sensors, Life Support] are capped at 2 per weight/type
+ * 4) All 'Mek Heads [Sensors, Life Support] are capped at 2 per weight/type
  * 5) All Gyros are capped at 1 per weight/type
  * 6) MASC is capped at 1 per type
  * 7) Any other parts are capped at 6.

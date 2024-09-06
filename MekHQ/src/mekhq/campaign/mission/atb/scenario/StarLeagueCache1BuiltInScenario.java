@@ -89,7 +89,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         int enemyStart = Board.START_N;
 
         int roll = Compute.d6();
-        /* Only has enemy if SL 'Mech is not primitive */
+        /* Only has enemy if SL 'Mek is not primitive */
         for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
             if (roll > 1) {
                 enemyEntities = new ArrayList<>();

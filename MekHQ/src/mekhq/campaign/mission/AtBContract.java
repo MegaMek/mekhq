@@ -521,7 +521,7 @@ public class AtBContract extends Contract {
                 rat = "CivilianUnits_APC";
                 c.addReport("Bonus: civilian APC");
                 break;
-            case 6: /* civilian 'Mech */
+            case 6: /* civilian 'Mek */
                 rat = "CivilianUnits_PrimMech";
                 c.addReport("Bonus: civilian Mek");
                 break;

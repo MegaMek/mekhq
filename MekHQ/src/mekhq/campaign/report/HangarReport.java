@@ -44,7 +44,7 @@ public class HangarReport extends AbstractReport {
 
     public JTree getHangarTree() {
         //region Variable Declarations
-        //region BattleMechs
+        //region BattleMeks
         int countMechs = 0;
 
         int countBattleMechs = 0;
@@ -70,7 +70,7 @@ public class HangarReport extends AbstractReport {
         int mediumIndustrialMech = 0;
         int lightIndustrialMech = 0;
         int ultralightIndustrialMech = 0;
-        //endregion BattleMechs
+        //endregion BattleMeks
 
         //region ASF
         int countASF = 0;

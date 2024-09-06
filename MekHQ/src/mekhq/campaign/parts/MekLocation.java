@@ -426,7 +426,7 @@ public class MekLocation extends Part {
         }
 
         if (isBreached()) {
-            // StratOps p177 - 'Mech Hull Breach
+            // StratOps p177 - 'Mek Hull Breach
             // "Once this time is spent [fixing the breach], the components
             // in the damaged location work normally. Other damage suffered
             // by that location prior to and after the breach must be
@@ -482,7 +482,7 @@ public class MekLocation extends Part {
         }
 
         if (isBreached()) {
-            // 'Mech hull breach is +0
+            // 'Mek hull breach is +0
             return 0;
         }
 

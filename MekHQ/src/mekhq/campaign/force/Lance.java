@@ -150,9 +150,9 @@ public class Lance {
 
     public double getEffectivePoints(Campaign c) {
         /* Used to check against force size limits; for this purpose we
-         * consider a 'Mech and a Point of BA to be a single Point so that
+         * consider a 'Mek and a Point of BA to be a single Point so that
          * a Nova that has 10 actual Points is calculated as 5 effective
-         * Points. We also count Points of vehicles with 'Mechs and
+         * Points. We also count Points of vehicles with 'Meks and
          * conventional infantry with BA to account for CHH vehicle Novas.
          */
         double armor = 0.0;

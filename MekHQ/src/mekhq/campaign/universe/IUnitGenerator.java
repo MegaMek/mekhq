@@ -69,7 +69,7 @@ public interface IUnitGenerator {
 
     /**
      * For convenience in generating battle armor/infantry, when the tonnage does not matter
-     * (a dedicated DropShip bay, battle armor riding on a 'Mech, etc)
+     * (a dedicated DropShip bay, battle armor riding on a 'Mek, etc)
      */
     double NO_WEIGHT_LIMIT = -1.0;
 

@@ -137,7 +137,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             for (Rank rank : campaign.getRankSystem().getRanks()) {
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".ranks (number, rankname) VALUES (?, ?)");
                 preparedStatement.setInt(1, i);
-                // TODO: This currently only exports MechWarrior Ranks. MercRoster software needs adjusted before this can be.
+                // TODO: This currently only exports MekWarrior Ranks. MercRoster software needs adjusted before this can be.
                 preparedStatement.setString(2, truncateString(rank.getName(Profession.MECHWARRIOR), 45));
                 preparedStatement.executeUpdate();
                 i++;

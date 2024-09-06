@@ -13,8 +13,8 @@ If you want to run a campaign with entirely custom ranks, remove all rank system
 
 Professions:
 Professions are used to determine the type of ranks a person has. They consist of a number of Personnel Roles that are a a part of the profession, and the profession code, which is used during alternate profession specification (explained below). The groupings of Personnel Roles cannot be customized. The professions are as followed:
-MechWarrior:
-	Personnel Roles: MechWarrior, LAM Pilot, ProtoMech Pilot
+MekWarrior:
+	Personnel Roles: MekWarrior, LAM Pilot, ProtoMech Pilot
 	Profession Code: "MW"
 	This is the default profession, and thus it may not be an empty profession (see below for more information about this term).
 Aerospace:
@@ -67,7 +67,7 @@ What NOT to do when working with Ranks:
 
 
 How Ranks Are Handled Internally:
-Ranks.java: This is a static class that is used to load and store rank systems. This is not to be instatiated nor used for any other purpose. 
+Ranks.java: This is a static class that is used to load and store rank systems. This is not to be instatiated nor used for any other purpose.
 RankSystem.java: This class contains the information for a single rank system, namely the system's code, the system's name, the system's type (transient value dependant on system load style and file location), and a list of all ranks within that system (which currently must include a rank for all possible rank tiers).
 Rank.java: This class contains the information regarding a single rank level, namely the rank names, the pay multiplier, and whether that level is to be considered officers. The numeric for this rank is currently the index on the rank system's list.
 RankSystemType: This enum contains the information one needs to parse through the different rank systems when working with them in Campaign Options Dialog.
@@ -77,5 +77,3 @@ ranks.xml: This contains all default rank systems used in MekHQ, with a required
 User Data ranks.xml: This contains all custom user ranks, which are loaded and treated internally as equivalent to the default rank systems outside of Campaign Options Dialog.
 Campaign.java: This contains the base campaign rank system, which may be a completely custom rank system that is not tracked in either of the rank files.
 Person.java: Person contains the person's rank system (with a default of the campaign rank system), their rank (saved as a numeric), their rank level (if applicable), their Manei Domini classification (requires WOBM for their rank system), and ROM Designation (requiring CG or WOBM).
-
-

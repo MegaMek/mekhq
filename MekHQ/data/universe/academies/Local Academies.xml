@@ -124,7 +124,7 @@
         <qualification>Mechanic Apprenticeship</qualification>
         <curriculum>Astech, Tech/Mechanic</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>AeroTech Apprenticeship</qualification>
+        <qualification>AeroTek Apprenticeship</qualification>
         <curriculum>Astech, Tech/Aero</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Technician Apprenticeship</qualification>
@@ -217,7 +217,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Advanced BattleMech Technologies</qualification>
+        <qualification>Advanced BattleMek Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Technology &amp; Development</qualification>
@@ -267,7 +267,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Advanced BattleMech Technologies</qualification>
+        <qualification>Advanced BattleMek Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Technology &amp; Development</qualification>
@@ -372,7 +372,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Academy</qualification>
+        <qualification>MekWarrior Academy</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Mechanized Academy</qualification>

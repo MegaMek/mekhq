@@ -598,8 +598,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 return;
             }
             int weight = campaign.getUnit(deployed.get(0)).getEntity().getWeightClass();
-            /* In the event that Star League Cache 1 generates a primitive 'Mech,
-             * the player can keep the 'Mech without a battle so no enemy
+            /* In the event that Star League Cache 1 generates a primitive 'Mek,
+             * the player can keep the 'Mek without a battle so no enemy
              * units are generated.
              */
 

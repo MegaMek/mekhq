@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Additional allied 'Mechs are approaching the area.</additionalBriefingText>
+	<additionalBriefingText>Additional allied 'Meks are approaching the area.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>

@@ -44,7 +44,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
      * Set based on greater than instead of the greater than or equal to of AtB
      * @param faction the faction to use in generating the commanding officer's rank
      * @param tracker the commanding officer's tracker
-     * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
+     * @param numMechWarriors the number of MekWarriors in their force, used to determine their rank
      */
     @Override
     protected void generateCommandingOfficerRank(final Faction faction,
@@ -64,7 +64,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
 
     //region Units
     /**
-     * This generates Clan 'Mechs differently, so you can get any of the quality ratings for Clan Pilots.
+     * This generates Clan 'Meks differently, so you can get any of the quality ratings for Clan Pilots.
      *
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
