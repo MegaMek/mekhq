@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Special Scenario: Ace Duel</name>
     <shortBriefing></shortBriefing>
-    <detailedBriefing>One of your non-officer MechWarriors has been challenged to a duel by an ace from the opposing force. Destroy the enemy 'Mech or force it to withdraw.</detailedBriefing>
+    <detailedBriefing>One of your non-officer MechWarriors has been challenged to a duel by an ace from the opposing force. Destroy the enemy 'Mek or force it to withdraw.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

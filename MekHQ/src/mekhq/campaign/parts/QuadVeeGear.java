@@ -53,7 +53,7 @@ public class QuadVeeGear extends Part {
 
     @Override
     public int getBaseTime() {
-        // Using value for 'Mech "weapons and other equipment"
+        // Using value for 'Mek "weapons and other equipment"
         if (isSalvaging()) {
             return 120;
         }

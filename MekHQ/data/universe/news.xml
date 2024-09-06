@@ -961,7 +961,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Stinger vs Wasp</headline> <!-- Source: Technical Readout: 3025 -->
         <date>2479</date>
-        <desc><![CDATA[<p>Earthwerks Inc, announced today the <em>Stinger</em>, a light 'Mech to rival the <em>Wasp</em> as the premier recon 'Mech of the Terran Hegemony.</p>]]></desc>
+        <desc><![CDATA[<p>Earthwerks Inc, announced today the <em>Stinger</em>, a light 'Mek to rival the <em>Wasp</em> as the premier recon 'Mek of the Terran Hegemony.</p>]]></desc>
         <service>TNS</service>
         <location>Terra</location>
     </newsItem>
@@ -975,7 +975,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Commando to be Upgraded</headline> <!-- Source: Technical Readout: 3039 -->
         <date>2480</date>
-        <desc><![CDATA[<p>Following recent advances in both 'Mech design and electronics, Coventry Defense Conglomerate has release news of a new COM-1D variant of their <em>Commando</em> light 'Mech. Sacrificing two tons of armor allows the <em>Commando</em> to carry an SRM-6.</p>]]></desc>
+        <desc><![CDATA[<p>Following recent advances in both 'Mek design and electronics, Coventry Defense Conglomerate has release news of a new COM-1D variant of their <em>Commando</em> light 'Mek. Sacrificing two tons of armor allows the <em>Commando</em> to carry an SRM-6.</p>]]></desc>
         <service>DBC</service>
         <location>Coventry</location>
     </newsItem>
@@ -988,14 +988,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Toro of Taurian Concordat</headline> <!-- Source: Era Digest: Age of War -->
         <date>2481</date>
-        <desc><![CDATA[<p>Taurus WarWorks announced today, the <em>Toro TR-A-1</em>. A 35 ton light 'Mech armed with a PPC and two LRM-5s, we see this as a long-range threat in the years to come.</p>]]></desc>
+        <desc><![CDATA[<p>Taurus WarWorks announced today, the <em>Toro TR-A-1</em>. A 35 ton light 'Mek armed with a PPC and two LRM-5s, we see this as a long-range threat in the years to come.</p>]]></desc>
         <service></service>
         <location>Taurus</location>
     </newsItem>
     <newsItem>
         <headline>Close Range Crossbow</headline> <!-- Source: MUL Online -->
         <date>2481</date>
-        <desc><![CDATA[<p>In an interesting announcement today, Arcturan Arms announced the introduction of a new variant on their long-range <em>Crossbow</em> 'Mech. The CRS-6C will now be packing an Autocannon/10. However, this comes at the lost of its LRMs and one medium laser. Only time will tell if this new variant will survive the rigors of the battlefield.</p>]]></desc>
+        <desc><![CDATA[<p>In an interesting announcement today, Arcturan Arms announced the introduction of a new variant on their long-range <em>Crossbow</em> 'Mek. The CRS-6C will now be packing an Autocannon/10. However, this comes at the lost of its LRMs and one medium laser. Only time will tell if this new variant will survive the rigors of the battlefield.</p>]]></desc>
         <service>DBC</service>
         <location>Arcturus</location>
     </newsItem>
@@ -1016,7 +1016,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Capellan Confederation's Firebee Makeover</headline> <!-- Source: Technical Readout: 3075 -->
         <date>2483</date>
-        <desc><![CDATA[<p>A second-generation version of the Capellan Confederation's 'Mech has been released. This new 'Mech designated FRB-2E, removes its LRM for two more SRMs and a large laser. Giving it that added long range punch without the limits of ammo.</p>]]></desc>
+        <desc><![CDATA[<p>A second-generation version of the Capellan Confederation's 'Mek has been released. This new 'Mek designated FRB-2E, removes its LRM for two more SRMs and a large laser. Giving it that added long range punch without the limits of ammo.</p>]]></desc>
         <service>CBS</service>
         <location>Boardwalk</location>
     </newsItem>
@@ -1058,14 +1058,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Commando Upgrade Again?</headline> <!-- Source: Technical Readout: 3039 -->
         <date>2486</date>
-        <desc><![CDATA[<p>Coventry Defense Conglomerate seeing the tactics of pilots of their light 'Mech has come out with a new variant which increases armor in addition to adding an SRM-4 and replacing its large laser with a medium one.</p>]]></desc>
+        <desc><![CDATA[<p>Coventry Defense Conglomerate seeing the tactics of pilots of their light 'Mek has come out with a new variant which increases armor in addition to adding an SRM-4 and replacing its large laser with a medium one.</p>]]></desc>
         <service>DBC</service>
         <location>Coventry</location>
     </newsItem>
     <newsItem>
         <headline>Thorn takes the field, sure to be a pain</headline> <!-- Source: Technical Readout: 2750 -->
         <date>2490</date>
-        <desc><![CDATA[<p>A new design focused on fire support for recon lances has been fielded over the last few months after successful trials. the <em>Thorn</em> is one of the lightest 'Mechs available at 20 tons but packs not only a pair of medium lasers, but a 5-pack long range missile system to provide a long-range punch for its lance-mates.</p>]]></desc>
+        <desc><![CDATA[<p>A new design focused on fire support for recon lances has been fielded over the last few months after successful trials. the <em>Thorn</em> is one of the lightest 'Meks available at 20 tons but packs not only a pair of medium lasers, but a 5-pack long range missile system to provide a long-range punch for its lance-mates.</p>]]></desc>
         <service>TNS</service>
         <location>Terra</location>
     </newsItem>
@@ -1088,7 +1088,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>SLDF fields new technology</headline> <!-- Source: MUL online -->
         <date>2630</date>
-        <desc><![CDATA[<p>A new era of war-fighting is upon us as one of the most technologically advanced BattleMechs has completed field-testing on Terra. The <em>Exterminator</em> has several new advances integrated that are still listed as classified. While several reports indicate that it will bring about a change in doctrine for several decades, the secrecy lends one to believe that the SLDF has a special mission in mind for this new 'Mech.</p>]]></desc>
+        <desc><![CDATA[<p>A new era of war-fighting is upon us as one of the most technologically advanced BattleMechs has completed field-testing on Terra. The <em>Exterminator</em> has several new advances integrated that are still listed as classified. While several reports indicate that it will bring about a change in doctrine for several decades, the secrecy lends one to believe that the SLDF has a special mission in mind for this new 'Mek.</p>]]></desc>
         <service>TNN</service>
         <location>Terra</location>
     </newsItem>
@@ -1153,7 +1153,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Mercury refits for longer life</headline> <!-- Source: Technical Readout: 2750 -->
         <date>2810</date>
-        <desc><![CDATA[<p>The <em>Mercury</em> BattleMech, a staple design since 2742 has been the most recent candidate for refits based on the increasing rarity of the original parts. Several systems have been replaced to more common models which has allowed the <em>MCY-98</em> to increase its armor protection. Unfortunately, these downgrades are removing some of the most prominent features of the speedy 'Mech and leaves pilots relying on that additional protection from enemies they would normally out run."</p>]]></desc>
+        <desc><![CDATA[<p>The <em>Mercury</em> BattleMech, a staple design since 2742 has been the most recent candidate for refits based on the increasing rarity of the original parts. Several systems have been replaced to more common models which has allowed the <em>MCY-98</em> to increase its armor protection. Unfortunately, these downgrades are removing some of the most prominent features of the speedy 'Mek and leaves pilots relying on that additional protection from enemies they would normally out run."</p>]]></desc>
         <service>TNN</service>
         <location>Terra</location>
     </newsItem>
@@ -1209,9 +1209,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Luthien</location>
     </newsItem>
     <newsItem>
-        <headline>Kalidasa's 'Mech Factory Assaulted</headline> <!-- Source: TBD -->
+        <headline>Kalidasa's 'Mek Factory Assaulted</headline> <!-- Source: TBD -->
         <date>3000-02</date>
-        <desc><![CDATA[<p>Filed 23 January 3000</p> <p>In a daring raid, persons unknown attacked Kalidasa’s 'Mech Factory today. The attackers struck before dawn with unknown intent, however attempts to steal BattleMechs coming off the production line failed when security forces overran the primary hostile force.</p>]]></desc>
+        <desc><![CDATA[<p>Filed 23 January 3000</p> <p>In a daring raid, persons unknown attacked Kalidasa’s 'Mek Factory today. The attackers struck before dawn with unknown intent, however attempts to steal BattleMechs coming off the production line failed when security forces overran the primary hostile force.</p>]]></desc>
         <service>CNB</service>
         <location>Kalidasa</location>
     </newsItem>
@@ -1498,7 +1498,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Capellan Confederation's Elite Goliath Unit Strikes Fear in Davion Forces at Indicass</headline> <!-- Source: House Liao (The Capellan Confederation) -->
         <date>3005</date>
-        <desc><![CDATA[<p>The Capellan Broadcast Service is proud to report that the elite Cochraine's Goliaths unit, under the careful direction of Chancellor Maximilian Liao, has seen its first action in defense of Indicass against the Davion aggressors. The <em>Goliaths</em>, known for their superior firepower and armor, were deployed against elements of the Ceti Hussars and were able to successfully destroy two companies of Davion 'Mechs, including the <em>Wolverine</em> and <em>Ostroc</em> models. This decisive victory resulted in the enemy's retreat, further solidifying the Capellan Confederation's position as a formidable military force. We would like to extend our gratitude to Chancellor Liao for his strategic planning and for ensuring that the Cochraine's Goliaths were only deployed in the direst of circumstances. This action is a testament to the skill and strength of our armed forces and the leadership of the Chancellor.</p>]]></desc>
+        <desc><![CDATA[<p>The Capellan Broadcast Service is proud to report that the elite Cochraine's Goliaths unit, under the careful direction of Chancellor Maximilian Liao, has seen its first action in defense of Indicass against the Davion aggressors. The <em>Goliaths</em>, known for their superior firepower and armor, were deployed against elements of the Ceti Hussars and were able to successfully destroy two companies of Davion 'Meks, including the <em>Wolverine</em> and <em>Ostroc</em> models. This decisive victory resulted in the enemy's retreat, further solidifying the Capellan Confederation's position as a formidable military force. We would like to extend our gratitude to Chancellor Liao for his strategic planning and for ensuring that the Cochraine's Goliaths were only deployed in the direst of circumstances. This action is a testament to the skill and strength of our armed forces and the leadership of the Chancellor.</p>]]></desc>
         <service>Capellan Broadcasting Corporation</service>
         <location>Sian</location>
     </newsItem>
@@ -1575,7 +1575,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>MercNet New Hire Announcement</headline> <!-- Source: Handbook: Mercenaries Supplemental II -->
         <date>3006</date>
-        <desc><![CDATA[<p>Attention all House liaisons! The Wild Geese, a new and highly experienced unit, have officially formed and are ready to take on any contract. With a diverse range of 'Mechs and a proven track record of success, this unit is ready to bring victory to your next battle. Contact us now to secure the services of the Wild Geese!</p>]]></desc>
+        <desc><![CDATA[<p>Attention all House liaisons! The Wild Geese, a new and highly experienced unit, have officially formed and are ready to take on any contract. With a diverse range of 'Meks and a proven track record of success, this unit is ready to bring victory to your next battle. Contact us now to secure the services of the Wild Geese!</p>]]></desc>
         <service>MercNet</service>
         <location>Galatea</location>
     </newsItem>
@@ -1652,7 +1652,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Solaris City's newest sensation: Ishiyama "Stone Mountain" arena opens its doors for high-stakes Mech battles!</headline> <!-- Source: TBD --> <!-- May not be correct as the entry for the arena states a construction date of 2785 -->
         <date>3007</date>
-        <desc><![CDATA[<p>Ladies and gentlemen, hold onto your seats because the newest and most thrilling arena is coming to Solaris City! The Ishiyama "Stone Mountain" arena, located in the heart of the Kobe District, will be the premier destination for all your gladiatorial needs. With state-of-the-art technology and the ability to host up to 34,000 spectators, the Ishiyama arena promises to be the ultimate destination for all BattleMech enthusiasts.</p> <p>From the famous one-on-one duels, to the all-out free-for-all brawls, the Ishiyama arena has something for everyone. And with the best pilots and 'Mechs from across the Inner Sphere competing, you can be sure that every match will be a nail-biting experience.</p> <p>So mark your calendars and get ready for the experience of a lifetime. The Ishiyama "Stone Mountain" arena is the place to be for all your BattleMech action needs. See you in the stands!</p>]]></desc>
+        <desc><![CDATA[<p>Ladies and gentlemen, hold onto your seats because the newest and most thrilling arena is coming to Solaris City! The Ishiyama "Stone Mountain" arena, located in the heart of the Kobe District, will be the premier destination for all your gladiatorial needs. With state-of-the-art technology and the ability to host up to 34,000 spectators, the Ishiyama arena promises to be the ultimate destination for all BattleMech enthusiasts.</p> <p>From the famous one-on-one duels, to the all-out free-for-all brawls, the Ishiyama arena has something for everyone. And with the best pilots and 'Meks from across the Inner Sphere competing, you can be sure that every match will be a nail-biting experience.</p> <p>So mark your calendars and get ready for the experience of a lifetime. The Ishiyama "Stone Mountain" arena is the place to be for all your BattleMech action needs. See you in the stands!</p>]]></desc>
         <service>Solaris VII News Network</service>
         <location>Solaris VII</location>
     </newsItem>
@@ -1694,7 +1694,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>New Valencia Under Siege: McCarron's Armored Cavalry Launches Bold Assault on Wolf's Dragoons</headline> <!-- Source: Wolf's Dragoons -->
         <date>3007-04</date>
-        <desc><![CDATA[<p>The long-standing rivalry between the Capellan Confederation and Wolf's Dragoons has reached a boiling point as McCarron's Armored Cavalry launches a surprise attack on the Dragoons' baseworld of New Valencia. The news of the assault has sent shockwaves through the Confederation, as the Dragoons have long been considered one of the most powerful and feared mercenary units in the Inner Sphere.</p> <p>According to reports, the Cavalry's attack was swift and brutal, catching the Dragoons off guard. The Dragoons are known for their elite 'Mech units, but the Cavalry's heavily armored tanks and infantry have proven to be a formidable match. The battle has been raging for days, with both sides taking heavy casualties.</p> <p>The Confederation is hailing the attack as a bold move to finally bring the Dragoons to heel. For too long, the Dragoons have operated with impunity, causing chaos and destruction throughout the Confederation and its neighboring states. The Capellan Chancellor, Maximilian Liao, has issued a statement praising the efforts of McCarron's Armored Cavalry and promising to continue the fight until the Dragoons are no longer a threat to the Confederation's security and stability.</p> <p>The attack on New Valencia has sent a clear message to the Dragoons and the rest of the Inner Sphere: the Confederation will not be intimidated by powerful mercenary units. The Cavalry's actions have earned them the admiration and respect of the Confederation's citizens, and they will continue to fight until justice is served.</p>]]></desc>
+        <desc><![CDATA[<p>The long-standing rivalry between the Capellan Confederation and Wolf's Dragoons has reached a boiling point as McCarron's Armored Cavalry launches a surprise attack on the Dragoons' baseworld of New Valencia. The news of the assault has sent shockwaves through the Confederation, as the Dragoons have long been considered one of the most powerful and feared mercenary units in the Inner Sphere.</p> <p>According to reports, the Cavalry's attack was swift and brutal, catching the Dragoons off guard. The Dragoons are known for their elite 'Mek units, but the Cavalry's heavily armored tanks and infantry have proven to be a formidable match. The battle has been raging for days, with both sides taking heavy casualties.</p> <p>The Confederation is hailing the attack as a bold move to finally bring the Dragoons to heel. For too long, the Dragoons have operated with impunity, causing chaos and destruction throughout the Confederation and its neighboring states. The Capellan Chancellor, Maximilian Liao, has issued a statement praising the efforts of McCarron's Armored Cavalry and promising to continue the fight until the Dragoons are no longer a threat to the Confederation's security and stability.</p> <p>The attack on New Valencia has sent a clear message to the Dragoons and the rest of the Inner Sphere: the Confederation will not be intimidated by powerful mercenary units. The Cavalry's actions have earned them the admiration and respect of the Confederation's citizens, and they will continue to fight until justice is served.</p>]]></desc>
         <service>Capellan Broadcast Service</service>
         <location>Sian</location>
     </newsItem>
@@ -1729,7 +1729,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Wolf's Dragoons Strike a Blow Against Piracy: Federated Suns Successfully Eliminates Criminal Elements on New Hati</headline> <!-- Source: Wolf's Dragoons -->
         <date>3007-10</date>
-        <desc><![CDATA[<p>The Federated Suns' fight against piracy has received a major boost with the recent successful operations conducted by the elite mercenary unit, the Wolf's Dragoons. Led by their legendary commander, Jaime Wolf, the Dragoons were deployed to the planet of New Hati to take on a group of heavily-armed pirate factions that had been wreaking havoc in the region.</p> <p>After several weeks of intense fighting, the Dragoons were able to eliminate the pirate threat and restore order to New Hati. The operation was a major success for the Federated Suns, as the pirate factions had become a major nuisance for the local population and a hindrance to trade and commerce in the area.</p> <p>According to reports, the Dragoons used a combination of overwhelming force and tactical expertise to outmaneuver and overpower the pirate forces. Their assault 'Mechs and aerospace fighters proved to be a decisive advantage, allowing the Dragoons to quickly gain the upper hand in the battles.</p> <p>The success of the operation is being hailed as a major victory for the Federated Suns and a testament to the skill and professionalism of the Wolf's Dragoons. The Dragoons' reputation as one of the most elite and capable mercenary units in the Inner Sphere has once again been solidified, with many praising their ability to quickly and efficiently eliminate a dangerous threat to the Federated Suns.</p> <p>With the pirate threat neutralized, New Hati is now able to return to normalcy and the Federated Suns can focus on rebuilding and revitalizing the region. The Dragoons have once again proven their worth as valuable allies and defenders of the Federated Suns.</p>]]></desc>
+        <desc><![CDATA[<p>The Federated Suns' fight against piracy has received a major boost with the recent successful operations conducted by the elite mercenary unit, the Wolf's Dragoons. Led by their legendary commander, Jaime Wolf, the Dragoons were deployed to the planet of New Hati to take on a group of heavily-armed pirate factions that had been wreaking havoc in the region.</p> <p>After several weeks of intense fighting, the Dragoons were able to eliminate the pirate threat and restore order to New Hati. The operation was a major success for the Federated Suns, as the pirate factions had become a major nuisance for the local population and a hindrance to trade and commerce in the area.</p> <p>According to reports, the Dragoons used a combination of overwhelming force and tactical expertise to outmaneuver and overpower the pirate forces. Their assault 'Meks and aerospace fighters proved to be a decisive advantage, allowing the Dragoons to quickly gain the upper hand in the battles.</p> <p>The success of the operation is being hailed as a major victory for the Federated Suns and a testament to the skill and professionalism of the Wolf's Dragoons. The Dragoons' reputation as one of the most elite and capable mercenary units in the Inner Sphere has once again been solidified, with many praising their ability to quickly and efficiently eliminate a dangerous threat to the Federated Suns.</p> <p>With the pirate threat neutralized, New Hati is now able to return to normalcy and the Federated Suns can focus on rebuilding and revitalizing the region. The Dragoons have once again proven their worth as valuable allies and defenders of the Federated Suns.</p>]]></desc>
         <service>Federated Broadcasting Corporation</service>
         <location>Ulvskollen</location>
     </newsItem>
@@ -1743,7 +1743,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Wolf's Dragoons decimate St. Ives Armored Cavalry in Weekapaug showdown</headline> <!-- Source: Wolf's Dragoons -->
         <date>3007-12</date>
-        <desc><![CDATA[<p>The Wolf's Dragoons, a legendary mercenary unit known for their tactical prowess, have once again proven their worth in battle. In a recent engagement on the planet of Weekapaug, the Dragoons successfully defended the planet against the formidable St. Ives Armored Cavalry.</p> <p>Sources close to the battle report that the Dragoons, led by their charismatic commander Jaime Wolf, employed a series of clever maneuvers and ambushes to outmaneuver the St. Ives forces. Their use of terrain and cover, combined with their expertly trained pilots, allowed the Dragoons to take down the St. Ives 'Mechs one by one.</p> <p>Despite being outnumbered, the Dragoons were able to hold their ground and ultimately emerge victorious, causing the St. Ives forces to retreat in defeat. This display of skill and bravery is yet another example of the Dragoons' reputation as one of the most elite mercenary units in the Inner Sphere.</p> <p>The victory on Weekapaug has solidified the Wolf's Dragoons' position as a top choice for any faction looking to hire top-notch military talent. Their reputation for success in battle is well earned and their victories continue to inspire awe and respect amongst their peers and enemies alike.</p>]]></desc>
+        <desc><![CDATA[<p>The Wolf's Dragoons, a legendary mercenary unit known for their tactical prowess, have once again proven their worth in battle. In a recent engagement on the planet of Weekapaug, the Dragoons successfully defended the planet against the formidable St. Ives Armored Cavalry.</p> <p>Sources close to the battle report that the Dragoons, led by their charismatic commander Jaime Wolf, employed a series of clever maneuvers and ambushes to outmaneuver the St. Ives forces. Their use of terrain and cover, combined with their expertly trained pilots, allowed the Dragoons to take down the St. Ives 'Meks one by one.</p> <p>Despite being outnumbered, the Dragoons were able to hold their ground and ultimately emerge victorious, causing the St. Ives forces to retreat in defeat. This display of skill and bravery is yet another example of the Dragoons' reputation as one of the most elite mercenary units in the Inner Sphere.</p> <p>The victory on Weekapaug has solidified the Wolf's Dragoons' position as a top choice for any faction looking to hire top-notch military talent. Their reputation for success in battle is well earned and their victories continue to inspire awe and respect amongst their peers and enemies alike.</p>]]></desc>
         <service>Federated Broadcasting Corporation</service>
         <location>Weekapaug</location>
     </newsItem>
@@ -1827,7 +1827,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>LAMs Lost: 19th Lyran Guards, Snord's Irregulars Raid Alula Australis</headline> <!-- Source: Wolf's Dragoons -->
         <date>3009</date>
-        <desc><![CDATA[<p>The 19th Lyran Guards and Snord's Irregulars recently conducted a raid on the planet Alula Australis, leaving behind a trail of destruction and loss. Among the damages incurred during the raid were the destruction of several exceptionally rare LAMs (Land-Air 'Mechs).</p> <p>LAMs, which are capable of transforming from a 'Mech to an aerospace fighter, are a highly controversial asset in modern warfare. Their versatility and ability to operate both in the air and on the ground make them valuable assets for any military force but make them prone to maintenance issues.</p> <p>The loss of these LAMs is a significant blow to the defenders of Alula Australis, as they will now have to find a way to compensate for the loss of such valuable assets. The raid also highlights the importance of protecting valuable military assets, as they can greatly impact the outcome of a battle.</p> <p>It is unknown at this time what the next move for the defenders of Alula Australis will be, but one thing is certain, they will have to work hard to overcome this setback.</p>]]></desc>
+        <desc><![CDATA[<p>The 19th Lyran Guards and Snord's Irregulars recently conducted a raid on the planet Alula Australis, leaving behind a trail of destruction and loss. Among the damages incurred during the raid were the destruction of several exceptionally rare LAMs (Land-Air 'Meks).</p> <p>LAMs, which are capable of transforming from a 'Mek to an aerospace fighter, are a highly controversial asset in modern warfare. Their versatility and ability to operate both in the air and on the ground make them valuable assets for any military force but make them prone to maintenance issues.</p> <p>The loss of these LAMs is a significant blow to the defenders of Alula Australis, as they will now have to find a way to compensate for the loss of such valuable assets. The raid also highlights the importance of protecting valuable military assets, as they can greatly impact the outcome of a battle.</p> <p>It is unknown at this time what the next move for the defenders of Alula Australis will be, but one thing is certain, they will have to work hard to overcome this setback.</p>]]></desc>
         <service>Irian News Interstellar</service>
         <location>Alula Australis</location>
     </newsItem>
@@ -1841,7 +1841,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Wolf's Dragoons Vanish</headline> <!-- Source: Wolf's Dragoons -->
         <date>3009-01-11</date>
-        <desc><![CDATA[<p>AFFS spokespeople confirmed today that the bulk of Wolf's Dragoons has left the New Valencia system, but would not confirm or deny they knew the mercenaries' destination. The few Dragoons left on-planet also refused to comment on their comrades' intentions, only saying it was an approved movement order.<p>It is not unusual for almost all of the Dragoons to be off of New Valencia. Just last year, before the spectacular assault on New Aragon, almost all the combat elements left. But what is unusual this time is that almost the entire support apparatus the insular Dragoons have maintained has gone with them this time. The streets and halls of Fort Jaime are deserted.</p> <p>Federated Suns News Service spole with one AFFS officer, who refused to be identified, who claims the Dragoons are off on a long strike against another powerful Capellan target, perhaps Sarna itself, or even Sian. Our military consultants say that is unlikely, given the mauling the Dragoons suffered on New Aragon, but possible.</p> <p>A more likely scenario is simple: wherever the Dragoons first got their windfall of 'Mechs, tanks and more, they didn't use it all. And they've gone back for more.</p> <p>That's an idea this reporter can't wait to see played out.</p>]]></desc>
+        <desc><![CDATA[<p>AFFS spokespeople confirmed today that the bulk of Wolf's Dragoons has left the New Valencia system, but would not confirm or deny they knew the mercenaries' destination. The few Dragoons left on-planet also refused to comment on their comrades' intentions, only saying it was an approved movement order.<p>It is not unusual for almost all of the Dragoons to be off of New Valencia. Just last year, before the spectacular assault on New Aragon, almost all the combat elements left. But what is unusual this time is that almost the entire support apparatus the insular Dragoons have maintained has gone with them this time. The streets and halls of Fort Jaime are deserted.</p> <p>Federated Suns News Service spole with one AFFS officer, who refused to be identified, who claims the Dragoons are off on a long strike against another powerful Capellan target, perhaps Sarna itself, or even Sian. Our military consultants say that is unlikely, given the mauling the Dragoons suffered on New Aragon, but possible.</p> <p>A more likely scenario is simple: wherever the Dragoons first got their windfall of 'Meks, tanks and more, they didn't use it all. And they've gone back for more.</p> <p>That's an idea this reporter can't wait to see played out.</p>]]></desc>
         <service>FSNS</service>
         <location>New Valencia</location>
     </newsItem>
@@ -1853,9 +1853,9 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Tharkad</location>
     </newsItem>
     <newsItem>
-        <headline>Dragoons New Mystery 'Mech</headline> <!-- Source: Wolf's Dragoons (sourcebook); Edited date in-line with information from  Wolf's Dragoons (sourcebook)-->
+        <headline>Dragoons New Mystery 'Mek</headline> <!-- Source: Wolf's Dragoons (sourcebook); Edited date in-line with information from  Wolf's Dragoons (sourcebook)-->
         <date>3010</date>
-        <desc><![CDATA[<p>When the Wolf's Dragoons returned to New Valencia in December 3009, they returned with more new, pristine war machines that no one had seen in centuries. Or in several cases, ever before.<p>One such case is a massive, slow assault 'Mech we've heard is called an <em>Annihilator</em>. This beast stumps around with no hands and four deadly autocannons, each of them equal to the guns carried by Davion <em>Enforcer</em> or <em>Centurion</em> BattleMechs. None of the Dragoons are willing to tell us where these and other 'Mech came from, where they were built, or how many more of them there might be.</p> <p>Once again, the mysterious Dragoons pose more questions than they can answer.</p>]]></desc>
+        <desc><![CDATA[<p>When the Wolf's Dragoons returned to New Valencia in December 3009, they returned with more new, pristine war machines that no one had seen in centuries. Or in several cases, ever before.<p>One such case is a massive, slow assault 'Mek we've heard is called an <em>Annihilator</em>. This beast stumps around with no hands and four deadly autocannons, each of them equal to the guns carried by Davion <em>Enforcer</em> or <em>Centurion</em> BattleMechs. None of the Dragoons are willing to tell us where these and other 'Mek came from, where they were built, or how many more of them there might be.</p> <p>Once again, the mysterious Dragoons pose more questions than they can answer.</p>]]></desc>
         <service>FSNS</service>
         <location>New Valencia</location>
     </newsItem>
@@ -1897,7 +1897,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Diaper Duty: Mallory's World Gets Down to Business with a Little Help from Its Bums</headline> <!-- Source: Historical Turning Points: Mallory's World -->
         <date>3010</date>
-        <desc><![CDATA[<p>Mallory's World, once a thriving world turned desolate wasteland by the fall of the Star League, is now a hub of industry, with a new company leading the way in the planet's rehabilitation: Mallory's World Diaper Concern.</p> <p>Yes, you heard that right! Diapers. But don't let the humble nature of the product fool you; these diapers are high-tech, reusable and helping to clean up the environment. The Mallory's World Diaper Concern is a prime example of how a little bit of innovation can go a long way in transforming a planet.</p> <p>"We're not just changing diapers, we're changing the world!" said an enthusiastic spokesperson from the company. And it's true; by producing eco-friendly diapers, the company is helping to reduce waste and improve the lives of the planet's residents.</p> <p>The company's product line has even caught the eye of some of the local MechWarriors. One anonymous Hussar was quoted as saying, "I've never felt so secure in my cockpit. It's like wearing a personal force field."</p> <p>So the next time you find yourself on Mallory's World, be sure to pick up a pack of Mallory's World Diapers and do your part in the effort to reclaim the Wastelands! And if you're really feeling adventurous, grab a pack for your 'Mech too. After all, even giant robots need to mind their manners.</p>]]></desc>
+        <desc><![CDATA[<p>Mallory's World, once a thriving world turned desolate wasteland by the fall of the Star League, is now a hub of industry, with a new company leading the way in the planet's rehabilitation: Mallory's World Diaper Concern.</p> <p>Yes, you heard that right! Diapers. But don't let the humble nature of the product fool you; these diapers are high-tech, reusable and helping to clean up the environment. The Mallory's World Diaper Concern is a prime example of how a little bit of innovation can go a long way in transforming a planet.</p> <p>"We're not just changing diapers, we're changing the world!" said an enthusiastic spokesperson from the company. And it's true; by producing eco-friendly diapers, the company is helping to reduce waste and improve the lives of the planet's residents.</p> <p>The company's product line has even caught the eye of some of the local MechWarriors. One anonymous Hussar was quoted as saying, "I've never felt so secure in my cockpit. It's like wearing a personal force field."</p> <p>So the next time you find yourself on Mallory's World, be sure to pick up a pack of Mallory's World Diapers and do your part in the effort to reclaim the Wastelands! And if you're really feeling adventurous, grab a pack for your 'Mek too. After all, even giant robots need to mind their manners.</p>]]></desc>
         <service>Federated News Services</service>
         <location>Mallory's World</location>
     </newsItem>
@@ -1918,7 +1918,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Merlin's debut</headline> <!-- Source: MUL Online -->
         <date>3010-05-15</date>
-        <desc><![CDATA[<p>The military community was shocked earlier this month to learn that the Mountain Wolf BattleMechs (MWBM) factory on Alpheratz was rebuilt in secret by the Outworld's Alliance and just recently produced its first new BattleMech. Even more surprising was the news that the 'Mech was of a brand new design, dubbed the <em>Merlin</em> by MWBM, it is a sturdy heavy 'Mech that uses parts common throughout the Inner Sphere and Periphery. The news of a new 'Mech has the military community quite excited as this is the first entirely new design in over 100 years. MWBM is reported to already have a line of customers interested in purchasing the new 'Mechs just as quickly as they can make them.</p>]]></desc>
+        <desc><![CDATA[<p>The military community was shocked earlier this month to learn that the Mountain Wolf BattleMechs (MWBM) factory on Alpheratz was rebuilt in secret by the Outworld's Alliance and just recently produced its first new BattleMech. Even more surprising was the news that the 'Mek was of a brand new design, dubbed the <em>Merlin</em> by MWBM, it is a sturdy heavy 'Mek that uses parts common throughout the Inner Sphere and Periphery. The news of a new 'Mek has the military community quite excited as this is the first entirely new design in over 100 years. MWBM is reported to already have a line of customers interested in purchasing the new 'Meks just as quickly as they can make them.</p>]]></desc>
         <service>CNB</service>
         <location>Alpheratz</location>
     </newsItem>
@@ -1981,7 +1981,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>8th Galedon Regulars formed</headline> <!-- Source: The Galtor Campaign -->
         <date>3011-03-19</date>
-        <desc><![CDATA[<p>There are reports of heightened security throughout the Federated Sun's Draconis March after news leaked that the Draconis Combine recently reformed the 8th Galedon Regulars. While there is very little known about the newly reformed regiment, reports indicate the unit is comprised primarily of heavy and assault 'Mechs. While one regiment is unlikely to make an impact on the highly contested border, the addition of a new assault regiment is never welcome news.</p>]]></desc>
+        <desc><![CDATA[<p>There are reports of heightened security throughout the Federated Sun's Draconis March after news leaked that the Draconis Combine recently reformed the 8th Galedon Regulars. While there is very little known about the newly reformed regiment, reports indicate the unit is comprised primarily of heavy and assault 'Meks. While one regiment is unlikely to make an impact on the highly contested border, the addition of a new assault regiment is never welcome news.</p>]]></desc>
         <service>FSNS</service>
         <location>Robinson</location>
     </newsItem>
@@ -2065,7 +2065,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Hendrik Grimm III founds Oberon Confederation</headline> <!-- Source: The Periphery (2nd Edition) -->
         <date>3012-06-05</date>
-        <desc><![CDATA[<p>In a surprising turn of events, self-styled King, Hendrik Grimm III has declared the founding of the Oberon Confederation, with a power base consisting of his large pirate band that has existed since at least 2855 when his grandfather, Hendrik Grimm, deserted from the LCAF along with many of the soldiers that served under him. The unit turned to piracy and made Oberon VI their base of operations and they have been plaguing surrounding system for more than a century.</p> <p>Oberon VI was once a jewel of the Rim Worlds Republic in the days of the Star League but never recovered from the ravages of the Amaris Coup. A century after the fall of the Star League the planet made for an easy target for the original Hendrik Grimm and a pirate's haven was founded and slavery became rampant.</p> <p>King Grimm III has promised social and political reform and a change to his ways, including using his men and 'Mechs to defend his new Confederation and to take on legitimate mercenary work for units that can be spared. What will actually become of the new nation remains to be seen. When asked for comment Lyran officials refused to make any public comments, though a few anonymously condemned Hendrik Grimm III and his "pirate nation".</p>]]></desc>
+        <desc><![CDATA[<p>In a surprising turn of events, self-styled King, Hendrik Grimm III has declared the founding of the Oberon Confederation, with a power base consisting of his large pirate band that has existed since at least 2855 when his grandfather, Hendrik Grimm, deserted from the LCAF along with many of the soldiers that served under him. The unit turned to piracy and made Oberon VI their base of operations and they have been plaguing surrounding system for more than a century.</p> <p>Oberon VI was once a jewel of the Rim Worlds Republic in the days of the Star League but never recovered from the ravages of the Amaris Coup. A century after the fall of the Star League the planet made for an easy target for the original Hendrik Grimm and a pirate's haven was founded and slavery became rampant.</p> <p>King Grimm III has promised social and political reform and a change to his ways, including using his men and 'Meks to defend his new Confederation and to take on legitimate mercenary work for units that can be spared. What will actually become of the new nation remains to be seen. When asked for comment Lyran officials refused to make any public comments, though a few anonymously condemned Hendrik Grimm III and his "pirate nation".</p>]]></desc>
         <service>CNB</service>
         <location>Oberon VI</location>
     </newsItem>
@@ -2079,7 +2079,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Marauder II unveiled</headline> <!-- Source: MUL Online -->
         <date>3012-11-05</date>
-        <desc><![CDATA[<p>Today, representatives of a joint General Motors and Blackwell Industries unveiled the <em>Marauder II</em>, a fearsome 100-ton assault 'Mech. While the new 'Mech is 33% heavier than the original, the 'Mech has a lot in common with its lighter sire, pairing a PPC and laser in each arm, with a large laser in place of the traditional autocannon. While the new <em>Marauder II</em> is slower, engineers have compensated by adding jump jets that allow this 'Mech to jump up to 90 meters at a time. The initial line of <em>Marauder II</em>s are slated for the Wolf's Dragoons, however Blackwell representatives stated that they would begin taking orders on a first-come, first-serve basis starting in six-months.</p>]]></desc>
+        <desc><![CDATA[<p>Today, representatives of a joint General Motors and Blackwell Industries unveiled the <em>Marauder II</em>, a fearsome 100-ton assault 'Mek. While the new 'Mek is 33% heavier than the original, the 'Mek has a lot in common with its lighter sire, pairing a PPC and laser in each arm, with a large laser in place of the traditional autocannon. While the new <em>Marauder II</em> is slower, engineers have compensated by adding jump jets that allow this 'Mek to jump up to 90 meters at a time. The initial line of <em>Marauder II</em>s are slated for the Wolf's Dragoons, however Blackwell representatives stated that they would begin taking orders on a first-come, first-serve basis starting in six-months.</p>]]></desc>
         <service>CNB</service>
         <location>Galatea</location>
     </newsItem>
@@ -2401,7 +2401,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Marik Civil War updates</headline> <!-- Source: Historical: Brush Wars -->
         <date>3014-12-03</date>
-        <desc><![CDATA[<p>The Civil War between brothers continues to rage in the Free Worlds League. Insider reports indicate that forces loyal to Anton Marik, the rebelling brother to Captain-General Janos Marik, have secured some key victories in their fight to overthrow the leader of the League, including the capture of the 'Mech factories on Irian and Emris IV, as well as additional military manufacturing on Bernardo and Asuncion. However, Anton's forces have suffered several setbacks and reversals that could put an end to this war soon. So far the biggest setbacks have been political and not on the battlefield. While many regions of the Free Worlds League have declared their neutrality in the conflict and have reserved their forces for the defense of their holdings from Liao and Steiner, the Captain-General has secured support of both Sirius and Regulus, two of the most powerful regions of the League. With the new forces they can provide to the Captain-General, even the elite Wolf's Dragoons may not be enough to keep Anton's Rebellion alive.</p>]]></desc>
+        <desc><![CDATA[<p>The Civil War between brothers continues to rage in the Free Worlds League. Insider reports indicate that forces loyal to Anton Marik, the rebelling brother to Captain-General Janos Marik, have secured some key victories in their fight to overthrow the leader of the League, including the capture of the 'Mek factories on Irian and Emris IV, as well as additional military manufacturing on Bernardo and Asuncion. However, Anton's forces have suffered several setbacks and reversals that could put an end to this war soon. So far the biggest setbacks have been political and not on the battlefield. While many regions of the Free Worlds League have declared their neutrality in the conflict and have reserved their forces for the defense of their holdings from Liao and Steiner, the Captain-General has secured support of both Sirius and Regulus, two of the most powerful regions of the League. With the new forces they can provide to the Captain-General, even the elite Wolf's Dragoons may not be enough to keep Anton's Rebellion alive.</p>]]></desc>
         <service>CNB</service>
         <location>New Home</location>
     </newsItem>
@@ -2646,7 +2646,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>The Free Worlds League's new BattleMech, the Liberator, doomed, reputation damaged and contracts cancelled</headline> <!-- Source: MUL -->
         <date>3018-10</date>
-        <desc><![CDATA[<p>The Free Worlds League's new BattleMech, the <em>Liberator</em>, was doomed by a severe flaw in its cooling system, according to a recent report. The development of the <em>Liberator</em> was sparked by evidence that the Lyran Commonwealth and Capellan Confederation were both working on new 'Mechs of their own. The <em>Liberator</em> was intended to be the first produced by the League in centuries, but its revolutionary torso design ultimately led to the failure of its cooling system. The flaws were revealed at the first public unveiling earlier this year, leading to the cancellation of the marketing and contracts and damaging the reputation of Kali Yama Industries.</p>]]></desc>
+        <desc><![CDATA[<p>The Free Worlds League's new BattleMech, the <em>Liberator</em>, was doomed by a severe flaw in its cooling system, according to a recent report. The development of the <em>Liberator</em> was sparked by evidence that the Lyran Commonwealth and Capellan Confederation were both working on new 'Meks of their own. The <em>Liberator</em> was intended to be the first produced by the League in centuries, but its revolutionary torso design ultimately led to the failure of its cooling system. The flaws were revealed at the first public unveiling earlier this year, leading to the cancellation of the marketing and contracts and damaging the reputation of Kali Yama Industries.</p>]]></desc>
         <service>CNB</service>
         <location>Kalidasa</location>
     </newsItem>
@@ -2724,7 +2724,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Old scout gets new variant</headline> <!-- Source: Technical Readout: 3039 -->
         <date>3025</date>
-        <desc><![CDATA[<p>Coventry Metal Works has begun producing a new variant of the venerable <em>Commando</em> light 'Mech. This new load-out incorporates a second 6-pack of short-range missiles and a flamer that replace the arm-mounted 4-pack. While this new loadout has significant offensive capabilities for a 25-ton 'Mech, it also reduced the armor by a ton, making the 'Mech that much more vulnerable.</p>]]></desc>
+        <desc><![CDATA[<p>Coventry Metal Works has begun producing a new variant of the venerable <em>Commando</em> light 'Mek. This new load-out incorporates a second 6-pack of short-range missiles and a flamer that replace the arm-mounted 4-pack. While this new loadout has significant offensive capabilities for a 25-ton 'Mek, it also reduced the armor by a ton, making the 'Mek that much more vulnerable.</p>]]></desc>
         <service>TMA</service>
         <location>Coventry</location>
     </newsItem>
@@ -2745,7 +2745,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Battlemaster variant defines new role</headline> <!-- Source: Technical Readout: 3039 -->
         <date>3025</date>
-        <desc><![CDATA[<p>A new variant of the <em>Battlemaster</em> has been showcased to mixed reviews. Replacing 80% of the primary weapons for various missile systems, the new configuration is more reliant of supplies than many dedicated assault 'Mechs currently fielded. While this does allow commanders to direct a battle from longer ranges, critics are still unsure how it will fare on the battlefield.</p>]]></desc>
+        <desc><![CDATA[<p>A new variant of the <em>Battlemaster</em> has been showcased to mixed reviews. Replacing 80% of the primary weapons for various missile systems, the new configuration is more reliant of supplies than many dedicated assault 'Meks currently fielded. While this does allow commanders to direct a battle from longer ranges, critics are still unsure how it will fare on the battlefield.</p>]]></desc>
         <service>FNS</service>
         <location>Pandora</location>
     </newsItem>
@@ -2836,7 +2836,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>New Champion named: Davion supporters shocked, bodies turn up</headline> <!-- Source: Warrior: EnGarde -->
         <date>3027-05-30</date>
-        <desc><![CDATA[<p>Philip Capet was killed in what game watchers have called one of the hottest feuds that Solaris VII has ever seen. Fighting in the name of the Capellan Confederation, Justin Xiang executed Capet during a match in the Ishiyama arena, disabling Capet's 'Mech and then deliberately shooting the cockpit. Davion supporters were shocked by this act of barbarism and many of the Stable owners are said to have voiced displeasure that he could be named champion with such an action. Rumors have been heard that this fight, one that both MechWarriors agreed to, was rigged and that Xiang would not trust Capet to keep the secret as several people close to Xiang have recently disappeared or have turned up dead, including former champion Gray Noton with whom he was seen several times since his arrival.</p>]]></desc>
+        <desc><![CDATA[<p>Philip Capet was killed in what game watchers have called one of the hottest feuds that Solaris VII has ever seen. Fighting in the name of the Capellan Confederation, Justin Xiang executed Capet during a match in the Ishiyama arena, disabling Capet's 'Mek and then deliberately shooting the cockpit. Davion supporters were shocked by this act of barbarism and many of the Stable owners are said to have voiced displeasure that he could be named champion with such an action. Rumors have been heard that this fight, one that both MechWarriors agreed to, was rigged and that Xiang would not trust Capet to keep the secret as several people close to Xiang have recently disappeared or have turned up dead, including former champion Gray Noton with whom he was seen several times since his arrival.</p>]]></desc>
         <service>SBC</service>
         <location>Solaris VII</location>
     </newsItem>
@@ -2878,7 +2878,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>"Here, My Love..." says Hanse Davion to Melissa Steiner</headline>
         <date>3028-08-21</date>
-        <desc><![CDATA[<p>No one thought, before the fact, that the wedding of First Prince Hanse Davion of the Federated Suns to Melissa Steiner, daughter of Archon Katrina Steiner of the Lyran Commonwealth, would be a boring affair, but no one could have anticipated this.</p> <p>The wedding itself was beautiful, everyone agreed. And the reception after had collected more Successor State lords than any even since the fall of the Star League so many centuries ago. But when it came time for the toasts...</p> <p>The bride went first, gifting her husband a regiment of 'Mechs. Kind of tacky, some might have said. But in line. What else could a Davion prince want more?</p> <p>The entire Inner Sphere found out when Hanse Davion rose to toast his wife. "I give you the Capellan Confederation!" Davion proclaimed.</p> <p>People went <em>crazy</em>. Most of us in the press thought that was it, but later in the hotel lobbies and bars we heard the first reports from ComStar: Davion regiments had crossed into the Confederation in overwhelming strength.</p> <p>Hanse Davion clearly means to deliver on his promise. Which means, fellow mercenaries, business is about to get <em>good</em>.</p>]]></desc>
+        <desc><![CDATA[<p>No one thought, before the fact, that the wedding of First Prince Hanse Davion of the Federated Suns to Melissa Steiner, daughter of Archon Katrina Steiner of the Lyran Commonwealth, would be a boring affair, but no one could have anticipated this.</p> <p>The wedding itself was beautiful, everyone agreed. And the reception after had collected more Successor State lords than any even since the fall of the Star League so many centuries ago. But when it came time for the toasts...</p> <p>The bride went first, gifting her husband a regiment of 'Meks. Kind of tacky, some might have said. But in line. What else could a Davion prince want more?</p> <p>The entire Inner Sphere found out when Hanse Davion rose to toast his wife. "I give you the Capellan Confederation!" Davion proclaimed.</p> <p>People went <em>crazy</em>. Most of us in the press thought that was it, but later in the hotel lobbies and bars we heard the first reports from ComStar: Davion regiments had crossed into the Confederation in overwhelming strength.</p> <p>Hanse Davion clearly means to deliver on his promise. Which means, fellow mercenaries, business is about to get <em>good</em>.</p>]]></desc>
         <service>MercNet</service>
         <location>Terra</location>
     </newsItem>
@@ -3102,7 +3102,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Mercenary turned author, from weapons to words</headline> <!-- Source: The Saga of the Gray Death Legion -->
         <date>3045</date>
-        <desc><![CDATA[<p>The Gray Death Legion mercenary unit has been know throughout the Inner Sphere as an example of what can be done in the face of adversity. Formed from battle and tested against treachery, thy have proven never to bet against them. Now they have thrown their hat into another type of battle, one for sales. Lori Kalmar has released a book detailing her time with the GDL titled <em>'Mechs of Flesh and Blood</em>. While critics have reviewed the book poorly, saying that it looks like it was written as a holodrama straight from the Free worlds League. Combat veteran and reviewer Gregory Barklette, provided one of the best reviews, "While written basically, it captures the intent of battlefield life, with the ups and downs that being in a merc outfit can bring." It is unknown at this time if a second volume will be coming from Avalon Press.</p>]]></desc>
+        <desc><![CDATA[<p>The Gray Death Legion mercenary unit has been know throughout the Inner Sphere as an example of what can be done in the face of adversity. Formed from battle and tested against treachery, thy have proven never to bet against them. Now they have thrown their hat into another type of battle, one for sales. Lori Kalmar has released a book detailing her time with the GDL titled <em>'Meks of Flesh and Blood</em>. While critics have reviewed the book poorly, saying that it looks like it was written as a holodrama straight from the Free worlds League. Combat veteran and reviewer Gregory Barklette, provided one of the best reviews, "While written basically, it captures the intent of battlefield life, with the ups and downs that being in a merc outfit can bring." It is unknown at this time if a second volume will be coming from Avalon Press.</p>]]></desc>
         <service>FNS</service>
         <location>New Avalon</location>
     </newsItem>
@@ -3116,7 +3116,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Venerable command BattleMech gets facelift</headline> <!-- Source: MUL Online -->
         <date>3045</date>
-        <desc><![CDATA[<p>The <em>Cyclops</em>, a common command BattleMech, has been fielded with a new variant, the CP-11-A. Sacrificing some of the short-range power of the Zeus-36 autocannon, the new model is equipped with a Zeus Slingshot Gauss Rifle which has an incredible range of 660 meters. While slightly less powerful, this new weapon system allows a commander or other pilot to engage enemies from ranges that many 'Mechs will struggle to effectively return fire from. This upgrade is also one of many produced locally within the Free Worlds League by Irian BattleMechs Unlimited.</p>]]></desc>
+        <desc><![CDATA[<p>The <em>Cyclops</em>, a common command BattleMech, has been fielded with a new variant, the CP-11-A. Sacrificing some of the short-range power of the Zeus-36 autocannon, the new model is equipped with a Zeus Slingshot Gauss Rifle which has an incredible range of 660 meters. While slightly less powerful, this new weapon system allows a commander or other pilot to engage enemies from ranges that many 'Meks will struggle to effectively return fire from. This upgrade is also one of many produced locally within the Free Worlds League by Irian BattleMechs Unlimited.</p>]]></desc>
         <service>INI</service>
         <location>Irian</location>
     </newsItem>
@@ -3186,7 +3186,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Recovered technology heralds new Jenners</headline> <!-- Source: Technical Readout: 3050 Upgrade -->
         <date>3046</date>
-        <desc><![CDATA[<p>The <em>Jenner</em> BattleMech is once again in production! After nearly two centuries, recent discoveries have allowed for new <em>Jenners</em> to be produced by Luthien Armor Works. Long associated with the Draconis Combine this totem BattleMech has been going extinct faster than replacement parts could be found or salvaged. This and other breakthroughs in 'Mech development have increased the survivability of these ancient designs.</p>]]></desc>
+        <desc><![CDATA[<p>The <em>Jenner</em> BattleMech is once again in production! After nearly two centuries, recent discoveries have allowed for new <em>Jenners</em> to be produced by Luthien Armor Works. Long associated with the Draconis Combine this totem BattleMech has been going extinct faster than replacement parts could be found or salvaged. This and other breakthroughs in 'Mek development have increased the survivability of these ancient designs.</p>]]></desc>
         <service>CNB</service>
         <location>Luthien</location>
     </newsItem>
@@ -3235,7 +3235,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>More Centurions on the way</headline> <!-- Source: Technical Readout: 3050 Upgrade -->
         <date>3047</date>
-        <desc><![CDATA[<p>An agreement between Corean Enterprises and Jalastar Aerospace has recently gone public for the production of <em>Centurion</em> BattleMechs. This agreement has both companies increasing their production lines ensuring that many more of the medium 'Mechs will be produced in the future. Current pilots have to be excited as parts for the older models were becoming more and more difficult to find as the machines were lost.</p>]]></desc>
+        <desc><![CDATA[<p>An agreement between Corean Enterprises and Jalastar Aerospace has recently gone public for the production of <em>Centurion</em> BattleMechs. This agreement has both companies increasing their production lines ensuring that many more of the medium 'Meks will be produced in the future. Current pilots have to be excited as parts for the older models were becoming more and more difficult to find as the machines were lost.</p>]]></desc>
         <service>CNB</service>
         <location>New Avalon</location>
     </newsItem>
@@ -3256,14 +3256,14 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Elite technicians form new company: Contracted to Wolf's Dragoons immediately</headline> <!-- Source: Field Manual: Mercenaries -->
         <date>3047</date>
-        <desc><![CDATA[<p>A group of some of the most skilled scroungers, jury-riggers, technicians, engineers, and tinkerers has come together to form one of the most in-demand working groups on Outreach, 'Mech Magic, Inc. The group has been around for quite some time working as individuals for-hire to almost every mercenary unit that could afford their services. Early this month the company was registered in the ComStar database as one of the first non-mercenary unit formations on the planet. Almost as soon as the company was founded, Colonel Jamie Wolf announced that they would be hiring a majority of the technical staff for the Dragoons. If they had been a traded company their stock would have tripled at the announcement. With a name like that they must have some secret spells working and some of the most damaged 'Mechs come out of their hangars smelling like they just came off the assembly line.</p>]]></desc>
+        <desc><![CDATA[<p>A group of some of the most skilled scroungers, jury-riggers, technicians, engineers, and tinkerers has come together to form one of the most in-demand working groups on Outreach, 'Mek Magic, Inc. The group has been around for quite some time working as individuals for-hire to almost every mercenary unit that could afford their services. Early this month the company was registered in the ComStar database as one of the first non-mercenary unit formations on the planet. Almost as soon as the company was founded, Colonel Jamie Wolf announced that they would be hiring a majority of the technical staff for the Dragoons. If they had been a traded company their stock would have tripled at the announcement. With a name like that they must have some secret spells working and some of the most damaged 'Meks come out of their hangars smelling like they just came off the assembly line.</p>]]></desc>
         <service>MercNet</service>
         <location>Outreach</location>
     </newsItem>
     <newsItem>
         <headline>Noisiel first inaugural Summer Games held: Father versus son to highlight the Games</headline> <!-- Source: Mercenaries Supplemental II -->
         <date>3047-07</date>
-        <desc><![CDATA[<p>Spectators were treated to a new form of 'Mech competition last month on Noisiel. Duke Michael Alextep and his son William faced off in the first ever <em>Atlas</em> rugby match. The event was the highlight of the first annual Noisiel Summer Games announced earlier this year. The event highlighted traditional athletes as well as some of the finest aerobatic maneuvers from AFFC pilots. The event was so popular talks are already under way as to the next years event with several ideas being submitted to the Duke's offices.</p>]]></desc>
+        <desc><![CDATA[<p>Spectators were treated to a new form of 'Mek competition last month on Noisiel. Duke Michael Alextep and his son William faced off in the first ever <em>Atlas</em> rugby match. The event was the highlight of the first annual Noisiel Summer Games announced earlier this year. The event highlighted traditional athletes as well as some of the finest aerobatic maneuvers from AFFC pilots. The event was so popular talks are already under way as to the next years event with several ideas being submitted to the Duke's offices.</p>]]></desc>
         <service>CNB</service>
         <location>Noisiel</location>
     </newsItem>
@@ -3298,7 +3298,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Axman unveiled</headline> <!-- Source: MUL Online -->
         <date>3048</date>
-        <desc><![CDATA[<p>Today the Federated Commonwealth unveiled a brand new design, developed by Team Banzai and the NAIS, the new <em>Axman</em> is the follow up to the iconic <em>Hatchetman</em> BattleMech. The new <em>Axman</em> weighs significantly more than its predecessor but is otherwise very similar. Both 'Mechs wield massive hatchets and are armed with large-bore autocannons for destroying other 'Mechs and both designs have a top speed of nearly 65 km/h and jump jets. The biggest difference between the <em>Axman</em> and the <em>Hatchetman</em>, other than their size, is the inclusion of rediscovered Lostech on the <em>Axman</em>.</p>]]></desc>
+        <desc><![CDATA[<p>Today the Federated Commonwealth unveiled a brand new design, developed by Team Banzai and the NAIS, the new <em>Axman</em> is the follow up to the iconic <em>Hatchetman</em> BattleMech. The new <em>Axman</em> weighs significantly more than its predecessor but is otherwise very similar. Both 'Meks wield massive hatchets and are armed with large-bore autocannons for destroying other 'Meks and both designs have a top speed of nearly 65 km/h and jump jets. The biggest difference between the <em>Axman</em> and the <em>Hatchetman</em>, other than their size, is the inclusion of rediscovered Lostech on the <em>Axman</em>.</p>]]></desc>
         <service>FBC</service>
         <location>New Avalon</location>
     </newsItem>
@@ -3312,7 +3312,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Devastator unveiled</headline> <!-- Source: MUL Online -->
         <date>3048</date>
-        <desc><![CDATA[<p>The Federated Commonwealth unveiled a new construction line at the Norse-Storm manufacturing plant on Loxley today. A news conference held at the plant wowed reports by showing off the impressive <em>Devastator</em> assault 'Mech.<br><br>The <em>Devastator</em> is rumored to have been designed by Aleksander Kerensky himself, just prior to the Amaris Coup, which resulted in only a handful of prototypes ever making it off the factory floor before the design was lost to history. The <em>Devastator</em> wasn't rediscovered until forces from the Federated Suns discovered blueprints in an abandoned Star League facility on Hoff in 3023. Unfortunately, the advanced materials and parts required meant that the <em>Devastator</em> would not see production for another two decades, with full production only beginning earlier this year.</p>]]></desc>
+        <desc><![CDATA[<p>The Federated Commonwealth unveiled a new construction line at the Norse-Storm manufacturing plant on Loxley today. A news conference held at the plant wowed reports by showing off the impressive <em>Devastator</em> assault 'Mek.<br><br>The <em>Devastator</em> is rumored to have been designed by Aleksander Kerensky himself, just prior to the Amaris Coup, which resulted in only a handful of prototypes ever making it off the factory floor before the design was lost to history. The <em>Devastator</em> wasn't rediscovered until forces from the Federated Suns discovered blueprints in an abandoned Star League facility on Hoff in 3023. Unfortunately, the advanced materials and parts required meant that the <em>Devastator</em> would not see production for another two decades, with full production only beginning earlier this year.</p>]]></desc>
         <service>FCNS</service>
         <location>Loxley</location>
     </newsItem>
@@ -3333,7 +3333,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>New BattleMech variant unveiled</headline> <!-- Source: MUL Online -->
         <date>3049</date>
-        <desc><![CDATA[<p>A new variant of the <em>Axeman</em> BattleMech has been demonstrated to the top brass of the AFFC. The new variant changes the entire tactical purpose of the 'Mech more inline with standoff fighters such as the <em>Trebuchet</em>. Long range missile systems are added in place of the devastating heavy autocannon which can literally tear many 'Mechs to scrap before the massive hand-to-hand weapon can be used to finish them off. Many veteran MechWarriors are leery though of having the heavier weapon removed in favor of such a long-range focused design. Time and experience will tell if they are proven to be valid concerns.</p>]]></desc>
+        <desc><![CDATA[<p>A new variant of the <em>Axeman</em> BattleMech has been demonstrated to the top brass of the AFFC. The new variant changes the entire tactical purpose of the 'Mek more inline with standoff fighters such as the <em>Trebuchet</em>. Long range missile systems are added in place of the devastating heavy autocannon which can literally tear many 'Meks to scrap before the massive hand-to-hand weapon can be used to finish them off. Many veteran MechWarriors are leery though of having the heavier weapon removed in favor of such a long-range focused design. Time and experience will tell if they are proven to be valid concerns.</p>]]></desc>
         <service>FNS</service>
         <location>Furillo</location>
     </newsItem>
@@ -3544,7 +3544,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Commando BattleMech updated</headline>
         <date>3058-01-18</date>
-        <desc><![CDATA[<p>Today officials from the Lyran Alliance Armed Forces announced the release of the latest variant of the venerable <em>Commando</em> BattleMech line, the new COM-7S, which utilizes cutting edge technology to improve the survivability and firepower of the mainstay light 'Mech of the LAAF.</p>]]></desc>
+        <desc><![CDATA[<p>Today officials from the Lyran Alliance Armed Forces announced the release of the latest variant of the venerable <em>Commando</em> BattleMech line, the new COM-7S, which utilizes cutting edge technology to improve the survivability and firepower of the mainstay light 'Mek of the LAAF.</p>]]></desc>
         <service>TBC</service>
         <location>Tharkad</location>
     </newsItem>
@@ -3614,7 +3614,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Coventry Military Academy reopens</headline>
         <date>3060-08-16</date>
-        <desc><![CDATA[<p>We have more good news to report regarding the Lyran Alliance's military academies. A ceremony was just held to christen the reopening of the Coventry Military Academy. As all of our viewers recall, the Coventry Military Academy was damaged during the Jade Falcons' destructive invasion in 3058, which saw the Jade Falcons conquer several worlds before converging on Coventry with several Galaxies of 'Mechs. The Falcons were intent on capturing the planet's vital 'Mech factories and there was fierce fighting by the defending 10th Skye Rangers, Coventry Militia and the Coventry Military Academy Training Cadre. The Academy's buildings and grounds were caught in the middle of one particularly violent battle and the Academy has been rebuilding ever since the Falcons were forced off the planet.</p>]]></desc>
+        <desc><![CDATA[<p>We have more good news to report regarding the Lyran Alliance's military academies. A ceremony was just held to christen the reopening of the Coventry Military Academy. As all of our viewers recall, the Coventry Military Academy was damaged during the Jade Falcons' destructive invasion in 3058, which saw the Jade Falcons conquer several worlds before converging on Coventry with several Galaxies of 'Meks. The Falcons were intent on capturing the planet's vital 'Mek factories and there was fierce fighting by the defending 10th Skye Rangers, Coventry Militia and the Coventry Military Academy Training Cadre. The Academy's buildings and grounds were caught in the middle of one particularly violent battle and the Academy has been rebuilding ever since the Falcons were forced off the planet.</p>]]></desc>
         <service>DBC</service>
         <location>Coventry</location>
     </newsItem>
@@ -3649,7 +3649,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Chancellor safe</headline>
         <date>3060-11-05</date>
-        <desc><![CDATA[<p>Today is a day of celebration for people of the Confederation, CBC has finally received word from the planet of Hustaing and along with verification that First Lord of the Star League and our Celestial Wisdom, Chancellor Sun-Tzu Liao is safe and never landed on Hustaing. The Blackwind Lancers threatened his Celestial Wisdom's fiance, Duchess Marik, but she was kept safe from the vile Lancers by the valiant efforts of the Hustaing Militia and Warrior House Hiritsu, and their righteous fury led to the capture of the vile Lancers and their 'Mechs. The Chancellor has announced the formation of the Hustaing Warriors, a new 'Mech battalion using the 'Mechs captured from the Blackwind Lancers and raised from Hustaing locals.<br><br>In his infinite wisdom, the Chancellor called an emergency meeting with the Star League council and declared a state of emergency and requested peacekeeping forces from the rest of the Inner Sphere to secure and demilitarize the St. Ives border to prevent any further unsanctioned attacks by the aggressive rebellious nation. The peacekeepers are expected to arrive within the next few weeks and I am sure the people of the Confederation will feel safer knowing the mighty Star League will help ensure our safety from our belligerent neighbors.</p>]]></desc>
+        <desc><![CDATA[<p>Today is a day of celebration for people of the Confederation, CBC has finally received word from the planet of Hustaing and along with verification that First Lord of the Star League and our Celestial Wisdom, Chancellor Sun-Tzu Liao is safe and never landed on Hustaing. The Blackwind Lancers threatened his Celestial Wisdom's fiance, Duchess Marik, but she was kept safe from the vile Lancers by the valiant efforts of the Hustaing Militia and Warrior House Hiritsu, and their righteous fury led to the capture of the vile Lancers and their 'Meks. The Chancellor has announced the formation of the Hustaing Warriors, a new 'Mek battalion using the 'Meks captured from the Blackwind Lancers and raised from Hustaing locals.<br><br>In his infinite wisdom, the Chancellor called an emergency meeting with the Star League council and declared a state of emergency and requested peacekeeping forces from the rest of the Inner Sphere to secure and demilitarize the St. Ives border to prevent any further unsanctioned attacks by the aggressive rebellious nation. The peacekeepers are expected to arrive within the next few weeks and I am sure the people of the Confederation will feel safer knowing the mighty Star League will help ensure our safety from our belligerent neighbors.</p>]]></desc>
         <service>CBC</service>
         <location>Hustaing</location>
     </newsItem>
@@ -3738,7 +3738,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <service>MercNet</service>
         <location>Outreach</location>
     </newsItem>
-    
+
     <newsItem>
     <headline>Luthien HPG Falls Silent, Sparking Fears of Imminent Threat</headline>
     <date>3067-12-19</date>
@@ -3851,8 +3851,8 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <location>Tharkad, Tukayyid</location>
 </newsItem>
 
-    
-    
+
+
 <!-- Jihad Era (3068 - 3080) -->
     <newsItem>
         <headline>Mercenary treachery</headline>

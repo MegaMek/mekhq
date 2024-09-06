@@ -64,7 +64,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
 
     //region Units
     /**
-     * This generates Clan 'Mechs differently, so you can get any of the quality ratings for Clan Pilots.
+     * This generates Clan 'Meks differently, so you can get any of the quality ratings for Clan Pilots.
      *
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation

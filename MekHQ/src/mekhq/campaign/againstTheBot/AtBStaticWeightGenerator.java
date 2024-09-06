@@ -39,7 +39,7 @@ public class AtBStaticWeightGenerator {
     /**
      * @param unitType the unit type to determine the format of weight to generate
      * @param faction the faction to generate the weight for
-     * @param regionVariations whether to generate 'Mech weights based on hardcoded regional variations
+     * @param regionVariations whether to generate 'Mek weights based on hardcoded regional variations
      * @return the generated weight
      */
     private static int getRandomWeight(final int unitType, final Faction faction,

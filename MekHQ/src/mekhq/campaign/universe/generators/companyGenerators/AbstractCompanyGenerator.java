@@ -113,7 +113,7 @@ import java.util.stream.Stream;
  *      Implement Surprises
  *      Implement Mystery Boxes
  *      Generate spare personnel (?)
- *      Optional: Mercenaries may customize their 'Mechs, with clantech if enabled only post-3055
+ *      Optional: Mercenaries may customize their 'Meks, with clantech if enabled only post-3055
  *      Think about generating custom setups for specific canon mercenary groups or factions
  *          - these would be surprise based, probably using a data file
  *          - special weapons, special units, and similar
@@ -881,7 +881,7 @@ public abstract class AbstractCompanyGenerator {
     private @Nullable Entity generateEntity(final Campaign campaign,
                                             final AtBRandomMechParameters parameters,
                                             final Faction faction) {
-        // Ultra-Light means no 'Mech generated
+        // Ultra-Light means no 'Mek generated
         if (parameters.getWeight() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
             return null;
         }
@@ -889,7 +889,7 @@ public abstract class AbstractCompanyGenerator {
         final MechSummary mechSummary = generateMechSummary(campaign, parameters, faction);
 
         if (mechSummary == null) {
-            LogManager.getLogger().error("Failed to generate an entity due to a null 'Mech summary for faction " + faction.getShortName());
+            LogManager.getLogger().error("Failed to generate an entity due to a null 'Mek summary for faction " + faction.getShortName());
             return null;
         }
 
@@ -904,7 +904,7 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
-     * @param faction the faction to generate the 'Mech from
+     * @param faction the faction to generate the 'Mek from
      * @return the MechSummary generated from the provided parameters, or null if generation fails
      */
     protected abstract @Nullable MechSummary generateMechSummary(final Campaign campaign,
@@ -974,7 +974,7 @@ public abstract class AbstractCompanyGenerator {
     }
 
     /**
-     * @param trackers the list of trackers including the support 'Mech techs
+     * @param trackers the list of trackers including the support 'Mek techs
      * @param units the list of units to have techs assigned to (order does not matter)
      */
     private void assignTechsToUnits(final List<CompanyGenerationPersonTracker> trackers,
@@ -1270,22 +1270,22 @@ public abstract class AbstractCompanyGenerator {
         for (int i = 0; i < numberMothballedEntities; i++) {
             final Faction faction = factionSelector.selectFaction(campaign);
             if (faction == null) {
-                LogManager.getLogger().error("Failed to generate a valid faction, and thus cannot generate a mothballed 'Mech");
+                LogManager.getLogger().error("Failed to generate a valid faction, and thus cannot generate a mothballed 'Mek");
                 continue;
             }
 
-            // Create the parameters to generate the 'Mech from
+            // Create the parameters to generate the 'Mek from
             final AtBRandomMechParameters parameters = new AtBRandomMechParameters(
                     getBattleMechWeightClassGenerator().generate(Utilities.dice(2, 6)),
                     getBattleMechQualityGenerator().generate(Utilities.dice(2, 6))
             );
 
-            // We want to ensure we get a 'Mech generated
+            // We want to ensure we get a 'Mek generated
             while (parameters.getWeight() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
                 parameters.setWeight(getBattleMechWeightClassGenerator().generate(Utilities.dice(2, 6)));
             }
 
-            // Generate the 'Mech, and add it to the mothballed entities list
+            // Generate the 'Mek, and add it to the mothballed entities list
             final Entity entity = generateEntity(campaign, parameters, faction);
             if (entity != null) {
                 mothballedEntities.add(entity);
@@ -1296,7 +1296,7 @@ public abstract class AbstractCompanyGenerator {
 
     /**
      * @param campaign the campaign to add the units to
-     * @param mothballedEntities the list of generated spare 'Mech entities to add and mothball
+     * @param mothballedEntities the list of generated spare 'Mek entities to add and mothball
      * @return the list of created units
      */
     private List<Unit> createMothballedSpareUnits(final Campaign campaign,

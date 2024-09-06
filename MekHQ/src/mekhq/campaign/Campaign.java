@@ -7303,8 +7303,8 @@ public class Campaign implements ITechManager {
             /*
              * Go through the personnel records again and assume that any person who joined
              * the unit on the founding date is one of the founding members. Also assume
-             * that MWs assigned to a non-Assault 'Mech on the date they joined came with
-             * that 'Mech (which is a less certain assumption)
+             * that MWs assigned to a non-Assault 'Mek on the date they joined came with
+             * that 'Mek (which is a less certain assumption)
              */
             for (Person p : getPersonnel()) {
                 LocalDate join = p.getPersonnelLog().stream()
