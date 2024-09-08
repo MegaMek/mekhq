@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report an issue with MegaMekLab
+description: Report an issue with MekHQ
 title: "Brief Description"
 labels: [bug]
 body:
@@ -21,7 +21,7 @@ body:
             - [MegaMekLab](https://github.com/MegaMek/megameklab/issues)
             - [MekHQ](https://github.com/MegaMek/mekhq/issues)
           required: true
-        - label: "I've tested the issue against the latest MILESTONE version"
+        - label: "I've tested the issue against at least the latest MILESTONE version"
           required: true
         - label: "I've asked on the MegaMek Discord about the error"
           required: true
@@ -119,7 +119,7 @@ body:
   - type: dropdown
     id: megamek-version
     attributes:
-      label: MegaMek Suite Version *
+      label: MekHQ Suite Version *
       description: Which version of MekHQ are you using? Pick your version from the list. If you select "Free Text," please enter your version in the box below.
       options:
         - "v0.50.0"
