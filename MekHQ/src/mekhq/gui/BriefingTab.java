@@ -19,7 +19,7 @@
 package mekhq.gui;
 
 import megamek.client.generator.ReconfigurationParameters;
-import megamek.client.generator.TeamLoadoutGenerator;
+import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
@@ -974,12 +974,12 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // Configure generated units with appropriate munitions (for BV calcs)
-        TeamLoadoutGenerator tlg = new TeamLoadoutGenerator(cGame);
+        TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(cGame);
 
         // Reconfigure each group separately so they only consider their own capabilities
         for (ArrayList<Entity> entityList: botTeamMappings.values()) {
             // bin fill ratio will be adjusted by the loadout generator based on piracy and quality
-            ReconfigurationParameters rp = TeamLoadoutGenerator.generateParameters(
+            ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(
                     cGame,
                     cGame.getOptions(),
                     entityList,
@@ -987,19 +987,19 @@ public final class BriefingTab extends CampaignGuiTab {
                     playerEntities,
                     allyFactionCodes,
                     opforQuality,
-                    ((isPirate) ? TeamLoadoutGenerator.UNSET_FILL_RATIO : 1.0f)
+                    ((isPirate) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f)
             );
             rp.isPirate = isPirate;
             rp.groundMap = groundMap;
             rp.spaceEnvironment = spaceMap;
-            MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, entityList, "");
+            MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, entityList, "");
             tlg.reconfigureEntities(entityList, opforFactionCode, mt, rp);
         }
 
         // Finally, reconfigure all allies (but not player entities) as one organization
         ArrayList<Entity> allEnemyEntities = new ArrayList<>();
         botTeamMappings.values().stream().forEach(x -> allEnemyEntities.addAll(x));
-        ReconfigurationParameters rp = TeamLoadoutGenerator.generateParameters(
+        ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(
                 cGame,
                 cGame.getOptions(),
                 alliedEntities,
@@ -1007,12 +1007,12 @@ public final class BriefingTab extends CampaignGuiTab {
                 allEnemyEntities,
                 opforFactionCodes,
                 opforQuality,
-                (getCampaign().getFaction().isPirate()) ? TeamLoadoutGenerator.UNSET_FILL_RATIO : 1.0f
+                (getCampaign().getFaction().isPirate()) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f
         );
         rp.isPirate = getCampaign().getFaction().isPirate();
         rp.groundMap = groundMap;
         rp.spaceEnvironment = spaceMap;
-        MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, alliedEntities, "");
+        MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, alliedEntities, "");
         tlg.reconfigureEntities(alliedEntities, allyFactionCodes.get(0), mt, rp);
 
     }

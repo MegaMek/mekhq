@@ -602,7 +602,7 @@ public class ResolveScenarioTracker {
                             }
                         }
                     // else if: can't do the following by u.usesSoloPilot because entity may be different if ejected
-                    } else if (en instanceof Mech || en instanceof Protomech || en.isFighter()) {
+                    } else if (en instanceof Mek || en instanceof ProtoMek || en.isFighter()) {
                         status.setHits(pilot.getHits());
                     } else {
                         // we have a multi-crewed Vehicle/Aero/Infantry
@@ -899,9 +899,9 @@ public class ResolveScenarioTracker {
                 en = ejected;
             }
             // check if this ejection was picked up by a player's unit
-            boolean pickedUp = en instanceof MechWarrior
-                    && !((MechWarrior) en).getPickedUpByExternalIdAsString().equals("-1")
-                    && null != unitsStatus.get(UUID.fromString(((MechWarrior) en).getPickedUpByExternalIdAsString()));
+            boolean pickedUp = en instanceof MekWarrior
+                    && !((MekWarrior) en).getPickedUpByExternalIdAsString().equals("-1")
+                    && null != unitsStatus.get(UUID.fromString(((MekWarrior) en).getPickedUpByExternalIdAsString()));
             // if the crew ejected from this unit, then skip it because we should find them elsewhere
             // if they are alive
             if (!(en instanceof EjectedCrew)
@@ -968,10 +968,10 @@ public class ResolveScenarioTracker {
 
             for (Person p : crew) {
                 OppositionPersonnelStatus status = new OppositionPersonnelStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
-                if (en instanceof Mech
-                        || en instanceof Protomech
+                if (en instanceof Mek
+                        || en instanceof ProtoMek
                         || en.isFighter()
-                        || en instanceof MechWarrior) {
+                        || en instanceof MekWarrior) {
                     Crew pilot = en.getCrew();
                     if (null == pilot) {
                         continue;
@@ -1171,7 +1171,7 @@ public class ResolveScenarioTracker {
                 status.assignFoundEntity(e, true);
             } else {
                 // completely destroyed units (such as from an ammo explosion) need to be
-                // kept track of, as mechwarriors may eject from them, etc.
+                // kept track of, as mekwarriors may eject from them, etc.
                 TestUnit nu = generateNewTestUnit(e);
                 UnitStatus us = new UnitStatus(nu);
                 salvageStatus.put(nu.getId(), us);
@@ -1978,13 +1978,13 @@ public class ResolveScenarioTracker {
             //assume its a total loss until we find something that says otherwise
             totalLoss = true;
             //create a brand new entity until we find one
-            MechSummary summary = MechSummaryCache.getInstance().getMech(getLookupName());
+            MekSummary summary = MekSummaryCache.getInstance().getMek(getLookupName());
             if (null != summary) {
                 try {
                     entity = unit.getEntity() == null
-                            ? new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity()
+                            ? new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity()
                             : unit.getEntity();
-                    baseEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                    baseEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 } catch (EntityLoadingException e) {
                     logger.error("", e);
                 }

@@ -35,7 +35,7 @@ public class UnitMarketOffer {
     //region Variable Declarations
     private UnitMarketType marketType;
     private int unitType;
-    private MechSummary unit;
+    private MekSummary unit;
     private int percent;
     private int transitDuration;
     //endregion Variable Declarations
@@ -46,7 +46,7 @@ public class UnitMarketOffer {
     }
 
     public UnitMarketOffer(final UnitMarketType marketType, final int unitType,
-                           final MechSummary unit, final int percent, final int transitDuration) {
+                           final MekSummary unit, final int percent, final int transitDuration) {
         setMarketType(marketType);
         setUnitType(unitType);
         setUnit(unit);
@@ -72,11 +72,11 @@ public class UnitMarketOffer {
         this.unitType = unitType;
     }
 
-    public MechSummary getUnit() {
+    public MekSummary getUnit() {
         return unit;
     }
 
-    public void setUnit(final MechSummary unit) {
+    public void setUnit(final MekSummary unit) {
         this.unit = unit;
     }
 
@@ -102,7 +102,7 @@ public class UnitMarketOffer {
      */
     public @Nullable Entity getEntity() {
         try {
-            return new MechFileParser(getUnit().getSourceFile(), getUnit().getEntryName()).getEntity();
+            return new MekFileParser(getUnit().getSourceFile(), getUnit().getEntryName()).getEntity();
         } catch (Exception e) {
             LogManager.getLogger().error("Unable to load entity: " + getUnit().getSourceFile()
                     + ": " + getUnit().getEntryName() + ". Returning null.", e);
@@ -147,7 +147,7 @@ public class UnitMarketOffer {
                     retVal.setUnitType(Integer.parseInt(wn3.getTextContent().trim()));
                 } else if (wn3.getNodeName().equalsIgnoreCase("unit")) {
                     final String unitName = wn3.getTextContent().trim();
-                    retVal.setUnit(MechSummaryCache.getInstance().getMech(unitName));
+                    retVal.setUnit(MekSummaryCache.getInstance().getMek(unitName));
                     if (retVal.getUnit() == null) {
                         LogManager.getLogger().error("Failed to find unit with name " + unitName + ", removing the offer from the market.");
                         return null;

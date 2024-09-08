@@ -41,8 +41,8 @@ public class PersonnelFilterTest {
     public void testGetToolTipText() {
         assertEquals(resources.getString("PersonnelFilter.ALL.toolTipText"),
                 PersonnelFilter.ALL.getToolTipText());
-        assertEquals(resources.getString("PersonnelFilter.PROTOMECH_PILOT.toolTipText"),
-                PersonnelFilter.PROTOMECH_PILOT.getToolTipText());
+        assertEquals(resources.getString("PersonnelFilter.PROTOMEK_PILOT.toolTipText"),
+                PersonnelFilter.PROTOMEK_PILOT.getToolTipText());
     }
     //endregion Getters
 
@@ -92,23 +92,23 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsMechWarriors() {
+    public void testIsMekWarriors() {
         for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.MECHWARRIORS) {
-                assertTrue(personnelFilter.isMechWarriors());
+            if (personnelFilter == PersonnelFilter.MEKWARRIORS) {
+                assertTrue(personnelFilter.isMekWarriors());
             } else {
-                assertFalse(personnelFilter.isMechWarriors());
+                assertFalse(personnelFilter.isMekWarriors());
             }
         }
     }
 
     @Test
-    public void testIsMechWarrior() {
+    public void testIsMekWarrior() {
         for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.MECHWARRIOR) {
-                assertTrue(personnelFilter.isMechWarrior());
+            if (personnelFilter == PersonnelFilter.MEKWARRIOR) {
+                assertTrue(personnelFilter.isMekWarrior());
             } else {
-                assertFalse(personnelFilter.isMechWarrior());
+                assertFalse(personnelFilter.isMekWarrior());
             }
         }
     }
@@ -213,12 +213,12 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsProtoMechPilot() {
+    public void testIsProtoMekPilot() {
         for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.PROTOMECH_PILOT) {
-                assertTrue(personnelFilter.isProtoMechPilot());
+            if (personnelFilter == PersonnelFilter.PROTOMEK_PILOT) {
+                assertTrue(personnelFilter.isProtoMekPilot());
             } else {
-                assertFalse(personnelFilter.isProtoMechPilot());
+                assertFalse(personnelFilter.isProtoMekPilot());
             }
         }
     }
@@ -312,12 +312,12 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsMechTech() {
+    public void testIsMekTech() {
         for (final PersonnelFilter personnelFilter : filters) {
-            if (personnelFilter == PersonnelFilter.MECH_TECH) {
-                assertTrue(personnelFilter.isMechTech());
+            if (personnelFilter == PersonnelFilter.MEK_TECH) {
+                assertTrue(personnelFilter.isMekTech());
             } else {
-                assertFalse(personnelFilter.isMechTech());
+                assertFalse(personnelFilter.isMekTech());
             }
         }
     }

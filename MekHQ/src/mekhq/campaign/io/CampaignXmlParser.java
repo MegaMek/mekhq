@@ -172,7 +172,7 @@ public class CampaignXmlParser {
 
         // Only reload unit data if we updated files on disk
         if (reloadUnitData) {
-            MechSummaryCache.getInstance().loadMechData();
+            MekSummaryCache.getInstance().loadMekData();
         }
 
         // the second time to check for any null entities
@@ -1013,7 +1013,7 @@ public class CampaignXmlParser {
      *         file was added to disk.
      */
     private static boolean processCustom(Campaign retVal, Node wn) {
-        String sCustomsDir = "data" + File.separator + "mechfiles"
+        String sCustomsDir = "data" + File.separator + "mekfiles"
                 + File.separator + "customs";  // TODO : Remove inline file path
         String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getName();
         File customsDir = new File(sCustomsDir);
@@ -1421,9 +1421,9 @@ public class CampaignXmlParser {
                 }
             }
 
-            // deal with true values for sensor and life support on non-Mech heads
+            // deal with true values for sensor and life support on non-Mek heads
             if ((prt instanceof MekLocation)
-                    && (((MekLocation) prt).getLoc() != Mech.LOC_HEAD)) {
+                    && (((MekLocation) prt).getLoc() != Mek.LOC_HEAD)) {
                 ((MekLocation) prt).setSensors(false);
                 ((MekLocation) prt).setLifeSupport(false);
             }

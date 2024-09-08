@@ -2,7 +2,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MechView;
+import megamek.common.MekView;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -16,13 +16,13 @@ import java.util.ResourceBundle;
  * @since July 15, 2009, 9:30 PM
  */
 public class MekViewDialog extends JDialog {
-    private MechView mview;
+    private MekView mview;
     private JButton btnOkay;
     private JScrollPane jScrollPane2;
     private JTextPane txtMek;
 
     /** Creates new form MekViewDialog */
-    public MekViewDialog(JFrame parent, boolean modal, MechView mv) {
+    public MekViewDialog(JFrame parent, boolean modal, MekView mv) {
         super(parent, modal);
         this.mview = mv;
         initComponents();
@@ -46,7 +46,7 @@ public class MekViewDialog extends JDialog {
         txtMek.setEditable(false);
         txtMek.setFont(Font.decode(resourceMap.getString("txtMek.font")));
         txtMek.setName("txtMek");
-        txtMek.setText(mview.getMechReadout());
+        txtMek.setText(mview.getMekReadout());
         jScrollPane2.setViewportView(txtMek);
 
         btnOkay.setText(resourceMap.getString("btnOkay.text"));

@@ -553,8 +553,8 @@ public class Refit extends Part implements IAcquisitionWork {
                     updateRefitClass(customJob ? CLASS_E : CLASS_D);
                 }
                 if (((MissingEnginePart) nPart).getEngine().getSideTorsoCriticalSlots().length > 0) {
-                    locationHasNewStuff[Mech.LOC_LT] = true;
-                    locationHasNewStuff[Mech.LOC_RT] = true;
+                    locationHasNewStuff[Mek.LOC_LT] = true;
+                    locationHasNewStuff[Mek.LOC_RT] = true;
                 }
             } else if (nPart instanceof MissingMekGyro) {
                 updateRefitClass(CLASS_D);
@@ -568,7 +568,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 locationHasNewStuff[nPart.getLocation()] = true;
             } else if (nPart instanceof MissingMekCockpit) {
                 updateRefitClass(CLASS_E);
-                locationHasNewStuff[Mech.LOC_HEAD] = true;
+                locationHasNewStuff[Mek.LOC_HEAD] = true;
             } else if (nPart instanceof MissingInfantryMotiveType || nPart instanceof MissingInfantryArmorPart) {
                 updateRefitClass(CLASS_A);
             } else {
@@ -803,11 +803,11 @@ public class Refit extends Part implements IAcquisitionWork {
 
         /*
          * Figure out how many untracked heat sinks are needed to complete the refit or will
-         * be removed. These are engine integrated heat sinks for Mechs or ASFs that change
+         * be removed. These are engine integrated heat sinks for Meks or ASFs that change
          * the heat sink type or heat sinks required for energy weapons for vehicles and
          * conventional fighters.
          */
-        if ((newEntity instanceof Mech)
+        if ((newEntity instanceof Mek)
                 || ((newEntity instanceof Aero) && !(newEntity instanceof ConvFighter))) {
             Part oldHS = heatSinkPart(oldUnit.getEntity());
             Part newHS = heatSinkPart(newEntity);
@@ -889,7 +889,7 @@ public class Refit extends Part implements IAcquisitionWork {
         if (!oldUnit.getEntity().isClan()) { // Clan units always have CASE or CASE II everywhere
             for (int loc = 0; loc < newEntity.locations(); loc++) {
                 // If the old location has neither kind of CASE and the new location has either, update the refit class
-                if (!(oldUnit.getEntity().locationHasCase(loc) || (oldUnit.getEntity() instanceof Mech && ((Mech) oldUnit.getEntity()).hasCASEII(loc))) && (newEntity.locationHasCase(loc) || (newEntity instanceof Mech && ((Mech) newEntity).hasCASEII(loc)))) {
+                if (!(oldUnit.getEntity().locationHasCase(loc) || (oldUnit.getEntity() instanceof Mek && ((Mek) oldUnit.getEntity()).hasCASEII(loc))) && (newEntity.locationHasCase(loc) || (newEntity instanceof Mek && ((Mek) newEntity).hasCASEII(loc)))) {
                     if (isOmniRefit) {
                         updateRefitClass(CLASS_OMNI);
                     } else {
@@ -955,9 +955,9 @@ public class Refit extends Part implements IAcquisitionWork {
                 time = oneWeekInMinutes * 12; // 3 Months [12 weeks]
             } else if (newEntity instanceof megamek.common.Dropship || newEntity instanceof megamek.common.Jumpship) {
                 time = oneWeekInMinutes * 4; // 1 Month [4 weeks]
-            } else if (newEntity instanceof Mech || newEntity instanceof megamek.common.Aero) { // ConvFighter and SmallCraft are derived from Aero
+            } else if (newEntity instanceof Mek || newEntity instanceof megamek.common.Aero) { // ConvFighter and SmallCraft are derived from Aero
                 time = oneWeekInMinutes * 2; // 2 Weeks
-            } else if (newEntity instanceof BattleArmor || newEntity instanceof megamek.common.Tank || newEntity instanceof megamek.common.Protomech) {
+            } else if (newEntity instanceof BattleArmor || newEntity instanceof megamek.common.Tank || newEntity instanceof ProtoMek) {
                 time = oneWeekInMinutes; // 1 Week
             } else {
                 time = 1111;
@@ -1293,9 +1293,9 @@ public class Refit extends Part implements IAcquisitionWork {
             if (part instanceof MekLocation) {
                 int loc = ((MekLocation) part).getLoc();
                 // Don't add center locations or limbs with a bad hip or shoulder to warehouse
-                if ((loc == Mech.LOC_CT) ||
-                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0) ||
-                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0)) {
+                if ((loc == Mek.LOC_CT) ||
+                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc) > 0) ||
+                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc) > 0)) {
                     part.setUnit(null);
                     getCampaign().getWarehouse().removePart(part);
                 }
@@ -1368,7 +1368,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         int expectedHeatSinkParts = 0;
         if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
-            // Only Aerospace Fighters are expected to have heat sink parts (Mechs handled separately)
+            // Only Aerospace Fighters are expected to have heat sink parts (Meks handled separately)
             // SmallCraft, DropShip, JumpShip, WarShip, and SpaceStation use SpacecraftCoolingSystem instead
             expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks() - ((Aero) newEntity).getPodHeatSinks() -
                     untrackedHeatSinkCount(newEntity);
@@ -1377,8 +1377,8 @@ public class Refit extends Part implements IAcquisitionWork {
             if ((!replacingLocations) && (part instanceof MekLocation)) {
                 // Preserve any hip or shoulder damage
                 int loc = ((MekLocation) part).getLoc();
-                if ((oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0) ||
-                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0)) {
+                if ((oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc) > 0) ||
+                        (oldEntity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc) > 0)) {
                     // Apply damage to hip or shoulder at slot 0
                     newEntity.getCritical(loc, 0).setDestroyed(true);
                 }
@@ -1427,8 +1427,8 @@ public class Refit extends Part implements IAcquisitionWork {
         assignArmActuators();
         assignBayParts();
 
-        if (newEntity instanceof Mech) {
-            // Now that Mech part locations have been set
+        if (newEntity instanceof Mek) {
+            // Now that Mek part locations have been set
             // Remove heat sink parts added for supply chain tracking purposes
             for (final Iterator<Part> partsIter = oldUnit.getParts().iterator(); partsIter.hasNext();) {
                 final Part part = partsIter.next();
@@ -1523,7 +1523,7 @@ public class Refit extends Part implements IAcquisitionWork {
         UnitUtil.compactCriticals(newEntity);
 
         String fileName = MHQXMLUtility.escape(newEntity.getChassis() + ' ' + newEntity.getModel());
-        String sCustomsDir = String.join(File.separator, "data", "mechfiles", "customs"); // TODO : Remove inline file path
+        String sCustomsDir = String.join(File.separator, "data", "mekfiles", "customs"); // TODO : Remove inline file path
         String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
@@ -1542,7 +1542,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         String fileNameCampaign;
         try {
-            if (newEntity instanceof Mech) {
+            if (newEntity instanceof Mek) {
                 // if this file already exists then don't overwrite it or we will end up with a bunch of copies
                 String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
                 fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
@@ -1551,7 +1551,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
                 try (FileOutputStream out = new FileOutputStream(fileNameCampaign);
                     PrintStream p = new PrintStream(out)) {
-                    p.println(((Mech) newEntity).getMtf());
+                    p.println(((Mek) newEntity).getMtf());
                 }
             } else {
                 // if this file already exists then don't overwrite it or we will end up with a bunch of copies
@@ -1570,9 +1570,9 @@ public class Refit extends Part implements IAcquisitionWork {
         getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
 
         try {
-            MechSummary summary = Utilities.retrieveOriginalUnit(newEntity);
+            MekSummary summary = Utilities.retrieveOriginalUnit(newEntity);
 
-            newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            newEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             LogManager.getLogger().info(String.format("Saved %s %s to %s",
                     newEntity.getChassis(), newEntity.getModel(), summary.getSourceFile()));
         } catch (EntityLoadingException ex) {
@@ -1588,8 +1588,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
             }
 
-            // Reload the mech cache if we had to delete the file
-            MechSummaryCache.getInstance().loadMechData();
+            // Reload the mek cache if we had to delete the file
+            MekSummaryCache.getInstance().loadMekData();
 
             throw ex;
         }
@@ -2266,10 +2266,10 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     private void assignArmActuators() {
-        if (!(oldUnit.getEntity() instanceof BipedMech)) {
+        if (!(oldUnit.getEntity() instanceof BipedMek)) {
             return;
         }
-        BipedMech m = (BipedMech) oldUnit.getEntity();
+        BipedMek m = (BipedMek) oldUnit.getEntity();
         // we only need to worry about lower arm actuators and hands
         Part rightLowerArm = null;
         Part leftLowerArm = null;
@@ -2289,20 +2289,20 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
                 int loc = part.getLocation();
 
-                if (type == Mech.ACTUATOR_LOWER_ARM) {
-                    if (loc == Mech.LOC_RARM) {
+                if (type == Mek.ACTUATOR_LOWER_ARM) {
+                    if (loc == Mek.LOC_RARM) {
                         rightLowerArm = part;
-                    } else if (loc == Mech.LOC_LARM) {
+                    } else if (loc == Mek.LOC_LARM) {
                         leftLowerArm = part;
                     } else if (null == missingArm1 && part instanceof MekActuator) {
                         missingArm1 = (MekActuator) part;
                     } else if (part instanceof MekActuator) {
                         missingArm2 = (MekActuator) part;
                     }
-                } else if (type == Mech.ACTUATOR_HAND) {
-                    if (loc == Mech.LOC_RARM) {
+                } else if (type == Mek.ACTUATOR_HAND) {
+                    if (loc == Mek.LOC_RARM) {
                         rightHand = part;
-                    } else if (loc == Mech.LOC_LARM) {
+                    } else if (loc == Mek.LOC_LARM) {
                         leftHand = part;
                     } else if (null == missingHand1 && part instanceof MekActuator) {
                         missingHand1 = (MekActuator) part;
@@ -2314,45 +2314,45 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         // ok now check all the conditions, assign right hand stuff first
-        if (null == rightHand && m.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_RARM)) {
+        if (null == rightHand && m.hasSystem(Mek.ACTUATOR_HAND, Mek.LOC_RARM)) {
             MekActuator part = missingHand1;
             if (null == part || part.getLocation() != Entity.LOC_NONE) {
                 part = missingHand2;
             }
             if (null != part) {
-                part.setLocation(Mech.LOC_RARM);
+                part.setLocation(Mek.LOC_RARM);
             }
         }
 
-        if (null == leftHand && m.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_LARM)) {
+        if (null == leftHand && m.hasSystem(Mek.ACTUATOR_HAND, Mek.LOC_LARM)) {
             MekActuator part = missingHand1;
             if (null == part || part.getLocation() != Entity.LOC_NONE) {
                 part = missingHand2;
             }
 
             if (null != part) {
-                part.setLocation(Mech.LOC_LARM);
+                part.setLocation(Mek.LOC_LARM);
             }
         }
 
-        if (null == rightLowerArm && m.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_RARM)) {
+        if (null == rightLowerArm && m.hasSystem(Mek.ACTUATOR_LOWER_ARM, Mek.LOC_RARM)) {
             MekActuator part = missingArm1;
             if (null == part || part.getLocation() != Entity.LOC_NONE) {
                 part = missingArm2;
             }
 
             if (null != part) {
-                part.setLocation(Mech.LOC_RARM);
+                part.setLocation(Mek.LOC_RARM);
             }
         }
-        if (null == leftLowerArm && m.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM)) {
+        if (null == leftLowerArm && m.hasSystem(Mek.ACTUATOR_LOWER_ARM, Mek.LOC_LARM)) {
             MekActuator part = missingArm1;
             if (null == part || part.getLocation() != Entity.LOC_NONE) {
                 part = missingArm2;
             }
 
             if (null != part) {
-                part.setLocation(Mech.LOC_LARM);
+                part.setLocation(Mek.LOC_LARM);
             }
         }
     }
@@ -2417,7 +2417,7 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Refits may require adding or removing heat sinks that are not tracked as parts. For Mechs and
+     * Refits may require adding or removing heat sinks that are not tracked as parts. For Meks and
      * ASFs this would be engine-integrated heat sinks if the heat sink type is changed. For vehicles and
      * conventional fighters this would be heat sinks required by energy weapons.
      *
@@ -2425,13 +2425,13 @@ public class Refit extends Part implements IAcquisitionWork {
      * @return       The number of heat sinks the unit mounts that are not tracked as parts.
      */
     private int untrackedHeatSinkCount(Entity entity) {
-        if (entity instanceof Mech) {
-            return Math.min(((Mech) entity).heatSinks(), entity.getEngine().integralHeatSinkCapacity(((Mech) entity).hasCompactHeatSinks()));
+        if (entity instanceof Mek) {
+            return Math.min(((Mek) entity).heatSinks(), entity.getEngine().integralHeatSinkCapacity(((Mek) entity).hasCompactHeatSinks()));
         } else if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
             return entity.getEngine().getWeightFreeEngineHeatSinks();
         } else {
             EntityVerifier verifier = EntityVerifier.getInstance(new File(
-                    "data/mechfiles/UnitVerifierOptions.xml"));
+                    "data/mekfiles/UnitVerifierOptions.xml"));
             TestEntity te;
             if (entity instanceof Tank) {
                 te = new TestTank((Tank) entity, verifier.tankOption, null);
@@ -2458,7 +2458,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 return new AeroHeatSink(0, AeroHeatSink.CLAN_HEAT_DOUBLE, false, campaign);
             }
             return new AeroHeatSink(0, ((Aero) entity).getHeatType(), false, campaign);
-        } else if (entity instanceof Mech) {
+        } else if (entity instanceof Mek) {
             Optional<MiscMounted> mount = entity.getMisc().stream()
                     .filter(m -> m.getType().hasFlag(MiscType.F_HEAT_SINK)
                             || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))

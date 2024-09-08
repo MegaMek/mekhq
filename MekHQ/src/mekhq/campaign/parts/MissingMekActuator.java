@@ -20,9 +20,9 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.BipedMech;
+import megamek.common.BipedMek;
 import megamek.common.CriticalSlot;
-import megamek.common.Mech;
+import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
@@ -56,7 +56,7 @@ public class MissingMekActuator extends MissingPart {
     public MissingMekActuator(int tonnage, int type, int loc, Campaign c) {
         super(tonnage, c);
         this.type = type;
-        Mech m = new BipedMech();
+        Mek m = new BipedMek();
         this.name = m.getSystemName(type) + " Actuator" ;
         this.location = loc;
     }
@@ -167,7 +167,7 @@ public class MissingMekActuator extends MissingPart {
 
     @Override
     public boolean isOmniPoddable() {
-        return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
+        return type == Mek.ACTUATOR_LOWER_ARM || type == Mek.ACTUATOR_HAND;
     }
 
     @Override

@@ -187,7 +187,7 @@ public class MissingEnginePart extends MissingPart {
              return null;
          }
          for (int i = 0; i < unit.getEntity().locations(); i++) {
-             if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
+             if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
                      && unit.isLocationDestroyed(i)) {
                  return unit.getEntity().getLocationName(i) + " is destroyed.";
              }
@@ -204,14 +204,14 @@ public class MissingEnginePart extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            if (unit.getEntity() instanceof Mech) {
-                unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+            if (unit.getEntity() instanceof Mek) {
+                unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE);
             } else if (unit.getEntity() instanceof Aero) {
                 ((Aero) unit.getEntity()).setEngineHits(((Aero) unit.getEntity()).getMaxEngineHits());
             } else if (unit.getEntity() instanceof Tank) {
                 ((Tank) unit.getEntity()).engineHit();
-            } else if (unit.getEntity() instanceof Protomech) {
-                ((Protomech) unit.getEntity()).setEngineHit(true);
+            } else if (unit.getEntity() instanceof ProtoMek) {
+                ((ProtoMek) unit.getEntity()).setEngineHit(true);
             }
         }
     }
@@ -241,7 +241,7 @@ public class MissingEnginePart extends MissingPart {
          if (null == unit || null == unit.getEntity()) {
              return false;
          }
-         if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT) {
+         if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CT) {
              return true;
          }
          boolean needsSideTorso = false;
@@ -255,8 +255,8 @@ public class MissingEnginePart extends MissingPart {
                  break;
          }
         return needsSideTorso
-                && ((unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT)
-                || (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT));
+                && ((unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT)
+                || (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT));
     }
 
     @Override

@@ -22,9 +22,9 @@ package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
 import megamek.common.Entity;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.campaign.unit.Unit;
@@ -45,21 +45,21 @@ public class AddUnitStoryTrigger extends StoryTrigger {
 
     @Override
     protected void execute() {
-        MechSummary ms = MechSummaryCache.getInstance().getMech(entityName);
+        MekSummary ms = MekSummaryCache.getInstance().getMek(entityName);
         if (ms == null) {
             LogManager.getLogger().error("Cannot find entry for {}", entityName);
             return;
         }
 
-        MechFileParser mechFileParser;
+        MekFileParser mekFileParser;
         try {
-            mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
+            mekFileParser = new MekFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
             LogManager.getLogger().error("Unable to load unit: {}", ms.getEntryName(), ex);
             return;
         }
 
-        Entity en = mechFileParser.getEntity();
+        Entity en = mekFileParser.getEntity();
 
         int quality = 3;
 

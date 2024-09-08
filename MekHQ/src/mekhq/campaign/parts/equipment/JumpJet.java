@@ -48,7 +48,7 @@ public class JumpJet extends EquipmentPart {
     @Override
     public double getTonnage() {
         double ton;
-        if (type.hasFlag(MiscType.F_PROTOMECH_EQUIPMENT)) {
+        if (type.hasFlag(MiscType.F_PROTOMEK_EQUIPMENT)) {
             if (getUnitTonnage() <=5) {
                 ton = 0.05;
             } else if (getUnitTonnage() <= 9) {

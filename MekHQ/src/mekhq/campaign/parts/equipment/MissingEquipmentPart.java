@@ -307,11 +307,11 @@ public class MissingEquipmentPart extends MissingPart {
             return false;
         }
         if (type instanceof MiscType) {
-            return type.hasFlag(MiscType.F_MECH_EQUIPMENT)
+            return type.hasFlag(MiscType.F_MEK_EQUIPMENT)
                     || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
                     || type.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
         } else if (type instanceof WeaponType) {
-            return (type.hasFlag(WeaponType.F_MECH_WEAPON)
+            return (type.hasFlag(WeaponType.F_MEK_WEAPON)
                     || type.hasFlag(WeaponType.F_TANK_WEAPON)
                     || type.hasFlag(WeaponType.F_AERO_WEAPON))
                     && !((WeaponType) type).isCapital();

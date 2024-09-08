@@ -133,7 +133,7 @@ public class MissingProtoMekArmActuator extends MissingPart {
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
-            ((ProtomekArmActuator) actualReplacement).setLocation(location);
+            ((ProtoMekArmActuator) actualReplacement).setLocation(location);
             remove(false);
             //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
@@ -142,13 +142,13 @@ public class MissingProtoMekArmActuator extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof ProtomekArmActuator
+        return part instanceof ProtoMekArmActuator
                 && getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override
     public Part getNewPart() {
-        return new ProtomekArmActuator(getUnitTonnage(), location, campaign);
+        return new ProtoMekArmActuator(getUnitTonnage(), location, campaign);
     }
 
     @Override
@@ -158,7 +158,7 @@ public class MissingProtoMekArmActuator extends MissingPart {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return ProtomekLocation.TECH_ADVANCEMENT;
+        return ProtoMekLocation.TECH_ADVANCEMENT;
     }
 
     @Override

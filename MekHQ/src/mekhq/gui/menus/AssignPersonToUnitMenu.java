@@ -112,11 +112,11 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
 
             // Parsing Booleans
             final boolean singlePerson = people.length == 1;
-            final boolean areAllBattleMechPilots = Stream.of(people)
-                    .allMatch(person -> person.getPrimaryRole().isMechWarriorGrouping()
-                            || person.getSecondaryRole().isMechWarriorGrouping());
-            final boolean areAllProtoMechPilots = Stream.of(people)
-                    .allMatch(person -> person.hasRole(PersonnelRole.PROTOMECH_PILOT));
+            final boolean areAllBattleMekPilots = Stream.of(people)
+                    .allMatch(person -> person.getPrimaryRole().isMekWarriorGrouping()
+                            || person.getSecondaryRole().isMekWarriorGrouping());
+            final boolean areAllProtoMekPilots = Stream.of(people)
+                    .allMatch(person -> person.hasRole(PersonnelRole.PROTOMEK_PILOT));
             final boolean areAllConventionalAerospacePilots = Stream.of(people)
                     .allMatch(person -> person.getPrimaryRole().isConventionalAirGrouping()
                             || person.getSecondaryRole().isConventionalAirGrouping());
@@ -227,10 +227,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     // Pilot Menu - Solo Pilot and VTOL Pilot Assignment
                     if (singlePerson && (unit.usesSoloPilot() || (entity instanceof VTOL) || entity.isSuperHeavy() || entity.isTripodMek())) {
                         final boolean valid;
-                        if (entity instanceof Mech) {
-                            valid = areAllBattleMechPilots;
-                        } else if (entity instanceof Protomech) {
-                            valid = areAllProtoMechPilots;
+                        if (entity instanceof Mek) {
+                            valid = areAllBattleMekPilots;
+                        } else if (entity instanceof ProtoMek) {
+                            valid = areAllProtoMekPilots;
                         } else if (entity instanceof ConvFighter) {
                             valid = areAllConventionalAerospacePilots;
                         } else if (entity instanceof Aero) {
@@ -321,7 +321,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                             || (entity instanceof Jumpship)) {
                         valid = areAllVesselGunners;
                     } else if (entity.isTripodMek() || entity.isSuperHeavy()) {
-                        valid = areAllBattleMechPilots;
+                        valid = areAllBattleMekPilots;
                     } else {
                         valid = false;
                     }

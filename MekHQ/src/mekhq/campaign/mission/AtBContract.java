@@ -532,7 +532,7 @@ public class AtBContract extends Contract {
         if (null != rat) {
             Entity en = null;
             RandomUnitGenerator.getInstance().setChosenRAT(rat);
-            ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
+            ArrayList<MekSummary> msl = RandomUnitGenerator.getInstance().generate(1);
 
             int quality = 3;
 
@@ -542,7 +542,7 @@ public class AtBContract extends Contract {
 
             if (!msl.isEmpty() && (msl.get(0) != null)) {
                 try {
-                    en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
+                    en = new MekFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
                 } catch (EntityLoadingException ex) {
                     LogManager.getLogger().error("Unable to load entity: {}: {}: {}",
                             msl.get(0).getSourceFile(),

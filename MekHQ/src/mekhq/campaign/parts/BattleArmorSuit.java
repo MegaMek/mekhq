@@ -270,7 +270,7 @@ public class BattleArmorSuit extends Part {
         alternateTon = 0;
         // Simplest way to do this is just get the full cost and tonnage of a new unit and divide by
         // squad size
-        MechSummary summary = MechSummaryCache.getInstance().getMech(getChassis() + " " + getModel());
+        MekSummary summary = MekSummaryCache.getInstance().getMek(getChassis() + " " + getModel());
         if (null != summary) {
             double squadSize = summary.getArmorTypes().length - 1;
             alternateCost = Money.of(summary.getAlternateCost()).dividedBy(squadSize);
@@ -561,13 +561,13 @@ public class BattleArmorSuit extends Part {
      */
     private void addSubParts() {
         // first get a copy of the entity, so we can create a test unit
-        MechSummary summary = MechSummaryCache.getInstance().getMech(getChassis() + " " + getModel());
+        MekSummary summary = MekSummaryCache.getInstance().getMek(getChassis() + " " + getModel());
         if (null == summary) {
             return;
         }
         Entity newEntity = null;
         try {
-            newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            newEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }

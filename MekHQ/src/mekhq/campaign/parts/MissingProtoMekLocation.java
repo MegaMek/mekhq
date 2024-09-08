@@ -159,8 +159,8 @@ public class MissingProtoMekLocation extends MissingPart {
             //you can't replace a center torso
             return false;
         }
-        if (part instanceof ProtomekLocation) {
-            ProtomekLocation mekLoc = (ProtomekLocation) part;
+        if (part instanceof ProtoMekLocation) {
+            ProtoMekLocation mekLoc = (ProtoMekLocation) part;
             return mekLoc.getLoc() == loc
                 && mekLoc.getUnitTonnage() == getUnitTonnage()
                 && mekLoc.hasBooster() == booster
@@ -184,7 +184,7 @@ public class MissingProtoMekLocation extends MissingPart {
         for (Part part : unit.getParts()) {
             if ((part.getLocation() == getLocation())
                     && !(part instanceof MissingPart)
-                    && (!(part instanceof ProtomekArmor) || ((ProtomekArmor) part).getAmount() > 0)) {
+                    && (!(part instanceof ProtoMekArmor) || ((ProtoMekArmor) part).getAmount() > 0)) {
                 return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
             }
         }
@@ -193,7 +193,7 @@ public class MissingProtoMekLocation extends MissingPart {
 
     @Override
     public Part getNewPart() {
-        return new ProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
+        return new ProtoMekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
     }
 
     private int getAppropriateSystemIndex() {
@@ -247,7 +247,7 @@ public class MissingProtoMekLocation extends MissingPart {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return ProtomekLocation.TECH_ADVANCEMENT;
+        return ProtoMekLocation.TECH_ADVANCEMENT;
     }
 
     @Override

@@ -19,7 +19,7 @@
 package mekhq.gui.panels;
 
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.client.ui.swing.widget.MegamekButton;
+import megamek.client.ui.swing.widget.MegaMekButton;
 import megamek.client.ui.swing.widget.SkinSpecification;
 import megamek.client.ui.swing.widget.SkinSpecification.UIComponents;
 import megamek.client.ui.swing.widget.SkinXMLHandler;
@@ -112,11 +112,11 @@ public class StartupScreenPanel extends AbstractMHQPanel {
             lblVersion.setForeground(skinSpec.fontColors.get(0));
         }
 
-        MegamekButton btnNewCampaign = new MegamekButton(resources.getString("btnNewCampaign.text"),
+        MegaMekButton btnNewCampaign = new MegaMekButton(resources.getString("btnNewCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnNewCampaign.addActionListener(evt -> startCampaign(null));
 
-        MegamekButton btnLoadCampaign = new MegamekButton(resources.getString("btnLoadCampaign.text"),
+        MegaMekButton btnLoadCampaign = new MegaMekButton(resources.getString("btnLoadCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnLoadCampaign.addActionListener(evt -> {
             final File file = selectCampaignFile();
@@ -125,12 +125,12 @@ public class StartupScreenPanel extends AbstractMHQPanel {
             }
         });
 
-        MegamekButton btnLoadLastCampaign = new MegamekButton(resources.getString("btnLoadLastCampaign.text"),
+        MegaMekButton btnLoadLastCampaign = new MegaMekButton(resources.getString("btnLoadLastCampaign.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnLoadLastCampaign.setEnabled(lastSaveFile != null);
         btnLoadLastCampaign.addActionListener(evt -> startCampaign(lastSaveFile));
 
-        MegamekButton btnLoadStoryArc = new MegamekButton(resources.getString("btnLoadStoryArc.text"),
+        MegaMekButton btnLoadStoryArc = new MegaMekButton(resources.getString("btnLoadStoryArc.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnLoadStoryArc.addActionListener(evt -> {
             StoryArcStub storyArcStub = selectStoryArc();
@@ -138,7 +138,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
                 startCampaign(storyArcStub.getInitCampaignFile(), storyArcStub);
             }
         });
-        MegamekButton btnQuit = new MegamekButton(resources.getString("Quit.text"),
+        MegaMekButton btnQuit = new MegaMekButton(resources.getString("Quit.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnQuit.addActionListener(evt -> System.exit(0));
 

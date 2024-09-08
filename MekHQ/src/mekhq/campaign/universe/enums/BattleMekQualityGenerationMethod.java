@@ -21,29 +21,29 @@ package mekhq.campaign.universe.enums;
 import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.ABattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.AStarBattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.AbstractBattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.AtBBattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.BBattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.CBattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.DBattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.FBattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.WindchildBattleMechQualityGenerator;
+import mekhq.campaign.universe.generators.battleMekQualityGenerators.ABattleMekQualityGenerator;
+import mekhq.campaign.universe.generators.battleMekQualityGenerators.AStarBattleMekQualityGenerator;
+import mekhq.campaign.universe.generators.battleMekQualityGenerators.AbstractBattleMekQualityGenerator;
+import mekhq.campaign.universe.generators.battleMekQualityGenerators.AtBBattleMekQualityGenerator;
+import mekhq.campaign.universe.generators.battleMekQualityGenerators.BBattleMekQualityGenerator;
+import mekhq.campaign.universe.generators.battleMekQualityGenerators.CBattleMekQualityGenerator;
+import mekhq.campaign.universe.generators.battleMekQualityGenerators.DBattleMekQualityGenerator;
+import mekhq.campaign.universe.generators.battleMekQualityGenerators.FBattleMekQualityGenerator;
+import mekhq.campaign.universe.generators.battleMekQualityGenerators.WindchildBattleMekQualityGenerator;
 
 /**
  * @author Justin "Windchild" Bowen
  */
 public enum BattleMekQualityGenerationMethod {
     //region Enum Declarations
-    AGAINST_THE_BOT("BattleMechQualityGenerationMethod.AGAINST_THE_BOT.text", "BattleMechQualityGenerationMethod.AGAINST_THE_BOT.toolTipText"),
-    WINDCHILD("BattleMechQualityGenerationMethod.WINDCHILD.text", "BattleMechQualityGenerationMethod.WINDCHILD.toolTipText"),
-    F("BattleMechQualityGenerationMethod.F.text", "BattleMechQualityGenerationMethod.F.toolTipText"),
-    D("BattleMechQualityGenerationMethod.D.text", "BattleMechQualityGenerationMethod.D.toolTipText"),
-    C("BattleMechQualityGenerationMethod.C.text", "BattleMechQualityGenerationMethod.C.toolTipText"),
-    B("BattleMechQualityGenerationMethod.B.text", "BattleMechQualityGenerationMethod.B.toolTipText"),
-    A("BattleMechQualityGenerationMethod.A.text", "BattleMechQualityGenerationMethod.A.toolTipText"),
-    A_STAR("BattleMechQualityGenerationMethod.A_STAR.text", "BattleMechQualityGenerationMethod.A_STAR.toolTipText");
+    AGAINST_THE_BOT("BattleMekQualityGenerationMethod.AGAINST_THE_BOT.text", "BattleMekQualityGenerationMethod.AGAINST_THE_BOT.toolTipText"),
+    WINDCHILD("BattleMekQualityGenerationMethod.WINDCHILD.text", "BattleMekQualityGenerationMethod.WINDCHILD.toolTipText"),
+    F("BattleMekQualityGenerationMethod.F.text", "BattleMekQualityGenerationMethod.F.toolTipText"),
+    D("BattleMekQualityGenerationMethod.D.text", "BattleMekQualityGenerationMethod.D.toolTipText"),
+    C("BattleMekQualityGenerationMethod.C.text", "BattleMekQualityGenerationMethod.C.toolTipText"),
+    B("BattleMekQualityGenerationMethod.B.text", "BattleMekQualityGenerationMethod.B.toolTipText"),
+    A("BattleMekQualityGenerationMethod.A.text", "BattleMekQualityGenerationMethod.A.toolTipText"),
+    A_STAR("BattleMekQualityGenerationMethod.A_STAR.text", "BattleMekQualityGenerationMethod.A_STAR.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -100,25 +100,25 @@ public enum BattleMekQualityGenerationMethod {
     }
     //endregion Boolean Comparison Methods
 
-    public AbstractBattleMechQualityGenerator getGenerator() {
+    public AbstractBattleMekQualityGenerator getGenerator() {
         switch (this) {
             case AGAINST_THE_BOT:
-                return new AtBBattleMechQualityGenerator();
+                return new AtBBattleMekQualityGenerator();
             case F:
-                return new FBattleMechQualityGenerator();
+                return new FBattleMekQualityGenerator();
             case D:
-                return new DBattleMechQualityGenerator();
+                return new DBattleMekQualityGenerator();
             case C:
-                return new CBattleMechQualityGenerator();
+                return new CBattleMekQualityGenerator();
             case B:
-                return new BBattleMechQualityGenerator();
+                return new BBattleMekQualityGenerator();
             case A:
-                return new ABattleMechQualityGenerator();
+                return new ABattleMekQualityGenerator();
             case A_STAR:
-                return new AStarBattleMechQualityGenerator();
+                return new AStarBattleMekQualityGenerator();
             case WINDCHILD:
             default:
-                return new WindchildBattleMechQualityGenerator();
+                return new WindchildBattleMekQualityGenerator();
         }
     }
 

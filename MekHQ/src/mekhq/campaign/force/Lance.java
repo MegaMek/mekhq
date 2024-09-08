@@ -55,8 +55,8 @@ public class Lance {
     public static final int STR_CLAN = 5;
     public static final int STR_CS = 6;
 
-    public static final long ETYPE_GROUND = Entity.ETYPE_MECH |
-            Entity.ETYPE_TANK | Entity.ETYPE_INFANTRY | Entity.ETYPE_PROTOMECH;
+    public static final long ETYPE_GROUND = Entity.ETYPE_MEK |
+            Entity.ETYPE_TANK | Entity.ETYPE_INFANTRY | Entity.ETYPE_PROTOMEK;
 
     /** Indicates a lance has no assigned mission */
     public static final int NO_MISSION = -1;
@@ -163,13 +163,13 @@ public class Lance {
             if (null != unit) {
                 Entity entity = unit.getEntity();
                 if (null != entity) {
-                    if ((entity.getEntityType() & Entity.ETYPE_MECH) != 0) {
+                    if ((entity.getEntityType() & Entity.ETYPE_MEK) != 0) {
                         armor += 1;
                     } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
                         other += 0.5;
                     } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
                         armor += 0.5;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_PROTOMECH) != 0) {
+                    } else if ((entity.getEntityType() & Entity.ETYPE_PROTOMEK) != 0) {
                         other += 0.2;
                     } else if ((entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
                         infantry += ((Infantry) entity).isSquad()?0.2:1;
@@ -489,8 +489,8 @@ public class Lance {
             if (null != unit) {
                 Entity entity = unit.getEntity();
                 if (null != entity) {
-                    if ((entity.getEntityType() & Entity.ETYPE_MECH) != 0 ||
-                            (entity.getEntityType() & Entity.ETYPE_PROTOMECH) != 0 ||
+                    if ((entity.getEntityType() & Entity.ETYPE_MEK) != 0 ||
+                            (entity.getEntityType() & Entity.ETYPE_PROTOMEK) != 0 ||
                             (entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
                         weight += entity.getWeight();
                     } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {

@@ -338,12 +338,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     selectedUnit);
             crd.setVisible(true);
             if (crd.isConfirmed()) {
-                MechSummary summary = MechSummaryCache.getInstance().getMech(crd.getSelectedRefit()
+                MekSummary summary = MekSummaryCache.getInstance().getMek(crd.getSelectedRefit()
                         .getNewEntity().getShortNameRaw());
                 if (summary != null) {
                     for (Unit unit : units) {
                         try {
-                            Entity refitEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                            Entity refitEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                             if (refitEntity != null) {
                                 Refit refit = new Refit(unit, refitEntity, false, false);
                                 if (refit.checkFixable() == null) {
@@ -796,7 +796,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
                 // TODO : Should I be able to refit BA?
                 if (allSameModel && allAvailable
-                        && ((unit.getEntity() instanceof Mech)
+                        && ((unit.getEntity() instanceof Mek)
                         || (unit.getEntity() instanceof Tank)
                         || (unit.getEntity() instanceof Aero)
                         || ((unit.getEntity() instanceof Infantry)))) {
@@ -808,11 +808,11 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (allSameModel && allAvailable
-                        && ((unit.getEntity() instanceof Mech)
+                        && ((unit.getEntity() instanceof Mek)
                         || (unit.getEntity() instanceof Tank)
                         || (unit.getEntity() instanceof Aero)
                         || ((unit.getEntity() instanceof Infantry)
-                        || (unit.getEntity() instanceof Protomech)))) {
+                        || (unit.getEntity() instanceof ProtoMek)))) {
                     menuItem = new JMenuItem("Refurbish Unit");
                     menuItem.setActionCommand(COMMAND_REFURBISH);
                     menuItem.addActionListener(this);
@@ -995,13 +995,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     private void addCustomUnitTag(Unit... units) {
-        String sCustomsDirCampaign = MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH
+        String sCustomsDirCampaign = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH
                 + gui.getCampaign().getName() + '/';
-        File customsDir = new File(MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH);
+        File customsDir = new File(MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
                 LogManager.getLogger().error("Unable to create directory "
-                        + MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH
+                        + MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH
                         + " to hold custom units, cannot assign custom unit tag");
                 return;
             }
@@ -1015,10 +1015,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         }
         for (Unit unit : units) {
             String fileName = unit.getEntity().getChassis() + ' ' + unit.getEntity().getModel();
-            if (unit.getEntity() instanceof Mech) {
+            if (unit.getEntity() instanceof Mek) {
                 // if this file already exists then don't overwrite
                 // it or we will end up with a bunch of copies
-                String fileOutName = MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH + File.separator
+                String fileOutName = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + File.separator
                         + fileName + ".mtf";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
@@ -1030,14 +1030,14 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 try (OutputStream os = new FileOutputStream(fileNameCampaign);
                      PrintStream p = new PrintStream(os)) {
 
-                    p.println(((Mech) unit.getEntity()).getMtf());
+                    p.println(((Mek) unit.getEntity()).getMtf());
                 } catch (Exception e) {
                     LogManager.getLogger().error("", e);
                 }
             } else {
                 // if this file already exists then don't overwrite
                 // it or we will end up with a bunch of copies
-                String fileOutName = MHQConstants.CUSTOM_MECHFILES_DIRECTORY_PATH + File.separator
+                String fileOutName = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + File.separator
                         + fileName + ".blk";
                 String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
                 if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
@@ -1057,6 +1057,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             gui.getCampaign().addCustom(unit.getEntity().getChassis() + ' '
                     + unit.getEntity().getModel());
         }
-        MechSummaryCache.getInstance().loadMechData();
+        MekSummaryCache.getInstance().loadMekData();
     }
 }

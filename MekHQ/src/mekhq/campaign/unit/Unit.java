@@ -112,7 +112,7 @@ public class Unit implements ITechnology {
     private double hVeeCapacity = 0.0;
     private double infCapacity = 0.0;
     private double lVeeCapacity = 0.0;
-    private double mechCapacity = 0.0;
+    private double mekCapacity = 0.0;
     private double protoCapacity = 0.0;
     private double shVeeCapacity = 0.0;
     private double scCapacity = 0.0;
@@ -280,8 +280,8 @@ public class Unit implements ITechnology {
         this.hVeeCapacity = getHeavyVehicleCapacity();
         this.infCapacity = getInfantryCapacity();
         this.lVeeCapacity = getLightVehicleCapacity();
-        this.mechCapacity = getMechCapacity();
-        this.protoCapacity = getProtomechCapacity();
+        this.mekCapacity = getMekCapacity();
+        this.protoCapacity = getProtoMekCapacity();
         this.shVeeCapacity = getSuperHeavyVehicleCapacity();
         this.scCapacity = getSmallCraftCapacity();
     }
@@ -429,10 +429,10 @@ public class Unit implements ITechnology {
     }
 
     public static boolean isFunctional(Entity en) {
-        if (en instanceof Mech) {
+        if (en instanceof Mek) {
             // center torso bad?? head bad?
-            if (en.isLocationBad(Mech.LOC_CT)
-                    || en.isLocationBad(Mech.LOC_HEAD)) {
+            if (en.isLocationBad(Mek.LOC_CT)
+                    || en.isLocationBad(Mek.LOC_HEAD)) {
                 return false;
             }
             // engine destruction?
@@ -441,9 +441,9 @@ public class Unit implements ITechnology {
             int cockpitHits = 0;
             for (int i = 0; i < en.locations(); i++) {
                 engineHits += en.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
-                        Mech.SYSTEM_ENGINE, i);
+                        Mek.SYSTEM_ENGINE, i);
                 cockpitHits += en.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
-                        Mech.SYSTEM_COCKPIT, i);
+                        Mek.SYSTEM_COCKPIT, i);
             }
             if (engineHits > 2) {
                 return false;
@@ -486,9 +486,9 @@ public class Unit implements ITechnology {
     }
 
     public static boolean isRepairable(Entity en) {
-        if (en instanceof Mech) {
+        if (en instanceof Mek) {
             // you can repair anything so long as one point of CT is left
-            if (en.getInternal(Mech.LOC_CT) <= 0) {
+            if (en.getInternal(Mek.LOC_CT) <= 0) {
                 return false;
             }
         }
@@ -552,9 +552,9 @@ public class Unit implements ITechnology {
     }
 
     public boolean hasBadHipOrShoulder(int loc) {
-        return entity instanceof Mech
-                && (entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0
-                        || entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0);
+        return entity instanceof Mek
+                && (entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc) > 0
+                        || entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc) > 0);
     }
 
     /**
@@ -698,7 +698,7 @@ public class Unit implements ITechnology {
                     armorFound = true;
                 }
             }
-            if (!armorFound && part instanceof ProtomekArmor a) {
+            if (!armorFound && part instanceof ProtoMekArmor a) {
                 if (a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
                     missingParts.add(a);
                     armorFound = true;
@@ -1199,7 +1199,7 @@ public class Unit implements ITechnology {
                 Money bayCost = Money.zero();
                 for (Bay next : js.getTransportBays()) {
                     baydoors += next.getDoors();
-                    if ((next instanceof MechBay) || (next instanceof ASFBay) || (next instanceof SmallCraftBay)) {
+                    if ((next instanceof MekBay) || (next instanceof ASFBay) || (next instanceof SmallCraftBay)) {
                         bayCost = bayCost.plus(20000.0 * next.getCapacity());
                     }
                     if ((next instanceof LightVehicleBay) || (next instanceof HeavyVehicleBay)) {
@@ -1214,8 +1214,8 @@ public class Unit implements ITechnology {
             }
         }
 
-        //protomeks: heat sinks can't be hit
-        if (entity instanceof Protomech) {
+        //ProtoMeks: heat sinks can't be hit
+        if (entity instanceof ProtoMek) {
             int sinks = 0;
             for (Mounted mount : entity.getWeaponList()) {
                 if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
@@ -1290,13 +1290,13 @@ public class Unit implements ITechnology {
 
     /**
      * Convenience method to call the right capacity getter based on unit type and weight
-     * @param unitType integer obtained from a unit's entity that denotes its type (mech, tank, etc)
+     * @param unitType integer obtained from a unit's entity that denotes its type (mek, tank, etc)
      * @param unitWeight double Weight in tons of the unit's entity. Important for tanks and infantry
      */
     public double getCorrectBayCapacity(int unitType, double unitWeight) {
         switch (unitType) {
             case UnitType.MEK:
-                return getCurrentMechCapacity();
+                return getCurrentMekCapacity();
             case UnitType.AEROSPACEFIGHTER:
             case UnitType.CONV_FIGHTER:
             case UnitType.AERO:
@@ -1345,7 +1345,7 @@ public class Unit implements ITechnology {
      * Convenience method to call the right capacity update based on unit type
      * When updating capacity, this method is concerned primarily with ensuring that space isn't released
      * beyond the unit's maximum. Checks are made to keep from going below 0 before we ever get here.
-     * @param unitType integer obtained from a unit's entity that denotes its type (mech, tank, etc)
+     * @param unitType integer obtained from a unit's entity that denotes its type (mek, tank, etc)
      * @param unitWeight double Weight in tons of the unit's entity. Important for infantry
      * @param addUnit boolean value that determines whether to add or subtract 1 from bay capacity
      * @param bayNumber integer representing the bay number that has been assigned to a cargo entity
@@ -1360,7 +1360,7 @@ public class Unit implements ITechnology {
         switch (unitType) {
             // Be sure that when releasing bay space, the transport does not go over its normal maximum
             case UnitType.MEK:
-                setMechCapacity(Math.min((getCurrentMechCapacity() + amount), getMechCapacity()));
+                setMekCapacity(Math.min((getCurrentMekCapacity() + amount), getMekCapacity()));
                 break;
             case UnitType.AEROSPACEFIGHTER:
             case UnitType.CONV_FIGHTER:
@@ -1577,42 +1577,42 @@ public class Unit implements ITechnology {
         scCapacity = bays;
     }
 
-    public double getMechCapacity() {
+    public double getMekCapacity() {
         double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof MechBay) {
+            if (b instanceof MekBay) {
                 bays += b.getCapacity();
             }
         }
         return bays;
     }
 
-    // Get only bays to which a mech has been assigned
-    public double getCurrentMechCapacity() {
-        return mechCapacity;
+    // Get only bays to which a mek has been assigned
+    public double getCurrentMekCapacity() {
+        return mekCapacity;
     }
 
-    // Used to assign a mech or LAM to a bay on a specific transport ship in the TO&E
-    public void setMechCapacity(double bays) {
-        mechCapacity = bays;
+    // Used to assign a mek or LAM to a bay on a specific transport ship in the TO&E
+    public void setMekCapacity(double bays) {
+        mekCapacity = bays;
     }
 
-    public double getProtomechCapacity() {
+    public double getProtoMekCapacity() {
         double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
-            if (b instanceof ProtomechBay) {
+            if (b instanceof ProtoMekBay) {
                 bays += b.getCapacity();
             }
         }
         return bays;
     }
 
-    // Get only bays to which a protomech has been assigned
-    public double getCurrentProtomechCapacity() {
+    // Get only bays to which a protomek has been assigned
+    public double getCurrentProtoMekCapacity() {
         return protoCapacity;
     }
 
-    // Used to assign a Protomech to a bay on a specific transport ship in the TO&E
+    // Used to assign a Protomek to a bay on a specific transport ship in the TO&E
     public void setProtoCapacity(double bays) {
         protoCapacity = bays;
     }
@@ -1709,7 +1709,7 @@ public class Unit implements ITechnology {
             return 1.0;
         }
         double tonnage = 100;
-        if (entity instanceof Mech && ((Mech) entity).isIndustrial()) {
+        if (entity instanceof Mek && ((Mek) entity).isIndustrial()) {
             tonnage = 400;
         } else if (entity instanceof VTOL) {
             tonnage = 30;
@@ -1833,8 +1833,8 @@ public class Unit implements ITechnology {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lVeeCapacity", lVeeCapacity);
             }
 
-            if (mechCapacity > 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mechCapacity", mechCapacity);
+            if (mekCapacity > 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mekCapacity", mekCapacity);
             }
 
             if (protoCapacity > 0) {
@@ -1993,8 +1993,8 @@ public class Unit implements ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("lVeeCapacity")) {
                     retVal.setLightVehicleCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
-                } else if (wn2.getNodeName().equalsIgnoreCase("mechCapacity")) {
-                    retVal.setMechCapacity(Double.parseDouble(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mekCapacity")) {
+                    retVal.setMekCapacity(Double.parseDouble(wn2.getTextContent()));
                     needsBayInitialization = false;
                 } else if (wn2.getNodeName().equalsIgnoreCase("protoCapacity")) {
                     retVal.setProtoCapacity(Double.parseDouble(wn2.getTextContent()));
@@ -2117,7 +2117,7 @@ public class Unit implements ITechnology {
         }
 
         if (getCampaign().getCampaignOptions().isUsePercentageMaint()) {
-            if (en instanceof Mech) {
+            if (en instanceof Mek) {
                 mCost = value.multipliedBy(0.02);
             } else if (en instanceof Warship) {
                 mCost = value.multipliedBy(0.07);
@@ -2143,7 +2143,7 @@ public class Unit implements ITechnology {
                 mCost = mCost.multipliedBy(0.1);
             }
         } else {
-            if (en instanceof Mech) {
+            if (en instanceof Mek) {
                 if (en.isOmni()) {
                     return Money.of(100.0);
                 } else {
@@ -2290,7 +2290,7 @@ public class Unit implements ITechnology {
                 lifeSupport = part;
             } else if (part instanceof MekSensor || part instanceof MissingMekSensor) {
                 sensor = part;
-            } else if (part instanceof ProtomekSensor || part instanceof MissingProtomekSensor) {
+            } else if (part instanceof ProtoMekSensor || part instanceof MissingProtoMekSensor) {
                 sensor = part;
             } else if (part instanceof MekCockpit || part instanceof MissingMekCockpit) {
                 cockpit = part;
@@ -2324,14 +2324,14 @@ public class Unit implements ITechnology {
                 locations[VTOL.LOC_ROTOR] = part;
             } else if (part instanceof MissingTurret && Tank.LOC_TURRET < locations.length) {
                 locations[Tank.LOC_TURRET] = part;
-            } else if (part instanceof ProtomekLocation) {
-                if (((ProtomekLocation) part).getLoc() < locations.length) {
-                    locations[((ProtomekLocation) part).getLoc()] = part;
+            } else if (part instanceof ProtoMekLocation) {
+                if (((ProtoMekLocation) part).getLoc() < locations.length) {
+                    locations[((ProtoMekLocation) part).getLoc()] = part;
                 } else {
                     partsToRemove.add(part);
                 }
             } else if (part instanceof MissingMekLocation
-                    || part instanceof MissingProtomekLocation) {
+                    || part instanceof MissingProtoMekLocation) {
                 if (part.getLocation() < locations.length) {
                     locations[part.getLocation()] = part;
                 } else {
@@ -2413,62 +2413,62 @@ public class Unit implements ITechnology {
                     type = ((MissingMekActuator) part).getType();
                 }
                 int loc = part.getLocation();
-                if (type == Mech.ACTUATOR_UPPER_ARM) {
-                    if (loc == Mech.LOC_RARM) {
+                if (type == Mek.ACTUATOR_UPPER_ARM) {
+                    if (loc == Mek.LOC_RARM) {
                         rightUpperArm = part;
                     } else {
                         leftUpperArm = part;
                     }
-                } else if (type == Mech.ACTUATOR_LOWER_ARM) {
-                    if (loc == Mech.LOC_RARM) {
+                } else if (type == Mek.ACTUATOR_LOWER_ARM) {
+                    if (loc == Mek.LOC_RARM) {
                         rightLowerArm = part;
                     } else {
                         leftLowerArm = part;
                     }
-                } else if (type == Mech.ACTUATOR_HAND) {
-                    if (loc == Mech.LOC_RARM) {
+                } else if (type == Mek.ACTUATOR_HAND) {
+                    if (loc == Mek.LOC_RARM) {
                         rightHand = part;
                     } else {
                         leftHand = part;
                     }
-                } else if (type == Mech.ACTUATOR_UPPER_LEG) {
-                    if (loc == Mech.LOC_LARM) {
+                } else if (type == Mek.ACTUATOR_UPPER_LEG) {
+                    if (loc == Mek.LOC_LARM) {
                         leftUpperFrontLeg = part;
-                    } else if (loc == Mech.LOC_RARM) {
+                    } else if (loc == Mek.LOC_RARM) {
                         rightUpperFrontLeg = part;
-                    } else if (loc == Mech.LOC_RLEG) {
+                    } else if (loc == Mek.LOC_RLEG) {
                         rightUpperLeg = part;
-                    } else if (loc == Mech.LOC_LLEG) {
+                    } else if (loc == Mek.LOC_LLEG) {
                         leftUpperLeg = part;
-                    } else if (loc == Mech.LOC_CLEG) {
+                    } else if (loc == Mek.LOC_CLEG) {
                         centerUpperLeg = part;
                     } else {
                         LogManager.getLogger().error("Unknown location of {} for a Upper Leg Actuator.", loc);
                     }
-                } else if (type == Mech.ACTUATOR_LOWER_LEG) {
-                    if (loc == Mech.LOC_LARM) {
+                } else if (type == Mek.ACTUATOR_LOWER_LEG) {
+                    if (loc == Mek.LOC_LARM) {
                         leftLowerFrontLeg = part;
-                    } else if (loc == Mech.LOC_RARM) {
+                    } else if (loc == Mek.LOC_RARM) {
                         rightLowerFrontLeg = part;
-                    } else if (loc == Mech.LOC_RLEG) {
+                    } else if (loc == Mek.LOC_RLEG) {
                         rightLowerLeg = part;
-                    } else if (loc == Mech.LOC_LLEG) {
+                    } else if (loc == Mek.LOC_LLEG) {
                         leftLowerLeg = part;
-                    } else if (loc == Mech.LOC_CLEG) {
+                    } else if (loc == Mek.LOC_CLEG) {
                         centerLowerLeg = part;
                     } else {
                         LogManager.getLogger().error("Unknown location of {} for a Lower Leg Actuator.", loc);
                     }
-                } else if (type == Mech.ACTUATOR_FOOT) {
-                    if (loc == Mech.LOC_LARM) {
+                } else if (type == Mek.ACTUATOR_FOOT) {
+                    if (loc == Mek.LOC_LARM) {
                         leftFrontFoot = part;
-                    } else if (loc == Mech.LOC_RARM) {
+                    } else if (loc == Mek.LOC_RARM) {
                         rightFrontFoot = part;
-                    } else if (loc == Mech.LOC_RLEG) {
+                    } else if (loc == Mek.LOC_RLEG) {
                         rightFoot = part;
-                    } else if (loc == Mech.LOC_LLEG) {
+                    } else if (loc == Mek.LOC_LLEG) {
                         leftFoot = part;
-                    } else if (loc == Mech.LOC_CLEG) {
+                    } else if (loc == Mek.LOC_CLEG) {
                         centerFoot = part;
                     } else {
                         LogManager.getLogger().error("Unknown location of " + loc + " for a Foot Actuator.");
@@ -2552,16 +2552,16 @@ public class Unit implements ITechnology {
                 dropCollar = part;
             } else if ((part instanceof KfBoom) || (part instanceof MissingKFBoom)) {
                 kfBoom = part;
-            } else if ((part instanceof ProtomekArmActuator) || (part instanceof MissingProtomekArmActuator)) {
+            } else if ((part instanceof ProtoMekArmActuator) || (part instanceof MissingProtoMekArmActuator)) {
                 int loc = part.getLocation();
-                if (loc == Protomech.LOC_LARM) {
+                if (loc == ProtoMek.LOC_LARM) {
                     protoLeftArmActuator = part;
-                } else if (loc == Protomech.LOC_RARM) {
+                } else if (loc == ProtoMek.LOC_RARM) {
                     protoRightArmActuator = part;
                 }
-            } else if (part instanceof ProtomekLegActuator || part instanceof MissingProtomekLegActuator) {
+            } else if (part instanceof ProtoMekLegActuator || part instanceof MissingProtoMekLegActuator) {
                 protoLegsActuator = part;
-            } else if (part instanceof ProtomekJumpJet || part instanceof MissingProtomekJumpJet) {
+            } else if (part instanceof ProtoMekJumpJet || part instanceof MissingProtoMekJumpJet) {
                 protoJumpJets.add(part);
             } else if ((part instanceof Thrusters)
                     && (entity instanceof SmallCraft || entity instanceof Jumpship)) {
@@ -2598,16 +2598,16 @@ public class Unit implements ITechnology {
                 continue;
             }
             if (null == locations[i]) {
-                if (entity instanceof Mech) {
+                if (entity instanceof Mek) {
                     MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(),
                             getEntity().getStructureType(), TechConstants.isClan(entity.getStructureTechLevel()),
-                            hasTSM(), entity instanceof QuadMech, false, false, getCampaign());
+                            hasTSM(), entity instanceof QuadMek, false, false, getCampaign());
                     addPart(mekLocation);
                     partsToAdd.add(mekLocation);
-                } else if (entity instanceof Protomech && i != Protomech.LOC_NMISS) {
-                    ProtomekLocation protomekLocation = new ProtomekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), ((Protomech) getEntity()).hasMyomerBooster(), false, getCampaign());
-                    addPart(protomekLocation);
-                    partsToAdd.add(protomekLocation);
+                } else if (entity instanceof ProtoMek && i != ProtoMek.LOC_NMISS) {
+                    ProtoMekLocation protoMekLocation = new ProtoMekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), ((ProtoMek) getEntity()).hasMyomerBooster(), false, getCampaign());
+                    addPart(protoMekLocation);
+                    partsToAdd.add(protoMekLocation);
                 } else if (entity instanceof Tank && i != Tank.LOC_BODY) {
                     if (entity instanceof VTOL) {
                         if (i == VTOL.LOC_ROTOR) {
@@ -2659,8 +2659,8 @@ public class Unit implements ITechnology {
                 }
             }
             if (null == armor[i]) {
-                if (entity instanceof Protomech) {
-                    ProtomekArmor a = new ProtomekArmor((int) getEntity().getWeight(), getEntity().getArmorType(i),
+                if (entity instanceof ProtoMek) {
+                    ProtoMekArmor a = new ProtoMekArmor((int) getEntity().getWeight(), getEntity().getArmorType(i),
                             getEntity().getOArmor(i, false), i, true, getCampaign());
                     addPart(a);
                     partsToAdd.add(a);
@@ -2768,7 +2768,7 @@ public class Unit implements ITechnology {
                             m.isOmniPodMounted(), getCampaign());
                     addPart(epart);
                     partsToAdd.add(epart);
-                    if (entity.hasETypeFlag(Entity.ETYPE_PROTOMECH)) {
+                    if (entity.hasETypeFlag(Entity.ETYPE_PROTOMEK)) {
                         protoJumpJets.add(epart);
                     }
                 }
@@ -2893,7 +2893,7 @@ public class Unit implements ITechnology {
         }
 
 
-        if (entity instanceof Mech) {
+        if (entity instanceof Mek) {
             if (null == gyro) {
                 gyro =  new MekGyro((int) entity.getWeight(), entity.getGyroType(), entity.getOriginalWalkMP(), entity.isClan(), getCampaign());
                 addPart(gyro);
@@ -2910,125 +2910,125 @@ public class Unit implements ITechnology {
                 partsToAdd.add(sensor);
             }
             if (null == cockpit) {
-                cockpit = new MekCockpit((int) entity.getWeight(), ((Mech) entity).getCockpitType(), entity.isClan(), getCampaign());
+                cockpit = new MekCockpit((int) entity.getWeight(), ((Mek) entity).getCockpitType(), entity.isClan(), getCampaign());
                 addPart(cockpit);
                 partsToAdd.add(cockpit);
             }
-            if (null == rightUpperArm && entity.hasSystem(Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM)) {
-                rightUpperArm = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM, getCampaign());
+            if (null == rightUpperArm && entity.hasSystem(Mek.ACTUATOR_UPPER_ARM, Mek.LOC_RARM)) {
+                rightUpperArm = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_UPPER_ARM, Mek.LOC_RARM, getCampaign());
                 addPart(rightUpperArm);
                 partsToAdd.add(rightUpperArm);
             }
-            if (null == leftUpperArm && entity.hasSystem(Mech.ACTUATOR_UPPER_ARM, Mech.LOC_LARM)) {
-                leftUpperArm = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_ARM, Mech.LOC_LARM, getCampaign());
+            if (null == leftUpperArm && entity.hasSystem(Mek.ACTUATOR_UPPER_ARM, Mek.LOC_LARM)) {
+                leftUpperArm = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_UPPER_ARM, Mek.LOC_LARM, getCampaign());
                 addPart(leftUpperArm);
                 partsToAdd.add(leftUpperArm);
             }
-            if (null == rightLowerArm && entity.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_RARM)) {
-                rightLowerArm = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_ARM, Mech.LOC_RARM, getCampaign());
+            if (null == rightLowerArm && entity.hasSystem(Mek.ACTUATOR_LOWER_ARM, Mek.LOC_RARM)) {
+                rightLowerArm = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_LOWER_ARM, Mek.LOC_RARM, getCampaign());
                 addPart(rightLowerArm);
                 partsToAdd.add(rightLowerArm);
             }
 
-            if (null == leftLowerArm && entity.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM)) {
-                leftLowerArm = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM, getCampaign());
+            if (null == leftLowerArm && entity.hasSystem(Mek.ACTUATOR_LOWER_ARM, Mek.LOC_LARM)) {
+                leftLowerArm = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_LOWER_ARM, Mek.LOC_LARM, getCampaign());
                 addPart(leftLowerArm);
                 partsToAdd.add(leftLowerArm);
             }
 
-            if (null == rightHand && entity.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_RARM)) {
-                rightHand = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_HAND, Mech.LOC_RARM, getCampaign());
+            if (null == rightHand && entity.hasSystem(Mek.ACTUATOR_HAND, Mek.LOC_RARM)) {
+                rightHand = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_HAND, Mek.LOC_RARM, getCampaign());
                 addPart(rightHand);
                 partsToAdd.add(rightHand);
             }
 
-            if (null == leftHand && entity.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_LARM)) {
-                leftHand = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_HAND, Mech.LOC_LARM, getCampaign());
+            if (null == leftHand && entity.hasSystem(Mek.ACTUATOR_HAND, Mek.LOC_LARM)) {
+                leftHand = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_HAND, Mek.LOC_LARM, getCampaign());
                 addPart(leftHand);
                 partsToAdd.add(leftHand);
             }
 
-            if (null == rightUpperLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RLEG)) {
-                rightUpperLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RLEG, getCampaign());
+            if (null == rightUpperLeg && entity.hasSystem(Mek.ACTUATOR_UPPER_LEG, Mek.LOC_RLEG)) {
+                rightUpperLeg = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_UPPER_LEG, Mek.LOC_RLEG, getCampaign());
                 addPart(rightUpperLeg);
                 partsToAdd.add(rightUpperLeg);
             }
 
-            if (null == leftUpperLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LLEG)) {
-                leftUpperLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LLEG, getCampaign());
+            if (null == leftUpperLeg && entity.hasSystem(Mek.ACTUATOR_UPPER_LEG, Mek.LOC_LLEG)) {
+                leftUpperLeg = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_UPPER_LEG, Mek.LOC_LLEG, getCampaign());
                 addPart(leftUpperLeg);
                 partsToAdd.add(leftUpperLeg);
             }
 
-            if ((centerUpperLeg == null) && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_CLEG)) {
-                centerUpperLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_CLEG, getCampaign());
+            if ((centerUpperLeg == null) && entity.hasSystem(Mek.ACTUATOR_UPPER_LEG, Mek.LOC_CLEG)) {
+                centerUpperLeg = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_UPPER_LEG, Mek.LOC_CLEG, getCampaign());
                 addPart(centerUpperLeg);
                 partsToAdd.add(centerUpperLeg);
             }
 
-            if (null == rightLowerLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG)) {
-                rightLowerLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG, getCampaign());
+            if (null == rightLowerLeg && entity.hasSystem(Mek.ACTUATOR_LOWER_LEG, Mek.LOC_RLEG)) {
+                rightLowerLeg = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_LOWER_LEG, Mek.LOC_RLEG, getCampaign());
                 addPart(rightLowerLeg);
                 partsToAdd.add(rightLowerLeg);
             }
 
-            if (null == leftLowerLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LLEG)) {
-                leftLowerLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LLEG, getCampaign());
+            if (null == leftLowerLeg && entity.hasSystem(Mek.ACTUATOR_LOWER_LEG, Mek.LOC_LLEG)) {
+                leftLowerLeg = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_LOWER_LEG, Mek.LOC_LLEG, getCampaign());
                 addPart(leftLowerLeg);
                 partsToAdd.add(leftLowerLeg);
             }
 
-            if ((centerLowerLeg == null) && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_CLEG)) {
-                centerLowerLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_CLEG, getCampaign());
+            if ((centerLowerLeg == null) && entity.hasSystem(Mek.ACTUATOR_LOWER_LEG, Mek.LOC_CLEG)) {
+                centerLowerLeg = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_LOWER_LEG, Mek.LOC_CLEG, getCampaign());
                 addPart(centerLowerLeg);
                 partsToAdd.add(centerLowerLeg);
             }
 
-            if (null == rightFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_RLEG)) {
-                rightFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_RLEG, getCampaign());
+            if (null == rightFoot && entity.hasSystem(Mek.ACTUATOR_FOOT, Mek.LOC_RLEG)) {
+                rightFoot = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_FOOT, Mek.LOC_RLEG, getCampaign());
                 addPart(rightFoot);
                 partsToAdd.add(rightFoot);
             }
 
-            if (null == leftFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_LLEG)) {
-                leftFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LLEG, getCampaign());
+            if (null == leftFoot && entity.hasSystem(Mek.ACTUATOR_FOOT, Mek.LOC_LLEG)) {
+                leftFoot = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_FOOT, Mek.LOC_LLEG, getCampaign());
                 addPart(leftFoot);
                 partsToAdd.add(leftFoot);
             }
 
-            if ((centerFoot == null) && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_CLEG)) {
-                centerFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_CLEG, getCampaign());
+            if ((centerFoot == null) && entity.hasSystem(Mek.ACTUATOR_FOOT, Mek.LOC_CLEG)) {
+                centerFoot = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_FOOT, Mek.LOC_CLEG, getCampaign());
                 addPart(centerFoot);
                 partsToAdd.add(centerFoot);
             }
 
-            if (null == rightUpperFrontLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RARM)) {
-                rightUpperFrontLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RARM, getCampaign());
+            if (null == rightUpperFrontLeg && entity.hasSystem(Mek.ACTUATOR_UPPER_LEG, Mek.LOC_RARM)) {
+                rightUpperFrontLeg = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_UPPER_LEG, Mek.LOC_RARM, getCampaign());
                 addPart(rightUpperFrontLeg);
                 partsToAdd.add(rightUpperFrontLeg);
             }
-            if (null == leftUpperFrontLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LARM)) {
-                leftUpperFrontLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LARM, getCampaign());
+            if (null == leftUpperFrontLeg && entity.hasSystem(Mek.ACTUATOR_UPPER_LEG, Mek.LOC_LARM)) {
+                leftUpperFrontLeg = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_UPPER_LEG, Mek.LOC_LARM, getCampaign());
                 addPart(leftUpperFrontLeg);
                 partsToAdd.add(leftUpperFrontLeg);
             }
-            if (null == rightLowerFrontLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RARM)) {
-                rightLowerFrontLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RARM, getCampaign());
+            if (null == rightLowerFrontLeg && entity.hasSystem(Mek.ACTUATOR_LOWER_LEG, Mek.LOC_RARM)) {
+                rightLowerFrontLeg = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_LOWER_LEG, Mek.LOC_RARM, getCampaign());
                 addPart(rightLowerFrontLeg);
                 partsToAdd.add(rightLowerFrontLeg);
             }
-            if (null == leftLowerFrontLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LARM)) {
-                leftLowerFrontLeg = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LARM, getCampaign());
+            if (null == leftLowerFrontLeg && entity.hasSystem(Mek.ACTUATOR_LOWER_LEG, Mek.LOC_LARM)) {
+                leftLowerFrontLeg = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_LOWER_LEG, Mek.LOC_LARM, getCampaign());
                 addPart(leftLowerFrontLeg);
                 partsToAdd.add(leftLowerFrontLeg);
             }
-            if (null == rightFrontFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_RARM)) {
-                rightFrontFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_RARM, getCampaign());
+            if (null == rightFrontFoot && entity.hasSystem(Mek.ACTUATOR_FOOT, Mek.LOC_RARM)) {
+                rightFrontFoot = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_FOOT, Mek.LOC_RARM, getCampaign());
                 addPart(rightFrontFoot);
                 partsToAdd.add(rightFrontFoot);
             }
-            if (null == leftFrontFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_LARM)) {
-                leftFrontFoot = new MekActuator((int) entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LARM, getCampaign());
+            if (null == leftFrontFoot && entity.hasSystem(Mek.ACTUATOR_FOOT, Mek.LOC_LARM)) {
+                leftFrontFoot = new MekActuator((int) entity.getWeight(), Mek.ACTUATOR_FOOT, Mek.LOC_LARM, getCampaign());
                 addPart(leftFrontFoot);
                 partsToAdd.add(leftFrontFoot);
             }
@@ -3217,32 +3217,32 @@ public class Unit implements ITechnology {
                 partsToAdd.add(turretLock);
             }
         }
-        if (entity instanceof Protomech) {
+        if (entity instanceof ProtoMek) {
             if (!entity.entityIsQuad()) {
                 if (null == protoLeftArmActuator) {
-                    protoLeftArmActuator = new ProtomekArmActuator((int) entity.getWeight(),Protomech.LOC_LARM, getCampaign());
+                    protoLeftArmActuator = new ProtoMekArmActuator((int) entity.getWeight(),ProtoMek.LOC_LARM, getCampaign());
                     addPart(protoLeftArmActuator);
                     partsToAdd.add(protoLeftArmActuator);
                 }
                 if (null == protoRightArmActuator) {
-                    protoRightArmActuator = new ProtomekArmActuator((int) entity.getWeight(),Protomech.LOC_RARM, getCampaign());
+                    protoRightArmActuator = new ProtoMekArmActuator((int) entity.getWeight(),ProtoMek.LOC_RARM, getCampaign());
                     addPart(protoRightArmActuator);
                     partsToAdd.add(protoRightArmActuator);
                 }
             }
             if (null == protoLegsActuator) {
-                protoLegsActuator = new ProtomekLegActuator((int) entity.getWeight(), getCampaign());
+                protoLegsActuator = new ProtoMekLegActuator((int) entity.getWeight(), getCampaign());
                 addPart(protoLegsActuator);
                 partsToAdd.add(protoLegsActuator);
             }
             if (null == sensor) {
-                sensor = new ProtomekSensor((int) entity.getWeight(), getCampaign());
+                sensor = new ProtoMekSensor((int) entity.getWeight(), getCampaign());
                 addPart(sensor);
                 partsToAdd.add(sensor);
             }
             int jj = (entity).getOriginalJumpMP() - protoJumpJets.size();
             while (jj > 0) {
-                ProtomekJumpJet protoJJ = new ProtomekJumpJet((int) entity.getWeight(), getCampaign());
+                ProtoMekJumpJet protoJJ = new ProtoMekJumpJet((int) entity.getWeight(), getCampaign());
                 addPart(protoJJ);
                 partsToAdd.add(protoJJ);
                 jj--;
@@ -3304,7 +3304,7 @@ public class Unit implements ITechnology {
                 }
             }
         }
-        if (getEntity() instanceof LandAirMech) {
+        if (getEntity() instanceof LandAirMek) {
             if (null == avionics) {
                 avionics = new Avionics((int) entity.getWeight(), getCampaign());
                 addPart(avionics);
@@ -3400,10 +3400,10 @@ public class Unit implements ITechnology {
 
     public @Nullable Image getImage(final Component component, final Camouflage camouflage,
                                     final boolean showDamage) {
-        if (MHQStaticDirectoryManager.getMechTileset() == null) {
+        if (MHQStaticDirectoryManager.getMekTileset() == null) {
             return null;
         }
-        final Image base = MHQStaticDirectoryManager.getMechTileset().imageFor(getEntity());
+        final Image base = MHQStaticDirectoryManager.getMekTileset().imageFor(getEntity());
         return new EntityImage(base, camouflage, component, getEntity()).loadPreviewImage(showDamage);
     }
 
@@ -3561,7 +3561,7 @@ public class Unit implements ITechnology {
                 }
             }
         } else {
-            if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MECH) == 0) {
+            if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MEK) == 0) {
                 calcCompositeCrew();
             } else {
                 refreshLAMPilot();
@@ -3616,7 +3616,7 @@ public class Unit implements ITechnology {
                     || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)
                     || entity.hasETypeFlag(Entity.ETYPE_TANK)
                     || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)
-                    || entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MECH)) {
+                    || entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MEK)) {
                 // Find the unit commander
                 Person commander = getCommander();
                 // If there is no crew, there's nothing left to do here.
@@ -3790,7 +3790,7 @@ public class Unit implements ITechnology {
                 sumPiloting += p.getSkill(driveType).getFinalSkillValue();
                 nDrivers++;
             } else if (entity instanceof Infantry) {
-                //For infantry we need to assign an 8 if they have no antimech skill
+                //For infantry we need to assign an 8 if they have no antimek skill
                 sumPiloting += 8;
                 nDrivers++;
             }
@@ -3919,7 +3919,7 @@ public class Unit implements ITechnology {
     }
 
     /**
-     * LAMs require a pilot that is cross-trained for mechs and fighters
+     * LAMs require a pilot that is cross-trained for meks and fighters
      */
     private void refreshLAMPilot() {
         Person pilot = getCommander();
@@ -3929,17 +3929,17 @@ public class Unit implements ITechnology {
             return;
         }
 
-        int pilotingMech = 13;
-        int gunneryMech = 13;
+        int pilotingMek = 13;
+        int gunneryMek = 13;
         int pilotingAero = 13;
         int gunneryAero = 13;
         int artillery = 13;
 
-        if (pilot.hasSkill(SkillType.S_PILOT_MECH)) {
-            pilotingMech = pilot.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue();
+        if (pilot.hasSkill(SkillType.S_PILOT_MEK)) {
+            pilotingMek = pilot.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue();
         }
-        if (pilot.hasSkill(SkillType.S_GUN_MECH)) {
-            gunneryMech = pilot.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+        if (pilot.hasSkill(SkillType.S_GUN_MEK)) {
+            gunneryMek = pilot.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue();
         }
         if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
             pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue();
@@ -3952,15 +3952,15 @@ public class Unit implements ITechnology {
         }
 
         if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
-            pilotingMech += pilot.getPilotingInjuryMod();
-            gunneryMech += pilot.getGunneryInjuryMod();
+            pilotingMek += pilot.getPilotingInjuryMod();
+            gunneryMek += pilot.getGunneryInjuryMod();
             pilotingAero += pilot.getPilotingInjuryMod();
             gunneryAero += pilot.getGunneryInjuryMod();
             artillery += pilot.getGunneryInjuryMod();
         }
         LAMPilot crew = (LAMPilot) entity.getCrew();
-        crew.setPiloting(Math.min(Math.max(pilotingMech, 0), 8));
-        crew.setGunnery(Math.min(Math.max(gunneryMech, 0), 7));
+        crew.setPiloting(Math.min(Math.max(pilotingMek, 0), 8));
+        crew.setGunnery(Math.min(Math.max(gunneryMek, 0), 7));
         crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
         crew.setGunneryAero(Math.min(Math.max(gunneryAero, 0), 7));
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 8), 0);
@@ -4213,8 +4213,8 @@ public class Unit implements ITechnology {
 
     // TODO : Switch similar tables in person to use this one instead
     public String determineUnitTechSkillType() {
-        if ((entity instanceof Mech) || (entity instanceof Protomech)) {
-            return SkillType.S_TECH_MECH;
+        if ((entity instanceof Mek) || (entity instanceof ProtoMek)) {
+            return SkillType.S_TECH_MEK;
         } else if (entity instanceof BattleArmor) {
             return SkillType.S_TECH_BA;
         } else if (entity instanceof Tank) {
@@ -4242,8 +4242,8 @@ public class Unit implements ITechnology {
         //Taharqa: I dont think we should do it based on computed size, but whether the unit logically
         //is the type of unit that has only one pilot. This is partly because there may be some vees
         //that only have one pilot and this is also a problem for BA units with only one active suit
-        return ((entity instanceof Mech)
-                || (entity instanceof Protomech)
+        return ((entity instanceof Mek)
+                || (entity instanceof ProtoMek)
                 || (entity instanceof Aero && !(entity instanceof SmallCraft) && !(entity instanceof Jumpship)))
                 && (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos());
     }
@@ -4940,7 +4940,7 @@ public class Unit implements ITechnology {
     public int getMaintenanceTime() {
         int retVal = 0;
 
-        if (getEntity() instanceof Mech) {
+        if (getEntity() instanceof Mek) {
             retVal = switch (getEntity().getWeightClass()) {
                 case EntityWeightClass.WEIGHT_ULTRA_LIGHT -> 30;
                 case EntityWeightClass.WEIGHT_LIGHT -> 45;
@@ -4948,7 +4948,7 @@ public class Unit implements ITechnology {
                 case EntityWeightClass.WEIGHT_HEAVY -> 75;
                 default -> 90;
             };
-        } else if (getEntity() instanceof Protomech) {
+        } else if (getEntity() instanceof ProtoMek) {
             retVal = 20;
         } else if (getEntity() instanceof BattleArmor) {
             retVal = 10;
@@ -5218,7 +5218,7 @@ public class Unit implements ITechnology {
             partsCost = partsCost.plus(entity.getWeight() * 0.001 * 15000);
         } else if (entity instanceof Tank) {
             partsCost = partsCost.plus(entity.getWeight() * 0.001 * 8000);
-        } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)) {
+        } else if ((entity instanceof Mek) || (entity instanceof BattleArmor)) {
             partsCost = partsCost.plus(entity.getWeight() * 0.001 * 10000);
         } else if (entity instanceof Infantry) {
             if (((Infantry) entity).isMechanized()) {
@@ -5234,8 +5234,8 @@ public class Unit implements ITechnology {
                 LogManager.getLogger().error("{} is not a generic CI. Movement mode is {}", getName(), entity.getMovementModeAsString());
             }
         } else {
-            // Only ProtoMechs should fall here. Anything else needs to be logged
-            if (!(entity instanceof Protomech)) {
+            // Only ProtoMeks should fall here. Anything else needs to be logged
+            if (!(entity instanceof ProtoMek)) {
                 LogManager.getLogger().error("{} has no Spare Parts value for unit type {}", getName(), Entity.getEntityTypeName(entity.getEntityType()));
             }
         }
@@ -5318,7 +5318,7 @@ public class Unit implements ITechnology {
             fuelCost = fuelCost.plus(getFighterFuelCost(entity));
         } else if (entity instanceof Aero) {
             fuelCost = fuelCost.plus(((Aero) entity).getFuelTonnage() * 4.0 * 15000.0);
-        } else if ((entity instanceof Tank) || (entity instanceof Mech)) {
+        } else if ((entity instanceof Tank) || (entity instanceof Mek)) {
             fuelCost = fuelCost.plus(getVehicleFuelCost(entity));
         } else if (entity instanceof Infantry) {
             fuelCost = fuelCost.plus(getInfantryFuelCost(entity));

@@ -118,7 +118,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 fullShots = mounted.getOriginalShots();
             }
 
-            if (unit.getEntity() instanceof Protomech) {
+            if (unit.getEntity() instanceof ProtoMek) {
                 // If protomechs are using alternate munitions then cut in half
                 if (!EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(getType().getMunitionType())){
                     fullShots = fullShots / 2;

@@ -73,11 +73,11 @@ public class SkillAwards {
         switch (skill.toLowerCase()) {
             // These first couple of cases are for those instances where the users want to check against multiple skills, but only needs one passing grade
             case "piloting":
-                relevantSkills = Arrays.asList(SkillType.S_PILOT_MECH, SkillType.S_PILOT_AERO, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_JET, SkillType.S_PILOT_SPACE);
+                relevantSkills = Arrays.asList(SkillType.S_PILOT_MEK, SkillType.S_PILOT_AERO, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_JET, SkillType.S_PILOT_SPACE);
                 break;
 
             case "accuracy":
-                relevantSkills = Arrays.asList(SkillType.S_GUN_MECH, SkillType.S_GUN_AERO, SkillType.S_GUN_VEE, SkillType.S_GUN_JET, SkillType.S_GUN_SPACE, SkillType.S_GUN_BA, SkillType.S_GUN_PROTO, SkillType.S_ARTILLERY, SkillType.S_SMALL_ARMS, SkillType.S_ANTI_MECH);
+                relevantSkills = Arrays.asList(SkillType.S_GUN_MEK, SkillType.S_GUN_AERO, SkillType.S_GUN_VEE, SkillType.S_GUN_JET, SkillType.S_GUN_SPACE, SkillType.S_GUN_BA, SkillType.S_GUN_PROTO, SkillType.S_ARTILLERY, SkillType.S_SMALL_ARMS, SkillType.S_ANTI_MEK);
                 break;
 
             case "command":
@@ -89,11 +89,11 @@ public class SkillAwards {
                 break;
 
             case "techwithmedical":
-                relevantSkills = Arrays.asList(SkillType.S_TECH_MECH, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC, SkillType.S_TECH_VESSEL, SkillType.S_TECH_BA, SkillType.S_ASTECH, SkillType.S_DOCTOR, SkillType.S_MEDTECH);
+                relevantSkills = Arrays.asList(SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC, SkillType.S_TECH_VESSEL, SkillType.S_TECH_BA, SkillType.S_ASTECH, SkillType.S_DOCTOR, SkillType.S_MEDTECH);
                 break;
 
             case "tech":
-                relevantSkills = Arrays.asList(SkillType.S_TECH_MECH, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC, SkillType.S_TECH_VESSEL, SkillType.S_TECH_BA, SkillType.S_ASTECH);
+                relevantSkills = Arrays.asList(SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC, SkillType.S_TECH_VESSEL, SkillType.S_TECH_BA, SkillType.S_ASTECH);
                 break;
 
             case "medical":
@@ -104,8 +104,8 @@ public class SkillAwards {
                 relevantSkills = Arrays.asList(SkillType.S_ASTECH, SkillType.S_MEDTECH);
                 break;
 
-            case "piloting/mech":
-                relevantSkills = List.of(SkillType.S_PILOT_MECH);
+            case "piloting/mek":
+                relevantSkills = List.of(SkillType.S_PILOT_MEK);
                 break;
 
             case "piloting/aerospace":
@@ -132,8 +132,8 @@ public class SkillAwards {
                 relevantSkills = List.of(SkillType.S_PILOT_SPACE);
                 break;
 
-            case "gunnery/mech":
-                relevantSkills = List.of(SkillType.S_GUN_MECH);
+            case "gunnery/mek":
+                relevantSkills = List.of(SkillType.S_GUN_MEK);
                 break;
 
             case "gunnery/aerospace":
@@ -156,12 +156,12 @@ public class SkillAwards {
                 relevantSkills = List.of(SkillType.S_GUN_BA);
                 break;
 
-            case "gunnery/protomech":
+            case "gunnery/protomek":
                 relevantSkills = List.of(SkillType.S_GUN_PROTO);
                 break;
 
-            case "tech/mech":
-                relevantSkills = List.of(SkillType.S_TECH_MECH);
+            case "tech/mek":
+                relevantSkills = List.of(SkillType.S_TECH_MEK);
                 break;
 
             case "tech/mechanic":
@@ -188,8 +188,8 @@ public class SkillAwards {
                 relevantSkills = List.of(SkillType.S_SMALL_ARMS);
                 break;
 
-            case "antimech":
-                relevantSkills = List.of(SkillType.S_ANTI_MECH);
+            case "antimek":
+                relevantSkills = List.of(SkillType.S_ANTI_MEK);
                 break;
             case "astech":
                 relevantSkills = List.of(SkillType.S_ASTECH);

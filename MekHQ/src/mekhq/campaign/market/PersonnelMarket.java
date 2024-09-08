@@ -61,7 +61,7 @@ public class PersonnelMarket {
     private Map<UUID, Entity> attachedEntities = new LinkedHashMap<>();
     /* Alternate types of rolls, set by PersonnelMarketDialog */
     private boolean paidRecruitment = false;
-    private PersonnelRole paidRecruitRole = PersonnelRole.MECHWARRIOR;
+    private PersonnelRole paidRecruitRole = PersonnelRole.MEKWARRIOR;
 
     public PersonnelMarket() {
         method = new PersonnelMarketDisabled();
@@ -279,10 +279,10 @@ public class PersonnelMarket {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
                     UUID id = UUID.fromString(wn2.getAttributes().getNamedItem("id").getTextContent());
-                    MechSummary ms = MechSummaryCache.getInstance().getMech(wn2.getTextContent());
+                    MekSummary ms = MekSummaryCache.getInstance().getMek(wn2.getTextContent());
                     Entity en = null;
                     try {
-                        en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+                        en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                     } catch (EntityLoadingException ex) {
                         LogManager.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage(), ex);
                     }
@@ -344,8 +344,8 @@ public class PersonnelMarket {
 
     public static long getUnitMainForceType(Campaign c) {
         long mostTypes = getUnitMainForceTypes(c);
-        if ((mostTypes & Entity.ETYPE_MECH) != 0) {
-            return Entity.ETYPE_MECH;
+        if ((mostTypes & Entity.ETYPE_MEK) != 0) {
+            return Entity.ETYPE_MEK;
         } else if ((mostTypes & Entity.ETYPE_TANK) != 0) {
             return Entity.ETYPE_TANK;
         } else if ((mostTypes & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
@@ -354,8 +354,8 @@ public class PersonnelMarket {
             return Entity.ETYPE_BATTLEARMOR;
         } else if ((mostTypes & Entity.ETYPE_INFANTRY) != 0) {
             return Entity.ETYPE_INFANTRY;
-        } else if ((mostTypes & Entity.ETYPE_PROTOMECH) != 0) {
-            return Entity.ETYPE_PROTOMECH;
+        } else if ((mostTypes & Entity.ETYPE_PROTOMEK) != 0) {
+            return Entity.ETYPE_PROTOMEK;
         } else if ((mostTypes & Entity.ETYPE_CONV_FIGHTER) != 0) {
             return Entity.ETYPE_CONV_FIGHTER;
         } else if ((mostTypes & Entity.ETYPE_SMALL_CRAFT) != 0) {
@@ -363,13 +363,13 @@ public class PersonnelMarket {
         } else if ((mostTypes & Entity.ETYPE_DROPSHIP) != 0) {
             return Entity.ETYPE_DROPSHIP;
         } else {
-            return Entity.ETYPE_MECH;
+            return Entity.ETYPE_MEK;
         }
     }
 
     public static long getUnitMainForceTypes(Campaign c) {
         HangarStatistics hangarStats = c.getHangarStatistics();
-        int mechs = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
+        int meks = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK);
         int ds = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int sc = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int cf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
@@ -377,8 +377,8 @@ public class PersonnelMarket {
         int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) + hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
         int inf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
         int ba = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
-        int proto = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
-        int most = mechs;
+        int proto = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK);
+        int most = meks;
         if (ds > most) {
             most = ds;
         }
@@ -404,8 +404,8 @@ public class PersonnelMarket {
             most = proto;
         }
         long retval = 0;
-        if (most == mechs) {
-            retval = retval | Entity.ETYPE_MECH;
+        if (most == meks) {
+            retval = retval | Entity.ETYPE_MEK;
         }
         if (most == ds) {
             retval = retval | Entity.ETYPE_DROPSHIP;
@@ -429,7 +429,7 @@ public class PersonnelMarket {
             retval = retval | Entity.ETYPE_BATTLEARMOR;
         }
         if (most == proto) {
-            retval = retval | Entity.ETYPE_PROTOMECH;
+            retval = retval | Entity.ETYPE_PROTOMEK;
         }
         return retval;
     }

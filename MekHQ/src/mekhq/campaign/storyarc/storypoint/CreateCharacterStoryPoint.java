@@ -109,7 +109,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         commander = true;
         clan = false;
         phenotype = Phenotype.NONE;
-        primaryRole = PersonnelRole.MECHWARRIOR;
+        primaryRole = PersonnelRole.MEKWARRIOR;
 
         editOrigin = false;
         editBirthday = false;

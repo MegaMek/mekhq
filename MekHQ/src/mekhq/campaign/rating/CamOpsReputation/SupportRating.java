@@ -162,22 +162,22 @@ public class SupportRating {
         Map<String, List<Integer>> technicianRequirements = new HashMap<>();
 
         // Calculate counts for each unit type
-        int mechCount = transportationRequirements.get("mechCount");
+        int mekCount = transportationRequirements.get("mekCount");
         int vehicleCount = transportationRequirements.get("totalVehicleCount");
         int aeroCount = transportationRequirements.get("asfCount") + transportationRequirements.get("smallCraftCount");
-        var baProtoCounts = calculateBattleArmorAndProtoMechCounts(campaign);
+        var baProtoCounts = calculateBattleArmorAndProtoMekCounts(campaign);
         int battleArmorCount = Math.round(baProtoCounts.get("battleArmorCount") / 5.0f);
-        mechCount += Math.round(baProtoCounts.get("protoMechCount") / 5.0f);
+        mekCount += Math.round(baProtoCounts.get("protoMekCount") / 5.0f);
 
         // Calculate tech counts
         var techCounts = calculateTechCounts(campaign);
-        technicianRequirements.put("mech", List.of(mechCount, techCounts.get("techMechCount")));
+        technicianRequirements.put("mek", List.of(mekCount, techCounts.get("techMekCount")));
         technicianRequirements.put("vehicle", List.of(vehicleCount, techCounts.get("techMechanicCount")));
         technicianRequirements.put("aero", List.of(aeroCount, techCounts.get("techAeroCount")));
         technicianRequirements.put("battleArmor", List.of(battleArmorCount, techCounts.get("techBattleArmorCount")));
 
         // Calculate total requirements and techs
-        int totalRequirements = (mechCount + vehicleCount + aeroCount + battleArmorCount);
+        int totalRequirements = (mekCount + vehicleCount + aeroCount + battleArmorCount);
         int totalTechs = techCounts.values().stream().mapToInt(Integer::intValue).sum();
         int percentage = (int) ((float) totalTechs / totalRequirements * 100);
 
@@ -197,16 +197,16 @@ public class SupportRating {
     }
 
     /**
-     * Calculates the total count of battle armor and proto mechs in a given campaign.
+     * Calculates the total count of battle armor and proto meks in a given campaign.
      *
      * @param campaign the campaign containing the units to be counted
-     * @return a map containing the counts of battle armor and proto mechs, with the keys "battleArmorCount" and "protoMechCount"
+     * @return a map containing the counts of battle armor and proto meks, with the keys "battleArmorCount" and "protoMekCount"
      */
-    private static Map<String, Integer> calculateBattleArmorAndProtoMechCounts(Campaign campaign) {
+    private static Map<String, Integer> calculateBattleArmorAndProtoMekCounts(Campaign campaign) {
         Map<String, Integer> counts = new HashMap<>();
 
         int battleArmorCount = 0;
-        int protoMechCount = 0;
+        int protoMekCount = 0;
 
         for (Unit unit : campaign.getActiveUnits()) {
             Entity entity = unit.getEntity();
@@ -214,12 +214,12 @@ public class SupportRating {
             if (entity.isBattleArmor()) {
                 battleArmorCount += unit.getFullCrewSize();
             } else if (entity.isProtoMek()) {
-                protoMechCount += unit.getFullCrewSize();
+                protoMekCount += unit.getFullCrewSize();
             }
         }
 
         counts.put("battleArmorCount", battleArmorCount);
-        counts.put("protoMechCount", protoMechCount);
+        counts.put("protoMekCount", protoMekCount);
 
         return counts;
     }
@@ -229,7 +229,7 @@ public class SupportRating {
      *
      * @param campaign the campaign object from which to calculate the tech counts
      * @return a map that contains the counts of different tech roles. The keys are as follows:
-     *          - "techMechCount" for personnel with the role "TechMech"
+     *          - "techMekCount" for personnel with the role "TechMek"
      *          - "techMechanicCount" for personnel with the role "TechMechanic"
      *          - "techAeroCount" for personnel with the role "TechAero"
      *          - "techBattleArmorCount" for personnel with the role "TechBA"
@@ -237,13 +237,13 @@ public class SupportRating {
     private static Map<String, Integer> calculateTechCounts(Campaign campaign) {
         Map<String, Integer> techCounts = new HashMap<>();
 
-        techCounts.put("techMechCount", 0);
+        techCounts.put("techMekCount", 0);
         techCounts.put("techMechanicCount", 0);
         techCounts.put("techAeroCount", 0);
         techCounts.put("techBattleArmorCount", 0);
 
         for (Person person : campaign.getActivePersonnel()) {
-            updateCount(person::isTechMech, "techMechCount", techCounts);
+            updateCount(person::isTechMek, "techMekCount", techCounts);
             updateCount(person::isTechMechanic, "techMechanicCount", techCounts);
             updateCount(person::isTechAero, "techAeroCount", techCounts);
             updateCount(person::isTechBA, "techBattleArmorCount", techCounts);

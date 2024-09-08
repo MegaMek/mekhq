@@ -53,7 +53,7 @@ public class ProtoMekLegActuator extends Part {
 
     public ProtoMekLegActuator(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "ProtoMech Leg Actuator";
+        this.name = "ProtoMek Leg Actuator";
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ProtoMekLegActuator extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingProtomekLegActuator(getUnitTonnage(), campaign);
+        return new MissingProtoMekLegActuator(getUnitTonnage(), campaign);
     }
 
     @Override
@@ -226,7 +226,7 @@ public class ProtoMekLegActuator extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECH);
+        return skillType.equals(SkillType.S_TECH_MEK);
     }
 
     @Override
@@ -251,7 +251,7 @@ public class ProtoMekLegActuator extends Part {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return ProtomekLocation.TECH_ADVANCEMENT;
+        return ProtoMekLocation.TECH_ADVANCEMENT;
     }
 
     @Override

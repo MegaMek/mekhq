@@ -21,7 +21,7 @@ package mekhq.gui.dialog;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.MechSummaryCache;
+import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import mekhq.MHQStaticDirectoryManager;
@@ -211,7 +211,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
          * 1 : Factions
          * 2 : Names
          * 3 : Planetary Systems
-         * 4 : Portraits, Camouflage, Mech Tileset, Force Icons, Awards
+         * 4 : Portraits, Camouflage, Mek Tileset, Force Icons, Awards
          * 5 : Units
          * 6 : New Campaign / Campaign Loading
          * 7 : Campaign Application
@@ -256,7 +256,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
             //region Progress 5
             setProgress(5);
-            while (!MechSummaryCache.getInstance().isInitialized()) {
+            while (!MekSummaryCache.getInstance().isInitialized()) {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ignored) {

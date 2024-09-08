@@ -144,7 +144,7 @@ public enum ROMDesignation {
     private static String determineDesignationFromRole(final PersonnelRole role,
                                                        final Person person) {
         switch (role) {
-            case MECHWARRIOR:
+            case MEKWARRIOR:
             case LAM_PILOT:
                 return EPSILON.toString();
             case GROUND_VEHICLE_DRIVER:
@@ -173,7 +173,7 @@ public enum ROMDesignation {
                     }
                 }
                 break;
-            case MECH_TECH:
+            case MEK_TECH:
             case MECHANIC:
             case AERO_TECH:
             case BA_TECH:

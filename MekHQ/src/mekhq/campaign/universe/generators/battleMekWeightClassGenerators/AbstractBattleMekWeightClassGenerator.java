@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.universe.generators.battleMekWeightClassGenerators;
 
-import mekhq.campaign.universe.enums.BattleMechWeightClassGenerationMethod;
+import mekhq.campaign.universe.enums.BattleMekWeightClassGenerationMethod;
 
 /**
  * This was designed to provide options for the method of weight generation for Company Generators,
@@ -27,17 +27,17 @@ import mekhq.campaign.universe.enums.BattleMechWeightClassGenerationMethod;
  */
 public abstract class AbstractBattleMekWeightClassGenerator {
     //region Variable Declarations
-    private final BattleMechWeightClassGenerationMethod method;
+    private final BattleMekWeightClassGenerationMethod method;
     //endregion Variable Declarations
 
     //region Constructors
-    protected AbstractBattleMekWeightClassGenerator(final BattleMechWeightClassGenerationMethod method) {
+    protected AbstractBattleMekWeightClassGenerator(final BattleMekWeightClassGenerationMethod method) {
         this.method = method;
     }
     //endregion Constructors
 
     //region Getters
-    public BattleMechWeightClassGenerationMethod getMethod() {
+    public BattleMekWeightClassGenerationMethod getMethod() {
         return method;
     }
     //endregion Getters

@@ -22,9 +22,9 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.common.Entity;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -260,11 +260,11 @@ public class Loot {
                 } else if (wn2.getNodeName().equalsIgnoreCase("cash")) {
                     retVal.cash = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("entityName")) {
-                    MechSummary summary = MechSummaryCache.getInstance().getMech(wn2.getTextContent());
+                    MekSummary summary = MekSummaryCache.getInstance().getMek(wn2.getTextContent());
                     if (null == summary) {
                         throw(new EntityLoadingException());
                     }
-                    Entity e = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                    Entity e = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                     if (null == e) {
                         continue;
                     }

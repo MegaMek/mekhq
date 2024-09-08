@@ -1453,7 +1453,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) {
             optionComp.addValue(Crew.HUMANTRO_NONE);
-            optionComp.addValue(Crew.HUMANTRO_MECH);
+            optionComp.addValue(Crew.HUMANTRO_MEK);
             optionComp.addValue(Crew.HUMANTRO_AERO);
             optionComp.addValue(Crew.HUMANTRO_VEE);
             optionComp.addValue(Crew.HUMANTRO_BA);
@@ -1559,13 +1559,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         if ((chkClan.isSelected()) || (Objects.requireNonNull(newPhenotype).isNone())) {
             if ((newPhenotype != null) && (newPhenotype != selectedPhenotype)) {
                 switch (selectedPhenotype) {
-                    case MECHWARRIOR:
-                        decreasePhenotypeBonus(SkillType.S_GUN_MECH);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_MECH);
+                    case MEKWARRIOR:
+                        decreasePhenotypeBonus(SkillType.S_GUN_MEK);
+                        decreasePhenotypeBonus(SkillType.S_PILOT_MEK);
                         break;
                     case ELEMENTAL:
                         decreasePhenotypeBonus(SkillType.S_GUN_BA);
-                        decreasePhenotypeBonus(SkillType.S_ANTI_MECH);
+                        decreasePhenotypeBonus(SkillType.S_ANTI_MEK);
                         break;
                     case AEROSPACE:
                         decreasePhenotypeBonus(SkillType.S_GUN_AERO);
@@ -1579,7 +1579,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                         decreasePhenotypeBonus(SkillType.S_PILOT_NVEE);
                         decreasePhenotypeBonus(SkillType.S_PILOT_VTOL);
                         break;
-                    case PROTOMECH:
+                    case PROTOMEK:
                         decreasePhenotypeBonus(SkillType.S_GUN_PROTO);
                         break;
                     case NAVAL:
@@ -1593,13 +1593,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 }
 
                 switch (newPhenotype) {
-                    case MECHWARRIOR:
-                        increasePhenotypeBonus(SkillType.S_GUN_MECH);
-                        increasePhenotypeBonus(SkillType.S_PILOT_MECH);
+                    case MEKWARRIOR:
+                        increasePhenotypeBonus(SkillType.S_GUN_MEK);
+                        increasePhenotypeBonus(SkillType.S_PILOT_MEK);
                         break;
                     case ELEMENTAL:
                         increasePhenotypeBonus(SkillType.S_GUN_BA);
-                        increasePhenotypeBonus(SkillType.S_ANTI_MECH);
+                        increasePhenotypeBonus(SkillType.S_ANTI_MEK);
                         break;
                     case AEROSPACE:
                         increasePhenotypeBonus(SkillType.S_GUN_AERO);
@@ -1613,7 +1613,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                         increasePhenotypeBonus(SkillType.S_PILOT_NVEE);
                         increasePhenotypeBonus(SkillType.S_PILOT_VTOL);
                         break;
-                    case PROTOMECH:
+                    case PROTOMEK:
                         increasePhenotypeBonus(SkillType.S_GUN_PROTO);
                         break;
                     case NAVAL:

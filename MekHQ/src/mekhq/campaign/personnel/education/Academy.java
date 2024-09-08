@@ -1043,8 +1043,8 @@ public class Academy implements Comparable<Academy> {
      */
     public static String skillParser(String skill) {
         return switch (skill.toLowerCase().trim()) {
-            case "piloting/mech" -> SkillType.S_PILOT_MECH;
-            case "gunnery/mech" -> SkillType.S_GUN_MECH;
+            case "piloting/mek" -> SkillType.S_PILOT_MEK;
+            case "gunnery/mek" -> SkillType.S_GUN_MEK;
             case "piloting/aerospace" -> SkillType.S_PILOT_AERO;
             case "gunnery/aerospace" -> SkillType.S_GUN_AERO;
             case "piloting/ground vehicle" -> SkillType.S_PILOT_GVEE;
@@ -1057,10 +1057,10 @@ public class Academy implements Comparable<Academy> {
             case "gunnery/spacecraft" -> SkillType.S_GUN_SPACE;
             case "artillery" -> SkillType.S_ARTILLERY;
             case "gunnery/battlesuit" -> SkillType.S_GUN_BA;
-            case "gunnery/protomech" -> SkillType.S_GUN_PROTO;
+            case "gunnery/protomek" -> SkillType.S_GUN_PROTO;
             case "small arms" -> SkillType.S_SMALL_ARMS;
-            case "anti-mech" -> SkillType.S_ANTI_MECH;
-            case "tech/mech" -> SkillType.S_TECH_MECH;
+            case "anti-mek" -> SkillType.S_ANTI_MEK;
+            case "tech/mek" -> SkillType.S_TECH_MEK;
             case "tech/mechanic" -> SkillType.S_TECH_MECHANIC;
             case "tech/aero" -> SkillType.S_TECH_AERO;
             case "tech/ba" -> SkillType.S_TECH_BA;

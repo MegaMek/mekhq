@@ -652,7 +652,7 @@ public class Campaign implements ITechManager {
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
 
-                MechSummary ms = getUnitGenerator().generate(getFactionCode(), shipSearchType, -1,
+                MekSummary ms = getUnitGenerator().generate(getFactionCode(), shipSearchType, -1,
                         getGameYear(), getUnitRatingMod());
 
                 if (ms == null) {
@@ -677,7 +677,7 @@ public class Campaign implements ITechManager {
     }
 
     public void purchaseShipSearchResult() {
-        MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
+        MekSummary ms = MekSummaryCache.getInstance().getMek(getShipSearchResult());
         if (ms == null) {
             LogManager.getLogger().error("Cannot find entry for {}", getShipSearchResult());
             return;
@@ -690,16 +690,16 @@ public class Campaign implements ITechManager {
             return;
         }
 
-        MechFileParser mechFileParser;
+        MekFileParser mekFileParser;
 
         try {
-            mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
+            mekFileParser = new MekFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
             LogManager.getLogger().error("Unable to load unit: {}", ms.getEntryName(), ex);
             return;
         }
 
-        Entity en = mechFileParser.getEntity();
+        Entity en = mekFileParser.getEntity();
 
         int transitDays = getCampaignOptions().isInstantUnitMarketDelivery() ? 0
                 : calculatePartTransitTime(Compute.d6(2) - 2);
@@ -1612,12 +1612,12 @@ public class Campaign implements ITechManager {
         int bloodnameTarget = 6;
         if (!ignoreDice) {
             switch (person.getPhenotype()) {
-                case MECHWARRIOR: {
-                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_MECH)
-                            ? person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue()
+                case MEKWARRIOR: {
+                    bloodnameTarget += person.hasSkill(SkillType.S_GUN_MEK)
+                            ? person.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
-                    bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MECH)
-                            ? person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue()
+                    bloodnameTarget += person.hasSkill(SkillType.S_PILOT_MEK)
+                            ? person.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
@@ -1634,8 +1634,8 @@ public class Campaign implements ITechManager {
                     bloodnameTarget += person.hasSkill(SkillType.S_GUN_BA)
                             ? person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
-                    bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MECH)
-                            ? person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue()
+                    bloodnameTarget += person.hasSkill(SkillType.S_ANTI_MEK)
+                            ? person.getSkill(SkillType.S_ANTI_MEK).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL;
                     break;
                 }
@@ -1664,7 +1664,7 @@ public class Campaign implements ITechManager {
                     }
                     break;
                 }
-                case PROTOMECH: {
+                case PROTOMEK: {
                     bloodnameTarget += 2 * (person.hasSkill(SkillType.S_GUN_PROTO)
                             ? person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue()
                             : TargetRoll.AUTOMATIC_FAIL);
@@ -3001,9 +3001,9 @@ public class Campaign implements ITechManager {
                 return report;
             }
         }
-        if ((partWork instanceof ProtomekArmor) && !partWork.isSalvaging()) {
-            if (!((ProtomekArmor) partWork).isInSupply()) {
-                report += "<b>Not enough Protomech armor remaining.  Task suspended.</b>";
+        if ((partWork instanceof ProtoMekArmor) && !partWork.isSalvaging()) {
+            if (!((ProtoMekArmor) partWork).isInSupply()) {
+                report += "<b>Not enough Protomek armor remaining.  Task suspended.</b>";
                 addReport(report);
                 return report;
             }
@@ -4843,26 +4843,26 @@ public class Campaign implements ITechManager {
 
     private void writeCustoms(PrintWriter pw1) {
         for (String name : customs) {
-            MechSummary ms = MechSummaryCache.getInstance().getMech(name);
+            MekSummary ms = MekSummaryCache.getInstance().getMek(name);
             if (ms == null) {
                 continue;
             }
 
-            MechFileParser mechFileParser = null;
+            MekFileParser mekFileParser = null;
             try {
-                mechFileParser = new MechFileParser(ms.getSourceFile());
+                mekFileParser = new MekFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
                 LogManager.getLogger().error("", ex);
             }
-            if (mechFileParser == null) {
+            if (mekFileParser == null) {
                 continue;
             }
-            Entity en = mechFileParser.getEntity();
+            Entity en = mekFileParser.getEntity();
             pw1.println("\t<custom>");
             pw1.println("\t\t<name>" + name + "</name>");
-            if (en instanceof Mech) {
+            if (en instanceof Mek) {
                 pw1.print("\t\t<mtf><![CDATA[");
-                pw1.print(((Mech) en).getMtf());
+                pw1.print(((Mek) en).getMtf());
                 pw1.println("]]></mtf>");
             } else {
                 try {
@@ -5112,17 +5112,17 @@ public class Campaign implements ITechManager {
         Money collarCost = Money.of(campaignOpsCosts ? 100000 : 50000);
 
         // first we need to get the total number of units by type
-        int nMech = stats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
+        int nMek = stats.getNumberOfUnitsByType(Entity.ETYPE_MEK);
         int nLVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
         int nHVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
         int nAero = stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
         int nSC = stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int nCF = stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
         int nBA = stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
-        int nMechInf = 0;
+        int nMekInf = 0;
         int nMotorInf = 0;
         int nFootInf = 0;
-        int nProto = stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
+        int nProto = stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK);
         int nDropship = stats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int nCollars = stats.getTotalDockingCollars();
         double nCargo = cargoStats.getTotalCargoCapacity(); // ignoring refrigerated/insulated/etc.
@@ -5132,7 +5132,7 @@ public class Campaign implements ITechManager {
         double carriedCargo = cargoStats.getCargoTonnage(true, false) + cargoStats.getCargoTonnage(false, true);
 
         // calculate the number of units left untransported
-        int noMech = Math.max(nMech - stats.getOccupiedBays(Entity.ETYPE_MECH), 0);
+        int noMek = Math.max(nMek - stats.getOccupiedBays(Entity.ETYPE_MEK), 0);
         int noDS = Math.max(nDropship - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
         int noSC = Math.max(nSC - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int noCF = Math.max(nCF - stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
@@ -5141,7 +5141,7 @@ public class Campaign implements ITechManager {
         int nohv = Math.max(nHVee - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int noinf = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(nBA - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        int noProto = Math.max(nProto - stats.getOccupiedBays(Entity.ETYPE_PROTOMECH), 0);
+        int noProto = Math.max(nProto - stats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
         int freehv = Math.max(stats.getTotalHeavyVehicleBays() - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int freeinf = Math.max(stats.getTotalInfantryBays() - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int freeba = Math.max(stats.getTotalBattleArmorBays() - stats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
@@ -5172,16 +5172,16 @@ public class Campaign implements ITechManager {
         // time as a baseline.
 
         // Roughly an Overlord
-        int largeDropshipMechCapacity = 36;
-        int largeMechDropshipASFCapacity = 6;
-        int largeMechDropshipCargoCapacity = 120;
-        Money largeMechDropshipCost = Money.of(campaignOpsCosts ? (1750000.0 / 4.2) : 400000);
+        int largeDropshipMekCapacity = 36;
+        int largeMekDropshipASFCapacity = 6;
+        int largeMekDropshipCargoCapacity = 120;
+        Money largeMekDropshipCost = Money.of(campaignOpsCosts ? (1750000.0 / 4.2) : 400000);
 
         // Roughly a Union
-        int averageDropshipMechCapacity = 12;
-        int mechDropshipASFCapacity = 2;
-        int mechDropshipCargoCapacity = 75;
-        Money mechDropshipCost = Money.of(campaignOpsCosts ? (1450000.0 / 4.2) : 150000);
+        int averageDropshipMekCapacity = 12;
+        int mekDropshipASFCapacity = 2;
+        int mekDropshipCargoCapacity = 75;
+        Money mekDropshipCost = Money.of(campaignOpsCosts ? (1450000.0 / 4.2) : 150000);
 
         // Roughly a Leopard CV
         int averageDropshipASFCapacity = 6;
@@ -5206,9 +5206,9 @@ public class Campaign implements ITechManager {
         int averageDropshipCargoCapacity = 2300;
         Money cargoDropshipCost = Money.of(campaignOpsCosts ? (550000.0 / 4.2) : 250000);
 
-        int mechCollars = 0;
-        double leasedLargeMechDropships = 0;
-        double leasedAverageMechDropships = 0;
+        int mekCollars = 0;
+        double leasedLargeMekDropships = 0;
+        double leasedAverageMekDropships = 0;
 
         int asfCollars = 0;
         double leasedAverageASFDropships = 0;
@@ -5228,41 +5228,41 @@ public class Campaign implements ITechManager {
         // to transport the force. Smaller dropships are represented by half-dropships.
 
         // If we're transporting more than a company, Overlord analogues are more efficient.
-        if (noMech > 12) {
-            leasedLargeMechDropships = noMech / (double) largeDropshipMechCapacity;
-            noMech -= (int) (leasedLargeMechDropships * largeDropshipMechCapacity);
-            mechCollars += (int) Math.ceil(leasedLargeMechDropships);
+        if (noMek > 12) {
+            leasedLargeMekDropships = noMek / (double) largeDropshipMekCapacity;
+            noMek -= (int) (leasedLargeMekDropships * largeDropshipMekCapacity);
+            mekCollars += (int) Math.ceil(leasedLargeMekDropships);
 
             // If there's more than a company left over, lease another Overlord. Otherwise
             // fall through and get a Union.
-            if (noMech > 12) {
-                leasedLargeMechDropships += 1;
-                noMech -= largeDropshipMechCapacity;
-                mechCollars += 1;
+            if (noMek > 12) {
+                leasedLargeMekDropships += 1;
+                noMek -= largeDropshipMekCapacity;
+                mekCollars += 1;
             }
 
-            leasedASFCapacity += (int) Math.floor(leasedLargeMechDropships * largeMechDropshipASFCapacity);
-            leasedCargoCapacity += largeMechDropshipCargoCapacity;
+            leasedASFCapacity += (int) Math.floor(leasedLargeMekDropships * largeMekDropshipASFCapacity);
+            leasedCargoCapacity += largeMekDropshipCargoCapacity;
         }
 
         // Unions
-        if (noMech > 0) {
-            leasedAverageMechDropships = noMech / (double) averageDropshipMechCapacity;
-            noMech -= (int) (leasedAverageMechDropships * averageDropshipMechCapacity);
-            mechCollars += (int) Math.ceil(leasedAverageMechDropships);
+        if (noMek > 0) {
+            leasedAverageMekDropships = noMek / (double) averageDropshipMekCapacity;
+            noMek -= (int) (leasedAverageMekDropships * averageDropshipMekCapacity);
+            mekCollars += (int) Math.ceil(leasedAverageMekDropships);
 
             // If we can fit in a smaller DropShip, lease one of those instead.
-            if ((noMech > 0) && (noMech < (averageDropshipMechCapacity / 2))) {
-                leasedAverageMechDropships += 0.5;
-                mechCollars += 1;
-            } else if (noMech > 0) {
-                leasedAverageMechDropships += 1;
-                mechCollars += 1;
+            if ((noMek > 0) && (noMek < (averageDropshipMekCapacity / 2))) {
+                leasedAverageMekDropships += 0.5;
+                mekCollars += 1;
+            } else if (noMek > 0) {
+                leasedAverageMekDropships += 1;
+                mekCollars += 1;
             }
 
             // Our Union-ish DropShip can carry some ASFs and cargo.
-            leasedASFCapacity += (int) Math.floor(leasedAverageMechDropships * mechDropshipASFCapacity);
-            leasedCargoCapacity += (int) Math.floor(leasedAverageMechDropships * mechDropshipCargoCapacity);
+            leasedASFCapacity += (int) Math.floor(leasedAverageMekDropships * mekDropshipASFCapacity);
+            leasedCargoCapacity += (int) Math.floor(leasedAverageMekDropships * mekDropshipCargoCapacity);
         }
 
         // Leopard CVs
@@ -5350,8 +5350,8 @@ public class Campaign implements ITechManager {
             }
         }
 
-        dropshipCost = mechDropshipCost.multipliedBy(leasedAverageMechDropships);
-        dropshipCost = dropshipCost.plus(largeMechDropshipCost.multipliedBy(leasedLargeMechDropships ));
+        dropshipCost = mekDropshipCost.multipliedBy(leasedAverageMekDropships);
+        dropshipCost = dropshipCost.plus(largeMekDropshipCost.multipliedBy(leasedLargeMekDropships ));
 
         dropshipCost = dropshipCost.plus(asfDropshipCost.multipliedBy(leasedAverageASFDropships));
 
@@ -5362,7 +5362,7 @@ public class Campaign implements ITechManager {
         dropshipCost = dropshipCost.plus(largeCargoDropshipCost.multipliedBy(leasedLargeCargoDropships));
 
         // Smaller/half-DropShips are cheaper to rent, but still take one collar each
-        int collarsNeeded = mechCollars + asfCollars + vehicleCollars + cargoCollars;
+        int collarsNeeded = mekCollars + asfCollars + vehicleCollars + cargoCollars;
 
         // add owned DropShips
         collarsNeeded += nDropship;
@@ -5380,7 +5380,7 @@ public class Campaign implements ITechManager {
                 if (!u.isMothballed()) {
                     Entity e = u.getEntity();
                     if ((e.getEntityType() & Entity.ETYPE_DROPSHIP) != 0) {
-                        ownDropshipCost = ownDropshipCost.plus(mechDropshipCost.multipliedBy(u.getMechCapacity()).dividedBy(averageDropshipMechCapacity));
+                        ownDropshipCost = ownDropshipCost.plus(mekDropshipCost.multipliedBy(u.getMekCapacity()).dividedBy(averageDropshipMekCapacity));
                         ownDropshipCost = ownDropshipCost.plus(asfDropshipCost.multipliedBy(u.getASFCapacity()).dividedBy(averageDropshipASFCapacity));
                         ownDropshipCost = ownDropshipCost.plus(vehicleDropshipCost.multipliedBy(u.getHeavyVehicleCapacity() + u.getLightVehicleCapacity()).dividedBy(averageDropshipVehicleCapacity));
                         ownDropshipCost = ownDropshipCost.plus(cargoDropshipCost.multipliedBy(u.getCargoCapacity()).dividedBy(averageDropshipCargoCapacity));
@@ -6373,7 +6373,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        if (entity instanceof Mech m) {
+        if (entity instanceof Mek m) {
             m.setCoolingFlawActive(false);
         } else if (entity instanceof Aero a) {
 
@@ -6907,7 +6907,7 @@ public class Campaign implements ITechManager {
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
-            if (onOrder instanceof Armor) { // ProtoMech Armor and BaArmor are derived from Armor
+            if (onOrder instanceof Armor) { // ProtoMek Armor and BaArmor are derived from Armor
                 nOrdered += ((Armor) onOrder).getAmount();
             } else if (onOrder instanceof AmmoStorage) {
                 nOrdered += ((AmmoStorage) onOrder).getShots();
@@ -6919,7 +6919,7 @@ public class Campaign implements ITechManager {
         inventory.setOrdered(nOrdered);
 
         String countModifier = "";
-        if (part instanceof Armor) { // ProtoMech Armor and BaArmor are derived from Armor
+        if (part instanceof Armor) { // ProtoMek Armor and BaArmor are derived from Armor
             countModifier = "points";
         }
         if (part instanceof AmmoStorage) {
@@ -7315,13 +7315,13 @@ public class Campaign implements ITechManager {
                 if ((join != null) && join.equals(founding)) {
                     p.setFounder(true);
                 }
-                if (p.getPrimaryRole().isMechWarrior()
+                if (p.getPrimaryRole().isMekWarrior()
                         || (p.getPrimaryRole().isAerospacePilot() && getCampaignOptions().isAeroRecruitsHaveUnits())
-                        || p.getPrimaryRole().isProtoMechPilot()) {
+                        || p.getPrimaryRole().isProtoMekPilot()) {
                     for (LogEntry e : p.getPersonnelLog()) {
                         if (e.getDate().equals(join) && e.getDesc().startsWith("Assigned to ")) {
-                            String mech = e.getDesc().substring(12);
-                            MechSummary ms = MechSummaryCache.getInstance().getMech(mech);
+                            String mek = e.getDesc().substring(12);
+                            MekSummary ms = MekSummaryCache.getInstance().getMek(mek);
                             if (null != ms && (p.isFounder()
                                     || ms.getWeightClass() < EntityWeightClass.WEIGHT_ASSAULT)) {
                                 p.setOriginalUnitWeight(ms.getWeightClass());

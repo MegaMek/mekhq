@@ -23,7 +23,7 @@ public class TechTableModel extends DataTableModel {
 
     /** Contains the skill levels to be displayed in a tech's description */
     private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
-        SkillType.S_TECH_MECH,
+        SkillType.S_TECH_MEK,
         SkillType.S_TECH_MECHANIC,
         SkillType.S_TECH_BA,
         SkillType.S_TECH_AERO,

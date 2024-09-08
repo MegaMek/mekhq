@@ -22,7 +22,7 @@
 package mekhq.campaign.mission;
 
 import megamek.Version;
-import megamek.client.generator.TeamLoadoutGenerator;
+import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -1056,7 +1056,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         int forceType = FORCE_MEK;
         if (campaign.getCampaignOptions().isUseVehicles()) {
-            int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMechs() +
+            int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMeks() +
                     campaign.getCampaignOptions().getOpForLanceTypeMixed() +
                     campaign.getCampaignOptions().getOpForLanceTypeVehicles();
             if (totalWeight > 0) {
@@ -1069,7 +1069,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 }
             }
         }
-        if (forceType == FORCE_MEK && campaign.getCampaignOptions().isRegionalMechVariations()) {
+        if (forceType == FORCE_MEK && campaign.getCampaignOptions().isRegionalMekVariations()) {
             weights = adjustWeightsForFaction(weights, faction);
         }
 
@@ -1157,7 +1157,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         int unitType = (forceType == FORCE_VEHICLE) ? UnitType.TANK : UnitType.MEK;
 
-        if (campaign.getCampaignOptions().isRegionalMechVariations()) {
+        if (campaign.getCampaignOptions().isRegionalMekVariations()) {
             if (unitType == UnitType.MEK) {
                 weights = adjustWeightsForFaction(weights, faction);
             }
@@ -1369,7 +1369,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             // TODO: replace with TeamLoadoutGenerator call once 0.50.1 errata go in
             boolean isAeroMap = getBoardType() == T_SPACE || getBoardType() == T_ATMOSPHERE;
 
-            TeamLoadoutGenerator.populateAeroBombs(aircraft,
+            TeamLoadOutGenerator.populateAeroBombs(aircraft,
                     campaign.getGameYear(),
                     !isAeroMap,
                     contract.getEnemyQuality(),

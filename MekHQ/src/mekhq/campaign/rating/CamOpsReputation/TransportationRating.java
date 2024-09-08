@@ -53,12 +53,12 @@ public class TransportationRating {
         transportationValues.put("asf", rating);
         transportationRating += rating;
 
-        // Mechs
-        capacity = transportationCapacities.get("mechBays");
-        requirements = transportationRequirements.get("mechCount");
+        // Meks
+        capacity = transportationCapacities.get("mekBays");
+        requirements = transportationRequirements.get("mekCount");
 
         rating = calculateRating(capacity, requirements);
-        transportationValues.put("mech", rating);
+        transportationValues.put("mek", rating);
         transportationRating += rating;
 
         // Super Heavy Vehicles
@@ -92,12 +92,12 @@ public class TransportationRating {
         transportationValues.put("lightVehicle", rating);
         transportationRating += rating;
 
-        // ProtoMechs
-        capacity = transportationCapacities.get("protoMechBays");
-        requirements = transportationRequirements.get("protoMechCount");
+        // ProtoMeks
+        capacity = transportationCapacities.get("protoMekBays");
+        requirements = transportationRequirements.get("protoMekCount");
 
         rating = calculateRating(capacity, requirements);
-        transportationValues.put("protoMech", rating);
+        transportationValues.put("protoMek", rating);
         transportationRating += rating;
 
         // Battle Armor
@@ -192,8 +192,8 @@ public class TransportationRating {
         int dockingCollars = 0;
         int hasJumpShipOrWarShip = 0;
 
-        int smallCraftBays = 0, mechBays = 0, asfBays = 0, superHeavyVehicleBays = 0, heavyVehicleBays = 0,
-                lightVehicleBays = 0, protoMechBays = 0, battleArmorBays = 0, infantryBays = 0, passengerCapacity = 0;
+        int smallCraftBays = 0, mekBays = 0, asfBays = 0, superHeavyVehicleBays = 0, heavyVehicleBays = 0,
+                lightVehicleBays = 0, protoMekBays = 0, battleArmorBays = 0, infantryBays = 0, passengerCapacity = 0;
 
         // Iterating through each unit in the campaign
         for (Unit unit : campaign.getActiveUnits()) {
@@ -222,8 +222,8 @@ public class TransportationRating {
             for (Bay bay : entity.getTransportBays()) {
                 if (bay instanceof SmallCraftBay) {
                     smallCraftBays += (int) bay.getCapacity();
-                } else if (bay instanceof MechBay) {
-                    mechBays += (int) bay.getCapacity();
+                } else if (bay instanceof MekBay) {
+                    mekBays += (int) bay.getCapacity();
                 } else if (bay instanceof ASFBay) {
                     asfBays += (int) bay.getCapacity();
                 } else if (bay instanceof SuperHeavyVehicleBay) {
@@ -232,8 +232,8 @@ public class TransportationRating {
                     heavyVehicleBays += (int) bay.getCapacity();
                 } else if (bay instanceof LightVehicleBay) {
                     lightVehicleBays += (int) bay.getCapacity();
-                } else if (bay instanceof ProtomechBay) {
-                    protoMechBays += (int) bay.getCapacity();
+                } else if (bay instanceof ProtoMekBay) {
+                    protoMekBays += (int) bay.getCapacity();
                 }  else if (bay instanceof BattleArmorBay) {
                     battleArmorBays += (int) bay.getCapacity();
                 } else if (bay instanceof InfantryBay) {
@@ -247,12 +247,12 @@ public class TransportationRating {
         // Map the capacity of each bay type
         Map<String, Integer> transportationCapacities = new HashMap<>(Map.of(
                 "smallCraftBays", smallCraftBays,
-                "mechBays", mechBays,
+                "mekBays", mekBays,
                 "asfBays", asfBays,
                 "superHeavyVehicleBays", superHeavyVehicleBays,
                 "heavyVehicleBays", heavyVehicleBays,
                 "lightVehicleBays", lightVehicleBays,
-                "protoMechBays", protoMechBays,
+                "protoMekBays", protoMekBays,
                 "battleArmorBays", battleArmorBays,
                 "infantryBays", infantryBays,
                 "passengerCapacity", passengerCapacity)
@@ -281,8 +281,8 @@ public class TransportationRating {
      */
     private static Map<String, Integer> calculateTransportRequirements(Campaign campaign) {
         // Initialize variables to store counts of different unit types
-        int dropShipCount = 0, smallCraftCount = 0, mechCount = 0, asfCount = 0, superHeavyVehicleCount = 0,
-                heavyVehicleCount = 0, lightVehicleCount = 0, protoMechCount = 0, battleArmorCount = 0,
+        int dropShipCount = 0, smallCraftCount = 0, mekCount = 0, asfCount = 0, superHeavyVehicleCount = 0,
+                heavyVehicleCount = 0, lightVehicleCount = 0, protoMekCount = 0, battleArmorCount = 0,
                 infantryCount = 0;
 
         // Iterate through each unit in the campaign
@@ -307,11 +307,11 @@ public class TransportationRating {
                 } else if (entity.isSmallCraft()) {
                     smallCraftCount++;
                 } else if (entity.isMek()) {
-                    mechCount++;
+                    mekCount++;
                 } else if (entity.isAerospaceFighter() || entity.isConventionalFighter()) {
                     asfCount++;
                 } else if (entity.isProtoMek()) {
-                    protoMechCount++;
+                    protoMekCount++;
                 }  else if (entity.isBattleArmor()) {
                     battleArmorCount++;
                 } else if (entity.isInfantry()) {
@@ -330,12 +330,12 @@ public class TransportationRating {
         Map<String, Integer> transportRequirements = new HashMap<>(Map.of(
                 "dropShipCount", dropShipCount,
                 "smallCraftCount", smallCraftCount,
-                "mechCount", mechCount,
+                "mekCount", mekCount,
                 "asfCount", asfCount,
                 "superHeavyVehicleCount", superHeavyVehicleCount,
                 "heavyVehicleCount", heavyVehicleCount,
                 "lightVehicleCount", lightVehicleCount,
-                "protoMechCount", protoMechCount,
+                "protoMekCount", protoMekCount,
                 "battleArmorCount", battleArmorCount,
                 "infantryCount", infantryCount)
         );

@@ -291,7 +291,7 @@ public class CrewSkillUpgrader {
 
     private String pickRandomHumanTRO() {
         return ObjectUtility.getRandomItem(
-                Arrays.asList(Crew.HUMANTRO_MECH, Crew.HUMANTRO_AERO, Crew.HUMANTRO_VEE, Crew.HUMANTRO_BA));
+                Arrays.asList(Crew.HUMANTRO_MEK, Crew.HUMANTRO_AERO, Crew.HUMANTRO_VEE, Crew.HUMANTRO_BA));
     }
 
     private String pickRandomEnvSpec() {

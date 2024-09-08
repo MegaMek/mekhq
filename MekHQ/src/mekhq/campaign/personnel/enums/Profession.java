@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
 
 public enum Profession {
     //region Enum Declarations
-    MECHWARRIOR("Profession.MECHWARRIOR.text", "Profession.MECHWARRIOR.toolTipText"),
+    MEKWARRIOR("Profession.MEKWARRIOR.text", "Profession.MEKWARRIOR.toolTipText"),
     AEROSPACE("Profession.AEROSPACE.text", "Profession.AEROSPACE.toolTipText"),
     VEHICLE("Profession.VEHICLE.text", "Profession.VEHICLE.toolTipText"),
     NAVAL("Profession.NAVAL.text", "Profession.NAVAL.toolTipText"),
@@ -60,8 +60,8 @@ public enum Profession {
     //endregion Getters
 
     //region Boolean Comparison Methods
-    public boolean isMechWarrior() {
-        return this == MECHWARRIOR;
+    public boolean isMekWarrior() {
+        return this == MEKWARRIOR;
     }
 
     public boolean isAerospace() {
@@ -161,7 +161,7 @@ public enum Profession {
         // TODO : I should be allowed to be empty, and have my default replaced by another column,
         // TODO : albeit with the validator properly run before to ensure the rank system is valid.
         // TODO : The default return for getAlternativeProfession would not need to change in this case
-        if (isMechWarrior()) {
+        if (isMekWarrior()) {
             return false;
         }
 
@@ -208,7 +208,7 @@ public enum Profession {
     public Profession getAlternateProfession(final String name) {
         switch (name.toUpperCase(Locale.ENGLISH)) {
             case "--MW":
-                return MECHWARRIOR;
+                return MEKWARRIOR;
             case "--ASF":
                 return AEROSPACE;
             case "--VEE":
@@ -227,8 +227,8 @@ public enum Profession {
                 return CIVILIAN;
             default:
                 LogManager.getLogger().debug("Cannot get alternate profession for unknown alternative "
-                        + name + " returning MECHWARRIOR.");
-                return MECHWARRIOR;
+                        + name + " returning MEKWARRIOR.");
+                return MEKWARRIOR;
         }
     }
 
@@ -255,7 +255,7 @@ public enum Profession {
             case VESSEL_GUNNER:
             case VESSEL_NAVIGATOR:
                 return NAVAL;
-            case MECH_TECH:
+            case MEK_TECH:
             case MECHANIC:
             case AERO_TECH:
             case BA_TECH:
@@ -272,11 +272,11 @@ public enum Profession {
             case DEPENDENT:
             case NONE:
                 return CIVILIAN;
-            case MECHWARRIOR:
+            case MEKWARRIOR:
             case LAM_PILOT:
-            case PROTOMECH_PILOT:
+            case PROTOMEK_PILOT:
             default:
-                return MECHWARRIOR;
+                return MEKWARRIOR;
         }
     }
 

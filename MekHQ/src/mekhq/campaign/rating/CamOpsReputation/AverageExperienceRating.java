@@ -130,7 +130,7 @@ public class AverageExperienceRating {
                 // For Infantry, average experience is calculated using a different method.
                 totalExperience += calculateInfantryExperience((Infantry) entity, crew); // add the average experience to the total
                 personnelCount++;
-            } else if (entity instanceof Protomech) {
+            } else if (entity instanceof ProtoMek) {
                 // ProtoMech entities only use gunnery for calculation
                 if (person.hasSkill(SkillType.S_GUN_PROTO)) {
                     totalExperience += person.getSkill(SkillType.S_GUN_PROTO).getTotalSkillLevel();

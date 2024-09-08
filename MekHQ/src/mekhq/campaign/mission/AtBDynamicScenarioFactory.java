@@ -489,7 +489,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         // If the force template is set up for artillery, add the role to all applicable unit
-        // types including the dynamic Mech/vehicle mixed type
+        // types including the dynamic Mek/vehicle mixed type
         if (forceTemplate.getUseArtillery()) {
             int artilleryCarriers = forceTemplate.getAllowedUnitType();
 
@@ -569,11 +569,11 @@ public class AtBDynamicScenarioFactory {
             } else {
 
                 // Determine unit types for each unit of the formation. Normally this is all one
-                // type, but SPECIAL_UNIT_TYPE_ATB_MIX may generate all Mechs, all vehicles, or
-                // a Mech/vehicle mixed formation.
+                // type, but SPECIAL_UNIT_TYPE_ATB_MIX may generate all Meks, all vehicles, or
+                // a Mek/vehicle mixed formation.
                 List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality, factionCode, allowsTanks, campaign);
 
-                // Formations composed entirely of Mechs, aerospace fighters (but not conventional),
+                // Formations composed entirely of Meks, aerospace fighters (but not conventional),
                 // and ground vehicles use weight categories as do SPECIAL_UNIT_TYPE_ATB_MIX.
                 // Formations of other types, plus artillery formations, do not use weight classes.
                 if ((actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX ||
@@ -659,10 +659,10 @@ public class AtBDynamicScenarioFactory {
                 if (campaign.getCampaignOptions().isAutoconfigMunitions()) {
                     // Configure *all* generated units with appropriate munitions (for BV calcs)
                     Game cGame = campaign.getGame();
-                    TeamLoadoutGenerator tlg = new TeamLoadoutGenerator(cGame);
+                    TeamLoadOutGenerator tlg = new TeamLoadOutGenerator(cGame);
                     ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(generatedLance);
-                    // bin fill ratio will be adjusted by the loadout generator based on piracy and quality
-                    ReconfigurationParameters rp = TeamLoadoutGenerator.generateParameters(
+                    // bin fill ratio will be adjusted by the load out generator based on piracy and quality
+                    ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(
                             cGame,
                             cGame.getOptions(),
                             arrayGeneratedLance,
@@ -670,16 +670,16 @@ public class AtBDynamicScenarioFactory {
                             new ArrayList<>(),
                             new ArrayList<>(),
                             ownerBaseQuality,
-                            ((isPirate) ? TeamLoadoutGenerator.UNSET_FILL_RATIO : 1.0f)
+                            ((isPirate) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f)
                     );
                     rp.isPirate = isPirate;
                     rp.groundMap = onGround;
                     rp.spaceEnvironment = (mapLocation == MapLocation.Space);
-                    MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, arrayGeneratedLance, "");
+                    MunitionTree mt = TeamLoadOutGenerator.generateMunitionTree(rp, arrayGeneratedLance, "");
                     tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp);
                 } else {
                     // Load the fighters with bombs
-                    TeamLoadoutGenerator.populateAeroBombs(generatedLance,
+                    TeamLoadOutGenerator.populateAeroBombs(generatedLance,
                             campaign.getGameYear(),
                             onGround,
                             ownerBaseQuality,
@@ -699,8 +699,8 @@ public class AtBDynamicScenarioFactory {
                 generatedLanceCount++;
             }
 
-            // Check for mechanized battle armor added to Clan star formations (must be exactly
-            // 5 OmniMechs, no more, no less)
+            // Check for mekanized battle armor added to Clan star formations (must be exactly
+            // 5 OmniMeks, no more, no less)
             generatedLance.addAll(generateBAForNova(scenario, generatedLance, factionCode, skill, quality, campaign));
 
             // Add the formation member BVs to the running total, and the entities to the tracking
@@ -792,7 +792,7 @@ public class AtBDynamicScenarioFactory {
      */
     public static List<Entity> generateCivilianUnits(int num, Campaign campaign) {
         RandomUnitGenerator.getInstance().setChosenRAT("CivilianUnits");
-        ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(num);
+        ArrayList<MekSummary> msl = RandomUnitGenerator.getInstance().generate(num);
         return msl.stream().map(ms -> createEntityWithCrew("IND", SkillLevel.GREEN, campaign, ms)).collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -1250,7 +1250,7 @@ public class AtBDynamicScenarioFactory {
                                               int weightClass,
                                               Collection<MissionRole> rolesByType,
                                               Campaign campaign) {
-        MechSummary unitData;
+        MekSummary unitData;
 
         // Set up random unit generation parameters
         UnitGeneratorParameters params = new UnitGeneratorParameters();
@@ -1299,7 +1299,7 @@ public class AtBDynamicScenarioFactory {
     public static Entity getTankEntity (UnitGeneratorParameters params,
                                        SkillLevel skill,
                                        Campaign campaign) {
-        MechSummary ms;
+        MekSummary ms;
 
         // useful debugging statement that forces generation of specific units rather than random ones
         // return getEntityByName("Heavy Tracked APC", params.getFaction(), skill, campaign);
@@ -1310,7 +1310,7 @@ public class AtBDynamicScenarioFactory {
         } else {
             params.setFilter(v -> !v.getUnitType().equals("VTOL"));
         }
-        MechSummary unitData = campaign.getUnitGenerator().generate(params);
+        MekSummary unitData = campaign.getUnitGenerator().generate(params);
 
         if (unitData == null) {
             if (!params.getMissionRoles().isEmpty()) {
@@ -1349,7 +1349,7 @@ public class AtBDynamicScenarioFactory {
         // Select from all infantry movement types
         params.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
 
-        MechSummary unitData = campaign.getUnitGenerator().generate(params);
+        MekSummary unitData = campaign.getUnitGenerator().generate(params);
 
         if (unitData == null) {
 
@@ -1614,7 +1614,7 @@ public class AtBDynamicScenarioFactory {
 
         UnitGeneratorParameters newParams = params.clone();
         newParams.setUnitType(UnitType.INFANTRY);
-        MechSummary unitData;
+        MekSummary unitData;
         boolean temporaryXCT = false;
         UnitGeneratorParameters noXCTParams;
         Entity crewedPlatoon;
@@ -1696,7 +1696,7 @@ public class AtBDynamicScenarioFactory {
      *                           for circumstances such as mechanized battle armor
      * @param skill              {@link SkillLevel} target skill for crews of generated units
      * @param retryAsMechanized  true to retry failed bay transport as mechanized transport
-     * @param campaign           current campign
+     * @param campaign           current campaign
      * @return              Generated battle armor entity with crew, null if one cannot be generated
      */
     private static Entity generateTransportedBAUnit (UnitGeneratorParameters params,
@@ -1724,7 +1724,7 @@ public class AtBDynamicScenarioFactory {
             newParams.addMissionRole(MissionRole.MECHANIZED_BA);
         }
 
-        MechSummary unitData = campaign.getUnitGenerator().generate(newParams);
+        MekSummary unitData = campaign.getUnitGenerator().generate(newParams);
 
         // If generating for an internal bay fails, try again as mechanized if the flag is set
         if (unitData == null) {
@@ -1743,7 +1743,7 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Worker function that generates a battle armor unit to attach to a unit of clan mechs
+     * Worker function that generates a battle armor unit to attach to a unit of clan meks
      */
     public static List<Entity> generateBAForNova(AtBScenario scenario, List<Entity> starUnits,
                                                  String factionCode, SkillLevel skill, int quality,
@@ -1751,7 +1751,7 @@ public class AtBDynamicScenarioFactory {
         List<Entity> transportedUnits = new ArrayList<>();
 
         // determine if this should be a nova
-        // if yes, then pick the fastest mech and load it up, adding the generated BA to the transport relationships.
+        // if yes, then pick the fastest mek and load it up, adding the generated BA to the transport relationships.
 
         // non-clan forces and units that aren't stars don't become novas
         // TODO: allow for non-Clan integrated mechanized formations, like WOB choirs, as well as stars that are short one or more omnis
@@ -1776,7 +1776,7 @@ public class AtBDynamicScenarioFactory {
 
         Entity actualTransport = null;
         for (Entity transport : starUnits) {
-            if (transport instanceof Mech && transport.isOmni()) {
+            if (transport instanceof Mek && transport.isOmni()) {
                 if ((actualTransport == null) || (actualTransport.getWalkMP() < transport.getWalkMP())) {
                     actualTransport = transport;
                 }
@@ -1822,12 +1822,12 @@ public class AtBDynamicScenarioFactory {
     @SuppressWarnings(value = "unused")
     private static Entity getEntityByName(String name, String factionCode, SkillLevel skill,
                                           Campaign campaign) {
-        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(name);
-        if (mechSummary == null) {
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(name);
+        if (mekSummary == null) {
             return null;
         }
 
-        return createEntityWithCrew(factionCode, skill, campaign, mechSummary);
+        return createEntityWithCrew(factionCode, skill, campaign, mekSummary);
     }
 
     /**
@@ -1840,7 +1840,7 @@ public class AtBDynamicScenarioFactory {
      * @param ms           Which entity to generate
      * @return             A crewed entity
      */
-    public static @Nullable Entity createEntityWithCrew(String factionCode, SkillLevel skill, Campaign campaign, MechSummary ms) {
+    public static @Nullable Entity createEntityWithCrew(String factionCode, SkillLevel skill, Campaign campaign, MekSummary ms) {
         return createEntityWithCrew(Factions.getInstance().getFaction(factionCode), skill, campaign, ms);
     }
 
@@ -1854,10 +1854,10 @@ public class AtBDynamicScenarioFactory {
     public static @Nullable Entity createEntityWithCrew (Faction faction,
                                                          SkillLevel skill,
                                                          Campaign campaign,
-                                                         MechSummary unitData) {
+                                                         MekSummary unitData) {
         Entity en;
         try {
-            en = new MechFileParser(unitData.getSourceFile(), unitData.getEntryName()).getEntity();
+            en = new MekFileParser(unitData.getSourceFile(), unitData.getEntryName()).getEntity();
         } catch (Exception ex) {
             LogManager.getLogger().error("Unable to load entity: {}: {}",
                     unitData.getSourceFile(),
@@ -1891,7 +1891,7 @@ public class AtBDynamicScenarioFactory {
             Phenotype phenotype = Phenotype.NONE;
             switch (en.getUnitType()) {
                 case UnitType.MEK:
-                    phenotype = Phenotype.MECHWARRIOR;
+                    phenotype = Phenotype.MEKWARRIOR;
                     break;
                 case UnitType.TANK:
                 case UnitType.VTOL:
@@ -1908,7 +1908,7 @@ public class AtBDynamicScenarioFactory {
                     phenotype = Phenotype.AEROSPACE;
                     break;
                 case UnitType.PROTOMEK:
-                    phenotype = Phenotype.PROTOMECH;
+                    phenotype = Phenotype.PROTOMEK;
                     break;
                 case UnitType.SMALL_CRAFT:
                 case UnitType.DROPSHIP:
@@ -2013,11 +2013,11 @@ public class AtBDynamicScenarioFactory {
     /**
      * Generates a selection of unit types, typically composing a lance, star, Level II, or similar
      * tactical formation.
-     * TODO: generate ProtoMech points when Clan mixed stars are called for
-     * TODO: generate Clan mixed nova stars e.g. two points of Mechs, two of vehicles, one ProtoMech
+     * TODO: generate ProtoMek points when Clan mixed stars are called for
+     * TODO: generate Clan mixed nova stars e.g. two points of Meks, two of vehicles, one ProtoMek
      *  point
      * @param unitTypeCode The type of units to generate, also accepts SPECIAL_UNIT_TYPE_ATB_MIX for
-     *                     random Mech/vehicle/mixed lance generation
+     *                     random Mek/vehicle/mixed lance generation
      * @param unitCount    Number of units to generate
      * @param forceQuality The equipment rating of the formation
      * @param factionCode  Short faction name
@@ -2035,29 +2035,29 @@ public class AtBDynamicScenarioFactory {
         List<Integer> unitTypes = new ArrayList<>(unitCount);
         int actualUnitType = unitTypeCode;
 
-        // This special unit type code randomly selects between all Mech, all vehicle, or mixed
-        // Mech/vehicle formations
+        // This special unit type code randomly selects between all Mek, all vehicle, or mixed
+        // Mek/vehicle formations
         if (unitTypeCode == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
             Faction faction = Factions.getInstance().getFaction(factionCode);
 
             // If ground vehicles are permitted in general and by environmental conditions, and
-            // for Clans if this is a Clan faction, then use them. Otherwise, only use Mechs.
+            // for Clans if this is a Clan faction, then use them. Otherwise, only use Meks.
             if (campaign.getCampaignOptions().isUseVehicles() &&
                     allowTanks &&
                     (!faction.isClan() ||
                             (faction.isClan() && campaign.getCampaignOptions().isClanVehicles()))) {
 
                 // some specialized logic for clan opfors
-                // if we're in the late republic or dark ages, clans no longer have the luxury of mech only stars
+                // if we're in the late republic or dark ages, clans no longer have the luxury of mek only stars
                 boolean clanEquipmentScarcity = campaign.getEra()
                         .hasFlag(EraFlag.LATE_REPUBLIC, EraFlag.DARK_AGES, EraFlag.ILCLAN);
                 if (faction.isClan() && !clanEquipmentScarcity) {
                     return generateClanUnitTypes(unitCount, forceQuality, factionCode, campaign);
                 }
 
-                // Use the Mech/vehicle/mixed ratios from campaign options as weighted values for
+                // Use the Mek/vehicle/mixed ratios from campaign options as weighted values for
                 // random unit type
-                int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMechs() +
+                int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMeks() +
                         campaign.getCampaignOptions().getOpForLanceTypeMixed() +
                         campaign.getCampaignOptions().getOpForLanceTypeVehicles();
                 if (totalWeight <= 0) {
@@ -2066,7 +2066,7 @@ public class AtBDynamicScenarioFactory {
                     int roll = Compute.randomInt(totalWeight);
                     if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles()) {
                         actualUnitType = UnitType.TANK;
-                        // Mixed units randomly select between Mech or ground vehicle
+                        // Mixed units randomly select between Mek or ground vehicle
                     } else if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles() +
                             campaign.getCampaignOptions().getOpForLanceTypeMixed()) {
                         for (int x = 0; x < unitCount; x++) {
@@ -2116,7 +2116,7 @@ public class AtBDynamicScenarioFactory {
             vehicleTarget -= forceQuality;
         }
 
-        // Random determination of Mech or ground vehicle
+        // Random determination of Mek or ground vehicle
         int roll = Compute.d6(2);
         int unitType = campaign.getCampaignOptions().isClanVehicles() && (roll <= vehicleTarget) ?
                 UnitType.TANK : UnitType.MEK;
@@ -2137,13 +2137,13 @@ public class AtBDynamicScenarioFactory {
      * <br/>
      * Certain roles have either explicit or implicit weight restrictions:
      * <ul>
-     *     <li>RECON with Mechs and ProtoMechs is limited to light and medium weight classes</li>
+     *     <li>RECON with Meks and ProtoMeks is limited to light and medium weight classes</li>
      *     <li>APC should include light and medium weights, as few heavy/assault weight classes
      *         include infantry bays</li>
-     *         <li>CAVALRY is limited to heavy weight class and lighter with Mechs and ProtoMechs, and
-     *         medium weight class and lighter with vehicles. Heavy cavalry Mechs are rare without
+     *         <li>CAVALRY is limited to heavy weight class and lighter with Meks and ProtoMeks, and
+     *         medium weight class and lighter with vehicles. Heavy cavalry Meks are rare without
      *         advanced technology and may fail to generate a random unit.</li>
-     *         <li>RAIDER is limited to heavy weight class and lighter for Mechs and ProtoMechs</li>
+     *         <li>RAIDER is limited to heavy weight class and lighter for Meks and ProtoMeks</li>
      * </ul>
      *
      * @param unitTypes      List of unit types (mek, tank, etc.)
@@ -2223,7 +2223,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        if (campaign.getCampaignOptions().isRegionalMechVariations()) {
+        if (campaign.getCampaignOptions().isRegionalMekVariations()) {
             weights = adjustWeightsForFaction(weights, faction);
         }
 
@@ -2795,7 +2795,7 @@ public class AtBDynamicScenarioFactory {
         List<Integer> entityWalkMPs = new ArrayList<>();
 
         for (Entity entity : entityList) {
-            // AtB has a legacy mechanism where units with jump jets are counted a little faster
+            // AtB has a legacy mekanism where units with jump jets are counted a little faster
             // for arrival times. We calculate it once and store it.
             int speed = calculateAtBSpeed(entity);
 
@@ -2948,7 +2948,7 @@ public class AtBDynamicScenarioFactory {
     /**
      * Convenience function to get the standard ground tactical formation size, based on faction. In
      * the case of Clan factions, this returns the number of points rather than a number of units,
-     * as points may be 2 ground vehicles or 5 ProtoMechs.
+     * as points may be 2 ground vehicles or 5 ProtoMeks.
      * TODO: conventional infantry typically uses 3 units per formation (company) - make a separate method
      * @param factionCode  string with faction short name/lookup key
      * @return             Number of units (points for Clan) in the formation
@@ -3053,13 +3053,13 @@ public class AtBDynamicScenarioFactory {
             boolean inSpace = boardType == AtBScenario.T_SPACE;
             boolean inAtmo = boardType == AtBScenario.T_ATMOSPHERE;
 
-            // hack for land-air mechs
-            if (entity instanceof LandAirMech) {
+            // hack for land-air meks
+            if (entity instanceof LandAirMek) {
                 if (inSpace || inAtmo) {
-                    entity.setConversionMode(LandAirMech.CONV_MODE_FIGHTER);
+                    entity.setConversionMode(LandAirMek.CONV_MODE_FIGHTER);
                 } else {
-                    // for now, the bot does not know how to use WIGEs, so go as a mech
-                    entity.setConversionMode(LandAirMech.CONV_MODE_MECH);
+                    // for now, the bot does not know how to use WIGEs, so go as a mek
+                    entity.setConversionMode(LandAirMek.CONV_MODE_MEK);
                 }
             }
 

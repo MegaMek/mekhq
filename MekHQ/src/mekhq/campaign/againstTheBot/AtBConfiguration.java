@@ -333,7 +333,7 @@ public class AtBConfiguration {
         return target;
     }
 
-    public @Nullable MechSummary findShip(int unitType) {
+    public @Nullable MekSummary findShip(int unitType) {
         WeightedTable<String> table = null;
         if (unitType == UnitType.JUMPSHIP) {
             table = jsTable;
@@ -349,7 +349,7 @@ public class AtBConfiguration {
         if (shipName == null) {
             return null;
         }
-        return MechSummaryCache.getInstance().getMech(shipName);
+        return MekSummaryCache.getInstance().getMek(shipName);
     }
 
     public static AtBConfiguration loadFromXml() {

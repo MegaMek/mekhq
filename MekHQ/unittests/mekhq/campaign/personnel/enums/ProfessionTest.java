@@ -47,8 +47,8 @@ public class ProfessionTest {
     //region Getters
     @Test
     public void testGetToolTipText() {
-        assertEquals(resources.getString("Profession.MECHWARRIOR.toolTipText"),
-                Profession.MECHWARRIOR.getToolTipText());
+        assertEquals(resources.getString("Profession.MEKWARRIOR.toolTipText"),
+                Profession.MEKWARRIOR.getToolTipText());
         assertEquals(resources.getString("Profession.ADMINISTRATOR.toolTipText"),
                 Profession.ADMINISTRATOR.getToolTipText());
     }
@@ -56,12 +56,12 @@ public class ProfessionTest {
 
     //region Boolean Comparison Methods
     @Test
-    public void testIsMechWarrior() {
+    public void testIsMekWarrior() {
         for (final Profession profession : professions) {
-            if (profession == Profession.MECHWARRIOR) {
-                assertTrue(profession.isMechWarrior());
+            if (profession == Profession.MEKWARRIOR) {
+                assertTrue(profession.isMekWarrior());
             } else {
-                assertFalse(profession.isMechWarrior());
+                assertFalse(profession.isMekWarrior());
             }
         }
     }
@@ -202,9 +202,9 @@ public class ProfessionTest {
     }
 
     @Test
-    public void testIsEmptyProfessionMechWarrior() {
+    public void testIsEmptyProfessionMekWarrior() {
         final RankSystem mockRankSystem = mock(RankSystem.class);
-        assertFalse(Profession.MECHWARRIOR.isEmptyProfession(mockRankSystem));
+        assertFalse(Profession.MEKWARRIOR.isEmptyProfession(mockRankSystem));
     }
 
     @Disabled // FIXME : Windchild : Broken Test
@@ -269,7 +269,7 @@ public class ProfessionTest {
         final RankSystem mockRankSystem = mock(RankSystem.class);
         when(mockRankSystem.getRanks()).thenReturn(ranks);
 
-        assertEquals(Profession.MECHWARRIOR, Profession.AEROSPACE.getAlternateProfession(mockRankSystem));
+        assertEquals(Profession.MEKWARRIOR, Profession.AEROSPACE.getAlternateProfession(mockRankSystem));
     }
 
     @Test
@@ -278,36 +278,36 @@ public class ProfessionTest {
 
         // --MW
         when(mockRank.getName(any())).thenReturn("--MW");
-        assertEquals(Profession.MECHWARRIOR, Profession.AEROSPACE.getAlternateProfession(mockRank));
+        assertEquals(Profession.MEKWARRIOR, Profession.AEROSPACE.getAlternateProfession(mockRank));
 
         // --ADMIN
         when(mockRank.getName(any())).thenReturn("--ADMIN");
-        assertEquals(Profession.ADMINISTRATOR, Profession.MECHWARRIOR.getAlternateProfession(mockRank));
+        assertEquals(Profession.ADMINISTRATOR, Profession.MEKWARRIOR.getAlternateProfession(mockRank));
     }
 
     @Test
     public void testGetAlternateProfessionString() {
-        assertEquals(Profession.MECHWARRIOR, Profession.MECHWARRIOR.getAlternateProfession("--MW"));
-        assertEquals(Profession.MECHWARRIOR, Profession.MECHWARRIOR.getAlternateProfession("--mw"));
-        assertEquals(Profession.MECHWARRIOR, Profession.MECHWARRIOR.getAlternateProfession("--hi"));
-        assertEquals(Profession.AEROSPACE, Profession.MECHWARRIOR.getAlternateProfession("--ASF"));
-        assertEquals(Profession.VEHICLE, Profession.MECHWARRIOR.getAlternateProfession("--VEE"));
-        assertEquals(Profession.NAVAL, Profession.MECHWARRIOR.getAlternateProfession("--NAVAL"));
-        assertEquals(Profession.INFANTRY, Profession.MECHWARRIOR.getAlternateProfession("--INF"));
-        assertEquals(Profession.TECH, Profession.MECHWARRIOR.getAlternateProfession("--TECH"));
-        assertEquals(Profession.MEDICAL, Profession.MECHWARRIOR.getAlternateProfession("--MEDICAL"));
-        assertEquals(Profession.ADMINISTRATOR, Profession.MECHWARRIOR.getAlternateProfession("--ADMIN"));
-        assertEquals(Profession.CIVILIAN, Profession.MECHWARRIOR.getAlternateProfession("--CIVILIAN"));
+        assertEquals(Profession.MEKWARRIOR, Profession.MEKWARRIOR.getAlternateProfession("--MW"));
+        assertEquals(Profession.MEKWARRIOR, Profession.MEKWARRIOR.getAlternateProfession("--mw"));
+        assertEquals(Profession.MEKWARRIOR, Profession.MEKWARRIOR.getAlternateProfession("--hi"));
+        assertEquals(Profession.AEROSPACE, Profession.MEKWARRIOR.getAlternateProfession("--ASF"));
+        assertEquals(Profession.VEHICLE, Profession.MEKWARRIOR.getAlternateProfession("--VEE"));
+        assertEquals(Profession.NAVAL, Profession.MEKWARRIOR.getAlternateProfession("--NAVAL"));
+        assertEquals(Profession.INFANTRY, Profession.MEKWARRIOR.getAlternateProfession("--INF"));
+        assertEquals(Profession.TECH, Profession.MEKWARRIOR.getAlternateProfession("--TECH"));
+        assertEquals(Profession.MEDICAL, Profession.MEKWARRIOR.getAlternateProfession("--MEDICAL"));
+        assertEquals(Profession.ADMINISTRATOR, Profession.MEKWARRIOR.getAlternateProfession("--ADMIN"));
+        assertEquals(Profession.CIVILIAN, Profession.MEKWARRIOR.getAlternateProfession("--CIVILIAN"));
     }
 
     @Test
     public void testGetProfessionFromPersonnelRole() {
         for (final PersonnelRole role : PersonnelRole.values()) {
             switch (role) {
-                case MECHWARRIOR:
+                case MEKWARRIOR:
                 case LAM_PILOT:
-                case PROTOMECH_PILOT:
-                    assertEquals(Profession.MECHWARRIOR, Profession.getProfessionFromPersonnelRole(role));
+                case PROTOMEK_PILOT:
+                    assertEquals(Profession.MEKWARRIOR, Profession.getProfessionFromPersonnelRole(role));
                     break;
                 case AEROSPACE_PILOT:
                 case CONVENTIONAL_AIRCRAFT_PILOT:
@@ -330,7 +330,7 @@ public class ProfessionTest {
                 case VESSEL_NAVIGATOR:
                     assertEquals(Profession.NAVAL, Profession.getProfessionFromPersonnelRole(role));
                     break;
-                case MECH_TECH:
+                case MEK_TECH:
                 case MECHANIC:
                 case AERO_TECH:
                 case BA_TECH:

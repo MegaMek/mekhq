@@ -487,7 +487,7 @@ public class RetirementDefectionDialog extends JDialog {
     };
 
     private void initResults() {
-        List<UUID> unassignedMechs = new ArrayList<>();
+        List<UUID> unassignedMeks = new ArrayList<>();
         List<UUID> unassignedASF = new ArrayList<>();
         ArrayList<UUID> availableUnits = new ArrayList<>();
         hqView.getCampaign().getHangar().forEachUnit(u -> {
@@ -497,7 +497,7 @@ public class RetirementDefectionDialog extends JDialog {
             availableUnits.add(u.getId());
             if (UnitType.MEK == u.getEntity().getUnitType()) {
                 if (null == u.getCommander()) {
-                    unassignedMechs.add(u.getId());
+                    unassignedMeks.add(u.getId());
                 }
             }
             if (UnitType.AEROSPACEFIGHTER == u.getEntity().getUnitType()) {
@@ -822,7 +822,7 @@ public class RetirementDefectionDialog extends JDialog {
             Person p = ((RetirementTableModel) retireeTable.getModel())
                     .getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
             switch (p.getPrimaryRole()) {
-                case MECHWARRIOR:
+                case MEKWARRIOR:
                     cbUnitCategory.setSelectedIndex(UnitType.MEK + 1);
                     break;
                 case GROUND_VEHICLE_DRIVER:
@@ -841,7 +841,7 @@ public class RetirementDefectionDialog extends JDialog {
                 case CONVENTIONAL_AIRCRAFT_PILOT:
                     cbUnitCategory.setSelectedIndex(UnitType.CONV_FIGHTER + 1);
                     break;
-                case PROTOMECH_PILOT:
+                case PROTOMEK_PILOT:
                     cbUnitCategory.setSelectedIndex(UnitType.PROTOMEK + 1);
                     break;
                 case BATTLE_ARMOUR:

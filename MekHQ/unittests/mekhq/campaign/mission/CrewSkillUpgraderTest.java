@@ -46,14 +46,14 @@ class CrewSkillUpgraderTest {
         ArrayList<Entity> entities = new ArrayList<>();
         // Iterate over these to make units
         ArrayList<Class> eClasses = new ArrayList<>(List.of(
-                BipedMech.class,
+                BipedMek.class,
                 VTOL.class,
                 Tank.class,
-                TripodMech.class,
+                TripodMek.class,
                 AeroSpaceFighter.class,
                 BattleArmor.class,
                 Infantry.class,
-                QuadMech.class,
+                QuadMek.class,
                 Jumpship.class
         ));
         ArrayList<CrewType> crewTypes = new ArrayList<>(List.of(
@@ -88,7 +88,7 @@ class CrewSkillUpgraderTest {
     @Test
     void testUpgradeCrewConfirmSPAAdded() {
         CrewSkillUpgrader csu = new CrewSkillUpgrader(4);
-        Entity e = new BipedMech();
+        Entity e = new BipedMek();
         Crew c = new Crew(CrewType.SINGLE, "Joanne Q. Publique", 1, 3, 4, Gender.FEMALE, false, null);
         e.setCrew(c);
 

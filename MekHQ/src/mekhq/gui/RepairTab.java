@@ -21,7 +21,7 @@ package mekhq.gui;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MechView;
+import megamek.common.MekView;
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
@@ -552,9 +552,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (selected > -1) {
             Unit unit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(selected));
             if (null != unit) {
-                MechView mv = new MechView(unit.getEntity(), true, true);
-                txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic()
-                        + "<br>" + mv.getMechReadoutLoadout() + "</div>");
+                MekView mv = new MekView(unit.getEntity(), true, true);
+                txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadoutBasic()
+                        + "<br>" + mv.getMekReadoutLoadout() + "</div>");
                 SwingUtilities.invokeLater(() -> scrollServicedUnitView.getVerticalScrollBar().setValue(0));
                 if (!unit.equals(selectedUnit)) {
                     choiceLocation.setSelectedIndex(0);

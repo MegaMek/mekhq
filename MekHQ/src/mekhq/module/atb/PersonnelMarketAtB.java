@@ -72,14 +72,14 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 } else if (r == 4 && c.getCampaignOptions().isUseAero()) {
                     p = c.newPerson(PersonnelRole.AERO_TECH);
                 } else {
-                    p = c.newPerson(PersonnelRole.MECH_TECH);
+                    p = c.newPerson(PersonnelRole.MEK_TECH);
                 }
             } else if (roll == 4 || roll == 10) {
-                p = c.newPerson(PersonnelRole.MECHWARRIOR);
+                p = c.newPerson(PersonnelRole.MEKWARRIOR);
             } else if (roll == 5 && c.getCampaignOptions().isUseAero()) {
                 p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
             } else if (roll == 5 && c.getFaction().isClan()) {
-                p = c.newPerson(PersonnelRole.MECHWARRIOR);
+                p = c.newPerson(PersonnelRole.MEKWARRIOR);
             } else if (roll == 5) {
                 int r = Compute.d6(2);
                 if (r == 2) {
@@ -147,9 +147,9 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 }
 
                 switch (p.getPrimaryRole()) {
-                    case MECHWARRIOR:
-                        adjustSkill(p, SkillType.S_GUN_MECH, gunneryMod);
-                        adjustSkill(p, SkillType.S_PILOT_MECH, pilotingMod);
+                    case MEKWARRIOR:
+                        adjustSkill(p, SkillType.S_GUN_MEK, gunneryMod);
+                        adjustSkill(p, SkillType.S_PILOT_MEK, pilotingMod);
                         break;
                     case GROUND_VEHICLE_DRIVER:
                         adjustSkill(p, SkillType.S_PILOT_GVEE, pilotingMod);
@@ -167,16 +167,16 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                         adjustSkill(p, SkillType.S_GUN_AERO, gunneryMod);
                         adjustSkill(p, SkillType.S_PILOT_AERO, pilotingMod);
                         break;
-                    case PROTOMECH_PILOT:
+                    case PROTOMEK_PILOT:
                         adjustSkill(p, SkillType.S_GUN_PROTO, gunneryMod);
                         break;
                     case BATTLE_ARMOUR:
                         adjustSkill(p, SkillType.S_GUN_BA, gunneryMod);
-                        adjustSkill(p, SkillType.S_ANTI_MECH, pilotingMod);
+                        adjustSkill(p, SkillType.S_ANTI_MEK, pilotingMod);
                         break;
                     case SOLDIER:
                         adjustSkill(p, SkillType.S_SMALL_ARMS, gunneryMod);
-                        adjustSkill(p, SkillType.S_ANTI_MECH, pilotingMod);
+                        adjustSkill(p, SkillType.S_ANTI_MEK, pilotingMod);
                         break;
                     default:
                         break;

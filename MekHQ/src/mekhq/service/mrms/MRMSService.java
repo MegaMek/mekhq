@@ -53,7 +53,7 @@ public class MRMSService {
         }
 
         return (unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Aero)
-                || (unit.getEntity() instanceof Mech) || (unit.getEntity() instanceof BattleArmor);
+                || (unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof BattleArmor);
     }
 
     public static MRMSPartSet performWarehouseMRMS(List<IPartWork> selectedParts,
@@ -495,7 +495,7 @@ public class MRMSService {
          * we'll proceed.
          */
 
-        if ((unit.getEntity() instanceof Mech)) {
+        if ((unit.getEntity() instanceof Mek)) {
             Map<Integer, Part> locationMap = new HashMap<>();
 
             for (IPartWork partWork : parts) {

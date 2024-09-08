@@ -22,7 +22,7 @@ import megamek.Version;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Compute;
 import megamek.common.EntityMovementMode;
-import megamek.common.MechSummary;
+import megamek.common.MekSummary;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -154,28 +154,28 @@ public abstract class AbstractUnitMarket {
                                              final Collection<EntityMovementMode> movementModes,
                                              final Collection<MissionRole> missionRoles,
                                              final int percent) {
-        final MechSummary mechSummary = campaign.getUnitGenerator().generate(faction.getShortName(),
+        final MekSummary mekSummary = campaign.getUnitGenerator().generate(faction.getShortName(),
                 unitType, weight, campaign.getGameYear(), quality, movementModes, missionRoles,
                 ms -> (!campaign.getCampaignOptions().isLimitByYear() || (campaign.getGameYear() > ms.getYear()))
                         && (!ms.isClan() || campaign.getCampaignOptions().isAllowClanPurchases())
                         && (ms.isClan() || campaign.getCampaignOptions().isAllowISPurchases()));
-        return (mechSummary == null) ? null : addSingleUnit(campaign, market, unitType, mechSummary, percent);
+        return (mekSummary == null) ? null : addSingleUnit(campaign, market, unitType, mekSummary, percent);
     }
 
     /**
      * @param campaign the campaign to use to generate the offer
      * @param market the market type the unit is being offered in
      * @param unitType the unit type of the generated unit
-     * @param mechSummary the generated mech summary
+     * @param mekSummary the generated mek summary
      * @param percent the percentage of the original unit cost the unit will be offered at
      * @return the name of the unit that has been added to the market
      */
     public String addSingleUnit(final Campaign campaign, final UnitMarketType market,
-                                   final int unitType, final MechSummary mechSummary,
+                                   final int unitType, final MekSummary mekSummary,
                                    final int percent) {
-        getOffers().add(new UnitMarketOffer(market, unitType, mechSummary, percent,
+        getOffers().add(new UnitMarketOffer(market, unitType, mekSummary, percent,
                 generateTransitDuration(campaign)));
-        return mechSummary.getName();
+        return mekSummary.getName();
     }
 
     /**

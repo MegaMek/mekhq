@@ -69,7 +69,7 @@ public class CompanyGenerationOptions {
     private boolean assignMostSkilledToPrimaryLances;
     private boolean automaticallyAssignRanks;
     private boolean useSpecifiedFactionToAssignRanks;
-    private boolean assignMechWarriorsCallsigns;
+    private boolean assignMekWarriorsCallsigns;
     private boolean assignFounderFlag;
 
     // Personnel Randomization
@@ -82,12 +82,12 @@ public class CompanyGenerationOptions {
     private boolean simulateRandomProcreation;
 
     // Units
-    private BattleMechFactionGenerationMethod battleMechFactionGenerationMethod;
-    private BattleMechWeightClassGenerationMethod battleMechWeightClassGenerationMethod;
-    private BattleMechQualityGenerationMethod battleMechQualityGenerationMethod;
-    private boolean neverGenerateStarLeagueMechs;
-    private boolean onlyGenerateStarLeagueMechs;
-    private boolean onlyGenerateOmniMechs;
+    private BattleMekFactionGenerationMethod battleMekFactionGenerationMethod;
+    private BattleMekWeightClassGenerationMethod battleMekWeightClassGenerationMethod;
+    private BattleMekQualityGenerationMethod battleMekQualityGenerationMethod;
+    private boolean neverGenerateStarLeagueMeks;
+    private boolean onlyGenerateStarLeagueMeks;
+    private boolean onlyGenerateOmniMeks;
     private boolean generateUnitsAsAttached;
     private boolean assignBestRollToCompanyCommander;
     private boolean sortStarLeagueUnitsFirst;
@@ -153,7 +153,7 @@ public class CompanyGenerationOptions {
         // Personnel
         final Map<PersonnelRole, Integer> supportPersonnel = new HashMap<>();
         if (method.isWindchild()) {
-            supportPersonnel.put(PersonnelRole.MECH_TECH, 12);
+            supportPersonnel.put(PersonnelRole.MEK_TECH, 12);
             supportPersonnel.put(PersonnelRole.MECHANIC, 0);
             supportPersonnel.put(PersonnelRole.AERO_TECH, 0);
             supportPersonnel.put(PersonnelRole.DOCTOR, 1);
@@ -162,7 +162,7 @@ public class CompanyGenerationOptions {
             supportPersonnel.put(PersonnelRole.ADMINISTRATOR_TRANSPORT, 1);
             supportPersonnel.put(PersonnelRole.ADMINISTRATOR_HR, 1);
         } else { // Defaults to AtB
-            supportPersonnel.put(PersonnelRole.MECH_TECH, 10);
+            supportPersonnel.put(PersonnelRole.MEK_TECH, 10);
             supportPersonnel.put(PersonnelRole.DOCTOR, 1);
             supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 1);
         }
@@ -178,7 +178,7 @@ public class CompanyGenerationOptions {
         setAssignMostSkilledToPrimaryLances(method.isWindchild());
         setAutomaticallyAssignRanks(true);
         setUseSpecifiedFactionToAssignRanks(false);
-        setAssignMechWarriorsCallsigns(true);
+        setAssignMekWarriorsCallsigns(true);
         setAssignFounderFlag(true);
 
         // Personnel Randomization
@@ -191,16 +191,16 @@ public class CompanyGenerationOptions {
         setSimulateRandomProcreation(method.isWindchild());
 
         // Units
-        setBattleMechFactionGenerationMethod(BattleMechFactionGenerationMethod.ORIGIN_FACTION);
-        setBattleMechWeightClassGenerationMethod(method.isAgainstTheBot()
-                ? BattleMechWeightClassGenerationMethod.AGAINST_THE_BOT
-                : BattleMechWeightClassGenerationMethod.WINDCHILD);
-        setBattleMechQualityGenerationMethod(method.isAgainstTheBot()
-                ? BattleMechQualityGenerationMethod.AGAINST_THE_BOT
-                : BattleMechQualityGenerationMethod.WINDCHILD);
-        setNeverGenerateStarLeagueMechs(false);
-        setOnlyGenerateStarLeagueMechs(false);
-        setOnlyGenerateOmniMechs(false);
+        setBattleMekFactionGenerationMethod(BattleMekFactionGenerationMethod.ORIGIN_FACTION);
+        setBattleMekWeightClassGenerationMethod(method.isAgainstTheBot()
+                ? BattleMekWeightClassGenerationMethod.AGAINST_THE_BOT
+                : BattleMekWeightClassGenerationMethod.WINDCHILD);
+        setBattleMekQualityGenerationMethod(method.isAgainstTheBot()
+                ? BattleMekQualityGenerationMethod.AGAINST_THE_BOT
+                : BattleMekQualityGenerationMethod.WINDCHILD);
+        setNeverGenerateStarLeagueMeks(false);
+        setOnlyGenerateStarLeagueMeks(false);
+        setOnlyGenerateOmniMeks(false);
         setGenerateUnitsAsAttached(method.isAgainstTheBot());
         setAssignBestRollToCompanyCommander(method.isWindchild());
         setSortStarLeagueUnitsFirst(true);
@@ -422,12 +422,12 @@ public class CompanyGenerationOptions {
         this.useSpecifiedFactionToAssignRanks = useSpecifiedFactionToAssignRanks;
     }
 
-    public boolean isAssignMechWarriorsCallsigns() {
-        return assignMechWarriorsCallsigns;
+    public boolean isAssignMekWarriorsCallsigns() {
+        return assignMekWarriorsCallsigns;
     }
 
-    public void setAssignMechWarriorsCallsigns(final boolean assignMechWarriorsCallsigns) {
-        this.assignMechWarriorsCallsigns = assignMechWarriorsCallsigns;
+    public void setAssignMekWarriorsCallsigns(final boolean assignMekWarriorsCallsigns) {
+        this.assignMekWarriorsCallsigns = assignMekWarriorsCallsigns;
     }
 
     public boolean isAssignFounderFlag() {
@@ -484,55 +484,55 @@ public class CompanyGenerationOptions {
     //endregion Starting Simulation
 
     //region Units
-    public BattleMechFactionGenerationMethod getBattleMechFactionGenerationMethod() {
-        return battleMechFactionGenerationMethod;
+    public BattleMekFactionGenerationMethod getBattleMekFactionGenerationMethod() {
+        return battleMekFactionGenerationMethod;
     }
 
-    public void setBattleMechFactionGenerationMethod(
-            final BattleMechFactionGenerationMethod battleMechFactionGenerationMethod) {
-        this.battleMechFactionGenerationMethod = battleMechFactionGenerationMethod;
+    public void setBattleMekFactionGenerationMethod(
+            final BattleMekFactionGenerationMethod battleMekFactionGenerationMethod) {
+        this.battleMekFactionGenerationMethod = battleMekFactionGenerationMethod;
     }
 
-    public BattleMechWeightClassGenerationMethod getBattleMechWeightClassGenerationMethod() {
-        return battleMechWeightClassGenerationMethod;
+    public BattleMekWeightClassGenerationMethod getBattleMekWeightClassGenerationMethod() {
+        return battleMekWeightClassGenerationMethod;
     }
 
-    public void setBattleMechWeightClassGenerationMethod(
-            final BattleMechWeightClassGenerationMethod battleMechWeightClassGenerationMethod) {
-        this.battleMechWeightClassGenerationMethod = battleMechWeightClassGenerationMethod;
+    public void setBattleMekWeightClassGenerationMethod(
+            final BattleMekWeightClassGenerationMethod battleMekWeightClassGenerationMethod) {
+        this.battleMekWeightClassGenerationMethod = battleMekWeightClassGenerationMethod;
     }
 
-    public BattleMechQualityGenerationMethod getBattleMechQualityGenerationMethod() {
-        return battleMechQualityGenerationMethod;
+    public BattleMekQualityGenerationMethod getBattleMekQualityGenerationMethod() {
+        return battleMekQualityGenerationMethod;
     }
 
-    public void setBattleMechQualityGenerationMethod(
-            final BattleMechQualityGenerationMethod battleMechQualityGenerationMethod) {
-        this.battleMechQualityGenerationMethod = battleMechQualityGenerationMethod;
+    public void setBattleMekQualityGenerationMethod(
+            final BattleMekQualityGenerationMethod battleMekQualityGenerationMethod) {
+        this.battleMekQualityGenerationMethod = battleMekQualityGenerationMethod;
     }
 
-    public boolean isNeverGenerateStarLeagueMechs() {
-        return neverGenerateStarLeagueMechs;
+    public boolean isNeverGenerateStarLeagueMeks() {
+        return neverGenerateStarLeagueMeks;
     }
 
-    public void setNeverGenerateStarLeagueMechs(final boolean neverGenerateStarLeagueMechs) {
-        this.neverGenerateStarLeagueMechs = neverGenerateStarLeagueMechs;
+    public void setNeverGenerateStarLeagueMeks(final boolean neverGenerateStarLeagueMeks) {
+        this.neverGenerateStarLeagueMeks = neverGenerateStarLeagueMeks;
     }
 
-    public boolean isOnlyGenerateStarLeagueMechs() {
-        return onlyGenerateStarLeagueMechs;
+    public boolean isOnlyGenerateStarLeagueMeks() {
+        return onlyGenerateStarLeagueMeks;
     }
 
-    public void setOnlyGenerateStarLeagueMechs(final boolean onlyGenerateStarLeagueMechs) {
-        this.onlyGenerateStarLeagueMechs = onlyGenerateStarLeagueMechs;
+    public void setOnlyGenerateStarLeagueMeks(final boolean onlyGenerateStarLeagueMeks) {
+        this.onlyGenerateStarLeagueMeks = onlyGenerateStarLeagueMeks;
     }
 
-    public boolean isOnlyGenerateOmniMechs() {
-        return onlyGenerateOmniMechs;
+    public boolean isOnlyGenerateOmniMeks() {
+        return onlyGenerateOmniMeks;
     }
 
-    public void setOnlyGenerateOmniMechs(final boolean onlyGenerateOmniMechs) {
-        this.onlyGenerateOmniMechs = onlyGenerateOmniMechs;
+    public void setOnlyGenerateOmniMeks(final boolean onlyGenerateOmniMeks) {
+        this.onlyGenerateOmniMeks = onlyGenerateOmniMeks;
     }
 
     public boolean isGenerateUnitsAsAttached() {
@@ -919,7 +919,7 @@ public class CompanyGenerationOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMostSkilledToPrimaryLances", isAssignMostSkilledToPrimaryLances());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "automaticallyAssignRanks", isAutomaticallyAssignRanks());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSpecifiedFactionToAssignRanks", isUseSpecifiedFactionToAssignRanks());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMechWarriorsCallsigns", isAssignMechWarriorsCallsigns());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMekWarriorsCallsigns", isAssignMekWarriorsCallsigns());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignFounderFlag", isAssignFounderFlag());
 
         // Personnel Randomization
@@ -932,12 +932,12 @@ public class CompanyGenerationOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateRandomProcreation", isSimulateRandomProcreation());
 
         // Units
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechFactionGenerationMethod", getBattleMechFactionGenerationMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechWeightClassGenerationMethod", getBattleMechWeightClassGenerationMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechQualityGenerationMethod", getBattleMechQualityGenerationMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "neverGenerateStarLeagueMechs", isNeverGenerateStarLeagueMechs());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "onlyGenerateStarLeagueMechs", isOnlyGenerateStarLeagueMechs());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "onlyGenerateOmniMechs", isOnlyGenerateOmniMechs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMekFactionGenerationMethod", getBattleMekFactionGenerationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMekWeightClassGenerationMethod", getBattleMekWeightClassGenerationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMekQualityGenerationMethod", getBattleMekQualityGenerationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "neverGenerateStarLeagueMeks", isNeverGenerateStarLeagueMeks());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "onlyGenerateStarLeagueMeks", isOnlyGenerateStarLeagueMeks());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "onlyGenerateOmniMeks", isOnlyGenerateOmniMeks());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateUnitsAsAttached", isGenerateUnitsAsAttached());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignBestRollToCompanyCommander", isAssignBestRollToCompanyCommander());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sortStarLeagueUnitsFirst", isSortStarLeagueUnitsFirst());
@@ -1127,8 +1127,8 @@ public class CompanyGenerationOptions {
                     case "useSpecifiedFactionToAssignRanks":
                         options.setUseSpecifiedFactionToAssignRanks(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "assignMechWarriorsCallsigns":
-                        options.setAssignMechWarriorsCallsigns(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "assignMekWarriorsCallsigns":
+                        options.setAssignMekWarriorsCallsigns(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "assignFounderFlag":
                         options.setAssignFounderFlag(Boolean.parseBoolean(wn.getTextContent().trim()));
@@ -1163,23 +1163,23 @@ public class CompanyGenerationOptions {
                     //endregion Starting Simulation
 
                     //region Units
-                    case "battleMechFactionGenerationMethod":
-                        options.setBattleMechFactionGenerationMethod(BattleMechFactionGenerationMethod.valueOf(wn.getTextContent().trim()));
+                    case "battleMekFactionGenerationMethod":
+                        options.setBattleMekFactionGenerationMethod(BattleMekFactionGenerationMethod.valueOf(wn.getTextContent().trim()));
                         break;
-                    case "battleMechWeightClassGenerationMethod":
-                        options.setBattleMechWeightClassGenerationMethod(BattleMechWeightClassGenerationMethod.valueOf(wn.getTextContent().trim()));
+                    case "battleMekWeightClassGenerationMethod":
+                        options.setBattleMekWeightClassGenerationMethod(BattleMekWeightClassGenerationMethod.valueOf(wn.getTextContent().trim()));
                         break;
-                    case "battleMechQualityGenerationMethod":
-                        options.setBattleMechQualityGenerationMethod(BattleMechQualityGenerationMethod.valueOf(wn.getTextContent().trim()));
+                    case "battleMekQualityGenerationMethod":
+                        options.setBattleMekQualityGenerationMethod(BattleMekQualityGenerationMethod.valueOf(wn.getTextContent().trim()));
                         break;
-                    case "neverGenerateStarLeagueMechs":
-                        options.setNeverGenerateStarLeagueMechs(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "neverGenerateStarLeagueMeks":
+                        options.setNeverGenerateStarLeagueMeks(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "onlyGenerateStarLeagueMechs":
-                        options.setOnlyGenerateStarLeagueMechs(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "onlyGenerateStarLeagueMeks":
+                        options.setOnlyGenerateStarLeagueMeks(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
-                    case "onlyGenerateOmniMechs":
-                        options.setOnlyGenerateOmniMechs(Boolean.parseBoolean(wn.getTextContent().trim()));
+                    case "onlyGenerateOmniMeks":
+                        options.setOnlyGenerateOmniMeks(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "generateUnitsAsAttached":
                         options.setGenerateUnitsAsAttached(Boolean.parseBoolean(wn.getTextContent().trim()));

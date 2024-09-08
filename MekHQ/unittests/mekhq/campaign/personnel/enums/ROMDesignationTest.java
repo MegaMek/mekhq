@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.BipedMech;
+import megamek.common.BipedMek;
 import megamek.common.Dropship;
 import megamek.common.Jumpship;
 import mekhq.MekHQ;
@@ -221,7 +221,7 @@ public class ROMDesignationTest {
 
         // No ROM Designations nor Secondary Role
         // MekWarrior- Expect " Epsilon"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
         assertEquals(" " + ROMDesignation.EPSILON, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // LAM Pilot - Expect " Epsilon"
@@ -274,9 +274,9 @@ public class ROMDesignationTest {
         when(mockUnit.getEntity()).thenReturn(new Jumpship());
         assertEquals(" " + ROMDesignation.THETA, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
-        // Vessel Crew, Biped Mech - Expect " "
+        // Vessel Crew, Biped Mek - Expect " "
         when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.VESSEL_CREW);
-        when(mockUnit.getEntity()).thenReturn(new BipedMech());
+        when(mockUnit.getEntity()).thenReturn(new BipedMek());
         assertEquals(" ", ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // Vessel Navigator, Null Unit - Expect " "
@@ -284,8 +284,8 @@ public class ROMDesignationTest {
         when(mockPerson.getUnit()).thenReturn(null);
         assertEquals(" ", ROMDesignation.getComStarBranchDesignation(mockPerson));
 
-        // Mech Tech - Expect " Zeta"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
+        // Mek Tech - Expect " Zeta"
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
         assertEquals(" " + ROMDesignation.ZETA, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // Mechanic - Expect " Zeta"
@@ -333,7 +333,7 @@ public class ROMDesignationTest {
         assertEquals(" ", ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // MekWarrior / Administrator (Command) - Expect " Epsilon Chi"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
         when(mockPerson.getSecondaryRole()).thenReturn(PersonnelRole.ADMINISTRATOR_COMMAND);
         assertEquals(" " + ROMDesignation.EPSILON + ' ' + ROMDesignation.CHI,
                 ROMDesignation.getComStarBranchDesignation(mockPerson));

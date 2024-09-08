@@ -617,12 +617,12 @@ public enum PersonnelTableModelColumn {
                 return ((unit == null) || !unit.isDeployed()) ? "-"
                         : campaign.getScenario(unit.getScenarioId()).getName();
             case MEK:
-                return (person.hasSkill(SkillType.S_GUN_MECH)
-                                ? Integer.toString(person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue())
+                return (person.hasSkill(SkillType.S_GUN_MEK)
+                                ? Integer.toString(person.getSkill(SkillType.S_GUN_MEK).getFinalSkillValue())
                                 : "-")
                         + '/'
-                        + (person.hasSkill(SkillType.S_PILOT_MECH)
-                                ? Integer.toString(person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue())
+                        + (person.hasSkill(SkillType.S_PILOT_MEK)
+                                ? Integer.toString(person.getSkill(SkillType.S_PILOT_MEK).getFinalSkillValue())
                                 : "-");
             case GROUND_VEHICLE:
                 return (person.hasSkill(SkillType.S_GUN_VEE)
@@ -677,8 +677,8 @@ public enum PersonnelTableModelColumn {
                         ? Integer.toString(person.getSkill(SkillType.S_GUN_BA).getFinalSkillValue())
                         : "-";
             case ANTI_MEK:
-                return person.hasSkill(SkillType.S_ANTI_MECH)
-                        ? Integer.toString(person.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue())
+                return person.hasSkill(SkillType.S_ANTI_MEK)
+                        ? Integer.toString(person.getSkill(SkillType.S_ANTI_MEK).getFinalSkillValue())
                         : "-";
             case SMALL_ARMS:
                 return person.hasSkill(SkillType.S_SMALL_ARMS)
@@ -701,8 +701,8 @@ public enum PersonnelTableModelColumn {
                         ? Integer.toString(person.getSkill(SkillType.S_LEADER).getFinalSkillValue())
                         : "-";
             case TECH_MEK:
-                return person.hasSkill(SkillType.S_TECH_MECH)
-                        ? Integer.toString(person.getSkill(SkillType.S_TECH_MECH).getFinalSkillValue())
+                return person.hasSkill(SkillType.S_TECH_MEK)
+                        ? Integer.toString(person.getSkill(SkillType.S_TECH_MEK).getFinalSkillValue())
                         : "-";
             case TECH_AERO:
                 return person.hasSkill(SkillType.S_TECH_AERO)

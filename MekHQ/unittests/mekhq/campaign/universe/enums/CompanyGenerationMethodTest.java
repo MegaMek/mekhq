@@ -87,8 +87,8 @@ public class CompanyGenerationMethodTest {
 
         final CompanyGenerationOptions mockOptions = mock(CompanyGenerationOptions.class);
         when(mockOptions.getRandomOriginOptions()).thenReturn(new RandomOriginOptions(false));
-        when(mockOptions.getBattleMechWeightClassGenerationMethod()).thenReturn(BattleMechWeightClassGenerationMethod.WINDCHILD);
-        when(mockOptions.getBattleMechQualityGenerationMethod()).thenReturn(BattleMechQualityGenerationMethod.WINDCHILD);
+        when(mockOptions.getBattleMekWeightClassGenerationMethod()).thenReturn(BattleMekWeightClassGenerationMethod.WINDCHILD);
+        when(mockOptions.getBattleMekQualityGenerationMethod()).thenReturn(BattleMekQualityGenerationMethod.WINDCHILD);
 
         assertInstanceOf(AtBCompanyGenerator.class, CompanyGenerationMethod.AGAINST_THE_BOT.getGenerator(mockCampaign, mockOptions));
         assertInstanceOf(WindchildCompanyGenerator.class, CompanyGenerationMethod.WINDCHILD.getGenerator(mockCampaign, mockOptions));

@@ -44,7 +44,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     private BigDecimal numberClan = BigDecimal.ZERO;
     private int countIS2 = 0;
     private int countClan = 0;
-    private int mechSupportNeeded = 0;
+    private int mekSupportNeeded = 0;
     private int tankSupportNeeded = 0;
     private int vtolSupportNeeded = 0;
     private int baSupportNeeded = 0;
@@ -162,10 +162,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             }
         }
 
-        if (en instanceof Mech) {
+        if (en instanceof Mek) {
             needed += (int) Math.ceil((Math.floor(en.getWeight() / 5) + 40) * timeMult);
-            LogManager.getLogger().debug("Unit " + u.getName() + " needs " + needed + " mech tech hours.");
-            mechSupportNeeded += needed;
+            LogManager.getLogger().debug("Unit " + u.getName() + " needs " + needed + " mek tech hours.");
+            mekSupportNeeded += needed;
         } else if (en instanceof Jumpship || en instanceof Dropship) {
             // according to FM:M(r), this should be tracked separately because it only applies to admin support but not
             // technical support.
@@ -292,7 +292,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private void updateTechSupportHours(Person p) {
-        String[] techSkills = new String[]{SkillType.S_TECH_MECH, SkillType.S_TECH_AERO,
+        String[] techSkills = new String[]{SkillType.S_TECH_MEK, SkillType.S_TECH_AERO,
                 SkillType.S_TECH_BA, SkillType.S_TECH_VESSEL, SkillType.S_TECH_MECHANIC};
 
         // Get the highest tech skill this person has.
@@ -356,8 +356,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         Crew p = u.getEntity().getCrew();
         BigDecimal combatSkillAverage;
 
-        // Infantry and ProtoMechs do not have a piloting skill.
-        if ((u.getEntity() instanceof Infantry) || (u.getEntity() instanceof Protomech)) {
+        // Infantry and ProtoMeks do not have a piloting skill.
+        if ((u.getEntity() instanceof Infantry) || (u.getEntity() instanceof ProtoMek)) {
             combatSkillAverage = new BigDecimal(p.getGunnery());
 
             // All other units use an average of piloting and gunnery.
@@ -377,7 +377,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     @Override
     public void reInitialize() {
-        mechSupportNeeded = 0;
+        mekSupportNeeded = 0;
         tankSupportNeeded = 0;
         vtolSupportNeeded = 0;
         baSupportNeeded = 0;
@@ -526,7 +526,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private int getTechSupportNeeded() {
-        return mechSupportNeeded + tankSupportNeeded + vtolSupportNeeded +
+        return mekSupportNeeded + tankSupportNeeded + vtolSupportNeeded +
                baSupportNeeded + convFighterSupportNeeded +
                aeroFighterSupportNeeded + smallCraftSupportNeeded;
     }
@@ -642,11 +642,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0);
 
         out.append(String.format(TEMPLATE, "DropShip Capacity:", getTransportPercent().toPlainString() + "%"))
-        .append("\n").append(String.format(TEMPLATE_TWO, "BattleMech Bays:", getMechCount(), getMechBayCount()))
+        .append("\n").append(String.format(TEMPLATE_TWO, "BattleMek Bays:", getMekCount(), getMekBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Fighter Bays:", getFighterCount(), getFighterBayCount()))
         .append(" (plus ").append(excessSmallCraftBays).append(" excess Small Craft)")
         .append("\n").append(String.format(TEMPLATE_TWO, "Small Craft Bays:", getSmallCraftCount(), getSmallCraftBayCount()))
-        .append("\n").append(String.format(TEMPLATE_TWO, "ProtoMech Bays:", getProtoCount(), getProtoBayCount()))
+        .append("\n").append(String.format(TEMPLATE_TWO, "ProtoMek Bays:", getProtoCount(), getProtoBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Super Heavy Vehicle Bays:", getSuperHeavyVeeCount(), getSuperHeavyVeeBayCount()))
         .append("\n").append(String.format(TEMPLATE_TWO, "Heavy Vehicle Bays:", getHeavyVeeCount(), getHeavyVeeBayCount()))
         .append(" (plus ").append(excessSuperHeavyVeeBays).append(" excess Super Heavy)")
@@ -681,7 +681,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                "\n" + String.format(TEMPLATE_SUB, "Tech Support:",
                 getTechSupportPercentage().toPlainString()) + "%" +
                "\n" + String.format(TEMPLATE_CAT, "Total Hours Needed:", getTechSupportNeeded()) +
-               "\n" + String.format(TEMPLATE_SUBCAT, "BattleMechs:", mechSupportNeeded) +
+               "\n" + String.format(TEMPLATE_SUBCAT, "BattleMeks:", mekSupportNeeded) +
                "\n" + String.format(TEMPLATE_SUBCAT, "Vehicles:", tankSupportNeeded) +
                "\n" + String.format(TEMPLATE_SUBCAT, "VTOL:", vtolSupportNeeded) +
                "\n" + String.format(TEMPLATE_SUBCAT, "Battle Armor:", baSupportNeeded) +
@@ -743,7 +743,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                "    Auxiliary vessels are not accounted for.\n" +
                "+ Support: Artillery weapons & Naval vessels are not accounted " +
                "for.\n" +
-               "Note: The Dragoons Rating, RAW, does not account for ProtoMechs " +
+               "Note: The Dragoons Rating, RAW, does not account for ProtoMeks " +
                "at all and Infantry only require admin & medical support, not " +
                "tech support.";
     }
@@ -754,7 +754,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         // so this is calculated first, and all calculations are based on this number
         int numBaBaysRequired = getBattleArmorCount() / 5;
         // Find the current number of units that might require transport
-        BigDecimal totalUnits = new BigDecimal(getMechCount() +
+        BigDecimal totalUnits = new BigDecimal(getMekCount() +
                 getProtoCount() +
                 getSuperHeavyVeeCount() +
                 getHeavyVeeCount() +
@@ -773,7 +773,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         int excessHeavyVeeBays = Math.max(getHeavyVeeBayCount() + excessSuperHeavyVeeBays - getHeavyVeeCount(), 0); //removes any filled heavy vehicle bays and spare super heavy vehicle bays, rest can be used to store light vehicles
         int excessSmallCraftBays = Math.max(getSmallCraftBayCount() - getSmallCraftCount(), 0); //removes any filled small craft bays, rest can be used to store fighters
 
-        int numberWithoutTransport = Math.max((getMechCount() - getMechBayCount()), 0);
+        int numberWithoutTransport = Math.max((getMekCount() - getMekBayCount()), 0);
         numberWithoutTransport += Math.max(getProtoCount() - getProtoBayCount(), 0);
         numberWithoutTransport += Math.max(getSuperHeavyVeeCount() - getSuperHeavyVeeBayCount(), 0);
         numberWithoutTransport += Math.max(getHeavyVeeCount() - getHeavyVeeBayCount() - excessSuperHeavyVeeBays, 0);
@@ -813,7 +813,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     private int getTechRatedUnits() {
-        return getMechCount() + getProtoCount() + getFighterCount() +
+        return getMekCount() + getProtoCount() + getFighterCount() +
                getLightVeeCount() +
                getHeavyVeeCount() + getSuperHeavyVeeCount() +
                getNumberBaSquads() + getSmallCraftCount() +

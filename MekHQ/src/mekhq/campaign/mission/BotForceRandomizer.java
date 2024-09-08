@@ -377,7 +377,7 @@ public class BotForceRandomizer {
      * @return A new Entity with crew.
      */
     public Entity getEntity(int uType, int weightClass, Campaign campaign) {
-        MechSummary ms;
+        MekSummary ms;
 
         // allow some variation in actual weight class
         int weightRoll = Compute.randomInt(6);
@@ -411,10 +411,10 @@ public class BotForceRandomizer {
      * @param campaign A campaign file
      * @return A crewed entity
      */
-    public @Nullable Entity createEntityWithCrew(MechSummary ms, Campaign campaign) {
+    public @Nullable Entity createEntityWithCrew(MekSummary ms, Campaign campaign) {
         Entity en;
         try {
-            en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+            en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
             LogManager.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName(), ex);
             return null;
@@ -447,7 +447,7 @@ public class BotForceRandomizer {
             Phenotype phenotype = Phenotype.NONE;
             switch (en.getUnitType()) {
                 case UnitType.MEK:
-                    phenotype = Phenotype.MECHWARRIOR;
+                    phenotype = Phenotype.MEKWARRIOR;
                     break;
                 case UnitType.TANK:
                 case UnitType.VTOL:
@@ -464,7 +464,7 @@ public class BotForceRandomizer {
                     phenotype = Phenotype.AEROSPACE;
                     break;
                 case UnitType.PROTOMEK:
-                    phenotype = Phenotype.PROTOMECH;
+                    phenotype = Phenotype.PROTOMEK;
                     break;
                 case UnitType.SMALL_CRAFT:
                 case UnitType.DROPSHIP:

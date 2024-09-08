@@ -106,15 +106,15 @@ public class PartsStore {
 
     private void stockBattleArmorSuits(Campaign c) {
         //this is just a test
-        for (MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
+        for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
             if (!summary.getUnitType().equals("BattleArmor")) {
                 continue;
             }
-            //FIXME: I can't pull entity movement mode and quad shape off of mechsummary
+            //FIXME: I can't pull entity movement mode and quad shape off of meksummary
             //try loading the full entity, but this might take too long
             Entity newEntity = null;
             try {
-                newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                newEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             } catch (EntityLoadingException e) {
                 LogManager.getLogger().error("", e);
             }
@@ -203,11 +203,11 @@ public class PartsStore {
             } else {
                 boolean poddable = !et.isOmniFixedOnly();
                 if (et instanceof MiscType) {
-                    poddable &= et.hasFlag(MiscType.F_MECH_EQUIPMENT)
+                    poddable &= et.hasFlag(MiscType.F_MEK_EQUIPMENT)
                             || et.hasFlag(MiscType.F_TANK_EQUIPMENT)
                             || et.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
                 } else if (et instanceof WeaponType) {
-                    poddable &= (et.hasFlag(WeaponType.F_MECH_WEAPON)
+                    poddable &= (et.hasFlag(WeaponType.F_MEK_WEAPON)
                             || et.hasFlag(Weapon.F_TANK_WEAPON)
                             || et.hasFlag(WeaponType.F_AERO_WEAPON))
                             && !((WeaponType) et).isCapital();
@@ -254,8 +254,8 @@ public class PartsStore {
     }
 
     private void stockMekActuators(Campaign c) {
-        for (int i = Mech.ACTUATOR_UPPER_ARM; i <= Mech.ACTUATOR_FOOT; i++) {
-            if (i == Mech.ACTUATOR_HIP) {
+        for (int i = Mek.ACTUATOR_UPPER_ARM; i <= Mek.ACTUATOR_FOOT; i++) {
+            if (i == Mek.ACTUATOR_HIP) {
                 continue;
             }
             int ton = 20;
@@ -352,20 +352,20 @@ public class PartsStore {
         for (double i = 0.5; i <= 8.0; i += 0.5) {
             //standard at intervals of 1.0, up to 4
             if (i % 1.0 == 0 && i <= 4.0) {
-                parts.add(new MekGyro(0, Mech.GYRO_STANDARD, i, false, c));
-                parts.add(new MekGyro(0, Mech.GYRO_STANDARD, i, true, c));
+                parts.add(new MekGyro(0, Mek.GYRO_STANDARD, i, false, c));
+                parts.add(new MekGyro(0, Mek.GYRO_STANDARD, i, true, c));
             }
             //compact at intervals of 1.5, up to 6
             if (i % 1.5 == 0 && i <= 6.0) {
-                parts.add(new MekGyro(0, Mech.GYRO_COMPACT, i, false, c));
+                parts.add(new MekGyro(0, Mek.GYRO_COMPACT, i, false, c));
             }
             //XL at 0.5 intervals up to 2
             if (i % 0.5 == 0 && i <= 2.0) {
-                parts.add(new MekGyro(0, Mech.GYRO_XL, i, false, c));
+                parts.add(new MekGyro(0, Mek.GYRO_XL, i, false, c));
             }
             //Heavy duty at 2.0 intervals
             if (i % 2.0 == 0) {
-                parts.add(new MekGyro(0, Mech.GYRO_HEAVY_DUTY, i, false, c));
+                parts.add(new MekGyro(0, Mek.GYRO_HEAVY_DUTY, i, false, c));
             }
 
         }
@@ -378,9 +378,9 @@ public class PartsStore {
             parts.add(new QuadVeeGear(ton, c));
         }
 
-        for (int type = Mech.COCKPIT_STANDARD; type < Mech.COCKPIT_STRING.length; type++) {
+        for (int type = Mek.COCKPIT_STANDARD; type < Mek.COCKPIT_STRING.length; type++) {
             parts.add(new MekCockpit(0, type, false, c));
-            if (type != Mech.COCKPIT_SMALL) {
+            if (type != Mek.COCKPIT_SMALL) {
                 parts.add(new MekCockpit(0, type, true, c));
             }
         }
@@ -434,12 +434,12 @@ public class PartsStore {
                 parts.add(new Armor(0, armor.getArmorType(), amount, -1, false, armor.isClan(), c));
             }
         }
-        parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_STANDARD_PROTOMEK, 100, -1, true, c));
-        parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_EDP, 66, -1, true, c));
+        parts.add(new ProtoMekArmor(0, EquipmentType.T_ARMOR_STANDARD_PROTOMEK, 100, -1, true, c));
+        parts.add(new ProtoMekArmor(0, EquipmentType.T_ARMOR_EDP, 66, -1, true, c));
     }
 
     private void stockMekLocations(Campaign c) {
-        for (int loc = Mech.LOC_HEAD; loc <= Mech.LOC_CLEG; loc++) {
+        for (int loc = Mek.LOC_HEAD; loc <= Mek.LOC_CLEG; loc++) {
             for (int ton = 20; ton <= 100; ton = ton + 5) {
                 for (int type = 0; type < EquipmentType.structureNames.length; type++) {
                     addMekLocation(c, loc, ton, type, false);
@@ -453,7 +453,7 @@ public class PartsStore {
     }
 
     private void addMekLocation(Campaign c, int loc, int ton, int type, boolean clan) {
-        if (loc == Mech.LOC_HEAD) {
+        if (loc == Mek.LOC_HEAD) {
             parts.add(new MekLocation(loc, ton, type, clan, false, false, true, true, c));
             parts.add(new MekLocation(loc, ton, type, clan, true, false, true, true, c));
             parts.add(new MekLocation(loc, ton, type, clan, false, false, false, false, c));
@@ -461,7 +461,7 @@ public class PartsStore {
         } else {
             parts.add(new MekLocation(loc, ton, type, clan, false, false, false, false, c));
             parts.add(new MekLocation(loc, ton, type, clan, true, false, false, false, c));
-            if (loc > Mech.LOC_LT) {
+            if (loc > Mek.LOC_LT) {
                 parts.add(new MekLocation(loc, ton, type, clan, false, true, false, false, c));
                 parts.add(new MekLocation(loc, ton, type, clan, true, true, false, false, c));
             }
@@ -469,13 +469,13 @@ public class PartsStore {
     }
 
     private void stockProtomekLocations(Campaign c) {
-        for (int loc = Protomech.LOC_HEAD; loc <= Protomech.LOC_MAINGUN; loc++) {
+        for (int loc = ProtoMek.LOC_HEAD; loc <= ProtoMek.LOC_MAINGUN; loc++) {
             for (int ton = 2; ton <= 15; ton++) {
-                parts.add(new ProtomekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, false, false, c));
-                parts.add(new ProtomekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, true, false, c));
-                if (loc == Protomech.LOC_LEG) {
-                    parts.add(new ProtomekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, false, true, c));
-                    parts.add(new ProtomekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, true, true, c));
+                parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, false, false, c));
+                parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, true, false, c));
+                if (loc == ProtoMek.LOC_LEG) {
+                    parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, false, true, c));
+                    parts.add(new ProtoMekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, true, true, c));
                 }
             }
         }
@@ -484,10 +484,10 @@ public class PartsStore {
     private void stockProtomekComponents(Campaign c) {
         int ton = 2;
         while (ton <= 15) {
-            parts.add(new ProtomekArmActuator(ton, c));
-            parts.add(new ProtomekLegActuator(ton, c));
-            parts.add(new ProtomekSensor(ton, c));
-            parts.add(new ProtomekJumpJet(ton, c));
+            parts.add(new ProtoMekArmActuator(ton, c));
+            parts.add(new ProtoMekLegActuator(ton, c));
+            parts.add(new ProtoMekSensor(ton, c));
+            parts.add(new ProtoMekJumpJet(ton, c));
             ton++;
         }
     }

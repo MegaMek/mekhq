@@ -49,14 +49,14 @@ import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.companyGeneration.AtBRandomMechParameters;
+import mekhq.campaign.universe.companyGeneration.AtBRandomMekParameters;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
 import mekhq.campaign.universe.enums.Alphabet;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.campaign.universe.enums.CompanyGenerationPersonType;
-import mekhq.campaign.universe.generators.battleMechQualityGenerators.AbstractBattleMechQualityGenerator;
-import mekhq.campaign.universe.generators.battleMechWeightClassGenerators.AbstractBattleMechWeightClassGenerator;
+import mekhq.campaign.universe.generators.battleMekQualityGenerators.AbstractBattleMekQualityGenerator;
+import mekhq.campaign.universe.generators.battleMekWeightClassGenerators.AbstractBattleMekWeightClassGenerator;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
@@ -125,8 +125,8 @@ public abstract class AbstractCompanyGenerator {
     private final CompanyGenerationMethod method;
     private final CompanyGenerationOptions options;
     private final AbstractPersonnelGenerator personnelGenerator;
-    private final AbstractBattleMechWeightClassGenerator battleMechWeightClassGenerator;
-    private final AbstractBattleMechQualityGenerator battleMechQualityGenerator;
+    private final AbstractBattleMekWeightClassGenerator battleMekWeightClassGenerator;
+    private final AbstractBattleMekQualityGenerator battleMekQualityGenerator;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
             MekHQ.getMHQOptions().getLocale());
@@ -138,8 +138,8 @@ public abstract class AbstractCompanyGenerator {
         this.method = method;
         this.options = options;
         this.personnelGenerator = campaign.getPersonnelGenerator(createFactionSelector(), createPlanetSelector());
-        this.battleMechWeightClassGenerator = getOptions().getBattleMechWeightClassGenerationMethod().getGenerator();
-        this.battleMechQualityGenerator = getOptions().getBattleMechQualityGenerationMethod().getGenerator();
+        this.battleMekWeightClassGenerator = getOptions().getBattleMekWeightClassGenerationMethod().getGenerator();
+        this.battleMekQualityGenerator = getOptions().getBattleMekQualityGenerationMethod().getGenerator();
     }
     //endregion Constructors
 
@@ -175,12 +175,12 @@ public abstract class AbstractCompanyGenerator {
                 : new DefaultPlanetSelector(getOptions().getRandomOriginOptions());
     }
 
-    public AbstractBattleMechWeightClassGenerator getBattleMechWeightClassGenerator() {
-        return battleMechWeightClassGenerator;
+    public AbstractBattleMekWeightClassGenerator getBattleMekWeightClassGenerator() {
+        return battleMekWeightClassGenerator;
     }
 
-    public AbstractBattleMechQualityGenerator getBattleMechQualityGenerator() {
-        return battleMechQualityGenerator;
+    public AbstractBattleMekQualityGenerator getBattleMekQualityGenerator() {
+        return battleMekQualityGenerator;
     }
     //endregion Getters/Setters
 
@@ -222,12 +222,12 @@ public abstract class AbstractCompanyGenerator {
      * @return the list of generated combat personnel within their individual trackers
      */
     private List<CompanyGenerationPersonTracker> generateCombatPersonnel(final Campaign campaign) {
-        final int numMechWarriors = determineNumberOfLances() * getOptions().getLanceSize();
+        final int numMekWarriors = determineNumberOfLances() * getOptions().getLanceSize();
 
-        final List<CompanyGenerationPersonTracker> initialTrackers = IntStream.range(0, numMechWarriors)
+        final List<CompanyGenerationPersonTracker> initialTrackers = IntStream.range(0, numMekWarriors)
                 .mapToObj(i -> {
-                    final Person person = campaign.newPerson(PersonnelRole.MECHWARRIOR, getPersonnelGenerator());
-                    if (getOptions().isAssignMechWarriorsCallsigns()) {
+                    final Person person = campaign.newPerson(PersonnelRole.MEKWARRIOR, getPersonnelGenerator());
+                    if (getOptions().isAssignMekWarriorsCallsigns()) {
                         person.setCallsign(RandomCallsignGenerator.getInstance().generate());
                     }
                     return new CompanyGenerationPersonTracker(person);
@@ -263,7 +263,7 @@ public abstract class AbstractCompanyGenerator {
             sortedTrackers.add(initialTrackers.stream()
                     .min(personnelSorter)
                     .orElse(new CompanyGenerationPersonTracker(
-                            campaign.newPerson(PersonnelRole.MECHWARRIOR, getPersonnelGenerator()))));
+                            campaign.newPerson(PersonnelRole.MEKWARRIOR, getPersonnelGenerator()))));
             initialTrackers.remove(sortedTrackers.get(0));
         }
 
@@ -312,9 +312,9 @@ public abstract class AbstractCompanyGenerator {
         sortedTrackers.addAll(initialTrackers);
 
         // Then generate the individuals based on their sorted trackers
-        generateCommandingOfficer(campaign, sortedTrackers.get(0), numMechWarriors);
+        generateCommandingOfficer(campaign, sortedTrackers.get(0), numMekWarriors);
         generateOfficers(sortedTrackers);
-        generateStandardMechWarriors(campaign, sortedTrackers);
+        generateStandardMekWarriors(campaign, sortedTrackers);
 
         return sortedTrackers;
     }
@@ -328,32 +328,32 @@ public abstract class AbstractCompanyGenerator {
      *
      * @param campaign the campaign to use in generating the commanding officer
      * @param tracker the commanding officer's tracker
-     * @param numMechWarriors the number of MekWarriors in their force, used to determine their rank
+     * @param numMekWarriors the number of MekWarriors in their force, used to determine their rank
      */
     private void generateCommandingOfficer(final Campaign campaign,
                                            final CompanyGenerationPersonTracker tracker,
-                                           final int numMechWarriors) {
-        tracker.setPersonType(CompanyGenerationPersonType.MECHWARRIOR_COMPANY_COMMANDER);
+                                           final int numMekWarriors) {
+        tracker.setPersonType(CompanyGenerationPersonType.MEKWARRIOR_COMPANY_COMMANDER);
         tracker.getPerson().setCommander(getOptions().isAssignCompanyCommanderFlag());
-        tracker.getPerson().improveSkill(SkillType.S_GUN_MECH);
-        tracker.getPerson().improveSkill(SkillType.S_PILOT_MECH);
+        tracker.getPerson().improveSkill(SkillType.S_GUN_MEK);
+        tracker.getPerson().improveSkill(SkillType.S_PILOT_MEK);
         assignRandomOfficerSkillIncrease(tracker, 2);
 
         if (getOptions().isAutomaticallyAssignRanks()) {
             final Faction faction = getOptions().isUseSpecifiedFactionToAssignRanks()
                     ? getOptions().getSpecifiedFaction() : campaign.getFaction();
-            generateCommandingOfficerRank(faction, tracker, numMechWarriors);
+            generateCommandingOfficerRank(faction, tracker, numMekWarriors);
         }
     }
 
     /**
      * @param faction the faction to use in generating the commanding officer's rank
      * @param tracker the commanding officer's tracker
-     * @param numMechWarriors the number of MekWarriors in their force, used to determine their rank
+     * @param numMekWarriors the number of MekWarriors in their force, used to determine their rank
      */
     protected abstract void generateCommandingOfficerRank(final Faction faction,
                                                           final CompanyGenerationPersonTracker tracker,
-                                                          final int numMechWarriors);
+                                                          final int numMekWarriors);
 
     /**
      * This generates the initial officer list and assigns the type
@@ -367,8 +367,8 @@ public abstract class AbstractCompanyGenerator {
         for (int i = 1; i < determineNumberOfLances(); i++) {
             // Set the Person Type on the tracker, so we can properly reroll later
             trackers.get(i).setPersonType((i < captainThreshold)
-                    ? CompanyGenerationPersonType.MECHWARRIOR_CAPTAIN
-                    : CompanyGenerationPersonType.MECHWARRIOR_LIEUTENANT);
+                    ? CompanyGenerationPersonType.MEKWARRIOR_CAPTAIN
+                    : CompanyGenerationPersonType.MEKWARRIOR_LIEUTENANT);
             // Generate the individual officer
             generateOfficer(trackers.get(i));
         }
@@ -401,23 +401,23 @@ public abstract class AbstractCompanyGenerator {
 
 
         // Improve Skills
-        final Skill gunnery = tracker.getPerson().getSkill(SkillType.S_GUN_MECH);
-        final Skill piloting = tracker.getPerson().getSkill(SkillType.S_PILOT_MECH);
+        final Skill gunnery = tracker.getPerson().getSkill(SkillType.S_GUN_MEK);
+        final Skill piloting = tracker.getPerson().getSkill(SkillType.S_PILOT_MEK);
         if ((gunnery == null) && (piloting != null)) {
-            tracker.getPerson().improveSkill(SkillType.S_GUN_MECH);
+            tracker.getPerson().improveSkill(SkillType.S_GUN_MEK);
         } else if ((gunnery != null) && (piloting == null)) {
-            tracker.getPerson().improveSkill(SkillType.S_PILOT_MECH);
+            tracker.getPerson().improveSkill(SkillType.S_PILOT_MEK);
         } else if (gunnery == null) {
             // Both are null... this shouldn't occur. In this case, boost both
-            tracker.getPerson().improveSkill(SkillType.S_GUN_MECH);
-            tracker.getPerson().improveSkill(SkillType.S_PILOT_MECH);
+            tracker.getPerson().improveSkill(SkillType.S_GUN_MEK);
+            tracker.getPerson().improveSkill(SkillType.S_PILOT_MEK);
         } else {
             tracker.getPerson().improveSkill((((gunnery.getLevel() > piloting.getLevel())
                     && getOptions().isApplyOfficerStatBonusToWorstSkill()) ? piloting : gunnery)
                     .getType().getName());
         }
 
-        if (tracker.getPersonType().isMechWarriorCaptain()) {
+        if (tracker.getPersonType().isMekWarriorCaptain()) {
             // Assign Random Officer Skill Increase
             assignRandomOfficerSkillIncrease(tracker, 2);
 
@@ -478,14 +478,14 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to generate the MekWarriors based on
      * @param trackers the list of all generated trackers
      */
-    private void generateStandardMechWarriors(final Campaign campaign,
+    private void generateStandardMekWarriors(final Campaign campaign,
                                               final List<CompanyGenerationPersonTracker> trackers) {
         for (final CompanyGenerationPersonTracker tracker : trackers) {
-            if (!tracker.getPersonType().isMechWarrior()) {
+            if (!tracker.getPersonType().isMekWarrior()) {
                 continue;
             }
 
-            generateStandardMechWarrior(campaign, tracker);
+            generateStandardMekWarrior(campaign, tracker);
         }
     }
 
@@ -496,7 +496,7 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to generate the MekWarrior based on
      * @param tracker the MekWarrior tracker to set up
      */
-    private void generateStandardMechWarrior(final Campaign campaign,
+    private void generateStandardMekWarrior(final Campaign campaign,
                                              final CompanyGenerationPersonTracker tracker) {
         if (getOptions().isAutomaticallyAssignRanks()) {
             final Faction faction = getOptions().isUseSpecifiedFactionToAssignRanks()
@@ -638,14 +638,14 @@ public abstract class AbstractCompanyGenerator {
      */
     public void generateUnitGenerationParameters(List<CompanyGenerationPersonTracker> trackers) {
         // First, we need to create the unit generation parameters
-        final List<AtBRandomMechParameters> parameters = createUnitGenerationParameters(trackers);
+        final List<AtBRandomMekParameters> parameters = createUnitGenerationParameters(trackers);
 
         // Then, we need to separate out the best roll for the unit commander if that option is enabled
         if (getOptions().isAssignBestRollToCompanyCommander()) {
             int bestIndex = 0;
-            AtBRandomMechParameters bestParameters = parameters.get(bestIndex);
+            AtBRandomMekParameters bestParameters = parameters.get(bestIndex);
             for (int i = 1; i < parameters.size(); i++) {
-                final AtBRandomMechParameters checkParameters = parameters.get(i);
+                final AtBRandomMekParameters checkParameters = parameters.get(i);
                 if (bestParameters.isStarLeague() == checkParameters.isStarLeague()) {
                     if (bestParameters.getWeight() == checkParameters.getWeight()) {
                         if (bestParameters.getQuality() < checkParameters.getQuality()) {
@@ -668,18 +668,18 @@ public abstract class AbstractCompanyGenerator {
         }
 
         // Now, we need to apply the various sorts based on the provided options
-        Comparator<AtBRandomMechParameters> parametersComparator = (p1, p2) -> 0;
+        Comparator<AtBRandomMekParameters> parametersComparator = (p1, p2) -> 0;
 
         if (getOptions().isSortStarLeagueUnitsFirst()) {
-            parametersComparator = parametersComparator.thenComparing(AtBRandomMechParameters::isStarLeague);
+            parametersComparator = parametersComparator.thenComparing(AtBRandomMekParameters::isStarLeague);
         }
 
         if (getOptions().isGroupByWeight()) {
-            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMechParameters::getWeight);
+            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMekParameters::getWeight);
         }
 
         if (getOptions().isGroupByQuality()) {
-            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMechParameters::getQuality);
+            parametersComparator = parametersComparator.thenComparingInt(AtBRandomMekParameters::getQuality);
         }
 
         parametersComparator = parametersComparator.reversed();
@@ -711,10 +711,10 @@ public abstract class AbstractCompanyGenerator {
 
     /**
      * @param trackers the list of all personnel trackers
-     * @return a list of the generated RandomMechParameters. These have NOT been assigned to the
+     * @return a list of the generated RandomMekParameters. These have NOT been assigned to the
      * individual trackers
      */
-    private List<AtBRandomMechParameters> createUnitGenerationParameters(
+    private List<AtBRandomMekParameters> createUnitGenerationParameters(
             final List<CompanyGenerationPersonTracker> trackers) {
         return trackers.stream().filter(tracker -> tracker.getPersonType().isCombat())
                 .map(this::createUnitGenerationParameter).collect(Collectors.toList());
@@ -727,14 +727,14 @@ public abstract class AbstractCompanyGenerator {
      * @param tracker the tracker to generate the parameters based on
      * @return the created parameters
      */
-    private AtBRandomMechParameters createUnitGenerationParameter(
+    private AtBRandomMekParameters createUnitGenerationParameter(
             final CompanyGenerationPersonTracker tracker) {
-        final AtBRandomMechParameters parameters = new AtBRandomMechParameters(
-                getOptions().isOnlyGenerateStarLeagueMechs() ? EntityWeightClass.WEIGHT_SUPER_HEAVY
-                        : rollBattleMechWeight(tracker, !getOptions().isNeverGenerateStarLeagueMechs()),
-                rollBattleMechQuality(tracker));
+        final AtBRandomMekParameters parameters = new AtBRandomMekParameters(
+                getOptions().isOnlyGenerateStarLeagueMeks() ? EntityWeightClass.WEIGHT_SUPER_HEAVY
+                        : rollBattleMekWeight(tracker, !getOptions().isNeverGenerateStarLeagueMeks()),
+                rollBattleMekQuality(tracker));
         if (parameters.isStarLeague()) {
-            parameters.setWeight(rollBattleMechWeight(tracker, false));
+            parameters.setWeight(rollBattleMekWeight(tracker, false));
         }
         return parameters;
     }
@@ -747,10 +747,10 @@ public abstract class AbstractCompanyGenerator {
      * EntityWeightClass.WEIGHT_NONE to not generate a BattleMek or
      * EntityWeightClass.WEIGHT_SUPER_HEAVY to generate a Star League BattleMek
      */
-    private int rollBattleMechWeight(final CompanyGenerationPersonTracker tracker,
+    private int rollBattleMekWeight(final CompanyGenerationPersonTracker tracker,
                                      final boolean initialRoll) {
         final int roll = Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker);
-        final int entityWeightClass = getBattleMechWeightClassGenerator().generate(roll);
+        final int entityWeightClass = getBattleMekWeightClassGenerator().generate(roll);
         return initialRoll ? entityWeightClass : Math.min(entityWeightClass, EntityWeightClass.WEIGHT_ASSAULT);
     }
 
@@ -758,8 +758,8 @@ public abstract class AbstractCompanyGenerator {
      * @param tracker the tracker to roll based on
      * @return the quality to use in generating the BattleMek
      */
-    private int rollBattleMechQuality(final CompanyGenerationPersonTracker tracker) {
-        return getBattleMechQualityGenerator().generate(
+    private int rollBattleMekQuality(final CompanyGenerationPersonTracker tracker) {
+        return getBattleMekQualityGenerator().generate(
                 Utilities.dice(2, 6) + getUnitGenerationParameterModifier(tracker));
     }
 
@@ -769,9 +769,9 @@ public abstract class AbstractCompanyGenerator {
      */
     private int getUnitGenerationParameterModifier(final CompanyGenerationPersonTracker tracker) {
         return switch (tracker.getPersonType()) {
-            case MECHWARRIOR_COMPANY_COMMANDER -> 2;
-            case MECHWARRIOR_CAPTAIN, MECHWARRIOR_LIEUTENANT -> 1;
-            case MECHWARRIOR -> 0;
+            case MEKWARRIOR_COMPANY_COMMANDER -> 2;
+            case MEKWARRIOR_CAPTAIN, MEKWARRIOR_LIEUTENANT -> 1;
+            case MEKWARRIOR -> 0;
             default -> {
                 // Shouldn't be hit, but a safety for attempting non-combat generation
                 LogManager.getLogger().error("Attempting to generate a unit for a {}, returning a -20 modifier", tracker.getPersonType());
@@ -790,35 +790,35 @@ public abstract class AbstractCompanyGenerator {
         // and the MekWarriors list
         final List<CompanyGenerationPersonTracker> sortedTrackers = new ArrayList<>();
         final List<CompanyGenerationPersonTracker> captains = trackers.stream().filter(tracker ->
-                tracker.getPersonType().isMechWarriorCaptain()).collect(Collectors.toList());
+                tracker.getPersonType().isMekWarriorCaptain()).collect(Collectors.toList());
         final List<CompanyGenerationPersonTracker> lieutenants = trackers.stream().filter(tracker ->
-                tracker.getPersonType().isMechWarriorLieutenant()).collect(Collectors.toList());
-        final List<CompanyGenerationPersonTracker> standardMechWarriors = trackers.stream().filter(tracker ->
-                tracker.getPersonType().isMechWarrior()).collect(Collectors.toList());
+                tracker.getPersonType().isMekWarriorLieutenant()).collect(Collectors.toList());
+        final List<CompanyGenerationPersonTracker> standardMekWarriors = trackers.stream().filter(tracker ->
+                tracker.getPersonType().isMekWarrior()).collect(Collectors.toList());
 
         // Sort Command Lance
-        organizeTrackersIntoLance(sortedTrackers, trackers.get(0), standardMechWarriors);
+        organizeTrackersIntoLance(sortedTrackers, trackers.get(0), standardMekWarriors);
 
         // If the command lance is part of a company, we sort the rest of that company immediately
         if (!getOptions().isGenerateMercenaryCompanyCommandLance() && (getOptions().getCompanyCount() > 0)) {
             for (int i = 1; i < getOptions().getLancesPerCompany(); i++) {
-                organizeTrackersIntoLance(sortedTrackers, lieutenants.remove(0), standardMechWarriors);
+                organizeTrackersIntoLance(sortedTrackers, lieutenants.remove(0), standardMekWarriors);
             }
         }
 
         // Sort into Companies
         while (!captains.isEmpty()) {
             // Assign the Captain's Lance
-            organizeTrackersIntoLance(sortedTrackers, captains.remove(0), standardMechWarriors);
+            organizeTrackersIntoLance(sortedTrackers, captains.remove(0), standardMekWarriors);
             // Then assign the other lances
             for (int y = 1; y < getOptions().getLancesPerCompany(); y++) {
-                organizeTrackersIntoLance(sortedTrackers, lieutenants.remove(0), standardMechWarriors);
+                organizeTrackersIntoLance(sortedTrackers, lieutenants.remove(0), standardMekWarriors);
             }
         }
 
         // Sort any individual lances
         while (!lieutenants.isEmpty()) {
-            organizeTrackersIntoLance(sortedTrackers, lieutenants.remove(0), standardMechWarriors);
+            organizeTrackersIntoLance(sortedTrackers, lieutenants.remove(0), standardMekWarriors);
         }
 
         return sortedTrackers;
@@ -827,18 +827,18 @@ public abstract class AbstractCompanyGenerator {
     /**
      * @param sortedTrackers the list to add the now sorted lance to
      * @param officer the officer to lead the lance
-     * @param standardMechWarriors the list of normal MekWarriors who can be assigned to this lance.
+     * @param standardMekWarriors the list of normal MekWarriors who can be assigned to this lance.
      */
     private void organizeTrackersIntoLance(final List<CompanyGenerationPersonTracker> sortedTrackers,
                                            final CompanyGenerationPersonTracker officer,
-                                           final List<CompanyGenerationPersonTracker> standardMechWarriors) {
+                                           final List<CompanyGenerationPersonTracker> standardMekWarriors) {
         sortedTrackers.add(officer);
-        if (standardMechWarriors.size() <= getOptions().getLanceSize() - 1) {
-            sortedTrackers.addAll(standardMechWarriors);
-            standardMechWarriors.clear();
+        if (standardMekWarriors.size() <= getOptions().getLanceSize() - 1) {
+            sortedTrackers.addAll(standardMekWarriors);
+            standardMekWarriors.clear();
         } else {
-            for (int i = 1; (i < getOptions().getLanceSize()) && !standardMechWarriors.isEmpty(); i++) {
-                sortedTrackers.add(standardMechWarriors.remove(0));
+            for (int i = 1; (i < getOptions().getLanceSize()) && !standardMekWarriors.isEmpty(); i++) {
+                sortedTrackers.add(standardMekWarriors.remove(0));
             }
         }
     }
@@ -865,7 +865,7 @@ public abstract class AbstractCompanyGenerator {
         if (tracker.getParameters() == null) {
             tracker.setEntity(null);
         } else {
-            final Faction faction = getOptions().getBattleMechFactionGenerationMethod()
+            final Faction faction = getOptions().getBattleMekFactionGenerationMethod()
                     .generateFaction(tracker.getPerson(), campaign, getOptions().getSpecifiedFaction());
             tracker.setEntity(generateEntity(campaign, tracker.getParameters(), faction));
         }
@@ -879,22 +879,22 @@ public abstract class AbstractCompanyGenerator {
      * @return the entity generated, or null otherwise
      */
     private @Nullable Entity generateEntity(final Campaign campaign,
-                                            final AtBRandomMechParameters parameters,
+                                            final AtBRandomMekParameters parameters,
                                             final Faction faction) {
         // Ultra-Light means no 'Mek generated
         if (parameters.getWeight() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
             return null;
         }
 
-        final MechSummary mechSummary = generateMechSummary(campaign, parameters, faction);
+        final MekSummary mekSummary = generateMekSummary(campaign, parameters, faction);
 
-        if (mechSummary == null) {
+        if (mekSummary == null) {
             LogManager.getLogger().error("Failed to generate an entity due to a null 'Mek summary for faction " + faction.getShortName());
             return null;
         }
 
         try {
-            return new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName()).getEntity();
+            return new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName()).getEntity();
         } catch (Exception ex) {
             LogManager.getLogger().error("Failed to generate entity", ex);
             return null;
@@ -905,10 +905,10 @@ public abstract class AbstractCompanyGenerator {
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
      * @param faction the faction to generate the 'Mek from
-     * @return the MechSummary generated from the provided parameters, or null if generation fails
+     * @return the MekSummary generated from the provided parameters, or null if generation fails
      */
-    protected abstract @Nullable MechSummary generateMechSummary(final Campaign campaign,
-                                                                 final AtBRandomMechParameters parameters,
+    protected abstract @Nullable MekSummary generateMekSummary(final Campaign campaign,
+                                                                 final AtBRandomMekParameters parameters,
                                                                  final Faction faction);
 
     /**
@@ -916,14 +916,14 @@ public abstract class AbstractCompanyGenerator {
      * @param parameters the parameters to use in generation
      * @param factionCode the faction code to use in generation
      * @param year the year to use in generation
-     * @return the MechSummary generated from the provided parameters, or null if generation fails
+     * @return the MekSummary generated from the provided parameters, or null if generation fails
      */
-    protected @Nullable MechSummary generateMechSummary(final Campaign campaign,
-                                                        final AtBRandomMechParameters parameters,
+    protected @Nullable MekSummary generateMekSummary(final Campaign campaign,
+                                                        final AtBRandomMekParameters parameters,
                                                         final String factionCode, final int year) {
-        Predicate<MechSummary> filter = ms ->
+        Predicate<MekSummary> filter = ms ->
                 (!campaign.getCampaignOptions().isLimitByYear() || (year > ms.getYear()));
-        if (getOptions().isOnlyGenerateOmniMechs()) {
+        if (getOptions().isOnlyGenerateOmniMeks()) {
             filter = filter.and(ms -> "Omni".equalsIgnoreCase(ms.getUnitSubType()));
         }
 
@@ -983,22 +983,22 @@ public abstract class AbstractCompanyGenerator {
             return;
         }
 
-        final List<CompanyGenerationPersonTracker> mechTechs = trackers.parallelStream()
+        final List<CompanyGenerationPersonTracker> mekTechs = trackers.parallelStream()
                 .filter(tracker -> tracker.getPersonType().isSupport())
-                .filter(tracker -> tracker.getPerson().getPrimaryRole().isMechTech())
+                .filter(tracker -> tracker.getPerson().getPrimaryRole().isMekTech())
                 .collect(Collectors.toList());
-        if (mechTechs.isEmpty()) {
+        if (mekTechs.isEmpty()) {
             return;
         }
 
         units.sort(Comparator.comparingDouble(Unit::getMaintenanceTime));
-        int numberMechTechs = mechTechs.size();
-        for (int i = 0; (i < units.size()) && !mechTechs.isEmpty(); i++) {
-            final Person mechTech = mechTechs.get(i % numberMechTechs).getPerson();
-            if (mechTech.getMaintenanceTimeUsing() + units.get(i).getMaintenanceTime() <= Person.PRIMARY_ROLE_SUPPORT_TIME) {
-                units.get(i).setTech(mechTech);
+        int numberMekTechs = mekTechs.size();
+        for (int i = 0; (i < units.size()) && !mekTechs.isEmpty(); i++) {
+            final Person mekTech = mekTechs.get(i % numberMekTechs).getPerson();
+            if (mekTech.getMaintenanceTimeUsing() + units.get(i).getMaintenanceTime() <= Person.PRIMARY_ROLE_SUPPORT_TIME) {
+                units.get(i).setTech(mekTech);
             } else {
-                mechTechs.remove(i % numberMechTechs--);
+                mekTechs.remove(i % numberMekTechs--);
             }
         }
     }
@@ -1049,7 +1049,7 @@ public abstract class AbstractCompanyGenerator {
                     layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE,
                                     MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                                    MHQConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
+                                    MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME));
                 }
 
                 // Background
@@ -1168,12 +1168,12 @@ public abstract class AbstractCompanyGenerator {
                 layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE).add(
                         new ForcePieceIcon(LayeredForceIconLayer.TYPE,
                                 MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                                MHQConstants.LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME));
+                                MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_CENTER_FILENAME));
             } else {
                 layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE).add(
                         new ForcePieceIcon(LayeredForceIconLayer.TYPE,
                                 MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH,
-                                MHQConstants.LAYERED_FORCE_ICON_BATTLEMECH_LEFT_FILENAME));
+                                MHQConstants.LAYERED_FORCE_ICON_BATTLEMEK_LEFT_FILENAME));
                 layeredForceIcon.getPieces().get(LayeredForceIconLayer.TYPE).add(
                         new ForcePieceIcon(LayeredForceIconLayer.TYPE,
                                 MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, filename));
@@ -1275,14 +1275,14 @@ public abstract class AbstractCompanyGenerator {
             }
 
             // Create the parameters to generate the 'Mek from
-            final AtBRandomMechParameters parameters = new AtBRandomMechParameters(
-                    getBattleMechWeightClassGenerator().generate(Utilities.dice(2, 6)),
-                    getBattleMechQualityGenerator().generate(Utilities.dice(2, 6))
+            final AtBRandomMekParameters parameters = new AtBRandomMekParameters(
+                    getBattleMekWeightClassGenerator().generate(Utilities.dice(2, 6)),
+                    getBattleMekQualityGenerator().generate(Utilities.dice(2, 6))
             );
 
             // We want to ensure we get a 'Mek generated
             while (parameters.getWeight() == EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-                parameters.setWeight(getBattleMechWeightClassGenerator().generate(Utilities.dice(2, 6)));
+                parameters.setWeight(getBattleMekWeightClassGenerator().generate(Utilities.dice(2, 6)));
             }
 
             // Generate the 'Mek, and add it to the mothballed entities list

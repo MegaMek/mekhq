@@ -163,7 +163,7 @@ public class ProtoMekArmor extends Armor {
             }
         }
         // Standard ProtoMek armor is not the same as Standard armor, but does not have an associated
-        // type entry so we can just use the base protomech advancement
-        return ProtoMek.TA_STANDARD_PROTOMECH;
+        // type entry so we can just use the base protomek advancement
+        return ProtoMek.TA_STANDARD_PROTOMEK;
     }
 }

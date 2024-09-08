@@ -60,7 +60,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private List<Person> commanderList = new ArrayList<>();
     private BigDecimal numberUnits = BigDecimal.ZERO;
     private BigDecimal totalSkillLevels = BigDecimal.ZERO;
-    private int mechCount = 0;
+    private int mekCount = 0;
     private int protoCount = 0;
     private int fighterCount = 0;
     private int lightVeeCount = 0;
@@ -74,7 +74,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int dropShipCount = 0;
     private int warShipCount = 0;
     private int jumpShipCount = 0;
-    private int mechBayCount = 0;
+    private int mekBayCount = 0;
     private int protoBayCount = 0;
     private int fighterBayCount = 0;
     private int smallCraftBayCount = 0;
@@ -439,7 +439,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setNumberUnits(BigDecimal.ZERO);
         setTotalSkillLevels(BigDecimal.ZERO);
 
-        setMechCount(0);
+        setMekCount(0);
         setFighterCount(0);
         setSmallCraftCount(0);
         setProtoCount(0);
@@ -454,7 +454,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setJumpShipCount(0);
         setWarShipCount(0);
 
-        setMechBayCount(0);
+        setMekBayCount(0);
         setFighterBayCount(0);
         setSmallCraftBayCount(0);
         setProtoBayCount(0);
@@ -488,13 +488,13 @@ public abstract class AbstractUnitRating implements IUnitRating {
     void updateBayCount(Entity e) {
         if (((e instanceof Jumpship) || (e instanceof Dropship)) && !(e instanceof SpaceStation)) {
             for (Bay bay : e.getTransportBays()) {
-                if (bay instanceof MechBay) {
-                    setMechBayCount(getMechBayCount() + (int) bay.getCapacity());
+                if (bay instanceof MekBay) {
+                    setMekBayCount(getMekBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof ASFBay) {
                     setFighterBayCount(getFighterBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof SmallCraftBay) {
                     setSmallCraftBayCount(getSmallCraftBayCount() + (int) bay.getCapacity());
-                } else if (bay instanceof ProtomechBay) {
+                } else if (bay instanceof ProtoMekBay) {
                     setProtoBayCount(getProtoBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof SuperHeavyVehicleBay) {
                     setSuperHeavyVeeBayCount(getSuperHeavyVeeBayCount() + (int) bay.getCapacity());
@@ -561,16 +561,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
         skillLevelCounts.clear();
     }
 
-    int getMechCount() {
-        return mechCount;
+    int getMekCount() {
+        return mekCount;
     }
 
-    void setMechCount(int mechCount) {
-        this.mechCount = mechCount;
+    void setMekCount(int mekCount) {
+        this.mekCount = mekCount;
     }
 
-    private void incrementMechCount() {
-        mechCount++;
+    private void incrementMekCount() {
+        mekCount++;
     }
 
     private void setInfantryUnitCount(int count) {
@@ -739,12 +739,12 @@ public abstract class AbstractUnitRating implements IUnitRating {
         jumpShipCount++;
     }
 
-    int getMechBayCount() {
-        return mechBayCount;
+    int getMekBayCount() {
+        return mekBayCount;
     }
 
-    protected void setMechBayCount(int mechBayCount) {
-        this.mechBayCount = mechBayCount;
+    protected void setMekBayCount(int mekBayCount) {
+        this.mekBayCount = mekBayCount;
     }
 
     int getProtoBayCount() {
@@ -892,7 +892,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         // TODO : Add Airship when MegaMek supports it.
         switch (unitType) {
             case UnitType.MEK:
-                incrementMechCount();
+                incrementMekCount();
                 break;
             case UnitType.PROTOMEK:
                 incrementProtoCount();

@@ -427,12 +427,12 @@ public class PartsStoreDialog extends JDialog {
                             || (part instanceof GravDeck)
                             || (part instanceof VeeSensor)
                             || (part instanceof VeeStabiliser)
-                            || (part instanceof ProtomekSensor);
+                            || (part instanceof ProtoMekSensor);
                 } else if (nGroup == SG_EQUIP) {
-                    return (part instanceof EquipmentPart) || (part instanceof ProtomekJumpJet);
+                    return (part instanceof EquipmentPart) || (part instanceof ProtoMekJumpJet);
                 } else if (nGroup == SG_LOC) {
                     return (part instanceof MekLocation) || (part instanceof TankLocation)
-                            || (part instanceof ProtomekLocation);
+                            || (part instanceof ProtoMekLocation);
                 } else if (nGroup == SG_WEAP) {
                     return (part instanceof EquipmentPart)
                             && (((EquipmentPart) part).getType() instanceof WeaponType);
@@ -441,14 +441,14 @@ public class PartsStoreDialog extends JDialog {
                 } else if (nGroup == SG_MISC) {
                     return ((part instanceof EquipmentPart)
                             && (((EquipmentPart) part).getType() instanceof MiscType)
-                            || (part instanceof ProtomekJumpJet));
+                            || (part instanceof ProtoMekJumpJet));
                 } else if (nGroup == SG_ENGINE) {
                     return part instanceof EnginePart;
                 } else if (nGroup == SG_GYRO) {
                     return part instanceof MekGyro;
                 } else if (nGroup == SG_ACT) {
-                    return ((part instanceof MekActuator) || (part instanceof ProtomekArmActuator)
-                            || (part instanceof ProtomekLegActuator));
+                    return ((part instanceof MekActuator) || (part instanceof ProtoMekArmActuator)
+                            || (part instanceof ProtoMekLegActuator));
                 } else if (nGroup == SG_COCKPIT) {
                     return part instanceof MekCockpit;
                 } else if (nGroup == SG_BA_SUIT) {

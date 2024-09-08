@@ -48,7 +48,7 @@ public class CampaignSummary {
     Campaign campaign;
 
     //unit totals
-    private int mechCount;
+    private int mekCount;
     private int veeCount;
     private int aeroCount;
     private int infantryCount;
@@ -111,7 +111,7 @@ public class CampaignSummary {
 
         //units
         countDamageStatus = new int[Entity.DMG_CRIPPLED + 1];
-        mechCount = 0;
+        mekCount = 0;
         veeCount = 0;
         aeroCount = 0;
         infantryCount = 0;
@@ -125,7 +125,7 @@ public class CampaignSummary {
             switch (e.getUnitType()) {
                 case UnitType.MEK:
                 case UnitType.PROTOMEK:
-                    mechCount++;
+                    mekCount++;
                     break;
                 case UnitType.VTOL:
                 case UnitType.TANK:
@@ -146,7 +146,7 @@ public class CampaignSummary {
         }
         //squad should count as 1/4 of a unit for force composition
         infantryCount += (int) Math.ceil(squadCount / 4.0);
-        totalUnitCount = mechCount + veeCount + infantryCount + aeroCount;
+        totalUnitCount = mekCount + veeCount + infantryCount + aeroCount;
 
         //missions
         countMissionByStatus = new int[MissionStatus.values().length];
@@ -170,7 +170,7 @@ public class CampaignSummary {
 
         //transport capacity
         HangarStatistics hangarStats = campaign.getHangarStatistics();
-        int noMech = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MECH) - hangarStats.getOccupiedBays(Entity.ETYPE_MECH), 0);
+        int noMek = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) - hangarStats.getOccupiedBays(Entity.ETYPE_MEK), 0);
         int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
         int noCF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - hangarStats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
@@ -180,7 +180,7 @@ public class CampaignSummary {
         int noinf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         @SuppressWarnings("unused") // FIXME: This should be used somewhere...
-        int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH) - hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMECH),  0);
+        int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK) - hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK),  0);
         int freehv = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int freeSC = Math.max(hangarStats.getTotalSmallCraftBays() - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
 
@@ -188,15 +188,15 @@ public class CampaignSummary {
         noASF = Math.max(noASF - freeSC, 0);
         nolv = Math.max(nolv - freehv, 0);
 
-        unitsOver = noMech + noASF + nolv + nohv + noinf + noBA + noProto;
-        unitsTransported = hangarStats.getOccupiedBays(Entity.ETYPE_MECH) +
+        unitsOver = noMek + noASF + nolv + nohv + noinf + noBA + noProto;
+        unitsTransported = hangarStats.getOccupiedBays(Entity.ETYPE_MEK) +
                 hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
                 hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER) +
                 hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true) +
                 hangarStats.getOccupiedBays(Entity.ETYPE_TANK) +
                 hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY) +
                 hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR) +
-                hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMECH);
+                hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK);
 
         nDS = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
     }
@@ -222,13 +222,13 @@ public class CampaignSummary {
     }
 
     /**
-     * A report that gives the percentage composition of the force in mech, armor, infantry, and aero units.
+     * A report that gives the percentage composition of the force in mek, armor, infantry, and aero units.
      * @return a <code>String</code> of the report
      */
     public String getForceCompositionReport() {
         List<String> composition = new ArrayList<>();
-        if (mechCount > 0) {
-            composition.add((int) Math.round(100 * mechCount / (double) totalUnitCount) + "% mech");
+        if (mekCount > 0) {
+            composition.add((int) Math.round(100 * mekCount / (double) totalUnitCount) + "% mek");
         }
         if (veeCount > 0) {
             composition.add((int) Math.round(100 * veeCount / (double) totalUnitCount) + "% armor");

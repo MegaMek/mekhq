@@ -56,7 +56,7 @@ public class ProtoMekArmActuator extends Part {
 
     public ProtoMekArmActuator(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
-        this.name = "ProtoMech Arm Actuator";
+        this.name = "ProtoMek Arm Actuator";
         this.location = loc;
     }
 
@@ -132,7 +132,7 @@ public class ProtoMekArmActuator extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingProtomekArmActuator(getUnitTonnage(), location, campaign);
+        return new MissingProtoMekArmActuator(getUnitTonnage(), location, campaign);
     }
 
     @Override
@@ -259,7 +259,7 @@ public class ProtoMekArmActuator extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECH);
+        return skillType.equals(SkillType.S_TECH_MEK);
     }
 
     @Override
@@ -274,7 +274,7 @@ public class ProtoMekArmActuator extends Part {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return ProtomekLocation.TECH_ADVANCEMENT;
+        return ProtoMekLocation.TECH_ADVANCEMENT;
     }
 
     @Override

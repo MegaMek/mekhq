@@ -472,8 +472,8 @@ public class MHQXMLUtility extends MMXMLUtility {
         if (tgtEnt.getCrew().getCommandBonus() != 0) {
             crew.append("\" " + MULParser.ATTR_COMMANDB + "=\"").append(tgtEnt.getCrew().getCommandBonus());
         }
-        if (tgtEnt instanceof Mech) {
-            crew.append("\" " + MULParser.ATTR_AUTOEJECT + "=\"").append(((Mech) tgtEnt).isAutoEject());
+        if (tgtEnt instanceof Mek) {
+            crew.append("\" " + MULParser.ATTR_AUTOEJECT + "=\"").append(((Mek) tgtEnt).isAutoEject());
         }
         crew.append("\" " + MULParser.ATTR_EJECTED + "=\"").append(tgtEnt.getCrew().isEjected()).append("\">\n");
 
@@ -492,7 +492,7 @@ public class MHQXMLUtility extends MMXMLUtility {
             if (tgtEnt.getCrew().getCrewFatigue(pos) != 0) {
                 crew.append("\" " + MULParser.ATTR_FATIGUE + "=\"").append(tgtEnt.getCrew().getCrewFatigue(pos));
             }
-          
+
             if (tgtEnt.getCrew().isDead(pos) || tgtEnt.getCrew().getHits(pos) >= Crew.DEATH) {
                 crew.append("\" " + MULParser.ATTR_HITS + "=\"" + MULParser.VALUE_DEAD + "");
             } else if (tgtEnt.getCrew().getHits(pos) > 0) {

@@ -29,11 +29,11 @@ import java.util.stream.Collectors;
 public enum Phenotype {
     //region Enum Declarations
     // External Phenotypes
-    MECHWARRIOR("Phenotype.MECHWARRIOR.text", "Trueborn.text", "Phenotype.MECHWARRIOR.text", "Phenotype.MECHWARRIOR.toolTipText"),
+    MEKWARRIOR("Phenotype.MEKWARRIOR.text", "Trueborn.text", "Phenotype.MEKWARRIOR.text", "Phenotype.MEKWARRIOR.toolTipText"),
     ELEMENTAL("Phenotype.ELEMENTAL.text", "Trueborn.text", "Phenotype.ELEMENTAL.text", "Phenotype.ELEMENTAL.toolTipText"),
     AEROSPACE("Phenotype.AEROSPACE.text", "Trueborn.text", "Phenotype.AEROSPACE.groupingNameText", "Phenotype.AEROSPACE.toolTipText"),
     VEHICLE("Phenotype.VEHICLE.text", "Trueborn.text", "Phenotype.VEHICLE.groupingNameText", "Phenotype.VEHICLE.toolTipText"),
-    PROTOMECH("Phenotype.PROTOMECH.text", "Trueborn.text", "Phenotype.PROTOMECH.groupingNameText", "Phenotype.PROTOMECH.toolTipText"),
+    PROTOMEK("Phenotype.PROTOMEK.text", "Trueborn.text", "Phenotype.PROTOMEK.groupingNameText", "Phenotype.PROTOMEK.toolTipText"),
     NAVAL("Phenotype.NAVAL.text", "Trueborn.text", "Phenotype.NAVAL.groupingNameText", "Phenotype.NAVAL.toolTipText"),
     // Internal Phenotypes
     NONE("Phenotype.NONE.text", "Freeborn.text", "Phenotype.NONE.text",  "Phenotype.NONE.toolTipText" , false),
@@ -89,8 +89,8 @@ public enum Phenotype {
     //endregion Getters
 
     //region Boolean Comparison Methods
-    public boolean isMechWarrior() {
-        return this == MECHWARRIOR;
+    public boolean isMekWarrior() {
+        return this == MEKWARRIOR;
     }
 
     public boolean isElemental() {
@@ -105,8 +105,8 @@ public enum Phenotype {
         return this == VEHICLE;
     }
 
-    public boolean isProtoMech() {
-        return this == PROTOMECH;
+    public boolean isProtoMek() {
+        return this == PROTOMEK;
     }
 
     public boolean isNaval() {
@@ -141,7 +141,7 @@ public enum Phenotype {
                 case 0:
                     return NONE;
                 case 1:
-                    return MECHWARRIOR;
+                    return MEKWARRIOR;
                 case 2:
                     return ELEMENTAL;
                 case 3:

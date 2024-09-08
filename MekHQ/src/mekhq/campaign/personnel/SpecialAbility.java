@@ -543,11 +543,11 @@ public class SpecialAbility {
         }
 
         if (!role.isCivilian()
-                && !((wt.hasFlag(WeaponType.F_MECH_WEAPON) && !role.isMechWarrior())
+                && !((wt.hasFlag(WeaponType.F_MEK_WEAPON) && !role.isMekWarrior())
                 || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && !role.isAerospacePilot())
                 || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !role.isVehicleCrewmember())
                 || (wt.hasFlag(WeaponType.F_BA_WEAPON) && !role.isBattleArmour())
-                || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && !role.isProtoMechPilot()))) {
+                || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && !role.isProtoMekPilot()))) {
             return false;
         }
 

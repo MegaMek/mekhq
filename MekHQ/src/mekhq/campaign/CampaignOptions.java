@@ -520,7 +520,7 @@ public class CampaignOptions {
 
     // Unit Market
     private UnitMarketMethod unitMarketMethod;
-    private boolean unitMarketRegionalMechVariations;
+    private boolean unitMarketRegionalMekVariations;
     private int unitMarketSpecialUnitChance;
     private int unitMarketRarityModifier;
     private boolean instantUnitMarketDelivery;
@@ -567,7 +567,7 @@ public class CampaignOptions {
 
     // Scenarios
     private boolean doubleVehicles;
-    private int opForLanceTypeMechs;
+    private int opForLanceTypeMeks;
     private int opForLanceTypeMixed;
     private int opForLanceTypeVehicles;
     private boolean opForUsesVTOLs;
@@ -576,7 +576,7 @@ public class CampaignOptions {
     private boolean allowOpForLocalUnits;
     private int opForLocalUnitChance;
     private boolean adjustPlayerVehicles;
-    private boolean regionalMechVariations;
+    private boolean regionalMekVariations;
     private boolean attachedPlayerCamouflage;
     private boolean playerControlsAttachedUnits;
     private boolean useDropShips;
@@ -779,7 +779,7 @@ public class CampaignOptions {
         getSalaryXPMultipliers().put(SkillLevel.HEROIC, 6.4);
         getSalaryXPMultipliers().put(SkillLevel.LEGENDARY, 12.8);
         setRoleBaseSalaries(new Money[personnelRoles.length]);
-        setRoleBaseSalary(PersonnelRole.MECHWARRIOR, 1500);
+        setRoleBaseSalary(PersonnelRole.MEKWARRIOR, 1500);
         setRoleBaseSalary(PersonnelRole.LAM_PILOT, 2250);
         setRoleBaseSalary(PersonnelRole.GROUND_VEHICLE_DRIVER, 900);
         setRoleBaseSalary(PersonnelRole.NAVAL_VEHICLE_DRIVER, 900);
@@ -788,14 +788,14 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.VEHICLE_CREW, 900);
         setRoleBaseSalary(PersonnelRole.AEROSPACE_PILOT, 1500);
         setRoleBaseSalary(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, 900);
-        setRoleBaseSalary(PersonnelRole.PROTOMECH_PILOT, 960);
+        setRoleBaseSalary(PersonnelRole.PROTOMEK_PILOT, 960);
         setRoleBaseSalary(PersonnelRole.BATTLE_ARMOUR, 960);
         setRoleBaseSalary(PersonnelRole.SOLDIER, 750);
         setRoleBaseSalary(PersonnelRole.VESSEL_PILOT, 1000);
         setRoleBaseSalary(PersonnelRole.VESSEL_GUNNER, 1000);
         setRoleBaseSalary(PersonnelRole.VESSEL_CREW, 1000);
         setRoleBaseSalary(PersonnelRole.VESSEL_NAVIGATOR, 1000);
-        setRoleBaseSalary(PersonnelRole.MECH_TECH, 800);
+        setRoleBaseSalary(PersonnelRole.MEK_TECH, 800);
         setRoleBaseSalary(PersonnelRole.MECHANIC, 800);
         setRoleBaseSalary(PersonnelRole.AERO_TECH, 800);
         setRoleBaseSalary(PersonnelRole.BA_TECH, 800);
@@ -1106,11 +1106,11 @@ public class CampaignOptions {
 
         //region Skill Randomization Tab
         phenotypeProbabilities = new int[Phenotype.getExternalPhenotypes().size()];
-        phenotypeProbabilities[Phenotype.MECHWARRIOR.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = 95;
         phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = 100;
         phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()] = 95;
         phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = 0;
-        phenotypeProbabilities[Phenotype.PROTOMECH.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.PROTOMEK.ordinal()] = 95;
         phenotypeProbabilities[Phenotype.NAVAL.ordinal()] = 25;
         //endregion Skill Randomization Tab
 
@@ -1121,7 +1121,7 @@ public class CampaignOptions {
         useOriginFactionForNames = true;
         usePortraitForRole = new boolean[personnelRoles.length];
         Arrays.fill(usePortraitForRole, false);
-        usePortraitForRole[PersonnelRole.MECHWARRIOR.ordinal()] = true;
+        usePortraitForRole[PersonnelRole.MEKWARRIOR.ordinal()] = true;
         assignPortraitOnRoleChange = false;
         //endregion Name and Portrait Generation Tab
 
@@ -1143,7 +1143,7 @@ public class CampaignOptions {
 
         // Unit Market
         setUnitMarketMethod(UnitMarketMethod.NONE);
-        setUnitMarketRegionalMechVariations(true);
+        setUnitMarketRegionalMekVariations(true);
         setUnitMarketSpecialUnitChance(30);
         setUnitMarketRarityModifier(0);
         setInstantUnitMarketDelivery(false);
@@ -1194,7 +1194,7 @@ public class CampaignOptions {
 
         // Scenarios
         doubleVehicles = false;
-        setOpForLanceTypeMechs(1);
+        setOpForLanceTypeMeks(1);
         setOpForLanceTypeMixed(2);
         setOpForLanceTypeVehicles(3);
         setOpForUsesVTOLs(true);
@@ -1205,7 +1205,7 @@ public class CampaignOptions {
         setFixedMapChance(25);
         setSpaUpgradeIntensity(0);
         adjustPlayerVehicles = false;
-        regionalMechVariations = false;
+        regionalMekVariations = false;
         attachedPlayerCamouflage = true;
         playerControlsAttachedUnits = false;
         useDropShips = false;
@@ -3443,12 +3443,12 @@ public class CampaignOptions {
         this.unitMarketMethod = unitMarketMethod;
     }
 
-    public boolean isUnitMarketRegionalMechVariations() {
-        return unitMarketRegionalMechVariations;
+    public boolean isUnitMarketRegionalMekVariations() {
+        return unitMarketRegionalMekVariations;
     }
 
-    public void setUnitMarketRegionalMechVariations(final boolean unitMarketRegionalMechVariations) {
-        this.unitMarketRegionalMechVariations = unitMarketRegionalMechVariations;
+    public void setUnitMarketRegionalMekVariations(final boolean unitMarketRegionalMekVariations) {
+        this.unitMarketRegionalMekVariations = unitMarketRegionalMekVariations;
     }
 
     public int getUnitMarketSpecialUnitChance() {
@@ -4208,12 +4208,12 @@ public class CampaignOptions {
         this.adjustPlayerVehicles = adjustPlayerVehicles;
     }
 
-    public int getOpForLanceTypeMechs() {
-        return opForLanceTypeMechs;
+    public int getOpForLanceTypeMeks() {
+        return opForLanceTypeMeks;
     }
 
-    public void setOpForLanceTypeMechs(final int opForLanceTypeMechs) {
-        this.opForLanceTypeMechs = opForLanceTypeMechs;
+    public void setOpForLanceTypeMeks(final int opForLanceTypeMeks) {
+        this.opForLanceTypeMeks = opForLanceTypeMeks;
     }
 
     public int getOpForLanceTypeMixed() {
@@ -4296,12 +4296,12 @@ public class CampaignOptions {
         this.mercSizeLimited = mercSizeLimited;
     }
 
-    public boolean isRegionalMechVariations() {
-        return regionalMechVariations;
+    public boolean isRegionalMekVariations() {
+        return regionalMekVariations;
     }
 
-    public void setRegionalMechVariations(final boolean regionalMechVariations) {
-        this.regionalMechVariations = regionalMechVariations;
+    public void setRegionalMekVariations(final boolean regionalMekVariations) {
+        this.regionalMekVariations = regionalMekVariations;
     }
 
     public boolean isAttachedPlayerCamouflage() {
@@ -4960,7 +4960,7 @@ public class CampaignOptions {
 
         //region Unit Market
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketMethod", getUnitMarketMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRegionalMechVariations", isUnitMarketRegionalMechVariations());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRegionalMekVariations", isUnitMarketRegionalMekVariations());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketSpecialUnitChance", getUnitMarketSpecialUnitChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRarityModifier", getUnitMarketRarityModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", isInstantUnitMarketDelivery());
@@ -4995,13 +4995,13 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanVehicles", clanVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doubleVehicles", doubleVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPlayerVehicles", adjustPlayerVehicles);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMechs", getOpForLanceTypeMechs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMeks", getOpForLanceTypeMeks());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMixed", getOpForLanceTypeMixed());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeVehicles", getOpForLanceTypeVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForUsesVTOLs", isOpForUsesVTOLs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", useDropShips);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", mercSizeLimited);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regionalMechVariations", regionalMechVariations);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regionalMekVariations", regionalMekVariations);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attachedPlayerCamouflage", attachedPlayerCamouflage);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "playerControlsAttachedUnits", playerControlsAttachedUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atbBattleChance", atbBattleChance);
@@ -5944,8 +5944,8 @@ public class CampaignOptions {
                     //region Unit Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketMethod")) {
                     retVal.setUnitMarketMethod(UnitMarketMethod.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketRegionalMechVariations")) {
-                    retVal.setUnitMarketRegionalMechVariations(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketRegionalMekVariations")) {
+                    retVal.setUnitMarketRegionalMekVariations(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketSpecialUnitChance")) {
                     retVal.setUnitMarketSpecialUnitChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketRarityModifier")) {
@@ -6008,8 +6008,8 @@ public class CampaignOptions {
                     retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {
                     retVal.adjustPlayerVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("opForLanceTypeMechs")) {
-                    retVal.setOpForLanceTypeMechs(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("opForLanceTypeMeks")) {
+                    retVal.setOpForLanceTypeMeks(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("opForLanceTypeMixed")) {
                     retVal.setOpForLanceTypeMixed(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("opForLanceTypeVehicles")) {
@@ -6020,8 +6020,8 @@ public class CampaignOptions {
                     retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mercSizeLimited")) {
                     retVal.mercSizeLimited = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("regionalMechVariations")) {
-                    retVal.regionalMechVariations = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("regionalMekVariations")) {
+                    retVal.regionalMekVariations = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("attachedPlayerCamouflage")) {
                     retVal.attachedPlayerCamouflage = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("playerControlsAttachedUnits")) {
@@ -6210,7 +6210,7 @@ public class CampaignOptions {
                         retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) { // Legacy
                     retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) { // Legacy

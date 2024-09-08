@@ -607,7 +607,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // Unit Market
     private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
-    private JCheckBox chkUnitMarketRegionalMechVariations;
+    private JCheckBox chkUnitMarketRegionalMekVariations;
     private JLabel lblUnitMarketSpecialUnitChance;
     private JSpinner spnUnitMarketSpecialUnitChance;
     private JLabel lblUnitMarketRarityModifier;
@@ -663,7 +663,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // scenarios
     private JCheckBox chkDoubleVehicles;
-    private JSpinner spnOpForLanceTypeMechs;
+    private JSpinner spnOpForLanceTypeMeks;
     private JSpinner spnOpForLanceTypeMixed;
     private JSpinner spnOpForLanceTypeVehicles;
     private JCheckBox chkOpForUsesVTOLs;
@@ -674,7 +674,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnSPAUpgradeIntensity;
     private JSpinner spnFixedMapChance;
     private JCheckBox chkAdjustPlayerVehicles;
-    private JCheckBox chkRegionalMechVariations;
+    private JCheckBox chkRegionalMekVariations;
     private JCheckBox chkAttachedPlayerCamouflage;
     private JCheckBox chkPlayerControlsAttachedUnits;
     private JCheckBox chkUseDropShips;
@@ -3158,15 +3158,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(lblOpForLanceType, gridBagConstraints);
 
-        spnOpForLanceTypeMechs = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
-        spnOpForLanceTypeMechs.setToolTipText(resources.getString("lblOpForLanceType.toolTipText"));
+        spnOpForLanceTypeMeks = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
+        spnOpForLanceTypeMeks.setToolTipText(resources.getString("lblOpForLanceType.toolTipText"));
         spnOpForLanceTypeMixed = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnOpForLanceTypeMixed.setToolTipText(resources.getString("lblOpForLanceType.toolTipText"));
         spnOpForLanceTypeVehicles = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnOpForLanceTypeVehicles.setToolTipText(resources.getString("lblOpForLanceType.toolTipText"));
         JPanel panOpForLanceType = new JPanel();
         panOpForLanceType.add(new JLabel(resources.getString("lblOpForLanceTypeMek.text")));
-        panOpForLanceType.add(spnOpForLanceTypeMechs);
+        panOpForLanceType.add(spnOpForLanceTypeMeks);
         panOpForLanceType.add(new JLabel(resources.getString("lblOpForLanceTypeMixed.text")));
         panOpForLanceType.add(spnOpForLanceTypeMixed);
         panOpForLanceType.add(new JLabel(resources.getString("lblOpForLanceTypeVehicle.text")));
@@ -3234,10 +3234,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkAdjustPlayerVehicles, gridBagConstraints);
 
-        chkRegionalMechVariations = new JCheckBox(resources.getString("chkRegionalMechVariations.text"));
-        chkRegionalMechVariations.setToolTipText(resources.getString("chkRegionalMechVariations.toolTipText"));
+        chkRegionalMekVariations = new JCheckBox(resources.getString("chkRegionalMekVariations.text"));
+        chkRegionalMekVariations.setToolTipText(resources.getString("chkRegionalMekVariations.toolTipText"));
         gridBagConstraints.gridy = yTablePosition++;
-        panSubAtBScenario.add(chkRegionalMechVariations, gridBagConstraints);
+        panSubAtBScenario.add(chkRegionalMekVariations, gridBagConstraints);
 
         chkAttachedPlayerCamouflage = new JCheckBox(resources.getString("chkAttachedPlayerCamouflage.text"));
         gridBagConstraints.gridy = yTablePosition++;
@@ -7672,7 +7672,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 return;
             }
             final boolean enabled = !method.isNone();
-            chkUnitMarketRegionalMechVariations.setEnabled(enabled);
+            chkUnitMarketRegionalMekVariations.setEnabled(enabled);
             lblUnitMarketSpecialUnitChance.setEnabled(enabled);
             spnUnitMarketSpecialUnitChance.setEnabled(enabled);
             lblUnitMarketRarityModifier.setEnabled(enabled);
@@ -7681,9 +7681,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkUnitMarketReportRefresh.setEnabled(enabled);
         });
 
-        chkUnitMarketRegionalMechVariations = new JCheckBox(resources.getString("chkUnitMarketRegionalMechVariations.text"));
-        chkUnitMarketRegionalMechVariations.setToolTipText(resources.getString("chkUnitMarketRegionalMechVariations.toolTipText"));
-        chkUnitMarketRegionalMechVariations.setName("chkUnitMarketRegionalMechVariations");
+        chkUnitMarketRegionalMekVariations = new JCheckBox(resources.getString("chkUnitMarketRegionalMekVariations.text"));
+        chkUnitMarketRegionalMekVariations.setToolTipText(resources.getString("chkUnitMarketRegionalMekVariations.toolTipText"));
+        chkUnitMarketRegionalMekVariations.setName("chkUnitMarketRegionalMekVariations");
 
         lblUnitMarketSpecialUnitChance = new JLabel();
         lblUnitMarketSpecialUnitChance.setText(resources.getString("lblUnitMarketSpecialUnitChance.text"));
@@ -7728,7 +7728,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblUnitMarketMethod)
                                 .addComponent(comboUnitMarketMethod, Alignment.LEADING))
-                        .addComponent(chkUnitMarketRegionalMechVariations)
+                        .addComponent(chkUnitMarketRegionalMekVariations)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblUnitMarketSpecialUnitChance)
                                 .addComponent(spnUnitMarketSpecialUnitChance, Alignment.LEADING))
@@ -7744,7 +7744,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblUnitMarketMethod)
                                 .addComponent(comboUnitMarketMethod))
-                        .addComponent(chkUnitMarketRegionalMechVariations)
+                        .addComponent(chkUnitMarketRegionalMekVariations)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblUnitMarketSpecialUnitChance)
                                 .addComponent(spnUnitMarketSpecialUnitChance))
@@ -8612,7 +8612,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Unit Market
         comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
-        chkUnitMarketRegionalMechVariations.setSelected(options.isUnitMarketRegionalMechVariations());
+        chkUnitMarketRegionalMekVariations.setSelected(options.isUnitMarketRegionalMekVariations());
         spnUnitMarketSpecialUnitChance.setValue(options.getUnitMarketSpecialUnitChance());
         spnUnitMarketRarityModifier.setValue(options.getUnitMarketRarityModifier());
         chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
@@ -8681,7 +8681,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkGenerateChases.setSelected(options.isGenerateChases());
 
         chkDoubleVehicles.setSelected(options.isDoubleVehicles());
-        spnOpForLanceTypeMechs.setValue(options.getOpForLanceTypeMechs());
+        spnOpForLanceTypeMeks.setValue(options.getOpForLanceTypeMeks());
         spnOpForLanceTypeMixed.setValue(options.getOpForLanceTypeMixed());
         spnOpForLanceTypeVehicles.setValue(options.getOpForLanceTypeVehicles());
         chkOpForUsesVTOLs.setSelected(options.isOpForUsesVTOLs());
@@ -8695,7 +8695,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnScenarioModMax.setValue(options.getScenarioModMax());
         spnScenarioModChance.setValue(options.getScenarioModChance());
         spnScenarioModBV.setValue(options.getScenarioModBV());
-        chkRegionalMechVariations.setSelected(options.isRegionalMechVariations());
+        chkRegionalMekVariations.setSelected(options.isRegionalMekVariations());
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
         chkUseDropShips.setSelected(options.isUseDropShips());
@@ -9182,7 +9182,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Unit Market
             options.setUnitMarketMethod(comboUnitMarketMethod.getSelectedItem());
-            options.setUnitMarketRegionalMechVariations(chkUnitMarketRegionalMechVariations.isSelected());
+            options.setUnitMarketRegionalMekVariations(chkUnitMarketRegionalMekVariations.isSelected());
             options.setUnitMarketSpecialUnitChance((Integer) spnUnitMarketSpecialUnitChance.getValue());
             options.setUnitMarketRarityModifier((int) spnUnitMarketRarityModifier.getValue());
             options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
@@ -9223,7 +9223,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setAutoconfigMunitions(chkAutoconfigMunitions.isSelected());
             options.setDoubleVehicles(chkDoubleVehicles.isSelected());
             options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
-            options.setOpForLanceTypeMechs((Integer) spnOpForLanceTypeMechs.getValue());
+            options.setOpForLanceTypeMeks((Integer) spnOpForLanceTypeMeks.getValue());
             options.setOpForLanceTypeMixed((Integer) spnOpForLanceTypeMixed.getValue());
             options.setOpForLanceTypeVehicles((Integer) spnOpForLanceTypeVehicles.getValue());
             options.setOpForUsesVTOLs(chkOpForUsesVTOLs.isSelected());
@@ -9246,7 +9246,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
             options.setBonusPartExchangeValue((Integer) spnBonusPartExchangeValue.getValue());
             options.setBonusPartMaxExchangeCount((Integer) spnBonusPartMaxExchangeCount.getValue());
-            options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
+            options.setRegionalMekVariations(chkRegionalMekVariations.isSelected());
             options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
             options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());
             options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());

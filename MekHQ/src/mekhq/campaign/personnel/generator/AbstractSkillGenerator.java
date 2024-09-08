@@ -73,13 +73,13 @@ public abstract class AbstractSkillGenerator {
      */
     protected void generateDefaultSkills(Person person, PersonnelRole primaryRole, int expLvl, int bonus, int rollModifier) {
         switch (primaryRole) {
-            case MECHWARRIOR:
-                addSkill(person, SkillType.S_PILOT_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+            case MEKWARRIOR:
+                addSkill(person, SkillType.S_PILOT_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_GUN_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case LAM_PILOT:
-                addSkill(person, SkillType.S_PILOT_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_PILOT_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_GUN_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 addSkill(person, SkillType.S_PILOT_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 addSkill(person, SkillType.S_GUN_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
@@ -109,17 +109,17 @@ public abstract class AbstractSkillGenerator {
                 addSkill(person, SkillType.S_PILOT_JET, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 addSkill(person, SkillType.S_GUN_JET, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
-            case PROTOMECH_PILOT:
+            case PROTOMEK_PILOT:
                 addSkill(person, SkillType.S_GUN_PROTO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case BATTLE_ARMOUR:
                 addSkill(person, SkillType.S_GUN_BA, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_ANTI_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 addSkill(person, SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case SOLDIER:
                 if (Utilities.rollProbability(rskillPrefs.getAntiMekProb())) {
-                    addSkill(person, SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    addSkill(person, SkillType.S_ANTI_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 }
                 addSkill(person, SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
@@ -135,8 +135,8 @@ public abstract class AbstractSkillGenerator {
             case VESSEL_NAVIGATOR:
                 addSkill(person, SkillType.S_NAV, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
-            case MECH_TECH:
-                addSkill(person, SkillType.S_TECH_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+            case MEK_TECH:
+                addSkill(person, SkillType.S_TECH_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case MECHANIC:
                 addSkill(person, SkillType.S_TECH_MECHANIC, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
@@ -206,9 +206,9 @@ public abstract class AbstractSkillGenerator {
         }
 
         switch (person.getPrimaryRole()) {
-            case MECHWARRIOR:
+            case MEKWARRIOR:
             case LAM_PILOT:
-                if (person.getPhenotype().isMechWarrior()) {
+                if (person.getPhenotype().isMekWarrior()) {
                     return 1;
                 }
                 break;
@@ -227,8 +227,8 @@ public abstract class AbstractSkillGenerator {
                     return 1;
                 }
                 break;
-            case PROTOMECH_PILOT:
-                if (person.getPhenotype().isProtoMech()) {
+            case PROTOMEK_PILOT:
+                if (person.getPhenotype().isProtoMek()) {
                     return 1;
                 }
             case BATTLE_ARMOUR:

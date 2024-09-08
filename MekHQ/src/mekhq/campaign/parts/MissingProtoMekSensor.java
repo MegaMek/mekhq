@@ -109,13 +109,13 @@ public class MissingProtoMekSensor extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof ProtomekSensor
+        return part instanceof ProtoMekSensor
                 && getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override
     public Part getNewPart() {
-        return new ProtomekSensor(getUnitTonnage(), campaign);
+        return new ProtoMekSensor(getUnitTonnage(), campaign);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class MissingProtoMekSensor extends MissingPart {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return ProtomekLocation.TECH_ADVANCEMENT;
+        return ProtoMekLocation.TECH_ADVANCEMENT;
     }
 
     @Override

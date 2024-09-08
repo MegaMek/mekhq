@@ -165,8 +165,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
     private static final String ASSIGN_FORCE_TRN_TITLE = "Assign Force to Transport Ship";
     private static final String UNASSIGN_FORCE_TRN_TITLE = "Unassign Force from Transport Ship";
-    private static final String MECH_CARRIERS = "Mech Transports";
-    private static final String PROTOMECH_CARRIERS = "ProtoMech Transports";
+    private static final String MEK_CARRIERS = "Mek Transports";
+    private static final String PROTOMEK_CARRIERS = "ProtoMek Transports";
     private static final String LVEE_CARRIERS = "Light Vehicle Transports";
     private static final String HVEE_CARRIERS = "Heavy Vehicle Transports";
     private static final String SHVEE_CARRIERS = "SuperHeavy Vehicle Transports";
@@ -709,13 +709,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 if (force.getTechID() == null) {
                     menu = new JMenu("Add Tech to Force");
 
-                    JMenu mechTechs = new JMenu("Mech Techs");
+                    JMenu mekTechs = new JMenu("Mek Techs");
                     JMenu aeroTechs = new JMenu("Aero Techs");
                     JMenu mechanics = new JMenu("Mechanics");
                     JMenu baTechs = new JMenu("BA Techs");
 
                     PersonnelRole role;
-                    PersonnelRole previousRole = PersonnelRole.MECH_TECH;
+                    PersonnelRole previousRole = PersonnelRole.MEK_TECH;
 
                     JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
                     JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
@@ -724,7 +724,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
                     JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
                     JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
-                    JMenu currentMenu = mechTechs;
+                    JMenu currentMenu = mekTechs;
 
                     // Get the list of techs, then sort them based on their tech role
                     List<Person> techList = gui.getCampaign().getTechs();
@@ -1053,8 +1053,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             // Capacity gets checked once the action is submitted.
             menu = new JMenu(TOEMouseAdapter.ASSIGN_FORCE_TRN_TITLE);
             // Add submenus for different types of transports
-            JMenu m_trn = new JMenu(TOEMouseAdapter.MECH_CARRIERS);
-            JMenu pm_trn = new JMenu(TOEMouseAdapter.PROTOMECH_CARRIERS);
+            JMenu m_trn = new JMenu(TOEMouseAdapter.MEK_CARRIERS);
+            JMenu pm_trn = new JMenu(TOEMouseAdapter.PROTOMEK_CARRIERS);
             JMenu lv_trn = new JMenu(TOEMouseAdapter.LVEE_CARRIERS);
             JMenu hv_trn = new JMenu(TOEMouseAdapter.HVEE_CARRIERS);
             JMenu shv_trn = new JMenu(TOEMouseAdapter.SHVEE_CARRIERS);
@@ -1123,13 +1123,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 i_trn.setEnabled(true);
                             }
 
-                            if (ship.getMechCapacity() > 0) {
-                                m_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentMechCapacity()));
+                            if (ship.getMekCapacity() > 0) {
+                                m_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentMekCapacity()));
                                 m_trn.setEnabled(true);
                             }
 
-                            if (ship.getProtomechCapacity() > 0) {
-                                pm_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentProtomechCapacity()));
+                            if (ship.getProtoMekCapacity() > 0) {
+                                pm_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentProtoMekCapacity()));
                                 pm_trn.setEnabled(true);
                             }
 
@@ -1387,8 +1387,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 int singleUnitType = -1;
 
                 // Add submenus for different types of transports
-                JMenu m_trn = new JMenu(TOEMouseAdapter.MECH_CARRIERS);
-                JMenu pm_trn = new JMenu(TOEMouseAdapter.PROTOMECH_CARRIERS);
+                JMenu m_trn = new JMenu(TOEMouseAdapter.MEK_CARRIERS);
+                JMenu pm_trn = new JMenu(TOEMouseAdapter.PROTOMEK_CARRIERS);
                 JMenu lv_trn = new JMenu(TOEMouseAdapter.LVEE_CARRIERS);
                 JMenu hv_trn = new JMenu(TOEMouseAdapter.HVEE_CARRIERS);
                 JMenu shv_trn = new JMenu(TOEMouseAdapter.SHVEE_CARRIERS);
@@ -1449,13 +1449,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 i_trn.setEnabled(true);
                             }
 
-                            if (ship.getMechCapacity() > 0) {
-                                m_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentMechCapacity()));
+                            if (ship.getMekCapacity() > 0) {
+                                m_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentMekCapacity()));
                                 m_trn.setEnabled(true);
                             }
 
-                            if (ship.getProtomechCapacity() > 0) {
-                                pm_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentProtomechCapacity()));
+                            if (ship.getProtoMekCapacity() > 0) {
+                                pm_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentProtoMekCapacity()));
                                 pm_trn.setEnabled(true);
                             }
 

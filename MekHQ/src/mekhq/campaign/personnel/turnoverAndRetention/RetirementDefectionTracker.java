@@ -87,8 +87,8 @@ public class RetirementDefectionTracker {
     private static Integer medicalCommanderModifier;
     private static Person administrationCommander;
     private static Integer administrationCommanderModifier;
-    private static Person mechWarriorCommander;
-    private static Integer mechWarriorCommanderModifier;
+    private static Person mekWarriorCommander;
+    private static Integer mekWarriorCommanderModifier;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionTracker");
 
@@ -438,7 +438,7 @@ public class RetirementDefectionTracker {
             case TECH -> techCommanderModifier;
             case MEDICAL -> medicalCommanderModifier;
             case ADMINISTRATOR -> administrationCommanderModifier;
-            case MECHWARRIOR -> mechWarriorCommanderModifier;
+            case MEKWARRIOR -> mekWarriorCommanderModifier;
             case CIVILIAN -> 0;
         };
     }
@@ -504,10 +504,10 @@ public class RetirementDefectionTracker {
                         administrationCommanderModifier = getIndividualCommanderLeadership(administrationCommander);
                     }
                     break;
-                case MECHWARRIOR:
-                    if (person.outRanksUsingSkillTiebreaker(campaign, mechWarriorCommander)) {
-                        mechWarriorCommander = person;
-                        mechWarriorCommanderModifier = getIndividualCommanderLeadership(mechWarriorCommander);
+                case MEKWARRIOR:
+                    if (person.outRanksUsingSkillTiebreaker(campaign, mekWarriorCommander)) {
+                        mekWarriorCommander = person;
+                        mekWarriorCommanderModifier = getIndividualCommanderLeadership(mekWarriorCommander);
                     }
                     break;
                 case CIVILIAN:
@@ -552,9 +552,9 @@ public class RetirementDefectionTracker {
                         administrationCommanderModifier = 0;
                     }
                     break;
-                case MECHWARRIOR:
-                    if (mechWarriorCommander == null) {
-                        mechWarriorCommanderModifier = 0;
+                case MEKWARRIOR:
+                    if (mekWarriorCommander == null) {
+                        mekWarriorCommanderModifier = 0;
                     }
                     break;
                 case CIVILIAN:
@@ -983,7 +983,7 @@ public class RetirementDefectionTracker {
                 payoutAmount = getPayoutOrBonusValue(campaign, person);
             }
 
-            if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
+            if (!shareSystem && (profession.isMekWarrior() || profession.isAerospace())
                     && (person.getOriginalUnitWeight() > 0)) {
                 weightClass = person.getOriginalUnitWeight() + person.getOriginalUnitTech();
             }

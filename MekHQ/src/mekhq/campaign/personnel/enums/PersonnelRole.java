@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 
 public enum PersonnelRole {
     //region Enum Declarations
-    MECHWARRIOR("PersonnelRole.MECHWARRIOR.text", KeyEvent.VK_M),
+    MEKWARRIOR("PersonnelRole.MEKWARRIOR.text", KeyEvent.VK_M),
     LAM_PILOT("PersonnelRole.LAM_PILOT.text", KeyEvent.VK_UNDEFINED),
     GROUND_VEHICLE_DRIVER("PersonnelRole.GROUND_VEHICLE_DRIVER.text", KeyEvent.VK_V),
     NAVAL_VEHICLE_DRIVER("PersonnelRole.NAVAL_VEHICLE_DRIVER.text", KeyEvent.VK_N),
@@ -38,14 +38,14 @@ public enum PersonnelRole {
     VEHICLE_CREW("PersonnelRole.VEHICLE_CREW.text", KeyEvent.VK_UNDEFINED),
     AEROSPACE_PILOT("PersonnelRole.AEROSPACE_PILOT.text", KeyEvent.VK_A),
     CONVENTIONAL_AIRCRAFT_PILOT("PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT.text", KeyEvent.VK_C),
-    PROTOMECH_PILOT("PersonnelRole.PROTOMECH_PILOT.text", KeyEvent.VK_P),
+    PROTOMEK_PILOT("PersonnelRole.PROTOMEK_PILOT.text", KeyEvent.VK_P),
     BATTLE_ARMOUR("PersonnelRole.BATTLE_ARMOUR.text", "PersonnelRole.BATTLE_ARMOUR.clan.text", KeyEvent.VK_B),
     SOLDIER("PersonnelRole.SOLDIER.text", KeyEvent.VK_S),
     VESSEL_PILOT("PersonnelRole.VESSEL_PILOT.text", KeyEvent.VK_I),
     VESSEL_GUNNER("PersonnelRole.VESSEL_GUNNER.text", KeyEvent.VK_U),
     VESSEL_CREW("PersonnelRole.VESSEL_CREW.text", KeyEvent.VK_W),
     VESSEL_NAVIGATOR("PersonnelRole.VESSEL_NAVIGATOR.text", KeyEvent.VK_Y),
-    MECH_TECH("PersonnelRole.MECH_TECH.text", KeyEvent.VK_T),
+    MEK_TECH("PersonnelRole.MEK_TECH.text", KeyEvent.VK_T),
     MECHANIC("PersonnelRole.MECHANIC.text", KeyEvent.VK_E),
     AERO_TECH("PersonnelRole.AERO_TECH.text", KeyEvent.VK_O),
     BA_TECH("PersonnelRole.BA_TECH.text", KeyEvent.VK_UNDEFINED),
@@ -91,8 +91,8 @@ public enum PersonnelRole {
     //endregion Getters
 
     //region Boolean Comparison Methods
-    public boolean isMechWarrior() {
-        return this == MECHWARRIOR;
+    public boolean isMekWarrior() {
+        return this == MEKWARRIOR;
     }
 
     public boolean isLAMPilot() {
@@ -127,8 +127,8 @@ public enum PersonnelRole {
         return this == CONVENTIONAL_AIRCRAFT_PILOT;
     }
 
-    public boolean isProtoMechPilot() {
-        return this == PROTOMECH_PILOT;
+    public boolean isProtoMekPilot() {
+        return this == PROTOMEK_PILOT;
     }
 
     public boolean isBattleArmour() {
@@ -155,8 +155,8 @@ public enum PersonnelRole {
         return this == VESSEL_NAVIGATOR;
     }
 
-    public boolean isMechTech() {
-        return this == MECH_TECH;
+    public boolean isMekTech() {
+        return this == MEK_TECH;
     }
 
     public boolean isMechanic() {
@@ -209,7 +209,7 @@ public enum PersonnelRole {
 
     public boolean isCombat() {
         switch (this) {
-            case MECHWARRIOR:
+            case MEKWARRIOR:
             case LAM_PILOT:
             case GROUND_VEHICLE_DRIVER:
             case NAVAL_VEHICLE_DRIVER:
@@ -218,7 +218,7 @@ public enum PersonnelRole {
             case VEHICLE_CREW:
             case AEROSPACE_PILOT:
             case CONVENTIONAL_AIRCRAFT_PILOT:
-            case PROTOMECH_PILOT:
+            case PROTOMEK_PILOT:
             case BATTLE_ARMOUR:
             case SOLDIER:
             case VESSEL_PILOT:
@@ -226,7 +226,7 @@ public enum PersonnelRole {
             case VESSEL_CREW:
             case VESSEL_NAVIGATOR:
                 return true;
-            case MECH_TECH:
+            case MEK_TECH:
             case MECHANIC:
             case AERO_TECH:
             case BA_TECH:
@@ -244,8 +244,8 @@ public enum PersonnelRole {
         }
     }
 
-    public boolean isMechWarriorGrouping() {
-        return isMechWarrior() || isLAMPilot();
+    public boolean isMekWarriorGrouping() {
+        return isMekWarrior() || isLAMPilot();
     }
 
     public boolean isAerospaceGrouping() {
@@ -289,11 +289,11 @@ public enum PersonnelRole {
     }
 
     public boolean isTech() {
-        return isMechTech() || isMechanic() || isAeroTech() || isBATech() || isVesselCrew();
+        return isMekTech() || isMechanic() || isAeroTech() || isBATech() || isVesselCrew();
     }
 
     public boolean isTechSecondary() {
-        return isMechTech() || isMechanic() || isAeroTech() || isBATech();
+        return isMekTech() || isMechanic() || isAeroTech() || isBATech();
     }
 
     public boolean isMedicalStaff() {
@@ -387,7 +387,7 @@ public enum PersonnelRole {
                 case 0:
                     return NONE;
                 case 1:
-                    return MECHWARRIOR;
+                    return MEKWARRIOR;
                 case 2:
                     return AEROSPACE_PILOT;
                 case 3:
@@ -403,7 +403,7 @@ public enum PersonnelRole {
                 case 8:
                     return SOLDIER;
                 case 9:
-                    return PROTOMECH_PILOT;
+                    return PROTOMEK_PILOT;
                 case 10:
                     return CONVENTIONAL_AIRCRAFT_PILOT;
                 case 11:
@@ -415,7 +415,7 @@ public enum PersonnelRole {
                 case 14:
                     return VESSEL_NAVIGATOR;
                 case 15:
-                    return MECH_TECH;
+                    return MEK_TECH;
                 case 16:
                     return MECHANIC;
                 case 17:

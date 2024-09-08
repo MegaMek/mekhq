@@ -563,7 +563,7 @@ public class CampaignGUI extends JPanel {
         miRefreshUnitCache.setName("miRefreshUnitCache");
         miRefreshUnitCache.setMnemonic(KeyEvent.VK_U);
         miRefreshUnitCache.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_DOWN_MASK));
-        miRefreshUnitCache.addActionListener(evt -> MechSummaryCache.refreshUnitData(false));
+        miRefreshUnitCache.addActionListener(evt -> MekSummaryCache.refreshUnitData(false));
         menuRefresh.add(miRefreshUnitCache);
 
         JMenuItem miRefreshCamouflage = new JMenuItem(resourceMap.getString("miRefreshCamouflage.text"));
@@ -732,7 +732,7 @@ public class CampaignGUI extends JPanel {
         miPurchaseUnit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
         miPurchaseUnit.addActionListener(evt -> {
             UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
-            if (!MechSummaryCache.getInstance().isInitialized()) {
+            if (!MekSummaryCache.getInstance().isInitialized()) {
                 unitLoadingDialog.setVisible(true);
             }
             AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(getFrame(), unitLoadingDialog,

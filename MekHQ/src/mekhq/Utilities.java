@@ -112,7 +112,7 @@ public class Utilities {
 
         List<AmmoType> ammoTypes = new ArrayList<>();
         for (AmmoType ammoType : munitions) {
-            // this is an abbreviated version of setupMunitions in the CustomMechDialog
+            // this is an abbreviated version of setupMunitions in the CustomMekDialog
             // TODO : clan/IS limitations?
 
             if ((entity instanceof Aero)
@@ -134,15 +134,15 @@ public class Utilities {
             }
 
             // Only Protos can use Proto-specific ammo
-            if (ammoType.hasFlag(AmmoType.F_PROTOMECH) && !(entity instanceof Protomech)) {
+            if (ammoType.hasFlag(AmmoType.F_PROTOMEK) && !(entity instanceof ProtoMek)) {
                 continue;
             }
 
             // When dealing with machine guns, Protos can only use proto-specific machine
             // gun ammo
-            if ((entity instanceof Protomech)
+            if ((entity instanceof ProtoMek)
                     && ammoType.hasFlag(AmmoType.F_MG)
-                    && !ammoType.hasFlag(AmmoType.F_PROTOMECH)) {
+                    && !ammoType.hasFlag(AmmoType.F_PROTOMEK)) {
                 continue;
             }
 
@@ -218,7 +218,7 @@ public class Utilities {
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
         CampaignOptions options = campaign.getCampaignOptions();
         ArrayList<String> variants = new ArrayList<>();
-        for (MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
+        for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
             // If this isn't the same chassis, is our current unit, we continue
             if (!en.getChassis().equalsIgnoreCase(summary.getChassis())
                     || en.getModel().equalsIgnoreCase(summary.getModel())
@@ -280,8 +280,8 @@ public class Utilities {
             return false;
         }
 
-        if (entity1 instanceof Mech) {
-            if (((Mech) entity1).getCockpitType() != ((Mech) entity2).getCockpitType()) {
+        if (entity1 instanceof Mek) {
+            if (((Mek) entity1).getCockpitType() != ((Mek) entity2).getCockpitType()) {
                 return false;
             } else if (entity1.getGyroType() != entity2.getGyroType()) {
                 return false;
@@ -412,21 +412,21 @@ public class Utilities {
         if (u.usesSoloPilot()) {
             // region Solo Pilot
             Person p;
-            if (u.getEntity() instanceof LandAirMech) {
+            if (u.getEntity() instanceof LandAirMek) {
                 p = c.newPerson(PersonnelRole.LAM_PILOT, factionCode, oldCrew.getGender());
-                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
+                p.addSkill(SkillType.S_PILOT_MEK, SkillType.getType(SkillType.S_PILOT_MEK).getTarget()
                         - oldCrew.getPiloting(), 0);
-                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
+                p.addSkill(SkillType.S_GUN_MEK, SkillType.getType(SkillType.S_GUN_MEK).getTarget()
                         - oldCrew.getGunnery(), 0);
                 p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget()
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget()
                         - oldCrew.getGunnery(), 0);
-            } else if (u.getEntity() instanceof Mech) {
-                p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode, oldCrew.getGender());
-                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
+            } else if (u.getEntity() instanceof Mek) {
+                p = c.newPerson(PersonnelRole.MEKWARRIOR, factionCode, oldCrew.getGender());
+                p.addSkill(SkillType.S_PILOT_MEK, SkillType.getType(SkillType.S_PILOT_MEK).getTarget()
                         - oldCrew.getPiloting(), 0);
-                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
+                p.addSkill(SkillType.S_GUN_MEK, SkillType.getType(SkillType.S_GUN_MEK).getTarget()
                         - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof Aero) {
                 p = c.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender());
@@ -440,8 +440,8 @@ public class Utilities {
                         - oldCrew.getPiloting(), 0);
                 p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget()
                         - oldCrew.getPiloting(), 0);
-            } else if (u.getEntity() instanceof Protomech) {
-                p = c.newPerson(PersonnelRole.PROTOMECH_PILOT, factionCode, oldCrew.getGender());
+            } else if (u.getEntity() instanceof ProtoMek) {
+                p = c.newPerson(PersonnelRole.PROTOMEK_PILOT, factionCode, oldCrew.getGender());
                 p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget()
                         - oldCrew.getGunnery(), 0);
             } else if (u.getEntity() instanceof VTOL) {
@@ -467,11 +467,11 @@ public class Utilities {
                 // region Multi-Slot Crew
                 for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
                     Person p = null;
-                    if (u.getEntity() instanceof Mech) {
-                        p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode, oldCrew.getGender(slot));
-                        p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
+                    if (u.getEntity() instanceof Mek) {
+                        p = c.newPerson(PersonnelRole.MEKWARRIOR, factionCode, oldCrew.getGender(slot));
+                        p.addSkill(SkillType.S_PILOT_MEK, SkillType.getType(SkillType.S_PILOT_MEK).getTarget()
                                 - oldCrew.getPiloting(slot), 0);
-                        p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget()
+                        p.addSkill(SkillType.S_GUN_MEK, SkillType.getType(SkillType.S_GUN_MEK).getTarget()
                                 - oldCrew.getGunnery(slot), 0);
                     } else if (u.getEntity() instanceof Aero) {
                         p = c.newPerson(PersonnelRole.AEROSPACE_PILOT, factionCode, oldCrew.getGender(slot));
@@ -546,14 +546,14 @@ public class Utilities {
                         p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(
                                 SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(),
                                 0);
-                    } else if (u.getEntity() instanceof Mech) {
-                        p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode,
+                    } else if (u.getEntity() instanceof Mek) {
+                        p = c.newPerson(PersonnelRole.MEKWARRIOR, factionCode,
                                 oldCrew.getGender(numberPeopleGenerated));
-                        p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(
-                                SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(),
+                        p.addSkill(SkillType.S_PILOT_MEK, SkillType.getType(
+                                SkillType.S_PILOT_MEK).getTarget() - oldCrew.getPiloting(),
                                 0);
-                        p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(
-                                SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(),
+                        p.addSkill(SkillType.S_GUN_MEK, SkillType.getType(
+                                SkillType.S_GUN_MEK).getTarget() - oldCrew.getGunnery(),
                                 0);
                     } else {
                         // assume tanker if we got here
@@ -593,15 +593,15 @@ public class Utilities {
                                     SkillType.getType(SkillType.S_GUN_SPACE).getTarget()
                                             - oldCrew.getGunnery()),
                                     0);
-                        } else if (u.getEntity() instanceof Mech) {
-                            p = c.newPerson(PersonnelRole.MECHWARRIOR, factionCode,
+                        } else if (u.getEntity() instanceof Mek) {
+                            p = c.newPerson(PersonnelRole.MEKWARRIOR, factionCode,
                                     oldCrew.getGender(numberPeopleGenerated));
-                            p.addSkill(SkillType.S_PILOT_MECH,
-                                    SkillType.getType(SkillType.S_PILOT_MECH).getTarget()
+                            p.addSkill(SkillType.S_PILOT_MEK,
+                                    SkillType.getType(SkillType.S_PILOT_MEK).getTarget()
                                             - oldCrew.getPiloting(),
                                     0);
-                            p.addSkill(SkillType.S_GUN_MECH,
-                                    SkillType.getType(SkillType.S_GUN_MECH).getTarget()
+                            p.addSkill(SkillType.S_GUN_MEK,
+                                    SkillType.getType(SkillType.S_GUN_MEK).getTarget()
                                             - oldCrew.getGunnery(),
                                     0);
                         } else {
@@ -1329,27 +1329,27 @@ public class Utilities {
      * unit
      *
      * @param newE new Entity we want to read information from
-     * @return MechSummary that most closely represents the original of the new
+     * @return MekSummary that most closely represents the original of the new
      *         Entity
      * @throws EntityLoadingException
      */
-    public static MechSummary retrieveOriginalUnit(Entity newE) throws EntityLoadingException {
-        MechSummaryCache cacheInstance = MechSummaryCache.getInstance();
-        cacheInstance.loadMechData();
+    public static MekSummary retrieveOriginalUnit(Entity newE) throws EntityLoadingException {
+        MekSummaryCache cacheInstance = MekSummaryCache.getInstance();
+        cacheInstance.loadMekData();
 
         // I need to change the new entity to the one from the mtf file now, so that
         // equipment numbers will match
-        MechSummary summary = cacheInstance.getMech(newE.getFullChassis() + ' ' + newE.getModel());
+        MekSummary summary = cacheInstance.getMek(newE.getFullChassis() + ' ' + newE.getModel());
 
         if (null == summary) {
             // Attempt to deal with new naming convention directly
-            summary = cacheInstance.getMech(
+            summary = cacheInstance.getMek(
                     newE.getChassis() + " (" + newE.getClanChassisName() + ") " + newE.getModel());
         }
 
         // If we got this far with no summary loaded, give up
         if (null == summary) {
-            throw new EntityLoadingException(String.format("Could not load %s %s from the mech cache",
+            throw new EntityLoadingException(String.format("Could not load %s %s from the mek cache",
                     newE.getChassis(), newE.getModel()));
         }
 

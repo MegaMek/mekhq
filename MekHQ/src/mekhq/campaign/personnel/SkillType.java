@@ -39,26 +39,26 @@ import java.util.Map;
  */
 public class SkillType {
     // combat skills
-    public static final String S_PILOT_MECH  = "Piloting/Mech";
+    public static final String S_PILOT_MEK  = "Piloting/Mek";
     public static final String S_PILOT_AERO  = "Piloting/Aerospace";
     public static final String S_PILOT_JET   = "Piloting/Aircraft";
     public static final String S_PILOT_GVEE  = "Piloting/Ground Vehicle";
     public static final String S_PILOT_VTOL  = "Piloting/VTOL";
     public static final String S_PILOT_NVEE  = "Piloting/Naval";
     public static final String S_PILOT_SPACE = "Piloting/Spacecraft";
-    public static final String S_GUN_MECH    = "Gunnery/Mech";
+    public static final String S_GUN_MEK    = "Gunnery/Mek";
     public static final String S_GUN_AERO    = "Gunnery/Aerospace";
     public static final String S_GUN_JET     = "Gunnery/Aircraft";
     public static final String S_GUN_VEE     = "Gunnery/Vehicle";
     public static final String S_GUN_SPACE   = "Gunnery/Spacecraft";
     public static final String S_GUN_BA      = "Gunnery/Battlesuit";
-    public static final String S_GUN_PROTO   = "Gunnery/ProtoMech";
+    public static final String S_GUN_PROTO   = "Gunnery/ProtoMek";
     public static final String S_ARTILLERY   = "Artillery";
     public static final String S_SMALL_ARMS  = "Small Arms";
-    public static final String S_ANTI_MECH   = "Anti-Mech";
+    public static final String S_ANTI_MEK   = "Anti-Mek";
     public static final String S_TACTICS     = "Tactics";
     // non-combat skills
-    public static final String S_TECH_MECH     = "Tech/Mech";
+    public static final String S_TECH_MEK     = "Tech/Mek";
     public static final String S_TECH_MECHANIC = "Tech/Mechanic";
     public static final String S_TECH_AERO     = "Tech/Aero";
     public static final String S_TECH_BA       = "Tech/BA";
@@ -75,11 +75,11 @@ public class SkillType {
 
     public static final int NUM_LEVELS = 11;
 
-    public static final String[] skillList = {S_PILOT_MECH,S_GUN_MECH,S_PILOT_AERO,S_GUN_AERO,
+    public static final String[] skillList = {S_PILOT_MEK,S_GUN_MEK,S_PILOT_AERO,S_GUN_AERO,
                                               S_PILOT_GVEE,S_PILOT_VTOL,S_PILOT_NVEE,S_GUN_VEE,
                                               S_PILOT_JET,S_GUN_JET,S_PILOT_SPACE,S_GUN_SPACE,S_ARTILLERY,
-                                              S_GUN_BA,S_GUN_PROTO,S_SMALL_ARMS,S_ANTI_MECH,
-                                              S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_TECH_VESSEL,S_ASTECH,
+                                              S_GUN_BA,S_GUN_PROTO,S_SMALL_ARMS,S_ANTI_MEK,
+                                              S_TECH_MEK,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_TECH_VESSEL,S_ASTECH,
                                               S_DOCTOR,S_MEDTECH,S_NAV,
                                               S_ADMIN,
                                               S_TACTICS,S_STRATEGY,
@@ -256,14 +256,14 @@ public class SkillType {
     }
 
     public boolean isPiloting() {
-        return name.equals(S_PILOT_MECH) || name.equals(S_PILOT_AERO)
+        return name.equals(S_PILOT_MEK) || name.equals(S_PILOT_AERO)
                     || name.equals(S_PILOT_GVEE) || name.equals(S_PILOT_VTOL)
                     || name.equals(S_PILOT_NVEE) || name.equals(S_PILOT_JET)
                     || name.equals(S_PILOT_SPACE);
     }
 
     public boolean isGunnery() {
-        return name.equals(S_GUN_MECH) || name.equals(S_GUN_AERO)
+        return name.equals(S_GUN_MEK) || name.equals(S_GUN_AERO)
                     || name.equals(S_GUN_VEE) || name.equals(S_GUN_BA)
                     || name.equals(S_SMALL_ARMS) || name.equals(S_GUN_JET)
                     || name.equals(S_GUN_SPACE) || name.equals(S_GUN_PROTO)
@@ -286,8 +286,8 @@ public class SkillType {
 
     public static void initializeTypes() {
         lookupHash = new Hashtable<>();
-        lookupHash.put(S_PILOT_MECH, createPilotingMech());
-        lookupHash.put(S_GUN_MECH, createGunneryMech());
+        lookupHash.put(S_PILOT_MEK, createPilotingMek());
+        lookupHash.put(S_GUN_MEK, createGunneryMek());
         lookupHash.put(S_PILOT_AERO, createPilotingAero());
         lookupHash.put(S_GUN_AERO, createGunneryAero());
         lookupHash.put(S_PILOT_JET, createPilotingJet());
@@ -302,8 +302,8 @@ public class SkillType {
         lookupHash.put(S_GUN_BA, createGunneryBA());
         lookupHash.put(S_GUN_PROTO, createGunneryProto());
         lookupHash.put(S_SMALL_ARMS, createSmallArms());
-        lookupHash.put(S_ANTI_MECH, createAntiMech());
-        lookupHash.put(S_TECH_MECH, createTechMech());
+        lookupHash.put(S_ANTI_MEK, createAntiMek());
+        lookupHash.put(S_TECH_MEK, createTechMek());
         lookupHash.put(S_TECH_MECHANIC, createTechMechanic());
         lookupHash.put(S_TECH_AERO, createTechAero());
         lookupHash.put(S_TECH_BA, createTechBA());
@@ -343,11 +343,11 @@ public class SkillType {
         } else if (en instanceof Aero) {
             return S_PILOT_AERO;
         } else if (en instanceof Infantry) {
-            return S_ANTI_MECH;
-        } else if (en instanceof Protomech) {
+            return S_ANTI_MEK;
+        } else if (en instanceof ProtoMek) {
             return S_GUN_PROTO;
         } else {
-            return S_PILOT_MECH;
+            return S_PILOT_MEK;
         }
     }
 
@@ -366,10 +366,10 @@ public class SkillType {
             } else {
                 return S_SMALL_ARMS;
             }
-        } else if (en instanceof Protomech) {
+        } else if (en instanceof ProtoMek) {
             return S_GUN_PROTO;
         } else {
-            return S_GUN_MECH;
+            return S_GUN_MEK;
         }
     }
 
@@ -415,8 +415,8 @@ public class SkillType {
                 }
             }
 
-            if ("Gunnery/Protomech".equals(retVal.getName())) { // Renamed in 0.49.12
-                retVal.name = "Gunnery/ProtoMech";
+            if ("Gunnery/Protomek".equals(retVal.getName())) { // Renamed in 0.49.12
+                retVal.name = "Gunnery/ProtoMek";
             }
 
             lookupHash.put(retVal.name, retVal);
@@ -455,8 +455,8 @@ public class SkillType {
                 }
             }
 
-            if ("Gunnery/Protomech".equals(retVal.getName())) { // Renamed in 0.49.12
-                retVal.name = "Gunnery/ProtoMech";
+            if ("Gunnery/Protomek".equals(retVal.getName())) { // Renamed in 0.49.12
+                retVal.name = "Gunnery/ProtoMek";
             }
 
             hash.put(retVal.name, retVal);
@@ -465,9 +465,9 @@ public class SkillType {
         }
     }
 
-    public static SkillType createPilotingMech() {
+    public static SkillType createPilotingMek() {
         SkillType skill = new SkillType();
-        skill.name = S_PILOT_MECH;
+        skill.name = S_PILOT_MEK;
         skill.target = 8;
         skill.greenLvl = 2;
         skill.countUp = false;
@@ -476,9 +476,9 @@ public class SkillType {
         return skill;
     }
 
-    public static SkillType createGunneryMech() {
+    public static SkillType createGunneryMek() {
         SkillType skill = new SkillType();
-        skill.name = S_GUN_MECH;
+        skill.name = S_GUN_MEK;
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
@@ -641,9 +641,9 @@ public class SkillType {
         return skill;
     }
 
-    public static SkillType createAntiMech() {
+    public static SkillType createAntiMek() {
         SkillType skill = new SkillType();
-        skill.name = S_ANTI_MECH;
+        skill.name = S_ANTI_MEK;
         skill.target = 8;
         skill.greenLvl = 2;
         skill.countUp = false;
@@ -652,9 +652,9 @@ public class SkillType {
         return skill;
     }
 
-    public static SkillType createTechMech() {
+    public static SkillType createTechMek() {
         SkillType skill = new SkillType();
-        skill.name = S_TECH_MECH;
+        skill.name = S_TECH_MEK;
         skill.target = 10;
         skill.countUp = false;
         skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};

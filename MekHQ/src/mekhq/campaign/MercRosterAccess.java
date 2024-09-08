@@ -138,7 +138,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".ranks (number, rankname) VALUES (?, ?)");
                 preparedStatement.setInt(1, i);
                 // TODO: This currently only exports MekWarrior Ranks. MercRoster software needs adjusted before this can be.
-                preparedStatement.setString(2, truncateString(rank.getName(Profession.MECHWARRIOR), 45));
+                preparedStatement.setString(2, truncateString(rank.getName(Profession.MEKWARRIOR), 45));
                 preparedStatement.executeUpdate();
                 i++;
                 progressTicker++;
@@ -175,24 +175,24 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 //write skill requirements
                 int equipment = 0;
                 switch (role) {
-                    case MECHWARRIOR:
+                    case MEKWARRIOR:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_MECH));
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_MEK));
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_MECH));
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_MEK));
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
                     case LAM_PILOT:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_MECH));
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_PILOT_MEK));
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_MECH));
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_MEK));
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
@@ -262,7 +262,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case PROTOMECH_PILOT:
+                    case PROTOMEK_PILOT:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
                         preparedStatement.setInt(1, skillHash.get(SkillType.S_GUN_PROTO));
                         preparedStatement.setInt(2, role.ordinal());
@@ -311,9 +311,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                         preparedStatement.executeUpdate();
                         equipment = 1;
                         break;
-                    case MECH_TECH:
+                    case MEK_TECH:
                         preparedStatement = connect.prepareStatement("INSERT INTO " + table + ".skillrequirements (skilltype, personneltype) VALUES (?, ?)");
-                        preparedStatement.setInt(1, skillHash.get(SkillType.S_TECH_MECH));
+                        preparedStatement.setInt(1, skillHash.get(SkillType.S_TECH_MEK));
                         preparedStatement.setInt(2, role.ordinal());
                         preparedStatement.executeUpdate();
                         break;

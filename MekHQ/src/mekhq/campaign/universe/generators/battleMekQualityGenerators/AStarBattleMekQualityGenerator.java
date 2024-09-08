@@ -19,7 +19,7 @@
 package mekhq.campaign.universe.generators.battleMekQualityGenerators;
 
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.enums.BattleMechQualityGenerationMethod;
+import mekhq.campaign.universe.enums.BattleMekQualityGenerationMethod;
 
 /**
  * @author Justin "Windchild" Bowen
@@ -27,7 +27,7 @@ import mekhq.campaign.universe.enums.BattleMechQualityGenerationMethod;
 public class AStarBattleMekQualityGenerator extends AbstractBattleMekQualityGenerator {
     //region Constructors
     public AStarBattleMekQualityGenerator() {
-        super(BattleMechQualityGenerationMethod.A_STAR);
+        super(BattleMekQualityGenerationMethod.A_STAR);
     }
     //endregion Constructors
 

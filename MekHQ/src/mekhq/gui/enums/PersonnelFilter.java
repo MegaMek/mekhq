@@ -36,8 +36,8 @@ public enum PersonnelFilter {
     ACTIVE("PersonnelFilter.ACTIVE.text", "PersonnelFilter.ACTIVE.toolTipText"),
     COMBAT("PersonnelFilter.COMBAT.text", "PersonnelFilter.COMBAT.toolTipText"),
     SUPPORT("PersonnelFilter.SUPPORT.text", "PersonnelFilter.SUPPORT.toolTipText"),
-    MECHWARRIORS("PersonnelFilter.MECHWARRIORS.text", "PersonnelFilter.MECHWARRIORS.toolTipText", true, false),
-    MECHWARRIOR("PersonnelFilter.MECHWARRIOR.text", "PersonnelFilter.MECHWARRIOR.toolTipText", false, true),
+    MEKWARRIORS("PersonnelFilter.MEKWARRIORS.text", "PersonnelFilter.MEKWARRIORS.toolTipText", true, false),
+    MEKWARRIOR("PersonnelFilter.MEKWARRIOR.text", "PersonnelFilter.MEKWARRIOR.toolTipText", false, true),
     LAM_PILOT("PersonnelFilter.LAM_PILOT.text", "PersonnelFilter.LAM_PILOT.toolTipText", false, true),
     VEHICLE_CREWMEMBER("PersonnelFilter.VEHICLE_CREWMEMBER.text", "PersonnelFilter.VEHICLE_CREWMEMBER.toolTipText", true, false),
     GROUND_VEHICLE_DRIVER("PersonnelFilter.GROUND_VEHICLE_DRIVER.text", "PersonnelFilter.GROUND_VEHICLE_DRIVER.toolTipText", false, true),
@@ -47,7 +47,7 @@ public enum PersonnelFilter {
     VEHICLE_CREW("PersonnelFilter.VEHICLE_CREW.text", "PersonnelFilter.VEHICLE_CREW.toolTipText", false, true),
     AEROSPACE_PILOT("PersonnelFilter.AEROSPACE_PILOT.text", "PersonnelFilter.AEROSPACE_PILOT.toolTipText"),
     CONVENTIONAL_AIRCRAFT_PILOT("PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.text", "PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.toolTipText"),
-    PROTOMECH_PILOT("PersonnelFilter.PROTOMECH_PILOT.text", "PersonnelFilter.PROTOMECH_PILOT.toolTipText"),
+    PROTOMEK_PILOT("PersonnelFilter.PROTOMEK_PILOT.text", "PersonnelFilter.PROTOMEK_PILOT.toolTipText"),
     BATTLE_ARMOUR("PersonnelFilter.BATTLE_ARMOUR.text", "PersonnelFilter.BATTLE_ARMOUR.toolTipText"),
     SOLDIER("PersonnelFilter.SOLDIER.text", "PersonnelFilter.SOLDIER.toolTipText"),
     VESSEL_CREWMEMBER("PersonnelFilter.VESSEL_CREWMEMBER.text", "PersonnelFilter.VESSEL_CREWMEMBER.toolTipText", true, false),
@@ -56,7 +56,7 @@ public enum PersonnelFilter {
     VESSEL_CREW("PersonnelFilter.VESSEL_CREW.text", "PersonnelFilter.VESSEL_CREW.toolTipText", false, true),
     VESSEL_NAVIGATOR("PersonnelFilter.VESSEL_NAVIGATOR.text", "PersonnelFilter.VESSEL_NAVIGATOR.toolTipText", false, true),
     TECH("PersonnelFilter.TECH.text", "PersonnelFilter.TECH.toolTipText", true, false),
-    MECH_TECH("PersonnelFilter.MECH_TECH.text", "PersonnelFilter.MECH_TECH.toolTipText", false, true),
+    MEK_TECH("PersonnelFilter.MEK_TECH.text", "PersonnelFilter.MEK_TECH.toolTipText", false, true),
     MECHANIC("PersonnelFilter.MECHANIC.text", "PersonnelFilter.MECHANIC.toolTipText", false, true),
     AERO_TECH("PersonnelFilter.AERO_TECH.text", "PersonnelFilter.AERO_TECH.toolTipText", false, true),
     BA_TECH("PersonnelFilter.BA_TECH.text", "PersonnelFilter.BA_TECH.toolTipText", false, true),
@@ -155,12 +155,12 @@ public enum PersonnelFilter {
         return this == SUPPORT;
     }
 
-    public boolean isMechWarriors() {
-        return this == MECHWARRIORS;
+    public boolean isMekWarriors() {
+        return this == MEKWARRIORS;
     }
 
-    public boolean isMechWarrior() {
-        return this == MECHWARRIOR;
+    public boolean isMekWarrior() {
+        return this == MEKWARRIOR;
     }
 
     public boolean isLAMPilot() {
@@ -199,8 +199,8 @@ public enum PersonnelFilter {
         return this == CONVENTIONAL_AIRCRAFT_PILOT;
     }
 
-    public boolean isProtoMechPilot() {
-        return this == PROTOMECH_PILOT;
+    public boolean isProtoMekPilot() {
+        return this == PROTOMEK_PILOT;
     }
 
     public boolean isBattleArmor() {
@@ -235,8 +235,8 @@ public enum PersonnelFilter {
         return this == TECH;
     }
 
-    public boolean isMechTech() {
-        return this == MECH_TECH;
+    public boolean isMekTech() {
+        return this == MEK_TECH;
     }
 
     public boolean isMechanic() {
@@ -378,13 +378,13 @@ public enum PersonnelFilter {
             case SUPPORT:
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
                         ? !person.getPrimaryRole().isCombat() : person.hasSupportRole(true));
-            case MECHWARRIORS:
+            case MEKWARRIORS:
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.getPrimaryRole().isMechWarriorGrouping()
-                        : (person.getPrimaryRole().isMechWarriorGrouping() || person.getSecondaryRole().isMechWarriorGrouping()));
-            case MECHWARRIOR:
+                        ? person.getPrimaryRole().isMekWarriorGrouping()
+                        : (person.getPrimaryRole().isMekWarriorGrouping() || person.getSecondaryRole().isMekWarriorGrouping()));
+            case MEKWARRIOR:
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.getPrimaryRole().isMechWarrior() : person.hasRole(PersonnelRole.MECHWARRIOR));
+                        ? person.getPrimaryRole().isMekWarrior() : person.hasRole(PersonnelRole.MEKWARRIOR));
             case LAM_PILOT:
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
                         ? person.getPrimaryRole().isLAMPilot() : person.hasRole(PersonnelRole.LAM_PILOT));
@@ -413,9 +413,9 @@ public enum PersonnelFilter {
             case CONVENTIONAL_AIRCRAFT_PILOT:
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
                         ? person.getPrimaryRole().isConventionalAircraftPilot() : person.hasRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT));
-            case PROTOMECH_PILOT:
+            case PROTOMEK_PILOT:
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.getPrimaryRole().isProtoMechPilot() : person.hasRole(PersonnelRole.PROTOMECH_PILOT));
+                        ? person.getPrimaryRole().isProtoMekPilot() : person.hasRole(PersonnelRole.PROTOMEK_PILOT));
             case BATTLE_ARMOUR:
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
                         ? person.getPrimaryRole().isBattleArmour() : person.hasRole(PersonnelRole.BATTLE_ARMOUR));
@@ -441,9 +441,9 @@ public enum PersonnelFilter {
             case TECH:
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
                         ? person.getPrimaryRole().isTech() : person.isTech());
-            case MECH_TECH:
+            case MEK_TECH:
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
-                        ? person.getPrimaryRole().isMechTech() : person.hasRole(PersonnelRole.MECH_TECH));
+                        ? person.getPrimaryRole().isMekTech() : person.hasRole(PersonnelRole.MEK_TECH));
             case MECHANIC:
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
                         ? person.getPrimaryRole().isMechanic() : person.hasRole(PersonnelRole.MECHANIC));

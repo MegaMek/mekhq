@@ -21,12 +21,12 @@ package mekhq.campaign.universe.companyGeneration;
 import megamek.common.EntityWeightClass;
 
 /**
- * This class contains the parameters used to generate a random mech, and allows sorting and
+ * This class contains the parameters used to generate a random mek, and allows sorting and
  * swapping the order of rolled parameters while keeping them connected.
  *
  * @author Justin "Windchild" Bowen
  */
-public class AtBRandomMechParameters {
+public class AtBRandomMekParameters {
     //region Variable Declarations
     private int weight;
     private int quality;
@@ -34,7 +34,7 @@ public class AtBRandomMechParameters {
     //endregion Variable Declarations
 
     //region Constructors
-    public AtBRandomMechParameters(final int weight, final int quality) {
+    public AtBRandomMekParameters(final int weight, final int quality) {
         setWeight(weight);
         setQuality(quality);
         setStarLeague(weight == EntityWeightClass.WEIGHT_SUPER_HEAVY);

@@ -94,7 +94,7 @@ public class RankTableModel extends DefaultTableModel {
                 rating = "E" + i;
             }
             array[i][RankTableModel.COL_NAME_RATE] = rating;
-            array[i][RankTableModel.COL_NAME_MW] = rank.getNameWithLevels(Profession.MECHWARRIOR);
+            array[i][RankTableModel.COL_NAME_MW] = rank.getNameWithLevels(Profession.MEKWARRIOR);
             array[i][RankTableModel.COL_NAME_ASF] = rank.getNameWithLevels(Profession.AEROSPACE);
             array[i][RankTableModel.COL_NAME_VEE] = rank.getNameWithLevels(Profession.VEHICLE);
             array[i][RankTableModel.COL_NAME_NAVAL] = rank.getNameWithLevels(Profession.NAVAL);
@@ -177,7 +177,7 @@ public class RankTableModel extends DefaultTableModel {
             case COL_NAME_RATE:
                 return resources.getString("RankTableModel.COL_NAME_RATE.toolTipText");
             case COL_NAME_MW:
-                return Profession.MECHWARRIOR.getToolTipText();
+                return Profession.MEKWARRIOR.getToolTipText();
             case COL_NAME_ASF:
                 return Profession.AEROSPACE.getToolTipText();
             case COL_NAME_VEE:

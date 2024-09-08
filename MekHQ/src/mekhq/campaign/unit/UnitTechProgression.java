@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 /**
- * Provides an ITechnology interface for every MechSummary, optionally customized for a particular
+ * Provides an ITechnology interface for every MekSummary, optionally customized for a particular
  * faction. This requires loading each Entity and calculating the CompositeTechLevel. It usually
  * runs once when the campaign is loaded after the faction is set but also needs to run if date from
  * another faction is needed. This is usually a result of changing the faction or changing the option
@@ -38,7 +38,7 @@ public class UnitTechProgression {
 
     private final static UnitTechProgression instance = new UnitTechProgression();
 
-    private Map<Integer, FutureTask<Map<MechSummary,ITechnology>>> techMap = new HashMap<>();
+    private Map<Integer, FutureTask<Map<MekSummary,ITechnology>>> techMap = new HashMap<>();
 
     /**
      * Initializes the data for a particular faction
@@ -54,8 +54,8 @@ public class UnitTechProgression {
      * @param techFaction The faction for which to calculate progression data.
      * @return            The task responsible for calculating the data for the faction.
      */
-    private FutureTask<Map<MechSummary,ITechnology>> getTask(int techFaction) {
-        FutureTask<Map<MechSummary,ITechnology>> task = instance.techMap.get(techFaction);
+    private FutureTask<Map<MekSummary,ITechnology>> getTask(int techFaction) {
+        FutureTask<Map<MekSummary,ITechnology>> task = instance.techMap.get(techFaction);
         if (null == task) {
             task = new FutureTask<>(new BuildMapTask(techFaction));
             new Thread(task).start();
@@ -78,7 +78,7 @@ public class UnitTechProgression {
      */
     public static ITechnology getProgression(final Unit unit,
             final int techFaction, final boolean block) {
-        MechSummary ms = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortName());
+        MekSummary ms = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortName());
         if (null != ms) {
             return getProgression(ms, techFaction, block);
         } else {
@@ -90,7 +90,7 @@ public class UnitTechProgression {
      * Get a faction-specific ITechnology object that can be used to calculate tech levels for the given unit.
      * If values have not been generated for the techFaction, a new task will be started.
      *
-     * @param ms            The <code>MechSummary</code> for which to calculate the tech progression.
+     * @param ms            The <code>MekSummary</code> for which to calculate the tech progression.
      * @param techFaction   The faction to use in calculating the progression.
      * @param block         If the task has not completed this method will wait until completion if block is true,
      *                      or return null if block is false. If the task has completed, it will return the value
@@ -98,13 +98,13 @@ public class UnitTechProgression {
      * @return              An ITechnology object for the unit and faction. If the task has not completed and
      *                      block is false, or there was an exception processing the task, null is returned.
      */
-    public static ITechnology getProgression(final MechSummary ms, final int techFaction, final boolean block) {
-        FutureTask<Map<MechSummary,ITechnology>> task = instance.getTask(techFaction);
+    public static ITechnology getProgression(final MekSummary ms, final int techFaction, final boolean block) {
+        FutureTask<Map<MekSummary,ITechnology>> task = instance.getTask(techFaction);
         if (!block && !task.isDone()) {
             return null;
         }
         try {
-            Map<MechSummary,ITechnology> map = task.get();
+            Map<MekSummary,ITechnology> map = task.get();
             if (!map.containsKey(ms)) {
                 map.put(ms, calcTechProgression(ms, techFaction));
             }
@@ -117,9 +117,9 @@ public class UnitTechProgression {
         return null;
     }
 
-    private static ITechnology calcTechProgression(MechSummary ms, int techFaction) {
+    private static ITechnology calcTechProgression(MekSummary ms, int techFaction) {
         try {
-            Entity en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+            Entity en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
                 LogManager.getLogger().error("Entity was null: " + ms.getName());
                 return null;
@@ -132,21 +132,21 @@ public class UnitTechProgression {
     }
 
     /**
-     * Goes through all the entries in MechSummaryCache, loads them, and calculates the composite
+     * Goes through all the entries in MekSummaryCache, loads them, and calculates the composite
      * tech level of all the equipment and construction options for a specific faction.
      */
-    private static class BuildMapTask implements Callable<Map<MechSummary,ITechnology>> {
+    private static class BuildMapTask implements Callable<Map<MekSummary,ITechnology>> {
         private int techFaction;
 
         BuildMapTask(int techFaction) {
             this.techFaction = techFaction;
         }
 
-        // Load all the Entities in the MechSummaryCache and calculate the tech level for the given faction.
+        // Load all the Entities in the MekSummaryCache and calculate the tech level for the given faction.
         @Override
-        public Map<MechSummary, ITechnology> call() throws Exception {
-            Map<MechSummary,ITechnology> map = new HashMap<>();
-            for (MechSummary ms : MechSummaryCache.getInstance().getAllMechs()) {
+        public Map<MekSummary, ITechnology> call() throws Exception {
+            Map<MekSummary,ITechnology> map = new HashMap<>();
+            for (MekSummary ms : MekSummaryCache.getInstance().getAllMeks()) {
                 map.put(ms, calcTechProgression(ms, techFaction));
             }
             return map;

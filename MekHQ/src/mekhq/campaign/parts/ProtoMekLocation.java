@@ -67,28 +67,28 @@ public class ProtoMekLocation extends Part {
         this.percent = 1.0;
         this.forQuad = quad;
         this.breached = false;
-        this.name = "ProtoMech Location";
+        this.name = "ProtoMek Location";
         switch (loc) {
             case ProtoMek.LOC_HEAD:
-                this.name = "ProtoMech Head";
+                this.name = "ProtoMek Head";
                 break;
             case ProtoMek.LOC_TORSO:
-                this.name = "ProtoMech Torso";
+                this.name = "ProtoMek Torso";
                 break;
             case ProtoMek.LOC_LARM:
-                this.name = "ProtoMech Left Arm";
+                this.name = "ProtoMek Left Arm";
                 break;
             case ProtoMek.LOC_RARM:
-                this.name = "ProtoMech Right Arm";
+                this.name = "ProtoMek Right Arm";
                 break;
             case ProtoMek.LOC_LEG:
-                this.name = "ProtoMech Legs";
+                this.name = "ProtoMek Legs";
                 if (forQuad) {
-                    this.name = "ProtoMech Legs (Quad)";
+                    this.name = "ProtoMek Legs (Quad)";
                 }
                 break;
             case ProtoMek.LOC_MAINGUN:
-                this.name = "ProtoMech Main Gun";
+                this.name = "ProtoMek Main Gun";
                 break;
         }
         if (booster) {
@@ -258,7 +258,7 @@ public class ProtoMekLocation extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
+        return new MissingProtoMekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
     }
 
     @Override
@@ -430,10 +430,10 @@ public class ProtoMekLocation extends Part {
         if (null != unit) {
             unit.getEntity().setInternal((int) Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
             //if all the system crits are marked off on the entity in this location, then we need to
-            //fix one of them, because the last crit on protomechs is always location destruction
+            //fix one of them, because the last crit on protomeks is always location destruction
             int systemIndx = getAppropriateSystemIndex();
             if (loc != -1 && unit.getEntity().getGoodCriticals(CriticalSlot.TYPE_SYSTEM, systemIndx, loc) <= 0) {
-                //Because the last crit for protomechs is always location destruction we need to
+                //Because the last crit for protomeks is always location destruction we need to
                 //clear the first system crit we find
                 for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
                     CriticalSlot slot = unit.getEntity().getCritical(loc, i);
@@ -482,7 +482,7 @@ public class ProtoMekLocation extends Part {
                     return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
                 }
             }
-            //protomechs only have system stuff in the crits, so we need to also
+            //protomeks only have system stuff in the crits, so we need to also
             //check for mounted equipment separately
             for (Mounted m : unit.getEntity().getEquipment()) {
                 if (m.isRepairable() && (m.getLocation() == loc || m.getSecondLocation() == loc)) {
@@ -609,7 +609,7 @@ public class ProtoMekLocation extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECH);
+        return skillType.equals(SkillType.S_TECH_MEK);
     }
 
     @Override

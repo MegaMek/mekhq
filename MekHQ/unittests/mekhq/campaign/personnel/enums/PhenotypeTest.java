@@ -56,12 +56,12 @@ public class PhenotypeTest {
 
     //region Boolean Comparison Methods
     @Test
-    public void testIsMechWarrior() {
+    public void testIsMekWarrior() {
         for (final Phenotype phenotype : phenotypes) {
-            if (phenotype == Phenotype.MECHWARRIOR) {
-                assertTrue(phenotype.isMechWarrior());
+            if (phenotype == Phenotype.MEKWARRIOR) {
+                assertTrue(phenotype.isMekWarrior());
             } else {
-                assertFalse(phenotype.isMechWarrior());
+                assertFalse(phenotype.isMekWarrior());
             }
         }
     }
@@ -100,12 +100,12 @@ public class PhenotypeTest {
     }
 
     @Test
-    public void testIsProtoMech() {
+    public void testIsProtoMek() {
         for (final Phenotype phenotype : phenotypes) {
-            if (phenotype == Phenotype.PROTOMECH) {
-                assertTrue(phenotype.isProtoMech());
+            if (phenotype == Phenotype.PROTOMEK) {
+                assertTrue(phenotype.isProtoMek());
             } else {
-                assertFalse(phenotype.isProtoMech());
+                assertFalse(phenotype.isProtoMek());
             }
         }
     }
@@ -161,7 +161,7 @@ public class PhenotypeTest {
 
         // Legacy Parsing
         assertEquals(Phenotype.NONE, Phenotype.parseFromString("0"));
-        assertEquals(Phenotype.MECHWARRIOR, Phenotype.parseFromString("1"));
+        assertEquals(Phenotype.MEKWARRIOR, Phenotype.parseFromString("1"));
         assertEquals(Phenotype.ELEMENTAL, Phenotype.parseFromString("2"));
         assertEquals(Phenotype.AEROSPACE, Phenotype.parseFromString("3"));
         assertEquals(Phenotype.VEHICLE, Phenotype.parseFromString("4"));
@@ -176,8 +176,8 @@ public class PhenotypeTest {
     public void testToStringOverride() {
         assertEquals(resources.getString("Freeborn.text"), Phenotype.NONE.toString());
         assertEquals(resources.getString("Trueborn.text"), Phenotype.GENERAL.toString());
-        assertEquals(resources.getString("Trueborn.text") + ' ' + resources.getString("Phenotype.MECHWARRIOR.text"),
-                Phenotype.MECHWARRIOR.toString());
+        assertEquals(resources.getString("Trueborn.text") + ' ' + resources.getString("Phenotype.MEKWARRIOR.text"),
+                Phenotype.MEKWARRIOR.toString());
         assertEquals(resources.getString("Trueborn.text") + ' ' + resources.getString("Phenotype.AEROSPACE.groupingNameText"),
                 Phenotype.AEROSPACE.toString());
     }

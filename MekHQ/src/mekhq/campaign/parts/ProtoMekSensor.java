@@ -52,7 +52,7 @@ public class ProtoMekSensor extends Part {
 
     public ProtoMekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "ProtoMech Sensors";
+        this.name = "ProtoMek Sensors";
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ProtoMekSensor extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingProtomekSensor(getUnitTonnage(), campaign);
+        return new MissingProtoMekSensor(getUnitTonnage(), campaign);
     }
 
     @Override
@@ -225,7 +225,7 @@ public class ProtoMekSensor extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECH);
+        return skillType.equals(SkillType.S_TECH_MEK);
     }
 
     @Override
@@ -251,7 +251,7 @@ public class ProtoMekSensor extends Part {
     @Override
     public TechAdvancement getTechAdvancement() {
         // No separate listing for the sensors; using same TA as structural components
-        return ProtomekLocation.TECH_ADVANCEMENT;
+        return ProtoMekLocation.TECH_ADVANCEMENT;
     }
 
     @Override

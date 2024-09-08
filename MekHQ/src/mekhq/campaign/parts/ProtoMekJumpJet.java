@@ -35,7 +35,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- * Legacy part that represents standard ProtoMech jump jets.
+ * Legacy part that represents standard ProtoMek jump jets.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
@@ -59,7 +59,7 @@ public class ProtoMekJumpJet extends Part {
 
     public ProtoMekJumpJet(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "ProtoMech Jump Jet";
+        this.name = "ProtoMek Jump Jet";
     }
 
     @Override
@@ -120,7 +120,7 @@ public class ProtoMekJumpJet extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingProtomekJumpJet(getUnitTonnage(), campaign);
+        return new MissingProtoMekJumpJet(getUnitTonnage(), campaign);
     }
 
     @Override
@@ -254,7 +254,7 @@ public class ProtoMekJumpJet extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECH);
+        return skillType.equals(SkillType.S_TECH_MEK);
     }
 
     @Override
@@ -275,7 +275,7 @@ public class ProtoMekJumpJet extends Part {
                 if (p.getId() == this.getId()) {
                     continue;
                 }
-                if (p instanceof MissingProtomekJumpJet
+                if (p instanceof MissingProtoMekJumpJet
                         || (p instanceof ProtoMekJumpJet && p.needsFixing())) {
                     damagedJJ++;
                 }

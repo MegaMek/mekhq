@@ -201,9 +201,9 @@ public class RestoreUnitAction implements IUnitAction {
 
             // TODO: Make this less painful. We just want to fix hips and shoulders.
             Entity entity = unit.getEntity();
-            if (entity instanceof Mech) {
+            if (entity instanceof Mek) {
                 for (int loc : new int[] {
-                    Mech.LOC_CLEG, Mech.LOC_LLEG, Mech.LOC_RLEG, Mech.LOC_LARM, Mech.LOC_RARM}) {
+                    Mek.LOC_CLEG, Mek.LOC_LLEG, Mek.LOC_RLEG, Mek.LOC_LARM, Mek.LOC_RARM}) {
                     int numberOfCriticals = entity.getNumberOfCriticals(loc);
                     for (int crit = 0; crit < numberOfCriticals; ++ crit) {
                         CriticalSlot slot = entity.getCritical(loc, crit);
@@ -230,21 +230,21 @@ public class RestoreUnitAction implements IUnitAction {
     }
 
     /**
-     * Gets a copy of the entity from the file system, via {@link MechSummaryCache}
-     * and {@link MechFileParser}.
+     * Gets a copy of the entity from the file system, via {@link MekSummaryCache}
+     * and {@link MekFileParser}.
      */
     private static class FileSystemEntityCopyFactory implements IEntityCopyFactory {
         /**
-         * Get a copy of the entity from the {@link MechSummaryCache}.
+         * Get a copy of the entity from the {@link MekSummaryCache}.
          * @param entity The entity to copy.
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
         @Override
         public @Nullable Entity copy(Entity entity) {
-            final MechSummary ms = MechSummaryCache.getInstance().getMech(entity.getShortNameRaw());
+            final MekSummary ms = MekSummaryCache.getInstance().getMek(entity.getShortNameRaw());
             try {
                 if (ms != null) {
-                    return new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+                    return new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                 }
             } catch (EntityLoadingException e) {
                 LogManager.getLogger().error("Cannot restore unit from entity, could not find: " + entity.getShortNameRaw(), e);

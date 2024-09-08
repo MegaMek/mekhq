@@ -22,7 +22,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MechSummaryCache;
+import megamek.common.MekSummaryCache;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
 import org.apache.logging.log4j.LogManager;
@@ -165,7 +165,7 @@ public class RefitNameDialog extends JDialog {
         if (model.isEmpty()) {
             model = refit.getOriginalEntity().getModel() + " Mk II";
         }
-        if (null != MechSummaryCache.getInstance().getMech(chassis + " " + model)) {
+        if (null != MekSummaryCache.getInstance().getMek(chassis + " " + model)) {
             JOptionPane.showMessageDialog(null,
                     "There is already a unit in the database with this name.\nPlease select a different name.",
                     "Name already in use",

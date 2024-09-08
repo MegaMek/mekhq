@@ -140,8 +140,8 @@ public class ChooseRefitDialog extends JDialog {
         txtOldUnit.setBorder(BorderFactory.createCompoundBorder(
                  BorderFactory.createTitledBorder(resourceMap.getString("txtOldUnit.title")),
                  BorderFactory.createEmptyBorder(5,5,5,5)));
-        MechView mv = new MechView(unit.getEntity(), false, true, true, ViewFormatting.HTML);
-        txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
+        MekView mv = new MekView(unit.getEntity(), false, true, true, ViewFormatting.HTML);
+        txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         scrOldUnit = new JScrollPane(txtOldUnit);
         scrOldUnit.setMinimumSize(new Dimension(300, 400));
         scrOldUnit.setPreferredSize(new Dimension(300, 400));
@@ -251,8 +251,8 @@ public class ChooseRefitDialog extends JDialog {
         btnOK.setEnabled(true);
         lstShopping = new JList<>(r.getShoppingListDescription());
         scrShoppingList.setViewportView(lstShopping);
-        MechView mv = new MechView(r.getNewEntity(), false, true);
-        txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
+        MekView mv = new MekView(r.getNewEntity(), false, true);
+        txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
     }
 
@@ -261,16 +261,16 @@ public class ChooseRefitDialog extends JDialog {
         List<Refit> refits = new ArrayList<>();
         Entity e = unit.getEntity();
         for (String model : Utilities.getAllVariants(e, campaign)) {
-            MechSummary summary = MechSummaryCache.getInstance().getMech(e.getFullChassis() + " " + model);
+            MekSummary summary = MekSummaryCache.getInstance().getMek(e.getFullChassis() + " " + model);
             if (null == summary) {
                 // Attempt to deal with new naming scheme directly
-                summary = MechSummaryCache.getInstance().getMech(e.getChassis() + " (" + e.getClanChassisName() + ") " + model);
+                summary = MekSummaryCache.getInstance().getMek(e.getChassis() + " (" + e.getClanChassisName() + ") " + model);
                 if (null == summary) {
                     continue;
                 }
             }
             try {
-                Entity refitEn = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                Entity refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 if (null != refitEn) {
                     Refit r = new Refit(unit, refitEn, false, false);
                     if (null == r.checkFixable()) {

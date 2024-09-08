@@ -131,25 +131,25 @@ public class Bloodname {
      * A warrior is three times as likely to have a Bloodname associated with the
      * same phenotype as a general name (which is split among the three types).
      * Elemental names are treated as general prior to 2870. The names that later
-     * became associated with ProtoMech pilots (identified in WoR) are assumed
+     * became associated with ProtoMek pilots (identified in WoR) are assumed
      * to have been poor performers and have a lower frequency even before the
      * invention of the PM, though have a higher frequency for PM pilots than other
      * aerospace names.
      */
     private int phenotypeMultiplier(Phenotype warriorType, int year) {
         switch (getPhenotype()) {
-            case MECHWARRIOR:
-                return warriorType.isMechWarrior() ? 3 : 0;
+            case MEKWARRIOR:
+                return warriorType.isMekWarrior() ? 3 : 0;
             case AEROSPACE:
-                return (warriorType.isAerospace() || warriorType.isProtoMech()) ? 3 : 0;
+                return (warriorType.isAerospace() || warriorType.isProtoMek()) ? 3 : 0;
             case ELEMENTAL:
                 if (year < 2870) {
                     return 1;
                 }
                 return warriorType.isElemental() ? 3 : 0;
-            case PROTOMECH:
+            case PROTOMEK:
                 switch (warriorType) {
-                    case PROTOMECH:
+                    case PROTOMEK:
                         return 9;
                     case AEROSPACE:
                         return 1;

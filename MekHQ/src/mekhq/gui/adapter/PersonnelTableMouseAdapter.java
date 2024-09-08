@@ -1958,8 +1958,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             }
                         }
                         menuItem = new JMenuItem(String.format(resources.getString("abilityDesc.format"), resources.getString("humantro_mek.text"), costDesc));
-                        if (!tros.contains(Crew.HUMANTRO_MECH)) {
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_MECH, String.valueOf(cost)));
+                        if (!tros.contains(Crew.HUMANTRO_MEK)) {
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_MEK, String.valueOf(cost)));
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
@@ -2131,7 +2131,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerHeadHits.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_HEADHIT));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT));
-                if (!person.getPrimaryRole().isMechWarriorGrouping()) {
+                if (!person.getPrimaryRole().isMekWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2140,7 +2140,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerTAC.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_TAC));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_TAC));
-                if (!person.getPrimaryRole().isMechWarriorGrouping()) {
+                if (!person.getPrimaryRole().isMekWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2149,7 +2149,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerKO.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_KO));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_KO));
-                if (!person.getPrimaryRole().isMechWarriorGrouping()) {
+                if (!person.getPrimaryRole().isMekWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2158,7 +2158,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerExplosion.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_EXPLOSION));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_EXPLOSION));
-                if (!person.getPrimaryRole().isMechWarriorGrouping()) {
+                if (!person.getPrimaryRole().isMekWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);
@@ -2167,7 +2167,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerMASCFailure.text"));
                 cbMenuItem.setSelected(person.getOptions().booleanOption(OPT_EDGE_MASC_FAILURE));
                 cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
-                if (!person.getPrimaryRole().isMechWarriorGrouping()) {
+                if (!person.getPrimaryRole().isMekWarriorGrouping()) {
                     cbMenuItem.setForeground(new Color(150, 150, 150));
                 }
                 cbMenuItem.addActionListener(this);

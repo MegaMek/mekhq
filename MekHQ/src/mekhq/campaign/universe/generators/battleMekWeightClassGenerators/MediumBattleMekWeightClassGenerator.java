@@ -19,7 +19,7 @@
 package mekhq.campaign.universe.generators.battleMekWeightClassGenerators;
 
 import megamek.common.EntityWeightClass;
-import mekhq.campaign.universe.enums.BattleMechWeightClassGenerationMethod;
+import mekhq.campaign.universe.enums.BattleMekWeightClassGenerationMethod;
 
 /**
  * @author Justin "Windchild" Bowen
@@ -27,7 +27,7 @@ import mekhq.campaign.universe.enums.BattleMechWeightClassGenerationMethod;
 public class MediumBattleMekWeightClassGenerator extends AbstractBattleMekWeightClassGenerator {
     //region Constructors
     public MediumBattleMekWeightClassGenerator() {
-        super(BattleMechWeightClassGenerationMethod.MEDIUM);
+        super(BattleMekWeightClassGenerationMethod.MEDIUM);
     }
     //endregion Constructors
 

@@ -118,13 +118,13 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     public Object getNewEquipment() {
         String name = getEntity().getFullChassis() + " " + getEntity().getModel();
         name = name.trim();
-        MechSummary summary = MechSummaryCache.getInstance().getMech(name);
+        MekSummary summary = MekSummaryCache.getInstance().getMek(name);
         if (null == summary) {
-            LogManager.getLogger().error("Could not find a mech summary for " + name);
+            LogManager.getLogger().error("Could not find a mek summary for " + name);
             return null;
         }
         try {
-            return new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            return new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
             LogManager.getLogger().error("Could not load " + summary.getEntryName());
             return null;
@@ -208,8 +208,8 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         //TODO: Fix weight classes
         //TODO: aero large craft
         //TODO: support vehicles
-        if (entity instanceof Mech) {
-            if (!((Mech) entity).isIndustrial()) {
+        if (entity instanceof Mek) {
+            if (!((Mek) entity).isIndustrial()) {
                 target.addModifier(0, "BattleMek");
             } else {
                 target.addModifier(-1, "IndustrialMek");
@@ -274,8 +274,8 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                 default:
                     target.addModifier(3, "Assault");
             }
-        } else if (entity instanceof Protomech) {
-            target.addModifier(+1, "Protomech");
+        } else if (entity instanceof ProtoMek) {
+            target.addModifier(+1, "ProtoMek");
         }
         //parts need to be initialized for this to work
         int avail = getAvailability();

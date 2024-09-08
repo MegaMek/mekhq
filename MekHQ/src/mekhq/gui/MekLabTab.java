@@ -21,6 +21,24 @@
  */
 package mekhq.gui;
 
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.io.File;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
+
+import org.apache.logging.log4j.LogManager;
+
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.*;
@@ -60,11 +78,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.enums.MHQTabType;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
 
 public class MekLabTab extends CampaignGuiTab {
     CampaignGUI campaignGUI;
@@ -106,7 +119,7 @@ public class MekLabTab extends CampaignGuiTab {
 
     @Override
     public void initTab() {
-        entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml")); // TODO : Remove inline file path
+        entityVerifier = EntityVerifier.getInstance(new File("data/mekfiles/UnitVerifierOptions.xml")); // TODO : Remove inline file path
         CConfig.load();
         UnitUtil.loadFonts();
         LogManager.getLogger().info("Starting MegaMekLab version: " + MMLConstants.VERSION);
@@ -183,7 +196,7 @@ public class MekLabTab extends CampaignGuiTab {
         c.weighty = 1.0;
         summaryPane.add(shoppingPanel, c);
 
-        // TODO: compare units dialog that pops up mech views back-to-back
+        // TODO: compare units dialog that pops up mek views back-to-back
 }
 
     @Override
@@ -202,10 +215,10 @@ public class MekLabTab extends CampaignGuiTab {
 
     public void loadUnit(Unit u) {
         unit = u;
-        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortNameRaw());
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortNameRaw());
         Entity entity;
         try {
-            entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
+            entity = (new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
             LogManager.getLogger().error("", ex);
             return;
@@ -237,9 +250,9 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     public void resetUnit() {
-        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortName());
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortName());
 
-        if (mechSummary == null) {
+        if (mekSummary == null) {
             LogManager.getLogger().error(String.format(
                     "Cannot reset unit %s as it cannot be found in the cache.",
                     unit.getEntity().getDisplayName()));
@@ -248,7 +261,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         Entity entity;
         try {
-            entity = new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName()).getEntity();
+            entity = new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName()).getEntity();
         } catch (EntityLoadingException ex) {
             LogManager.getLogger().error("", ex);
             return;
@@ -281,16 +294,16 @@ public class MekLabTab extends CampaignGuiTab {
             testEntity = new TestSupportVehicle(entity, entityVerifier.tankOption, null);
         } else if (entity instanceof Aero) {
             testEntity = new TestAero((Aero) entity, entityVerifier.aeroOption, null);
-        } else if (entity instanceof Mech) {
-            testEntity = new TestMech((Mech) entity, entityVerifier.mechOption, null);
+        } else if (entity instanceof Mek) {
+            testEntity = new TestMek((Mek) entity, entityVerifier.mekOption, null);
         } else if (entity instanceof Tank) {
             testEntity = new TestTank((Tank) entity, entityVerifier.tankOption, null);
         } else if (entity instanceof BattleArmor) {
             testEntity = new TestBattleArmor((BattleArmor) entity, entityVerifier.baOption, null);
         } else if (entity instanceof Infantry) {
             testEntity = new TestInfantry((Infantry) entity, entityVerifier.tankOption, null);
-        } else if (entity instanceof Protomech) {
-            testEntity = new TestProtomech((Protomech) entity, entityVerifier.protomechOption, null);
+        } else if (entity instanceof ProtoMek) {
+            testEntity = new TestProtoMek((ProtoMek) entity, entityVerifier.protomekOption, null);
         }
         if (null == testEntity) {
             return;
@@ -378,9 +391,9 @@ public class MekLabTab extends CampaignGuiTab {
         Entity entity = labPanel.getEntity();
 
         if (entity.getOriginalJumpMP() > 0 && !(entity instanceof Infantry)) {
-            if (entity.getJumpType() == Mech.JUMP_IMPROVED) {
+            if (entity.getJumpType() == Mek.JUMP_IMPROVED) {
                 heat += Math.max(3, entity.getOriginalJumpMP() / 2);
-            } else if (entity.getJumpType() != Mech.JUMP_BOOSTER) {
+            } else if (entity.getJumpType() != Mek.JUMP_BOOSTER) {
                 heat += Math.max(3, entity.getOriginalJumpMP());
             }
             if (entity.getEngine().getEngineType() == Engine.XXL_ENGINE) {
@@ -392,12 +405,12 @@ public class MekLabTab extends CampaignGuiTab {
             heat += 2;
         }
 
-        if (entity instanceof Mech) {
-            if (((Mech) entity).hasNullSig()) {
+        if (entity instanceof Mek) {
+            if (((Mek) entity).hasNullSig()) {
                 heat += 10;
             }
 
-            if (((Mech) entity).hasChameleonShield()) {
+            if (((Mek) entity).hasChameleonShield()) {
                 heat += 6;
             }
         }
@@ -445,16 +458,16 @@ public class MekLabTab extends CampaignGuiTab {
             return new supportVehiclePanel(en);
         } else if (en instanceof Aero) {
             return new AeroPanel((Aero) en);
-        } else if (en instanceof Mech) {
-            return new MekPanel((Mech) en);
+        } else if (en instanceof Mek) {
+            return new MekPanel((Mek) en);
         } else if (en instanceof Tank) {
             return new TankPanel((Tank) en);
         } else if (en instanceof BattleArmor) {
             return new BattleArmorPanel((BattleArmor) en);
         } else if (en instanceof Infantry) {
             return new InfantryPanel((Infantry) en);
-        } else if (en instanceof Protomech) {
-            return new ProtomechPanel((Protomech) en);
+        } else if (en instanceof ProtoMek) {
+            return new ProtoMekPanel((ProtoMek) en);
         } else {
             return null;
         }
@@ -741,13 +754,13 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private class MekPanel extends EntityPanel {
-        private final Mech entity;
+        private final Mek entity;
         private BMStructureTab structureTab;
         private BMEquipmentTab equipmentTab;
         private BMBuildTab buildTab;
         private PreviewTab previewTab;
 
-        public MekPanel(Mech m) {
+        public MekPanel(Mek m) {
             entity = m;
             reloadTabs();
         }
@@ -1356,14 +1369,14 @@ public class MekLabTab extends CampaignGuiTab {
         }
     }
 
-    private class ProtomechPanel extends EntityPanel {
-        private final Protomech entity;
+    private class ProtoMekPanel extends EntityPanel {
+        private final ProtoMek entity;
         private PMStructureTab structureTab;
         private PMEquipmentTab equipmentTab;
         private PMBuildTab buildTab;
         private PreviewTab previewTab;
 
-        ProtomechPanel(Protomech m) {
+        ProtoMekPanel(ProtoMek m) {
             entity = m;
             reloadTabs();
         }

@@ -99,7 +99,7 @@ public class SkillPrereq {
                         skillSet.containsKey(SkillType.S_GUN_AERO);
             case UnitType.BATTLE_ARMOR:
                 return skillSet.containsKey(SkillType.S_GUN_BA) ||
-                        skillSet.containsKey(SkillType.S_ANTI_MECH);
+                        skillSet.containsKey(SkillType.S_ANTI_MEK);
             case UnitType.CONV_FIGHTER:
                 return skillSet.containsKey(SkillType.S_GUN_JET) ||
                         skillSet.containsKey(SkillType.S_PILOT_JET);
@@ -118,7 +118,7 @@ public class SkillPrereq {
                         skillSet.containsKey(SkillType.S_GUN_VEE);
             case UnitType.INFANTRY:
                 return skillSet.containsKey(SkillType.S_SMALL_ARMS) ||
-                        skillSet.containsKey(SkillType.S_ANTI_MECH);
+                        skillSet.containsKey(SkillType.S_ANTI_MEK);
             case UnitType.NAVAL:
                 return skillSet.containsKey(SkillType.S_PILOT_NVEE) ||
                         skillSet.containsKey(SkillType.S_GUN_VEE);
@@ -128,8 +128,8 @@ public class SkillPrereq {
                 return skillSet.containsKey(SkillType.S_PILOT_VTOL) ||
                         skillSet.containsKey(SkillType.S_GUN_VEE);
             case UnitType.MEK:
-                return skillSet.containsKey(SkillType.S_PILOT_MECH) ||
-                        skillSet.containsKey(SkillType.S_GUN_MECH);
+                return skillSet.containsKey(SkillType.S_PILOT_MEK) ||
+                        skillSet.containsKey(SkillType.S_GUN_MEK);
             default:
                 return false;
         }

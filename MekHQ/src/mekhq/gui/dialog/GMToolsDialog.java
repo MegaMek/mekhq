@@ -1428,11 +1428,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
             case UnitType.INFANTRY:
                 return getPerson().getPrimaryRole().isSoldier();
             case UnitType.MEK:
-                return getPerson().getPrimaryRole().isMechWarrior();
+                return getPerson().getPrimaryRole().isMekWarrior();
             case UnitType.NAVAL:
                 return getPerson().getPrimaryRole().isNavalVehicleDriver();
             case UnitType.PROTOMEK:
-                return getPerson().getPrimaryRole().isProtoMechPilot();
+                return getPerson().getPrimaryRole().isProtoMekPilot();
             case UnitType.TANK:
                 return getPerson().getPrimaryRole().isGroundVehicleDriver();
             case UnitType.VTOL:
@@ -1467,7 +1467,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             return null;
         }
 
-        final Predicate<MechSummary> predicate = summary ->
+        final Predicate<MekSummary> predicate = summary ->
                 (!getGUI().getCampaign().getCampaignOptions().isLimitByYear() || (targetYear > summary.getYear()))
                         && (!summary.isClan() || getGUI().getCampaign().getCampaignOptions().isAllowClanPurchases())
                         && (summary.isClan() || getGUI().getCampaign().getCampaignOptions().isAllowISPurchases());
@@ -1475,7 +1475,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         final int unitWeight = getComboUnitWeight().isEnabled()
                 ? getComboUnitWeight().getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT
                 : AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED;
-        final MechSummary summary = getGUI().getCampaign().getUnitGenerator()
+        final MekSummary summary = getGUI().getCampaign().getUnitGenerator()
                 .generate(Objects.requireNonNull(getComboRATFaction().getSelectedItem()).getFaction().getShortName(),
                         unitType, unitWeight, targetYear, getComboQuality().getSelectedIndex(), predicate);
 
@@ -1485,7 +1485,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         try {
-            final Entity entity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+            final Entity entity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             getLblUnitPicked().setText(String.format("<html><a href='ENTITY'>%s</html>", summary.getName()));
             return entity;
         } catch (Exception ex) {
@@ -1656,8 +1656,8 @@ public class GMToolsDialog extends AbstractMHQDialog {
             }
         }
 
-        if (getSelectedPhenotype().isProtoMech() && (getBloodnameYear() < 3060)) {
-            txt += "<div>ProtoMechs did not exist in " + getBloodnameYear() + ". Using Aerospace.</div>";
+        if (getSelectedPhenotype().isProtoMek() && (getBloodnameYear() < 3060)) {
+            txt += "<div>ProtoMeks did not exist in " + getBloodnameYear() + ". Using Aerospace.</div>";
             setSelectedPhenotype(Phenotype.AEROSPACE);
         } else if (getSelectedPhenotype().isNaval() && (!"CSR".equals(getOriginClan().getGenerationCode()))) {
             txt += "<div>The Naval phenotype is unique to Clan Snow Raven. Using General.</div>";

@@ -23,8 +23,8 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
@@ -166,7 +166,7 @@ public class ShipSearchDialog extends JDialog {
         JButton button;
 
         if (gui.getCampaign().getShipSearchResult() != null) {
-            MechSummary ms = MechSummaryCache.getInstance().getMech(gui.getCampaign().getShipSearchResult());
+            MekSummary ms = MekSummaryCache.getInstance().getMek(gui.getCampaign().getShipSearchResult());
 
             if ((ms != null) || (gui.getCampaign().getShipSearchResult() != null)) {
                 JLabel lblAvailable = new JLabel();

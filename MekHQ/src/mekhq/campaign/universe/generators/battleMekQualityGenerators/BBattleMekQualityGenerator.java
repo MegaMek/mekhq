@@ -19,15 +19,15 @@
 package mekhq.campaign.universe.generators.battleMekQualityGenerators;
 
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.enums.BattleMechQualityGenerationMethod;
+import mekhq.campaign.universe.enums.BattleMekQualityGenerationMethod;
 
 /**
  * @author Justin "Windchild" Bowen
  */
-public class BBattleMekQualityGenerator extends AbstractBattleMechQualityGenerator {
+public class BBattleMekQualityGenerator extends AbstractBattleMekQualityGenerator {
     //region Constructors
     public BBattleMekQualityGenerator() {
-        super(BattleMechQualityGenerationMethod.B);
+        super(BattleMekQualityGenerationMethod.B);
     }
     //endregion Constructors
 

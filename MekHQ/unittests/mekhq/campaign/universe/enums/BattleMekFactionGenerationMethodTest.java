@@ -35,7 +35,7 @@ import mekhq.campaign.universe.Faction;
 
 public class BattleMekFactionGenerationMethodTest {
     //region Variable Declarations
-    private static final BattleMechFactionGenerationMethod[] methods = BattleMechFactionGenerationMethod.values();
+    private static final BattleMekFactionGenerationMethod[] methods = BattleMekFactionGenerationMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
             MekHQ.getMHQOptions().getLocale());
@@ -44,43 +44,43 @@ public class BattleMekFactionGenerationMethodTest {
     //region Getters
     @Test
     public void testGetToolTipText() {
-        assertEquals(resources.getString("BattleMechFactionGenerationMethod.ORIGIN_FACTION.toolTipText"),
-                BattleMechFactionGenerationMethod.ORIGIN_FACTION.getToolTipText());
-        assertEquals(resources.getString("BattleMechFactionGenerationMethod.SPECIFIED_FACTION.toolTipText"),
-                BattleMechFactionGenerationMethod.SPECIFIED_FACTION.getToolTipText());
+        assertEquals(resources.getString("BattleMekFactionGenerationMethod.ORIGIN_FACTION.toolTipText"),
+                BattleMekFactionGenerationMethod.ORIGIN_FACTION.getToolTipText());
+        assertEquals(resources.getString("BattleMekFactionGenerationMethod.SPECIFIED_FACTION.toolTipText"),
+                BattleMekFactionGenerationMethod.SPECIFIED_FACTION.getToolTipText());
     }
     //endregion Getters
 
     //region Boolean Comparison Methods
     @Test
     public void testIsOriginFaction() {
-        for (final BattleMechFactionGenerationMethod battleMechFactionGenerationMethod : methods) {
-            if (battleMechFactionGenerationMethod == BattleMechFactionGenerationMethod.ORIGIN_FACTION) {
-                assertTrue(battleMechFactionGenerationMethod.isOriginFaction());
+        for (final BattleMekFactionGenerationMethod battleMekFactionGenerationMethod : methods) {
+            if (battleMekFactionGenerationMethod == BattleMekFactionGenerationMethod.ORIGIN_FACTION) {
+                assertTrue(battleMekFactionGenerationMethod.isOriginFaction());
             } else {
-                assertFalse(battleMechFactionGenerationMethod.isOriginFaction());
+                assertFalse(battleMekFactionGenerationMethod.isOriginFaction());
             }
         }
     }
 
     @Test
     public void testIsCampaignFaction() {
-        for (final BattleMechFactionGenerationMethod battleMechFactionGenerationMethod : methods) {
-            if (battleMechFactionGenerationMethod == BattleMechFactionGenerationMethod.CAMPAIGN_FACTION) {
-                assertTrue(battleMechFactionGenerationMethod.isCampaignFaction());
+        for (final BattleMekFactionGenerationMethod battleMekFactionGenerationMethod : methods) {
+            if (battleMekFactionGenerationMethod == BattleMekFactionGenerationMethod.CAMPAIGN_FACTION) {
+                assertTrue(battleMekFactionGenerationMethod.isCampaignFaction());
             } else {
-                assertFalse(battleMechFactionGenerationMethod.isCampaignFaction());
+                assertFalse(battleMekFactionGenerationMethod.isCampaignFaction());
             }
         }
     }
 
     @Test
     public void testIsSpecifiedFaction() {
-        for (final BattleMechFactionGenerationMethod battleMechFactionGenerationMethod : methods) {
-            if (battleMechFactionGenerationMethod == BattleMechFactionGenerationMethod.SPECIFIED_FACTION) {
-                assertTrue(battleMechFactionGenerationMethod.isSpecifiedFaction());
+        for (final BattleMekFactionGenerationMethod battleMekFactionGenerationMethod : methods) {
+            if (battleMekFactionGenerationMethod == BattleMekFactionGenerationMethod.SPECIFIED_FACTION) {
+                assertTrue(battleMekFactionGenerationMethod.isSpecifiedFaction());
             } else {
-                assertFalse(battleMechFactionGenerationMethod.isSpecifiedFaction());
+                assertFalse(battleMekFactionGenerationMethod.isSpecifiedFaction());
             }
         }
     }
@@ -99,21 +99,21 @@ public class BattleMekFactionGenerationMethodTest {
         final Faction mockSpecifiedFaction = mock(Faction.class);
 
         assertEquals(
-                BattleMechFactionGenerationMethod.ORIGIN_FACTION.generateFaction(mockPerson, mockCampaign, mockSpecifiedFaction),
+                BattleMekFactionGenerationMethod.ORIGIN_FACTION.generateFaction(mockPerson, mockCampaign, mockSpecifiedFaction),
                 mockOriginFaction);
         assertEquals(
-                BattleMechFactionGenerationMethod.CAMPAIGN_FACTION.generateFaction(mockPerson, mockCampaign, mockSpecifiedFaction),
+                BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.generateFaction(mockPerson, mockCampaign, mockSpecifiedFaction),
                 mockCampaignFaction);
         assertEquals(
-                BattleMechFactionGenerationMethod.SPECIFIED_FACTION.generateFaction(mockPerson, mockCampaign, mockSpecifiedFaction),
+                BattleMekFactionGenerationMethod.SPECIFIED_FACTION.generateFaction(mockPerson, mockCampaign, mockSpecifiedFaction),
                 mockSpecifiedFaction);
     }
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("BattleMechFactionGenerationMethod.CAMPAIGN_FACTION.text"),
-                BattleMechFactionGenerationMethod.CAMPAIGN_FACTION.toString());
-        assertEquals(resources.getString("BattleMechFactionGenerationMethod.SPECIFIED_FACTION.text"),
-                BattleMechFactionGenerationMethod.SPECIFIED_FACTION.toString());
+        assertEquals(resources.getString("BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.text"),
+                BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.toString());
+        assertEquals(resources.getString("BattleMekFactionGenerationMethod.SPECIFIED_FACTION.text"),
+                BattleMekFactionGenerationMethod.SPECIFIED_FACTION.toString());
     }
 }

@@ -22,7 +22,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
-import megamek.common.Mech;
+import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
@@ -49,7 +49,7 @@ public class MissingMekGyro extends MissingPart {
     public MissingMekGyro(int tonnage, int type, double gyroTonnage, boolean isClan, Campaign c) {
         super(tonnage, c);
         this.type = type;
-        this.name = Mech.getGyroTypeString(type);
+        this.name = Mek.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
         this.isClan = isClan;
     }
@@ -111,9 +111,9 @@ public class MissingMekGyro extends MissingPart {
     @Override
     public int getTechRating() {
         switch (type) {
-            case Mech.GYRO_COMPACT:
-            case Mech.GYRO_HEAVY_DUTY:
-            case Mech.GYRO_XL:
+            case Mek.GYRO_COMPACT:
+            case Mek.GYRO_HEAVY_DUTY:
+            case Mek.GYRO_XL:
                 return EquipmentType.RATING_E;
             default:
                 return EquipmentType.RATING_D;
@@ -134,8 +134,8 @@ public class MissingMekGyro extends MissingPart {
         if (null == unit) {
             return null;
         }
-        if (unit.isLocationBreached(Mech.LOC_CT)) {
-            return unit.getEntity().getLocationName(Mech.LOC_CT) + " is breached.";
+        if (unit.isLocationBreached(Mek.LOC_CT)) {
+            return unit.getEntity().getLocationName(Mek.LOC_CT) + " is breached.";
         }
         return null;
     }
@@ -148,7 +148,7 @@ public class MissingMekGyro extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_GYRO, Mek.LOC_CT);
         }
     }
 
@@ -160,12 +160,12 @@ public class MissingMekGyro extends MissingPart {
 
     @Override
     public int getLocation() {
-        return Mech.LOC_CT;
+        return Mek.LOC_CT;
     }
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return Mech.getGyroTechAdvancement(type);
+        return Mek.getGyroTechAdvancement(type);
     }
 
     @Override

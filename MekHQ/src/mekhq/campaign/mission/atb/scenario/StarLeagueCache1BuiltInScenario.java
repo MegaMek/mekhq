@@ -106,11 +106,11 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
 
         List<Entity> otherForce = new ArrayList<>();
-        MechSummary ms = null;
+        MekSummary ms = null;
 
         if (roll == 1) {
             RandomUnitGenerator.getInstance().setChosenRAT("CivilianUnits_PrimMech");
-            ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
+            ArrayList<MekSummary> msl = RandomUnitGenerator.getInstance().generate(1);
             if (!msl.isEmpty()) {
                 ms = msl.get(0);
             }

@@ -76,13 +76,13 @@ public class AtBEventProcessor {
     private void doPaidRecruitment(Campaign campaign) {
         int mod;
         switch (campaign.getPersonnelMarket().getPaidRecruitRole()) {
-            case MECHWARRIOR:
+            case MEKWARRIOR:
                 mod = -2;
                 break;
             case SOLDIER:
                 mod = 2;
                 break;
-            case MECH_TECH:
+            case MEK_TECH:
             case MECHANIC:
             case AERO_TECH:
             case BA_TECH:
@@ -143,7 +143,7 @@ public class AtBEventProcessor {
         final Collection<MissionRole> missionRoles = new ArrayList<>();
         int unitType;
         switch (p.getPrimaryRole()) {
-            case MECHWARRIOR:
+            case MEKWARRIOR:
                 unitType = UnitType.MEK;
                 break;
             case AEROSPACE_PILOT:
@@ -152,7 +152,7 @@ public class AtBEventProcessor {
                 }
                 unitType = UnitType.AEROSPACEFIGHTER;
                 break;
-            case PROTOMECH_PILOT:
+            case PROTOMEK_PILOT:
                 unitType = UnitType.PROTOMEK;
                 break;
             case BATTLE_ARMOUR:
@@ -187,17 +187,17 @@ public class AtBEventProcessor {
             }
         }
         final String faction = getRecruitFaction(campaign);
-        MechSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight, campaign.getGameYear(),
+        MekSummary ms = campaign.getUnitGenerator().generate(faction, unitType, weight, campaign.getGameYear(),
                 IUnitRating.DRAGOON_F, movementModes, missionRoles);
         Entity en;
         if (null != ms) {
             if (Factions.getInstance().getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
                 String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");
-                ms = MechSummaryCache.getInstance().getMech(name);
+                ms = MekSummaryCache.getInstance().getMek(name);
                 LogManager.getLogger().info("looking for Clan infantry " + name);
             }
             try {
-                en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+                en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             } catch (EntityLoadingException ex) {
                 en = null;
                 LogManager.getLogger().error("Unable to load entity: "

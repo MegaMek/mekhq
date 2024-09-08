@@ -120,13 +120,13 @@ public class MissingProtoMekJumpJet extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof ProtomekJumpJet
-                && getUnitTonnage() == ((ProtomekJumpJet) part).getUnitTonnage();
+        return part instanceof ProtoMekJumpJet
+                && getUnitTonnage() == ((ProtoMekJumpJet) part).getUnitTonnage();
     }
 
     @Override
     public Part getNewPart() {
-        return new ProtomekJumpJet(getUnitTonnage(), campaign);
+        return new ProtoMekJumpJet(getUnitTonnage(), campaign);
     }
 
     private int getOtherDamagedJumpJets() {
@@ -137,7 +137,7 @@ public class MissingProtoMekJumpJet extends MissingPart {
                     continue;
                 }
                 if (p instanceof MissingProtoMekJumpJet
-                        || (p instanceof ProtomekJumpJet && ((ProtomekJumpJet) p).needsFixing())) {
+                        || (p instanceof ProtoMekJumpJet && ((ProtoMekJumpJet) p).needsFixing())) {
                     damagedJJ++;
                 }
             }
@@ -158,7 +158,7 @@ public class MissingProtoMekJumpJet extends MissingPart {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return ProtomekJumpJet.TECH_ADVANCEMENT;
+        return ProtoMekJumpJet.TECH_ADVANCEMENT;
     }
 
 }

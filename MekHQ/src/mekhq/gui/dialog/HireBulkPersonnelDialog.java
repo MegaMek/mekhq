@@ -384,13 +384,13 @@ public class HireBulkPersonnelDialog extends JDialog {
      */
     protected void overrideSkills(Person person, PersonnelRole primaryRole, int expLvl) {
         switch (primaryRole) {
-            case MECHWARRIOR:
-                addSkillFixedExperienceLevel(person, S_PILOT_MECH, expLvl);
-                addSkillFixedExperienceLevel(person, S_GUN_MECH, expLvl);
+            case MEKWARRIOR:
+                addSkillFixedExperienceLevel(person, S_PILOT_MEK, expLvl);
+                addSkillFixedExperienceLevel(person, S_GUN_MEK, expLvl);
                 break;
             case LAM_PILOT:
-                addSkillFixedExperienceLevel(person, S_PILOT_MECH, expLvl);
-                addSkillFixedExperienceLevel(person, S_GUN_MECH, expLvl);
+                addSkillFixedExperienceLevel(person, S_PILOT_MEK, expLvl);
+                addSkillFixedExperienceLevel(person, S_GUN_MEK, expLvl);
                 addSkillFixedExperienceLevel(person, S_PILOT_AERO, expLvl);
                 addSkillFixedExperienceLevel(person, S_GUN_AERO, expLvl);
                 break;
@@ -420,18 +420,18 @@ public class HireBulkPersonnelDialog extends JDialog {
                 addSkillFixedExperienceLevel(person, S_PILOT_JET, expLvl);
                 addSkillFixedExperienceLevel(person, S_GUN_JET, expLvl);
                 break;
-            case PROTOMECH_PILOT:
+            case PROTOMEK_PILOT:
                 addSkillFixedExperienceLevel(person, S_GUN_PROTO, expLvl);
                 break;
             case BATTLE_ARMOUR:
                 addSkillFixedExperienceLevel(person, S_GUN_BA, expLvl);
-                addSkillFixedExperienceLevel(person, S_ANTI_MECH, expLvl);
+                addSkillFixedExperienceLevel(person, S_ANTI_MEK, expLvl);
                 addSkillFixedExperienceLevel(person, S_SMALL_ARMS, expLvl);
                 break;
             case SOLDIER:
                 addSkillFixedExperienceLevel(person, S_SMALL_ARMS, expLvl);
                 if (Utilities.rollProbability(new RandomSkillPreferences().getAntiMekProb())) {
-                    addSkillFixedExperienceLevel(person, S_ANTI_MECH, expLvl);
+                    addSkillFixedExperienceLevel(person, S_ANTI_MEK, expLvl);
                 }
                 break;
             case VESSEL_PILOT:
@@ -446,8 +446,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             case VESSEL_NAVIGATOR:
                 addSkillFixedExperienceLevel(person, S_NAV, expLvl);
                 break;
-            case MECH_TECH:
-                addSkillFixedExperienceLevel(person, S_TECH_MECH, expLvl);
+            case MEK_TECH:
+                addSkillFixedExperienceLevel(person, S_TECH_MEK, expLvl);
                 break;
             case AERO_TECH:
                 addSkillFixedExperienceLevel(person, S_TECH_AERO, expLvl);

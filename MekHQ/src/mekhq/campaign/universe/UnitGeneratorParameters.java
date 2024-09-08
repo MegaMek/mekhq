@@ -10,7 +10,7 @@ import megamek.client.ratgenerator.MissionRole;
 import megamek.client.ratgenerator.ModelRecord;
 import megamek.client.ratgenerator.UnitTable.Parameters;
 import megamek.common.EntityMovementMode;
-import megamek.common.MechSummary;
+import megamek.common.MekSummary;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 
 /**
@@ -26,7 +26,7 @@ public class UnitGeneratorParameters {
     private int year;
     private int quality;
     private Collection<EntityMovementMode> movementModes;
-    private Predicate<MechSummary> filter;
+    private Predicate<MekSummary> filter;
     private Collection<MissionRole> missionRoles;
 
     public UnitGeneratorParameters() {
@@ -149,11 +149,11 @@ public class UnitGeneratorParameters {
         missionRoles.add(role);
     }
 
-    public Predicate<MechSummary> getFilter() {
+    public Predicate<MekSummary> getFilter() {
         return filter;
     }
 
-    public void setFilter(Predicate<MechSummary> filter) {
+    public void setFilter(Predicate<MekSummary> filter) {
         this.filter = filter;
     }
 }

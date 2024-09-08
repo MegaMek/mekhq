@@ -23,7 +23,7 @@ package mekhq.campaign.universe;
 
 import megamek.client.ratgenerator.*;
 import megamek.common.EntityMovementMode;
-import megamek.common.MechSummary;
+import megamek.common.MekSummary;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import org.apache.logging.log4j.LogManager;
@@ -92,46 +92,46 @@ public class RATGeneratorConnector extends AbstractUnitGenerator {
     }
 
     @Override
-    public @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
+    public @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
                                           final int year, final int quality,
                                           final Collection<EntityMovementMode> movementModes,
                                           final Collection<MissionRole> missionRoles,
-                                          @Nullable Predicate<MechSummary> filter) {
+                                          @Nullable Predicate<MekSummary> filter) {
         final UnitTable table = findTable(faction, unitType, weightClass, year, quality, movementModes, missionRoles);
         return (table == null) ? null : table.generateUnit((filter == null) ? null : filter::test);
     }
 
     @Override
-    public List<MechSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
+    public List<MekSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
                                       final int year, final int quality,
                                       final Collection<EntityMovementMode> movementModes,
                                       final Collection<MissionRole> missionRoles,
-                                      @Nullable Predicate<MechSummary> filter) {
+                                      @Nullable Predicate<MekSummary> filter) {
         final UnitTable table = findTable(faction, unitType, weightClass, year, quality, movementModes, missionRoles);
         return (table == null) ? new ArrayList<>() : table.generateUnits(count, (filter == null) ? null : filter::test);
     }
 
     /**
-     * Generates a list of mech summaries from a RAT determined by the given faction, quality and other parameters.
+     * Generates a list of mek summaries from a RAT determined by the given faction, quality and other parameters.
      * We force a fallback to try to ensure that something is generated if the parents have any possible units to generate,
      * as that is the normally expected behaviour for MekHQ OpFor generation.
      * @param count How many units to generate
      * @param parameters RATGenerator parameters
      */
     @Override
-    public List<MechSummary> generate(final int count, final UnitGeneratorParameters parameters) {
+    public List<MekSummary> generate(final int count, final UnitGeneratorParameters parameters) {
         final UnitTable table = findOpForTable(parameters);
         return table.generateUnits(count, (parameters.getFilter() == null) ? null : ms -> parameters.getFilter().test(ms));
     }
 
     /**
-     * Generates a single mech summary from a RAT determined by the given faction, quality and other parameters.
+     * Generates a single mek summary from a RAT determined by the given faction, quality and other parameters.
      * We force a fallback to try to ensure that something is generated if the parents have any possible units to generate,
      * as that is the normally expected behaviour for MekHQ OpFor generation.
      * @param parameters RATGenerator parameters
      */
     @Override
-    public @Nullable MechSummary generate(final UnitGeneratorParameters parameters) {
+    public @Nullable MekSummary generate(final UnitGeneratorParameters parameters) {
         final UnitTable table = findOpForTable(parameters);
         return table.generateUnit((parameters.getFilter() == null) ? null : ms -> parameters.getFilter().test(ms));
     }
@@ -140,7 +140,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator {
      * This finds a unit table for OpFor generation. It falls back using the parent faction to try to ensure there are
      * units in the unit table, so an OpFor is generated.
      * @param unitParameters the base parameters to find the table using.
-     * @return the unit table to use in generating OpFor mech summaries
+     * @return the unit table to use in generating OpFor mek summaries
      */
     private UnitTable findOpForTable(final UnitGeneratorParameters unitParameters) {
         final UnitTable.Parameters parameters = unitParameters.getRATGeneratorParameters();

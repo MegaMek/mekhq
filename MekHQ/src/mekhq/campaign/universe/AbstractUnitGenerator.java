@@ -19,7 +19,7 @@
 package mekhq.campaign.universe;
 
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.common.MechSummary;
+import megamek.common.MekSummary;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.rating.IUnitRating;
 import org.apache.logging.log4j.LogManager;
@@ -62,7 +62,7 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
      * @return List of turrets
      */
     @Override
-    public List<MechSummary> generateTurrets(int num, SkillLevel skill, int quality, int currentYear) {
+    public List<MekSummary> generateTurrets(int num, SkillLevel skill, int quality, int currentYear) {
         int ratYear;
 
         // less dirty hack

@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.universe.generators.battleMekQualityGenerators;
 
-import mekhq.campaign.universe.enums.BattleMechQualityGenerationMethod;
+import mekhq.campaign.universe.enums.BattleMekQualityGenerationMethod;
 
 /**
  * This was designed to provide options for the method of quality generation for Company Generators,
@@ -27,17 +27,17 @@ import mekhq.campaign.universe.enums.BattleMechQualityGenerationMethod;
  */
 public abstract class AbstractBattleMekQualityGenerator {
     //region Variable Declarations
-    private final BattleMechQualityGenerationMethod method;
+    private final BattleMekQualityGenerationMethod method;
     //endregion Variable Declarations
 
     //region Constructors
-    protected AbstractBattleMekQualityGenerator(final BattleMechQualityGenerationMethod method) {
+    protected AbstractBattleMekQualityGenerator(final BattleMekQualityGenerationMethod method) {
         this.method = method;
     }
     //endregion Constructors
 
     //region Getters
-    public BattleMechQualityGenerationMethod getMethod() {
+    public BattleMekQualityGenerationMethod getMethod() {
         return method;
     }
     //endregion Getters
