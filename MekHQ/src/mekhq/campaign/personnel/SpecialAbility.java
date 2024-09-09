@@ -20,6 +20,24 @@
  */
 package mekhq.campaign.personnel;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Vector;
+
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
@@ -38,17 +56,6 @@ import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * This object will serve as a wrapper for a specific pilot special ability. In
@@ -538,7 +545,7 @@ public class SpecialAbility {
     /**
      * Worker function that determines if a piece of equipment is eligible for being
      * selected for an SPA.
-     * 
+     *
      * @param et          Equipment type to check
      * @param role        Person's primary role. This check is ignored if
      *                    PersonnelRole.NONE is passed in.
@@ -565,7 +572,7 @@ public class SpecialAbility {
         if (!role.isCivilian()
                 && !((wt.hasFlag(WeaponType.F_MEK_WEAPON) && !role.isMekWarrior())
                         || (wt.hasFlag(WeaponType.F_AERO_WEAPON) && !role.isAerospacePilot())
-                        || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !role.isVehicleCrewmember())
+                        || (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !role.isVehicleCrewMember())
                         || (wt.hasFlag(WeaponType.F_BA_WEAPON) && !role.isBattleArmour())
                         || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && !role.isProtoMekPilot()))) {
             return false;

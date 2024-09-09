@@ -18,6 +18,29 @@
  */
 package mekhq.gui.adapter;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.personnel.education.Academy.skillParser;
+import static mekhq.campaign.personnel.education.EducationController.getAcademy;
+import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
+
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+
+import org.apache.logging.log4j.LogManager;
+
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
@@ -40,12 +63,26 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogger;
-import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.Award;
+import mekhq.campaign.personnel.AwardsFactory;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.ManeiDominiClass;
+import mekhq.campaign.personnel.enums.ManeiDominiRank;
+import mekhq.campaign.personnel.enums.MergingSurnameStyle;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -67,22 +104,6 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.campaign.personnel.education.Academy.skillParser;
-import static mekhq.campaign.personnel.education.EducationController.getAcademy;
-import static mekhq.campaign.personnel.education.EducationController.makeEnrollmentCheck;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     // region Variable Declarations
@@ -2259,7 +2280,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final boolean isNotAeroOrConventional = !(person.getPrimaryRole().isAerospacePilot()
                         || person.getPrimaryRole().isConventionalAircraftPilot()
                         || person.getPrimaryRole().isLAMPilot());
-                final boolean isNotVessel = !person.getPrimaryRole().isVesselCrewmember();
+                final boolean isNotVessel = !person.getPrimaryRole().isVesselCrewMember();
                 final boolean isNotAeroConvOrVessel = isNotAeroOrConventional || isNotVessel;
 
                 cbMenuItem = new JCheckBoxMenuItem(resources.getString("edgeTriggerAeroAltLoss.text"));

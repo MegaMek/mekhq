@@ -18,31 +18,32 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.BipedMek;
-import megamek.common.Dropship;
-import megamek.common.Jumpship;
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import megamek.common.BipedMek;
+import megamek.common.Dropship;
+import megamek.common.Jumpship;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
+
 public class ROMDesignationTest {
-    //region Variable Declarations
+    // region Variable Declarations
     private static final ROMDesignation[] designations = ROMDesignation.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
     public void testIsNone() {
         for (final ROMDesignation designation : designations) {
@@ -207,7 +208,7 @@ public class ROMDesignationTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     @Test
     public void testGetComStarBranchDesignation() {
@@ -293,7 +294,7 @@ public class ROMDesignationTest {
         assertEquals(" " + ROMDesignation.ZETA, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // Aero Tech - Expect " Zeta"
-        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.AERO_TECH);
+        when(mockPerson.getPrimaryRole()).thenReturn(PersonnelRole.AERO_TEK);
         assertEquals(" " + ROMDesignation.ZETA, ROMDesignation.getComStarBranchDesignation(mockPerson));
 
         // BA Tech - Expect " Zeta"
@@ -345,7 +346,7 @@ public class ROMDesignationTest {
                 ROMDesignation.getComStarBranchDesignation(mockPerson));
     }
 
-    //region File I/O
+    // region File I/O
     @Test
     public void testParseFromString() {
         // Normal Parsing
@@ -360,7 +361,7 @@ public class ROMDesignationTest {
         assertEquals(ROMDesignation.NONE, ROMDesignation.parseFromString("15"));
         assertEquals(ROMDesignation.NONE, ROMDesignation.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
     public void testToStringOverride() {

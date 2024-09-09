@@ -19,6 +19,18 @@
  */
 package mekhq.campaign;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.EquipmentType;
@@ -39,13 +51,6 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * @author natit
@@ -797,7 +802,7 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.VESSEL_NAVIGATOR, 1000);
         setRoleBaseSalary(PersonnelRole.MEK_TECH, 800);
         setRoleBaseSalary(PersonnelRole.MECHANIC, 800);
-        setRoleBaseSalary(PersonnelRole.AERO_TECH, 800);
+        setRoleBaseSalary(PersonnelRole.AERO_TEK, 800);
         setRoleBaseSalary(PersonnelRole.BA_TECH, 800);
         setRoleBaseSalary(PersonnelRole.ASTECH, 400);
         setRoleBaseSalary(PersonnelRole.DOCTOR, 1500);

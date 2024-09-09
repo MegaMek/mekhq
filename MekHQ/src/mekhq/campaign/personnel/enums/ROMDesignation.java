@@ -18,18 +18,19 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import java.util.ResourceBundle;
+
+import org.apache.logging.log4j.LogManager;
+
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.ResourceBundle;
 
 public enum ROMDesignation {
-    //region Enum Declarations
+    // region Enum Declarations
     NONE("ROMDesignation.NONE.text"),
     EPSILON("ROMDesignation.EPSILON.text"),
     PI("ROMDesignation.PI.text"),
@@ -45,21 +46,21 @@ public enum ROMDesignation {
     CHI("ROMDesignation.CHI.text"),
     GAMMA("ROMDesignation.GAMMA.text"),
     KAPPA("ROMDesignation.KAPPA.text");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     ROMDesignation(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isNone() {
         return this == NONE;
     }
@@ -119,7 +120,7 @@ public enum ROMDesignation {
     public boolean isKappa() {
         return this == KAPPA;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     public static String getComStarBranchDesignation(final Person person) {
         final StringBuilder sb = new StringBuilder(" ");
@@ -142,7 +143,7 @@ public enum ROMDesignation {
     }
 
     private static String determineDesignationFromRole(final PersonnelRole role,
-                                                       final Person person) {
+            final Person person) {
         switch (role) {
             case MEKWARRIOR:
             case LAM_PILOT:
@@ -175,7 +176,7 @@ public enum ROMDesignation {
                 break;
             case MEK_TECH:
             case MECHANIC:
-            case AERO_TECH:
+            case AERO_TEK:
             case BA_TECH:
             case ASTECH:
                 return ZETA.toString();
@@ -194,7 +195,7 @@ public enum ROMDesignation {
         return "";
     }
 
-    //region File I/O
+    // region File I/O
     public static ROMDesignation parseFromString(final String text) {
         // Parse based on the enum name
         try {
@@ -218,7 +219,7 @@ public enum ROMDesignation {
         LogManager.getLogger().error("Unable to parse " + text + " into a ROMDesignation. Returning NONE");
         return ROMDesignation.NONE;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

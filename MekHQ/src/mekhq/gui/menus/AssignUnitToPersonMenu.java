@@ -18,6 +18,15 @@
  */
 package mekhq.gui.menus;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.swing.JMenuItem;
+
+import org.apache.logging.log4j.LogManager;
+
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
@@ -27,27 +36,21 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.sorter.PersonTitleSorter;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
- * This is a standard menu that takes either a unit or multiple units that require the same tech
+ * This is a standard menu that takes either a unit or multiple units that
+ * require the same tech
  * type, and allows the user to assign or remove a tech from them.
  */
 public class AssignUnitToPersonMenu extends JScrollableMenu {
-    //region Constructors
+    // region Constructors
     public AssignUnitToPersonMenu(final Campaign campaign, final Unit... units) {
         super("AssignUnitToPersonMenu");
         initialize(campaign, units);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Initialization
+    // region Initialization
     private void initialize(final Campaign campaign, final Unit... units) {
         // Immediate Return for Illegal Assignments:
         // 1) No units to assign
@@ -68,7 +71,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // Assign Tech to Unit Menu
         add(new AssignUnitToTechMenu(campaign, units));
 
-        // Finally, add the ability to simply unassign... provided at least one of the units has
+        // Finally, add the ability to simply unassign... provided at least one of the
+        // units has
         // any crew or a tech
         if (Stream.of(units).anyMatch(unit -> (unit.getTech() != null) || !unit.getCrew().isEmpty())) {
             final JMenuItem miUnassignCrew = new JMenuItem(resources.getString("miUnassignCrew.text"));
@@ -87,11 +91,15 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         final JScrollableMenu pilotMenu = new JScrollableMenu("pilotMenu", resources.getString("pilotMenu.text"));
         final JScrollableMenu driverMenu = new JScrollableMenu("driverMenu", resources.getString("driverMenu.text"));
         final JScrollableMenu gunnerMenu = new JScrollableMenu("gunnerMenu", resources.getString("gunnerMenu.text"));
-        final JScrollableMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu", resources.getString("crewmemberMenu.text"));
-        final JScrollableMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu", resources.getString("techOfficerMenu.text"));
-        final JScrollableMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu", resources.getString("consoleCommanderMenu.text"));
+        final JScrollableMenu crewmemberMenu = new JScrollableMenu("crewmemberMenu",
+                resources.getString("crewmemberMenu.text"));
+        final JScrollableMenu techOfficerMenu = new JScrollableMenu("techOfficerMenu",
+                resources.getString("techOfficerMenu.text"));
+        final JScrollableMenu consoleCommanderMenu = new JScrollableMenu("consoleCommanderMenu",
+                resources.getString("consoleCommanderMenu.text"));
         final JScrollableMenu soldierMenu = new JScrollableMenu("soldierMenu", resources.getString("soldierMenu.text"));
-        final JScrollableMenu navigatorMenu = new JScrollableMenu("navigatorMenu", resources.getString("navigatorMenu.text"));
+        final JScrollableMenu navigatorMenu = new JScrollableMenu("navigatorMenu",
+                resources.getString("navigatorMenu.text"));
 
         // Parsing Booleans
         final Entity entity = units[0].getEntity();
@@ -117,9 +125,12 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // 2) A Prisoner
         // 3) Already assigned to a unit
         // 4) Civilian Primary Role
-        // 5) Astech Primary role with the Medical, Administrator, or None Secondary Roles
-        // 6) Medical Primary role with the Astech, Administrator, or None Secondary Roles
-        // 7) Administrator Primary Role with Astech, Medical, Administrator, or None Secondary Roles
+        // 5) Astech Primary role with the Medical, Administrator, or None Secondary
+        // Roles
+        // 6) Medical Primary role with the Astech, Administrator, or None Secondary
+        // Roles
+        // 7) Administrator Primary Role with Astech, Medical, Administrator, or None
+        // Secondary Roles
         // Then sorts the remainder based on their full title
         List<Person> personnel = campaign.getPersonnel().stream()
                 .filter(person -> person.getStatus().isActive())
@@ -128,17 +139,17 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                 .filter(person -> !Profession.getProfessionFromPersonnelRole(person.getPrimaryRole()).isCivilian())
                 .filter(person -> !person.getPrimaryRole().isAstech()
                         || !(person.getSecondaryRole().isMedicalStaff()
-                        || person.getSecondaryRole().isAdministrator()
-                        || person.getSecondaryRole().isNone()))
+                                || person.getSecondaryRole().isAdministrator()
+                                || person.getSecondaryRole().isNone()))
                 .filter(person -> !person.getPrimaryRole().isMedicalStaff()
                         || !(person.getSecondaryRole().isAstech()
-                        || person.getSecondaryRole().isAdministrator()
-                        || person.getSecondaryRole().isNone()))
+                                || person.getSecondaryRole().isAdministrator()
+                                || person.getSecondaryRole().isNone()))
                 .filter(person -> !person.getPrimaryRole().isAdministrator()
                         || !(person.getSecondaryRole().isAstech()
-                        || person.getSecondaryRole().isMedicalStaff()
-                        || person.getSecondaryRole().isAdministrator()
-                        || person.getSecondaryRole().isNone()))
+                                || person.getSecondaryRole().isMedicalStaff()
+                                || person.getSecondaryRole().isAdministrator()
+                                || person.getSecondaryRole().isNone()))
                 .sorted(new PersonTitleSorter().reversed())
                 .collect(Collectors.toList());
 
@@ -146,7 +157,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
             return;
         }
 
-        // The order of this if statement is required to properly filter based on the unit type
+        // The order of this if statement is required to properly filter based on the
+        // unit type
         if (isMek) {
             personnel = personnel.stream()
                     .filter(person -> person.getPrimaryRole().isMekWarriorGrouping()
@@ -159,13 +171,13 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     .collect(Collectors.toList());
         } else if (isTank) {
             personnel = personnel.stream()
-                    .filter(person -> person.getPrimaryRole().isVehicleCrewmember()
-                            || person.getSecondaryRole().isVehicleCrewmember())
+                    .filter(person -> person.getPrimaryRole().isVehicleCrewMember()
+                            || person.getSecondaryRole().isVehicleCrewMember())
                     .collect(Collectors.toList());
         } else if (isSmallCraftOrJumpShip) {
             personnel = personnel.stream()
-                    .filter(person -> person.getPrimaryRole().isVesselCrewmember()
-                            || person.getSecondaryRole().isVesselCrewmember())
+                    .filter(person -> person.getPrimaryRole().isVesselCrewMember()
+                            || person.getSecondaryRole().isVesselCrewMember())
                     .collect(Collectors.toList());
         } else if (isConventionalAircraft) {
             personnel = personnel.stream()
@@ -184,7 +196,8 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         } else if (usesSoldiers) {
             personnel = personnel.stream()
                     .filter(person -> person.hasRole(isConventionalInfantry
-                            ? PersonnelRole.SOLDIER : PersonnelRole.BATTLE_ARMOUR))
+                            ? PersonnelRole.SOLDIER
+                            : PersonnelRole.BATTLE_ARMOUR))
                     .collect(Collectors.toList());
         } else {
             LogManager.getLogger().error("Unhandled entity type of " + units[0].getEntity().getClass().toString());
@@ -229,33 +242,39 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             .filter(person -> person.hasRole(PersonnelRole.VTOL_PILOT))
                             .collect(Collectors.toList());
                 } else {
-                    LogManager.getLogger().warn("Attempting to assign pilot to unknown unit type of " + units[0].getEntity().getClass());
+                    LogManager.getLogger().warn(
+                            "Attempting to assign pilot to unknown unit type of " + units[0].getEntity().getClass());
                     filteredPersonnel = new ArrayList<>();
                 }
 
-
                 if (!filteredPersonnel.isEmpty()) {
                     // Create the SkillLevel Submenus
-                    final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                    final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu",
+                            SkillLevel.LEGENDARY.toString());
                     final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
                     final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
-                    final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
-                    final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                    final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu",
+                            SkillLevel.VETERAN.toString());
+                    final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu",
+                            SkillLevel.REGULAR.toString());
                     final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
-                    final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
+                    final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                            SkillLevel.ULTRA_GREEN.toString());
 
                     // Add the person to the proper menu
                     for (final Person person : filteredPersonnel) {
                         final JScrollableMenu subMenu;
                         final SkillLevel skillLevel;
                         if (isMek) {
-                            skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isMekWarriorGrouping());
+                            skillLevel = person.getSkillLevel(campaign,
+                                    !person.getPrimaryRole().isMekWarriorGrouping());
                         } else if (isProtoMek) {
                             skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isProtoMekPilot());
                         } else if (isSmallCraftOrJumpShip) {
                             skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVesselPilot());
                         } else if (isConventionalAircraft) {
-                            skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isConventionalAirGrouping());
+                            skillLevel = person.getSkillLevel(campaign,
+                                    !person.getPrimaryRole().isConventionalAirGrouping());
                         } else if (isAero) {
                             skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isAerospaceGrouping());
                         } else { // it's a VTOL
@@ -323,23 +342,29 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                 final boolean isNaval = units[0].getEntity().getMovementMode().isMarine();
                 filteredPersonnel = personnel.stream()
                         .filter(person -> person.hasRole(isNaval
-                                ? PersonnelRole.NAVAL_VEHICLE_DRIVER : PersonnelRole.GROUND_VEHICLE_DRIVER))
+                                ? PersonnelRole.NAVAL_VEHICLE_DRIVER
+                                : PersonnelRole.GROUND_VEHICLE_DRIVER))
                         .collect(Collectors.toList());
                 if (!filteredPersonnel.isEmpty()) {
                     // Create the SkillLevel Submenus
-                    final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                    final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu",
+                            SkillLevel.LEGENDARY.toString());
                     final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
                     final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
-                    final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
-                    final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
+                    final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu",
+                            SkillLevel.VETERAN.toString());
+                    final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu",
+                            SkillLevel.REGULAR.toString());
                     final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
-                    final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
+                    final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                            SkillLevel.ULTRA_GREEN.toString());
 
                     // Add the person to the proper menu
                     for (final Person person : filteredPersonnel) {
                         final JScrollableMenu subMenu;
                         switch (person.getSkillLevel(campaign, isNaval
-                                ? !person.getPrimaryRole().isNavalVehicleDriver() : !person.getPrimaryRole().isGroundVehicleDriver())) {
+                                ? !person.getPrimaryRole().isNavalVehicleDriver()
+                                : !person.getPrimaryRole().isGroundVehicleDriver())) {
                             case LEGENDARY:
                                 subMenu = legendaryMenu;
                                 break;
@@ -397,17 +422,19 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     .filter(person -> (isSmallCraftOrJumpShip && person.hasRole(PersonnelRole.VESSEL_GUNNER)) ||
                             (isTank && person.hasRole(PersonnelRole.VEHICLE_GUNNER)) ||
                             ((isSuperHeavyMek || isTripod) && person.getPrimaryRole().isMekWarriorGrouping()
-                                || person.getSecondaryRole().isMekWarriorGrouping()))
+                                    || person.getSecondaryRole().isMekWarriorGrouping()))
                     .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
                 // Create the SkillLevel Submenus
-                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu",
+                        SkillLevel.LEGENDARY.toString());
                 final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
                 final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
                 final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
                 final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
                 final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
-                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
+                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                        SkillLevel.ULTRA_GREEN.toString());
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
@@ -481,19 +508,22 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
                 // Create the SkillLevel Submenus
-                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu",
+                        SkillLevel.LEGENDARY.toString());
                 final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
                 final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
                 final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
                 final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
                 final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
-                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
+                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                        SkillLevel.ULTRA_GREEN.toString());
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
                     switch (person.getSkillLevel(campaign, isAero
-                            ? !person.getPrimaryRole().isVesselCrew() : !person.getPrimaryRole().isVehicleCrew())) {
+                            ? !person.getPrimaryRole().isVesselCrew()
+                            : !person.getPrimaryRole().isVehicleCrew())) {
                         case LEGENDARY:
                             subMenu = legendaryMenu;
                             break;
@@ -544,10 +574,14 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
             }
         }
 
-        // Tech Officer and Console Commander Menu, currently combined as required by the current setup
-        // TODO : Our implementation for Console Commanders in MekHQ makes this a necessity, but
-        // TODO : I find that really terrible. We should be able to separate out tech officers
-        // TODO : and Console Commanders properly. Because of this, I'm leaving the base code
+        // Tech Officer and Console Commander Menu, currently combined as required by
+        // the current setup
+        // TODO : Our implementation for Console Commanders in MekHQ makes this a
+        // necessity, but
+        // TODO : I find that really terrible. We should be able to separate out tech
+        // officers
+        // TODO : and Console Commanders properly. Because of this, I'm leaving the base
+        // code
         // TODO : here as the older style for now.
         if (canTakeTechOfficer) {
             for (final Person person : personnel) {
@@ -589,24 +623,28 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         if (units[0].usesSoldiers() && canTakeMoreGunners) {
             filteredPersonnel = personnel.stream()
                     .filter(person -> person.hasRole(isConventionalInfantry
-                            ? PersonnelRole.SOLDIER : PersonnelRole.BATTLE_ARMOUR))
+                            ? PersonnelRole.SOLDIER
+                            : PersonnelRole.BATTLE_ARMOUR))
                     .collect(Collectors.toList());
 
             if (!filteredPersonnel.isEmpty()) {
                 // Create the SkillLevel Submenus
-                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu",
+                        SkillLevel.LEGENDARY.toString());
                 final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
                 final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
                 final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
                 final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
                 final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
-                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
+                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                        SkillLevel.ULTRA_GREEN.toString());
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
                     switch (person.getSkillLevel(campaign, isConventionalInfantry
-                            ? !person.getPrimaryRole().isSoldier() : !person.getPrimaryRole().isBattleArmour())) {
+                            ? !person.getPrimaryRole().isSoldier()
+                            : !person.getPrimaryRole().isBattleArmour())) {
                         case LEGENDARY:
                             subMenu = legendaryMenu;
                             break;
@@ -665,13 +703,15 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                     .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
                 // Create the SkillLevel Submenus
-                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                final JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu",
+                        SkillLevel.LEGENDARY.toString());
                 final JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
                 final JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
                 final JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
                 final JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
                 final JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
-                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
+                final JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                        SkillLevel.ULTRA_GREEN.toString());
 
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
@@ -736,5 +776,5 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         add(soldierMenu);
         add(navigatorMenu);
     }
-    //endregion Initialization
+    // endregion Initialization
 }

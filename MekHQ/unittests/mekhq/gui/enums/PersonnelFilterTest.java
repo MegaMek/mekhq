@@ -18,37 +18,37 @@
  */
 package mekhq.gui.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PersonnelFilterTest {
-    //region Variable Declarations
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class PersonnelFilterTest {
+    // region Variable Declarations
     private static final PersonnelFilter[] filters = PersonnelFilter.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
-    public void testGetToolTipText() {
+    void testGetToolTipText() {
         assertEquals(resources.getString("PersonnelFilter.ALL.toolTipText"),
                 PersonnelFilter.ALL.getToolTipText());
         assertEquals(resources.getString("PersonnelFilter.PROTOMEK_PILOT.toolTipText"),
                 PersonnelFilter.PROTOMEK_PILOT.getToolTipText());
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsAll() {
+    void testIsAll() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.ALL) {
                 assertTrue(personnelFilter.isAll());
@@ -59,7 +59,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsActive() {
+    void testIsActive() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.ACTIVE) {
                 assertTrue(personnelFilter.isActive());
@@ -70,7 +70,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsCombat() {
+    void testIsCombat() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.COMBAT) {
                 assertTrue(personnelFilter.isCombat());
@@ -81,7 +81,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsSupport() {
+    void testIsSupport() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.SUPPORT) {
                 assertTrue(personnelFilter.isSupport());
@@ -92,7 +92,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsMekWarriors() {
+    void testIsMekWarriors() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.MEKWARRIORS) {
                 assertTrue(personnelFilter.isMekWarriors());
@@ -103,7 +103,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsMekWarrior() {
+    void testIsMekWarrior() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.MEKWARRIOR) {
                 assertTrue(personnelFilter.isMekWarrior());
@@ -114,7 +114,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsLAMPilot() {
+    void testIsLAMPilot() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.LAM_PILOT) {
                 assertTrue(personnelFilter.isLAMPilot());
@@ -125,18 +125,18 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsVehicleCrewmember() {
+    void testIsVehicleCrewMember() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VEHICLE_CREWMEMBER) {
-                assertTrue(personnelFilter.isVehicleCrewmember());
+                assertTrue(personnelFilter.isVehicleCrewMember());
             } else {
-                assertFalse(personnelFilter.isVehicleCrewmember());
+                assertFalse(personnelFilter.isVehicleCrewMember());
             }
         }
     }
 
     @Test
-    public void testIsGroundVehicleDriver() {
+    void testIsGroundVehicleDriver() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.GROUND_VEHICLE_DRIVER) {
                 assertTrue(personnelFilter.isGroundVehicleDriver());
@@ -147,7 +147,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsNavalVehicleDriver() {
+    void testIsNavalVehicleDriver() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.NAVAL_VEHICLE_DRIVER) {
                 assertTrue(personnelFilter.isNavalVehicleDriver());
@@ -158,7 +158,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsVTOLPilot() {
+    void testIsVTOLPilot() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VTOL_PILOT) {
                 assertTrue(personnelFilter.isVTOLPilot());
@@ -169,7 +169,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsVehicleGunner() {
+    void testIsVehicleGunner() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VEHICLE_GUNNER) {
                 assertTrue(personnelFilter.isVehicleGunner());
@@ -180,7 +180,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsVehicleCrew() {
+    void testIsVehicleCrew() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VEHICLE_CREW) {
                 assertTrue(personnelFilter.isVehicleCrew());
@@ -191,7 +191,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsAerospacePilot() {
+    void testIsAerospacePilot() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.AEROSPACE_PILOT) {
                 assertTrue(personnelFilter.isAerospacePilot());
@@ -202,7 +202,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsConventionalAircraftPilot() {
+    void testIsConventionalAircraftPilot() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT) {
                 assertTrue(personnelFilter.isConventionalAircraftPilot());
@@ -213,7 +213,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsProtoMekPilot() {
+    void testIsProtoMekPilot() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.PROTOMEK_PILOT) {
                 assertTrue(personnelFilter.isProtoMekPilot());
@@ -224,7 +224,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsBattleArmour() {
+    void testIsBattleArmour() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.BATTLE_ARMOUR) {
                 assertTrue(personnelFilter.isBattleArmor());
@@ -235,7 +235,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsSoldier() {
+    void testIsSoldier() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.SOLDIER) {
                 assertTrue(personnelFilter.isSoldier());
@@ -246,18 +246,18 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsVesselCrewmember() {
+    void testIsVesselCrewMember() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VESSEL_CREWMEMBER) {
-                assertTrue(personnelFilter.isVesselCrewmember());
+                assertTrue(personnelFilter.isVesselCrewMember());
             } else {
-                assertFalse(personnelFilter.isVesselCrewmember());
+                assertFalse(personnelFilter.isVesselCrewMember());
             }
         }
     }
 
     @Test
-    public void testIsVesselPilot() {
+    void testIsVesselPilot() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VESSEL_PILOT) {
                 assertTrue(personnelFilter.isVesselPilot());
@@ -268,7 +268,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsVesselGunner() {
+    void testIsVesselGunner() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VESSEL_GUNNER) {
                 assertTrue(personnelFilter.isVesselGunner());
@@ -279,7 +279,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsVesselCrew() {
+    void testIsVesselCrew() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VESSEL_CREW) {
                 assertTrue(personnelFilter.isVesselCrew());
@@ -290,7 +290,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsVesselNavigator() {
+    void testIsVesselNavigator() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.VESSEL_NAVIGATOR) {
                 assertTrue(personnelFilter.isVesselNavigator());
@@ -301,7 +301,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsTech() {
+    void testIsTech() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.TECH) {
                 assertTrue(personnelFilter.isTech());
@@ -312,7 +312,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsMekTech() {
+    void testIsMekTech() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.MEK_TECH) {
                 assertTrue(personnelFilter.isMekTech());
@@ -323,7 +323,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsMechanic() {
+    void testIsMechanic() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.MECHANIC) {
                 assertTrue(personnelFilter.isMechanic());
@@ -334,18 +334,18 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsAeroTech() {
+    void testIsAeroTek() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.AERO_TECH) {
-                assertTrue(personnelFilter.isAeroTech());
+                assertTrue(personnelFilter.isAeroTek());
             } else {
-                assertFalse(personnelFilter.isAeroTech());
+                assertFalse(personnelFilter.isAeroTek());
             }
         }
     }
 
     @Test
-    public void testIsBATech() {
+    void testIsBATech() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.BA_TECH) {
                 assertTrue(personnelFilter.isBATech());
@@ -356,7 +356,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsAstech() {
+    void testIsAstech() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.ASTECH) {
                 assertTrue(personnelFilter.isAstech());
@@ -367,7 +367,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsMedical() {
+    void testIsMedical() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.MEDICAL) {
                 assertTrue(personnelFilter.isMedical());
@@ -378,7 +378,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsDoctor() {
+    void testIsDoctor() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.DOCTOR) {
                 assertTrue(personnelFilter.isDoctor());
@@ -389,7 +389,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsMedic() {
+    void testIsMedic() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.MEDIC) {
                 assertTrue(personnelFilter.isMedic());
@@ -400,7 +400,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsAdministrator() {
+    void testIsAdministrator() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.ADMINISTRATOR) {
                 assertTrue(personnelFilter.isAdministrator());
@@ -411,7 +411,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsAdministratorCommand() {
+    void testIsAdministratorCommand() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.ADMINISTRATOR_COMMAND) {
                 assertTrue(personnelFilter.isAdministratorCommand());
@@ -422,7 +422,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsAdministratorLogistics() {
+    void testIsAdministratorLogistics() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.ADMINISTRATOR_LOGISTICS) {
                 assertTrue(personnelFilter.isAdministratorLogistics());
@@ -433,7 +433,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsAdministratorTransport() {
+    void testIsAdministratorTransport() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.ADMINISTRATOR_TRANSPORT) {
                 assertTrue(personnelFilter.isAdministratorTransport());
@@ -444,7 +444,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsAdministratorHR() {
+    void testIsAdministratorHR() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.ADMINISTRATOR_HR) {
                 assertTrue(personnelFilter.isAdministratorHR());
@@ -455,7 +455,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsDependent() {
+    void testIsDependent() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.DEPENDENT) {
                 assertTrue(personnelFilter.isDependent());
@@ -466,7 +466,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsFounder() {
+    void testIsFounder() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.FOUNDER) {
                 assertTrue(personnelFilter.isFounder());
@@ -477,7 +477,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsPrisoner() {
+    void testIsPrisoner() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.PRISONER) {
                 assertTrue(personnelFilter.isPrisoner());
@@ -488,7 +488,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsInactive() {
+    void testIsInactive() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.INACTIVE) {
                 assertTrue(personnelFilter.isInactive());
@@ -499,7 +499,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsMIA() {
+    void testIsMIA() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.MIA) {
                 assertTrue(personnelFilter.isMIA());
@@ -510,7 +510,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsRetired() {
+    void testIsRetired() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.RETIRED) {
                 assertTrue(personnelFilter.isRetired());
@@ -521,7 +521,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsDeserted() {
+    void testIsDeserted() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.DESERTED) {
                 assertTrue(personnelFilter.isDeserted());
@@ -532,7 +532,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsStudent() {
+    void testIsStudent() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.STUDENT) {
                 assertTrue(personnelFilter.isStudent());
@@ -543,7 +543,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsKIA() {
+    void testIsKIA() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.KIA) {
                 assertTrue(personnelFilter.isKIA());
@@ -554,7 +554,7 @@ public class PersonnelFilterTest {
     }
 
     @Test
-    public void testIsDead() {
+    void testIsDead() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.DEAD) {
                 assertTrue(personnelFilter.isDead());
@@ -563,52 +563,10 @@ public class PersonnelFilterTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetStandardPersonnelFilters() {
-
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetExpandedPersonnelFilters() {
-
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetIndividualRolesStandardPersonnelFilters() {
-
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetIndividualRolesExpandedPersonnelFilters() {
-
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetAllStandardFilters() {
-
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetAllIndividualRoleFilters() {
-        assertEquals(filters.length, PersonnelFilter.getAllIndividualRoleFilters().size());
-    }
-
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGetFilteredInformation() {
-
-    }
+    // endregion Boolean Comparison Methods
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("PersonnelFilter.ALL.text"), PersonnelFilter.ALL.toString());
         assertEquals(resources.getString("PersonnelFilter.SOLDIER.text"), PersonnelFilter.SOLDIER.toString());
         assertEquals(resources.getString("PersonnelFilter.PRISONER.text"), PersonnelFilter.PRISONER.toString());

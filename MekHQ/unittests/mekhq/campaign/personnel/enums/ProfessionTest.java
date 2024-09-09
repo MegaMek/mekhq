@@ -18,16 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.personnel.ranks.RankSystem;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,15 +26,26 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
+
 public class ProfessionTest {
-    //region Variable Declarations
+    // region Variable Declarations
     private static final Profession[] professions = Profession.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
     public void testGetToolTipText() {
         assertEquals(resources.getString("Profession.MEKWARRIOR.toolTipText"),
@@ -52,9 +53,9 @@ public class ProfessionTest {
         assertEquals(resources.getString("Profession.ADMINISTRATOR.toolTipText"),
                 Profession.ADMINISTRATOR.getToolTipText());
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
     public void testIsMekWarrior() {
         for (final Profession profession : professions) {
@@ -153,40 +154,48 @@ public class ProfessionTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     @Disabled // FIXME : Windchild : Broken Test
     @Test
     public void testGetProfession() {
-/*
-        final Rank mockRankA = mock(Rank.class);
-        when(mockRankA.getName(Profession.NAVAL)).thenReturn("Naval");
-        when(mockRankA.isEmpty(Profession.NAVAL)).thenReturn(false);
-        when(mockRankA.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false);
-        when(mockRankA.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
-        when(mockRankA.isEmpty(Profession.AEROSPACE)).thenReturn(false);
-        when(mockRankA.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(true);
-
-        final Rank mockRankB = mock(Rank.class);
-        when(mockRankB.getName(Profession.NAVAL)).thenReturn("-");
-        when(mockRankB.isEmpty(Profession.NAVAL)).thenReturn(true);
-        when(mockRankB.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false);
-        when(mockRankB.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
-        when(mockRankB.isEmpty(Profession.AEROSPACE)).thenReturn(false);
-        when(mockRankB.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(true);
-
-        final List<Rank> ranks = new ArrayList<>();
-        ranks.add(mockRankA);
-        ranks.add(mockRankB);
-
-        final RankSystem mockRankSystem = mock(RankSystem.class);
-        when(mockRankSystem.getRanks()).thenReturn(ranks);
-
-        assertEquals(Profession.NAVAL, Profession.NAVAL.getProfession(mockRankSystem, mockRankA));
-        assertEquals(Profession.NAVAL, Profession.AEROSPACE.getProfession(mockRankSystem, mockRankA));
-        assertEquals(Profession.NAVAL, Profession.NAVAL.getProfession(mockRankSystem, mockRankB));
-        assertEquals(Profession.NAVAL, Profession.AEROSPACE.getProfession(mockRankSystem, mockRankB));
- */
+        /*
+         * final Rank mockRankA = mock(Rank.class);
+         * when(mockRankA.getName(Profession.NAVAL)).thenReturn("Naval");
+         * when(mockRankA.isEmpty(Profession.NAVAL)).thenReturn(false);
+         * when(mockRankA.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false
+         * );
+         * when(mockRankA.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
+         * when(mockRankA.isEmpty(Profession.AEROSPACE)).thenReturn(false);
+         * when(mockRankA.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(
+         * true);
+         * 
+         * final Rank mockRankB = mock(Rank.class);
+         * when(mockRankB.getName(Profession.NAVAL)).thenReturn("-");
+         * when(mockRankB.isEmpty(Profession.NAVAL)).thenReturn(true);
+         * when(mockRankB.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false
+         * );
+         * when(mockRankB.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
+         * when(mockRankB.isEmpty(Profession.AEROSPACE)).thenReturn(false);
+         * when(mockRankB.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(
+         * true);
+         * 
+         * final List<Rank> ranks = new ArrayList<>();
+         * ranks.add(mockRankA);
+         * ranks.add(mockRankB);
+         * 
+         * final RankSystem mockRankSystem = mock(RankSystem.class);
+         * when(mockRankSystem.getRanks()).thenReturn(ranks);
+         * 
+         * assertEquals(Profession.NAVAL, Profession.NAVAL.getProfession(mockRankSystem,
+         * mockRankA));
+         * assertEquals(Profession.NAVAL,
+         * Profession.AEROSPACE.getProfession(mockRankSystem, mockRankA));
+         * assertEquals(Profession.NAVAL, Profession.NAVAL.getProfession(mockRankSystem,
+         * mockRankB));
+         * assertEquals(Profession.NAVAL,
+         * Profession.AEROSPACE.getProfession(mockRankSystem, mockRankB));
+         */
     }
 
     @Disabled // FIXME : Windchild : Test Missing
@@ -210,52 +219,56 @@ public class ProfessionTest {
     @Disabled // FIXME : Windchild : Broken Test
     @Test
     public void testIsEmptyProfessionInitialRank() {
-/*
-        final Rank mockRank = mock(Rank.class);
-        when(mockRank.getName(Profession.NAVAL)).thenReturn("Naval");
-        when(mockRank.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
-
-        final List<Rank> ranks = new ArrayList<>();
-        ranks.add(mockRank);
-
-        final RankSystem mockRankSystem = mock(RankSystem.class);
-        when(mockRankSystem.getRanks()).thenReturn(ranks);
-
-        assertFalse(Profession.NAVAL.isEmptyProfession(mockRankSystem));
-        assertTrue(Profession.AEROSPACE.isEmptyProfession(mockRankSystem));
-*/
+        /*
+         * final Rank mockRank = mock(Rank.class);
+         * when(mockRank.getName(Profession.NAVAL)).thenReturn("Naval");
+         * when(mockRank.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
+         * 
+         * final List<Rank> ranks = new ArrayList<>();
+         * ranks.add(mockRank);
+         * 
+         * final RankSystem mockRankSystem = mock(RankSystem.class);
+         * when(mockRankSystem.getRanks()).thenReturn(ranks);
+         * 
+         * assertFalse(Profession.NAVAL.isEmptyProfession(mockRankSystem));
+         * assertTrue(Profession.AEROSPACE.isEmptyProfession(mockRankSystem));
+         */
     }
 
     @Disabled // FIXME : Windchild : Broken Test
     @Test
     public void testIsEmptyProfessionCheckAll() {
-/*
-        final Rank mockRankA = mock(Rank.class);
-        when(mockRankA.getName(Profession.NAVAL)).thenReturn("Naval");
-        when(mockRankA.isEmpty(Profession.NAVAL)).thenReturn(false);
-        when(mockRankA.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false);
-        when(mockRankA.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
-        when(mockRankA.isEmpty(Profession.AEROSPACE)).thenReturn(false);
-        when(mockRankA.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(true);
-
-        final Rank mockRankB = mock(Rank.class);
-        when(mockRankB.getName(Profession.NAVAL)).thenReturn("-");
-        when(mockRankB.isEmpty(Profession.NAVAL)).thenReturn(true);
-        when(mockRankB.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false);
-        when(mockRankB.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
-        when(mockRankB.isEmpty(Profession.AEROSPACE)).thenReturn(false);
-        when(mockRankB.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(true);
-
-        final List<Rank> ranks = new ArrayList<>();
-        ranks.add(mockRankA);
-        ranks.add(mockRankB);
-
-        final RankSystem mockRankSystem = mock(RankSystem.class);
-        when(mockRankSystem.getRanks()).thenReturn(ranks);
-
-        assertFalse(Profession.NAVAL.isEmptyProfession(mockRankSystem));
-        assertTrue(Profession.AEROSPACE.isEmptyProfession(mockRankSystem));
- */
+        /*
+         * final Rank mockRankA = mock(Rank.class);
+         * when(mockRankA.getName(Profession.NAVAL)).thenReturn("Naval");
+         * when(mockRankA.isEmpty(Profession.NAVAL)).thenReturn(false);
+         * when(mockRankA.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false
+         * );
+         * when(mockRankA.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
+         * when(mockRankA.isEmpty(Profession.AEROSPACE)).thenReturn(false);
+         * when(mockRankA.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(
+         * true);
+         * 
+         * final Rank mockRankB = mock(Rank.class);
+         * when(mockRankB.getName(Profession.NAVAL)).thenReturn("-");
+         * when(mockRankB.isEmpty(Profession.NAVAL)).thenReturn(true);
+         * when(mockRankB.indicatesAlternativeSystem(Profession.NAVAL)).thenReturn(false
+         * );
+         * when(mockRankB.getName(Profession.AEROSPACE)).thenReturn("--NAVAL");
+         * when(mockRankB.isEmpty(Profession.AEROSPACE)).thenReturn(false);
+         * when(mockRankB.indicatesAlternativeSystem(Profession.AEROSPACE)).thenReturn(
+         * true);
+         * 
+         * final List<Rank> ranks = new ArrayList<>();
+         * ranks.add(mockRankA);
+         * ranks.add(mockRankB);
+         * 
+         * final RankSystem mockRankSystem = mock(RankSystem.class);
+         * when(mockRankSystem.getRanks()).thenReturn(ranks);
+         * 
+         * assertFalse(Profession.NAVAL.isEmptyProfession(mockRankSystem));
+         * assertTrue(Profession.AEROSPACE.isEmptyProfession(mockRankSystem));
+         */
     }
 
     @Test
@@ -332,7 +345,7 @@ public class ProfessionTest {
                     break;
                 case MEK_TECH:
                 case MECHANIC:
-                case AERO_TECH:
+                case AERO_TEK:
                 case BA_TECH:
                 case ASTECH:
                     assertEquals(Profession.TECH, Profession.getProfessionFromPersonnelRole(role));

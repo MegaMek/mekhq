@@ -18,6 +18,25 @@
  */
 package mekhq.gui.dialog;
 
+import static mekhq.campaign.personnel.SkillType.*;
+import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
+
+import org.apache.logging.log4j.LogManager;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -34,21 +53,6 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JSpinner.NumberEditor;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import static mekhq.campaign.personnel.SkillType.*;
-import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
 
 /**
  * @author Jay Lawson
@@ -75,7 +79,8 @@ public class HireBulkPersonnelDialog extends JDialog {
     private int minAgeVal = 18;
     private int maxAgeVal = 99;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog",
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.HireBulkPersonnelDialog",
             MekHQ.getMHQOptions().getLocale());
 
     public HireBulkPersonnelDialog(final JFrame frame, final boolean modal, final Campaign campaign) {
@@ -120,7 +125,8 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
         for (final PersonnelRole personnelRole : PersonnelRole.getPrimaryRoles()) {
-            personTypeModel.addElement(new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()), personnelRole));
+            personTypeModel.addElement(
+                    new PersonTypeItem(personnelRole.getName(campaign.getFaction().isClan()), personnelRole));
         }
         choiceType.setModel(personTypeModel);
         choiceType.setName("choiceType");
@@ -147,7 +153,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         int sn_min = 1;
         SpinnerNumberModel sn = new SpinnerNumberModel(1, sn_min, CampaignGUI.MAX_QUANTITY_SPINNER, 1);
         spnNumber = new JSpinner(sn);
-        spnNumber.setEditor(new NumberEditor(spnNumber,"#")); //prevent digit grouping, e.g. 1,000
+        spnNumber.setEditor(new NumberEditor(spnNumber, "#")); // prevent digit grouping, e.g. 1,000
         jtf = ((DefaultEditor) spnNumber.getEditor()).getTextField();
         jtf.addKeyListener(new KeyListener() {
             @Override
@@ -165,7 +171,7 @@ public class HireBulkPersonnelDialog extends JDialog {
                         jtf.setText(String.valueOf(newValue));
                     }
                 } catch (NumberFormatException ex) {
-                    //Not a number in text field
+                    // Not a number in text field
                     spnNumber.setValue(sn_min);
                     jtf.setText(String.valueOf(sn_min));
                 }
@@ -196,7 +202,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
             gridBagConstraints.gridwidth = 2;
             getContentPane().add(sep, gridBagConstraints);
-            ++ mainGridPos;
+            ++mainGridPos;
 
             gridBagConstraints = newConstraints(0, mainGridPos);
             gridBagConstraints.weightx = 1.0;
@@ -241,12 +247,12 @@ public class HireBulkPersonnelDialog extends JDialog {
             });
             ageRangePanel.add(maxAge, newConstraints(2, 0));
 
-            ++ mainGridPos;
+            ++mainGridPos;
 
             // Skill level
             gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
             gridBagConstraints.gridwidth = 2;
-            ++ mainGridPos;
+            ++mainGridPos;
 
             gridBagConstraints = newConstraints(0, mainGridPos);
             gridBagConstraints.weightx = 1.0;
@@ -278,7 +284,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
             skillRangePanel.add(skillLevel, newConstraints(0, 0));
 
-            ++ mainGridPos;
+            ++mainGridPos;
         }
 
         btnHire.addActionListener(evt -> hire(false));
@@ -337,8 +343,7 @@ public class HireBulkPersonnelDialog extends JDialog {
                 overrideSkills(
                         person,
                         selectedItem.getRole(),
-                        Objects.requireNonNull(skillLevel.getSelectedItem()).ordinal()
-                );
+                        Objects.requireNonNull(skillLevel.getSelectedItem()).ordinal());
             }
 
             person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
@@ -377,10 +382,13 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     /**
-     * Replaces the skills for a {@link Person} based on their primary role and desired experience level.
-     * @param person The {@link Person} to add default skills.
+     * Replaces the skills for a {@link Person} based on their primary role and
+     * desired experience level.
+     * 
+     * @param person      The {@link Person} to add default skills.
      * @param primaryRole The primary role of the person
-     * @param expLvl The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
+     * @param expLvl      The experience level of the person (e.g.
+     *                    {@link SkillType#EXP_GREEN}).
      */
     protected void overrideSkills(Person person, PersonnelRole primaryRole, int expLvl) {
         switch (primaryRole) {
@@ -449,7 +457,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             case MEK_TECH:
                 addSkillFixedExperienceLevel(person, S_TECH_MEK, expLvl);
                 break;
-            case AERO_TECH:
+            case AERO_TEK:
                 addSkillFixedExperienceLevel(person, S_TECH_AERO, expLvl);
                 break;
             case BA_TECH:
@@ -479,10 +487,11 @@ public class HireBulkPersonnelDialog extends JDialog {
 
     /**
      * Adds a skill to a person with a fixed experience level.
-     * If the person already has the specified skill, the bonus value will be retained.
+     * If the person already has the specified skill, the bonus value will be
+     * retained.
      *
-     * @param person The Person to add the skill to.
-     * @param skill The name of the skill to add.
+     * @param person        The Person to add the skill to.
+     * @param skill         The name of the skill to add.
      * @param experienceLvl The experience level for the skill.
      */
     private static void addSkillFixedExperienceLevel(Person person, String skill, int experienceLvl) {

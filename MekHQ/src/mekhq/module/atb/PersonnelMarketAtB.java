@@ -50,18 +50,18 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
             int roll = Compute.d6(2);
             if (roll == 2) {
                 switch (Compute.randomInt(4)) {
-                case 0:
-                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND);
-                    break;
-                case 1:
-                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_HR);
-                    break;
-                case 2:
-                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_LOGISTICS);
-                    break;
-                case 3:
-                    p = c.newPerson(PersonnelRole.ADMINISTRATOR_TRANSPORT);
-                    break;
+                    case 0:
+                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_COMMAND);
+                        break;
+                    case 1:
+                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_HR);
+                        break;
+                    case 2:
+                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_LOGISTICS);
+                        break;
+                    case 3:
+                        p = c.newPerson(PersonnelRole.ADMINISTRATOR_TRANSPORT);
+                        break;
                 }
             } else if (roll == 3 || roll == 11) {
                 int r = Compute.d6();
@@ -70,7 +70,7 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 } else if (r < 4) {
                     p = c.newPerson(PersonnelRole.MECHANIC);
                 } else if (r == 4 && c.getCampaignOptions().isUseAero()) {
-                    p = c.newPerson(PersonnelRole.AERO_TECH);
+                    p = c.newPerson(PersonnelRole.AERO_TEK);
                 } else {
                     p = c.newPerson(PersonnelRole.MEK_TECH);
                 }
@@ -106,8 +106,10 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 retVal.add(p);
 
                 if (p.getPrimaryRole().isGroundVehicleDriver()) {
-                    /* Replace driver with 1-6 crew with equal
-                     * chances of being drivers or gunners */
+                    /*
+                     * Replace driver with 1-6 crew with equal
+                     * chances of being drivers or gunners
+                     */
                     retVal.remove(p);
                     for (int i = 0; i < Compute.d6(); i++) {
                         retVal.add(c.newPerson((Compute.d6() < 4) ? PersonnelRole.GROUND_VEHICLE_DRIVER
@@ -116,7 +118,8 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
                 }
 
                 Person adminHR = c.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
-                int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+                int adminHRExp = (adminHR == null) ? SkillType.EXP_ULTRA_GREEN
+                        : adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
                 int gunneryMod = 0;
                 int pilotingMod = 0;
                 switch (adminHRExp) {
@@ -197,11 +200,12 @@ public class PersonnelMarketAtB implements PersonnelMarketMethod {
 
     /**
      * Adjust a recruit's skill based on HR admin skill
+     *
      * @param p         The recruit
      * @param skillName The name of the skill to adjust
      * @param mod       The amount to adjust the skill
      */
-    public void adjustSkill (Person p, String skillName, int mod) {
+    public void adjustSkill(Person p, String skillName, int mod) {
         if (p.getSkill(skillName) == null) {
             return;
         }

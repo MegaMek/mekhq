@@ -18,6 +18,26 @@
  */
 package mekhq.gui.adapter;
 
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.StringTokenizer;
+import java.util.UUID;
+import java.util.Vector;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTree;
+import javax.swing.tree.TreePath;
+
+import org.apache.logging.log4j.LogManager;
+
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
@@ -48,12 +68,6 @@ import mekhq.gui.dialog.iconDialogs.LayeredForceIconDialog;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.tree.TreePath;
-import java.awt.event.ActionEvent;
-import java.util.*;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
     private final CampaignGUI gui;
@@ -160,7 +174,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     private static final String COMMAND_GOTO_PILOT = "GOTO_PILOT|UNIT|empty|";
 
     // String tokens for dialog boxes used for transport loading
-    private static final String LOAD_UNITS_DIALOG_TEXT = "You are deploying a Transport with units assigned to it. \n" + "Would you also like to deploy these units?";
+    private static final String LOAD_UNITS_DIALOG_TEXT = "You are deploying a Transport with units assigned to it. \n"
+            + "Would you also like to deploy these units?";
     private static final String LOAD_UNITS_DIALOG_TITLE = "Also deploy transported units?";
 
     private static final String ASSIGN_FORCE_TRN_TITLE = "Assign Force to Transport Ship";
@@ -202,7 +217,6 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             }
         }
 
-
         if (type.equals(TOEMouseAdapter.FORCE)) {
             Vector<Force> newForces = new Vector<>();
             for (Force force : forces) {
@@ -224,7 +238,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             forces = newForces;
         }
 
-        // TODO : eliminate any forces that are descendants of other forces in the vector
+        // TODO : eliminate any forces that are descendants of other forces in the
+        // vector
         final Force singleForce = forces.isEmpty() ? null : forces.get(0);
         final Unit singleUnit = units.isEmpty() ? null : units.get(0);
 
@@ -265,14 +280,16 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                                     u.setTech(tech);
                                 } else {
-                                    cantTech.append(tech.getFullName()).append(" cannot maintain ").append(u.getName()).append('\n');
+                                    cantTech.append(tech.getFullName()).append(" cannot maintain ").append(u.getName())
+                                            .append('\n');
                                 }
                             }
                         }
 
                         if (!cantTech.toString().isBlank()) {
                             cantTech.append("You will need to assign a tech manually.");
-                            JOptionPane.showMessageDialog(null, cantTech.toString(), "Warning", JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.showMessageDialog(null, cantTech.toString(), "Warning",
+                                    JOptionPane.WARNING_MESSAGE);
                         }
                     }
                 }
@@ -438,7 +455,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             null,
                             "Are you sure you want to delete "
                                     + force.getFullName() + '?',
-                                    "Delete Force?", JOptionPane.YES_NO_OPTION)) {
+                            "Delete Force?", JOptionPane.YES_NO_OPTION)) {
                         return;
                     }
                     // Clear any transport assignments of units in the deleted force
@@ -454,7 +471,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                 ServiceLogger.removedFrom(oldTech, gui.getCampaign().getLocalDate(), singleForce.getName());
 
-                if (singleForce.getAllUnits(false) !=null) {
+                if (singleForce.getAllUnits(false) != null) {
                     for (UUID uuid : singleForce.getAllUnits(false)) {
                         Unit u = gui.getCampaign().getUnit(uuid);
                         if (null != u.getTech()) {
@@ -505,7 +522,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     if (null != unit && null != scenario) {
                         if (unit.hasTransportedUnits()) {
                             // Prompt the player to also deploy any units transported by this one
-                            int optionChoice = JOptionPane.showConfirmDialog(null, TOEMouseAdapter.LOAD_UNITS_DIALOG_TEXT,
+                            int optionChoice = JOptionPane.showConfirmDialog(null,
+                                    TOEMouseAdapter.LOAD_UNITS_DIALOG_TEXT,
                                     TOEMouseAdapter.LOAD_UNITS_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
                             if (optionChoice == JOptionPane.YES_OPTION) {
                                 extraUnits.addAll(unit.getTransportedUnits());
@@ -636,7 +654,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 uPath.add(path);
             }
         }
-        for (Force force: forces) {
+        for (Force force : forces) {
             for (UUID id : force.getAllUnits(false)) {
                 Unit u = gui.getCampaign().getUnit(id);
                 if (null != u) {
@@ -682,7 +700,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         if (addItem) {
                             menuItem = new JMenuItem(formationLevel.toString());
                             menuItem.setToolTipText(formationLevel.getDescription());
-                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL + force.getId() + '|' + formationLevel);
+                            menuItem.setActionCommand(TOEMouseAdapter.COMMAND_OVERRIDE_FORCE_FORMATION_LEVEL
+                                    + force.getId() + '|' + formationLevel);
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(true);
                             menu.add(menuItem);
@@ -717,13 +736,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     PersonnelRole role;
                     PersonnelRole previousRole = PersonnelRole.MEK_TECH;
 
-                    JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu", SkillLevel.LEGENDARY.toString());
+                    JScrollableMenu legendaryMenu = new JScrollableMenu("legendaryMenu",
+                            SkillLevel.LEGENDARY.toString());
                     JScrollableMenu heroicMenu = new JScrollableMenu("heroicMenu", SkillLevel.HEROIC.toString());
                     JScrollableMenu eliteMenu = new JScrollableMenu("eliteMenu", SkillLevel.ELITE.toString());
                     JScrollableMenu veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
                     JScrollableMenu regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
                     JScrollableMenu greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
-                    JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
+                    JScrollableMenu ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                            SkillLevel.ULTRA_GREEN.toString());
                     JMenu currentMenu = mekTechs;
 
                     // Get the list of techs, then sort them based on their tech role
@@ -760,12 +781,13 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                                 veteranMenu = new JScrollableMenu("veteranMenu", SkillLevel.VETERAN.toString());
                                 regularMenu = new JScrollableMenu("regularMenu", SkillLevel.REGULAR.toString());
                                 greenMenu = new JScrollableMenu("greenMenu", SkillLevel.GREEN.toString());
-                                ultraGreenMenu = new JScrollableMenu("ultraGreenMenu", SkillLevel.ULTRA_GREEN.toString());
+                                ultraGreenMenu = new JScrollableMenu("ultraGreenMenu",
+                                        SkillLevel.ULTRA_GREEN.toString());
                                 switch (role) {
                                     case MECHANIC:
                                         currentMenu = mechanics;
                                         break;
-                                    case AERO_TECH:
+                                    case AERO_TEK:
                                         currentMenu = aeroTechs;
                                         break;
                                     case BA_TECH:
@@ -820,7 +842,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     JMenuHelpers.addMenuIfNonEmpty(popup, menu);
                 } else {
                     menuItem = new JMenuItem("Remove Tech from Force");
-                    menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_LANCE_TECH + force.getTechID() + '|' + forceIds);
+                    menuItem.setActionCommand(
+                            TOEMouseAdapter.COMMAND_REMOVE_LANCE_TECH + force.getTechID() + '|' + forceIds);
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
                 }
@@ -854,8 +877,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
 
-                for (int wc = EntityWeightClass.WEIGHT_SMALL_SUPPORT;
-                     wc <= EntityWeightClass.WEIGHT_LARGE_SUPPORT; wc++) {
+                for (int wc = EntityWeightClass.WEIGHT_SMALL_SUPPORT; wc <= EntityWeightClass.WEIGHT_LARGE_SUPPORT; wc++) {
                     for (int ut : svTypes) {
                         String typeName = UnitType.getTypeName(ut);
                         String wcName = EntityWeightClass.getClassName(wc, typeName, true);
@@ -935,8 +957,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     String unittype = UnitType.getTypeName(ut);
                     JMenu tmp = unitTypeMenus.get(UnitType.getTypeName(ut));
                     if (tmp.isEnabled()) {
-                        for (int wc = EntityWeightClass.WEIGHT_SMALL_SUPPORT;
-                             wc <= EntityWeightClass.WEIGHT_LARGE_SUPPORT; wc++) {
+                        for (int wc = EntityWeightClass.WEIGHT_SMALL_SUPPORT; wc <= EntityWeightClass.WEIGHT_LARGE_SUPPORT; wc++) {
                             JMenu tmp2 = weightClassForUnitType.get(unittype + '_'
                                     + EntityWeightClass.getClassName(wc, unittype, true));
                             if (tmp2.isEnabled()) {
@@ -957,7 +978,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     for (UUID personID : eligibleCommanders) {
                         Person person = gui.getCampaign().getPerson(personID);
 
-                        JMenuItem commanderOption = new JMenuItem(person.getFullTitle() + " (" + person.getRoleDesc() + ')');
+                        JMenuItem commanderOption = new JMenuItem(
+                                person.getFullTitle() + " (" + person.getRoleDesc() + ')');
                         commanderOption.setActionCommand(COMMAND_SET_LANCE_COMMANDER + personID + '|' + forceIds);
                         commanderOption.addActionListener(this);
                         menuItem.add(commanderOption);
@@ -1008,7 +1030,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem.addActionListener(this);
             popup.add(menuItem);
 
-            menuItem = new JMenuItem(force.isCombatForce() ? "Make Force and Subforces Non-Combat Forces" : "Make Force and Subforces Combat Forces");
+            menuItem = new JMenuItem(force.isCombatForce() ? "Make Force and Subforces Non-Combat Forces"
+                    : "Make Force and Subforces Combat Forces");
             menuItem.setActionCommand(COMMAND_CHANGE_FORCE_COMBAT_STATUSES + forceIds);
             menuItem.addActionListener(this);
             popup.add(menuItem);
@@ -1026,7 +1049,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                             continue;
                         }
                         menuItem = new JMenuItem(scenario.getName());
-                        menuItem.setActionCommand(TOEMouseAdapter.COMMAND_DEPLOY_FORCE + scenario.getId() + '|' + forceIds);
+                        menuItem.setActionCommand(
+                                TOEMouseAdapter.COMMAND_DEPLOY_FORCE + scenario.getId() + '|' + forceIds);
                         menuItem.addActionListener(this);
                         missionMenu.add(menuItem);
                     }
@@ -1045,7 +1069,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem("Remove Force");
             menuItem.setActionCommand(TOEMouseAdapter.COMMAND_REMOVE_FORCE + forceIds);
             menuItem.addActionListener(this);
-            menuItem.setEnabled(!StaticChecks.areAnyForcesDeployed(forces) && !StaticChecks.areAnyUnitsDeployed(unitsInForces));
+            menuItem.setEnabled(
+                    !StaticChecks.areAnyForcesDeployed(forces) && !StaticChecks.areAnyUnitsDeployed(unitsInForces));
             popup.add(menuItem);
 
             // Attempt to Assign all units in the selected force(s) to a transport ship.
@@ -1086,7 +1111,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
 
-                // Only display the Assign to Ship command if your command has at least 1 valid transport
+                // Only display the Assign to Ship command if your command has at least 1 valid
+                // transport
                 // and if your selection does not include a transport
                 if (!gui.getCampaign().getTransportShips().isEmpty()) {
                     for (Unit ship : gui.getCampaign().getTransportShips()) {
@@ -1098,63 +1124,76 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         if (allUnitsSameType) {
                             double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                             if (capacity > 0) {
-                                JMenuItem shipMenuItem = new JMenuItem(ship.getName() + " , Space available: " + capacity);
-                                shipMenuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + '|' + unitIds);
+                                JMenuItem shipMenuItem = new JMenuItem(
+                                        ship.getName() + " , Space available: " + capacity);
+                                shipMenuItem
+                                        .setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + '|' + unitIds);
                                 shipMenuItem.addActionListener(this);
                                 shipMenuItem.setEnabled(true);
                                 singleUnitMenu.add(shipMenuItem);
                                 singleUnitMenu.setEnabled(true);
                             }
                         } else {
-                            // Add this ship to the appropriate submenu(s). Most transports will fit into multiple
+                            // Add this ship to the appropriate submenu(s). Most transports will fit into
+                            // multiple
                             // categories
                             if (ship.getASFCapacity() > 0) {
-                                a_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentASFCapacity()));
+                                a_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentASFCapacity()));
                                 a_trn.setEnabled(true);
                             }
 
                             if (ship.getBattleArmorCapacity() > 0) {
-                                ba_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentBattleArmorCapacity()));
+                                ba_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentBattleArmorCapacity()));
                                 ba_trn.setEnabled(true);
                             }
 
                             if (ship.getInfantryCapacity() > 0) {
-                                i_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentInfantryCapacity()));
+                                i_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentInfantryCapacity()));
                                 i_trn.setEnabled(true);
                             }
 
                             if (ship.getMekCapacity() > 0) {
-                                m_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentMekCapacity()));
+                                m_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentMekCapacity()));
                                 m_trn.setEnabled(true);
                             }
 
                             if (ship.getProtoMekCapacity() > 0) {
-                                pm_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentProtoMekCapacity()));
+                                pm_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentProtoMekCapacity()));
                                 pm_trn.setEnabled(true);
                             }
 
                             if (ship.getSmallCraftCapacity() > 0) {
-                                sc_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentSmallCraftCapacity()));
+                                sc_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentSmallCraftCapacity()));
                                 sc_trn.setEnabled(true);
                             }
 
                             if (ship.getDocks() > 0) {
-                                ds_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentDocks()));
+                                ds_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentDocks()));
                                 ds_trn.setEnabled(true);
                             }
 
                             if (ship.getLightVehicleCapacity() > 0) {
-                                lv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentLightVehicleCapacity()));
+                                lv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentLightVehicleCapacity()));
                                 lv_trn.setEnabled(true);
                             }
 
                             if (ship.getHeavyVehicleCapacity() > 0) {
-                                hv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentHeavyVehicleCapacity()));
+                                hv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentHeavyVehicleCapacity()));
                                 hv_trn.setEnabled(true);
                             }
 
                             if (ship.getSuperHeavyVehicleCapacity() > 0) {
-                                shv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentSuperHeavyVehicleCapacity()));
+                                shv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentSuperHeavyVehicleCapacity()));
                                 shv_trn.setEnabled(true);
                             }
                         }
@@ -1381,7 +1420,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
 
-                // First, only display the Assign to Ship command if your command has at least 1 valid transport
+                // First, only display the Assign to Ship command if your command has at least 1
+                // valid transport
                 boolean allUnitsSameType = false;
                 double unitWeight = 0;
                 int singleUnitType = -1;
@@ -1412,7 +1452,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
                 if (!gui.getCampaign().getTransportShips().isEmpty()) {
                     // Attempt to Assign unit to a transport ship. This checks to see if the ship
-                    // is in a basic state that can accept units. Capacity gets checked once the action
+                    // is in a basic state that can accept units. Capacity gets checked once the
+                    // action
                     // is submitted.
                     menu = new JMenu("Assign Unit to Transport Ship");
                     for (Unit ship : gui.getCampaign().getTransportShips()) {
@@ -1424,63 +1465,76 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         if (allUnitsSameType) {
                             double capacity = ship.getCorrectBayCapacity(singleUnitType, unitWeight);
                             if (capacity > 0) {
-                                JMenuItem shipMenuItem = new JMenuItem(ship.getName() + " , Space available: " + capacity);
-                                shipMenuItem.setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + '|' + unitIds);
+                                JMenuItem shipMenuItem = new JMenuItem(
+                                        ship.getName() + " , Space available: " + capacity);
+                                shipMenuItem
+                                        .setActionCommand(TOEMouseAdapter.COMMAND_ASSIGN_TO_SHIP + id + '|' + unitIds);
                                 shipMenuItem.addActionListener(this);
                                 shipMenuItem.setEnabled(true);
                                 singleUnitMenu.add(shipMenuItem);
                                 singleUnitMenu.setEnabled(true);
                             }
                         } else {
-                            // Add this ship to the appropriate submenu(s). Most transports will fit into multiple
+                            // Add this ship to the appropriate submenu(s). Most transports will fit into
+                            // multiple
                             // categories
                             if (ship.getASFCapacity() > 0) {
-                                a_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentASFCapacity()));
+                                a_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentASFCapacity()));
                                 a_trn.setEnabled(true);
                             }
 
                             if (ship.getBattleArmorCapacity() > 0) {
-                                ba_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentBattleArmorCapacity()));
+                                ba_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentBattleArmorCapacity()));
                                 ba_trn.setEnabled(true);
                             }
 
                             if (ship.getInfantryCapacity() > 0) {
-                                i_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentInfantryCapacity()));
+                                i_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentInfantryCapacity()));
                                 i_trn.setEnabled(true);
                             }
 
                             if (ship.getMekCapacity() > 0) {
-                                m_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentMekCapacity()));
+                                m_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentMekCapacity()));
                                 m_trn.setEnabled(true);
                             }
 
                             if (ship.getProtoMekCapacity() > 0) {
-                                pm_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentProtoMekCapacity()));
+                                pm_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentProtoMekCapacity()));
                                 pm_trn.setEnabled(true);
                             }
 
                             if (ship.getSmallCraftCapacity() > 0) {
-                                sc_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentSmallCraftCapacity()));
+                                sc_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentSmallCraftCapacity()));
                                 sc_trn.setEnabled(true);
                             }
 
                             if (ship.getDocks() > 0) {
-                                ds_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentDocks()));
+                                ds_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentDocks()));
                                 ds_trn.setEnabled(true);
                             }
 
                             if (ship.getLightVehicleCapacity() > 0) {
-                                lv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentLightVehicleCapacity()));
+                                lv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentLightVehicleCapacity()));
                                 lv_trn.setEnabled(true);
                             }
 
                             if (ship.getHeavyVehicleCapacity() > 0) {
-                                hv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentHeavyVehicleCapacity()));
+                                hv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentHeavyVehicleCapacity()));
                                 hv_trn.setEnabled(true);
                             }
 
                             if (ship.getSuperHeavyVehicleCapacity() > 0) {
-                                shv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(), ship.getCurrentSuperHeavyVehicleCapacity()));
+                                shv_trn.add(transportMenuItem(ship.getName(), id, unitIds.toString(),
+                                        ship.getCurrentSuperHeavyVehicleCapacity()));
                                 shv_trn.setEnabled(true);
                             }
                         }
@@ -1541,8 +1595,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
      * Determines whether a given formation level can be added to a force.
      *
      * @param formationLevel The formation level to check.
-     * @param faction The faction to check against.
-     * @return true if the formation level can be added to the faction, false otherwise.
+     * @param faction        The faction to check against.
+     * @return true if the formation level can be added to the faction, false
+     *         otherwise.
      */
     private static boolean isAddFormationLevel(FormationLevel formationLevel, Faction faction) {
         if (formationLevel.isNone() || formationLevel.isInvalid()) {
@@ -1561,9 +1616,12 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TO&E
-     * @param unitsToUpdate A vector of UUIDs of the units that we need to update. This can be either a collection that the player
-     * has selected or all units in a given force
+     * Worker function to make sure transport assignment data gets cleared out when
+     * unit(s) are removed from the TO&E
+     * 
+     * @param unitsToUpdate A vector of UUIDs of the units that we need to update.
+     *                      This can be either a collection that the player
+     *                      has selected or all units in a given force
      */
     private void clearTransportAssignment(Vector<UUID> unitsToUpdate) {
         for (UUID id : unitsToUpdate) {
@@ -1575,7 +1633,9 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * Worker function to make sure transport assignment data gets cleared out when unit(s) are removed from the TO&E
+     * Worker function to make sure transport assignment data gets cleared out when
+     * unit(s) are removed from the TO&E
+     * 
      * @param currentUnit The unit currently being processed
      */
     private void clearTransportAssignment(@Nullable Unit currentUnit) {
@@ -1593,13 +1653,17 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * Worker function that creates a new instance of a JMenuItem for a set of transport ship characteristics
-     * Used to have a single ship appear on multiple menu entries defined by type of unit transported
+     * Worker function that creates a new instance of a JMenuItem for a set of
+     * transport ship characteristics
+     * Used to have a single ship appear on multiple menu entries defined by type of
+     * unit transported
      * Displays the remaining capacity in bays of the specified type
      *
      * @param shipName String name of this ship.
-     * @param shipId Unique id of this ship. Used to fill out actionPerformed(ActionEvent)
-     * @param unitIds  String of units delimited by | used to fill out actionPerformed(ActionEvent)
+     * @param shipId   Unique id of this ship. Used to fill out
+     *                 actionPerformed(ActionEvent)
+     * @param unitIds  String of units delimited by | used to fill out
+     *                 actionPerformed(ActionEvent)
      * @param capacity Double representing the capacity of the designated bay type
      */
 

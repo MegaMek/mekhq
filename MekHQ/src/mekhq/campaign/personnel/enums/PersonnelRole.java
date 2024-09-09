@@ -18,17 +18,18 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+
+import mekhq.MekHQ;
+
 public enum PersonnelRole {
-    //region Enum Declarations
+    // region Enum Declarations
     MEKWARRIOR("PersonnelRole.MEKWARRIOR.text", KeyEvent.VK_M),
     LAM_PILOT("PersonnelRole.LAM_PILOT.text", KeyEvent.VK_UNDEFINED),
     GROUND_VEHICLE_DRIVER("PersonnelRole.GROUND_VEHICLE_DRIVER.text", KeyEvent.VK_V),
@@ -47,7 +48,7 @@ public enum PersonnelRole {
     VESSEL_NAVIGATOR("PersonnelRole.VESSEL_NAVIGATOR.text", KeyEvent.VK_Y),
     MEK_TECH("PersonnelRole.MEK_TECH.text", KeyEvent.VK_T),
     MECHANIC("PersonnelRole.MECHANIC.text", KeyEvent.VK_E),
-    AERO_TECH("PersonnelRole.AERO_TECH.text", KeyEvent.VK_O),
+    AERO_TEK("PersonnelRole.AERO_TEK.text", KeyEvent.VK_O),
     BA_TECH("PersonnelRole.BA_TECH.text", KeyEvent.VK_UNDEFINED),
     ASTECH("PersonnelRole.ASTECH.text", KeyEvent.VK_UNDEFINED),
     DOCTOR("PersonnelRole.DOCTOR.text", KeyEvent.VK_D),
@@ -58,15 +59,15 @@ public enum PersonnelRole {
     ADMINISTRATOR_HR("PersonnelRole.ADMINISTRATOR_HR.text", KeyEvent.VK_H),
     DEPENDENT("PersonnelRole.DEPENDENT.text", KeyEvent.VK_UNDEFINED),
     NONE("PersonnelRole.NONE.text", KeyEvent.VK_UNDEFINED);
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String clanName;
     private final int mnemonic; // Unused: J, K, Q, X, Z
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     PersonnelRole(final String name, final int mnemonic) {
         this(name, null, mnemonic);
     }
@@ -78,9 +79,9 @@ public enum PersonnelRole {
         this.clanName = (clanName == null) ? this.name : resources.getString(clanName);
         this.mnemonic = mnemonic;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getName(final boolean isClan) {
         return isClan ? clanName : name;
     }
@@ -88,9 +89,9 @@ public enum PersonnelRole {
     public int getMnemonic() {
         return mnemonic;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isMekWarrior() {
         return this == MEKWARRIOR;
     }
@@ -163,8 +164,8 @@ public enum PersonnelRole {
         return this == MECHANIC;
     }
 
-    public boolean isAeroTech() {
-        return this == AERO_TECH;
+    public boolean isAeroTek() {
+        return this == AERO_TEK;
     }
 
     public boolean isBATech() {
@@ -228,7 +229,7 @@ public enum PersonnelRole {
                 return true;
             case MEK_TECH:
             case MECHANIC:
-            case AERO_TECH:
+            case AERO_TEK:
             case BA_TECH:
             case ASTECH:
             case DOCTOR:
@@ -268,7 +269,7 @@ public enum PersonnelRole {
         return isVTOLPilot() || isVehicleGunner() || isVehicleCrew();
     }
 
-    public boolean isVehicleCrewmember() {
+    public boolean isVehicleCrewMember() {
         return isGroundVehicleCrew() || isNavalVehicleDriver() || isVTOLPilot();
     }
 
@@ -276,7 +277,7 @@ public enum PersonnelRole {
         return isSoldier() || isBattleArmour();
     }
 
-    public boolean isVesselCrewmember() {
+    public boolean isVesselCrewMember() {
         return isVesselPilot() || isVesselGunner() || isVesselCrew() || isVesselNavigator();
     }
 
@@ -289,11 +290,11 @@ public enum PersonnelRole {
     }
 
     public boolean isTech() {
-        return isMekTech() || isMechanic() || isAeroTech() || isBATech() || isVesselCrew();
+        return isMekTech() || isMechanic() || isAeroTek() || isBATech() || isVesselCrew();
     }
 
     public boolean isTechSecondary() {
-        return isMekTech() || isMechanic() || isAeroTech() || isBATech();
+        return isMekTech() || isMechanic() || isAeroTek() || isBATech();
     }
 
     public boolean isMedicalStaff() {
@@ -315,9 +316,9 @@ public enum PersonnelRole {
     public boolean isCivilian() {
         return isDependent() || isNone();
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region Static Methods
+    // region Static Methods
     /**
      * @return a list of roles that can be included in the personnel market
      */
@@ -328,7 +329,8 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return a list of roles that are potential primary roles. Currently, this is all bar NONE
+     * @return a list of roles that are potential primary roles. Currently, this is
+     *         all bar NONE
      */
     public static List<PersonnelRole> getPrimaryRoles() {
         return Stream.of(values())
@@ -337,11 +339,12 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return a list of roles that are considered to be vessel (as in spacecraft) crewmembers
+     * @return a list of roles that are considered to be vessel (as in spacecraft)
+     *         crew members
      */
     public static List<PersonnelRole> getVesselRoles() {
         return Stream.of(values())
-                .filter(PersonnelRole::isVesselCrewmember)
+                .filter(PersonnelRole::isVesselCrewMember)
                 .collect(Collectors.toList());
     }
 
@@ -371,9 +374,9 @@ public enum PersonnelRole {
                 .filter(PersonnelRole::isCivilian)
                 .count());
     }
-    //endregion Static Methods
+    // endregion Static Methods
 
-    //region File I/O
+    // region File I/O
     public static PersonnelRole parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -419,7 +422,7 @@ public enum PersonnelRole {
                 case 16:
                     return MECHANIC;
                 case 17:
-                    return AERO_TECH;
+                    return AERO_TEK;
                 case 18:
                     return BA_TECH;
                 case 19:
@@ -450,10 +453,12 @@ public enum PersonnelRole {
         LogManager.getLogger().error("Unable to parse " + text + " into a PersonnelRole. Returning NONE.");
         return NONE;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     /**
-     * This method is not recommend to be used in MekHQ, but is provided for non-specified utilization
+     * This method is not recommend to be used in MekHQ, but is provided for
+     * non-specified utilization
+     *
      * @return the base name of this role, without applying any overrides
      */
     @Override

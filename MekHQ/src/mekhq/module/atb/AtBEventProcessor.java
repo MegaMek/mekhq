@@ -18,9 +18,22 @@
  */
 package mekhq.module.atb;
 
+import java.time.DayOfWeek;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.apache.logging.log4j.LogManager;
+
 import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.*;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
+import megamek.common.EntityWeightClass;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
+import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
@@ -36,11 +49,6 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import org.apache.logging.log4j.LogManager;
-
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Main engine of the Against the Bot campaign system.
@@ -68,7 +76,8 @@ public class AtBEventProcessor {
                     ev.getCampaign().getLocalDate(), Money.of(100000), "Paid recruitment roll")) {
                 doPaidRecruitment(ev.getCampaign());
             } else {
-                ev.getCampaign().addReport("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Insufficient funds for paid recruitment.</font></html>");
+                ev.getCampaign().addReport("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                        + "'>Insufficient funds for paid recruitment.</font></html>");
             }
         }
     }
@@ -84,7 +93,7 @@ public class AtBEventProcessor {
                 break;
             case MEK_TECH:
             case MECHANIC:
-            case AERO_TECH:
+            case AERO_TEK:
             case BA_TECH:
             case DOCTOR:
                 mod = 1;
@@ -128,7 +137,9 @@ public class AtBEventProcessor {
     }
 
     /**
-     * Listens for new personnel to be added to the market and determines which should come with units.
+     * Listens for new personnel to be added to the market and determines which
+     * should come with units.
+     * 
      * @param ev
      */
     @Subscribe
@@ -248,10 +259,10 @@ public class AtBEventProcessor {
     }
 
     private void swapSkills(Person p, String skill1, String skill2) {
-        int s1 = p.hasSkill(skill1)?p.getSkill(skill1).getLevel():0;
-        int b1 = p.hasSkill(skill1)?p.getSkill(skill1).getBonus():0;
-        int s2 = p.hasSkill(skill2)?p.getSkill(skill2).getLevel():0;
-        int b2 = p.hasSkill(skill2)?p.getSkill(skill2).getBonus():0;
+        int s1 = p.hasSkill(skill1) ? p.getSkill(skill1).getLevel() : 0;
+        int b1 = p.hasSkill(skill1) ? p.getSkill(skill1).getBonus() : 0;
+        int s2 = p.hasSkill(skill2) ? p.getSkill(skill2).getLevel() : 0;
+        int b2 = p.hasSkill(skill2) ? p.getSkill(skill2).getBonus() : 0;
         p.addSkill(skill1, s2, b2);
         p.addSkill(skill2, s1, b1);
         if (p.getSkill(skill1).getLevel() == 0) {
