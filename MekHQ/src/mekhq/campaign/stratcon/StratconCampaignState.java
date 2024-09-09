@@ -34,10 +34,10 @@ import javax.xml.namespace.QName;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import mekhq.campaign.mission.Scenario;
 
 /**
  * Contract-level state object for a StratCon campaign.
+ * 
  * @author NickAragua
  */
 @XmlRootElement(name = "StratconCampaignState")
@@ -81,6 +81,7 @@ public class StratconCampaignState {
 
     /**
      * The opfor BV multiplier. Intended to be additive.
+     * 
      * @return The additive opfor BV multiplier.
      */
     public double getGlobalOpforBVMultiplier() {
@@ -157,7 +158,9 @@ public class StratconCampaignState {
     }
 
     /**
-     * Convenience/speed method of determining whether or not a force with the given ID has been deployed to a track in this campaign.
+     * Convenience/speed method of determining whether or not a force with the given
+     * ID has been deployed to a track in this campaign.
+     * 
      * @param forceID the force ID to check
      * @return Deployed or not.
      */
@@ -170,9 +173,10 @@ public class StratconCampaignState {
 
         return false;
     }
-    
+
     /**
-     * Removes the scenario with the given campaign scenario ID from any tracks where it's present
+     * Removes the scenario with the given campaign scenario ID from any tracks
+     * where it's present
      */
     public void removeStratconScenario(int scenarioID) {
         for (StratconTrackState trackState : tracks) {
@@ -183,12 +187,14 @@ public class StratconCampaignState {
     /**
      * Serialize this instance of a campaign state to a PrintWriter
      * Omits initial xml declaration
+     * 
      * @param pw The destination print writer
      */
     public void Serialize(PrintWriter pw) {
         try {
             JAXBContext context = JAXBContext.newInstance(StratconCampaignState.class);
-            JAXBElement<StratconCampaignState> stateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), StratconCampaignState.class, this);
+            JAXBElement<StratconCampaignState> stateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME),
+                    StratconCampaignState.class, this);
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -199,7 +205,9 @@ public class StratconCampaignState {
     }
 
     /**
-     * Attempt to deserialize an instance of a Campaign State from the passed-in XML Node
+     * Attempt to deserialize an instance of a Campaign State from the passed-in XML
+     * Node
+     * 
      * @param xmlNode The node with the campaign state
      * @return Possibly an instance of a StratconCampaignState
      */
@@ -215,7 +223,8 @@ public class StratconCampaignState {
             LogManager.getLogger().error("Error Deserializing Campaign State", e);
         }
 
-        // Hack: LocalDate doesn't serialize/deserialize nicely within a map, so we store it as a int-string map instead
+        // Hack: LocalDate doesn't serialize/deserialize nicely within a map, so we
+        // store it as a int-string map instead
         // while we're here, manually restore the coordinate-force lookup
         if (resultingCampaignState != null) {
             for (StratconTrackState track : resultingCampaignState.getTracks()) {

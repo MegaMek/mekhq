@@ -22,7 +22,6 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
-import megamek.common.TechConstants;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -69,7 +68,7 @@ public class MASC extends EquipmentPart {
         if (null == type) {
             return 0;
         }
-        //supercharger tonnage will need to be set by hand in parts store
+        // supercharger tonnage will need to be set by hand in parts store
         if (isClan()) {
             return Math.round(getUnitTonnage() / 25.0f);
         }
@@ -79,7 +78,7 @@ public class MASC extends EquipmentPart {
     @Override
     public Money getStickerPrice() {
         if (isSupercharger()) {
-            return Money.of(engineRating * (isOmniPodded()? 1250 : 10000));
+            return Money.of(engineRating * (isOmniPodded() ? 1250 : 10000));
         } else {
             return Money.of(engineRating * getTonnage() * 1000);
         }
@@ -94,7 +93,7 @@ public class MASC extends EquipmentPart {
     }
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
+    public boolean isSamePartTypeAndStatus(Part part) {
         if (needsFixing() || part.needsFixing()) {
             return false;
         }
@@ -161,7 +160,7 @@ public class MASC extends EquipmentPart {
             return details + ", " + getEngineRating() + " rating";
         }
         return details + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
-     }
+    }
 
     @Override
     public boolean isOmniPoddable() {

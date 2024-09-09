@@ -1,6 +1,5 @@
 package asserts;
 
-import mekhq.campaign.parts.equipment.BattleArmorAmmoBin;
 import org.junit.jupiter.api.Assertions;
 
 import java.math.BigDecimal;
@@ -8,7 +7,6 @@ import java.math.RoundingMode;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Deric Page (deric.page@nisc.coop) (ext 2335)

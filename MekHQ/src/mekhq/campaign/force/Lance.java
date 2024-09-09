@@ -39,12 +39,12 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.UUID;
 
 /**
  * Used by Against the Bot to track additional information about each force
- * on the TO&amp;E that has at least one unit assigned. Extra info includes whether
+ * on the TO&amp;E that has at least one unit assigned. Extra info includes
+ * whether
  * the force counts as a lance (or star or level II) eligible for assignment
  * to a mission role and what the assignment is on which contract.
  *
@@ -76,7 +76,8 @@ public class Lance {
         }
     }
 
-    public Lance() {}
+    public Lance() {
+    }
 
     public Lance(int fid, Campaign c) {
         forceId = fid;
@@ -84,7 +85,8 @@ public class Lance {
         missionId = -1;
         for (AtBContract contract : c.getActiveAtBContracts()) {
             missionId = ((contract.getParentContract() == null)
-                    ? contract : contract.getParentContract()).getId();
+                    ? contract
+                    : contract.getParentContract()).getId();
         }
         commanderId = findCommander(forceId, c);
     }
@@ -149,7 +151,8 @@ public class Lance {
     }
 
     public double getEffectivePoints(Campaign c) {
-        /* Used to check against force size limits; for this purpose we
+        /*
+         * Used to check against force size limits; for this purpose we
          * consider a 'Mek and a Point of BA to be a single Point so that
          * a Nova that has 10 actual Points is calculated as 5 effective
          * Points. We also count Points of vehicles with 'Meks and
@@ -172,7 +175,7 @@ public class Lance {
                     } else if ((entity.getEntityType() & Entity.ETYPE_PROTOMEK) != 0) {
                         other += 0.2;
                     } else if ((entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
-                        infantry += ((Infantry) entity).isSquad()?0.2:1;
+                        infantry += ((Infantry) entity).isSquad() ? 0.2 : 1;
                     }
                 }
             }
@@ -181,7 +184,8 @@ public class Lance {
     }
 
     public int getWeightClass(Campaign c) {
-        /* Clan units only count half the weight of ASF and vehicles
+        /*
+         * Clan units only count half the weight of ASF and vehicles
          * (2/Point). IS units only count half the weight of vehicles
          * if the option is enabled, possibly dropping the lance to a lower
          * weight class and decreasing the enemy force against vehicle/combined
@@ -215,8 +219,10 @@ public class Lance {
             return false;
         }
 
-        /* Check that the number of units and weight are within the limits
-         * and that the force contains at least one ground unit. */
+        /*
+         * Check that the number of units and weight are within the limits
+         * and that the force contains at least one ground unit.
+         */
         if (c.getCampaignOptions().isLimitLanceNumUnits()) {
             int size = getSize(c);
             if (size < getStdLanceSize(c.getFaction()) - 1 ||
@@ -273,19 +279,25 @@ public class Lance {
         }
 
         int roll;
-        //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
+        // thresholds are coded from charts with 1-100 range, so we add 1 to mod to
+        // adjust 0-based random int
         int battleTypeMod = 1 + (AtBMoraleLevel.NORMAL.ordinal() - getContract(c).getMoraleLevel().ordinal()) * 5;
         battleTypeMod += getContract(c).getBattleTypeMod();
 
-        // debugging code that will allow you to force the generation of a particular scenario.
-        // when generating a lance-based scenario (Standup, Probe, etc), the second parameter in
+        // debugging code that will allow you to force the generation of a particular
+        // scenario.
+        // when generating a lance-based scenario (Standup, Probe, etc), the second
+        // parameter in
         // createScenario is "this" (the lance). Otherwise, it should be null.
 
-        /*if (true) {
-            AtBScenario scenario = AtBScenarioFactory.createScenario(c, this, AtBScenario.BASEATTACK, true, getBattleDate(c.getLocalDate()));
-            scenario.setMissionId(this.getMissionId());
-            return scenario;
-        }*/
+        /*
+         * if (true) {
+         * AtBScenario scenario = AtBScenarioFactory.createScenario(c, this,
+         * AtBScenario.BASEATTACK, true, getBattleDate(c.getLocalDate()));
+         * scenario.setMissionId(this.getMissionId());
+         * return scenario;
+         * }
+         */
 
         switch (role) {
             case FIGHTING: {
@@ -477,7 +489,8 @@ public class Lance {
 
     /**
      * Worker function that calculates the total weight of a force with the given ID
-     * @param c Campaign in which the force resides
+     * 
+     * @param c       Campaign in which the force resides
      * @param forceId Force for which to calculate weight
      * @return Total force weight
      */
@@ -512,4 +525,4 @@ public class Lance {
 
         return weight;
     }
- }
+}

@@ -20,7 +20,6 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.Version;
 import megamek.common.AmmoType;
-import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
@@ -53,7 +52,8 @@ public class BattleArmorAmmoBinTest {
 
         int equipmentNum = 18;
         int shotsNeeded = ammoType.getShots();
-        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false, mockCampaign);
+        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false,
+                mockCampaign);
 
         assertTrue(ammoBin.canNeverScrap());
     }
@@ -65,7 +65,8 @@ public class BattleArmorAmmoBinTest {
 
         int equipmentNum = 18;
         int shotsNeeded = ammoType.getShots();
-        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false, mockCampaign);
+        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false,
+                mockCampaign);
 
         assertFalse(ammoBin.needsMaintenance());
     }
@@ -77,7 +78,8 @@ public class BattleArmorAmmoBinTest {
 
         int equipmentNum = 18;
         int shotsNeeded = ammoType.getShots();
-        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false, mockCampaign);
+        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false,
+                mockCampaign);
 
         assertEquals(ammoType, ammoBin.getType());
         assertEquals(equipmentNum, ammoBin.getEquipmentNum());
@@ -93,7 +95,8 @@ public class BattleArmorAmmoBinTest {
 
         int equipmentNum = 18;
         int shotsNeeded = ammoType.getShots() - 1;
-        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false, mockCampaign);
+        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, ammoType, equipmentNum, shotsNeeded, false,
+                mockCampaign);
 
         // Ensure the clone has all the same stuff
         BattleArmorAmmoBin clone = ammoBin.clone();
@@ -109,7 +112,8 @@ public class BattleArmorAmmoBinTest {
     public void battleArmorAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
-        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots() - 1, false, mockCampaign);
+        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots() - 1,
+                false, mockCampaign);
         ammoBin.setId(25);
 
         // Write the BattleArmorAmmoBin XML
@@ -146,7 +150,8 @@ public class BattleArmorAmmoBinTest {
     }
 
     @Test
-    public void oneShotBattleArmorAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
+    public void oneShotBattleArmorAmmoBinWriteToXmlTest()
+            throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Ammo");
         Campaign mockCampaign = mock(Campaign.class);
         BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, 0, true, mockCampaign);
@@ -230,7 +235,8 @@ public class BattleArmorAmmoBinTest {
     public void emptyBattleArmorAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
-        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots(), false, mockCampaign);
+        BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots(),
+                false, mockCampaign);
         ammoBin.setId(25);
 
         // Write the BattleArmorAmmoBin XML

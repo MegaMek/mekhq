@@ -20,15 +20,14 @@ package mekhq.io.migration;
 
 import megamek.Version;
 import megamek.common.options.GameOptions;
-import megamek.common.options.IOption;
-import megamek.common.options.OptionsConstants;
 
 public class GameOptionsMigrator {
     public static void migrate(final Version version, final GameOptions gameOptions) {
         // commented out as an example of how to do
-        //if (version.isLowerThan("0.49.11")) {
-        //    final IOption turnTimerOption = gameOptions.getOption(OptionsConstants.BASE_TURN_TIMER);
-        //    turnTimerOption.setValue(turnTimerOption.intValue() * 60);
-        //}
+        // if (version.isLowerThan("0.49.11")) {
+        // final IOption turnTimerOption =
+        // gameOptions.getOption(OptionsConstants.BASE_TURN_TIMER);
+        // turnTimerOption.setValue(turnTimerOption.intValue() * 60);
+        // }
     }
 }

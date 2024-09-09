@@ -2,7 +2,6 @@ package mekhq.campaign.mission;
 
 import megamek.common.*;
 import megamek.common.enums.Gender;
-import megamek.common.options.IBasicOptionGroup;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
@@ -25,7 +24,7 @@ class CrewSkillUpgraderTest {
     boolean allSPAsFalse(Crew c) {
         Enumeration<IOptionGroup> g = c.getOptions().getGroups();
         Enumeration<IOption> o = c.getOptions(PilotOptions.LVL3_ADVANTAGES);
-        while(o.hasMoreElements()) {
+        while (o.hasMoreElements()) {
             IOption spa = o.nextElement();
             if (spa.getValue() instanceof Vector) {
                 if (!((Vector<?>) spa.getValue()).isEmpty()) {
@@ -54,8 +53,7 @@ class CrewSkillUpgraderTest {
                 BattleArmor.class,
                 Infantry.class,
                 QuadMek.class,
-                Jumpship.class
-        ));
+                Jumpship.class));
         ArrayList<CrewType> crewTypes = new ArrayList<>(List.of(
                 CrewType.SINGLE,
                 CrewType.DUAL,
@@ -65,20 +63,20 @@ class CrewSkillUpgraderTest {
                 CrewType.VESSEL,
                 CrewType.QUADVEE,
                 CrewType.COMMAND_CONSOLE,
-                CrewType.SUPERHEAVY_TRIPOD
-        ));
+                CrewType.SUPERHEAVY_TRIPOD));
 
         for (int i = 0; i < 1000; i++) {
             Entity e = (Entity) eClasses.get(i % eClasses.size()).getDeclaredConstructor().newInstance();
             CrewType t = crewTypes.get(i % crewTypes.size());
-            Crew c = new Crew(t, "Pilot #" + String.valueOf(i), t.getCrewSlots(), 2, 3, Gender.RANDOMIZE, i % 2==0, null);
+            Crew c = new Crew(t, "Pilot #" + String.valueOf(i), t.getCrewSlots(), 2, 3, Gender.RANDOMIZE, i % 2 == 0,
+                    null);
             assertTrue(allSPAsFalse(c));
             e.setCrew(c);
             entities.add(e);
         }
 
         // Upgrade each entity and confirm SPA is assigned
-        for (Entity ent: entities) {
+        for (Entity ent : entities) {
             csu.upgradeCrew(ent);
             assertFalse(allSPAsFalse(ent.getCrew()));
         }

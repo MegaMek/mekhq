@@ -19,7 +19,6 @@
 package mekhq.campaign.parts.equipment;
 
 import megamek.common.AmmoType;
-import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.WeaponMounted;
 import mekhq.utilities.MHQXMLUtility;
@@ -51,7 +50,8 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     }
 
     /**
-     * @return The <code>Mounted</code> of the unit's <code>Entity</code> that contains this ammo bin,
+     * @return The <code>Mounted</code> of the unit's <code>Entity</code> that
+     *         contains this ammo bin,
      *         or null if there is no unit or the ammo bin is not in any bay.
      */
     public @Nullable WeaponMounted getBay() {
@@ -81,7 +81,9 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     }
 
     /**
-     * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
+     * Sets the bay for this ammo bin. Does not check whether the ammo bin is
+     * actually in the bay.
+     * 
      * @param bay
      */
     public void setBay(WeaponMounted bay) {
@@ -92,7 +94,9 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     }
 
     /**
-     * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
+     * Sets the bay for this ammo bin. Does not check whether the ammo bin is
+     * actually in the bay.
+     * 
      * @param bayEqNum
      */
     public void setBay(int bayEqNum) {

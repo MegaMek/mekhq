@@ -23,7 +23,6 @@ package mekhq.campaign.storyarc.storypoint;
 import megamek.Version;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.gui.dialog.StoryChoiceDialog;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -36,7 +35,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * This StoryPoint creates a {@link StoryChoiceDialog StoryChoiceDialog} which offers the player
+ * This StoryPoint creates a {@link StoryChoiceDialog StoryChoiceDialog} which
+ * offers the player
  * potentially more than one possible choice or response.
  */
 public class ChoiceStoryPoint extends DialogStoryPoint {
@@ -89,11 +89,11 @@ public class ChoiceStoryPoint extends DialogStoryPoint {
         for (Entry<String, String> entry : choices.entrySet()) {
             // FIXME: not sue how to do this with attribute using new XML writing methods
             pw1.println(MHQXMLUtility.indentStr(indent)
-                    +"<choice id=\""
-                    +entry.getKey()
-                    +"\">"
-                    +entry.getValue()
-                    +"</choice>");
+                    + "<choice id=\""
+                    + entry.getKey()
+                    + "\">"
+                    + entry.getValue()
+                    + "</choice>");
         }
         writeToXmlEnd(pw1, --indent);
     }
@@ -108,15 +108,15 @@ public class ChoiceStoryPoint extends DialogStoryPoint {
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("title")) {
-                    title =wn2.getTextContent().trim();
+                    title = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("question")) {
-                    question =wn2.getTextContent().trim();
+                    question = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("choice")) {
                     String id = wn2.getAttributes().getNamedItem("id").getTextContent().trim();
-                    String choice =wn2.getTextContent().trim();
+                    String choice = wn2.getTextContent().trim();
                     choices.put(id, choice);
                 } else if (wn2.getNodeName().equalsIgnoreCase("chosen")) {
-                    chosen =wn2.getTextContent().trim();
+                    chosen = wn2.getTextContent().trim();
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

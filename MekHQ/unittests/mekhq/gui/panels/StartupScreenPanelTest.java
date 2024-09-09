@@ -1,7 +1,6 @@
 package mekhq.gui.panels;
 
 import megamek.common.preference.PreferenceManager;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
@@ -19,7 +18,7 @@ class StartupScreenPanelTest {
     }
 
     @Test
-    void testSaveFilterAllowsValidCampaignSaves(){
+    void testSaveFilterAllowsValidCampaignSaves() {
         String fileName = "MySave.xml";
         assertTrue(StartupScreenPanel.saveFilter.accept(dir, fileName));
         fileName = "MySave.CPNX";
@@ -29,7 +28,7 @@ class StartupScreenPanelTest {
     }
 
     @Test
-    void testSaveFilterNotAllowClientSettingsXML(){
+    void testSaveFilterNotAllowClientSettingsXML() {
         String fileName = PreferenceManager.DEFAULT_CFG_FILE_NAME;
         boolean allowed = StartupScreenPanel.saveFilter.accept(dir, fileName);
         assertFalse(allowed);
