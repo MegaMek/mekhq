@@ -18,6 +18,28 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.io.File;
+import java.io.FileInputStream;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.swing.*;
+
+import org.apache.logging.log4j.LogManager;
+
 import megamek.common.AmmoType;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
@@ -39,16 +61,6 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.FileDialogs;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.text.NumberFormat;
-import java.util.List;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class manages the GUI and logic for the campaign subset export wizard.
@@ -440,7 +452,7 @@ public class CampaignExportWizard extends JDialog {
                 destinationCampaign.restore();
                 destinationCampaign.cleanUp();
             } catch (NullEntityException ex) {
-                LogManager.getLogger().error("The following units could not be loaded by the campaign:\n" + ex.getMessage() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
+                LogManager.getLogger().error("The following units could not be loaded by the campaign:\n" + ex.getMessage() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mekfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
                 return false;
             } catch (Exception ex) {
                 LogManager.getLogger().error("The campaign file could not be loaded.\nPlease check the log file for details.");

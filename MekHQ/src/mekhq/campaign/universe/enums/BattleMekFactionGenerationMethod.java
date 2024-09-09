@@ -30,9 +30,9 @@ import mekhq.campaign.universe.Faction;
  */
 public enum BattleMekFactionGenerationMethod {
     //region Enum Declarations
-    ORIGIN_FACTION("BattleMechFactionGenerationMethod.ORIGIN_FACTION.text", "BattleMechFactionGenerationMethod.ORIGIN_FACTION.toolTipText"),
-    CAMPAIGN_FACTION("BattleMechFactionGenerationMethod.CAMPAIGN_FACTION.text", "BattleMechFactionGenerationMethod.CAMPAIGN_FACTION.toolTipText"),
-    SPECIFIED_FACTION("BattleMechFactionGenerationMethod.SPECIFIED_FACTION.text", "BattleMechFactionGenerationMethod.SPECIFIED_FACTION.toolTipText");
+    ORIGIN_FACTION("BattleMekFactionGenerationMethod.ORIGIN_FACTION.text", "BattleMekFactionGenerationMethod.ORIGIN_FACTION.toolTipText"),
+    CAMPAIGN_FACTION("BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.text", "BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.toolTipText"),
+    SPECIFIED_FACTION("BattleMekFactionGenerationMethod.SPECIFIED_FACTION.text", "BattleMekFactionGenerationMethod.SPECIFIED_FACTION.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <storyArc version="0.49.19-SNAPSHOT">
     <title>Young Wolves</title>
-    <details>Clan Invasion Era; Mechs Only</details>
+    <details>Clan Invasion Era; Meks Only</details>
     <description>
 # Young Wolves
 
@@ -20,7 +20,7 @@ glory and sacrifice. The Refusal War will test their resolve, skill, and, most i
 
 This story arc will take the user through the Clan Refusal War as a Wolf Star Captain. Most battles will involve
 between a trinary and a star of units, although there will also be several possibilities for individual duels. All combat
-will be mech only. Two main story endings are possible, depending on player choices.
+will be mek only. Two main story endings are possible, depending on player choices.
 
 ## Credits
 
@@ -91,7 +91,7 @@ Battletech history, but some deviations have been made for narrative purposes.
             <id>e9c2df78-df50-417e-aaf0-ed3e26dbeca3</id>
             <title>Young Wolves Story Arc</title>
             <narrative>
-In this story arc, you will lead a trinary of Wolf mechwarriors into battle during the Refusal War.
+In this story arc, you will lead a trinary of Wolf MekWarriors into battle during the Refusal War.
 Momentarily you will create a character, but first I want to discuss some technical issues.
 
 You will start on an existing campaign file with campaign options already set. You are welcome to
@@ -132,8 +132,8 @@ That's it. I hope you enjoy the campaign!
             <firstname>Julius</firstname>
             <age>32</age>
             <clan>true</clan>
-            <phenotype>MECHWARRIOR</phenotype>
-            <primaryRole>MECHWARRIOR</primaryRole>
+            <phenotype>MekWarrior</phenotype>
+            <primaryRole>MekWarrior</primaryRole>
             <edge>3</edge>
             <editOrigin>false</editOrigin>
             <editBirthday>false</editBirthday>
@@ -141,7 +141,7 @@ That's it. I hope you enjoy the campaign!
             <limitFaction>true</limitFaction>
             <nameRestrictions>FIRST_NAME</nameRestrictions>
             <instructions>
-                Use this form to create a Clan Wolf mechwarrior, using an XP pool to buy skills and special abilities. Leftover XP will be added to your character. Only
+                Use this form to create a Clan Wolf MekWarrior, using an XP pool to buy skills and special abilities. Leftover XP will be added to your character. Only
                 Gunnery, Piloting, and Tactics (initiative) will have in-game effects in the story arc.
             </instructions>
             <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
@@ -193,7 +193,7 @@ That's it. I hope you enjoy the campaign!
             <id>5fc66857-384a-4e8e-b0cd-cf9050507bdb</id>
             <title>Khan Ulric has Fallen</title>
             <narrative>
-                Khan Ulric Kerensky has fallen in battle. You fight bravely on as you are swarmed by Jade Falcon mechs
+                Khan Ulric Kerensky has fallen in battle. You fight bravely on as you are swarmed by Jade Falcon meks
                 from all sides. Eventually you succumb to the onslaught. The story ends here.
             </narrative>
             <storySplash>
@@ -206,8 +206,8 @@ That's it. I hope you enjoy the campaign!
         <storyPoint name="narr_trial_game_over" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>441b1e8e-6ce3-4138-b173-6f21195a0d22</id>
             <title>End of Your Story</title>
-            <narrative>As you attempt to extricate yourself from the cockpit of your downed mech, you hear the footfall
-                of Mathius's mech approach. You know there will be no mercy. This fight was always to the death. As the
+            <narrative>As you attempt to extricate yourself from the cockpit of your downed mek, you hear the footfall
+                of Mathius's mek approach. You know there will be no mercy. This fight was always to the death. As the
                 laser beams begin to atomize your body, you close your eyes, taking some small comfort that Clan Wolf
                 will live on in some form or another and that you have done all that could be expected of you as a
                 warrior. This is the end of your story.
@@ -223,7 +223,7 @@ That's it. I hope you enjoy the campaign!
             <id>d9e7b352-5b0b-46dd-bb6d-076bfcab99ee</id>
             <title>End of Your Story</title>
             <narrative>
-                *Your mech lies sprawled on the ground, nothing but salvage. You hear the footfalls of Chistu's mech as
+                *Your mek lies sprawled on the ground, nothing but salvage. You hear the footfalls of Chistu's mek as
                 he approaches.*
 
                 It would have been better if you had died when you were supposed to, {commanderRank}. No matter, I will
@@ -864,7 +864,7 @@ That's it. I hope you enjoy the campaign!
             <id>59bc0303-670c-4891-8fd2-eede2ec3e0cf</id>
             <title>Mercy or Death?</title>
             <question>
-                *As you approach Mathius's downed mech, you can see him within through the glasteel cockpit. He is not
+                *As you approach Mathius's downed mek, you can see him within through the glasteel cockpit. He is not
                 struggling to escape. His voice comes through your comm, thick with contempt and rage.*
 
                 Do it! Grant me enough dignity to at least die like a warrior, you warden stravag coward!
@@ -1151,7 +1151,7 @@ That's it. I hope you enjoy the campaign!
             <question>
                 *He smiles and nods his head as you issue the batchall in its proper form, clearly impressed.*
 
-                I am Star Captain Tobias Malthus and I defend this facility with a binary of Jade Falcon mechwarriors.
+                I am Star Captain Tobias Malthus and I defend this facility with a binary of Jade Falcon MekWarriors.
                 What force will you commit to utter destruction against the beak and talon of the Falcon?
             </question>
             <choice id="batchall_all">I see no reason to honor your solahma forces with a fair fight. I bid my full
@@ -1186,7 +1186,7 @@ That's it. I hope you enjoy the campaign!
                 me to teach you a lesson in humility.
 
                 If you do not wish to take the lead that I granted you as the aggressor, then I shall begin. I am Star
-                Captain Tobias Malthus and I defend this facility with a binary of Jade Falcon mechwarriors. What force
+                Captain Tobias Malthus and I defend this facility with a binary of Jade Falcon MekWarriors. What force
                 will you commit to utter destruction against the beak and talon of the Falcon?
             </question>
             <choice id="batchall_all">I see no reason to honor your solahma forces with a fair fight. I bid my full
@@ -1347,7 +1347,7 @@ That's it. I hope you enjoy the campaign!
 
                 At the present moment, the logistics of finding a location for such a trial are not easy. However, the
                 Falcons on Butler have agreed to grant safcon if you wish to have this trial on-planet, so long as only
-                two mechs leave the ship. Apparently, some traditions are still honored even in the midst of this
+                two meks leave the ship. Apparently, some traditions are still honored even in the midst of this
                 *dezgra* war.
 
                 Since you are the defender, the choice of battlefield is yours, {commander}. Where would you like to
@@ -1441,7 +1441,7 @@ That's it. I hope you enjoy the campaign!
                 Hello {commander}. I am glad to see it is you returning. Unfortunately, we have a bit of a situation
                 here. After hearing the results of the trial, Ella was able to convince a few other warriors that it
                 would be better to die in battle here against the Falcons than to go into exile with Khan Phelan. They
-                were able to exit with their mechs before I was aware of the plan.
+                were able to exit with their meks before I was aware of the plan.
 
                 *As she says this, you begin to hear the sounds of heavy weapons fire in the distance. The Falcons are
                 likely enraged by this perceived violation of the truce. Going after these warriors would be suicide.*
@@ -1475,7 +1475,7 @@ That's it. I hope you enjoy the campaign!
                 Hello {commander}. I am glad to see it is you returning. Unfortunately, we have a bit of a situation
                 here. After hearing the results of the trial, Ella attempted to convince other warriors that it would be
                 better to die in battle here against the Falcons than to go into exile with Khan Phelan. She was not
-                able to convince anyone else to join her, but she was able to exit with her mech before I was aware of
+                able to convince anyone else to join her, but she was able to exit with her mek before I was aware of
                 her plans.
 
                 *As she says this, you begin to hear the sounds of heavy weapons fire in the distance. The Falcons are
@@ -1697,7 +1697,7 @@ That's it. I hope you enjoy the campaign!
             <question>
                 *What was once a grand square is now a wasteland of wreckage. The smoking carcasses of metal giants lie
                 all around you. Some are Jade Falcons, but many belong to your own forces. Yet, out of the smoke come
-                more green mechs. One of them hails you on your comm.*
+                more green meks. One of them hails you on your comm.*
 
                 Wolf commander, this is Star Captain Mel Ustone. You have fought with honor and skill. I ask you to accept defeat so that I will not be
                 forced to kill a great warrior. I promise that you and your warriors will not remain bondsmen long.
@@ -1833,7 +1833,7 @@ That's it. I hope you enjoy the campaign!
                 You also claimed to witness this event. What did you see?
             </question>
             <choice id="treachery">Khan Chistu used a targeting laser to send overwhelming indirect missile fired at
-                Ulric's mech after an individual trial had been declared.
+                Ulric's mek after an individual trial had been declared.
             </choice>
             <choice id="murder">This *stravag* lured Ulric into the open and murdered him with indirect missile fire
                 after declaring an individual trial.
@@ -1897,21 +1897,21 @@ That's it. I hope you enjoy the campaign!
             </storyOutcomes>
             <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
         </storyPoint>
-        <storyPoint name="choice_trial_mech" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+        <storyPoint name="choice_trial_mek" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
             <id>12480bac-61db-4ba1-ae33-f84bc4404765</id>
-            <title>Which Mech?</title>
+            <title>Which Mek?</title>
             <question>
-                *You step into an assigned mech bay to prepare for the Trial and are surprised when your chief tech is
+                *You step into an assigned mek bay to prepare for the Trial and are surprised when your chief tech is
                 there to greet you.*
 
                 Greetings, {commander}. Since the battle, they have me working as a bondsman tech, but I was just
-                ordered to get over to this mech bay on the double to support you for a Trial. Scuttlebut says it is to
+                ordered to get over to this mek bay on the double to support you for a Trial. Scuttlebut says it is to
                 get our Clan back. I sure as hell hope so, because this Falcon jumpsuit itches like you would not
                 believe.
 
-                Anyway, first thing we need to do is get you a mech, since pretty much everything we had is in the
+                Anyway, first thing we need to do is get you a mek, since pretty much everything we had is in the
                 salvage pile. Your opponent is going to be in a *Executioner* although I do not know the configuration.
-                If you want to go for a similar assault mech, I could put you in a *Warhawk*. Alternatively, I could put
+                If you want to go for a similar assault mek, I could put you in a *Warhawk*. Alternatively, I could put
                 you in something a little lighter, faster, and more iconic like the *Timber Wolf*. If you want to really
                 go for speed, I can put you in a *Stormcrow* and you can try to run circles around him.
 
@@ -2099,7 +2099,7 @@ That's it. I hope you enjoy the campaign!
             <id>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</id>
             <title>Back on board</title>
             <narrative>
-                Welcome back, {commanderRank}. Once you have your mechs secured in their bays, I am ready to boost for
+                Welcome back, {commanderRank}. Once you have your meks secured in their bays, I am ready to boost for
                 orbit. From there, we are headed to Sudeten along with the rest of the joint task force. I have already
                 mapped in coordinates, so you don't need to worry about the details. You can check on our travel
                 progress from the on-board interstellar map, if you like. The trip should give you enough time to deal
@@ -2122,7 +2122,7 @@ That's it. I hope you enjoy the campaign!
                 battles. You can always check on our supplies by heading over to the warehouse.
 
                 Also keep in mind that we have no way to acquire new units given the situation. We do have some
-                second-line mechs mothballed in the hangar bay, that can be used to replace units that have been
+                second-line meks mothballed in the hangar bay, that can be used to replace units that have been
                 completely destroyed or do not have available parts. It will take some time to pull those units out of
                 mothball, though, so be sure to give me some advance warning.
             </narrative>
@@ -2148,10 +2148,10 @@ That's it. I hope you enjoy the campaign!
             <title>Doc Chat</title>
             <narrative>
                 Greetings, {commander}. I am the doctor assigned to the *Moonhowler*. If you have any wounded
-                mechwarriors from this battle or future battles, be sure to send them to the infirmary so that I may
+                MekWarriors from this battle or future battles, be sure to send them to the infirmary so that I may
                 treat them.
 
-                I know that the ego of many mechwarriors is such that they are too proud to admit to their injuries, but
+                I know that the ego of many MekWarriors is such that they are too proud to admit to their injuries, but
                 it is imperative that they do so. If they are not sent to the infirmary, natural healing will take much
                 longer.
             </narrative>
@@ -2165,7 +2165,7 @@ That's it. I hope you enjoy the campaign!
                 Good choice, {commanderRank}. You cannot go wrong with that beast. It may not have the tonnage of the
                 *Executioner* but it sure does pack a punch!
 
-                I will get to work on it right away. We should have your mech ready for combat shortly. Give him hell,
+                I will get to work on it right away. We should have your mek ready for combat shortly. Give him hell,
                 {commanderRank}!
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
@@ -2179,9 +2179,9 @@ That's it. I hope you enjoy the campaign!
             <title>You Chose Timber Wolf</title>
             <narrative>
                 I hoped you would pick that one, {commanderRank}. What better way to restore the honor of Clan Wolf than
-                with our iconic mech!
+                with our iconic mek!
 
-                I will get to work on it right away. We should have your mech ready for combat shortly. Give him hell,
+                I will get to work on it right away. We should have your mek ready for combat shortly. Give him hell,
                 {commanderRank}!
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
@@ -2196,7 +2196,7 @@ That's it. I hope you enjoy the campaign!
             <narrative>
                 Excellent idea, {commanderRank}. You will easily outpace his slow ass in that ride.
 
-                I will get to work on it right away. We should have your mech ready for combat shortly. Give him hell,
+                I will get to work on it right away. We should have your mek ready for combat shortly. Give him hell,
                 {commanderRank}!
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
@@ -2210,10 +2210,10 @@ That's it. I hope you enjoy the campaign!
             <title>Preparing for the Trial</title>
             <narrative>
                 So tomorrow is the big day, huh? You let us know if you want to make any changes or need any repairs to
-                the mech you want to use for each battle. Depending on your opponent, you may want to swap your loadout,
+                the mek you want to use for each battle. Depending on your opponent, you may want to swap your loadout,
                 or even change your ride entirely.
 
-                We will also be ready to repair your mech right after battle. If you don't bang it up too much, we
+                We will also be ready to repair your mek right after battle. If you don't bang it up too much, we
                 should be able to get it ready for the next day's combat.
 
                 Good luck, {commanderRank}.
@@ -2226,7 +2226,7 @@ That's it. I hope you enjoy the campaign!
             <narrative>
                 *Before Vlad can respond, you are mobbed by other Wolves ready to offer their congratulations.*
 
-                I told you that was the right mech for the fight! Glad to see you managed to win without totally
+                I told you that was the right mek for the fight! Glad to see you managed to win without totally
                 wrecking my equipment.
 
                 I will be so glad to get this malfing green jumpsuit off. It is definitely not my color.
@@ -2261,7 +2261,7 @@ That's it. I hope you enjoy the campaign!
                 Like every other damn warrior in this Touman, you probably have your own opinions about my decision.
                 Frankly, I don't give a damn. From an operational standpoint, all it means is that we will not
                 have Khan Ward's forces available to us. I will, therefore, need to lean more heavily on my existing forces,
-                including yours. In other words, I hope you got all the dents out of your mechs because I am going to
+                including yours. In other words, I hope you got all the dents out of your meks because I am going to
                 need them shortly.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -2362,7 +2362,7 @@ That's it. I hope you enjoy the campaign!
                 Bring us down tight and steady, pilot! You flip this egg, and you pay for it!
 
                 *You can hear the metal struts supporting the hull groan with the pressure. Then you feel an abrupt and
-                heavy jerk as your mech rocks on its actuators. As the bay doors begin to open, sand is blown across the
+                heavy jerk as your mek rocks on its actuators. As the bay doors begin to open, sand is blown across the
                 metal floors of the hangar bay by the howling winds outside.*
 
                 And that is touchdown! You are clear for egress, {commanderRank}. Good hunting!
@@ -2444,7 +2444,7 @@ That's it. I hope you enjoy the campaign!
             <narrative>
                 *Natasha fixes you with an incredulous stare.*
 
-                An old man with ten beat-up second class mechs and mostly freebirth warriors, and you decide to go after
+                An old man with ten beat-up second class meks and mostly freebirth warriors, and you decide to go after
                 him with everything you have? Well, that wasn't exactly honorable, but I guess I can appreciate your
                 ruthlessness. Well done, {commanderRank}. I always figured that was a milk run for you, but it ought to
                 bolster the morale of your troops. They are going to need it because Twycross is going to be a lot harder
@@ -2522,7 +2522,7 @@ That's it. I hope you enjoy the campaign!
             <id>31c98f3d-0373-4f53-8715-dd7e41566b1f</id>
             <title>Secure for Liftoff</title>
             <narrative>
-                {commander}, welcome back on board. We kept it warm and toasty for you. As soon as you get your mechs
+                {commander}, welcome back on board. We kept it warm and toasty for you. As soon as you get your meks
                 secured, we have orders to make for the nadir jump point. Scuttlebut says we are headed for Twycross
                 next.
             </narrative>
@@ -2698,7 +2698,7 @@ That's it. I hope you enjoy the campaign!
             <id>9c8bfcf2-b805-4b52-86b4-a114ce543c00</id>
             <title>Post-Mission Report</title>
             <narrative>
-                Excellent work, {commanderRank}. With their supply line cut, the Falcon mechs started running dry, and we
+                Excellent work, {commanderRank}. With their supply line cut, the Falcon meks started running dry, and we
                 pushed them all the way back to their rally point at the Bay of Broken Hope.
 
                 Now I have something special planned for the Falcons. You should join my forces as we march on the Bay
@@ -2781,7 +2781,7 @@ That's it. I hope you enjoy the campaign!
             <narrative>
                 Strap yourself in {commanderRank}. This could be a bumpy ride.
 
-                *You strap yourself in. After several minutes of waiting in silence in the cockpit of your mech, you are
+                *You strap yourself in. After several minutes of waiting in silence in the cockpit of your mek, you are
                 suddenly thrown violently to the left and right as the Moonhowler executes evasive action.*
 
                 Sorry, {commanderRank}. The drop zone is a little hot right now, but nothing I cannot handle. We should
@@ -2975,7 +2975,7 @@ That's it. I hope you enjoy the campaign!
                 meet and slay any Jade Falcon who thinks more of himself than he should and prefers courage to wisdom.
                 Come now. Your time is at hand.
 
-                *As you oversee the boarding of your trinary's mechs into the *Moonhowler*, you feel a mixture of pride
+                *As you oversee the boarding of your trinary's meks into the *Moonhowler*, you feel a mixture of pride
                 and concern and wonder whether that Dire Wolf will ever come out of the Great Gash again.*
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -3192,7 +3192,7 @@ That's it. I hope you enjoy the campaign!
                 final screams he might have made are drowned out by the sounds of metal popping and steam hissing. All
                 that remains is a smoking carcass. Vandervahn Chistu is no more.*
 
-                *As you make your way back into the mech bay, you are dimly aware of a crowd chanting and cheering.*
+                *As you make your way back into the mek bay, you are dimly aware of a crowd chanting and cheering.*
             </narrative>
             <storySplash>
                 <category></category>
@@ -3208,7 +3208,7 @@ That's it. I hope you enjoy the campaign!
                 Clan Wolf.
 
                 *You leave Chistu to be freed by techs that have run onto the field. As you make your way back into the
-                mech bay, you are dimly aware of a crowd chanting and cheering.*
+                mek bay, you are dimly aware of a crowd chanting and cheering.*
             </narrative>
             <storySplash>
                 <category></category>
@@ -3684,7 +3684,7 @@ That's it. I hope you enjoy the campaign!
             <title>Broken Hope</title>
             <narrative>
                 *Phelan waits for you on a bluff overlooking the Bay of Broken Hope. You can see Jade Falcon technicians
-                and mechwarriors running frantically throughout the camp below as they prepare for the coming onslaught
+                and MekWarriors running frantically throughout the camp below as they prepare for the coming onslaught
                 of Wolves. Ice and snow lie gleaming upon the bulbous tops of Jade Falcon dropships.*
 
                 Thank you for meeting me here. I wanted to show you something. We lost Tukkayid because the Inner Sphere
@@ -3712,7 +3712,7 @@ That's it. I hope you enjoy the campaign!
                 where it is torn apart by the combined Kell Hound fire.*
 
                 *Finally, the Wolf fighters cease their onslaught. A thick black fog hangs over the Jade Falcon camp,
-                partially concealing a scene of utter devastation. The twisted remains of mechs litter the ground, and
+                partially concealing a scene of utter devastation. The twisted remains of meks litter the ground, and
                 survivors are seen limping here and there among the ruins.*
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
@@ -4019,10 +4019,10 @@ That's it. I hope you enjoy the campaign!
                     <id>828189ee-a14f-4c7a-bb33-b62883757152</id>
                     <givenName>Tobias</givenName>
                     <bloodname>Malthus</bloodname>
-                    <primaryRole>MECHWARRIOR</primaryRole>
+                    <primaryRole>MekWarrior</primaryRole>
                     <faction>CJF</faction>
                     <clan>true</clan>
-                    <phenotype>MECHWARRIOR</phenotype>
+                    <phenotype>MekWarrior</phenotype>
                     <portrait>
                         <category></category>
                         <filename>Tobias.jpg</filename>
@@ -4042,12 +4042,12 @@ That's it. I hope you enjoy the campaign!
                         <bonus>0</bonus>
                     </skill>
                     <skill>
-                        <type>Piloting/Mech</type>
+                        <type>Piloting/Mek</type>
                         <level>3</level>
                         <bonus>1</bonus>
                     </skill>
                     <skill>
-                        <type>Gunnery/Mech</type>
+                        <type>Gunnery/Mek</type>
                         <level>3</level>
                         <bonus>1</bonus>
                     </skill>
@@ -4073,11 +4073,11 @@ That's it. I hope you enjoy the campaign!
                     <id>828189ee-a14f-4c7a-bb33-b62883757152</id>
                     <givenName>Tobias</givenName>
                     <bloodname>Malthus</bloodname>
-                    <primaryRole>MECHWARRIOR</primaryRole>
+                    <primaryRole>MekWarrior</primaryRole>
                     <prisonerStatus>BONDSMAN</prisonerStatus>
                     <faction>CJF</faction>
                     <clan>true</clan>
-                    <phenotype>MECHWARRIOR</phenotype>
+                    <phenotype>MekWarrior</phenotype>
                     <portrait>
                         <category></category>
                         <filename>Tobias.jpg</filename>
@@ -4097,12 +4097,12 @@ That's it. I hope you enjoy the campaign!
                         <bonus>0</bonus>
                     </skill>
                     <skill>
-                        <type>Piloting/Mech</type>
+                        <type>Piloting/Mek</type>
                         <level>3</level>
                         <bonus>1</bonus>
                     </skill>
                     <skill>
-                        <type>Gunnery/Mech</type>
+                        <type>Gunnery/Mek</type>
                         <level>3</level>
                         <bonus>1</bonus>
                     </skill>
@@ -4169,7 +4169,7 @@ That's it. I hope you enjoy the campaign!
             <title>Congratulations</title>
             <narrative>
                 Congratulations, {commander}. Glad to see you managed to earn a bloodname without totally wrecking my -
-                sorry, I mean your - mech. We will get right on it and get it back in mint condition in no time.
+                sorry, I mean your - mek. We will get right on it and get it back in mint condition in no time.
             </narrative>
             <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
             <nextStoryPointId>35fabd74-41fa-4472-b409-8a1d0c280418</nextStoryPointId>
@@ -4218,7 +4218,7 @@ That's it. I hope you enjoy the campaign!
             <title>In the Thick of It</title>
             <narrative>
                 *As the last of the Jade Falcons falls, You see a Timber Wolf emerge through the smoke behind you. You
-                raise your weapons only to realize that it is Vlad's mech. You can see evidence of furious battle
+                raise your weapons only to realize that it is Vlad's mek. You can see evidence of furious battle
                 engraved upon its armored carapace.*
 
                 That takes care of the enemies to our rear. We are almost at the designated spot for the trial. Let us
@@ -4231,7 +4231,7 @@ That's it. I hope you enjoy the campaign!
             <id>098ff77b-519e-4448-8d63-a2748107ce78</id>
             <title>Its a Trap!</title>
             <narrative>
-                *Caught off guard by this strange comment, you suddenly notice a small light emanating from Chistu's mech
+                *Caught off guard by this strange comment, you suddenly notice a small light emanating from Chistu's mek
                 and seeming to probe Ulric's Gargoyle. Your heart races, as you realize something is wrong. Vlad,
                 however, realizes it a second sooner.*
 
@@ -4390,7 +4390,7 @@ That's it. I hope you enjoy the campaign!
             <id>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</id>
             <title>Negotiating the Trial</title>
             <narrative>
-                Very well. You will both travel to the trial site aboard the *Moonhowler* but only your two mechs will
+                Very well. You will both travel to the trial site aboard the *Moonhowler* but only your two meks will
                 dismount. Failure to follow this order may result in hostilities with the defending Jade Falcon forces.
                 I think you both know how the rest of this goes. Should Star Commander Mathius prove victorious, we are
                 leaving a jumpship behind with a double-charged lithium battery that should allow you to catch up with
@@ -4436,13 +4436,13 @@ That's it. I hope you enjoy the campaign!
                 alive or atomized.
 
                 You stand for a moment in contemplation as your weapons cycle and cool. You note movement out of the
-                corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin
+                corner of your eye and look up to see several Jade Falcon meks approaching. Fearing a trap, you begin
                 cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and
-                instead their mechs have formed something like a circle of equals. Slowly, they bow their heads in
+                instead their meks have formed something like a circle of equals. Slowly, they bow their heads in
                 recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word,
-                they salute your mech and withdraw.
+                they salute your mek and withdraw.
 
-                As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the
+                As the salvage crews arrive to recover what is left of Mathius's mek, you return slowly to the
                 *Moonhowler*.
             </narrative>
             <nextStoryPointId>00f287b1-c152-457c-9691-998c0ea386dc</nextStoryPointId>
@@ -4458,13 +4458,13 @@ That's it. I hope you enjoy the campaign!
                 cockpit. Through the glazed glasteel, you can see his body slump over lifelessly.*
 
                 *You stand for a moment in silent shock at Mathius's unexpected rashness. Then you note movement out of
-                the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you
+                the corner of your eye and look up to see several Jade Falcon meks approaching. Fearing a trap, you
                 begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and
-                instead their mechs have formed something like a Circle of Equals. Slowly, they bow their heads in
+                instead their meks have formed something like a Circle of Equals. Slowly, they bow their heads in
                 recognition of a warrior's life lost in the honorable combat of a Trial of Refusal. Then without a word,
-                they salute your mech and withdraw.*
+                they salute your mek and withdraw.*
 
-                *As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the
+                *As the salvage crews arrive to recover what is left of Mathius's mek, you return slowly to the
                 Moonhowler.*
             </narrative>
             <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
@@ -4474,17 +4474,17 @@ That's it. I hope you enjoy the campaign!
             <id>bf062237-46dc-4661-8764-a4ad41bb6565</id>
             <title>Death of a Warrior</title>
             <narrative>
-                As the battle abruptly dies out, you look at the battered remains of Mathius's mech. There is no
+                As the battle abruptly dies out, you look at the battered remains of Mathius's mek. There is no
                 movement from the crushed cockpit. It appears that Mathius did not survive the trial.
 
                 You stand for a moment in contemplation as your weapons cycle and cool. You note movement out of the
-                corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin
+                corner of your eye and look up to see several Jade Falcon meks approaching. Fearing a trap, you begin
                 cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and
-                instead their mechs have formed something like a circle of equals. Slowly, they bow their heads in
+                instead their meks have formed something like a circle of equals. Slowly, they bow their heads in
                 recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word,
-                they salute your mech and withdraw.
+                they salute your mek and withdraw.
 
-                As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the
+                As the salvage crews arrive to recover what is left of Mathius's mek, you return slowly to the
                 *Moonhowler*.
             </narrative>
             <nextStoryPointId>00f287b1-c152-457c-9691-998c0ea386dc</nextStoryPointId>
@@ -4498,7 +4498,7 @@ That's it. I hope you enjoy the campaign!
                 and when I do I will come looking for you. You hear me? This isn't over. I will--
 
                 *You turn off your comms at this point and begin trudging back to the *Moonhowler*. Your rear camera
-                shows you that several Jade Falcon mechs that were apparently stationed as observers have begun to move
+                shows you that several Jade Falcon meks that were apparently stationed as observers have begun to move
                 forward. What they will do with Mathius, you do not know.*
             </narrative>
             <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
@@ -4516,7 +4516,7 @@ That's it. I hope you enjoy the campaign!
 
                 *Sighing, you get out of your bunk, straighten up your jacket, and take the lift down to the mess.*
 
-                *You arrive to see a crowd surrounding two of your mechwarriors who are standing off from one another,
+                *You arrive to see a crowd surrounding two of your MekWarriors who are standing off from one another,
                 with hostile intent mirrored in their eyes. You see that each is holding a long combat knife.*
             </narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
@@ -4546,7 +4546,7 @@ That's it. I hope you enjoy the campaign!
             </narrative>
             <storySplash>
                 <category></category>
-                <filename>splash-mechbay.png</filename>
+                <filename>splash-mekbay.png</filename>
             </storySplash>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_knives" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -4833,10 +4833,10 @@ That's it. I hope you enjoy the campaign!
             <id>2321ceb2-2158-40fa-8e4b-34325310bf72</id>
             <title>The End?</title>
             <narrative>
-                *You fight like Wolves, but there are simply too many enemies. As your mechwarriors fall, you sense this
+                *You fight like Wolves, but there are simply too many enemies. As your MekWarriors fall, you sense this
                 battle will be the end of your command and perhaps your life.*
 
-                *Finally, your own mech is brought down. As your consciousness fades into darkness, you have a dim
+                *Finally, your own mek is brought down. As your consciousness fades into darkness, you have a dim
                 awareness of someone pulling your body from a burning cockpit. Then all goes black.*
             </narrative>
             <storySplash>
@@ -4852,7 +4852,7 @@ That's it. I hope you enjoy the campaign!
                 *As you open the mike to deliver your response, you suddenly lose your balance and start to see double.
                 It appears that the head injury you suffered in combat was worse than you thought.*
 
-                *Your body tenses as your mech topples. At the moment of impact, you feel exploding pain in your temple
+                *Your body tenses as your mek topples. At the moment of impact, you feel exploding pain in your temple
                 and the whole world fades to black.*
             </narrative>
             <storySplash>
@@ -4865,12 +4865,12 @@ That's it. I hope you enjoy the campaign!
             <id>a7be7384-5642-4045-bd32-1c79fd3b1e3f</id>
             <title>Bloodname Trial</title>
             <narrative>
-                *You step forward to meet your first opponent, a heavily muscled mechwarrior. You hear Khan Crichell
+                *You step forward to meet your first opponent, a heavily muscled MekWarrior. You hear Khan Crichell
                 behind you.*
 
                 Why are you worthy of the {bloodname} bloodname?
 
-                *The mechwarrior responds.*
+                *The MekWarrior responds.*
 
                 I am Star Commander Marketta. I represent fourteen who are not worthy.
 
@@ -5164,7 +5164,7 @@ That's it. I hope you enjoy the campaign!
                 <systemId>Twycross</systemId>
                 <desc>
                     Hoping to draw the Jade Falcons into the same error that cost them Twycross during the Clan
-                    invasion, Khan Kerensky placed mechs in strategic locations all throughout the Great Gash. She then
+                    invasion, Khan Kerensky placed meks in strategic locations all throughout the Great Gash. She then
                     organized her remaining forces on the Plain of Curtains in front of the Gash to try to lure the Jade
                     Falcons into the kill zone.
                 </desc>
@@ -5356,7 +5356,7 @@ the player can claim control of the battlefield for *isorla*.
 
 The player may be granted *hegira* from the Falcon forces at any point by using the `/defeat`
 command in MegaMek. Players granted *hegira* cannot claim control of the battlefield. They can
-recover downed pilots, but not mechs or salvage.
+recover downed pilots, but not meks or salvage.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
@@ -5827,7 +5827,7 @@ forces.
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Hide and Seek</name>
                 <desc>
-After wading up the river bed of the Baker River, you have pulled steaming mechs out along the banks
+After wading up the river bed of the Baker River, you have pulled steaming meks out along the banks
 near your target. Your star has been assigned the task of taking out a nearby comm center and supply
 depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements
 if you remain in the field too long. So meet your objectives and get out.
@@ -6089,7 +6089,7 @@ forces after round 12 when all available reinforcements have arrived.
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Hide and Seek</name>
                 <desc>
-After wading up the river bed of the Baker River, you have pulled your steaming mechs out along the
+After wading up the river bed of the Baker River, you have pulled your steaming meks out along the
 banks near your target. Your star has been assigned the task of taking out a nearby comm center and
 supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy
 reinforcements if you remain in the field too long. So meet your objectives and get out.
@@ -7095,7 +7095,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Highlander IIC" model="(Standard)" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b400b7ca-d594-4240-87d0-c69776a445ec"
-                                quirks="command_mech::cowl::reinforced_legs::difficult_eject">
+                                quirks="command_mek::cowl::reinforced_legs::difficult_eject">
                             <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
@@ -7363,7 +7363,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Highlander IIC" model="(Standard)" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b400b7ca-d594-4240-87d0-c69776a445ec"
-                                quirks="command_mech::cowl::reinforced_legs::difficult_eject">
+                                quirks="command_mek::cowl::reinforced_legs::difficult_eject">
                             <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
@@ -7582,7 +7582,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                 <temperature>-10</temperature>
                 <desc>
 In this trial, you will face Warrior Konstantin, piloting a *Hellbringer* in its prime
-configuration. Honor would dictate that you respond with a mech of a similar weight class, but you
+configuration. Honor would dictate that you respond with a mek of a similar weight class, but you
 are not required to do so.
 
 Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in
@@ -7678,7 +7678,7 @@ capturing the facility.
                 <temperature>-10</temperature>
                 <desc>
                     In this trial, you will face Warrior Murniyani, a freebirth warrior piloting a *Shadow Hawk IIC*.
-                    Honor would dictate that you respond with a mech of a similar weight class, but you are not required
+                    Honor would dictate that you respond with a mek of a similar weight class, but you are not required
                     to do so.
 
                     Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in
@@ -7774,7 +7774,7 @@ capturing the facility.
                 <temperature>-10</temperature>
                 <desc>
 In this trial, you will face Warrior Gunter, a solahma warrior piloting a *Highlander IIC*. Honor
-would dictate that you respond with a mech of a similar weight class, but you are not required to do
+would dictate that you respond with a mek of a similar weight class, but you are not required to do
 so.
 
 Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in
@@ -7804,7 +7804,7 @@ capturing the facility.
                         <entity chassis="Highlander IIC" model="(Standard)" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b400b7ca-d594-4240-87d0-c69776a445ec"
-                                quirks="command_mech::cowl::reinforced_legs::difficult_eject">
+                                quirks="command_mek::cowl::reinforced_legs::difficult_eject">
                             <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
@@ -7877,7 +7877,7 @@ capturing the facility.
                 <temperature>-10</temperature>
                 <desc>
 In this trial, you will face Warrior Joscelyn, a freebirth warrior piloting a *Champion C*. Honor
-would dictate that you respond with a mech of a similar weight class, but you are not required to do
+would dictate that you respond with a mek of a similar weight class, but you are not required to do
 so.
 
 Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in
@@ -7974,7 +7974,7 @@ capturing the facility.
                 <temperature>-10</temperature>
                 <desc>
 In this trial, you will face Warrior Hyacinth, a freebirth warrior piloting a *Locust IIC*. Honor
-would dictate that you respond with a mech of a similar weight class, but you are not required to do
+would dictate that you respond with a mek of a similar weight class, but you are not required to do
 so.
 
 Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in
@@ -8064,7 +8064,7 @@ capturing the facility.
                 <temperature>-10</temperature>
                 <desc>
 In this trial, you will face Warrior Callum, who pilots a *Warhammer IIC*. Honor would dictate that
-you respond with a mech of a similar weight class, but you are not required to do so.
+you respond with a mek of a similar weight class, but you are not required to do so.
 
 Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in
 capturing the facility.
@@ -8161,7 +8161,7 @@ capturing the facility.
                 <temperature>-10</temperature>
                 <desc>
 In this trial, you will face Star Commander Jelexiz, who pilots a *Griffin IIC*. Honor would dictate
-that you respond with a mech of a similar weight class, but you are not required to do so.
+that you respond with a mek of a similar weight class, but you are not required to do so.
 
 Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in
 capturing the facility.
@@ -8257,7 +8257,7 @@ capturing the facility.
                 <temperature>-10</temperature>
                 <desc>
 In this trial, you will face Warrior Tania, a freebirth warrior piloting a *Shadow Hawk IIC*. Honor
-would dictate that you respond with a mech of a similar weight class, but you are not required to do
+would dictate that you respond with a mek of a similar weight class, but you are not required to do
 so.
 
 Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in
@@ -8353,7 +8353,7 @@ capturing the facility.
                 <temperature>-10</temperature>
                 <desc>
 In this trial, you will face Star Captain Tobias Malthus who pilots a *Summoner* in its C
-configuration. Honor would dictate that you respond with a mech of a similar weight class, but you
+configuration. Honor would dictate that you respond with a mek of a similar weight class, but you
 are not required to do so.
 
 Keep in mind that you may only claim *isorla* in trials that you win, even if you succeed in
@@ -8884,7 +8884,7 @@ Jade Falcon units will operate under forced withdrawal but will not ask for nor 
                 <name>Trial of Refusal</name>
                 <desc>
 You have chosen to face Star Commander Mathius on the great Thompkins mega-glacier. The environment
-will be inhospitable and cold. Most importantly, the ice will prove difficult for piloting a mech,
+will be inhospitable and cold. Most importantly, the ice will prove difficult for piloting a mek,
 so be sure to watch your step.
                 </desc>
                 <start>6</start>
@@ -9050,7 +9050,7 @@ the equator of Butler. The environment will make movement difficult, especially 
                 <name>Trial of Refusal</name>
                 <desc>
 You have chosen to face Star Commander Mathius in the vacuum of the moon of Valet orbiting Butler.
-It is a dangerous and unforgiving environment in which any stray hit could disable your mech through
+It is a dangerous and unforgiving environment in which any stray hit could disable your mek through
 breaches into your internal system.
                 </desc>
                 <start>6</start>
@@ -9562,7 +9562,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                 <name>Destroy the Convoy</name>
                 <desc>
 You must destroy the supply convoy heading towards Broken Hope. To avoid detection, you will be
-limited to two stars of mechs.
+limited to two stars of meks.
 
 ### Hegira/Retreat Conditions
 
@@ -10159,14 +10159,14 @@ scenario resolution.
 Due to the small number of participants, you were seeded directly into round two.
 
 In this round, you face a warrior named Aziza who is even older than you. Assigned to a second line
-mech in a garrison cluster, she nonetheless proved herself in battle upon Morges, earning a
+mek in a garrison cluster, she nonetheless proved herself in battle upon Morges, earning a
 nomination for this trial.
 
 Aziza pilots an ancient second line *Warhammer IIC* that still presents a formidable threat.
 
 ### Hegira/Retreat Conditions
 
-Aziza will yield the contest if her mech is crippled and your mech is not. You may surrender at any point. You cannot salvage her mech.
+Aziza will yield the contest if her mek is crippled and your mek is not. You may surrender at any point. You cannot salvage her mek.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
@@ -10182,7 +10182,7 @@ Aziza will yield the contest if her mech is crippled and your mech is not. You m
                     <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
                 </scenarioDeploymentLimit>
                 <botForce>
-                    <name>Mechwarrior Aziza</name>
+                    <name>MekWarrior Aziza</name>
                     <team>2</team>
                     <start>2</start>
                     <camouflage>
@@ -10196,7 +10196,7 @@ Aziza will yield the contest if her mech is crippled and your mech is not. You m
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="f3a17b2c-6e3f-4b9e-9745-bc4d07b8ed65" quirks="searchlight::stable">
                             <pilot size="1" name="Warrior Aziza" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
-                                   portraitCat="Female/MechWarrior/" portraitFile="MW_F_34.png" commandB="1"
+                                   portraitCat="Female/MekWarrior/" portraitFile="MW_F_34.png" commandB="1"
                                    externalId="db0c2d27-0ec8-484d-be13-001f8e14b680" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -10223,7 +10223,7 @@ Aziza will yield the contest if her mech is crippled and your mech is not. You m
                 </botForce>
                 <scenarioObjective>
                     <associatedForceNames>
-                        <associatedForceName>Mechwarrior Aziza</associatedForceName>
+                        <associatedForceName>MekWarrior Aziza</associatedForceName>
                     </associatedForceNames>
                     <successEffects>
                         <successEffect>
@@ -10292,13 +10292,13 @@ Aziza will yield the contest if her mech is crippled and your mech is not. You m
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Trial of Bloodright, Round 3</name>
                 <desc>
-Your opponent in this round is a brash, young mechwarrior named Damien. What he lacks for in
+Your opponent in this round is a brash, young MekWarrior named Damien. What he lacks for in
 experience, he makes up for in enthusiasm. He likes speed and will be bringing a jump-capable
 *Shadow Cat*. Make sure you don't let him run (or jump) circles around you.
 
 ### Hegira/Retreat Conditions
 
-Damien will yield the contest if his mech is crippled and your mech is not. You may surrender at any point. You cannot salvage his mech.
+Damien will yield the contest if his mek is crippled and your mek is not. You may surrender at any point. You cannot salvage his mek.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
@@ -10314,7 +10314,7 @@ Damien will yield the contest if his mech is crippled and your mech is not. You 
                     <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
                 </scenarioDeploymentLimit>
                 <botForce>
-                    <name>Mechwarrior Damien</name>
+                    <name>MekWarrior Damien</name>
                     <team>2</team>
                     <start>2</start>
                     <camouflage>
@@ -10328,7 +10328,7 @@ Damien will yield the contest if his mech is crippled and your mech is not. You 
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="9072cbba-59b4-4396-b458-4e0f39628ab1" quirks="low_profile">
                             <pilot size="1" name="Damien" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="3" artillery="4"
-                                   portraitCat="Male/MechWarrior/" portraitFile="MW_M_68.png"
+                                   portraitCat="Male/MekWarrior/" portraitFile="MW_M_68.png"
                                    externalId="e9a1f09b-5fdf-496b-bc0a-7b094a74af3a" ejected="false"
                                    advantages="jumping_jack" autoeject="true" condejectammo="false"
                                    condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
@@ -10351,7 +10351,7 @@ Damien will yield the contest if his mech is crippled and your mech is not. You 
                 </botForce>
                 <scenarioObjective>
                     <associatedForceNames>
-                        <associatedForceName>Mechwarrior Damien</associatedForceName>
+                        <associatedForceName>MekWarrior Damien</associatedForceName>
                     </associatedForceNames>
                     <successEffects>
                         <successEffect>
@@ -10421,13 +10421,13 @@ Damien will yield the contest if his mech is crippled and your mech is not. You 
                 <name>Trial of Bloodright, Round 4</name>
                 <desc>
 You have made it to the semi-finals. Your opponent in this round is Star Commander Jameel. He is an
-experienced mechwarrior. He will be piloting a *Summoner C*. I am sure you realize this means a
+experienced MekWarrior. He will be piloting a *Summoner C*. I am sure you realize this means a
 heavy ultra auto-cannon in the left arm. If you let him in too close, he can end this trial very
 quickly.
 
 ### Hegira/Retreat Conditions
 
-Jameel will yield the contest if his mech is crippled and your mech is not. You may surrender at any point. You cannot salvage his mech.
+Jameel will yield the contest if his mek is crippled and your mek is not. You may surrender at any point. You cannot salvage his mek.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
@@ -10556,13 +10556,13 @@ Jameel will yield the contest if his mech is crippled and your mech is not. You 
                 <name>Trial of Bloodright, Round 5</name>
                 <desc>
 This is it - the finals. Win today and the bloodname is yours. That will not be easy, however. Your
-opponent is Star Captain Olympia. She is an experienced mechwarrior and considered something of a
+opponent is Star Captain Olympia. She is an experienced MekWarrior and considered something of a
 tactical genius. She will be piloting an *Executioner* in its A configuration, which means lots of
 lasers.
 
 ### Hegira/Retreat Conditions
 
-Having reached the finals, Olympia will not surrender until her mech is destroyed. You may surrender at any point. You cannot salvage her mech.
+Having reached the finals, Olympia will not surrender until her mek is destroyed. You may surrender at any point. You cannot salvage her mek.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
@@ -10593,7 +10593,7 @@ Having reached the finals, Olympia will not surrender until her mech is destroye
                                 neverDeployed="true" externalId="567320de-1439-4387-b7cf-e52d3f75d1ff"
                                 quirks="distracting">
                             <pilot size="1" name="Star Captain Olympia" nick="" gender="FEMALE" clanperson="true" gunnery="1" piloting="2"
-                                   artillery="4" portraitCat="Female/MechWarrior/" portraitFile="MW_F_49.png"
+                                   artillery="4" portraitCat="Female/MekWarrior/" portraitFile="MW_F_49.png"
                                    externalId="096cf76a-679d-4f3e-ba86-3edfa06606e5" ejected="false" commandB="4"
                                    advantages="tactical_genius" autoeject="true" condejectammo="false"
                                    condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
@@ -10700,7 +10700,7 @@ It is time to suit up and finish this.
 
 ### Hegira/Retreat Conditions
 
-There is no surrender or hegira available in this battle. You must fight until one combatant's mech is destroyed. You cannot salvage Chistu's mech.
+There is no surrender or hegira available in this battle. You must fight until one combatant's mek is destroyed. You cannot salvage Chistu's mek.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
@@ -10872,7 +10872,7 @@ There is no surrender or hegira available in this battle. You must fight until o
             <id>8408467a-9131-4d3e-83f7-6f1722cbb9a9</id>
             <title>Star Colonel Marco Hall</title>
             <portrait>
-                <category>Male/MechWarrior</category>
+                <category>Male/MekWarrior</category>
                 <filename>MW_M_93.png</filename>
             </portrait>
         </personality>
@@ -10952,7 +10952,7 @@ There is no surrender or hegira available in this battle. You must fight until o
             <id>682a21b2-206d-4ee9-b8bd-7c31b5e23696</id>
             <title>Star Commander Marketta</title>
             <portrait>
-                <category>Female/MechWarrior</category>
+                <category>Female/MekWarrior</category>
                 <filename>MW_F_4.png</filename>
             </portrait>
         </personality>

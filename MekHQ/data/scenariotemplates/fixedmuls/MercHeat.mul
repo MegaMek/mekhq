@@ -2,7 +2,7 @@
 
 <unit version="0.49.16-SNAPSHOT" >
 
-		<entity chassis="Phoenix Hawk" model="PXH-1D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="756f5756-1be5-45e6-ae78-0715aa25c8d0" quirks="command_mech::imp_com::ubiquitous_is::ubiquitous_clan">
+		<entity chassis="Phoenix Hawk" model="PXH-1D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="756f5756-1be5-45e6-ae78-0715aa25c8d0" quirks="command_mek::imp_com::ubiquitous_is::ubiquitous_clan">
 			<pilot size="1" name="David Withecombe" nick="" gender="MALE" gunnery="3" piloting="3" externalId="4b8c4226-8dbd-494b-acba-e53cd5b8467b" ejected="false" advantages="hopping_jack::melee_master" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
       The first slot in a location is at index="1".
 			<location index="4"> Right Arm

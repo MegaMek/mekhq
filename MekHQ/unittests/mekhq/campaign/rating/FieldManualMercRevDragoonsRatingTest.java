@@ -20,6 +20,25 @@
  */
 package mekhq.campaign.rating;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -30,18 +49,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -459,10 +466,10 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(4).when(testRating).getLightVeeCount();
         String expected = "Transportation      -10\n" +
                           "    DropShip Capacity:       0%\n" +
-                          "        #BattleMek Bays:             0 needed /   0 available\n" +
+                          "        #BattleMek Bays:              0 needed /   0 available\n" +
                           "        #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
                           "        #Small Craft Bays:            0 needed /   0 available\n" +
-                          "        #ProtoMek Bays:              0 needed /   0 available\n" +
+                          "        #ProtoMek Bays:               0 needed /   0 available\n" +
                           "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
                           "        #Heavy Vehicle Bays:          4 needed /   0 available (plus 0 excess Super Heavy)\n" +
                           "        #Light Vehicle Bays:          4 needed /   0 available (plus 0 excess Heavy and 0 excess Super Heavy)\n" +
@@ -478,10 +485,10 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(8).when(testRating).getHeavyVeeBayCount();
         expected = "Transportation        0\n" +
                    "    DropShip Capacity:      100%\n" +
-                   "        #BattleMek Bays:             0 needed /   0 available\n" +
+                   "        #BattleMek Bays:              0 needed /   0 available\n" +
                    "        #Fighter Bays:                0 needed /   0 available (plus 0 excess Small Craft)\n" +
                    "        #Small Craft Bays:            0 needed /   0 available\n" +
-                   "        #ProtoMek Bays:              0 needed /   0 available\n" +
+                   "        #ProtoMek Bays:               0 needed /   0 available\n" +
                    "        #Super Heavy Vehicle Bays:    0 needed /   0 available\n" +
                    "        #Heavy Vehicle Bays:          4 needed /   8 available (plus 0 excess Super Heavy)\n" +
                    "        #Light Vehicle Bays:          4 needed /   0 available (plus 4 excess Heavy and 0 excess Super Heavy)\n" +
