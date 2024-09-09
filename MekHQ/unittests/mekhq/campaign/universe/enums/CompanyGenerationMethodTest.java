@@ -18,17 +18,6 @@
  */
 package mekhq.campaign.universe.enums;
 
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
-import mekhq.campaign.universe.generators.companyGenerators.AtBCompanyGenerator;
-import mekhq.campaign.universe.generators.companyGenerators.WindchildCompanyGenerator;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -37,27 +26,39 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CompanyGenerationMethodTest {
-    //region Variable Declarations
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.RandomOriginOptions;
+import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
+import mekhq.campaign.universe.generators.companyGenerators.AtBCompanyGenerator;
+import mekhq.campaign.universe.generators.companyGenerators.WindchildCompanyGenerator;
+
+class CompanyGenerationMethodTest {
+    // region Variable Declarations
     private static final CompanyGenerationMethod[] methods = CompanyGenerationMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
-    public void testGetToolTipText() {
+    void testGetToolTipText() {
         assertEquals(resources.getString("CompanyGenerationMethod.AGAINST_THE_BOT.toolTipText"),
                 CompanyGenerationMethod.AGAINST_THE_BOT.getToolTipText());
         assertEquals(resources.getString("CompanyGenerationMethod.WINDCHILD.toolTipText"),
                 CompanyGenerationMethod.WINDCHILD.getToolTipText());
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsAgainstTheBot() {
+    void testIsAgainstTheBot() {
         for (final CompanyGenerationMethod companyGenerationMethod : methods) {
             if (companyGenerationMethod == CompanyGenerationMethod.AGAINST_THE_BOT) {
                 assertTrue(companyGenerationMethod.isAgainstTheBot());
@@ -68,7 +69,7 @@ public class CompanyGenerationMethodTest {
     }
 
     @Test
-    public void testIsWindchild() {
+    void testIsWindchild() {
         for (final CompanyGenerationMethod companyGenerationMethod : methods) {
             if (companyGenerationMethod == CompanyGenerationMethod.WINDCHILD) {
                 assertTrue(companyGenerationMethod.isWindchild());
@@ -77,25 +78,28 @@ public class CompanyGenerationMethodTest {
             }
         }
     }
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
 
     @Test
-    public void testGetGenerator() {
+    void testGetGenerator() {
         final Campaign mockCampaign = mock(Campaign.class);
         when(mockCampaign.getPersonnelGenerator(any(), any())).thenCallRealMethod();
         when(mockCampaign.getRandomSkillPreferences()).thenReturn(mock(RandomSkillPreferences.class));
 
         final CompanyGenerationOptions mockOptions = mock(CompanyGenerationOptions.class);
         when(mockOptions.getRandomOriginOptions()).thenReturn(new RandomOriginOptions(false));
-        when(mockOptions.getBattleMekWeightClassGenerationMethod()).thenReturn(BattleMekWeightClassGenerationMethod.WINDCHILD);
+        when(mockOptions.getBattleMekWeightClassGenerationMethod())
+                .thenReturn(BattleMekWeightClassGenerationMethod.WINDCHILD);
         when(mockOptions.getBattleMekQualityGenerationMethod()).thenReturn(BattleMekQualityGenerationMethod.WINDCHILD);
 
-        assertInstanceOf(AtBCompanyGenerator.class, CompanyGenerationMethod.AGAINST_THE_BOT.getGenerator(mockCampaign, mockOptions));
-        assertInstanceOf(WindchildCompanyGenerator.class, CompanyGenerationMethod.WINDCHILD.getGenerator(mockCampaign, mockOptions));
+        assertInstanceOf(AtBCompanyGenerator.class,
+                CompanyGenerationMethod.AGAINST_THE_BOT.getGenerator(mockCampaign, mockOptions));
+        assertInstanceOf(WindchildCompanyGenerator.class,
+                CompanyGenerationMethod.WINDCHILD.getGenerator(mockCampaign, mockOptions));
     }
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("CompanyGenerationMethod.AGAINST_THE_BOT.text"),
                 CompanyGenerationMethod.AGAINST_THE_BOT.toString());
         assertEquals(resources.getString("CompanyGenerationMethod.WINDCHILD.text"),

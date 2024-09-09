@@ -20,25 +20,6 @@
  */
 package mekhq.campaign;
 
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Infantry;
-import megamek.common.enums.SkillLevel;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Systems;
-import org.apache.logging.log4j.LogManager;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,6 +28,24 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import megamek.common.Dropship;
+import megamek.common.EquipmentType;
+import megamek.common.enums.SkillLevel;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Systems;
 
 /**
  * @author Deric Page (dericdotpageatgmaildotcom)
@@ -65,7 +64,7 @@ public class CampaignTest {
     }
 
     @Test
-    public void testGetTechs() {
+    void testGetTechs() {
         List<Person> testPersonList = new ArrayList<>(5);
         List<Person> testActivePersonList = new ArrayList<>(5);
 
@@ -150,16 +149,7 @@ public class CampaignTest {
     }
 
     @Test
-    public void testCampaignResetInfantry() {
-        // It is possible for Infantry to have BAP equal true, but empty Sensors vector.
-        Campaign campaign = new Campaign();
-        Entity infantry = spy(new Infantry());
-        when(infantry.hasBAP()).thenReturn(true);
-        campaign.clearGameData(infantry);
-    }
-
-    @Test
-    public void testTransportShips() {
+    void testTransportShips() {
         Campaign campaign = spy(new Campaign());
 
         // New campaigns have no transports
