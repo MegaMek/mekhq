@@ -20,14 +20,17 @@
  */
 package mekhq.campaign.finances;
 
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.PlanetarySystem;
-import org.apache.logging.log4j.LogManager;
+import java.io.FileInputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+
 import org.joda.money.CurrencyUnitDataProvider;
 import org.joda.money.format.MoneyFormatter;
 import org.joda.money.format.MoneyFormatterBuilder;
@@ -36,10 +39,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import java.io.FileInputStream;
-import java.time.LocalDate;
-import java.util.*;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Main class used to handle all money and currency information.
@@ -50,6 +57,8 @@ import java.util.*;
  * @author Vicente Cartas Espinel (vicente.cartas at outlook.com)
  */
 public class CurrencyManager extends CurrencyUnitDataProvider {
+    private static final MMLogger logger = MMLogger.create(CurrencyManager.class);
+
     private static final CurrencyManager instance = new CurrencyManager();
 
     /** The last time the default currency was checked. */
@@ -163,7 +172,8 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             for (Contract contract : this.campaign.getActiveContracts()) {
                 if (contract instanceof AtBContract) {
                     Currency currency = possibleCurrencies.getOrDefault(
-                            Factions.getInstance().getFaction(((AtBContract) contract).getEmployerCode()).getCurrencyCode(),
+                            Factions.getInstance().getFaction(((AtBContract) contract).getEmployerCode())
+                                    .getCurrencyCode(),
                             null);
 
                     if (currency != null) {
@@ -172,7 +182,8 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                 }
             }
 
-            // Use the currency of one of the factions in the planet where the unit is deployed, if it exists
+            // Use the currency of one of the factions in the planet where the unit is
+            // deployed, if it exists
             if (currentSystem != null) {
                 Set<Faction> factions = currentSystem.getFactionSet(date);
                 for (Faction faction : factions) {
@@ -189,14 +200,15 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
     @Override
     protected void registerCurrencies() {
-        LogManager.getLogger().info("Starting load currency information from XML...");
+        logger.info("Starting load currency information from XML...");
 
         try {
             // Using factory get an instance of document builder
             DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            try (FileInputStream xmlFile = new FileInputStream("data/universe/currencies.xml")) { // TODO : Remove inline file path
+            try (FileInputStream xmlFile = new FileInputStream("data/universe/currencies.xml")) { // TODO : Remove
+                                                                                                  // inline file path
                 Document xmlDoc = db.parse(xmlFile);
 
                 Element root = xmlDoc.getDocumentElement();
@@ -205,7 +217,8 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
                 for (int i = 0; i < currencies.getLength(); i++) {
                     String name = "", code = "", symbol = "";
-                    int numericCurrencyCode = -1, decimalPlaces = 0, startYear = Integer.MAX_VALUE, endYear = Integer.MIN_VALUE;
+                    int numericCurrencyCode = -1, decimalPlaces = 0, startYear = Integer.MAX_VALUE,
+                            endYear = Integer.MIN_VALUE;
                     boolean isDefault = false, isBackup = false;
 
                     NodeList currencyData = currencies.item(i).getChildNodes();
@@ -283,9 +296,9 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                 }
             }
 
-            LogManager.getLogger().info("Load of currency information complete!");
+            logger.info("Load of currency information complete!");
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error(ex, "Unknown Exception - registerCurrencies");
         }
     }
 

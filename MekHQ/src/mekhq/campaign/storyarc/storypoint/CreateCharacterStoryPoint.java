@@ -20,6 +20,15 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.Enumeration;
+import java.util.UUID;
+
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -45,18 +54,12 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.CreateCharacterDialog;
 import mekhq.gui.dialog.CreateCharacterDialog.NameRestrictions;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.Enumeration;
-import java.util.UUID;
 
 /**
- * This StoryPoint opens a {@link CreateCharacterDialog CreateCharacterDialog} which allows a player to create a new
- * character. Various initial values can be set, as well as an initial experience point pool. Additionally, the ability
+ * This StoryPoint opens a {@link CreateCharacterDialog CreateCharacterDialog}
+ * which allows a player to create a new
+ * character. Various initial values can be set, as well as an initial
+ * experience point pool. Additionally, the ability
  * to edit certain parts of the character can be restricted.
  */
 public class CreateCharacterStoryPoint extends StoryPoint {
@@ -79,7 +82,8 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     private int edge;
 
     /**
-     * The id of the person in the campaign. This will otherwise be set randomly. By setting it manually we can
+     * The id of the person in the campaign. This will otherwise be set randomly. By
+     * setting it manually we can
      * reference it later.
      */
     private UUID personId;
@@ -98,7 +102,6 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     /** ids to assign person to unit and force **/
     private UUID assignedUnitId;
     private int assignedForceId;
-
 
     public CreateCharacterStoryPoint() {
         super();
@@ -168,8 +171,8 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         skillPrefs.setAntiMekProb(0);
         skillPrefs.setSecondSkillProb(0);
         skillPrefs.setSecondSkillBonus(-12);
-        skillPrefs.setTacticsMod(0,-12);
-        skillPrefs.setSpecialAbilBonus(0, -12);
+        skillPrefs.setTacticsMod(0, -12);
+        skillPrefs.setSpecialAbilityBonus(0, -12);
         skillPrefs.setOverallRecruitBonus(-12);
         skillPrefs.setCombatSmallArmsBonus(-12);
         skillPrefs.setSupportSmallArmsBonus(-12);
@@ -177,7 +180,6 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         skillGenerator.generateSkills(getCampaign(), p, SkillType.EXP_ULTRA_GREEN);
 
         p.setBirthday(getCampaign().getLocalDate().minusYears(age));
-
 
         // set education
         if (p.getAge(getCampaign().getLocalDate()) < 16) {
@@ -208,7 +210,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
             Unit u = getCampaign().getUnit(assignedUnitId);
             if (null != u && u.isUnmanned()) {
                 u.addPilotOrSoldier(person, false);
-                //only assign to force if properly assigned to a unit
+                // only assign to force if properly assigned to a unit
                 Force force = getCampaign().getForce(assignedForceId);
                 if (null != force && null != person.getUnit()) {
                     getCampaign().addUnitToForce(u, force.getId());
@@ -220,7 +222,8 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     }
 
     private void setEdgeTriggers(Person p) {
-        //just check them all to be sure - no good way to separate these by primary role at the moment
+        // just check them all to be sure - no good way to separate these by primary
+        // role at the moment
         PersonnelOptions options = p.getOptions();
 
         for (Enumeration<IOptionGroup> i = options.getGroups(); i
@@ -283,7 +286,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                     xpPool = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("age")) {
                     age = Integer.parseInt(wn2.getTextContent().trim());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     rank = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("firstname")) {
                     firstname = wn2.getTextContent().trim();
@@ -305,13 +308,13 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                     faction = Factions.getInstance().getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("editOrigin")) {
                     editOrigin = Boolean.parseBoolean(wn2.getTextContent().trim());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("editBirthday")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("editBirthday")) {
                     editBirthday = Boolean.parseBoolean(wn2.getTextContent().trim());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("editGender")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("editGender")) {
                     editGender = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitFaction")) {
                     limitFaction = Boolean.parseBoolean(wn2.getTextContent().trim());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("nameRestrictions")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("nameRestrictions")) {
                     nameRestrictions = NameRestrictions.valueOf(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("instructions")) {
                     instructions = wn2.getTextContent().trim();
