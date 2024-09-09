@@ -11,9 +11,9 @@ import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 
-public class MovedAmmoBinTest {
+class MovedAmmoBinTest {
     @Test
-    public void notAmmoBinEquipmentTest() {
+    void notAmmoBinEquipmentTest() {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         EquipmentPart mockPart = mock(EquipmentPart.class);
 
@@ -25,7 +25,7 @@ public class MovedAmmoBinTest {
     }
 
     @Test
-    public void noMatchingEquipmentTest() {
+    void noMatchingEquipmentTest() {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         when(mockProposal.getEquipment()).thenReturn(Collections.emptySet());
         AmmoBin mockPart = mock(AmmoBin.class);
@@ -38,7 +38,7 @@ public class MovedAmmoBinTest {
     }
 
     @Test
-    public void doesNotMatchDestroyedEquipmentTest() {
+    void doesNotMatchDestroyedEquipmentTest() {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.isDestroyed()).thenReturn(true);
@@ -53,7 +53,7 @@ public class MovedAmmoBinTest {
     }
 
     @Test
-    public void doesNotMatchEquipmentTest() {
+    void doesNotMatchEquipmentTest() {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mock(EquipmentType.class));
@@ -69,7 +69,7 @@ public class MovedAmmoBinTest {
     }
 
     @Test
-    public void doesNotMatchAmmoTypeTest() {
+    void doesNotMatchAmmoTypeTest() {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         Mounted mockMount = mock(Mounted.class);
         when(mockMount.getType()).thenReturn(mock(AmmoType.class));
@@ -83,9 +83,9 @@ public class MovedAmmoBinTest {
 
         verify(mockProposal, times(0)).proposeMapping(any(), anyInt());
     }
-    
+
     @Test
-    public void mountMatchesEquipmentTest() {
+    void mountMatchesEquipmentTest() {
         EquipmentProposal mockProposal = mock(EquipmentProposal.class);
         AmmoType mockType = mock(AmmoType.class);
         Mounted mockMount = mock(Mounted.class);
@@ -93,12 +93,12 @@ public class MovedAmmoBinTest {
         when(mockProposal.getEquipment()).thenReturn(Collections.singletonMap(1, mockMount).entrySet());
         AmmoBin mockPart = mock(AmmoBin.class);
         when(mockPart.getType()).thenReturn(mock(AmmoType.class));
-        doReturn(true).when(mockPart).canChangeMunitions(eq(mockType));
+        doReturn(true).when(mockPart).canChangeMunitions(mockType);
 
         MovedAmmoBinStep step = new MovedAmmoBinStep();
 
         step.visit(mockProposal, mockPart);
 
-        verify(mockProposal, times(1)).proposeMapping(eq(mockPart), eq(1));
+        verify(mockProposal, times(1)).proposeMapping(mockPart, 1);
     }
 }

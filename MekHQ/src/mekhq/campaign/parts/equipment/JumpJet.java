@@ -49,7 +49,7 @@ public class JumpJet extends EquipmentPart {
     public double getTonnage() {
         double ton;
         if (type.hasFlag(MiscType.F_PROTOMEK_EQUIPMENT)) {
-            if (getUnitTonnage() <=5) {
+            if (getUnitTonnage() <= 5) {
                 ton = 0.05;
             } else if (getUnitTonnage() <= 9) {
                 ton = 0.1;
@@ -72,7 +72,8 @@ public class JumpJet extends EquipmentPart {
     }
 
     /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
+     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer
+     * detail, boolean ignoreAmmo)
      *
      */
     @Override
@@ -106,13 +107,14 @@ public class JumpJet extends EquipmentPart {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             int priorHits = hits;
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            Mounted<?> mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted) {
                 if (mounted.isMissing()) {
                     remove(false);
                     return;
                 }
-                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
+                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
+                        mounted.getLocation());
             }
             if (checkForDestruction
                     && hits > priorHits
@@ -125,7 +127,7 @@ public class JumpJet extends EquipmentPart {
     @Override
     public int getBaseTime() {
         if (isSalvaging()) {
-            return isOmniPodded()? 30 : 60;
+            return isOmniPodded() ? 30 : 60;
         }
         return 100;
     }

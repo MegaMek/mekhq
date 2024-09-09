@@ -109,17 +109,19 @@ public class MekLabTab extends CampaignGuiTab {
 
     private JPanel shoppingPanel;
 
-    //region Constructors
+    // region Constructors
     public MekLabTab(CampaignGUI gui, String name) {
         super(gui, name);
         this.campaignGUI = gui;
         this.repaint();
     }
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     public void initTab() {
-        entityVerifier = EntityVerifier.getInstance(new File("data/mekfiles/UnitVerifierOptions.xml")); // TODO : Remove inline file path
+        entityVerifier = EntityVerifier.getInstance(new File("data/mekfiles/UnitVerifierOptions.xml")); // TODO : Remove
+                                                                                                        // inline file
+                                                                                                        // path
         CConfig.load();
         UnitUtil.loadFonts();
         LogManager.getLogger().info("Starting MegaMekLab version: " + MMLConstants.VERSION);
@@ -197,7 +199,7 @@ public class MekLabTab extends CampaignGuiTab {
         summaryPane.add(shoppingPanel, c);
 
         // TODO: compare units dialog that pops up mek views back-to-back
-}
+    }
 
     @Override
     public void refreshAll() {
@@ -227,7 +229,8 @@ public class MekLabTab extends CampaignGuiTab {
         UnitUtil.updateLoadedUnit(entity);
         entity.setModel(entity.getModel() + " Mk II");
         removeAll();
-        // We need to override the values in the MML properties file with the campaign options settings.
+        // We need to override the values in the MML properties file with the campaign
+        // options settings.
         CConfig.setParam(CConfig.TECH_EXTINCT, String.valueOf(campaignGUI.getCampaign().showExtinct()));
         CConfig.setParam(CConfig.TECH_PROGRESSION, String.valueOf(campaignGUI.getCampaign().useVariableTechLevel()));
         CConfig.setParam(CConfig.TECH_SHOW_FACTION, String.valueOf(campaignGUI.getCampaign().getTechFaction() >= 0));
@@ -354,10 +357,12 @@ public class MekLabTab extends CampaignGuiTab {
         lblCost.setText(refit.getCost().toAmountAndSymbolString());
         lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>+"
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
+                    + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>+"
                     + bvDiff + "</font>)</html>");
         } else if (bvDiff < 0) {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + bvDiff
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='"
+                    + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + bvDiff
                     + "</font>)</html>");
         } else {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (+" + bvDiff + ")</html>");
@@ -365,12 +370,14 @@ public class MekLabTab extends CampaignGuiTab {
 
         if (currentTonnage != tonnage) {
             lblTons.setText(
-                    "<html>Tonnage: <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + currentTonnage + '/' + tonnage + "</font></html>");
+                    "<html>Tonnage: <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                            + currentTonnage + '/' + tonnage + "</font></html>");
         } else {
             lblTons.setText("Tonnage: " + currentTonnage + '/' + tonnage);
         }
         if (totalHeat > heat) {
-            lblHeat.setText("<html>Heat: <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + totalHeat + '/' + heat + "</font></html>");
+            lblHeat.setText("<html>Heat: <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                    + totalHeat + '/' + heat + "</font></html>");
         } else {
             lblHeat.setText("<html>Heat: " + totalHeat + '/' + heat + "</html>");
         }
@@ -415,7 +422,7 @@ public class MekLabTab extends CampaignGuiTab {
             }
         }
 
-        for (Mounted mounted : entity.getWeaponList()) {
+        for (Mounted<?> mounted : entity.getWeaponList()) {
             WeaponType wtype = (WeaponType) mounted.getType();
             double weaponHeat = wtype.getHeat();
 
@@ -476,11 +483,11 @@ public class MekLabTab extends CampaignGuiTab {
     private abstract static class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource {
 
         private boolean refreshRequired = false;
+
         @Override
         public abstract Entity getEntity();
 
         abstract void setTechFaction(int techFaction);
-
 
         @Override
         public void scheduleRefresh() {
@@ -1426,7 +1433,8 @@ public class MekLabTab extends CampaignGuiTab {
         public void refreshBuild() {
             buildTab.refresh();
             refreshSummary();
-            // trick to catch toggling the main gun location, which does not affect the status bar
+            // trick to catch toggling the main gun location, which does not affect the
+            // status bar
             refreshRefitSummary();
         }
 

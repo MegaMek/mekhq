@@ -92,11 +92,14 @@ public class CampaignXmlParser {
     }
 
     /**
-     * Designed to create a campaign object from an input stream containing an XML structure.
+     * Designed to create a campaign object from an input stream containing an XML
+     * structure.
      *
      * @return The created Campaign object, or null if there was a problem.
-     * @throws CampaignXmlParseException Thrown when there was a problem parsing the CPNX file
-     * @throws NullEntityException Thrown when an entity is referenced but cannot be loaded or found
+     * @throws CampaignXmlParseException Thrown when there was a problem parsing the
+     *                                   CPNX file
+     * @throws NullEntityException       Thrown when an entity is referenced but
+     *                                   cannot be loaded or found
      */
     public Campaign parse() throws CampaignXmlParseException, NullEntityException {
         LogManager.getLogger().info("Starting load of campaign file from XML...");
@@ -230,7 +233,8 @@ public class CampaignXmlParser {
                 if (xn.equalsIgnoreCase("campaignOptions")) {
                     retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
-                    retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
+                    retVal.setRandomSkillPreferences(
+                            RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("parts")) {
                     processPartNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("personnel")) {
@@ -277,7 +281,8 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("lances")) {
                     processLanceNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
-                    retVal.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
+                    retVal.setRetirementDefectionTracker(
+                            RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
                     retVal.setShipSearchStart(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
@@ -435,10 +440,12 @@ public class CampaignXmlParser {
         timestamp = System.currentTimeMillis();
 
         retVal.getHangar().forEachUnit(unit -> {
-            // Some units have been incorrectly assigned a null C3UUID as a string. This should
+            // Some units have been incorrectly assigned a null C3UUID as a string. This
+            // should
             // correct that by setting a new C3UUID
             if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i() || unit.getEntity().hasNavalC3())
-                    && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
+                    && (unit.getEntity().getC3UUIDAsString() == null
+                            || unit.getEntity().getC3UUIDAsString().equals("null"))) {
                 unit.getEntity().setC3UUID();
                 unit.getEntity().setC3NetIdSelf();
             }
@@ -535,7 +542,6 @@ public class CampaignXmlParser {
                 System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-
         // Check all parts that are reserved for refit and if the refit id unit
         // is not refitting or is gone then unreserve
         for (Part part : retVal.getWarehouse().getParts()) {
@@ -593,14 +599,16 @@ public class CampaignXmlParser {
                     tech.removeTechUnit(u);
                 }
                 if (null != reason) {
-                    LogManager.getLogger().warn(String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
+                    LogManager.getLogger()
+                            .warn(String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
                 }
             }
         }
     }
 
     /**
-     * Pulled out purely for encapsulation. Makes the code neater and easier to read.
+     * Pulled out purely for encapsulation. Makes the code neater and easier to
+     * read.
      *
      * @param retVal The Campaign object that is being populated.
      * @param wni    The XML node we're working from.
@@ -968,7 +976,8 @@ public class CampaignXmlParser {
             if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                LogManager.getLogger().error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
+                LogManager.getLogger()
+                        .error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
                 continue;
             }
             SpecialAbility.generateInstanceFromXML(wn2, options, version);
@@ -1007,26 +1016,29 @@ public class CampaignXmlParser {
 
     /**
      * Processes a custom unit in a campaign.
+     * 
      * @param retVal The {@see Campaign} being parsed.
-     * @param wn The current XML element representing a custom unit.
+     * @param wn     The current XML element representing a custom unit.
      * @return A value indicating whether or not a new custom unit
      *         file was added to disk.
      */
     private static boolean processCustom(Campaign retVal, Node wn) {
         String sCustomsDir = "data" + File.separator + "mekfiles"
-                + File.separator + "customs";  // TODO : Remove inline file path
+                + File.separator + "customs"; // TODO : Remove inline file path
         String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
-                LogManager.getLogger().error("Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
+                LogManager.getLogger()
+                        .error("Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
                 return false;
             }
         }
         File customsDirCampaign = new File(sCustomsDirCampaign);
         if (!customsDirCampaign.exists()) {
             if (!customsDirCampaign.mkdir()) {
-                LogManager.getLogger().error("Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
+                LogManager.getLogger().error(
+                        "Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
                 return false;
             }
         }
@@ -1069,7 +1081,8 @@ public class CampaignXmlParser {
                 return false;
             }
 
-            // If this file already exists then don't overwrite it or we will end up with a bunch of copies
+            // If this file already exists then don't overwrite it or we will end up with a
+            // bunch of copies
             String safeName = MHQXMLUtility.escape(name);
             String fileName = sCustomsDir + File.separator + safeName + ext;
             String fileNameCampaign = sCustomsDirCampaign + File.separator + safeName + ext;
@@ -1092,7 +1105,7 @@ public class CampaignXmlParser {
         LogManager.getLogger().info("Writing custom unit from inline data to " + fileName);
 
         try (OutputStream out = new FileOutputStream(fileName);
-            PrintStream p = new PrintStream(out)) {
+                PrintStream p = new PrintStream(out)) {
 
             p.println(contents);
 
@@ -1293,9 +1306,11 @@ public class CampaignXmlParser {
                 if (prt.getUnit().getEntity().usesWeaponBays()) {
                     AmmoMounted ammo;
                     if (prt instanceof EquipmentPart) {
-                        ammo = (AmmoMounted) prt.getUnit().getEntity().getEquipment(((EquipmentPart) prt).getEquipmentNum());
+                        ammo = (AmmoMounted) prt.getUnit().getEntity()
+                                .getEquipment(((EquipmentPart) prt).getEquipmentNum());
                     } else {
-                        ammo = (AmmoMounted) prt.getUnit().getEntity().getEquipment(((MissingEquipmentPart) prt).getEquipmentNum());
+                        ammo = (AmmoMounted) prt.getUnit().getEntity()
+                                .getEquipment(((MissingEquipmentPart) prt).getEquipmentNum());
                     }
                     if (null != ammo) {
                         if (prt instanceof AmmoBin) {
@@ -1353,7 +1368,7 @@ public class CampaignXmlParser {
                         continue;
                     }
 
-                    Mounted m = u.getEntity().getEquipment(ePart.getEquipmentNum());
+                    Mounted<?> m = u.getEntity().getEquipment(ePart.getEquipmentNum());
 
                     // Remove equipment parts missing mounts
                     if (m == null) {
@@ -1377,7 +1392,7 @@ public class CampaignXmlParser {
                     }
                 }
                 if (prt instanceof MissingEquipmentPart) {
-                    Mounted m = u.getEntity().getEquipment(((MissingEquipmentPart) prt).getEquipmentNum());
+                    Mounted<?> m = u.getEntity().getEquipment(((MissingEquipmentPart) prt).getEquipmentNum());
 
                     // Remove equipment parts missing mounts
                     if (m == null) {
@@ -1385,7 +1400,8 @@ public class CampaignXmlParser {
                         continue;
                     }
 
-                    // Remove missing equipment parts without a valid location, unless they're an ammo bin as they may not have a location
+                    // Remove missing equipment parts without a valid location, unless they're an
+                    // ammo bin as they may not have a location
                     if ((m.getLocation() == Entity.LOC_NONE) && !(prt instanceof MissingAmmoBin)) {
                         removeParts.add(prt);
                         continue;
@@ -1414,7 +1430,7 @@ public class CampaignXmlParser {
                     removeParts.add(prt);
                 } else if (((u.getEntity() instanceof SmallCraft) || (u.getEntity() instanceof Jumpship))
                         && ((prt instanceof EnginePart) || (prt instanceof MissingEnginePart))) {
-                    //units from earlier versions might have the wrong kind of engine
+                    // units from earlier versions might have the wrong kind of engine
                     removeParts.add(prt);
                 } else {
                     u.addPart(prt);
@@ -1492,8 +1508,10 @@ public class CampaignXmlParser {
     }
 
     /**
-     * Determines if the supplied part is a MASC from an older save. This means that it needs to be converted
+     * Determines if the supplied part is a MASC from an older save. This means that
+     * it needs to be converted
      * to an actual MASC part.
+     * 
      * @param p The part to check.
      * @return Whether it's an old MASC.
      */
@@ -1505,8 +1523,10 @@ public class CampaignXmlParser {
     }
 
     /**
-     * Determines if the supplied part is a "missing" MASC from an older save. This means that it needs to be converted
+     * Determines if the supplied part is a "missing" MASC from an older save. This
+     * means that it needs to be converted
      * to an actual "missing" MASC part.
+     * 
      * @param p The part to check.
      * @return Whether it's an old "missing" MASC.
      */
@@ -1573,20 +1593,20 @@ public class CampaignXmlParser {
                     }
                 }
                 if (null != systemId) {
-                    //iterate through events hash and assign events to planets
+                    // iterate through events hash and assign events to planets
                     Iterator<Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
                     while (it.hasNext()) {
                         Entry<Integer, List<PlanetaryEvent>> pair = it.next();
                         Systems.getInstance().updatePlanetaryEvents(systemId, pair.getValue(), true, pair.getKey());
                     }
-                    //check for system-wide events
+                    // check for system-wide events
                     if (!sysEvents.isEmpty()) {
                         Systems.getInstance().updatePlanetarySystemEvents(systemId, sysEvents, true);
                     }
                 }
             }
 
-            //legacy code for before switch to planetary systems if planet is at top level
+            // legacy code for before switch to planetary systems if planet is at top level
             if (wn2.getNodeName().equalsIgnoreCase("planet")) {
                 NodeList planetNodes = wn2.getChildNodes();
                 String planetId = null;
@@ -1614,17 +1634,19 @@ public class CampaignXmlParser {
         }
     }
 
-
-    //region Migration Methods
-    //region Ancestry Migration
+    // region Migration Methods
+    // region Ancestry Migration
     private static Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
 
     /**
-     * This method is used to add people to the ancestry migration map that is used to migrate
-     * from the old Ancestors setup to {@link mekhq.campaign.personnel.familyTree.Genealogy} starting
+     * This method is used to add people to the ancestry migration map that is used
+     * to migrate
+     * from the old Ancestors setup to
+     * {@link mekhq.campaign.personnel.familyTree.Genealogy} starting
      * from 0.47.8
+     * 
      * @param ancestorsId the Person's Ancestor Id
-     * @param person the person to add the the above HashMap
+     * @param person      the person to add the the above HashMap
      */
     public static void addToAncestryMigrationMap(UUID ancestorsId, Person person) {
         ancestryMigrationMap.putIfAbsent(ancestorsId, new ArrayList<>());
@@ -1633,7 +1655,9 @@ public class CampaignXmlParser {
 
     /**
      * This method is used to migrate from Ancestry nodes to
-     * {@link mekhq.campaign.personnel.familyTree.Genealogy} since the swap-over in 0.47.8
+     * {@link mekhq.campaign.personnel.familyTree.Genealogy} since the swap-over in
+     * 0.47.8
+     * 
      * @param wn the node containing the saved ancestry
      */
     private static void migrateAncestorNodes(Campaign campaign, Node wn) {
@@ -1680,7 +1704,8 @@ public class CampaignXmlParser {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
                     father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
                 } else {
-                    LogManager.getLogger().warn("Person with id " + father.getId() + "does not exist, skipping adding Genealogy for them.");
+                    LogManager.getLogger().warn(
+                            "Person with id " + father.getId() + "does not exist, skipping adding Genealogy for them.");
                 }
 
                 if (mother == null) {
@@ -1689,11 +1714,12 @@ public class CampaignXmlParser {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
                     mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
                 } else {
-                    LogManager.getLogger().warn("Person with id " + mother.getId() + " does not exist, skipping adding Genealogy for them.");
+                    LogManager.getLogger().warn("Person with id " + mother.getId()
+                            + " does not exist, skipping adding Genealogy for them.");
                 }
             }
         }
     }
-    //endregion Ancestry Migration
-    //endregion Migration Methods
+    // endregion Ancestry Migration
+    // endregion Migration Methods
 }

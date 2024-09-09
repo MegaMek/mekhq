@@ -155,9 +155,12 @@ public class MekLocation extends Part {
         // use MegaMek's implementation of internal structure weight calculation
         // assume rounding to nearest half-ton
         // superheavy flag is set if weight is more than 100
-        // assume movement mode is biped or tripod (technically meks can have other movement modes but
-        // that doesn't affect structure weight); currently impossible to tell whether a "loose" left leg is for a biped or tripod.
-        EntityMovementMode movementMode = (getLoc() == Mek.LOC_CLEG) ? EntityMovementMode.TRIPOD : EntityMovementMode.BIPED;
+        // assume movement mode is biped or tripod (technically meks can have other
+        // movement modes but
+        // that doesn't affect structure weight); currently impossible to tell whether a
+        // "loose" left leg is for a biped or tripod.
+        EntityMovementMode movementMode = (getLoc() == Mek.LOC_CLEG) ? EntityMovementMode.TRIPOD
+                : EntityMovementMode.BIPED;
 
         double tonnage = Structure.getWeightStructure(structureType, getUnitTonnage(), Ceil.HALFTON,
                 (getUnitTonnage() > 100), movementMode);
@@ -165,25 +168,25 @@ public class MekLocation extends Part {
         // determine the weight of the location;
         // if it's a "strange" location, then the rest of this is pointless.
         switch (loc) {
-        case Mek.LOC_HEAD:
-            tonnage *= 0.05;
-            break;
-        case Mek.LOC_CT:
-            tonnage *= 0.25;
-            break;
-        case Mek.LOC_LT:
-        case Mek.LOC_RT:
-            tonnage *= 0.15;
-            break;
-        case Mek.LOC_LARM:
-        case Mek.LOC_RARM:
-        case Mek.LOC_LLEG:
-        case Mek.LOC_RLEG:
-        case Mek.LOC_CLEG:
-            tonnage *= 0.1;
-            break;
-        default:
-            return 0;
+            case Mek.LOC_HEAD:
+                tonnage *= 0.05;
+                break;
+            case Mek.LOC_CT:
+                tonnage *= 0.25;
+                break;
+            case Mek.LOC_LT:
+            case Mek.LOC_RT:
+                tonnage *= 0.15;
+                break;
+            case Mek.LOC_LARM:
+            case Mek.LOC_RARM:
+            case Mek.LOC_LLEG:
+            case Mek.LOC_RLEG:
+            case Mek.LOC_CLEG:
+                tonnage *= 0.1;
+                break;
+            default:
+                return 0;
         }
 
         return tonnage;
@@ -229,7 +232,8 @@ public class MekLocation extends Part {
                 && ((getStructureType() != EquipmentType.T_STRUCTURE_ENDO_STEEL)
                         || (isClan() == other.isClan()))
                 && (!isArm() || forQuad() == other.forQuad())
-                // Sensors and life support only matter if we're comparing two parts in the warehouse.
+                // Sensors and life support only matter if we're comparing two parts in the
+                // warehouse.
                 && ((getUnit() != null) || (other.getUnit() != null)
                         || (hasSensors() == other.hasSensors()
                                 && hasLifeSupport() == other.hasLifeSupport()));
@@ -246,6 +250,7 @@ public class MekLocation extends Part {
 
     /**
      * Sets the percent armor remaining.
+     * 
      * @param percent The percent armor remaining, expressed as a fraction.
      */
     protected void setPercent(double percent) {
@@ -317,7 +322,7 @@ public class MekLocation extends Part {
                 }
 
                 slot.setMissing(false);
-                Mounted m = slot.getMount();
+                Mounted<?> m = slot.getMount();
                 if (null != m) {
                     m.setMissing(false);
                 }
@@ -334,7 +339,7 @@ public class MekLocation extends Part {
                 }
 
                 slot.setBreached(false);
-                Mounted m = slot.getMount();
+                Mounted<?> m = slot.getMount();
                 if (null != m) {
                     m.setBreached(false);
                 }
@@ -395,7 +400,8 @@ public class MekLocation extends Part {
         if (getUnit() != null) {
             setBlownOff(getUnit().getEntity().isLocationBlownOff(getLoc()));
             setBreached(getUnit().isLocationBreached(getLoc()));
-            setPercent(getUnit().getEntity().getInternalForReal(getLoc()) / ((double) getUnit().getEntity().getOInternal(getLoc())));
+            setPercent(getUnit().getEntity().getInternalForReal(getLoc())
+                    / ((double) getUnit().getEntity().getOInternal(getLoc())));
             if (getPercent() <= 0.0) {
                 remove(false);
             }
@@ -439,6 +445,7 @@ public class MekLocation extends Part {
 
     /**
      * Gets the time (in minutes) to repair or salvage this location.
+     * 
      * @return The time (in minutes) to repair or salvage this location.
      */
     private int getRepairOrSalvageTime() {
@@ -462,7 +469,8 @@ public class MekLocation extends Part {
         // StratOps p191 / p183-185
         if (isSalvaging()) {
             if (isBlownOff()) {
-                // The difficulty in removing a location which does not exist is philosophical...
+                // The difficulty in removing a location which does not exist is
+                // philosophical...
                 return 0;
             } else {
                 // ... otherwise use the difficulty table
@@ -491,6 +499,7 @@ public class MekLocation extends Part {
 
     /**
      * Gets the repair or salvage difficulty for this location.
+     * 
      * @return The difficulty modifier for repair or salvage of this location.
      */
     private int getRepairOrSalvageDifficulty() {
@@ -518,6 +527,7 @@ public class MekLocation extends Part {
 
     /**
      * Sets a value indicating whether or not the location is breached.
+     * 
      * @param breached A value indicating whether or not the location is breached.
      */
     protected void setBreached(boolean breached) {
@@ -533,6 +543,7 @@ public class MekLocation extends Part {
 
     /**
      * Sets a value indicating whether or not the location is blown off.
+     * 
      * @param blownOff A value indicating whether or not the location is blown off.
      */
     protected void setBlownOff(boolean blownOff) {
@@ -609,7 +620,7 @@ public class MekLocation extends Part {
                     slot.setHit(false);
                     slot.setRepairable(true);
                     slot.setMissing(false);
-                    Mounted m = slot.getMount();
+                    Mounted<?> m = slot.getMount();
                     if (m != null) {
                         m.setHit(false);
                         m.setDestroyed(false);
@@ -649,7 +660,8 @@ public class MekLocation extends Part {
     }
 
     /**
-     * Gets a string indicating why the location is not salvageable, or {@code null} if
+     * Gets a string indicating why the location is not salvageable, or {@code null}
+     * if
      * the location can be salvaged.
      */
     public @Nullable String checkSalvageable() {
@@ -673,7 +685,7 @@ public class MekLocation extends Part {
         // Check for armor
         if ((unit.getEntity().getArmorForReal(loc, false) > 0)
                 || (unit.getEntity().hasRearArmor(loc)
-                        && (unit.getEntity().getArmorForReal(loc, true) > 0 ))) {
+                        && (unit.getEntity().getArmorForReal(loc, true) > 0))) {
             return "must salvage armor in this location first";
         }
 
@@ -690,7 +702,8 @@ public class MekLocation extends Part {
             // Certain other specific crits need to be left out
             // (uggh, there must be a better way to do this!)
             if ((slot.getType() == CriticalSlot.TYPE_SYSTEM)
-                    && IntStream.of(Mek.ACTUATOR_HIP, Mek.ACTUATOR_SHOULDER, Mek.SYSTEM_LIFE_SUPPORT, Mek.SYSTEM_SENSORS)
+                    && IntStream
+                            .of(Mek.ACTUATOR_HIP, Mek.ACTUATOR_SHOULDER, Mek.SYSTEM_LIFE_SUPPORT, Mek.SYSTEM_SENSORS)
                             .anyMatch(j -> (slot.getIndex() == j))) {
                 continue;
             }
@@ -701,14 +714,16 @@ public class MekLocation extends Part {
                     if (unit.findPart(p -> p instanceof MissingLandingGear) != null) {
                         continue;
                     } else {
-                        partsToSalvageOrScrap.add(String.format("Landing Gear (%s)", unit.getEntity().getLocationName(loc)));
+                        partsToSalvageOrScrap
+                                .add(String.format("Landing Gear (%s)", unit.getEntity().getLocationName(loc)));
                     }
-                // Skip Avionics if already gone
+                    // Skip Avionics if already gone
                 } else if (slot.getIndex() == LandAirMek.LAM_AVIONICS) {
                     if (unit.findPart(p -> p instanceof MissingAvionics) != null) {
                         continue;
                     } else {
-                        partsToSalvageOrScrap.add(String.format("Avionics (%s)", unit.getEntity().getLocationName(loc)));
+                        partsToSalvageOrScrap
+                                .add(String.format("Avionics (%s)", unit.getEntity().getLocationName(loc)));
                     }
                 }
             }
@@ -764,10 +779,11 @@ public class MekLocation extends Part {
     @Override
     public String checkScrappable() {
         // Can't scrap a center torso
-        if (loc ==  Mek.LOC_CT) {
+        if (loc == Mek.LOC_CT) {
             return "Mek Center Torso's cannot be scrapped";
         }
-        // Only allow scrapping of locations with nothing on them, otherwise you will get weirdness
+        // Only allow scrapping of locations with nothing on them, otherwise you will
+        // get weirdness
         // where armor and actuators are still attached but everything else is scrapped
         // You can't salvage torsos until arms and legs are gone
         String limbName = forQuad ? " front leg " : " arm ";
@@ -782,7 +798,7 @@ public class MekLocation extends Part {
         // Check for armor
         if ((unit.getEntity().getArmorForReal(loc, false) > 0)
                 || (unit.getEntity().hasRearArmor(loc)
-                        && (unit.getEntity().getArmorForReal(loc, true) > 0 ))) {
+                        && (unit.getEntity().getArmorForReal(loc, true) > 0))) {
             return "You must first remove the armor from this location before you scrap it";
         }
         // You can only salvage a location that has nothing left on it
@@ -807,14 +823,16 @@ public class MekLocation extends Part {
                     if (unit.findPart(p -> p instanceof MissingLandingGear) != null) {
                         continue;
                     } else {
-                        return "Landing gear in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                        return "Landing gear in " + unit.getEntity().getLocationName(loc)
+                                + " must be salvaged or scrapped first.";
                     }
-                // Skip Avionics if already gone
+                    // Skip Avionics if already gone
                 } else if (slot.getIndex() == LandAirMek.LAM_AVIONICS) {
                     if (unit.findPart(p -> p instanceof MissingAvionics) != null) {
                         continue;
                     } else {
-                        return "Avionics in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                        return "Avionics in " + unit.getEntity().getLocationName(loc)
+                                + " must be salvaged or scrapped first.";
                     }
                 }
             }
@@ -859,7 +877,8 @@ public class MekLocation extends Part {
         }
 
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</b></span>";
+            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                    + "'>Impossible</b></span>";
         } else {
             toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
                     + SkillType.getExperienceLevelName(getSkillMin()) + '+'
@@ -934,14 +953,14 @@ public class MekLocation extends Part {
         }
     }
 
-     @Override
-     public void doMaintenanceDamage(int d) {
+    @Override
+    public void doMaintenanceDamage(int d) {
         if ((getUnit() != null) && (d > 0)) {
             int points = getUnit().getEntity().getInternal(getLoc());
             getUnit().getEntity().setInternal(Math.max(points - d, 1), getLoc());
             updateConditionFromEntity(false);
         }
-     }
+    }
 
     @Override
     public String getLocationName() {

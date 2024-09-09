@@ -89,8 +89,8 @@ public class TankLocation extends Part {
         computeCost();
     }
 
-    protected void computeCost () {
-        //TODO: implement
+    protected void computeCost() {
+        // TODO: implement
     }
 
     @Override
@@ -153,7 +153,7 @@ public class TankLocation extends Part {
                         continue;
                     }
                     slot.setBreached(false);
-                    Mounted m = slot.getMount();
+                    Mounted<?> m = slot.getMount();
                     if (null != m) {
                         m.setBreached(false);
                     }
@@ -307,18 +307,18 @@ public class TankLocation extends Part {
         return toReturn;
     }
 
-     @Override
-     public boolean isRightTechType(String skillType) {
-         return skillType.equals(SkillType.S_TECH_MECHANIC);
-     }
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_MECHANIC);
+    }
 
-     @Override
-     public void doMaintenanceDamage(int d) {
-         int points = unit.getEntity().getInternal(loc);
-         points = Math.max(points -d, 1);
-         unit.getEntity().setInternal(points, loc);
-         updateConditionFromEntity(false);
-     }
+    @Override
+    public void doMaintenanceDamage(int d) {
+        int points = unit.getEntity().getInternal(loc);
+        points = Math.max(points - d, 1);
+        unit.getEntity().setInternal(points, loc);
+        updateConditionFromEntity(false);
+    }
 
     @Override
     public String getLocationName() {

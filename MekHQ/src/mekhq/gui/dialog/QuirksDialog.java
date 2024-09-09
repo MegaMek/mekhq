@@ -51,7 +51,8 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
     private JButton cancelButton;
 
     /**
-     * Handles the editing and deteling of Quirks. Utilizes the QuirksPanel from megamek for the bulk of its work.
+     * Handles the editing and deteling of Quirks. Utilizes the QuirksPanel from
+     * megamek for the bulk of its work.
      *
      * @param entity The {@link Entity} being edited.
      * @param parent The {@link JFrame} of the parent panel.
@@ -68,16 +69,16 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
 
     private void initGUI() {
 
-        //Set up the megamek QuirksPanel.
-        for (Mounted m : entity.getWeaponList()) {
+        // Set up the megamek QuirksPanel.
+        for (Mounted<?> m : entity.getWeaponList()) {
             h_wpnQuirks.put(entity.getEquipmentNum(m), m.getQuirks());
         }
         qpanel = new QuirksPanel(entity, entity.getQuirks(), true, this, h_wpnQuirks);
         qpanel.refreshQuirks();
 
-        //Set up the display of this dialog.
+        // Set up the display of this dialog.
         JScrollPane scroller = new JScrollPane(qpanel);
-        scroller.setPreferredSize(new Dimension(300,200));
+        scroller.setPreferredSize(new Dimension(300, 200));
         setLayout(new BorderLayout());
         add(scroller, BorderLayout.CENTER);
         add(buildButtonPanel(), BorderLayout.SOUTH);
@@ -92,7 +93,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
         } catch (Exception ex) {
             LogManager.getLogger().error("Failed to set user preferences", ex);
         }
-}
+    }
 
     private JPanel buildButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
@@ -112,7 +113,8 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
 
     @Override
     public void optionClicked(DialogOptionComponent dialogOptionComponent, IOption iOption, boolean b) {
-        //Not Used  Included because QuriksPanel requires a DialogOptionListener interface.
+        // Not Used Included because QuriksPanel requires a DialogOptionListener
+        // interface.
     }
 
     @Override

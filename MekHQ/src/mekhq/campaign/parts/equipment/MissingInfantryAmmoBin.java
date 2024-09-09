@@ -49,13 +49,13 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     /**
      * Construct a new placeholder for a missing infantry ammo bin
      *
-     * @param tonnage     The weight of the unit it's installed on
-     * @param ammoType    The type of ammo
-     * @param equipNum    The equipment index on the unit
-     * @param weaponType  The weapon this ammo is for
-     * @param clips       The number of clips of ammo
-     * @param omniPodded  Whether the weapon is pod-mounted on an omnivehicle
-     * @param c           The campaign instance
+     * @param tonnage    The weight of the unit it's installed on
+     * @param ammoType   The type of ammo
+     * @param equipNum   The equipment index on the unit
+     * @param weaponType The weapon this ammo is for
+     * @param clips      The number of clips of ammo
+     * @param omniPodded Whether the weapon is pod-mounted on an omnivehicle
+     * @param c          The campaign instance
      */
     public MissingInfantryAmmoBin(int tonnage, @Nullable AmmoType ammoType, int equipNum,
             @Nullable InfantryWeapon weaponType, int clips, boolean omniPodded, @Nullable Campaign c) {
@@ -101,7 +101,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     @Override
     public int getLocation() {
         if (unit != null) {
-            Mounted m = unit.getEntity().getEquipment(equipmentNum);
+            Mounted<?> m = unit.getEntity().getEquipment(equipmentNum);
             while (m.getLinkedBy() != null) {
                 m = m.getLinkedBy();
             }

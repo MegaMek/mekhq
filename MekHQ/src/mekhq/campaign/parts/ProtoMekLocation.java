@@ -132,9 +132,10 @@ public class ProtoMekLocation extends Part {
         double totalStructureCost = 2400 * getUnitTonnage();
         if (booster) {
             if (null != unit) {
-                totalStructureCost += Math.round(unit.getEntity().getEngine().getRating() * 1000 * unit.getEntity().getWeight() * 0.025f);
+                totalStructureCost += Math
+                        .round(unit.getEntity().getEngine().getRating() * 1000 * unit.getEntity().getWeight() * 0.025f);
             } else {
-                //FIXME: uggh different costs by engine rating and weight, use a fake rating
+                // FIXME: uggh different costs by engine rating and weight, use a fake rating
                 totalStructureCost += Math.round(75000 * getUnitTonnage() * 0.025f);
             }
         }
@@ -156,7 +157,7 @@ public class ProtoMekLocation extends Part {
                 && getUnitTonnage() == part.getUnitTonnage()
                 && hasBooster() == ((ProtoMekLocation) part).hasBooster()
                 && (!isLegs() || forQuad == ((ProtoMekLocation) part).forQuad);
-               // && getStructureType() == ((ProtomekLocation) part).getStructureType();
+        // && getStructureType() == ((ProtomekLocation) part).getStructureType();
     }
 
     private boolean isLegs() {
@@ -225,7 +226,7 @@ public class ProtoMekLocation extends Part {
                         continue;
                     }
                     slot.setMissing(false);
-                    Mounted m = slot.getMount();
+                    Mounted<?> m = slot.getMount();
                     if (null != m) {
                         m.setMissing(false);
                     }
@@ -242,7 +243,7 @@ public class ProtoMekLocation extends Part {
                         continue;
                     }
                     slot.setBreached(false);
-                    Mounted m = slot.getMount();
+                    Mounted<?> m = slot.getMount();
                     if (null != m) {
                         m.setBreached(false);
                     }
@@ -280,7 +281,8 @@ public class ProtoMekLocation extends Part {
                 unit.addPart(missing);
                 campaign.getQuartermaster().addPart(missing, 0);
             }
-            //According to StratOps, this always destroys all equipment in that location as well
+            // According to StratOps, this always destroys all equipment in that location as
+            // well
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
                 final CriticalSlot cs = unit.getEntity().getCritical(loc, i);
                 if (null == cs || !cs.isEverHittable()) {
@@ -289,14 +291,14 @@ public class ProtoMekLocation extends Part {
                 cs.setHit(true);
                 cs.setDestroyed(true);
                 cs.setRepairable(false);
-                Mounted m = cs.getMount();
+                Mounted<?> m = cs.getMount();
                 if (null != m) {
                     m.setHit(true);
                     m.setDestroyed(true);
                     m.setRepairable(false);
                 }
             }
-            for (Mounted m : unit.getEntity().getEquipment()) {
+            for (Mounted<?> m : unit.getEntity().getEquipment()) {
                 if (m.getLocation() == loc || m.getSecondLocation() == loc) {
                     m.setHit(true);
                     m.setDestroyed(true);
@@ -313,7 +315,8 @@ public class ProtoMekLocation extends Part {
         if (null != unit) {
             blownOff = unit.getEntity().isLocationBlownOff(loc);
             breached = unit.isLocationBreached(loc);
-            percent = ((double) unit.getEntity().getInternalForReal(loc)) / ((double) unit.getEntity().getOInternal(loc));
+            percent = ((double) unit.getEntity().getInternalForReal(loc))
+                    / ((double) unit.getEntity().getOInternal(loc));
             if (percent <= 0.0) {
                 remove(false);
             }
@@ -397,14 +400,14 @@ public class ProtoMekLocation extends Part {
                 } else if (isBreached()) {
                     toReturn += " (Breached)";
                 } else {
-                    toReturn += " (" + Math.round(100*percent) + "%)";
+                    toReturn += " (" + Math.round(100 * percent) + "%)";
                 }
             }
             return toReturn;
         }
         toReturn += getUnitTonnage() + " tons";
         if (includeRepairDetails) {
-            toReturn += " (" + Math.round(100*percent) + "%)";
+            toReturn += " (" + Math.round(100 * percent) + "%)";
         }
         return toReturn;
     }
@@ -429,12 +432,14 @@ public class ProtoMekLocation extends Part {
     public void updateConditionFromPart() {
         if (null != unit) {
             unit.getEntity().setInternal((int) Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
-            //if all the system crits are marked off on the entity in this location, then we need to
-            //fix one of them, because the last crit on protomeks is always location destruction
+            // if all the system crits are marked off on the entity in this location, then
+            // we need to
+            // fix one of them, because the last crit on protomeks is always location
+            // destruction
             int systemIndx = getAppropriateSystemIndex();
             if (loc != -1 && unit.getEntity().getGoodCriticals(CriticalSlot.TYPE_SYSTEM, systemIndx, loc) <= 0) {
-                //Because the last crit for protomeks is always location destruction we need to
-                //clear the first system crit we find
+                // Because the last crit for protomeks is always location destruction we need to
+                // clear the first system crit we find
                 for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
                     CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                     if ((slot != null) && slot.getType() == CriticalSlot.TYPE_SYSTEM) {
@@ -455,12 +460,12 @@ public class ProtoMekLocation extends Part {
             return null;
         }
         if (isSalvaging()) {
-            //check for armor
+            // check for armor
             if (unit.getEntity().getArmorForReal(loc, false) > 0
-                    || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0 )) {
+                    || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0)) {
                 return "must salvage armor in this location first";
             }
-            //you can only salvage a location that has nothing left on it
+            // you can only salvage a location that has nothing left on it
             int systemRepairable = 0;
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
@@ -468,25 +473,28 @@ public class ProtoMekLocation extends Part {
                 if ((slot == null) || !slot.isEverHittable()) {
                     continue;
                 }
-                //we don't care about the final critical hit to the system
-                //in locations because that just represents the location destruction
+                // we don't care about the final critical hit to the system
+                // in locations because that just represents the location destruction
                 if (slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                     if (slot.isRepairable()) {
                         if (systemRepairable > 0) {
-                            return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                            return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                                    + " must be salvaged or scrapped first.";
                         } else {
                             systemRepairable++;
                         }
                     }
                 } else if (slot.isRepairable()) {
-                    return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                    return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                            + " must be salvaged or scrapped first.";
                 }
             }
-            //protomeks only have system stuff in the crits, so we need to also
-            //check for mounted equipment separately
-            for (Mounted m : unit.getEntity().getEquipment()) {
+            // protomeks only have system stuff in the crits, so we need to also
+            // check for mounted equipment separately
+            for (Mounted<?> m : unit.getEntity().getEquipment()) {
                 if (m.isRepairable() && (m.getLocation() == loc || m.getSecondLocation() == loc)) {
-                    return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first." + m.getName();
+                    return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                            + " must be salvaged or scrapped first." + m.getName();
                 }
             }
         }
@@ -502,15 +510,15 @@ public class ProtoMekLocation extends Part {
     @Override
     public @Nullable String checkScrappable() {
         // Can't scrap a center torso
-        if (loc ==  ProtoMek.LOC_TORSO) {
+        if (loc == ProtoMek.LOC_TORSO) {
             return "ProtoMek Torsos cannot be scrapped";
         }
         // Check for armor
         if (unit.getEntity().getArmor(loc, false) > 0
-                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0 )) {
+                || (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0)) {
             return "You must first remove the armor from this location before you scrap it";
         }
-        //you can only salvage a location that has nothing left on it
+        // you can only salvage a location that has nothing left on it
         int systemRepairable = 0;
         for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
             CriticalSlot slot = unit.getEntity().getCritical(loc, i);
@@ -518,25 +526,29 @@ public class ProtoMekLocation extends Part {
             if ((slot == null) || !slot.isEverHittable()) {
                 continue;
             }
-            //we don't care about the final critical hit to the system
-            //in locations because that just represents the location destruction
+            // we don't care about the final critical hit to the system
+            // in locations because that just represents the location destruction
             if (slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                 if (slot.isRepairable()) {
                     if (systemRepairable > 0) {
-                        return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                        return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                                + " must be salvaged or scrapped first.";
                     } else {
                         systemRepairable++;
                     }
                 }
             } else if (slot.isRepairable()) {
-                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                        + " must be salvaged or scrapped first.";
             }
         }
-        // ProtoMeks only have system stuff in the crits, so we need to also check for mounted
+        // ProtoMeks only have system stuff in the crits, so we need to also check for
+        // mounted
         // equipment separately
-        for (Mounted m : unit.getEntity().getEquipment()) {
+        for (Mounted<?> m : unit.getEntity().getEquipment()) {
             if (m.isRepairable() && (m.getLocation() == loc || m.getSecondLocation() == loc)) {
-                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first." + m.getName();
+                return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                        + " must be salvaged or scrapped first." + m.getName();
             }
         }
         return null;
@@ -574,11 +586,12 @@ public class ProtoMekLocation extends Part {
 
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             if (getSkillMin() > SkillType.EXP_ELITE) {
-                toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</b></span>";
+                toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                        + "'>Impossible</b></span>";
             } else {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                    + "</span></b></b><br/>";
+                toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                        + SkillType.getExperienceLevelName(getSkillMin()) + '+'
+                        + "</span></b></b><br/>";
             }
         } else {
             toReturn += "</b><br/>";
@@ -615,7 +628,7 @@ public class ProtoMekLocation extends Part {
     @Override
     public void doMaintenanceDamage(int d) {
         int points = unit.getEntity().getInternal(loc);
-        points = Math.max(points -d, 1);
+        points = Math.max(points - d, 1);
         unit.getEntity().setInternal(points, loc);
         updateConditionFromEntity(false);
     }

@@ -37,11 +37,14 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 
 /**
- * Ammo bin for a weapon bay that combines multiple tons of ammo into a single bin. Reload times
- * are calculated per ton, and a reload tech action handles a single ton of ammo (or whatever the
+ * Ammo bin for a weapon bay that combines multiple tons of ammo into a single
+ * bin. Reload times
+ * are calculated per ton, and a reload tech action handles a single ton of ammo
+ * (or whatever the
  * smallest amount is for capital weapon ammo).
  *
- * When the munition type is changed, fix actions diminish the capacity of this bay and add to
+ * When the munition type is changed, fix actions diminish the capacity of this
+ * bay and add to
  * the capacity of the appropriate bin in the same bay.
  *
  * @author Neoancient
@@ -49,7 +52,7 @@ import java.io.PrintWriter;
 public class LargeCraftAmmoBin extends AmmoBin {
     private int bayEqNum = -1;
 
-    transient private Mounted bay;
+    transient private Mounted<?> bay;
     transient private double ammoTonnage;
 
     public LargeCraftAmmoBin() {
@@ -73,10 +76,11 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     /**
-     * @return The <code>Mounted</code> of the unit's <code>Entity</code> that contains this ammo bin,
+     * @return The <code>Mounted</code> of the unit's <code>Entity</code> that
+     *         contains this ammo bin,
      *         or null if there is no unit or the ammo bin is not in any bay.
      */
-    public @Nullable Mounted getBay() {
+    public @Nullable Mounted<?> getBay() {
         if (getUnit() == null) {
             return null;
         } else if (bay != null) {
@@ -110,10 +114,12 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     /**
-     * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
+     * Sets the bay for this ammo bin. Does not check whether the ammo bin is
+     * actually in the bay.
+     * 
      * @param bay the bay that will contain this ammo bin
      */
-    public void setBay(Mounted bay) {
+    public void setBay(Mounted<?> bay) {
         if (null != unit) {
             bayEqNum = unit.getEntity().getEquipmentNum(bay);
             this.bay = bay;
@@ -121,7 +127,9 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     /**
-     * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
+     * Sets the bay for this ammo bin. Does not check whether the ammo bin is
+     * actually in the bay.
+     * 
      * @param bayEqNum the number of the bay that will contain this ammo bin
      */
     public void setBay(int bayEqNum) {
@@ -169,7 +177,8 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     protected Money getPricePerTon() {
-        // Since ammo swaps are handled by moving capacity from one bay to another, the ammo type
+        // Since ammo swaps are handled by moving capacity from one bay to another, the
+        // ammo type
         // of the bay and the unit should be the same.
         return Money.of(getType().getRawCost());
     }
@@ -224,7 +233,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
      * Load a single ton of ammo into the bay.
      */
     public void loadBinSingleTon() {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             int shots = requisitionAmmo(getType(), Math.min(shotsNeeded, getType().getShots()));
 
@@ -241,7 +250,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         int shots = Math.min(getCurrentShots(), getType().getShots());
         AmmoType curType = getType();
 
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             shots = Math.min(mounted.getBaseShotsLeft(), shots);
             mounted.setShotsLeft(mounted.getBaseShotsLeft() - shots);
@@ -278,7 +287,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             size = mounted.getSize();
             type = mounted.getType();
@@ -297,8 +306,8 @@ public class LargeCraftAmmoBin extends AmmoBin {
         if (isSalvaging()) {
             return 120;
         } else {
-            //Capital Missiles take a flat 60m per missile per errata
-            //Better set this for cruise missiles and screen launchers too.
+            // Capital Missiles take a flat 60m per missile per errata
+            // Better set this for cruise missiles and screen launchers too.
             if (getType().hasFlag(AmmoType.F_CAP_MISSILE)
                     || getType().hasFlag(AmmoType.F_CRUISE_MISSILE)
                     || getType().hasFlag(AmmoType.F_SCREEN)) {
@@ -335,9 +344,12 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     /**
-     * Check all the bins in the same bay that feed the same weapon(s) to determine whether there is
-     * sufficient capacity to load more ammo into this bin. In the case of an ammo swap some ammo
-     * may need to be removed from another bin in this bay before more can be loaded.
+     * Check all the bins in the same bay that feed the same weapon(s) to determine
+     * whether there is
+     * sufficient capacity to load more ammo into this bin. In the case of an ammo
+     * swap some ammo
+     * may need to be removed from another bin in this bay before more can be
+     * loaded.
      *
      * @return The amount of unused capacity that can be used to reload ammo.
      */
@@ -396,9 +408,11 @@ public class LargeCraftAmmoBin extends AmmoBin {
             int shotsAvailable = getAmountAvailable();
             PartInventory inventories = campaign.getPartInventory(getNewPart());
             if (shotsAvailable == 0) {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No ammo ("+ inventories.getTransitOrderedDetails() + ")</font>";
+                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                        + "'>No ammo (" + inventories.getTransitOrderedDetails() + ")</font>";
             } else if (shotsAvailable < shotsNeeded) {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only " + shotsAvailable + " available ("+ inventories.getTransitOrderedDetails() + ")</font>";
+                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only "
+                        + shotsAvailable + " available (" + inventories.getTransitOrderedDetails() + ")</font>";
             }
             return getType().getDesc() + ", " + shotsNeeded + " shots needed" + availability;
         } else {

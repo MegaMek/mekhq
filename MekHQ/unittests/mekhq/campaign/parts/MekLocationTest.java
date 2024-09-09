@@ -570,7 +570,7 @@ class MekLocationTest {
         doReturn(hittable).when(entity).getCritical(location, 0);
         CriticalSlot notHittable = mock(CriticalSlot.class);
         doReturn(notHittable).when(entity).getCritical(location, 1);
-        Mounted<?> mount = mock(Mounted.class);
+        Mounted mount = mock(Mounted.class);
         when(notHittable.getMount()).thenReturn(mount);
         doReturn(null).when(entity).getCritical(location, 2);
 

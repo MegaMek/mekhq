@@ -39,7 +39,7 @@ import java.util.Objects;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingEquipmentPart extends MissingPart {
-    //crap equipmenttype is not serialized!
+    // crap equipmenttype is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
     protected int equipmentNum;
@@ -194,10 +194,10 @@ public class MissingEquipmentPart extends MissingPart {
                 && Objects.equals(newPart.getStickerPrice(), equipmentPart.getStickerPrice());
     }
 
-    protected @Nullable Mounted getMounted() {
+    protected @Nullable Mounted<?> getMounted() {
         final Unit unit = getUnit();
         if ((unit != null) && (unit.getEntity() != null) && (getEquipmentNum() >= 0)) {
-            final Mounted mounted = unit.getEntity().getEquipment(getEquipmentNum());
+            final Mounted<?> mounted = unit.getEntity().getEquipment(getEquipmentNum());
             if (mounted != null) {
                 return mounted;
             }
@@ -217,7 +217,7 @@ public class MissingEquipmentPart extends MissingPart {
 
         // The part is only fixable if the location is not destroyed.
         // be sure to check location and second location
-        final Mounted m = getMounted();
+        final Mounted<?> m = getMounted();
         if ((unit != null) && (m != null)) {
             int loc = m.getLocation();
             if (unit.isLocationBreached(loc)) {
@@ -245,7 +245,7 @@ public class MissingEquipmentPart extends MissingPart {
     @Override
     public boolean onBadHipOrShoulder() {
         final Unit unit = getUnit();
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if ((unit != null) && (mounted != null)) {
             return unit.hasBadHipOrShoulder(mounted.getLocation())
                     || (mounted.isSplit() && unit.hasBadHipOrShoulder(mounted.getSecondLocation()));
@@ -271,7 +271,7 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public int getLocation() {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         return (mounted != null) ? mounted.getLocation() : Entity.LOC_NONE;
     }
 
@@ -280,7 +280,7 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     public boolean isRearFacing() {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         return (mounted != null) && mounted.isRearMounted();
     }
 
@@ -292,7 +292,7 @@ public class MissingEquipmentPart extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         final Unit unit = getUnit();
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if ((unit != null) && (mounted != null)) {
             mounted.setHit(true);
             mounted.setDestroyed(true);
@@ -321,7 +321,7 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public String getLocationName() {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if ((mounted != null) && (mounted.getLocation() != Entity.LOC_NONE)) {
             return getUnit().getEntity().getLocationName(mounted.getLocation());
         }
@@ -331,7 +331,7 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public boolean isInLocation(String loc) {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if (mounted == null) {
             return false;
         }

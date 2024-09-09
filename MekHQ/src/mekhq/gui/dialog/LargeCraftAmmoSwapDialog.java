@@ -79,11 +79,11 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
 
     private void apply() {
         // Save the current number of shots by bay and ammo type
-        Map<Mounted, Map<String, Integer>> shotsByBay = new HashMap<>();
+        Map<Mounted<?>, Map<String, Integer>> shotsByBay = new HashMap<>();
         for (Part p : unit.getParts()) {
             if (p instanceof LargeCraftAmmoBin) {
                 LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
-                Mounted m = unit.getEntity().getEquipment(bin.getEquipmentNum());
+                Mounted<?> m = unit.getEntity().getEquipment(bin.getEquipmentNum());
                 shotsByBay.putIfAbsent(bin.getBay(), new HashMap<>());
                 shotsByBay.get(bin.getBay()).merge(bin.getType().getInternalName(),
                         m.getBaseShotsLeft(),
@@ -94,13 +94,14 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
         mainPanel.apply();
         // Rebuild bin parts as necessary
         new AdjustLargeCraftAmmoAction().execute(unit.getCampaign(), unit);
-        // Update the parts and set the number of shots needed based on the current size and the number
+        // Update the parts and set the number of shots needed based on the current size
+        // and the number
         // of shots stored.
         for (Part p : unit.getParts()) {
             if (p instanceof LargeCraftAmmoBin) {
                 LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
                 bin.updateConditionFromEntity(false);
-                Mounted ammo = unit.getEntity().getEquipment(bin.getEquipmentNum());
+                Mounted<?> ammo = unit.getEntity().getEquipment(bin.getEquipmentNum());
                 int oldShots = shotsByBay.get(bin.getBay()).getOrDefault(bin.getType().getInternalName(), 0);
                 // If we're removing ammo, add it the warehouse
                 int shotsToChange = oldShots - ammo.getBaseShotsLeft();
@@ -112,23 +113,23 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
                     unit.getCampaign().getQuartermaster().addAmmo(bin.getType(), shotsToChange);
                 }
                 if (shotsByBay.containsKey(bin.getBay())) {
-                    Map<String,Integer> oldAmmo = shotsByBay.get(bin.getBay());
+                    Map<String, Integer> oldAmmo = shotsByBay.get(bin.getBay());
                     if (oldAmmo.containsKey(bin.getType().getInternalName())) {
-                        //We've found the matching ammo bin, even though they've moved around.
+                        // We've found the matching ammo bin, even though they've moved around.
                         if (shotsToChange < 0) {
                             // We need to load some extra ammo, but part of the bin is already loaded
                             bin.setShotsNeeded(Math.abs(shotsToChange));
                         } else {
-                            //If we've just removed ammo, don't do anything else.
+                            // If we've just removed ammo, don't do anything else.
                             continue;
                         }
                     } else {
-                        //We've got a new bin for a new ammo type. It needs loading.
+                        // We've got a new bin for a new ammo type. It needs loading.
                         bin.setShotsNeeded(bin.getFullShots());
                     }
                 } else {
-                    //This bin isn't on our original ammo list at all. It needs loading.
-                    //This shouldn't ever happen - it would mean we've created a totally new bay.
+                    // This bin isn't on our original ammo list at all. It needs loading.
+                    // This shouldn't ever happen - it would mean we've created a totally new bay.
                     bin.setShotsNeeded(bin.getFullShots());
                 }
                 bin.updateConditionFromPart();

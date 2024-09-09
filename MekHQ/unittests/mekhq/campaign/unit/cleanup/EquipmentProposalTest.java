@@ -15,10 +15,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-public class EquipmentProposalTest {
+class EquipmentProposalTest {
 
     @Test
-    public void getUnitTest() {
+    void getUnitTest() {
         Unit unit = mock(Unit.class);
 
         EquipmentProposal proposal = new EquipmentProposal(unit);
@@ -26,7 +26,7 @@ public class EquipmentProposalTest {
     }
 
     @Test
-    public void considerTest() {
+    void considerTest() {
         Unit unit = mock(Unit.class);
 
         EquipmentProposal proposal = new EquipmentProposal(unit);
@@ -46,7 +46,7 @@ public class EquipmentProposalTest {
     }
 
     @Test
-    public void includeEquipmentTest() {
+    void includeEquipmentTest() {
         Unit unit = mock(Unit.class);
 
         int equipmentNum = 1;
@@ -68,7 +68,7 @@ public class EquipmentProposalTest {
     }
 
     @Test
-    public void getOriginalMappingTest() {
+    void getOriginalMappingTest() {
         Unit unit = mock(Unit.class);
 
         EquipmentProposal proposal = new EquipmentProposal(unit);
@@ -89,7 +89,7 @@ public class EquipmentProposalTest {
     }
 
     @Test
-    public void proposeMappingTest() {
+    void proposeMappingTest() {
         Unit unit = mock(Unit.class);
 
         EquipmentProposal proposal = new EquipmentProposal(unit);
@@ -125,9 +125,9 @@ public class EquipmentProposalTest {
         assertNull(proposal.getEquipment(originalEquipmentNum));
         assertNull(proposal.getEquipment(originalMissingEquipmentNum));
     }
-    
+
     @Test
-    public void isReducedTest() {
+    void isReducedTest() {
         Unit unit = mock(Unit.class);
 
         EquipmentProposal proposal = new EquipmentProposal(unit);
@@ -161,7 +161,7 @@ public class EquipmentProposalTest {
     }
 
     @Test
-    public void applyTest() {
+    void applyTest() {
         Unit unit = mock(Unit.class);
 
         EquipmentProposal proposal = new EquipmentProposal(unit);
@@ -198,9 +198,9 @@ public class EquipmentProposalTest {
 
         proposal.apply();
 
-        verify(mockEquipmentPart, times(1)).setEquipmentNum(eq(originalEquipmentNum));
-        verify(mockMissingEquipmentPart, times(1)).setEquipmentNum(eq(originalMissingEquipmentNum));
-        verify(mockIncorrectEquipmentPart, times(1)).setEquipmentNum(eq(-1));
-        verify(mockIncorrectMissingEquipmentPart, times(1)).setEquipmentNum(eq(-1));
+        verify(mockEquipmentPart, times(1)).setEquipmentNum(originalEquipmentNum);
+        verify(mockMissingEquipmentPart, times(1)).setEquipmentNum(originalMissingEquipmentNum);
+        verify(mockIncorrectEquipmentPart, times(1)).setEquipmentNum(-1);
+        verify(mockIncorrectMissingEquipmentPart, times(1)).setEquipmentNum(-1);
     }
 }

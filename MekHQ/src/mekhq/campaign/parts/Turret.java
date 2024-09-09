@@ -69,7 +69,7 @@ public class Turret extends TankLocation {
         super.setUnit(u);
         if (null != unit) {
             weight = 0;
-            for (Mounted m : unit.getEntity().getWeaponList()) {
+            for (Mounted<?> m : unit.getEntity().getWeaponList()) {
                 WeaponType wt = (WeaponType) m.getType();
                 if (m.getLocation() == this.loc) {
                     weight += wt.getTonnage(unit.getEntity()) / 10.0;
@@ -170,11 +170,11 @@ public class Turret extends TankLocation {
             return null;
         }
         if (isSalvaging()) {
-            //check for armor
+            // check for armor
             if (unit.getEntity().getArmorForReal(loc, false) > 0) {
                 return "must salvage armor in this location first";
             }
-            //you can only salvage a location that has nothing left on it
+            // you can only salvage a location that has nothing left on it
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                 // ignore empty & non-hittable slots
@@ -182,7 +182,8 @@ public class Turret extends TankLocation {
                     continue;
                 }
                 if (slot.isRepairable()) {
-                    return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                    return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                            + " must be salvaged or scrapped first.";
                 }
             }
         }
@@ -191,11 +192,11 @@ public class Turret extends TankLocation {
 
     @Override
     public String checkScrappable() {
-        //check for armor
+        // check for armor
         if (unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED) {
             return "You must scrap armor in the turret first";
         }
-        //you can only scrap a location that has nothing left on it
+        // you can only scrap a location that has nothing left on it
         for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
             CriticalSlot slot = unit.getEntity().getCritical(loc, i);
             // ignore empty & non-hittable slots
