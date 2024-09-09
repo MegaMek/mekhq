@@ -7095,7 +7095,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Highlander IIC" model="(Standard)" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b400b7ca-d594-4240-87d0-c69776a445ec"
-                                quirks="command_mek::cowl::reinforced_legs::difficult_eject">
+                                quirks="command_mech::cowl::reinforced_legs::difficult_eject">
                             <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
@@ -7363,7 +7363,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Highlander IIC" model="(Standard)" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b400b7ca-d594-4240-87d0-c69776a445ec"
-                                quirks="command_mek::cowl::reinforced_legs::difficult_eject">
+                                quirks="command_mech::cowl::reinforced_legs::difficult_eject">
                             <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
@@ -7804,7 +7804,7 @@ capturing the facility.
                         <entity chassis="Highlander IIC" model="(Standard)" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b400b7ca-d594-4240-87d0-c69776a445ec"
-                                quirks="command_mek::cowl::reinforced_legs::difficult_eject">
+                                quirks="command_mech::cowl::reinforced_legs::difficult_eject">
                             <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"

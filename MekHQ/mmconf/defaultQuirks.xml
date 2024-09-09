@@ -4,247 +4,247 @@
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-C</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-CM</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-D (Danielle)</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-D</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-D-DC</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-Dr</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-K</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-K2</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-K3</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-RS</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-S</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-S2</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-WGS Samsonov</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas</chassis>
         <model>AS8-D</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas II</chassis>
         <model>AS7-D-H</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Atlas II</chassis>
         <model>AS7-D-H2</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-1D</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-1G Red Corsair</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-1G</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-1Gb</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-1Gbc</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-1Gc</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-1G-DC</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-1S</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-2C</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-3M (Rogers)</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-3M</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-3S</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-4L</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-4S Calvin II</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-4S Calvin</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-4S</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-5M</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-6X</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-10S</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-10S2</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-CM</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-K3</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-K4</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-M3</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>BattleMaster</chassis>
         <model>BLR-C</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Black Knight</chassis>
         <model>BL6b-KNT</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Black Knight</chassis>
         <model>BL-6-KNT</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Black Knight</chassis>
         <model>BL-6-KNT Ian</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Black Knight</chassis>
         <model>BL-7-KNT</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Black Knight</chassis>
         <model>BL-7-KNT-L</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Black Knight</chassis>
         <model>BL-9-KNT</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Black Knight</chassis>
         <model>BL-10-KNT Ross</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Black Knight</chassis>
         <model>BL-12-KNT</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Blackjack</chassis>
@@ -1028,47 +1028,47 @@
     <unit>
         <chassis>King Crab</chassis>
         <model>KGC-0000</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>King Crab</chassis>
         <model>KGC-000</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>King Crab</chassis>
         <model>KGC-000b</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>King Crab</chassis>
         <model>KGC-001</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>King Crab</chassis>
         <model>KGC-005</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>King Crab</chassis>
         <model>KGC-005r</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>King Crab</chassis>
         <model>KGC-008</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>King Crab</chassis>
         <model>KGC-009</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>King Crab</chassis>
         <model>KGC-010</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Lancelot</chassis>
@@ -1193,152 +1193,152 @@
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-1R</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>Bounty Hunter 3015</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>Bounty Hunter 3044</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-C</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-2R</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-3D</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-3L</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-3M</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-3R</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-5D</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-5L</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-5M</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-5R</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-5S</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-5T</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-6L</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-7D</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-9M</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-9M2</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-9S</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-9W</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-9W2</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Marauder</chassis>
         <model>MAD-SD Douglass</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Mongoose</chassis>
         <model>MON-66</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Mongoose</chassis>
         <model>MON-66b</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Mongoose</chassis>
         <model>MON-67</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Mongoose</chassis>
         <model>MON-68</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Mongoose</chassis>
         <model>MON-70</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Mongoose</chassis>
         <model>MON-76</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Mongoose</chassis>
         <model>MON-86</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
     </unit>
     <unit>
         <chassis>Quickdraw</chassis>
@@ -1928,85 +1928,85 @@
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-6K</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-6M</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-6R</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-7D</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-7K</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-7M</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-8C</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-8D</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-8K</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-9D</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-9K</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-9M</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-9W</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
         <chassis>Wolverine</chassis>
         <model>WVR-9W2</model>
-        <quirk>command_mek</quirk>
+        <quirk>command_mech</quirk>
         <quirk>cramped_cockpit</quirk>
     </unit>
     <unit>
