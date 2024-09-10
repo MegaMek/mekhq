@@ -34,14 +34,14 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 
 public class BattleMekFactionGenerationMethodTest {
-    //region Variable Declarations
+    // region Variable Declarations
     private static final BattleMekFactionGenerationMethod[] methods = BattleMekFactionGenerationMethod.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
     public void testGetToolTipText() {
         assertEquals(resources.getString("BattleMekFactionGenerationMethod.ORIGIN_FACTION.toolTipText"),
@@ -49,9 +49,9 @@ public class BattleMekFactionGenerationMethodTest {
         assertEquals(resources.getString("BattleMekFactionGenerationMethod.SPECIFIED_FACTION.toolTipText"),
                 BattleMekFactionGenerationMethod.SPECIFIED_FACTION.getToolTipText());
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
     public void testIsOriginFaction() {
         for (final BattleMekFactionGenerationMethod battleMekFactionGenerationMethod : methods) {
@@ -84,12 +84,12 @@ public class BattleMekFactionGenerationMethodTest {
             }
         }
     }
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
 
     @Test
     public void testGenerateFaction() {
-        final Faction mockOriginFaction = mock(Faction.class);
         final Person mockPerson = mock(Person.class);
+        final Faction mockOriginFaction = mock(Faction.class);
         when(mockPerson.getOriginFaction()).thenReturn(mockOriginFaction);
 
         final Faction mockCampaignFaction = mock(Faction.class);
@@ -99,13 +99,16 @@ public class BattleMekFactionGenerationMethodTest {
         final Faction mockSpecifiedFaction = mock(Faction.class);
 
         assertEquals(
-                BattleMekFactionGenerationMethod.ORIGIN_FACTION.generateFaction(mockPerson, mockCampaign, mockSpecifiedFaction),
+                BattleMekFactionGenerationMethod.ORIGIN_FACTION.generateFaction(mockPerson, mockCampaign,
+                        mockSpecifiedFaction),
                 mockOriginFaction);
         assertEquals(
-                BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.generateFaction(mockPerson, mockCampaign, mockSpecifiedFaction),
+                BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.generateFaction(mockPerson, mockCampaign,
+                        mockSpecifiedFaction),
                 mockCampaignFaction);
         assertEquals(
-                BattleMekFactionGenerationMethod.SPECIFIED_FACTION.generateFaction(mockPerson, mockCampaign, mockSpecifiedFaction),
+                BattleMekFactionGenerationMethod.SPECIFIED_FACTION.generateFaction(mockPerson, mockCampaign,
+                        mockSpecifiedFaction),
                 mockSpecifiedFaction);
     }
 
