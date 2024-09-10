@@ -18,17 +18,18 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.BayType;
-import megamek.common.Entity;
-import megamek.common.ITechnology;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
+import java.io.PrintWriter;
+
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.BayType;
+import megamek.common.Entity;
+import megamek.common.ITechnology;
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Neoancient
@@ -123,7 +124,7 @@ public class MissingCubicle extends MissingPart {
                 bayType = BayType.parse(wn2.getTextContent());
                 if (null == bayType) {
                     LogManager.getLogger().error("Could not parse bay type " + wn2.getTextContent());
-                    bayType = BayType.MECH;
+                    bayType = BayType.MEK;
                 }
                 name = bayType.getDisplayName() + " Cubicle";
             }
