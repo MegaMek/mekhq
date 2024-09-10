@@ -6,7 +6,7 @@ techbase:Inner Sphere
 era:3076
 source:TRO: Jihad
 rules level:2
-role: Missile Boat
+role:Missile Boat
 
 
 
@@ -160,4 +160,3 @@ IS Endo Steel
 -Empty-
 
 imagefile:.\data\images\fluff\Mech\shadow hawk SHD-7CS.jpg
-
