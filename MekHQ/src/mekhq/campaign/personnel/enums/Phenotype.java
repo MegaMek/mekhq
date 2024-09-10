@@ -41,16 +41,16 @@ public enum Phenotype {
             "Phenotype.PROTOMEK.toolTipText"),
     NAVAL("Phenotype.NAVAL.text", "Trueborn.text", "Phenotype.NAVAL.groupingNameText", "Phenotype.NAVAL.toolTipText"),
 
+    // Remove Milestone past 0.49.19
+    MECHWARRIOR("Phenotype.MEKWARRIOR.text", "Trueborn.text", "Phenotype.MEKWARRIOR.text",
+            "Phenotype.MEKWARRIOR.toolTipText"),
+    PROTOMECH("Phenotype.PROTOMEK.text", "Trueborn.text", "Phenotype.PROTOMEK.groupingNameText",
+            "Phenotype.PROTOMEK.toolTipText"),
+
     // Internal Phenotypes
     NONE("Phenotype.NONE.text", "Freeborn.text", "Phenotype.NONE.text", "Phenotype.NONE.toolTipText", false),
     GENERAL("Phenotype.GENERAL.text", "Trueborn.text", "Phenotype.GENERAL.text", "Phenotype.GENERAL.toolTipText",
-            false),
-
-    // Remove Milestone past 0.49.19
-    MECHWARRIOR("MechWarrior", "Trueborn.text", "Phenotype.MEKWARRIOR.text", "Phenotype.MEKWARRIOR.toolTipText"),
-    PROTOMECH("ProtoMech", "Trueborn.text", "Phenotype.PROTOMEK.groupingNameText",
-            "Phenotype.PROTOMEK.toolTipText"),
-            ;
+            false);
 
     // endregion Enum Declarations
 

@@ -595,7 +595,7 @@ public class CampaignOptions {
     private int scenarioModMax;
     private int scenarioModChance;
     private int scenarioModBV;
-    private boolean autoconfigMunitions;
+    private boolean autoConfigMunitions;
     // endregion Against the Bot Tab
     // endregion Variable Declarations
 
@@ -1122,6 +1122,10 @@ public class CampaignOptions {
         phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = 0;
         phenotypeProbabilities[Phenotype.PROTOMEK.ordinal()] = 95;
         phenotypeProbabilities[Phenotype.NAVAL.ordinal()] = 25;
+
+        // Remove Milestone after 0.49.19
+        phenotypeProbabilities[Phenotype.MECHWARRIOR.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.PROTOMECH.ordinal()] = 95;
         // endregion Skill Randomization Tab
 
         // region Rank System Tab
@@ -1222,7 +1226,7 @@ public class CampaignOptions {
         useWeatherConditions = true;
         useLightConditions = true;
         usePlanetaryConditions = false;
-        autoconfigMunitions = true;
+        autoConfigMunitions = true;
         setScenarioModMax(3);
         setScenarioModChance(25);
         setScenarioModBV(50);
@@ -4578,12 +4582,12 @@ public class CampaignOptions {
         this.scenarioModBV = scenarioModBV;
     }
 
-    public boolean isAutoconfigMunitions() {
-        return autoconfigMunitions;
+    public boolean isAutoConfigMunitions() {
+        return autoConfigMunitions;
     }
 
-    public void setAutoconfigMunitions(final boolean autoconfigMunitions) {
-        this.autoconfigMunitions = autoconfigMunitions;
+    public void setAutoConfigMunitions(final boolean autoConfigMunitions) {
+        this.autoConfigMunitions = autoConfigMunitions;
     }
 
     // region File IO
@@ -5124,7 +5128,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModMax", scenarioModMax);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", scenarioModChance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", scenarioModBV);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoconfigMunitions", autoconfigMunitions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoConfigMunitions", autoConfigMunitions);
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonus);
@@ -6188,8 +6192,8 @@ public class CampaignOptions {
                     retVal.setScenarioModChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioModBV")) {
                     retVal.setScenarioModBV(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("autoconfigMunitions")) {
-                    retVal.setAutoconfigMunitions(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoConfigMunitions")) {
+                    retVal.setAutoConfigMunitions(Boolean.parseBoolean(wn2.getTextContent().trim()));
 
                     // region Legacy
                     // Removed in 0.49.*
