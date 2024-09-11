@@ -19,20 +19,21 @@
 
 package mekhq.campaign.parts.equipment;
 
+import java.io.PrintWriter;
+
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Ammo bin missing from a small support vehicle
@@ -41,7 +42,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
     private InfantryWeapon weaponType;
 
     // Used in deserialization
-    @SuppressWarnings("unused")
+
     public MissingInfantryAmmoBin() {
         this(0, null, 0, null, 0, false, null);
     }

@@ -18,20 +18,21 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.Objects;
+
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;
 import megamek.common.equipment.ArmorType;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import java.io.PrintWriter;
-import java.util.Objects;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Standard support vehicle armor, which can differ by BAR and tech rating.
@@ -43,7 +44,7 @@ public class SVArmor extends Armor {
     /**
      * Constructor used during campaign deserialization
      */
-    @SuppressWarnings("unused")
+
     public SVArmor() {
         this(2, RATING_D, 0, Entity.LOC_NONE, null);
     }
@@ -51,11 +52,11 @@ public class SVArmor extends Armor {
     /**
      * Create an instance of a support vehicle armor part
      *
-     * @param bar          The Barrier Armor Rating for the armor
-     * @param techRating   The armor tech rating
-     * @param points       The number of points of armor
-     * @param loc          The location on the unit
-     * @param campaign     The campaign instance
+     * @param bar        The Barrier Armor Rating for the armor
+     * @param techRating The armor tech rating
+     * @param points     The number of points of armor
+     * @param loc        The location on the unit
+     * @param campaign   The campaign instance
      */
     public SVArmor(int bar, int techRating, int points, int loc, Campaign campaign) {
         super(0, EquipmentType.T_ARMOR_STANDARD, points, loc, false, false, campaign);
@@ -140,8 +141,8 @@ public class SVArmor extends Armor {
     public int getAmountAvailable() {
         SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
-                && part.isPresent()
-                && !part.isReservedForRefit();
+                    && part.isPresent()
+                    && !part.isReservedForRefit();
         });
 
         return a != null ? a.getAmount() : 0;
@@ -151,8 +152,8 @@ public class SVArmor extends Armor {
     public void changeAmountAvailable(int amount) {
         SVArmor a = (SVArmor) campaign.getWarehouse().findSparePart(part -> {
             return isSamePartType(part)
-                && part.isPresent()
-                && Objects.equals(getRefitUnit(), part.getRefitUnit());
+                    && part.isPresent()
+                    && Objects.equals(getRefitUnit(), part.getRefitUnit());
         });
 
         if (null != a) {

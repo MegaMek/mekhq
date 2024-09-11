@@ -18,22 +18,32 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.SkillType;
+import java.io.PrintWriter;
+
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.Aero;
+import megamek.common.Engine;
+import megamek.common.Entity;
+import megamek.common.FuelType;
+import megamek.common.ITechnology;
+import megamek.common.Tank;
+import megamek.common.TechAdvancement;
+import megamek.common.TechConstants;
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * Engine for a support vehicle. An identical support vehicle engine will have the same engine type,
- * unit tonnage, tech rating, and movement factor. The movement factor is the vehicle's (cruise/safe thrust)^2 + 4.
+ * Engine for a support vehicle. An identical support vehicle engine will have
+ * the same engine type,
+ * unit tonnage, tech rating, and movement factor. The movement factor is the
+ * vehicle's (cruise/safe thrust)^2 + 4.
  * ICEs will also have the same fuel type.
  */
 public class SVEnginePart extends Part {
@@ -47,7 +57,7 @@ public class SVEnginePart extends Part {
     /**
      * Constructor used during campaign deserialization
      */
-    @SuppressWarnings("unused")
+
     public SVEnginePart() {
         this(0, 0.0, Engine.COMBUSTION_ENGINE, RATING_D, FuelType.PETROCHEMICALS, null);
     }
@@ -55,15 +65,18 @@ public class SVEnginePart extends Part {
     /**
      * Creates a support vehicle engine part.
      *
-     * @param unitTonnage      The mass of the unit it is installed on/intended for, in tons.
-     * @param engineTonnage    The mass of the engine
-     * @param etype            An {@link Engine} type constant
-     * @param techRating       The engine's tech rating, {@code RATING_A} through {@code RATING_F}
-     * @param fuelType         Needed to distinguish different types of internal combustion engines.
-     * @param campaign         The campaign instance
+     * @param unitTonnage   The mass of the unit it is installed on/intended for, in
+     *                      tons.
+     * @param engineTonnage The mass of the engine
+     * @param etype         An {@link Engine} type constant
+     * @param techRating    The engine's tech rating, {@code RATING_A} through
+     *                      {@code RATING_F}
+     * @param fuelType      Needed to distinguish different types of internal
+     *                      combustion engines.
+     * @param campaign      The campaign instance
      */
     public SVEnginePart(int unitTonnage, double engineTonnage, int etype, int techRating,
-                        FuelType fuelType, Campaign campaign) {
+            FuelType fuelType, Campaign campaign) {
         super(unitTonnage, campaign);
         this.engineTonnage = unitTonnage;
         this.etype = etype;
@@ -314,7 +327,8 @@ public class SVEnginePart extends Part {
                 return skillType.equals(SkillType.S_TECH_MECHANIC);
             }
         }
-        // We're not tracking whether parts in the warehouse came from ground or fixed-wing/airships,
+        // We're not tracking whether parts in the warehouse came from ground or
+        // fixed-wing/airships,
         // so let either tech repair it.
         return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_MECHANIC));
     }

@@ -19,18 +19,24 @@
 
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.parts.*;
+import java.io.PrintWriter;
+import java.util.Objects;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.util.Objects;
+import megamek.common.AmmoType;
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.Mounted;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.common.weapons.infantry.InfantryWeapon;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.InfantryAmmoStorage;
+import mekhq.campaign.parts.Part;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Ammo bin for infantry weapons used by small support vehicles
@@ -39,7 +45,7 @@ public class InfantryAmmoBin extends AmmoBin {
     private InfantryWeapon weaponType;
 
     // Used in deserialization
-    @SuppressWarnings("unused")
+
     public InfantryAmmoBin() {
         this(0, null, 0, 0, null, 0, false, null);
     }
@@ -271,7 +277,7 @@ public class InfantryAmmoBin extends AmmoBin {
 
     /**
      * Weapons with configurable ammo have two ammo bin parts.
-     * 
+     *
      * @return The other bin for the same weapon, or null if there isn't one.
      */
     public @Nullable InfantryAmmoBin findPartnerBin() {

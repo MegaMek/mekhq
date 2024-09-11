@@ -18,6 +18,16 @@
  */
 package mekhq.campaign;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getCombinedSkillValues;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.UnitType;
@@ -30,47 +40,39 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getCombinedSkillValues;
 
 /**
- * calculates and stores summary information on a campaign for use in reporting, mostly for the command center
+ * calculates and stores summary information on a campaign for use in reporting,
+ * mostly for the command center
  */
 public class CampaignSummary {
 
     Campaign campaign;
 
-    //unit totals
+    // unit totals
     private int mekCount;
     private int veeCount;
     private int aeroCount;
     private int infantryCount;
     private int totalUnitCount;
 
-    //unit damage status
+    // unit damage status
     private int[] countDamageStatus;
 
-    //personnel totals
+    // personnel totals
     private int totalCombatPersonnel;
     private int totalSupportPersonnel;
     private int totalInjuries;
 
-    //mission status
+    // mission status
     private int[] countMissionByStatus;
     private int completedMissions;
 
-    //cargo
+    // cargo
     private double cargoCapacity;
     private double cargoTons;
 
-    //transport capacity
+    // transport capacity
     private int unitsOver;
     private int unitsTransported;
     private int nDS;
@@ -85,12 +87,13 @@ public class CampaignSummary {
     }
 
     /**
-     * This will update all of the values in CampaignSummary to the latest from the campaign. It should
+     * This will update all of the values in CampaignSummary to the latest from the
+     * campaign. It should
      * be run before pulling out any reports
      */
     public void updateInformation() {
 
-        //personnel
+        // personnel
         totalCombatPersonnel = 0;
         totalSupportPersonnel = 0;
         totalInjuries = 0;
@@ -109,7 +112,7 @@ public class CampaignSummary {
             }
         }
 
-        //units
+        // units
         countDamageStatus = new int[Entity.DMG_CRIPPLED + 1];
         mekCount = 0;
         veeCount = 0;
@@ -118,7 +121,8 @@ public class CampaignSummary {
         int squadCount = 0;
         for (Unit u : campaign.getHangar().getUnits()) {
             Entity e = u.getEntity();
-            if (u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent() || (null == e)) {
+            if (u.isUnmanned() || u.isSalvage() || u.isMothballed() || u.isMothballing() || !u.isPresent()
+                    || (null == e)) {
                 continue;
             }
             countDamageStatus[u.getDamageState()]++;
@@ -144,11 +148,11 @@ public class CampaignSummary {
                     break;
             }
         }
-        //squad should count as 1/4 of a unit for force composition
+        // squad should count as 1/4 of a unit for force composition
         infantryCount += (int) Math.ceil(squadCount / 4.0);
         totalUnitCount = mekCount + veeCount + infantryCount + aeroCount;
 
-        //missions
+        // missions
         countMissionByStatus = new int[MissionStatus.values().length];
         for (Mission m : campaign.getMissions()) {
             countMissionByStatus[m.getStatus().ordinal()]++;
@@ -161,30 +165,42 @@ public class CampaignSummary {
             }
         }
 
-        //cargo capacity
+        // cargo capacity
         CargoStatistics cargoStats = campaign.getCargoStatistics();
         cargoCapacity = cargoStats.getTotalCombinedCargoCapacity();
         cargoTons = cargoStats.getCargoTonnage(false);
         double mothballedTonnage = cargoStats.getCargoTonnage(false, true);
         cargoTons = (cargoTons + mothballedTonnage);
 
-        //transport capacity
+        // transport capacity
         HangarStatistics hangarStats = campaign.getHangarStatistics();
-        int noMek = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) - hangarStats.getOccupiedBays(Entity.ETYPE_MEK), 0);
-        int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noMek = Math.max(
+                hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK) - hangarStats.getOccupiedBays(Entity.ETYPE_MEK),
+                0);
+        int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT)
+                - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
-        int noCF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - hangarStats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER) - hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
-        int nolv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
-        int nohv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) - hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int noinf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
-        int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR) - hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
-        @SuppressWarnings("unused") // FIXME: This should be used somewhere...
-        int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK) - hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK),  0);
-        int freehv = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
-        int freeSC = Math.max(hangarStats.getTotalSmallCraftBays() - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
+        int noCF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER)
+                - hangarStats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
+        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER)
+                - hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
+        int nolv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true)
+                - hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
+        int nohv = Math.max(
+                hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
+                0);
+        int noinf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY)
+                - hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
+        int noBA = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR)
+                - hangarStats.getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
+        int noProto = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK)
+                - hangarStats.getOccupiedBays(Entity.ETYPE_PROTOMEK), 0);
+        int freehv = Math.max(hangarStats.getTotalHeavyVehicleBays() - hangarStats.getOccupiedBays(Entity.ETYPE_TANK),
+                0);
+        int freeSC = Math
+                .max(hangarStats.getTotalSmallCraftBays() - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
 
-        //check for free bays elsewhere
+        // check for free bays elsewhere
         noASF = Math.max(noASF - freeSC, 0);
         nolv = Math.max(nolv - freehv, 0);
 
@@ -202,7 +218,9 @@ public class CampaignSummary {
     }
 
     /**
-     * A report that gives numbers of combat and support personnel as well as injuries
+     * A report that gives numbers of combat and support personnel as well as
+     * injuries
+     * 
      * @return a <code>String</code> of the report
      */
     public String getPersonnelReport() {
@@ -212,6 +230,7 @@ public class CampaignSummary {
 
     /**
      * A report that gives the number of units in different damage states
+     * 
      * @return a <code>String</code> of the report
      */
     public String getForceRepairReport() {
@@ -222,7 +241,9 @@ public class CampaignSummary {
     }
 
     /**
-     * A report that gives the percentage composition of the force in mek, armor, infantry, and aero units.
+     * A report that gives the percentage composition of the force in mek, armor,
+     * infantry, and aero units.
+     * 
      * @return a <code>String</code> of the report
      */
     public String getForceCompositionReport() {
@@ -244,6 +265,7 @@ public class CampaignSummary {
 
     /**
      * A report that gives the percentage of successful missions
+     * 
      * @return a <code>String</code> of the report
      */
     public String getMissionSuccessReport() {
@@ -254,6 +276,7 @@ public class CampaignSummary {
 
     /**
      * A report that gives capacity and existing tonnage of all cargo
+     * 
      * @return a <code>String</code> of the report
      */
     public StringBuilder getCargoCapacityReport() {
@@ -287,6 +310,7 @@ public class CampaignSummary {
 
     /**
      * A report that gives information about the transportation capacity
+     * 
      * @return a <code>String</code> of the report
      */
     public String getTransportCapacity() {
@@ -306,7 +330,8 @@ public class CampaignSummary {
     /**
      * Generates an administrative capacity report for the Command Center.
      *
-     * @param campaign the campaign for which the administrative capacity report is generated
+     * @param campaign the campaign for which the administrative capacity report is
+     *                 generated
      * @return the administrative capacity report in HTML format
      */
     public String getAdministrativeCapacityReport(Campaign campaign) {

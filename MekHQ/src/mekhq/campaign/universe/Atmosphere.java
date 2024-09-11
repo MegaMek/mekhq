@@ -44,52 +44,42 @@ public enum Atmosphere {
         this.name = name;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isNone() {
         return this == NONE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTaintedPoison() {
         return this == TAINTEDPOISON;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTaintedCaustic() {
         return this == TAINTEDCAUSTIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTaintedFlame() {
         return this == TAINTEDFLAME;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isToxicPoison() {
         return this == TOXICPOISON;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isToxicCaustic() {
         return this == TOXICCAUSTIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isToxicFlame() {
         return this == TOXICFLAME;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBreathable() {
         return this == BREATHABLE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTainted() {
         return isTaintedPoison() || isTaintedCaustic() || isTaintedFlame();
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isToxic() {
         return isToxicPoison() || isToxicCaustic() || isToxicFlame();
     }
