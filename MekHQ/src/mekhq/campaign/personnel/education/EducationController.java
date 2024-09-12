@@ -69,10 +69,10 @@ public class EducationController {
         // has the character already failed to apply to this academy?
         if (person.getEduFailedApplications().contains(academy)) {
             campaign.addReport(String.format(resources.getString("secondApplication.text"),
-                    person.getHyperlinkedFullTitle()),
+                    person.getHyperlinkedFullTitle(),
                     academyNameInSet,
                     "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                    "</span>");
+                    "</span>"));
             return false;
         }
 
