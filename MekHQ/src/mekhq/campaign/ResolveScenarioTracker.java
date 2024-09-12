@@ -1476,7 +1476,7 @@ public class ResolveScenarioTracker {
 
                 // Then, we need to determine if they are a defector
                 if (prisonerStatus.isCurrentPrisoner() && getCampaign().getCampaignOptions().isUseAtBPrisonerDefection()) {
-                    int campaignUnitRating = getCampaign().getUnitRatingAsInteger();
+                    int campaignUnitRating = getCampaign().getUnitRatingMod();
 
                     // if this isn't an AtB Contract, we use the individual's experience level, instead of enemy skill
                     int enemyRating = person.getExperienceLevel(campaign, false);
@@ -1485,7 +1485,7 @@ public class ResolveScenarioTracker {
                         enemyRating = ((AtBContract) mission).getEnemySkill().ordinal();
                     }
 
-                    int requiredValue = 8 + enemyRating - campaignUnitRating;
+                    int requiredValue = 10 + enemyRating - campaignUnitRating;
 
                     if (getCampaign().getCampaignOptions().isUseLoyaltyModifiers()) {
                         requiredValue += person.getLoyaltyModifier(person.getLoyalty());
