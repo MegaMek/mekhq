@@ -39,6 +39,7 @@ public enum FormationLevel {
     DIVISION("FormationLevel.DIVISION.text", "FormationLevel.DIVISION.description", 5, true, false, false),
     CORPS("FormationLevel.CORPS.text", "FormationLevel.CORPS.description", 6, true, false, false),
     ARMY("FormationLevel.ARMY.text", "FormationLevel.ARMY.description", 7, true, false, false),
+    ARMY_GROUP("FormationLevel.ARMY_GROUP.text", "FormationLevel.ARMY_GROUP.description", 8, true, false, false),
 
     // Clan
     STAR_OR_NOVA("FormationLevel.STAR_OR_NOVA.text", "FormationLevel.STAR_OR_NOVA.description", 0, false, true, false),
@@ -252,20 +253,21 @@ public enum FormationLevel {
             case "8", "Division" -> DIVISION;
             case "9", "Corps" -> CORPS;
             case "10", "Army" -> ARMY;
+            case "11", "Army Group" -> ARMY_GROUP;
 
             // Clan
-            case "11", "Star or Nova" -> STAR_OR_NOVA;
-            case "12", "Binary or Trinary" -> BINARY_OR_TRINARY;
-            case "13", "Cluster" -> CLUSTER;
-            case "14", "Galaxy" -> GALAXY;
-            case "15", "Touman" -> TOUMAN;
+            case "12", "Star or Nova" -> STAR_OR_NOVA;
+            case "13", "Binary or Trinary" -> BINARY_OR_TRINARY;
+            case "14", "Cluster" -> CLUSTER;
+            case "15", "Galaxy" -> GALAXY;
+            case "16", "Touman" -> TOUMAN;
 
             // ComStar
-            case "16", "Level II or Choir" -> LEVEL_II_OR_CHOIR;
-            case "17", "Level III" -> LEVEL_III;
-            case "18", "Level IV" -> LEVEL_IV;
-            case "19", "Level V" -> LEVEL_V;
-            case "20", "Level VI" -> LEVEL_VI;
+            case "17", "Level II or Choir" -> LEVEL_II_OR_CHOIR;
+            case "18", "Level III" -> LEVEL_III;
+            case "19", "Level IV" -> LEVEL_IV;
+            case "20", "Level V" -> LEVEL_V;
+            case "21", "Level VI" -> LEVEL_VI;
 
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromString: "
@@ -296,20 +298,21 @@ public enum FormationLevel {
             case 8 -> DIVISION;
             case 9 -> CORPS;
             case 10 -> ARMY;
+            case 11 -> ARMY_GROUP;
 
             // Clan
-            case 11 -> STAR_OR_NOVA;
-            case 12 -> BINARY_OR_TRINARY;
-            case 13 -> CLUSTER;
-            case 14 -> GALAXY;
-            case 15 -> TOUMAN;
+            case 12 -> STAR_OR_NOVA;
+            case 13 -> BINARY_OR_TRINARY;
+            case 14 -> CLUSTER;
+            case 15 -> GALAXY;
+            case 16 -> TOUMAN;
 
             // ComStar
-            case 16 -> LEVEL_II_OR_CHOIR;
-            case 17 -> LEVEL_III;
-            case 18 -> LEVEL_IV;
-            case 19 -> LEVEL_V;
-            case 20 -> LEVEL_VI;
+            case 17 -> LEVEL_II_OR_CHOIR;
+            case 18 -> LEVEL_III;
+            case 19 -> LEVEL_IV;
+            case 20 -> LEVEL_V;
+            case 21 -> LEVEL_VI;
 
             default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromInt: "
@@ -339,20 +342,21 @@ public enum FormationLevel {
             case DIVISION -> 8;
             case CORPS -> 9;
             case ARMY -> 10;
+            case ARMY_GROUP -> 11;
 
             // Clan
-            case STAR_OR_NOVA -> 11;
-            case BINARY_OR_TRINARY -> 12;
-            case CLUSTER -> 13;
-            case GALAXY -> 14;
-            case TOUMAN -> 15;
+            case STAR_OR_NOVA -> 12;
+            case BINARY_OR_TRINARY -> 13;
+            case CLUSTER -> 14;
+            case GALAXY -> 15;
+            case TOUMAN -> 16;
 
             // ComStar
-            case LEVEL_II_OR_CHOIR -> 16;
-            case LEVEL_III -> 17;
-            case LEVEL_IV -> 18;
-            case LEVEL_V -> 19;
-            case LEVEL_VI -> 20;
+            case LEVEL_II_OR_CHOIR -> 17;
+            case LEVEL_III -> 18;
+            case LEVEL_IV -> 19;
+            case LEVEL_V -> 20;
+            case LEVEL_VI -> 21;
         };
     }
 
@@ -391,7 +395,8 @@ public enum FormationLevel {
                 case 4 -> BRIGADE;
                 case 5 -> DIVISION;
                 case 6 -> CORPS;
-                default -> ARMY;
+                case 7 -> ARMY;
+                default -> ARMY_GROUP;
             };
         }
     }
