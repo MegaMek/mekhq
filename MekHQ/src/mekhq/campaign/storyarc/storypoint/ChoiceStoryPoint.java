@@ -20,19 +20,20 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.gui.dialog.StoryChoiceDialog;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.gui.dialog.StoryChoiceDialog;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * This StoryPoint creates a {@link StoryChoiceDialog StoryChoiceDialog} which
@@ -40,6 +41,7 @@ import java.util.Map.Entry;
  * potentially more than one possible choice or response.
  */
 public class ChoiceStoryPoint extends DialogStoryPoint {
+    private static final MMLogger logger = MMLogger.create(ChoiceStoryPoint.class);
 
     private String title;
     private String question;
@@ -119,7 +121,7 @@ public class ChoiceStoryPoint extends DialogStoryPoint {
                     chosen = wn2.getTextContent().trim();
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

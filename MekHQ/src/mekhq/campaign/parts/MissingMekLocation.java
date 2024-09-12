@@ -20,25 +20,34 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.CriticalSlot;
+import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
+import megamek.common.LandAirMek;
+import megamek.common.Mek;
+import megamek.common.MiscType;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMekLocation extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingMekLocation.class);
+
     protected int loc;
     protected int structureType;
     protected boolean clan; // Needed for Endo-steel
@@ -62,7 +71,8 @@ public class MissingMekLocation extends MissingPart {
         this.clan = clan;
     }
 
-    public MissingMekLocation(int loc, int tonnage, int structureType, boolean clan, boolean hasTSM, boolean quad, Campaign c) {
+    public MissingMekLocation(int loc, int tonnage, int structureType, boolean clan, boolean hasTSM, boolean quad,
+            Campaign c) {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
@@ -70,8 +80,8 @@ public class MissingMekLocation extends MissingPart {
         this.tsm = hasTSM;
         this.percent = 1.0;
         this.forQuad = quad;
-        //TODO: need to account for internal structure and myomer types
-        //crap, no static report for location names?
+        // TODO: need to account for internal structure and myomer types
+        // crap, no static report for location names?
         this.name = "Mek Location";
         switch (loc) {
             case Mek.LOC_HEAD:
@@ -164,7 +174,7 @@ public class MissingMekLocation extends MissingPart {
                     forQuad = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
     }
@@ -180,7 +190,7 @@ public class MissingMekLocation extends MissingPart {
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         if ((loc == Mek.LOC_CT) && !refit) {
-            //you can't replace a center torso
+            // you can't replace a center torso
             return false;
         } else if (part instanceof MekLocation) {
             MekLocation mekLoc = (MekLocation) part;
@@ -222,7 +232,8 @@ public class MissingMekLocation extends MissingPart {
                 continue;
             }
 
-            // certain other specific crits need to be left out (uggh, must be a better way to do this!)
+            // certain other specific crits need to be left out (uggh, must be a better way
+            // to do this!)
             if (slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                 // Skip Hip and Shoulder actuators
                 if ((slot.getIndex() == Mek.ACTUATOR_HIP)
@@ -235,14 +246,16 @@ public class MissingMekLocation extends MissingPart {
                         if (unit.findPart(p -> p instanceof MissingLandingGear) != null) {
                             continue;
                         } else {
-                            partsToSalvageOrScrap.add(String.format("Landing Gear (%s)", unit.getEntity().getLocationName(loc)));
+                            partsToSalvageOrScrap
+                                    .add(String.format("Landing Gear (%s)", unit.getEntity().getLocationName(loc)));
                         }
-                    // Skip Avionics if already gone
+                        // Skip Avionics if already gone
                     } else if (slot.getIndex() == LandAirMek.LAM_AVIONICS) {
                         if (unit.findPart(p -> p instanceof MissingAvionics) != null) {
                             continue;
                         } else {
-                            partsToSalvageOrScrap.add(String.format("Avionics (%s)", unit.getEntity().getLocationName(loc)));
+                            partsToSalvageOrScrap
+                                    .add(String.format("Avionics (%s)", unit.getEntity().getLocationName(loc)));
                         }
                     }
                 }
@@ -270,7 +283,8 @@ public class MissingMekLocation extends MissingPart {
                         continue;
                     }
 
-                    Part repairablePart = unit.findPart(p -> (p instanceof EquipmentPart) && (((EquipmentPart) p).getEquipmentNum() == equipmentNum));
+                    Part repairablePart = unit.findPart(p -> (p instanceof EquipmentPart)
+                            && (((EquipmentPart) p).getEquipmentNum() == equipmentNum));
                     if (repairablePart != null) {
                         partName = repairablePart.getName();
                     }
@@ -289,10 +303,12 @@ public class MissingMekLocation extends MissingPart {
 
     @Override
     public Part getNewPart() {
-       /* int cockpitType = -1;
-        if (null != unit) {
-            cockpitType = ((Mek) unit.getEntity()).getCockpitType();
-        }*/
+        /*
+         * int cockpitType = -1;
+         * if (null != unit) {
+         * cockpitType = ((Mek) unit.getEntity()).getCockpitType();
+         * }
+         */
         boolean lifeSupport = (loc == Mek.LOC_HEAD);
         boolean sensors = (loc == Mek.LOC_HEAD);
         return new MekLocation(loc, getUnitTonnage(), structureType, clan,
@@ -357,13 +373,15 @@ public class MissingMekLocation extends MissingPart {
             missingSensor.remove(false);
             newPart.updateConditionFromPart();
         }
-        /*if (part.hasCockpit() && null != missingCockpit) {
-            newPart = missingCockpit.getNewPart();
-            unit.addPart(newPart);
-            campaign.getQuartermaster().addPart(newPart);
-            missingCockpit.remove(false);
-            newPart.updateConditionFromPart();
-        }*/
+        /*
+         * if (part.hasCockpit() && null != missingCockpit) {
+         * newPart = missingCockpit.getNewPart();
+         * unit.addPart(newPart);
+         * campaign.getQuartermaster().addPart(newPart);
+         * missingCockpit.remove(false);
+         * newPart.updateConditionFromPart();
+         * }
+         */
         if (part.hasLifeSupport() && null != missingLifeSupport) {
             newPart = missingLifeSupport.getNewPart();
             unit.addPart(newPart);

@@ -31,7 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 
@@ -43,6 +42,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.EquipmentType;
+import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.utilities.MHQXMLUtility;
 
@@ -55,6 +55,8 @@ import mekhq.utilities.MHQXMLUtility;
  */
 
 public class Systems {
+    private static final MMLogger logger = MMLogger.create(Systems.class);
+
     private static Systems systems;
 
     // Marshaller / unmarshaller instances
@@ -68,7 +70,7 @@ public class Systems {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             unmarshaller = context.createUnmarshaller();
         } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
@@ -83,7 +85,7 @@ public class Systems {
             planetMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             planetUnmarshaller = jContext.createUnmarshaller();
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
@@ -260,12 +262,12 @@ public class Systems {
      * @throws ParseException
      */
     public static Systems loadDefault() throws DOMException, IOException {
-        LogManager.getLogger().info("Starting load of system data from XML...");
+        logger.info("Starting load of system data from XML...");
         long currentTime = System.currentTimeMillis();
 
         Systems systems = load("data/universe/planetary_systems", "data/universe/systems.xml");
 
-        LogManager.getLogger().info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
+        logger.info(String.format(Locale.ROOT, "Loaded a total of %d systems in %.3fs.",
                 systems.systemList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
 
         systems.logVeryCloseSystems();
@@ -333,7 +335,7 @@ public class Systems {
                 }
             }
         } catch (JAXBException | IOException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
@@ -341,13 +343,13 @@ public class Systems {
         List<PlanetarySystem> toRemove = new ArrayList<>();
         for (PlanetarySystem system : systemList.values()) {
             if ((null == system.getX()) || (null == system.getY())) {
-                LogManager.getLogger().error(String.format("System \"%s\" is missing coordinates", system.getId()));
+                logger.error(String.format("System \"%s\" is missing coordinates", system.getId()));
                 toRemove.add(system);
                 continue;
             }
             // make sure the primary slot is not larger than the number of planets
             if (system.getPrimaryPlanetPosition() > system.getPlanets().size()) {
-                LogManager.getLogger().error(String
+                logger.error(String
                         .format("System \"%s\" has a primary slot greater than the number of planets", system.getId()));
                 toRemove.add(system);
                 continue;
@@ -370,7 +372,7 @@ public class Systems {
             if (veryCloseSystems.size() > 1) {
                 for (PlanetarySystem closeSystem : veryCloseSystems) {
                     if (!system.getId().equals(closeSystem.getId())) {
-                        LogManager.getLogger().warn(String.format(Locale.ROOT,
+                        logger.warn(String.format(Locale.ROOT,
                                 "Extremely close systems detected. Data error? %s <-> %s: %.3f ly",
                                 system.getId(), closeSystem.getId(), system.getDistanceTo(closeSystem)));
                     }
@@ -478,7 +480,7 @@ public class Systems {
         try {
             planetMarshaller.marshal(event, out);
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
@@ -492,7 +494,7 @@ public class Systems {
         try {
             marshaller.marshal(event, out);
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
@@ -507,7 +509,7 @@ public class Systems {
         try {
             return (Planet.PlanetaryEvent) planetUnmarshaller.unmarshal(node);
         } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
         return null;
     }
@@ -523,7 +525,7 @@ public class Systems {
         try {
             return (PlanetarySystem.PlanetarySystemEvent) unmarshaller.unmarshal(node);
         } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
         return null;
     }

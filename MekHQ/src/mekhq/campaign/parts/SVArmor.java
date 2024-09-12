@@ -21,7 +21,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
 import megamek.common.Entity;
@@ -29,6 +28,7 @@ import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;
 import megamek.common.equipment.ArmorType;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -38,6 +38,8 @@ import mekhq.utilities.MHQXMLUtility;
  * Standard support vehicle armor, which can differ by BAR and tech rating.
  */
 public class SVArmor extends Armor {
+    private static final MMLogger logger = MMLogger.create(SVArmor.class);
+
     private int bar;
     private int techRating;
 
@@ -193,7 +195,7 @@ public class SVArmor extends Armor {
                         break;
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }

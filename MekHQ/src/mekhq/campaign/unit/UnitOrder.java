@@ -20,8 +20,15 @@
  */
 package mekhq.campaign.unit;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
@@ -29,12 +36,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
 
 /**
  * We use an extension of unit to create a unit order acquisition work
@@ -42,6 +43,7 @@ import java.io.PrintWriter;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class UnitOrder extends Unit implements IAcquisitionWork {
+    private static final MMLogger logger = MMLogger.create(UnitOrder.class);
 
     int quantity;
     int daysToWait;
@@ -96,8 +98,9 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     @Override
     public String getAcquisitionName() {
         // This cannot be hyperlinked name due to the fact that we have a null unit ID
-        // Also, the field this goes into does not currently support html, and would need our listener attached
-        //  - Dylan
+        // Also, the field this goes into does not currently support html, and would
+        // need our listener attached
+        // - Dylan
         return getName();
     }
 
@@ -120,13 +123,13 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         name = name.trim();
         MekSummary summary = MekSummaryCache.getInstance().getMek(name);
         if (null == summary) {
-            LogManager.getLogger().error("Could not find a mek summary for " + name);
+            logger.error("Could not find a mek summary for " + name);
             return null;
         }
         try {
             return new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            LogManager.getLogger().error("Could not load " + summary.getEntryName());
+            logger.error("Could not load " + summary.getEntryName());
             return null;
         }
     }
@@ -181,33 +184,36 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     @Override
     public String find(int transitDays) {
-        //TODO: probably get a duplicate entity
+        // TODO: probably get a duplicate entity
         if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+                    + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                    + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> unit not found</b>.</font>";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                + "'><b> unit not found</b>.</font>";
     }
 
     @Override
     public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         if (!entity.isCanon()) {
-            //TODO: custom job
+            // TODO: custom job
         }
         if (entity.isClan() && getCampaign().getCampaignOptions().getClanAcquisitionPenalty() > 0) {
             target.addModifier(getCampaign().getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
         } else if (getCampaign().getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(getCampaign().getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
-        //TODO: Fix weight classes
-        //TODO: aero large craft
-        //TODO: support vehicles
+        // TODO: Fix weight classes
+        // TODO: aero large craft
+        // TODO: support vehicles
         if (entity instanceof Mek) {
             if (!((Mek) entity).isIndustrial()) {
                 target.addModifier(0, "BattleMek");
@@ -277,7 +283,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         } else if (entity instanceof ProtoMek) {
             target.addModifier(+1, "ProtoMek");
         }
-        //parts need to be initialized for this to work
+        // parts need to be initialized for this to work
         int avail = getAvailability();
         if (this.isExtinctIn(getCampaign().getGameYear())) {
             avail = EquipmentType.RATING_X;
@@ -287,10 +293,10 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         return target;
     }
 
-
     @Override
     public int getAvailability() {
-        return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(), getCampaign().getTechFaction());
+        return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(),
+                getCampaign().getTechFaction());
     }
 
     @Override
@@ -344,7 +350,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         retVal.initializeParts(false);

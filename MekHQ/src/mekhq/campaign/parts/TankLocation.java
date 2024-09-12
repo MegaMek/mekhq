@@ -20,24 +20,34 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.CriticalSlot;
+import megamek.common.IArmorState;
+import megamek.common.ILocationExposureStatus;
+import megamek.common.Mounted;
+import megamek.common.SimpleTechLevel;
+import megamek.common.Tank;
+import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class TankLocation extends Part {
+    private static final MMLogger logger = MMLogger.create(TankLocation.class);
+
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
             .setPrototypeFactions(F_TH).setProductionFactions(F_TH)
@@ -134,7 +144,7 @@ public class TankLocation extends Part {
                     breached = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }

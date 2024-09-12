@@ -27,7 +27,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -35,11 +34,14 @@ import org.w3c.dom.Node;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 
 public class MHQXMLUtility extends MMXMLUtility {
+    private static final MMLogger logger = MMLogger.create(MHQXMLUtility.class);
+
     private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
 
     /**
@@ -580,7 +582,7 @@ public class MHQXMLUtility extends MMXMLUtility {
                 if (campaign != null) {
                     entity.setGame(campaign.getGame());
                 }
-                LogManager.getLogger().trace("Returning " + entity + " from getEntityFromXmlString(String)...");
+                logger.trace("Returning " + entity + " from getEntityFromXmlString(String)...");
                 return entity;
             default:
                 throw new IllegalArgumentException(

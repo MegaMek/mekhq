@@ -1,24 +1,30 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Award;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Award;
+
 public class InjuryAwards {
+    private static final MMLogger logger = MMLogger.create(InjuryAwards.class);
+
     /**
-     * This function loops through Injury Awards, checking whether the person is eligible to receive each type of award
+     * This function loops through Injury Awards, checking whether the person is
+     * eligible to receive each type of award
      *
-     * @param campaign the campaign to be processed
-     * @param person the Person to check award eligibility for
-     * @param awards awards the awards to be processed (should only include awards where item == Injury)
-     * @param injuryCount the number of Hits sustained in the Scenario just concluded
+     * @param campaign    the campaign to be processed
+     * @param person      the Person to check award eligibility for
+     * @param awards      awards the awards to be processed (should only include
+     *                    awards where item == Injury)
+     * @param injuryCount the number of Hits sustained in the Scenario just
+     *                    concluded
      */
-    public static Map<Integer, List<Object>> InjuryAwardsProcessor(Campaign campaign, UUID person, List<Award> awards, int injuryCount) {
+    public static Map<Integer, List<Object>> InjuryAwardsProcessor(Campaign campaign, UUID person, List<Award> awards,
+            int injuryCount) {
         int injuriesNeeded;
 
         List<Award> eligibleAwards = new ArrayList<>();
@@ -30,7 +36,7 @@ public class InjuryAwards {
                 try {
                     injuriesNeeded = award.getQty();
                 } catch (Exception e) {
-                    LogManager.getLogger().warn("Injury Award {} from the {} set has invalid range qty {}",
+                    logger.warn("Injury Award {} from the {} set has invalid range qty {}",
                             award.getName(), award.getSet(), award.getQty());
                     continue;
                 }

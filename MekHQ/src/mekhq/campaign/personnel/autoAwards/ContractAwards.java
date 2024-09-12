@@ -1,24 +1,33 @@
 package mekhq.campaign.personnel.autoAwards;
 
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
-import org.apache.logging.log4j.LogManager;
-
-import java.time.temporal.ChronoUnit;
-import java.util.*;
 
 public class ContractAwards {
+    private static final MMLogger logger = MMLogger.create(ContractAwards.class);
+
     /**
-     * This function loops through Contract Awards, checking whether the person is eligible to receive each type of award
+     * This function loops through Contract Awards, checking whether the person is
+     * eligible to receive each type of award
+     *
      * @param campaign the campaign to be processed
-     * @param mission the mission that just concluded
-     * @param person the person to check award eligibility for
-     * @param awards the awards to be processed (should only include awards where item == Kill)
+     * @param mission  the mission that just concluded
+     * @param person   the person to check award eligibility for
+     * @param awards   the awards to be processed (should only include awards where
+     *                 item == Kill)
      */
     public static Map<Integer, List<Object>> ContractAwardsProcessor(Campaign campaign, Mission mission,
-                                                                     UUID person, List<Award> awards) {
+            UUID person, List<Award> awards) {
         List<Award> eligibleAwards = new ArrayList<>();
         List<Award> eligibleAwardsBestable = new ArrayList<>();
         Award bestAward = new Award();
@@ -42,7 +51,7 @@ public class ContractAwards {
                             eligibleAwardsBestable.add(award);
                         }
                     } catch (Exception e) {
-                        LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}",
+                        logger.warn("Award {} from the {} set has an invalid qty value {}",
                                 award.getName(), award.getSet(), award.getQty());
                     }
                 } else if (validTypes.contains(award.getRange().toLowerCase())) {
@@ -63,7 +72,7 @@ public class ContractAwards {
                             }
                     }
                 } else {
-                    LogManager.getLogger().warn("Award {} from the {} set has an invalid range value {}",
+                    logger.warn("Award {} from the {} set has an invalid range value {}",
                             award.getName(), award.getSet(), award.getRange());
                 }
             }

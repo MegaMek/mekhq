@@ -35,13 +35,12 @@ import javax.swing.*;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JSpinner.NumberEditor;
 
-import org.apache.logging.log4j.LogManager;
-
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -58,6 +57,8 @@ import mekhq.gui.displayWrappers.RankDisplay;
  * @author Jay Lawson
  */
 public class HireBulkPersonnelDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(HireBulkPersonnelDialog.class);
+
     private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
 
@@ -320,7 +321,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -328,7 +329,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         int number = (Integer) spnNumber.getModel().getValue();
         PersonTypeItem selectedItem = (PersonTypeItem) choiceType.getSelectedItem();
         if (selectedItem == null) {
-            LogManager.getLogger().error("Attempted to bulk hire for null PersonnelType!");
+            logger.error("Attempted to bulk hire for null PersonnelType!");
             return;
         }
 
@@ -384,7 +385,7 @@ public class HireBulkPersonnelDialog extends JDialog {
     /**
      * Replaces the skills for a {@link Person} based on their primary role and
      * desired experience level.
-     * 
+     *
      * @param person      The {@link Person} to add default skills.
      * @param primaryRole The primary role of the person
      * @param expLvl      The experience level of the person (e.g.

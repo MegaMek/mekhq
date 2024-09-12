@@ -1,5 +1,12 @@
 package mekhq.campaign.personnel.autoAwards;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.IntStream;
+
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -7,24 +14,22 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.IntStream;
 
 public class TheatreOfWarAwards {
+    private static final MMLogger logger = MMLogger.create(TheatreOfWarAwards.class);
+
     /**
-     * This function loops through Theatre of War Awards, checking whether the person is eligible to receive each type of award
+     * This function loops through Theatre of War Awards, checking whether the
+     * person is eligible to receive each type of award
      *
      * @param campaign the campaign to be processed
-     * @param mission the mission just completed
-     * @param person the person to check award eligibility for
-     * @param awards the awards to be processed (should only include awards where item == TheatreOfWar)
+     * @param mission  the mission just completed
+     * @param person   the person to check award eligibility for
+     * @param awards   the awards to be processed (should only include awards where
+     *                 item == TheatreOfWar)
      */
-    public static Map<Integer, List<Object>> TheatreOfWarAwardsProcessor(Campaign campaign, Mission mission, UUID person, List<Award> awards) {
+    public static Map<Integer, List<Object>> TheatreOfWarAwardsProcessor(Campaign campaign, Mission mission,
+            UUID person, List<Award> awards) {
         boolean isEligible;
         List<Award> eligibleAwards = new ArrayList<>();
 
@@ -38,11 +43,11 @@ public class TheatreOfWarAwards {
             List<String> defenders = new ArrayList<>();
 
             List<String> wartime = List.of(award.getSize()
-                    .replaceAll("\\s","")
+                    .replaceAll("\\s", "")
                     .split(","));
 
             if (wartime.size() != 2) {
-                LogManager.getLogger().warn("Award {} from the {} set has invalid start/end date {}",
+                logger.warn("Award {} from the {} set has invalid start/end date {}",
                         award.getName(), award.getSet(), award.getSize());
                 continue;
             }
@@ -60,13 +65,13 @@ public class TheatreOfWarAwards {
                     }
 
                     if ((attackers.isEmpty()) || (defenders.isEmpty())) {
-                        LogManager.getLogger().warn("Award {} from the {} set has incorrectly formated belligerents {}",
+                        logger.warn("Award {} from the {} set has incorrectly formated belligerents {}",
                                 award.getName(), award.getSet(), award.getRange());
                         continue;
                     }
                 }
             } else {
-                LogManager.getLogger().warn("Award {} from the {} set has no belligerents",
+                logger.warn("Award {} from the {} set has no belligerents",
                         award.getName(), award.getSet());
                 continue;
             }
@@ -79,7 +84,7 @@ public class TheatreOfWarAwards {
                 }
 
                 if (belligerents.size() == 1) {
-                    if(!processFaction(belligerents.get(0), employer)) {
+                    if (!processFaction(belligerents.get(0), employer)) {
                         continue;
                     }
                 } else if ((campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
@@ -104,11 +109,13 @@ public class TheatreOfWarAwards {
     }
 
     /**
-     * Streams through years covered by Contract, returns true if at least one is during wartime
+     * Streams through years covered by Contract, returns true if at least one is
+     * during wartime
      *
-     * @param wartime a list with two entries, war start year and war end year (can be identical)
+     * @param wartime           a list with two entries, war start year and war end
+     *                          year (can be identical)
      * @param contractStartYear the contract's start yet
-     * @param currentYear the current campaign year
+     * @param currentYear       the current campaign year
      */
     private static boolean isDuringWartime(List<String> wartime, int contractStartYear, int currentYear) {
         int contractLength = currentYear - contractStartYear;
@@ -118,16 +125,18 @@ public class TheatreOfWarAwards {
                     .anyMatch(checkYear -> (checkYear >= Integer.parseInt(wartime.get(0)))
                             && (checkYear <= Integer.parseInt(wartime.get(1))));
         } catch (Exception e) {
-            LogManager.getLogger().error("Failed to parse isDuringWartime. Returning false.");
+            logger.error("Failed to parse isDuringWartime. Returning false.");
             return false;
         }
     }
 
     /**
-     * Streams through the contents of factions and returns true if any match missionFaction
+     * Streams through the contents of factions and returns true if any match
+     * missionFaction
      *
      * @param missionFaction a single faction (either employer or enemy)
-     * @param factions a list of factions (either a list of attackers, or of defenders)
+     * @param factions       a list of factions (either a list of attackers, or of
+     *                       defenders)
      */
     private static boolean hasLoyalty(String missionFaction, List<String> factions) {
         return factions.stream().anyMatch(faction -> processFaction(missionFaction, faction));
@@ -137,13 +146,13 @@ public class TheatreOfWarAwards {
      * Checks whether missionFaction matches the requirements of belligerent
      *
      * @param missionFaction a single faction (either employer or enemy)
-     * @param belligerent the faction, or super-faction, to be matched against
+     * @param belligerent    the faction, or super-faction, to be matched against
      */
     static boolean processFaction(String missionFaction, String belligerent) {
         Faction faction = Factions.getInstance().getFaction(missionFaction);
 
-        missionFaction = missionFaction.toLowerCase().replaceAll("\\s","");
-        belligerent = belligerent.toLowerCase().replaceAll("\\s","");
+        missionFaction = missionFaction.toLowerCase().replaceAll("\\s", "");
+        belligerent = belligerent.toLowerCase().replaceAll("\\s", "");
 
         switch (belligerent) {
             case "majorpowers":

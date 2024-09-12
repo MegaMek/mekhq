@@ -18,6 +18,32 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.*;
+
 import megamek.client.ui.swing.lobby.LobbyUtility;
 import megamek.client.ui.swing.minimap.Minimap;
 import megamek.common.Board;
@@ -25,26 +51,14 @@ import megamek.common.BoardDimensions;
 import megamek.common.Configuration;
 import megamek.common.MapSettings;
 import megamek.common.util.fileUtils.MegaMekFile;
-import megamek.server.totalwarfare.TWGameManager;
+import megamek.logging.MMLogger;
 import megamek.server.ServerBoardHelper;
+import megamek.server.totalwarfare.TWGameManager;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.Scenario;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 public class EditMapSettingsDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(EditMapSettingsDialog.class);
 
     private int mapSizeX;
     private int mapSizeY;
@@ -71,9 +85,8 @@ public class EditMapSettingsDialog extends JDialog {
 
     private ImageLoader loader;
 
-
     public EditMapSettingsDialog(JFrame parent, boolean modal, int boardType, boolean usingFixedMap, String map,
-                                 int mapSizeX, int mapSizeY) {
+            int mapSizeX, int mapSizeY) {
 
         super(parent, modal);
         this.boardType = boardType;
@@ -123,7 +136,6 @@ public class EditMapSettingsDialog extends JDialog {
         scrChooseMap = new JScrollPane();
         scrChooseMap.setMinimumSize(new Dimension(600, 800));
         scrChooseMap.setPreferredSize(new Dimension(600, 800));
-
 
         checkFixed = new JCheckBox(resourceMap.getString("checkFixed.text"));
         checkFixed.setSelected(usingFixedMap);
@@ -186,7 +198,7 @@ public class EditMapSettingsDialog extends JDialog {
         if (usingFixedMap) {
             listFixedMaps.setSelectedValue(map, true);
             scrChooseMap.setViewportView(listFixedMaps);
-        }  else {
+        } else {
             listMapGenerators.setSelectedValue(map, true);
             scrChooseMap.setViewportView(listMapGenerators);
         }
@@ -313,20 +325,21 @@ public class EditMapSettingsDialog extends JDialog {
     /**
      * A modified version of the thumbnail board rendered from Megamek.ChatLounge
      */
-    private class BoardNameRenderer extends DefaultListCellRenderer  {
+    private class BoardNameRenderer extends DefaultListCellRenderer {
 
         private Image image;
         private ImageIcon icon;
 
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value,
-                                                      int index, boolean isSelected, boolean cellHasFocus) {
+                int index, boolean isSelected, boolean cellHasFocus) {
 
             String board = (String) value;
-            // For generated boards, add the size to have different images for different sizes
-            //if (board.startsWith(MapSettings.BOARD_GENERATED)) {
-            //    board += comboMapSize.getSelectedItem();
-            //}
+            // For generated boards, add the size to have different images for different
+            // sizes
+            // if (board.startsWith(MapSettings.BOARD_GENERATED)) {
+            // board += comboMapSize.getSelectedItem();
+            // }
 
             // If an icon is present for the current board, use it
             icon = mapIcons.get(board);
@@ -338,11 +351,13 @@ public class EditMapSettingsDialog extends JDialog {
                     image = baseImages.get(board);
                 }
                 if (image == null) {
-                    // There's no base image: trigger loading it and, for now, return the base list's panel
+                    // There's no base image: trigger loading it and, for now, return the base
+                    // list's panel
                     // The [GENERATED] entry will always land here as well
                     loader.add(board);
                     setToolTipText(null);
-                    return super.getListCellRendererComponent(list, new File(board).getName(), index, isSelected, cellHasFocus);
+                    return super.getListCellRendererComponent(list, new File(board).getName(), index, isSelected,
+                            cellHasFocus);
                 } else {
                     icon = new ImageIcon(image);
 
@@ -380,7 +395,7 @@ public class EditMapSettingsDialog extends JDialog {
                 try {
                     boards.put(name);
                 } catch (Exception e) {
-                    LogManager.getLogger().error("", e);
+                    logger.error("", e);
                 }
             }
         }
@@ -404,7 +419,8 @@ public class EditMapSettingsDialog extends JDialog {
             }
 
             // Determine a minimap zoom from the board size and gui scale.
-            // This is very magic numbers but currently the minimap has only fixed zoom states.
+            // This is very magic numbers but currently the minimap has only fixed zoom
+            // states.
             int largerEdge = Math.max(board.getWidth(), board.getHeight());
             int zoom = 3;
             if (largerEdge < 17) {
@@ -423,7 +439,7 @@ public class EditMapSettingsDialog extends JDialog {
                 zoom = Math.max(zoom, 3);
             }
             float scale = 1;
-            zoom = (int) (scale*zoom);
+            zoom = (int) (scale * zoom);
             if (zoom > 6) {
                 zoom = 6;
             }
@@ -438,12 +454,11 @@ public class EditMapSettingsDialog extends JDialog {
             LobbyUtility.drawMinimapLabel(text, bufImage.getWidth(), bufImage.getHeight(), g, !errors.isEmpty());
             g.dispose();
 
-            synchronized(baseImages) {
+            synchronized (baseImages) {
                 baseImages.put(boardName, bufImage);
             }
             return bufImage;
         }
-
 
         @Override
         protected Void doInBackground() throws Exception {

@@ -25,10 +25,9 @@ import java.util.stream.Stream;
 
 import javax.swing.JMenuItem;
 
-import org.apache.logging.log4j.LogManager;
-
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -43,6 +42,8 @@ import mekhq.gui.sorter.PersonTitleSorter;
  * type, and allows the user to assign or remove a tech from them.
  */
 public class AssignUnitToPersonMenu extends JScrollableMenu {
+    private static final MMLogger logger = MMLogger.create(AssignPersonToUnitMenu.class);
+
     // region Constructors
     public AssignUnitToPersonMenu(final Campaign campaign, final Unit... units) {
         super("AssignUnitToPersonMenu");
@@ -200,7 +201,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             : PersonnelRole.BATTLE_ARMOUR))
                     .collect(Collectors.toList());
         } else {
-            LogManager.getLogger().error("Unhandled entity type of " + units[0].getEntity().getClass().toString());
+            logger.error("Unhandled entity type of " + units[0].getEntity().getClass().toString());
             return;
         }
 
@@ -242,7 +243,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                             .filter(person -> person.hasRole(PersonnelRole.VTOL_PILOT))
                             .collect(Collectors.toList());
                 } else {
-                    LogManager.getLogger().warn(
+                    logger.warn(
                             "Attempting to assign pilot to unknown unit type of " + units[0].getEntity().getClass());
                     filteredPersonnel = new ArrayList<>();
                 }

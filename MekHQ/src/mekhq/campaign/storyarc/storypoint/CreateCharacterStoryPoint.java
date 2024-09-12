@@ -25,13 +25,13 @@ import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
@@ -63,6 +63,7 @@ import mekhq.utilities.MHQXMLUtility;
  * to edit certain parts of the character can be restricted.
  */
 public class CreateCharacterStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(CreateCharacterStoryPoint.class);
 
     /** how much XP does the player have to spend on the character **/
     int xpPool;
@@ -328,7 +329,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                     personId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

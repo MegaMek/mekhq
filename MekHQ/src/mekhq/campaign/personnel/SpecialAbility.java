@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -52,6 +51,7 @@ import megamek.common.weapons.autocannons.LBXACWeapon;
 import megamek.common.weapons.autocannons.UACWeapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -73,6 +73,8 @@ import mekhq.utilities.MHQXMLUtility;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SpecialAbility {
+    private static final MMLogger logger = MMLogger.create(SpecialAbility.class);
+
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLANPILOT = "clanperson";
 
@@ -90,7 +92,7 @@ public class SpecialAbility {
 
     // prerequisite skills and options
     private Vector<String> prereqAbilities;
-    private Vector<SkillPrereq> prereqSkills;
+    private Vector<SkillPerquisite> prereqSkills;
     private Map<String, String> prereqMisc;
 
     // these are abilities that will disqualify the person from getting the current
@@ -139,13 +141,13 @@ public class SpecialAbility {
         clone.invalidAbilities = (Vector<String>) this.invalidAbilities.clone();
         clone.removeAbilities = (Vector<String>) this.removeAbilities.clone();
         clone.choiceValues = (Vector<String>) this.choiceValues.clone();
-        clone.prereqSkills = (Vector<SkillPrereq>) this.prereqSkills.clone();
+        clone.prereqSkills = (Vector<SkillPerquisite>) this.prereqSkills.clone();
         clone.prereqMisc = new HashMap<>(this.prereqMisc);
         return clone;
     }
 
     public boolean isEligible(Person p) {
-        for (SkillPrereq sp : prereqSkills) {
+        for (SkillPerquisite sp : prereqSkills) {
             if (!sp.qualifies(p)) {
                 return false;
             }
@@ -170,7 +172,7 @@ public class SpecialAbility {
     }
 
     public boolean isEligible(boolean isClanPilot, Skills skills, PersonnelOptions options) {
-        for (SkillPrereq sp : prereqSkills) {
+        for (SkillPerquisite sp : prereqSkills) {
             if (!sp.qualifies(skills)) {
                 return false;
             }
@@ -226,11 +228,11 @@ public class SpecialAbility {
         this.weight = weight;
     }
 
-    public Vector<SkillPrereq> getPrereqSkills() {
+    public Vector<SkillPerquisite> getPrereqSkills() {
         return prereqSkills;
     }
 
-    public void setPrereqSkills(Vector<SkillPrereq> prereq) {
+    public void setPrereqSkills(Vector<SkillPerquisite> prereq) {
         prereqSkills = prereq;
     }
 
@@ -274,7 +276,7 @@ public class SpecialAbility {
                 Utilities.combineString(invalidAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "removeAbilities", Utilities.combineString(removeAbilities, "::"));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "choiceValues", Utilities.combineString(choiceValues, "::"));
-        for (SkillPrereq skillpre : prereqSkills) {
+        for (SkillPerquisite skillpre : prereqSkills) {
             skillpre.writeToXML(pw, indent);
         }
 
@@ -310,7 +312,7 @@ public class SpecialAbility {
                 } else if (wn2.getNodeName().equalsIgnoreCase("choiceValues")) {
                     retVal.choiceValues = Utilities.splitString(wn2.getTextContent(), "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
-                    SkillPrereq skill = SkillPrereq.generateInstanceFromXML(wn2);
+                    SkillPerquisite skill = SkillPerquisite.generateInstanceFromXML(wn2);
                     if (!skill.isEmpty()) {
                         retVal.prereqSkills.add(skill);
                     }
@@ -336,7 +338,7 @@ public class SpecialAbility {
 
             specialAbilities.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -367,7 +369,7 @@ public class SpecialAbility {
                 } else if (wn2.getNodeName().equalsIgnoreCase("choiceValues")) {
                     retVal.choiceValues = Utilities.splitString(wn2.getTextContent(), "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
-                    SkillPrereq skill = SkillPrereq.generateInstanceFromXML(wn2);
+                    SkillPerquisite skill = SkillPerquisite.generateInstanceFromXML(wn2);
                     if (!skill.isEmpty()) {
                         retVal.prereqSkills.add(skill);
                     }
@@ -392,7 +394,7 @@ public class SpecialAbility {
             }
             spHash.put(retVal.lookupName, retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -405,7 +407,7 @@ public class SpecialAbility {
         try (InputStream is = new FileInputStream("data/universe/defaultspa.xml")) { // TODO : Remove inline file path
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return;
         }
 
@@ -602,7 +604,7 @@ public class SpecialAbility {
             toReturn += getDisplayName(prereq) + "<br>";
         }
 
-        for (SkillPrereq skPr : prereqSkills) {
+        for (SkillPerquisite skPr : prereqSkills) {
             toReturn += skPr + "<br>";
         }
 

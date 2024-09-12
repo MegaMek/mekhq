@@ -21,7 +21,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.Objects;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -30,6 +29,7 @@ import megamek.common.EquipmentType;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.utilities.MHQXMLUtility;
@@ -40,6 +40,8 @@ import mekhq.utilities.MHQXMLUtility;
  * standard and inferno munitions, but does not distinguish the type of weapon.
  */
 public class InfantryAmmoStorage extends AmmoStorage {
+    private static final MMLogger logger = MMLogger.create(InfantryAmmoStorage.class);
+
     private InfantryWeapon weaponType;
 
     public InfantryAmmoStorage() {
@@ -62,7 +64,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
                 this.name = weaponType.getShortName() + " Ammo";
             }
         } else {
-            LogManager.getLogger().error("InfantryAmmoStorage does not have a weapon type!");
+            logger.error("InfantryAmmoStorage does not have a weapon type!");
         }
     }
 

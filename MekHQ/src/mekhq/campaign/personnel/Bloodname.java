@@ -21,27 +21,37 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.Compute;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.personnel.enums.Phenotype;
-import org.apache.logging.log4j.LogManager;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.*;
+import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Neoancient
  */
 public class Bloodname {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Bloodname.class);
+
+    // region Variable Declarations
     private static List<Bloodname> bloodnames;
 
     private String name;
@@ -57,7 +67,7 @@ public class Bloodname {
     private List<Clan> postReavingClans;
     private List<NameAcquired> acquiringClans;
     private NameAcquired absorbed;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
     public Bloodname() {
         name = "";
@@ -125,16 +135,22 @@ public class Bloodname {
 
     /**
      * @param warriorType A Phenotype constant
-     * @param year The current year of the campaign setting
+     * @param year        The current year of the campaign setting
      * @return An adjustment to the frequency of this name for the phenotype.
      *
-     * A warrior is three times as likely to have a Bloodname associated with the
-     * same phenotype as a general name (which is split among the three types).
-     * Elemental names are treated as general prior to 2870. The names that later
-     * became associated with ProtoMek pilots (identified in WoR) are assumed
-     * to have been poor performers and have a lower frequency even before the
-     * invention of the PM, though have a higher frequency for PM pilots than other
-     * aerospace names.
+     *         A warrior is three times as likely to have a Bloodname associated
+     *         with the
+     *         same phenotype as a general name (which is split among the three
+     *         types).
+     *         Elemental names are treated as general prior to 2870. The names that
+     *         later
+     *         became associated with ProtoMek pilots (identified in WoR) are
+     *         assumed
+     *         to have been poor performers and have a lower frequency even before
+     *         the
+     *         invention of the PM, though have a higher frequency for PM pilots
+     *         than other
+     *         aerospace names.
      */
     private int phenotypeMultiplier(Phenotype warriorType, int year) {
         switch (getPhenotype()) {
@@ -211,7 +227,7 @@ public class Bloodname {
                     retVal.startDate = Integer.parseInt(wn.getTextContent().trim()) + 20;
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
 
@@ -221,13 +237,15 @@ public class Bloodname {
     /**
      * Determines a likely Bloodname based on Clan, phenotype, and year.
      *
-     * @param factionCode The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
-     * @param phenotype The person's Phenotype
-     * @param year The current campaign year
+     * @param factionCode The faction code for the Clan; must exist in
+     *                    data/names/bloodnames/clans.xml
+     * @param phenotype   The person's Phenotype
+     * @param year        The current campaign year
      * @return An object representing the chosen Bloodname
      *
-     * Though based as much as possible on official sources, the method employed here involves a
-     * considerable amount of speculation.
+     *         Though based as much as possible on official sources, the method
+     *         employed here involves a
+     *         considerable amount of speculation.
      */
     public static @Nullable Bloodname randomBloodname(String factionCode, Phenotype phenotype, int year) {
         return randomBloodname(Clan.getClan(factionCode), phenotype, year);
@@ -236,26 +254,30 @@ public class Bloodname {
     /**
      * Determines a likely Bloodname based on Clan, phenotype, and year.
      *
-     * @param faction The Clan faction; must exist in data/names/bloodnames/clans.xml
+     * @param faction   The Clan faction; must exist in
+     *                  data/names/bloodnames/clans.xml
      * @param phenotype The person's Phenotype
-     * @param year The current campaign year
+     * @param year      The current campaign year
      * @return An object representing the chosen Bloodname
      *
-     * Though based as much as possible on official sources, the method employed here involves a
-     * considerable amount of speculation.
+     *         Though based as much as possible on official sources, the method
+     *         employed here involves a
+     *         considerable amount of speculation.
      */
     public static @Nullable Bloodname randomBloodname(Clan faction, Phenotype phenotype, int year) {
         if (faction == null) {
-            LogManager.getLogger().error("Random Bloodname attempted for a clan that does not exist."
+            logger.error("Random Bloodname attempted for a clan that does not exist."
                     + System.lineSeparator()
                     + "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate.");
             return null;
         } else if (phenotype == null) {
-            LogManager.getLogger().error("Random Bloodname attempted for an unknown phenotype. Please open a bug report so this issue may be fixed.");
+            logger.error(
+                    "Random Bloodname attempted for an unknown phenotype. Please open a bug report so this issue may be fixed.");
             return null;
         }
 
-        // This is required because there are currently no bloodnames specifically for vehicle phenotypes
+        // This is required because there are currently no bloodnames specifically for
+        // vehicle phenotypes
         if (phenotype.isVehicle()) {
             phenotype = Phenotype.GENERAL;
         }
@@ -266,7 +288,8 @@ public class Bloodname {
         }
 
         if (Compute.randomInt(20) == 0) {
-            /* Bloodnames that are predominantly used for a particular phenotype are not
+            /*
+             * Bloodnames that are predominantly used for a particular phenotype are not
              * exclusively used for that phenotype. A 5% chance of ignoring phenotype will
              * result in a very small chance (around 1%) of a Bloodname usually associated
              * with a different phenotype.
@@ -274,18 +297,24 @@ public class Bloodname {
             phenotype = Phenotype.GENERAL;
         }
 
-        /* The relative probability of the various Bloodnames that are original to this Clan */
+        /*
+         * The relative probability of the various Bloodnames that are original to this
+         * Clan
+         */
         Map<Bloodname, Fraction> weights = new HashMap<>();
         /* A list of non-exclusive Bloodnames from other Clans */
         List<Bloodname> nonExclusives = new ArrayList<>();
-        /* The relative probability that a warrior in this Clan will have a non-exclusive
+        /*
+         * The relative probability that a warrior in this Clan will have a
+         * non-exclusive
          * Bloodname that originally belonged to another Clan; the smaller the number
          * of exclusive Bloodnames of this Clan, the larger this chance.
          */
         double nonExclusivesWeight = 0.0;
 
         for (Bloodname name : bloodnames) {
-            /* Bloodnames exclusive to Clans that have been abjured (NC, WIE) continue
+            /*
+             * Bloodnames exclusive to Clans that have been abjured (NC, WIE) continue
              * to be used by those Clans but not by others.
              */
             if (name.isInactive(year) ||
@@ -296,7 +325,8 @@ public class Bloodname {
 
             Fraction weight = null;
 
-            /* Effects of the Wars of Reaving would take a generation to show up
+            /*
+             * Effects of the Wars of Reaving would take a generation to show up
              * in the breeding programs, so the tables given in the WoR source book
              * are in effect from about 3100 on.
              */
@@ -307,20 +337,22 @@ public class Bloodname {
                         numClans++;
                     }
                 }
-                /* Non-exclusive names have a weight of 1 (equal to exclusives) up to 2900,
+                /*
+                 * Non-exclusive names have a weight of 1 (equal to exclusives) up to 2900,
                  * then decline 10% per 50 years to a minimum of 0.6 in 3050+. In the few
                  * cases where the other Clans using the name are known, the weight is
                  * 1/(number of Clans) instead.
                  */
                 if (name.getOrigClan().equals(faction.getGenerationCode()) ||
                         (null != name.getAbsorbed() && faction.getGenerationCode().equals(name.getAbsorbed().clan) &&
-                        name.getAbsorbed().year > year)) {
+                                name.getAbsorbed().year > year)) {
                     if (name.isExclusive() || numClans > 1) {
                         weight = new Fraction(1, numClans);
                     } else {
                         weight = eraFraction(year);
                         nonExclusivesWeight += 1 - weight.value();
-                        /* The fraction is squared to represent the combined effect
+                        /*
+                         * The fraction is squared to represent the combined effect
                          * of increasing distribution among the Clans and the likelihood
                          * that non-exclusive names would suffer
                          * more reavings and have a lower Bloodcount.
@@ -328,7 +360,8 @@ public class Bloodname {
                         weight.mul(weight);
                     }
                 } else {
-                    /* Most non-exclusives have an unknown distribution and are estimated.
+                    /*
+                     * Most non-exclusives have an unknown distribution and are estimated.
                      * When the actual Clans sharing the Bloodname are known, it is divided
                      * among those Clans.
                      */
@@ -347,7 +380,8 @@ public class Bloodname {
             } else {
                 if (name.getPostReavingClans().contains(faction)) {
                     weight = new Fraction(name.phenotypeMultiplier(phenotype, year), name.getPostReavingClans().size());
-                    /* Assume that Bloodnames that were exclusive before the Wars of Reaving
+                    /*
+                     * Assume that Bloodnames that were exclusive before the Wars of Reaving
                      * are more numerous (higher bloodcount).
                      */
                     if (!name.isLimited()) {
@@ -392,7 +426,8 @@ public class Bloodname {
     }
 
     /**
-     * Represents the decreasing frequency of non-exclusive names within the original Clan
+     * Represents the decreasing frequency of non-exclusive names within the
+     * original Clan
      * due to dispersal throughout the Clans and reavings.
      *
      * @param year The current year of the campaign
@@ -421,7 +456,7 @@ public class Bloodname {
         try {
             fis = new FileInputStream(f);
         } catch (FileNotFoundException e) {
-            LogManager.getLogger().error("Cannot find file bloodnames.xml");
+            logger.error("Cannot find file bloodnames.xml");
             return;
         }
 
@@ -432,7 +467,7 @@ public class Bloodname {
             doc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            LogManager.getLogger().error("Could not parse bloodnames.xml", ex);
+            logger.error("Could not parse bloodnames.xml", ex);
             return;
         }
 
@@ -448,12 +483,13 @@ public class Bloodname {
                 }
             }
         }
-        LogManager.getLogger().info("Loaded " + bloodnames.size() + " Bloodname records.");
+        logger.info("Loaded " + bloodnames.size() + " Bloodname records.");
     }
 
     private static class NameAcquired {
         public int year;
         public String clan;
+
         public NameAcquired(int y, String c) {
             year = y;
             clan = c;

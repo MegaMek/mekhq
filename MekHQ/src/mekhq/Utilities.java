@@ -19,7 +19,27 @@
  */
 package mekhq;
 
-import io.sentry.Sentry;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.w3c.dom.Node;
+
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
@@ -31,6 +51,7 @@ import megamek.common.enums.Gender;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -42,24 +63,10 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
 
 public class Utilities {
+    private static final MMLogger logger = MMLogger.create(Utilities.class);
+
     private Utilities() {
         throw new IllegalStateException("Utilities - Utility Class");
     }
@@ -101,12 +108,10 @@ public class Utilities {
 
         final Vector<AmmoType> munitions = AmmoType.getMunitionsFor(currentAmmoType.getAmmoType());
         if (munitions == null) {
-            if (LogManager.getLogger().isErrorEnabled()) {
-                LogManager.getLogger()
-                        .error(String.format(
-                                "Cannot getMunitions for %s because of a null munitions list for ammo type %d",
-                                entity.getDisplayName(), currentAmmoType.getAmmoType()));
-            }
+            logger
+                    .error(String.format(
+                            "Cannot getMunitions for %s because of a null munitions list for ammo type %d",
+                            entity.getDisplayName(), currentAmmoType.getAmmoType()));
             return Collections.emptyList();
         }
 
@@ -250,12 +255,10 @@ public class Utilities {
                 // calculating the progression.
                 // In such a case we will log it and take the least restrictive action, which is
                 // to let it through.
-                if (LogManager.getLogger().isWarnEnabled()) {
-                    LogManager.getLogger().warn(
-                            String.format(
-                                    "Could not determine tech progression for %s, including among available refits.",
-                                    summary.getName()));
-                }
+                logger.warn(
+                        String.format(
+                                "Could not determine tech progression for %s, including among available refits.",
+                                summary.getName()));
             } else if (!campaign.isLegal(techProg)) {
                 continue;
             }
@@ -343,7 +346,8 @@ public class Utilities {
     }
 
     /**
-     * Generates an experience level based on a 2d6 roll modified by the bonus value.
+     * Generates an experience level based on a 2d6 roll modified by the bonus
+     * value.
      *
      * @param bonus the bonus value to be added to the roll
      * @return the generated experience level
@@ -905,10 +909,12 @@ public class Utilities {
 
     public static int getSimpleTechLevel(int level) {
         return switch (level) {
-            case TechConstants.T_IS_TW_NON_BOX, TechConstants.T_CLAN_TW, TechConstants.T_IS_TW_ALL, TechConstants.T_TW_ALL ->
-                    CampaignOptions.TECH_STANDARD;
+            case TechConstants.T_IS_TW_NON_BOX, TechConstants.T_CLAN_TW, TechConstants.T_IS_TW_ALL,
+                    TechConstants.T_TW_ALL ->
+                CampaignOptions.TECH_STANDARD;
             case TechConstants.T_IS_ADVANCED, TechConstants.T_CLAN_ADVANCED -> CampaignOptions.TECH_ADVANCED;
-            case TechConstants.T_IS_EXPERIMENTAL, TechConstants.T_CLAN_EXPERIMENTAL -> CampaignOptions.TECH_EXPERIMENTAL;
+            case TechConstants.T_IS_EXPERIMENTAL, TechConstants.T_CLAN_EXPERIMENTAL ->
+                CampaignOptions.TECH_EXPERIMENTAL;
             case TechConstants.T_IS_UNOFFICIAL, TechConstants.T_CLAN_UNOFFICIAL -> CampaignOptions.TECH_UNOFFICIAL;
             case TechConstants.T_TECH_UNKNOWN -> CampaignOptions.TECH_UNKNOWN;
             default -> CampaignOptions.TECH_INTRO;
@@ -933,13 +939,10 @@ public class Utilities {
                 fos.write(buf, 0, len);
             }
 
-            if (LogManager.getLogger().isInfoEnabled()) {
-                LogManager.getLogger()
-                        .info(String.format("Copied file %s to file %s", inFile.getPath(), outFile.getPath()));
-            }
+            logger
+                    .info(String.format("Copied file %s to file %s", inFile.getPath(), outFile.getPath()));
         } catch (Exception ex) {
-            Sentry.captureException(ex);
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -974,7 +977,7 @@ public class Utilities {
 
             report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
         } catch (Exception ioe) {
-            LogManager.getLogger().error("Error exporting JTable", ioe);
+            logger.error("Error exporting JTable", ioe);
             report = "Error exporting JTable. See log for details.";
         }
         return report;
@@ -1107,7 +1110,7 @@ public class Utilities {
                             parser.accept(fis);
                         } catch (Exception ex) {
                             // Ignore this file then
-                            LogManager.getLogger().error(
+                            logger.error(
                                     String.format("Exception trying to parse %s - ignoring.", file.getPath()),
                                     ex);
                         }
@@ -1227,8 +1230,7 @@ public class Utilities {
         try {
             Thread.sleep(500);
         } catch (Exception ex) {
-            Sentry.captureException(ex);
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -1394,7 +1396,8 @@ public class Utilities {
             int SEx = player.getStartingAnySEx() + 1;
             int SEy = player.getStartingAnySEy() + 1;
             if ((NWx + NWy + SEx + SEy) > 0) {
-                result.append(" (").append(NWx).append(", ").append(NWy).append(")-(").append(SEx).append(", ").append(SEy).append(')');
+                result.append(" (").append(NWx).append(", ").append(NWy).append(")-(").append(SEx).append(", ")
+                        .append(SEy).append(')');
             }
         }
         int so = player.getStartOffset();

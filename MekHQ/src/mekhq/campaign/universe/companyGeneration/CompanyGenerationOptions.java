@@ -33,7 +33,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -41,6 +40,7 @@ import org.w3c.dom.NodeList;
 import megamek.Version;
 import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -59,6 +59,7 @@ import mekhq.utilities.MHQXMLUtility;
  * @author Justin "Windchild" Bowen
  */
 public class CompanyGenerationOptions {
+    private static final MMLogger logger = MMLogger.create(CompanyGenerationOptions.class);
     // region Variable Declarations
     // Base Information
     private CompanyGenerationMethod method;
@@ -868,7 +869,7 @@ public class CompanyGenerationOptions {
     // region File IO
     /**
      * Writes these options to an XML file
-     * 
+     *
      * @param file the file to write to, or null to not write to a file
      */
     public void writeToFile(@Nullable File file) {
@@ -889,7 +890,7 @@ public class CompanyGenerationOptions {
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             writeToXML(pw, 0, MHQConstants.VERSION);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -1035,7 +1036,7 @@ public class CompanyGenerationOptions {
      */
     public static CompanyGenerationOptions parseFromXML(final @Nullable File file) {
         if (file == null) {
-            LogManager.getLogger().error("Received a null file, returning the default Windchild options");
+            logger.error("Received a null file, returning the default Windchild options");
             return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         }
         final Element element;
@@ -1044,7 +1045,7 @@ public class CompanyGenerationOptions {
         try (InputStream is = new FileInputStream(file)) {
             element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to open file, returning the default Windchild options", ex);
+            logger.error("Failed to open file, returning the default Windchild options", ex);
             return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         }
         element.normalize();
@@ -1052,7 +1053,7 @@ public class CompanyGenerationOptions {
         final Version version = new Version(element.getAttribute("version"));
         final CompanyGenerationOptions options = parseFromXML(element.getChildNodes(), version);
         if (options == null) {
-            LogManager.getLogger().error("Failed to parse file, returning the default Windchild options");
+            logger.error("Failed to parse file, returning the default Windchild options");
             return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         } else {
             return options;
@@ -1067,7 +1068,7 @@ public class CompanyGenerationOptions {
     public static @Nullable CompanyGenerationOptions parseFromXML(final NodeList nl,
             final Version version) {
         if (MHQConstants.VERSION.isLowerThan(version)) {
-            LogManager.getLogger().error(String.format(
+            logger.error(String.format(
                     "Cannot parse Company Generation Options from %s in older version %s.",
                     version.toString(), MHQConstants.VERSION));
             return null;
@@ -1379,7 +1380,7 @@ public class CompanyGenerationOptions {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return null;
         }
 

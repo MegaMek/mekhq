@@ -21,7 +21,6 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -31,6 +30,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
@@ -39,10 +39,11 @@ import mekhq.utilities.MHQXMLUtility;
  * Ammo bin missing from a small support vehicle
  */
 public class MissingInfantryAmmoBin extends MissingAmmoBin {
+    private static final MMLogger logger = MMLogger.create(MissingInfantryAmmoBin.class);
+
     private InfantryWeapon weaponType;
 
     // Used in deserialization
-
     public MissingInfantryAmmoBin() {
         this(0, null, 0, null, 0, false, null);
     }
@@ -74,7 +75,7 @@ public class MissingInfantryAmmoBin extends MissingAmmoBin {
         if (getWeaponType() != null) {
             name = getWeaponType().getName() + " Ammo Bin";
         } else {
-            LogManager.getLogger().error("MissingInfantryAmmoBin does not have a weapon type!");
+            logger.error("MissingInfantryAmmoBin does not have a weapon type!");
         }
     }
 

@@ -18,25 +18,29 @@
  */
 package mekhq.gui.model;
 
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.personnel.ranks.RankSystem;
-import mekhq.gui.utilities.MekHqTableCellRenderer;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
+
 public class RankTableModel extends DefaultTableModel {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(RankTableModel.class);
+
+    // region Variable Declarations
     private RankSystem rankSystem;
 
     public final static int COL_NAME_RATE = 0;
@@ -55,27 +59,29 @@ public class RankTableModel extends DefaultTableModel {
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public RankTableModel(final RankSystem rankSystem) {
         setRankSystem(rankSystem);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public RankSystem getRankSystem() {
         return rankSystem;
     }
 
     /**
-     * @param rankSystem The system to set the model for. Null values are properly handled but are
-     *                   considered to be an unexpected error condition and thus do not change the
+     * @param rankSystem The system to set the model for. Null values are properly
+     *                   handled but are
+     *                   considered to be an unexpected error condition and thus do
+     *                   not change the
      *                   underlying model.
      */
     public void setRankSystem(final @Nullable RankSystem rankSystem) {
         if (rankSystem == null) {
-            LogManager.getLogger().error("Attempted to set based on a null rank system, returning without setting any data");
+            logger.error("Attempted to set based on a null rank system, returning without setting any data");
             return;
         }
 
@@ -113,7 +119,7 @@ public class RankTableModel extends DefaultTableModel {
     public void setRankSystemDirect(final RankSystem rankSystem) {
         this.rankSystem = rankSystem;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     @Override
     public boolean isCellEditable(final int row, final int column) {
@@ -199,7 +205,7 @@ public class RankTableModel extends DefaultTableModel {
             case COL_PAYMULT:
                 return resources.getString("RankTableModel.COL_PAYMULT.toolTipText");
             default:
-                LogManager.getLogger().error("Unknown column in RankTableModel of " + column);
+                logger.error("Unknown column in RankTableModel of " + column);
                 return resources.getString("RankTableModel.defaultToolTip.toolTipText");
         }
     }
@@ -208,15 +214,19 @@ public class RankTableModel extends DefaultTableModel {
         try {
             final List<Rank> ranks = new ArrayList<>();
 
-            // Java annoyingly doesn't have typed vectors in the DefaultTableModel, but we can just
+            // Java annoyingly doesn't have typed vectors in the DefaultTableModel, but we
+            // can just
             // suppress the warnings this causes
-            @SuppressWarnings(value = "rawtypes") final Vector<Vector> vectors = getDataVector();
-            for (@SuppressWarnings(value = "rawtypes") Vector row : vectors) {
+            @SuppressWarnings(value = "rawtypes")
+            final Vector<Vector> vectors = getDataVector();
+            for (@SuppressWarnings(value = "rawtypes")
+            Vector row : vectors) {
                 final String[] names = {
                         (String) row.get(RankTableModel.COL_NAME_MW), (String) row.get(RankTableModel.COL_NAME_ASF),
                         (String) row.get(RankTableModel.COL_NAME_VEE), (String) row.get(RankTableModel.COL_NAME_NAVAL),
                         (String) row.get(RankTableModel.COL_NAME_INF), (String) row.get(RankTableModel.COL_NAME_TECH),
-                        (String) row.get(RankTableModel.COL_NAME_MEDICAL), (String) row.get(RankTableModel.COL_NAME_ADMIN),
+                        (String) row.get(RankTableModel.COL_NAME_MEDICAL),
+                        (String) row.get(RankTableModel.COL_NAME_ADMIN),
                         (String) row.get(RankTableModel.COL_NAME_CIVILIAN)
                 };
                 final boolean officer = (boolean) row.get(RankTableModel.COL_OFFICER);
@@ -225,7 +235,7 @@ public class RankTableModel extends DefaultTableModel {
             }
             return ranks;
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
             return new ArrayList<>();
         }
     }
@@ -237,8 +247,8 @@ public class RankTableModel extends DefaultTableModel {
     public class Renderer extends MekHqTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(final JTable table, final Object value,
-                                                       final boolean isSelected, final boolean hasFocus,
-                                                       final int row, final int column) {
+                final boolean isSelected, final boolean hasFocus,
+                final int row, final int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             final int actualCol = table.convertColumnIndexToModel(column);
             setToolTipText(getToolTip(actualCol));

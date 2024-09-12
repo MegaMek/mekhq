@@ -20,7 +20,6 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -33,6 +32,7 @@ import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -47,6 +47,8 @@ import mekhq.utilities.MHQXMLUtility;
  * ICEs will also have the same fuel type.
  */
 public class SVEnginePart extends Part {
+    private static final MMLogger logger = MMLogger.create(SVEnginePart.class);
+
     private double engineTonnage;
     private int etype;
     private int techRating;
@@ -191,7 +193,7 @@ public class SVEnginePart extends Part {
                         break;
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }

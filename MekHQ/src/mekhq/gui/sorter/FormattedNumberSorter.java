@@ -1,16 +1,19 @@
 package mekhq.gui.sorter;
 
-import org.apache.logging.log4j.LogManager;
-
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Comparator;
 
+import megamek.logging.MMLogger;
+
 /**
  * A comparator for numbers that have been formatted with DecimalFormat
+ * 
  * @author Jay Lawson
  */
 public class FormattedNumberSorter implements Comparator<String> {
+    private static final MMLogger logger = MMLogger.create(FormattedNumberSorter.class);
+
     private static final String PLUS_SIGN = "+";
     private static final DecimalFormat FORMAT = new DecimalFormat();
 
@@ -37,13 +40,13 @@ public class FormattedNumberSorter implements Comparator<String> {
         try {
             l0 = FORMAT.parse(s0).longValue();
         } catch (ParseException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
         long l1 = 0;
         try {
             l1 = FORMAT.parse(s1).longValue();
         } catch (ParseException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
         return Long.compare(l0, l1);
     }

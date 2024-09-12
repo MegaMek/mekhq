@@ -20,48 +20,57 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.UnitType;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.UnitType;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * This object tracks a specific skill prerequisite for a special ability. This object can list more
- * than one skill and we will track these skills in a hashmap where the value gives the minimum skill
- * level. The collection of skills is treated as an OR statement such that a person possessing any of the
- * skills at the appropriate level will evaluate as eligible. To create AND conditions, use multiple skill
+ * This object tracks a specific skill prerequisite for a special ability. This
+ * object can list more
+ * than one skill and we will track these skills in a hashmap where the value
+ * gives the minimum skill
+ * level. The collection of skills is treated as an OR statement such that a
+ * person possessing any of the
+ * skills at the appropriate level will evaluate as eligible. To create AND
+ * conditions, use multiple skill
  * prereqs in the SpecialAbility object.
  *
- * We are going to limit the skill levels by the Green, Regular, Veteran, Elite notation such
+ * We are going to limit the skill levels by the Green, Regular, Veteran, Elite
+ * notation such
  * that:
  * 0 - Any
  * 1 - Green
  * 2 - Regular
  * 3 - Veteran
  * 4 - Elite
- * This way, if the user changes the meaning of various skill levels, they won't have to redo all of
- * their prereqs - we could consider expanding this to allow users to specify a more specific numeric
+ * This way, if the user changes the meaning of various skill levels, they won't
+ * have to redo all of
+ * their prereqs - we could consider expanding this to allow users to specify a
+ * more specific numeric
  * skill level (to allow for better consistency with AToW) for example
  *
  * @author Jay Lawson
  *
  */
-public class SkillPrereq {
+public class SkillPerquisite {
+    private static final MMLogger logger = MMLogger.create(SkillPerquisite.class);
     private Hashtable<String, Integer> skillSet;
 
-    public SkillPrereq() {
+    public SkillPerquisite() {
         skillSet = new Hashtable<>();
     }
 
     @Override
     @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
-    public SkillPrereq clone() {
-        SkillPrereq clone = new SkillPrereq();
+    public SkillPerquisite clone() {
+        SkillPerquisite clone = new SkillPerquisite();
         clone.skillSet = (Hashtable<String, Integer>) this.skillSet.clone();
         return clone;
     }
@@ -87,7 +96,9 @@ public class SkillPrereq {
 
     /**
      * Determines if the given unit type "qualifies" for this skill pre-requisite.
-     * For now, we simply check whether the pre-requisite skills are required for the unit type
+     * For now, we simply check whether the pre-requisite skills are required for
+     * the unit type
+     *
      * @param unitType the type of unit that is being checked
      * @return
      */
@@ -172,17 +183,18 @@ public class SkillPrereq {
             if (lvl <= 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skill", key);
             } else {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skill", key + "::" + SkillType.getExperienceLevelName(lvl));
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skill",
+                        key + "::" + SkillType.getExperienceLevelName(lvl));
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillPrereq");
     }
 
-    public static SkillPrereq generateInstanceFromXML(Node wn) {
-        SkillPrereq retVal = null;
+    public static SkillPerquisite generateInstanceFromXML(Node wn) {
+        SkillPerquisite retVal = null;
 
         try {
-            retVal = new SkillPrereq();
+            retVal = new SkillPerquisite();
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -194,14 +206,14 @@ public class SkillPrereq {
                         level = parseStringForLevel(skillName);
                         skillName = parseStringForName(skillName);
                     }
-                    //if the skill name does not match existing skills, then ignore
+                    // if the skill name does not match existing skills, then ignore
                     if (null != SkillType.getType(skillName)) {
                         retVal.addPrereq(skillName, level);
                     }
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
         return retVal;
     }

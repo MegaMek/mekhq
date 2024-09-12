@@ -20,23 +20,34 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.stream.Collectors;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SpecialAbility;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Taharqa
  */
 public class SelectAbilitiesDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(SelectAbilitiesDialog.class);
+
     private JButton btnClose;
     private JButton btnOK;
     private List<JCheckBox> chkAbil;
@@ -78,7 +89,7 @@ public class SelectAbilitiesDialog extends JDialog {
             spaNames.add(spa.getName());
         }
 
-        JPanel panButtons = new JPanel(new GridLayout(0,2));
+        JPanel panButtons = new JPanel(new GridLayout(0, 2));
         btnOK.setText("Done");
         btnOK.addActionListener(evt -> done());
 
@@ -105,7 +116,7 @@ public class SelectAbilitiesDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

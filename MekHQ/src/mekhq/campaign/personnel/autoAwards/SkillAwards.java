@@ -6,14 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.logging.log4j.LogManager;
-
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
 public class SkillAwards {
+    private static final MMLogger logger = MMLogger.create(SkillAwards.class);
+
     /**
      * This function loops through Skill Awards, checking whether the person is
      * eligible to receive each type of award
@@ -31,7 +32,7 @@ public class SkillAwards {
             try {
                 requiredSkillLevel = award.getQty();
             } catch (Exception e) {
-                LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}",
+                logger.warn("Award {} from the {} set has an invalid qty value {}",
                         award.getName(), award.getSet(), award.getQty());
                 continue;
             }
@@ -253,7 +254,7 @@ public class SkillAwards {
                 break;
 
             default:
-                LogManager.getLogger().warn("Award {} from the {} set has invalid skill {}", award.getName(),
+                logger.warn("Award {} from the {} set has invalid skill {}", award.getName(),
                         award.getSet(), skill);
 
                 // this treats the malformed Skill as if a Person was untrained

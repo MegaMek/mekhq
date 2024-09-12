@@ -18,23 +18,26 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.AmmoType;
-import megamek.common.annotations.Nullable;
-import megamek.common.equipment.WeaponMounted;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Part;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+import java.util.Objects;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.util.Objects;
+import megamek.common.AmmoType;
+import megamek.common.annotations.Nullable;
+import megamek.common.equipment.WeaponMounted;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author cwspain
  */
 public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
+    private static final MMLogger logger = MMLogger.create(MissingLargeCraftAmmoBin.class);
+
     private int bayEqNum;
 
     private transient WeaponMounted bay;
@@ -76,14 +79,14 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
             }
         }
 
-        LogManager.getLogger().warn("Could not find weapon bay for " + typeName + " for " + unit.getName());
+        logger.warn("Could not find weapon bay for " + typeName + " for " + unit.getName());
         return null;
     }
 
     /**
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is
      * actually in the bay.
-     * 
+     *
      * @param bay
      */
     public void setBay(WeaponMounted bay) {
@@ -96,7 +99,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     /**
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is
      * actually in the bay.
-     * 
+     *
      * @param bayEqNum
      */
     public void setBay(int bayEqNum) {
@@ -175,7 +178,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
                     bayEqNum = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }

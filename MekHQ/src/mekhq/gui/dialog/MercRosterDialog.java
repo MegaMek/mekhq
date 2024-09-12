@@ -1,24 +1,32 @@
 package mekhq.gui.dialog;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.MercRosterAccess;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
 
+import javax.swing.*;
+
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.MercRosterAccess;
+
 /**
- * A dialog that sets up a connection with a mysql MercRoster database to upload campaign data
+ * A dialog that sets up a connection with a mysql MercRoster database to upload
+ * campaign data
+ * 
  * @author Jay Lawson
  * @since Jan 6, 2010, 10:46:02 PM
  */
 public class MercRosterDialog extends JDialog implements PropertyChangeListener {
+    private static final MMLogger logger = MMLogger.create(MercRosterDialog.class);
+
     private Campaign campaign;
     private JFrame frame;
 
@@ -54,7 +62,6 @@ public class MercRosterDialog extends JDialog implements PropertyChangeListener 
         btnUpload = new JButton(resourceMap.getString("btnUpload.text"));
         btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
 
-
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
@@ -68,7 +75,7 @@ public class MercRosterDialog extends JDialog implements PropertyChangeListener 
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0.0;
         gbc.weighty = 0.0;
-        gbc.insets = new Insets(5,5,5,5);
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
         getContentPane().add(new JLabel(resourceMap.getString("lblAddress.text")), gbc);
 
@@ -121,7 +128,7 @@ public class MercRosterDialog extends JDialog implements PropertyChangeListener 
         gbc.weightx = 1.0;
         getContentPane().add(txtPasswd, gbc);
 
-        JPanel panButtons = new JPanel(new GridLayout(0,2));
+        JPanel panButtons = new JPanel(new GridLayout(0, 2));
         panButtons.add(btnUpload);
         panButtons.add(btnCancel);
 
@@ -147,7 +154,7 @@ public class MercRosterDialog extends JDialog implements PropertyChangeListener 
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -167,7 +174,7 @@ public class MercRosterDialog extends JDialog implements PropertyChangeListener 
             JOptionPane.showMessageDialog(frame,
                     "Could not connect to the mysql database. Check your entries and confirm\n that you can connect to the database remotely.",
                     "Could not connect", JOptionPane.ERROR_MESSAGE);
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return;
         }
         access.addPropertyChangeListener(this);

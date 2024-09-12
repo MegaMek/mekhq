@@ -18,44 +18,50 @@
  */
 package mekhq.campaign.market.unitMarket;
 
-import megamek.Version;
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.market.enums.UnitMarketType;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.Version;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.market.enums.UnitMarketType;
+import mekhq.utilities.MHQXMLUtility;
 
 public class UnitMarketOffer {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(UnitMarketOffer.class);
+    // region Variable Declarations
     private UnitMarketType marketType;
     private int unitType;
     private MekSummary unit;
     private int percent;
     private int transitDuration;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     private UnitMarketOffer() {
 
     }
 
     public UnitMarketOffer(final UnitMarketType marketType, final int unitType,
-                           final MekSummary unit, final int percent, final int transitDuration) {
+            final MekSummary unit, final int percent, final int transitDuration) {
         setMarketType(marketType);
         setUnitType(unitType);
         setUnit(unit);
         setPercent(percent);
         setTransitDuration(transitDuration);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public UnitMarketType getMarketType() {
         return marketType;
     }
@@ -95,7 +101,7 @@ public class UnitMarketOffer {
     public void setTransitDuration(final int transitDuration) {
         this.transitDuration = transitDuration;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     /**
      * @return the Entity offered in this UnitMarketOffer
@@ -104,7 +110,7 @@ public class UnitMarketOffer {
         try {
             return new MekFileParser(getUnit().getSourceFile(), getUnit().getEntryName()).getEntity();
         } catch (Exception e) {
-            LogManager.getLogger().error("Unable to load entity: " + getUnit().getSourceFile()
+            logger.error("Unable to load entity: " + getUnit().getSourceFile()
                     + ": " + getUnit().getEntryName() + ". Returning null.", e);
             return null;
         }
@@ -117,7 +123,7 @@ public class UnitMarketOffer {
         return Money.of((double) getUnit().getCost()).multipliedBy(getPercent()).dividedBy(100);
     }
 
-    //region File I/O
+    // region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "offer");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "market", getMarketType().name());
@@ -129,8 +135,8 @@ public class UnitMarketOffer {
     }
 
     public static @Nullable UnitMarketOffer generateInstanceFromXML(final Node wn,
-                                                                    final Campaign campaign,
-                                                                    final Version version) {
+            final Campaign campaign,
+            final Version version) {
         UnitMarketOffer retVal = new UnitMarketOffer();
         NodeList nl = wn.getChildNodes();
 
@@ -149,7 +155,8 @@ public class UnitMarketOffer {
                     final String unitName = wn3.getTextContent().trim();
                     retVal.setUnit(MekSummaryCache.getInstance().getMek(unitName));
                     if (retVal.getUnit() == null) {
-                        LogManager.getLogger().error("Failed to find unit with name " + unitName + ", removing the offer from the market.");
+                        logger.error(
+                                "Failed to find unit with name " + unitName + ", removing the offer from the market.");
                         return null;
                     }
                 } else if (wn3.getNodeName().equalsIgnoreCase("pct") // Legacy, 0.49.3 removal
@@ -160,16 +167,17 @@ public class UnitMarketOffer {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return null;
         }
 
         if (version.isLowerThan("0.49.3")) {
             retVal.setTransitDuration(campaign.getCampaignOptions().isInstantUnitMarketDelivery()
-                    ? 0 : campaign.calculatePartTransitTime(Compute.d6(2) - 2));
+                    ? 0
+                    : campaign.calculatePartTransitTime(Compute.d6(2) - 2));
         }
 
         return retVal;
     }
-    //endregion File I/O
+    // endregion File I/O
 }

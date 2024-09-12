@@ -20,23 +20,26 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MASC extends EquipmentPart {
+    private static final MMLogger logger = MMLogger.create(MASC.class);
+
     protected int engineRating;
 
     public MASC() {
@@ -130,7 +133,7 @@ public class MASC extends EquipmentPart {
                     engineRating = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
         restore();

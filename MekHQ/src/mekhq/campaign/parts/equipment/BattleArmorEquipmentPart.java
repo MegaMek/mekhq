@@ -20,18 +20,19 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.personnel.Person;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.EquipmentType;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.Person;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  *
@@ -57,6 +58,8 @@ import java.io.PrintWriter;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorEquipmentPart extends EquipmentPart {
+    private static final MMLogger logger = MMLogger.create(BattleArmorEquipmentPart.class);
+
     private int trooper;
 
     public BattleArmorEquipmentPart() {
@@ -109,7 +112,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
                     trooper = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
         restore();

@@ -18,34 +18,46 @@
  */
 package mekhq.campaign.mission.atb;
 
+import java.util.UUID;
+
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.*;
+import megamek.common.Board;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.HitData;
+import megamek.common.Mounted;
+import megamek.common.ToHitData;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.UUID;
 
 /**
  * Class that handles the application of scenario modifier actions to
  * AtBDynamicScenarios
- * 
+ *
  * @author NickAragua
  */
 public class AtBScenarioModifierApplicator {
+    private static final MMLogger logger = MMLogger.create(AtBScenarioModifierApplicator.class);
+
     /**
      * Adds the given force to the given scenario at the appropriate point in time.
      */
@@ -226,7 +238,7 @@ public class AtBScenarioModifierApplicator {
     public static void adjustQuality(AtBDynamicScenario scenario, Campaign c, ForceAlignment eventRecipient,
             int qualityAdjustment) {
         if (eventRecipient != ForceAlignment.Opposing) {
-            LogManager.getLogger().warn("Can only adjust opfor unit quality");
+            logger.warn("Can only adjust opfor unit quality");
             return;
         }
 
@@ -319,7 +331,7 @@ public class AtBScenarioModifierApplicator {
     /**
      * Worker method that turns all your allies into treacherous enemies
      * Look into a variant of this where some hostiles defect or go rogue?
-     * 
+     *
      * @param scenario  The scenario to process.
      * @param recipient Who's switching sides. Only valid recipient is Allied
      *                  currently.
@@ -343,7 +355,7 @@ public class AtBScenarioModifierApplicator {
 
     /**
      * Appends the given text to the scenario briefing.
-     * 
+     *
      * @param scenario               The scenario to modify.
      * @param additionalBriefingText The additional briefing text.
      */

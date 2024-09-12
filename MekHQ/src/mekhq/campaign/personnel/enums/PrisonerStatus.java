@@ -18,55 +18,58 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum PrisonerStatus {
-    //region Enum Declarations
+    // region Enum Declarations
     /**
      * This is used for personnel who are not (currently) prisoners
      */
     FREE("PrisonerStatus.FREE.text", "PrisonerStatus.FREE.titleExtension"),
     /**
-     * This is used to track standard personnel who are prisoners and not willing to defect
+     * This is used to track standard personnel who are prisoners and not willing to
+     * defect
      */
     PRISONER("PrisonerStatus.PRISONER.text", "PrisonerStatus.PRISONER.titleExtension"),
     /**
-     * This is used to track standard personnel who are prisoners and are willing to defect
+     * This is used to track standard personnel who are prisoners and are willing to
+     * defect
      */
     PRISONER_DEFECTOR("PrisonerStatus.PRISONER_DEFECTOR.text", "PrisonerStatus.PRISONER_DEFECTOR.titleExtension"),
     /**
      * This is used to track clan personnel who become Bondsmen when captured
      */
     BONDSMAN("PrisonerStatus.BONDSMAN.text", "PrisonerStatus.BONDSMAN.titleExtension");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String titleExtension;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     PrisonerStatus(final String name, final String titleExtension) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.titleExtension = resources.getString(titleExtension);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getTitleExtension() {
         return titleExtension;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isFree() {
         return this == FREE;
     }
+
     public boolean isFreeOrBondsman() {
         return isFree() || isBondsman();
     }
@@ -86,11 +89,12 @@ public enum PrisonerStatus {
     public boolean isCurrentPrisoner() {
         return isPrisoner() || isPrisonerDefector();
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
-     * @param text The saved value to parse, either the older magic number save format or the
+     * @param text The saved value to parse, either the older magic number save
+     *             format or the
      *             PrisonerStatus.name() value
      * @return the Prisoner Status in question
      */
@@ -117,10 +121,11 @@ public enum PrisonerStatus {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
+        MMLogger.create(PrisonerStatus.class)
+                .error("Unable to parse " + text + " into a PrisonerStatus. Returning FREE.");
         return FREE;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

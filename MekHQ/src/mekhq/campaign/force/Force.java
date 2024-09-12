@@ -33,7 +33,6 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -41,6 +40,7 @@ import org.w3c.dom.NodeList;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.OrganizationChangedEvent;
@@ -70,6 +70,8 @@ import mekhq.utilities.MHQXMLUtility;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Force {
+    private static final MMLogger logger = MMLogger.create(Force.class);
+
     // region Variable Declarations
     // pathway to force icon
     public static final int FORCE_NONE = -1;
@@ -682,8 +684,9 @@ public class Force {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in Forces nodes: {}",
+                            String message = String.format("Unknown node type not loaded in Forces nodes: %s",
                                     wn3.getNodeName());
+                            logger.error(message);
                             continue;
                         }
 
@@ -693,7 +696,7 @@ public class Force {
             }
             c.importForce(retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return null;
         }
 

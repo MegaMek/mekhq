@@ -20,24 +20,27 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.BipedMek;
 import megamek.common.CriticalSlot;
 import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMekActuator extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingMekActuator.class);
+
     protected int type;
     protected int location;
 
@@ -57,13 +60,13 @@ public class MissingMekActuator extends MissingPart {
         super(tonnage, c);
         this.type = type;
         Mek m = new BipedMek();
-        this.name = m.getSystemName(type) + " Actuator" ;
+        this.name = m.getSystemName(type) + " Actuator";
         this.location = loc;
     }
 
     @Override
     public int getBaseTime() {
-        return isOmniPodded()? 30 : 90;
+        return isOmniPodded() ? 30 : 90;
     }
 
     @Override
@@ -73,8 +76,8 @@ public class MissingMekActuator extends MissingPart {
 
     @Override
     public double getTonnage() {
-        //TODO: how much do actuators weight?
-        //apparently nothing
+        // TODO: how much do actuators weight?
+        // apparently nothing
         return 0;
     }
 
@@ -105,7 +108,7 @@ public class MissingMekActuator extends MissingPart {
                     location = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -120,7 +123,7 @@ public class MissingMekActuator extends MissingPart {
             replacement.decrementQuantity();
             ((MekActuator) actualReplacement).setLocation(location);
             remove(false);
-            //assign the replacement part to the unit
+            // assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
         }
     }
@@ -137,7 +140,7 @@ public class MissingMekActuator extends MissingPart {
     @Override
     public @Nullable String checkFixable() {
         if (null == unit) {
-             return null;
+            return null;
         }
         if (unit.isLocationBreached(location)) {
             return unit.getEntity().getLocationName(location) + " is breached.";

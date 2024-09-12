@@ -20,47 +20,50 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class VeeStabiliser extends Part {
+public class VeeStabilizer extends Part {
+    private static final MMLogger logger = MMLogger.create(VeeStabilizer.class);
+
     private int loc;
 
-    public VeeStabiliser() {
+    public VeeStabilizer() {
         this(0, 0, null);
     }
 
-    public VeeStabiliser(int tonnage, int loc, Campaign c) {
+    public VeeStabilizer(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
         this.name = "Vehicle Stabiliser";
     }
 
     @Override
-    public VeeStabiliser clone() {
-        VeeStabiliser clone = new VeeStabiliser(getUnitTonnage(), 0, campaign);
+    public VeeStabilizer clone() {
+        VeeStabilizer clone = new VeeStabilizer(getUnitTonnage(), 0, campaign);
         clone.copyBaseData(this);
         return clone;
     }
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof VeeStabiliser;
+        return part instanceof VeeStabilizer;
     }
 
     @Override
@@ -82,7 +85,7 @@ public class VeeStabiliser extends Part {
                     loc = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -102,7 +105,7 @@ public class VeeStabiliser extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingVeeStabiliser(getUnitTonnage(), loc, campaign);
+        return new MissingVeeStabilizer(getUnitTonnage(), loc, campaign);
     }
 
     @Override
@@ -165,8 +168,7 @@ public class VeeStabiliser extends Part {
         if (null != unit && unit.getEntity() instanceof Tank) {
             if (hits > 0 && !((Tank) unit.getEntity()).isStabiliserHit(loc)) {
                 ((Tank) unit.getEntity()).setStabiliserHit(loc);
-            }
-            else if (hits == 0 && ((Tank) unit.getEntity()).isStabiliserHit(loc)) {
+            } else if (hits == 0 && ((Tank) unit.getEntity()).isStabiliserHit(loc)) {
                 ((Tank) unit.getEntity()).clearStabiliserHit(loc);
             }
         }

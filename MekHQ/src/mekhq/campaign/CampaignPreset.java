@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -81,7 +80,6 @@ import mekhq.utilities.MHQXMLUtility;
  * @author Justin "Windchild" Bowen
  */
 public class CampaignPreset {
-
     private static final MMLogger logger = MMLogger.create(CampaignPreset.class);
 
     // region Variable Declarations
@@ -429,7 +427,7 @@ public class CampaignPreset {
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return null;
         }
 

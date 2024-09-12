@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.StringJoiner;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.StringJoiner;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author MKerensky
  */
 public class KFDriveCoil extends Part {
+    private static final MMLogger logger = MMLogger.create(KFDriveCoil.class);
+
     public static final TechAdvancement TA_DRIVE_COIL = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
@@ -101,7 +104,7 @@ public class KFDriveCoil extends Part {
     public int getBaseTime() {
         int time;
         if (isSalvaging()) {
-            //SO KF Drive times, p184-5
+            // SO KF Drive times, p184-5
             time = 28800;
         } else {
             time = 4800;
@@ -111,7 +114,7 @@ public class KFDriveCoil extends Part {
 
     @Override
     public int getDifficulty() {
-        //SO Difficulty Mods
+        // SO Difficulty Mods
         if (isSalvaging()) {
             return 2;
         }
@@ -121,7 +124,7 @@ public class KFDriveCoil extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship) unit.getEntity()).setKFDriveCoilHit(needsFixing());
+            ((Jumpship) unit.getEntity()).setKFDriveCoilHit(needsFixing());
         }
     }
 
@@ -131,7 +134,8 @@ public class KFDriveCoil extends Part {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
             Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFDriveCoilHit(false);
-            // Also repair your KF Drive integrity - +1 point if you have other components to fix
+            // Also repair your KF Drive integrity - +1 point if you have other components
+            // to fix
             // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
@@ -149,8 +153,10 @@ public class KFDriveCoil extends Part {
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 ((Jumpship) unit.getEntity()).setKFDriveCoilHit(true);
             }
-            // All the BT lore says you can't jump while carrying around another KF Drive, therefore
-            // you can't salvage and keep this in the warehouse, just remove/scrap and replace it
+            // All the BT lore says you can't jump while carrying around another KF Drive,
+            // therefore
+            // you can't salvage and keep this in the warehouse, just remove/scrap and
+            // replace it
             // See SO p130 for reference
             campaign.getWarehouse().removePart(this);
             unit.removePart(this);
@@ -231,7 +237,7 @@ public class KFDriveCoil extends Part {
                     docks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
     }
@@ -249,7 +255,7 @@ public class KFDriveCoil extends Part {
             joiner.add(details);
         }
         joiner.add(getUnitTonnage() + " tons")
-              .add(getDocks() + " collars");
+                .add(getDocks() + " collars");
         return joiner.toString();
     }
 

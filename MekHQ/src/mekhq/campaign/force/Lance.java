@@ -21,8 +21,20 @@
  */
 package mekhq.campaign.force;
 
-import megamek.common.*;
-import mekhq.utilities.MHQXMLUtility;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.UUID;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.Infantry;
+import megamek.common.UnitType;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -32,14 +44,7 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.UUID;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Used by Against the Bot to track additional information about each force
@@ -51,6 +56,8 @@ import java.util.UUID;
  * @author Neoancient
  */
 public class Lance {
+    private static final MMLogger logger = MMLogger.create(Lance.class);
+
     public static final int STR_IS = 4;
     public static final int STR_CLAN = 5;
     public static final int STR_CS = 6;
@@ -482,14 +489,14 @@ public class Lance {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
         return retVal;
     }
 
     /**
      * Worker function that calculates the total weight of a force with the given ID
-     * 
+     *
      * @param c       Campaign in which the force resides
      * @param forceId Force for which to calculate weight
      * @return Total force weight

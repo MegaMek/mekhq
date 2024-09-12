@@ -20,11 +20,22 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.stream.IntStream;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.verifier.Structure;
 import megamek.common.verifier.TestEntity.Ceil;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -35,21 +46,13 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.stream.IntStream;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MekLocation extends Part {
+    private static final MMLogger logger = MMLogger.create(MekLocation.class);
+
     protected int loc;
     protected int structureType;
     protected boolean clan; // Only need for Endo-Steel
@@ -250,7 +253,7 @@ public class MekLocation extends Part {
 
     /**
      * Sets the percent armor remaining.
-     * 
+     *
      * @param percent The percent armor remaining, expressed as a fraction.
      */
     protected void setPercent(double percent) {
@@ -300,7 +303,7 @@ public class MekLocation extends Part {
                     breached = Boolean.parseBoolean(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -445,7 +448,7 @@ public class MekLocation extends Part {
 
     /**
      * Gets the time (in minutes) to repair or salvage this location.
-     * 
+     *
      * @return The time (in minutes) to repair or salvage this location.
      */
     private int getRepairOrSalvageTime() {
@@ -499,7 +502,7 @@ public class MekLocation extends Part {
 
     /**
      * Gets the repair or salvage difficulty for this location.
-     * 
+     *
      * @return The difficulty modifier for repair or salvage of this location.
      */
     private int getRepairOrSalvageDifficulty() {
@@ -527,7 +530,7 @@ public class MekLocation extends Part {
 
     /**
      * Sets a value indicating whether or not the location is breached.
-     * 
+     *
      * @param breached A value indicating whether or not the location is breached.
      */
     protected void setBreached(boolean breached) {
@@ -543,7 +546,7 @@ public class MekLocation extends Part {
 
     /**
      * Sets a value indicating whether or not the location is blown off.
-     * 
+     *
      * @param blownOff A value indicating whether or not the location is blown off.
      */
     protected void setBlownOff(boolean blownOff) {

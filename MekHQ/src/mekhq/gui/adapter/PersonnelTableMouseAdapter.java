@@ -39,8 +39,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
-import org.apache.logging.log4j.LogManager;
-
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
@@ -52,6 +50,7 @@ import megamek.common.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -106,6 +105,8 @@ import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
+    private static final MMLogger logger = MMLogger.create(PersonnelTableMouseAdapter.class);
+
     // region Variable Declarations
     private static final String CMD_RANKSYSTEM = "RANKSYSTEM";
     private static final String CMD_RANK = "RANK";
@@ -289,7 +290,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         autoAwardsController.PromotionController(gui.getCampaign(), false);
                     }
                 } catch (Exception e) {
-                    LogManager.getLogger().error("", e);
+                    logger.error("", e);
                 }
                 break;
             }
@@ -300,7 +301,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setManeiDominiClass(mdClass);
                     }
                 } catch (Exception e) {
-                    LogManager.getLogger().error("Failed to assign Manei Domini Class", e);
+                    logger.error("Failed to assign Manei Domini Class", e);
                 }
                 break;
             }
@@ -318,7 +319,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setPrimaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    LogManager.getLogger().error("Failed to assign ROM designator", e);
+                    logger.error("Failed to assign ROM designator", e);
                 }
                 break;
             }
@@ -329,7 +330,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         person.setSecondaryDesignator(romDesignation);
                     }
                 } catch (Exception e) {
-                    LogManager.getLogger().error("Failed to assign ROM secondary designator", e);
+                    logger.error("Failed to assign ROM secondary designator", e);
                 }
                 break;
             }
@@ -404,7 +405,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     gui.getCampaign().getLocalDate());
                         }
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Could not remove award.", e);
+                        logger.error("Could not remove award.", e);
                     }
                 }
                 break;
@@ -664,7 +665,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         }
                     }
                 } catch (Exception e) {
-                    LogManager.getLogger().error("Unknown PrisonerStatus Option. No changes will be made.", e);
+                    logger.error("Unknown PrisonerStatus Option. No changes will be made.", e);
                 }
                 break;
             }

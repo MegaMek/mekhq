@@ -21,6 +21,44 @@
  */
 package mekhq.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
+import java.util.stream.IntStream;
+import java.util.zip.GZIPOutputStream;
+
+import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -29,11 +67,21 @@ import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.*;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.Jumpship;
+import megamek.common.MULParser;
+import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.*;
+import megamek.logging.MMLogger;
+import mekhq.IconPackage;
+import mekhq.MHQConstants;
+import mekhq.MHQOptionsChangedEvent;
+import mekhq.MHQStaticDirectoryManager;
+import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
@@ -54,7 +102,11 @@ import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
 import mekhq.campaign.personnel.death.ExponentialRandomDeath;
 import mekhq.campaign.personnel.death.PercentageRandomDeath;
 import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
-import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RandomDeathMethod;
+import mekhq.campaign.personnel.enums.RandomDivorceMethod;
+import mekhq.campaign.personnel.enums.RandomMarriageMethod;
+import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
@@ -69,35 +121,24 @@ import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
 import mekhq.gui.dialog.nagDialogs.*;
-import mekhq.gui.dialog.reportDialogs.*;
+import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
+import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
+import mekhq.gui.dialog.reportDialogs.NewsReportDialog;
+import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
+import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
+import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
+import mekhq.gui.dialog.reportDialogs.UnitRatingReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.xml.parsers.DocumentBuilder;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
-import java.util.List;
-import java.util.*;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * The application's main frame.
  */
 public class CampaignGUI extends JPanel {
+    private static final MMLogger logger = MMLogger.create(CampaignGUI.class);
+
     private static final long serialVersionUID = 3126634639249129512L;
     // region Variable Declarations
     public static final int MAX_START_WIDTH = 1400;
@@ -294,7 +335,7 @@ public class CampaignGUI extends JPanel {
             preferences.manage(new JWindowPreference(frame));
             UIUtil.keepOnScreen(frame);
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -440,7 +481,7 @@ public class CampaignGUI extends JPanel {
                                         .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                                 + "_ExportedPersonnel");
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         });
         miExportCSVFile.add(miExportPersonCSV);
@@ -456,7 +497,7 @@ public class CampaignGUI extends JPanel {
                                         .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                                 + "_ExportedUnits");
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         });
         miExportCSVFile.add(miExportUnitCSV);
@@ -472,7 +513,7 @@ public class CampaignGUI extends JPanel {
                                         .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                                 + "_ExportedFinances");
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         });
         miExportCSVFile.add(miExportFinancesCSV);
@@ -533,7 +574,7 @@ public class CampaignGUI extends JPanel {
                                         .withLocale(MekHQ.getMHQOptions().getDateLocale()))
                                 + "_ExportedPlanets");
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         });
         miExportXMLFile.add(miExportPlanetsXML);
@@ -876,9 +917,11 @@ public class CampaignGUI extends JPanel {
         miDragoonsRating.setMnemonic(KeyEvent.VK_U);
         miDragoonsRating.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_DOWN_MASK));
         if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
-            miDragoonsRating.addActionListener(evt -> new UnitRatingReportDialog(getFrame(), getCampaign()).setVisible(true));
+            miDragoonsRating
+                    .addActionListener(evt -> new UnitRatingReportDialog(getFrame(), getCampaign()).setVisible(true));
         } else {
-            miDragoonsRating.addActionListener(evt -> new ReputationReportDialog(getFrame(), getCampaign()).setVisible(true));
+            miDragoonsRating
+                    .addActionListener(evt -> new ReputationReportDialog(getFrame(), getCampaign()).setVisible(true));
         }
         menuReports.add(miDragoonsRating);
 
@@ -1326,14 +1369,14 @@ public class CampaignGUI extends JPanel {
 
     public void showUnitMarket() {
         if (getCampaign().getUnitMarket().getMethod().isNone()) {
-            LogManager.getLogger().error("Attempted to show the unit market while it is disabled");
+            logger.error("Attempted to show the unit market while it is disabled");
         } else {
             new UnitMarketDialog(getFrame(), getCampaign()).showDialog();
         }
     }
 
     public boolean saveCampaign(ActionEvent evt) {
-        LogManager.getLogger().info("Saving campaign...");
+        logger.info("Saving campaign...");
         // Choose a file...
         File file = FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
         if (file == null) {
@@ -1374,17 +1417,18 @@ public class CampaignGUI extends JPanel {
             pw.flush();
             // delete the backup file because we didn't need it
             if (backupFile.exists() && !backupFile.delete()) {
-                LogManager.getLogger().error("Backup file deletion failure. This means that the backup file of {} will be retained instead of being properly deleted.",
+                logger.error(
+                        "Backup file deletion failure. This means that the backup file of {} will be retained instead of being properly deleted.",
                         backupFile.getPath());
             }
-            LogManager.getLogger().info("Campaign saved to {}", file);
+            logger.info("Campaign saved to {}", file);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             JOptionPane.showMessageDialog(frame, """
-                            Oh no! The program was unable to correctly save your game. We know this
-                            is annoying and apologize. Please help us out and submit a bug with the
-                            mekhq.log file from this game so we can prevent this from happening in
-                            the future.""",
+                    Oh no! The program was unable to correctly save your game. We know this
+                    is annoying and apologize. Please help us out and submit a bug with the
+                    mekhq.log file from this game so we can prevent this from happening in
+                    the future.""",
                     "Could not save game",
                     JOptionPane.ERROR_MESSAGE);
 
@@ -1393,14 +1437,14 @@ public class CampaignGUI extends JPanel {
                 if (backupFile.exists()) {
                     Utilities.copyfile(backupFile, file);
                     if (!backupFile.delete()) {
-                        LogManager.getLogger().error(
+                        logger.error(
                                 "Backup file deletion failure after restoring the original file. This means that the backup file of "
                                         + backupFile.getPath()
                                         + " will be retained instead of being properly deleted.");
                     }
                 }
             } else {
-                LogManager.getLogger().error(String.format(
+                logger.error(String.format(
                         "File deletion failure. This means that the file at %s will be retained instead of being properly deleted, with any backup at %s not being restored nor deleted.",
                         file.getPath(), backupFile.getPath()));
             }
@@ -1745,27 +1789,30 @@ public class CampaignGUI extends JPanel {
     protected void exportPlanets(FileType format, String dialogTitle, String filename) {
         // TODO: Fix this
         /*
-        GUI.fileDialogSave(
-                frame,
-                dialogTitle,
-                format,
-                MekHQ.getPlanetsDirectory().getValue(),
-                "planets." + format.getRecommendedExtension())
-                .ifPresent(f -> {
-                    MekHQ.getPlanetsDirectory().setValue(f.getParent());
-                    File file = checkFileEnding(f, format.getRecommendedExtension());
-                    checkToBackupFile(file, file.getPath());
-                    String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
-                    JOptionPane.showMessageDialog(mainPanel, report);
-                });
-
-        GUI.fileDialogSave(frame, dialogTitle, new File(".", "planets." + format.getRecommendedExtension()), format).ifPresent(f -> {
-            File file = checkFileEnding(f, format.getRecommendedExtension());
-            checkToBackupFile(file, file.getPath());
-            String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
-            JOptionPane.showMessageDialog(mainPanel, report);
-        });
-        */
+         * GUI.fileDialogSave(
+         * frame,
+         * dialogTitle,
+         * format,
+         * MekHQ.getPlanetsDirectory().getValue(),
+         * "planets." + format.getRecommendedExtension())
+         * .ifPresent(f -> {
+         * MekHQ.getPlanetsDirectory().setValue(f.getParent());
+         * File file = checkFileEnding(f, format.getRecommendedExtension());
+         * checkToBackupFile(file, file.getPath());
+         * String report = Planets.getInstance().exportPlanets(file.getPath(),
+         * format.getRecommendedExtension());
+         * JOptionPane.showMessageDialog(mainPanel, report);
+         * });
+         *
+         * GUI.fileDialogSave(frame, dialogTitle, new File(".", "planets." +
+         * format.getRecommendedExtension()), format).ifPresent(f -> {
+         * File file = checkFileEnding(f, format.getRecommendedExtension());
+         * checkToBackupFile(file, file.getPath());
+         * String report = Planets.getInstance().exportPlanets(file.getPath(),
+         * format.getRecommendedExtension());
+         * JOptionPane.showMessageDialog(mainPanel, report);
+         * });
+         */
     }
 
     /**
@@ -1916,7 +1963,7 @@ public class CampaignGUI extends JPanel {
                     getCampaign().addNewUnit(entity, allowNewPilots, 0, quality);
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -1925,7 +1972,7 @@ public class CampaignGUI extends JPanel {
         File personnelFile = FileDialogs.openPersonnel(frame).orElse(null);
 
         if (personnelFile != null) {
-            LogManager.getLogger().info("Starting load of personnel file from XML...");
+            logger.info("Starting load of personnel file from XML...");
             // Initialize variables.
             Document xmlDoc;
 
@@ -1937,7 +1984,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(is);
             } catch (Exception ex) {
-                LogManager.getLogger().error("Cannot load person XML", ex);
+                logger.error("Cannot load person XML", ex);
                 return; // otherwise we NPE out in the next line
             }
 
@@ -1961,14 +2008,14 @@ public class CampaignGUI extends JPanel {
                 }
 
                 if (!wn2.getNodeName().equalsIgnoreCase("person")) {
-                    LogManager.getLogger()
+                    logger
                             .error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                     continue;
                 }
 
                 Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
                 if ((p != null) && (getCampaign().getPerson(p.getId()) != null)) {
-                    LogManager.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: {}, Id {})",
+                    logger.error("ERROR: Cannot load person who exists, ignoring. (Name: {}, Id {})",
                             p.getFullName(),
                             p.getId());
                     p = null;
@@ -2010,7 +2057,7 @@ public class CampaignGUI extends JPanel {
                 }
             }
 
-            LogManager.getLogger().info("Finished load of personnel file");
+            logger.info("Finished load of personnel file");
         }
     }
 
@@ -2035,12 +2082,12 @@ public class CampaignGUI extends JPanel {
 
         PersonnelTab pt = getPersonnelTab();
         if (pt == null) {
-            LogManager.getLogger().error("Cannot export person if there's not a personnel tab");
+            logger.error("Cannot export person if there's not a personnel tab");
             return;
         }
         int row = pt.getPersonnelTable().getSelectedRow();
         if (row < 0) {
-            LogManager.getLogger().warn("Cannot export person if no one is selected! Ignoring.");
+            logger.warn("Cannot export person if no one is selected! Ignoring.");
             return;
         }
         Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
@@ -2075,14 +2122,14 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            LogManager.getLogger().info("Personnel saved to {}", file);
+            logger.info("Personnel saved to {}", file);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             JOptionPane.showMessageDialog(getFrame(), """
-                            Oh no! The program was unable to correctly export your personnel. We know this
-                            is annoying and apologize. Please help us out and submit a bug with the
-                            mekhq.log file from this game so we can prevent this from happening in
-                            the future.""",
+                    Oh no! The program was unable to correctly export your personnel. We know this
+                    is annoying and apologize. Please help us out and submit a bug with the
+                    mekhq.log file from this game so we can prevent this from happening in
+                    the future.""",
                     "Could not export personnel", JOptionPane.ERROR_MESSAGE);
             // restore the backup file
             file.delete();
@@ -2102,7 +2149,7 @@ public class CampaignGUI extends JPanel {
 
         File partsFile = maybeFile.get();
 
-        LogManager.getLogger().info("Starting load of parts file from XML...");
+        logger.info("Starting load of parts file from XML...");
         // Initialize variables.
         Document xmlDoc;
 
@@ -2114,7 +2161,7 @@ public class CampaignGUI extends JPanel {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return;
         }
 
@@ -2141,7 +2188,7 @@ public class CampaignGUI extends JPanel {
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                LogManager.getLogger().error("Unknown node type not loaded in Parts nodes: {}",
+                logger.error("Unknown node type not loaded in Parts nodes: {}",
                         wn2.getNodeName());
                 continue;
             }
@@ -2153,7 +2200,7 @@ public class CampaignGUI extends JPanel {
         }
 
         getCampaign().importParts(parts);
-        LogManager.getLogger().info("Finished load of parts file");
+        logger.info("Finished load of parts file");
     }
 
     public void savePartsFile() {
@@ -2179,7 +2226,7 @@ public class CampaignGUI extends JPanel {
         // Get the information to export
         final WarehouseTab warehouseTab = getWarehouseTab();
         if (warehouseTab == null) {
-            LogManager.getLogger().error("Cannot export parts for a null warehouse tab");
+            logger.error("Cannot export parts for a null warehouse tab");
             return;
         }
 
@@ -2187,7 +2234,7 @@ public class CampaignGUI extends JPanel {
         PartsTableModel partsModel = warehouseTab.getPartsModel();
         int row = partsTable.getSelectedRow();
         if (row < 0) {
-            LogManager.getLogger().warn("Cannot export parts if none are selected! Ignoring.");
+            logger.warn("Cannot export parts if none are selected! Ignoring.");
             return;
         }
         Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
@@ -2221,14 +2268,14 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            LogManager.getLogger().info("Parts saved to {}", file);
+            logger.info("Parts saved to {}", file);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             JOptionPane.showMessageDialog(getFrame(), """
-                            Oh no! The program was unable to correctly export your parts. We know this
-                            is annoying and apologize. Please help us out and submit a bug with the
-                            mekhq.log file from this game so we can prevent this from happening in
-                            the future.""",
+                    Oh no! The program was unable to correctly export your parts. We know this
+                    is annoying and apologize. Please help us out and submit a bug with the
+                    mekhq.log file from this game so we can prevent this from happening in
+                    the future.""",
                     "Could not export parts", JOptionPane.ERROR_MESSAGE);
             // restore the backup file
             file.delete();
@@ -2279,7 +2326,7 @@ public class CampaignGUI extends JPanel {
             try {
                 lab.refreshRefitSummary();
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -2481,7 +2528,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (getCampaign().getLocalDate().equals(getCampaign().getLocalDate().with(TemporalAdjusters.lastDayOfMonth()))) {
+        if (getCampaign().getLocalDate()
+                .equals(getCampaign().getLocalDate().with(TemporalAdjusters.lastDayOfMonth()))) {
             if (new UnableToAffordExpensesNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
                 evt.cancel();
                 return;

@@ -20,7 +20,15 @@
  */
 package mekhq.campaign;
 
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.Locale;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.TransitCompleteEvent;
@@ -29,13 +37,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.Locale;
 
 /**
  * This keeps track of a location, which includes both the planet
@@ -47,6 +48,8 @@ import java.util.Locale;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class CurrentLocation {
+    private static final MMLogger logger = MMLogger.create(CurrentLocation.class);
+
     private PlanetarySystem currentSystem;
     // keep track of jump path
     private JumpPath jumpPath;
@@ -80,7 +83,7 @@ public class CurrentLocation {
     }
 
     public double getPercentageTransit() {
-        return 1- transitTime / currentSystem.getTimeToJumpPoint(1.0);
+        return 1 - transitTime / currentSystem.getTimeToJumpPoint(1.0);
     }
 
     public boolean isInTransit() {
@@ -92,8 +95,9 @@ public class CurrentLocation {
     }
 
     /**
-     * @return the current planet location. This is currently the primary planet of the system, but
-     * in the future this will not be the case.
+     * @return the current planet location. This is currently the primary planet of
+     *         the system, but
+     *         in the future this will not be the case.
      */
     public Planet getPlanet() {
         return getCurrentSystem().getPrimaryPlanet();
@@ -104,17 +108,21 @@ public class CurrentLocation {
     }
 
     /**
-     * @return a <code>boolean</code> indicating whether the JumpShip is at the zenith or not (nadir if false).
+     * @return a <code>boolean</code> indicating whether the JumpShip is at the
+     *         zenith or not (nadir if false).
      */
     public boolean isJumpZenith() {
         return jumpZenith;
     }
 
     /**
-     * pick the best jump point (nadir of zenith). Chooses the one with a recharge station or randomly selects if both have a
+     * pick the best jump point (nadir of zenith). Chooses the one with a recharge
+     * station or randomly selects if both have a
      * recharge station or neither does.
+     *
      * @param now - a <code>LocalDate</code> object for the present time
-     * @return a <code> boolean indicating whether the zenith position was chosen or not.
+     * @return a <code> boolean indicating whether the zenith position was chosen or
+     *         not.
      */
     private boolean pickJumpPoint(LocalDate now) {
         if (currentSystem.isZenithCharge(now) && !currentSystem.isNadirCharge(now)) {
@@ -145,7 +153,8 @@ public class CurrentLocation {
         }
         if (!Double.isInfinite(currentSystem.getRechargeTime(date))) {
             sb.append(", <i>")
-                    .append(String.format(Locale.ROOT, "%.0f", (100.0 * rechargeTime) / currentSystem.getRechargeTime(date)))
+                    .append(String.format(Locale.ROOT, "%.0f",
+                            (100.0 * rechargeTime) / currentSystem.getRechargeTime(date)))
                     .append("% charged </i>");
         }
         return sb.append("</html>").toString();
@@ -162,6 +171,7 @@ public class CurrentLocation {
     /**
      * Gets a value indicating whether or not the JumpShip
      * is currently recharging.
+     *
      * @param campaign The campaign object which owns the JumpShip.
      * @return True if the JumpShip has to spend time recharging,
      *         otherwise false.
@@ -173,6 +183,7 @@ public class CurrentLocation {
     /**
      * Marks the JumpShip at the current location to be
      * fully charged.
+     *
      * @param campaign The campaign object which owns the JumpShip.
      */
     public void setRecharged(Campaign campaign) {
@@ -190,7 +201,8 @@ public class CurrentLocation {
         double neededRechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate());
         double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
         if (usedRechargeTime > 0) {
-            campaign.addReport("JumpShips spent " + (Math.round(100.0 * usedRechargeTime) / 100.0) + " hours recharging drives");
+            campaign.addReport(
+                    "JumpShips spent " + (Math.round(100.0 * usedRechargeTime) / 100.0) + " hours recharging drives");
             rechargeTime += usedRechargeTime;
             if (rechargeTime >= neededRechargeTime) {
                 campaign.addReport("JumpShip drives fully charged");
@@ -205,8 +217,9 @@ public class CurrentLocation {
             // first check to see if we are transiting
             double usedTransitTime = Math.min(hours, 24.0 * (currentSystem.getTimeToJumpPoint(1.0) - transitTime));
             if (usedTransitTime > 0) {
-                transitTime += usedTransitTime/24.0;
-                campaign.addReport("DropShips spent " + (Math.round(100.0 * usedTransitTime) / 100.0) + " hours in transit to jump point");
+                transitTime += usedTransitTime / 24.0;
+                campaign.addReport("DropShips spent " + (Math.round(100.0 * usedTransitTime) / 100.0)
+                        + " hours in transit to jump point");
                 if (isAtJumpPoint()) {
                     campaign.addReport("Jump point reached");
                 }
@@ -219,7 +232,8 @@ public class CurrentLocation {
                                     true, campaign.getCampaignOptions().isEquipmentContractBase()),
                             "Jump from " + currentSystem.getName(campaign.getLocalDate())
                                     + " to " + jumpPath.get(1).getName(campaign.getLocalDate()))) {
-                        campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>You cannot afford to make the jump!</b></font>");
+                        campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                                + "'><b>You cannot afford to make the jump!</b></font>");
                         return;
                     }
                 }
@@ -228,14 +242,16 @@ public class CurrentLocation {
                 jumpZenith = pickJumpPoint(campaign.getLocalDate());
                 jumpPath.removeFirstSystem();
                 MekHQ.triggerEvent(new LocationChangedEvent(this, true));
-                // reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is greater
+                // reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is
+                // greater
                 hours -= Math.max(usedRechargeTime, usedTransitTime);
                 transitTime = currentSystem.getTimeToJumpPoint(1.0);
                 rechargeTime = 0;
                 // if there are hours remaining, then begin recharging jump drive
                 usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
                 if (usedRechargeTime > 0) {
-                    campaign.addReport("JumpShips spent " + (Math.round(100.0 * usedRechargeTime) / 100.0) + " hours recharging drives");
+                    campaign.addReport("JumpShips spent " + (Math.round(100.0 * usedRechargeTime) / 100.0)
+                            + " hours recharging drives");
                     rechargeTime += usedRechargeTime;
                     if (rechargeTime >= neededRechargeTime) {
                         campaign.addReport("JumpShip drives fully charged");
@@ -246,11 +262,12 @@ public class CurrentLocation {
         // if we are now at the final jump point, then lets begin in-system transit
         if (jumpPath.size() == 1) {
             double usedTransitTime = Math.min(hours, 24.0 * transitTime);
-            campaign.addReport("DropShips spent " + (Math.round(100.0 * usedTransitTime) / 100.0) + " hours transiting into system");
-            transitTime -= usedTransitTime/24.0;
+            campaign.addReport("DropShips spent " + (Math.round(100.0 * usedTransitTime) / 100.0)
+                    + " hours transiting into system");
+            transitTime -= usedTransitTime / 24.0;
             if (transitTime <= 0) {
                 campaign.addReport(jumpPath.getLastSystem().getPrintableName(campaign.getLocalDate()) + " reached.");
-                //we are here!
+                // we are here!
                 transitTime = 0;
                 jumpPath = null;
                 MekHQ.triggerEvent(new TransitCompleteEvent(this));
@@ -285,7 +302,7 @@ public class CurrentLocation {
                     PlanetarySystem p = Systems.getInstance().getSystemById(wn2.getTextContent());
                     if (null == p) {
                         // Whoops, we can't find your planet man, back to Earth
-                        LogManager.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
+                        logger.error("Couldn't find planet named " + wn2.getTextContent());
                         p = c.getSystemByName("Terra");
                         if (null == p) {
                             // If that doesn't work then give the first planet we have
@@ -304,7 +321,7 @@ public class CurrentLocation {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         return retVal;

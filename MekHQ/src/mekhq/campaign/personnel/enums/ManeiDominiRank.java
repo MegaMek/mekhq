@@ -18,13 +18,13 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum ManeiDominiRank {
-    //region Enum Declarations
+    // region Enum Declarations
     NONE("ManeiDominiRank.NONE.text"),
     ALPHA("ManeiDominiRank.ALPHA.text"),
     BETA("ManeiDominiRank.BETA.text"),
@@ -33,21 +33,21 @@ public enum ManeiDominiRank {
     DELTA("ManeiDominiRank.DELTA.text"),
     SIGMA("ManeiDominiRank.SIGMA.text"),
     OMICRON("ManeiDominiRank.OMICRON.text");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     ManeiDominiRank(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isNone() {
         return this == NONE;
     }
@@ -79,9 +79,9 @@ public enum ManeiDominiRank {
     public boolean isOmicron() {
         return this == OMICRON;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     public static ManeiDominiRank parseFromString(final String text) {
         // Parse based on the enum name
         try {
@@ -101,10 +101,11 @@ public enum ManeiDominiRank {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + "into a ManeiDominiRank. Returning NONE.");
+        MMLogger.create(ManeiDominiRank.class)
+                .error("Unable to parse " + text + "into a ManeiDominiRank. Returning NONE.");
         return NONE;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

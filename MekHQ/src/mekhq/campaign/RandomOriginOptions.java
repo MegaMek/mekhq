@@ -20,11 +20,11 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.utilities.MHQXMLUtility;
@@ -33,6 +33,8 @@ import mekhq.utilities.MHQXMLUtility;
  * @author Justin "Windchild" Bowen
  */
 public class RandomOriginOptions {
+    private static final MMLogger logger = MMLogger.create(RandomOriginOptions.class);
+
     // region Variable Declarations
     private boolean randomizeOrigin;
     private boolean randomizeDependentOrigin;
@@ -253,7 +255,7 @@ public class RandomOriginOptions {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return null;
         }
 

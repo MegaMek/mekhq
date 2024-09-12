@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.StringJoiner;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.StringJoiner;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author MKerensky
  */
 public class KFFieldInitiator extends Part {
+    private static final MMLogger logger = MMLogger.create(KFFieldInitiator.class);
+
     public static final TechAdvancement TA_FIELD_INITIATOR = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
@@ -101,7 +104,7 @@ public class KFFieldInitiator extends Part {
     public int getBaseTime() {
         int time;
         if (isSalvaging()) {
-            //SO KF Drive times, p184-5
+            // SO KF Drive times, p184-5
             time = 28800;
         } else {
             time = 4800;
@@ -111,7 +114,7 @@ public class KFFieldInitiator extends Part {
 
     @Override
     public int getDifficulty() {
-        //SO Difficulty Mods
+        // SO Difficulty Mods
         if (isSalvaging()) {
             return 2;
         }
@@ -131,8 +134,9 @@ public class KFFieldInitiator extends Part {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
             Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFFieldInitiatorHit(false);
-            //Also repair your KF Drive integrity - +1 point if you have other components to fix
-            //Otherwise, fix it all.
+            // Also repair your KF Drive integrity - +1 point if you have other components
+            // to fix
+            // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
             } else {
@@ -148,8 +152,8 @@ public class KFFieldInitiator extends Part {
                 Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setKFFieldInitiatorHit(true);
-                //You can transport a field initiator
-                //See SO p130 for reference
+                // You can transport a field initiator
+                // See SO p130 for reference
                 Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
                 if (!salvage) {
                     campaign.getWarehouse().removePart(this);
@@ -157,7 +161,7 @@ public class KFFieldInitiator extends Part {
                     spare.incrementQuantity();
                     campaign.getWarehouse().removePart(this);
                 } else {
-                    //Start a new collection
+                    // Start a new collection
                     campaign.getQuartermaster().addPart(this, 0);
                 }
                 campaign.getWarehouse().removePart(this);
@@ -236,7 +240,7 @@ public class KFFieldInitiator extends Part {
                     docks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -254,7 +258,7 @@ public class KFFieldInitiator extends Part {
             joiner.add(details);
         }
         joiner.add(getUnitTonnage() + " tons")
-              .add(getDocks() + " collars");
+                .add(getDocks() + " collars");
         return joiner.toString();
     }
 

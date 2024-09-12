@@ -21,6 +21,30 @@
  */
 package mekhq.campaign.unit;
 
+import static mekhq.campaign.parts.Part.QUALITY_A;
+import static mekhq.campaign.parts.Part.QUALITY_B;
+import static mekhq.campaign.parts.Part.QUALITY_C;
+import static mekhq.campaign.parts.Part.QUALITY_D;
+import static mekhq.campaign.parts.Part.QUALITY_E;
+import static mekhq.campaign.parts.Part.QUALITY_F;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Image;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import javax.swing.UIManager;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
@@ -37,6 +61,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -61,23 +86,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.io.migration.CamouflageMigrator;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.PrintWriter;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static mekhq.campaign.parts.Part.*;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to
@@ -86,6 +94,8 @@ import static mekhq.campaign.parts.Part.*;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Unit implements ITechnology {
+    private static final MMLogger logger = MMLogger.create(Unit.class);
+
     public static final int SITE_IMPROVISED = 0;
     public static final int SITE_FIELD_WORKSHOP = 1;
     public static final int SITE_FACILITY_BASIC = 2;
@@ -211,7 +221,7 @@ public class Unit implements ITechnology {
     /**
      * A convenience function to tell whether the unit can be acted upon
      * e.g. assigned pilots, techs, repaired, etc.
-     * 
+     *
      * @return
      */
     public boolean isAvailable() {
@@ -221,7 +231,7 @@ public class Unit implements ITechnology {
     /**
      * A convenience function to tell whether the unit can be acted upon
      * e.g. assigned pilots, techs, repaired, etc.
-     * 
+     *
      * @return
      */
     public boolean isAvailable(boolean ignoreRefit) {
@@ -336,7 +346,7 @@ public class Unit implements ITechnology {
 
     /**
      * Sets the transport ship assignment for this unit.
-     * 
+     *
      * @param assignment The transport ship assignment, or null if this unit
      *                   is not being transported.
      */
@@ -361,7 +371,7 @@ public class Unit implements ITechnology {
 
     /**
      * Adds a unit to our set of transported units.
-     * 
+     *
      * @param unit The unit being transported by this instance.
      */
     public void addTransportedUnit(Unit unit) {
@@ -370,7 +380,7 @@ public class Unit implements ITechnology {
 
     /**
      * Adds a unit to a specific bay on our unit.
-     * 
+     *
      * @param unit      The unit being transported by this instance.
      * @param bayNumber The bay which will contain the unit.
      */
@@ -383,7 +393,7 @@ public class Unit implements ITechnology {
 
     /**
      * Removes a unit from our set of transported units.
-     * 
+     *
      * @param unit The unit to remove from our set of transported units.
      * @return True if the unit was removed from our bays, otherwise false.
      */
@@ -599,7 +609,7 @@ public class Unit implements ITechnology {
     /**
      * Gets a list of parts on a unit which need service (either repair or salvage),
      * optionally excluding parts already being worked on.
-     * 
+     *
      * @param onlyNotBeingWorkedOn When true, excludes parts currently being
      *                             repaired or salvaged.
      */
@@ -942,7 +952,7 @@ public class Unit implements ITechnology {
 
     /**
      * Number of slots doomed, missing or destroyed in all locations
-     * 
+     *
      * @param type
      * @param index
      * @return
@@ -1320,7 +1330,7 @@ public class Unit implements ITechnology {
     /**
      * Convenience method to call the right capacity getter based on unit type and
      * weight
-     * 
+     *
      * @param unitType   integer obtained from a unit's entity that denotes its type
      *                   (mek, tank, etc)
      * @param unitWeight double Weight in tons of the unit's entity. Important for
@@ -1369,7 +1379,7 @@ public class Unit implements ITechnology {
                     return getCurrentSuperHeavyVehicleCapacity();
                 }
             default:
-                LogManager.getLogger().error("No transport bay defined for specified unit type.");
+                logger.error("No transport bay defined for specified unit type.");
                 return 0;
         }
     }
@@ -1380,7 +1390,7 @@ public class Unit implements ITechnology {
      * space isn't released
      * beyond the unit's maximum. Checks are made to keep from going below 0 before
      * we ever get here.
-     * 
+     *
      * @param unitType   integer obtained from a unit's entity that denotes its type
      *                   (mek, tank, etc)
      * @param unitWeight double Weight in tons of the unit's entity. Important for
@@ -1419,12 +1429,12 @@ public class Unit implements ITechnology {
                         break;
                     } else {
                         // This shouldn't happen
-                        LogManager.getLogger().error("Fighter got assigned to a non-ASF, non-SC bay.");
+                        logger.error("Fighter got assigned to a non-ASF, non-SC bay.");
                         break;
                     }
                 }
                 // This shouldn't happen either
-                LogManager.getLogger().error("Fighter's bay number assignment produced a null bay");
+                logger.error("Fighter's bay number assignment produced a null bay");
                 break;
             case UnitType.DROPSHIP:
                 setDocks(Math.min((getCurrentDocks() + amount), getDocks()));
@@ -1461,13 +1471,13 @@ public class Unit implements ITechnology {
                         break;
                     } else {
                         // This shouldn't happen
-                        LogManager.getLogger()
+                        logger
                                 .error("Vehicle got assigned to a non-light/heavy/super heavy vehicle bay.");
                         break;
                     }
                 }
                 // This shouldn't happen either
-                LogManager.getLogger().error("Vehicle's bay number assignment produced a null bay");
+                logger.error("Vehicle's bay number assignment produced a null bay");
                 break;
         }
     }
@@ -1676,7 +1686,7 @@ public class Unit implements ITechnology {
      * both the target bay and the UUID of the transport ship. Once in the MM lobby,
      * this data
      * will be used to actually load the unit into a bay on the transport.
-     * 
+     *
      * @param units Vector of units that we wish to load into this transport
      */
     public void loadTransportShip(Vector<Unit> units) {
@@ -1697,7 +1707,7 @@ public class Unit implements ITechnology {
     /**
      * Calculates transport bay space required by an infantry platoon,
      * which is not the same as the flat weight of that platoon
-     * 
+     *
      * @param unit The Entity that we need the weight for
      */
     public double calcInfantryBayWeight(Entity unit) {
@@ -1713,7 +1723,7 @@ public class Unit implements ITechnology {
      * Bay unloading utility used when removing units from bay-equipped transport
      * units
      * and/or moving them to a new transport
-     * 
+     *
      * @param u The unit that we wish to unload from this transport
      */
     public void unloadFromTransportShip(Unit u) {
@@ -2092,7 +2102,7 @@ public class Unit implements ITechnology {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("Could not parse unit {}", idNode.getTextContent().trim(), ex);
+            logger.error("Could not parse unit {}", idNode.getTextContent().trim(), ex);
             return null;
         }
 
@@ -2101,7 +2111,7 @@ public class Unit implements ITechnology {
         }
 
         if (retVal.id == null) {
-            LogManager.getLogger().warn("ID not pre-defined; generating unit's ID.");
+            logger.warn("ID not pre-defined; generating unit's ID.");
             retVal.id = UUID.randomUUID();
         }
 
@@ -2118,7 +2128,7 @@ public class Unit implements ITechnology {
     /**
      * This function returns an html-coded list that says what
      * quirks are enabled for this unit
-     * 
+     *
      * @return
      */
     public @Nullable String getQuirksList() {
@@ -2158,7 +2168,7 @@ public class Unit implements ITechnology {
      * is confusing and difficult to manage so lets just make maintenance costs
      * relative
      * to the length of the maintenance cycle that the user defined
-     * 
+     *
      * @return
      */
     public Money getMaintenanceCost() {
@@ -2427,7 +2437,7 @@ public class Unit implements ITechnology {
                 } else {
                     partsToRemove.add(part);
                 }
-            } else if ((part instanceof VeeStabiliser || part instanceof MissingVeeStabiliser)) {
+            } else if ((part instanceof VeeStabilizer || part instanceof MissingVeeStabilizer)) {
                 if (part.getLocation() < stabilisers.length) {
                     stabilisers[part.getLocation()] = part;
                 } else {
@@ -2509,7 +2519,7 @@ public class Unit implements ITechnology {
                     } else if (loc == Mek.LOC_CLEG) {
                         centerUpperLeg = part;
                     } else {
-                        LogManager.getLogger().error("Unknown location of {} for a Upper Leg Actuator.", loc);
+                        logger.error("Unknown location of {} for a Upper Leg Actuator.", loc);
                     }
                 } else if (type == Mek.ACTUATOR_LOWER_LEG) {
                     if (loc == Mek.LOC_LARM) {
@@ -2523,7 +2533,7 @@ public class Unit implements ITechnology {
                     } else if (loc == Mek.LOC_CLEG) {
                         centerLowerLeg = part;
                     } else {
-                        LogManager.getLogger().error("Unknown location of {} for a Lower Leg Actuator.", loc);
+                        logger.error("Unknown location of {} for a Lower Leg Actuator.", loc);
                     }
                 } else if (type == Mek.ACTUATOR_FOOT) {
                     if (loc == Mek.LOC_LARM) {
@@ -2537,7 +2547,7 @@ public class Unit implements ITechnology {
                     } else if (loc == Mek.LOC_CLEG) {
                         centerFoot = part;
                     } else {
-                        LogManager.getLogger().error("Unknown location of " + loc + " for a Foot Actuator.");
+                        logger.error("Unknown location of " + loc + " for a Foot Actuator.");
                     }
                 }
             } else if (part instanceof QuadVeeGear || part instanceof MissingQuadVeeGear) {
@@ -2760,7 +2770,7 @@ public class Unit implements ITechnology {
                 partsToAdd.add(a);
             }
             if (entity instanceof Tank && null == stabilisers[i] && i != Tank.LOC_BODY) {
-                VeeStabiliser s = new VeeStabiliser((int) getEntity().getWeight(), i, getCampaign());
+                VeeStabilizer s = new VeeStabilizer((int) getEntity().getWeight(), i, getCampaign());
                 addPart(s);
                 partsToAdd.add(s);
             }
@@ -3467,7 +3477,7 @@ public class Unit implements ITechnology {
 
     /**
      * Find a part on a unit.
-     * 
+     *
      * @param predicate A predicate to apply to each part on the unit.
      * @return The first part which matched the predicate, otherwise null.
      */
@@ -4318,7 +4328,7 @@ public class Unit implements ITechnology {
     /**
      * Compute the number of generic space/vehicle crew (e.g. not driver, gunner, or
      * navigator)
-     * 
+     *
      * @return The number of generic crew required
      */
     public int getTotalCrewNeeds() {
@@ -4515,7 +4525,7 @@ public class Unit implements ITechnology {
         Objects.requireNonNull(p);
 
         if (null != tech) {
-            LogManager.getLogger().warn(
+            logger.warn(
                     String.format("New tech assigned %s without removing previous tech %s", p.getFullName(), tech));
         }
         ensurePersonIsRegistered(p);
@@ -4538,7 +4548,7 @@ public class Unit implements ITechnology {
         Objects.requireNonNull(person);
         if (getCampaign().getPerson(person.getId()) == null) {
             getCampaign().recruitPerson(person, person.getPrisonerStatus(), true, false);
-            LogManager.getLogger().warn(String.format("The person %s added this unit %s, was not in the campaign.",
+            logger.warn(String.format("The person %s added this unit %s, was not in the campaign.",
                     person.getFullName(), getName()));
         }
     }
@@ -4695,7 +4705,7 @@ public class Unit implements ITechnology {
     /**
      * Gets a value indicating whether or not the unit is being mothballed
      * or activated.
-     * 
+     *
      * @return True if the unit is undergoing mothballing or activation,
      *         otherwise false.
      */
@@ -4705,7 +4715,7 @@ public class Unit implements ITechnology {
 
     /**
      * Gets the time (in minutes) remaining to mothball or activate the unit.
-     * 
+     *
      * @return The time (in minutes) remaining to mothball or activate the unit.
      */
     public int getMothballTime() {
@@ -4714,7 +4724,7 @@ public class Unit implements ITechnology {
 
     /**
      * Sets the time (in minutes) remaining to mothball or activate the unit.
-     * 
+     *
      * @param t The time (in minutes) remaining to mothball or activate the unit.
      */
     public void setMothballTime(int t) {
@@ -4723,7 +4733,7 @@ public class Unit implements ITechnology {
 
     /**
      * Gets a value indicating whether or not this unit is mothballed.
-     * 
+     *
      * @return True if the unit is mothballed, otherwise false.
      */
     public boolean isMothballed() {
@@ -4737,7 +4747,7 @@ public class Unit implements ITechnology {
      * If the unit is being activated, all of its personnel will be restored (if
      * applicable)
      * and its maintenance cycle will be reset.
-     * 
+     *
      * @param b True if the unit is now mothballed, or false if the unit is now
      *          activated.
      */
@@ -4761,7 +4771,7 @@ public class Unit implements ITechnology {
 
     /**
      * Begins mothballing a unit.
-     * 
+     *
      * @param mothballTech The tech performing the mothball.
      */
     public void startMothballing(Person mothballTech) {
@@ -4770,7 +4780,7 @@ public class Unit implements ITechnology {
 
     /**
      * Begins mothballing a unit, optionally as a GM action.
-     * 
+     *
      * @param mothballTech The tech performing the mothball.
      * @param isGM         A value indicating if the mothball action should
      *                     be performed immediately by the GM.
@@ -4818,7 +4828,7 @@ public class Unit implements ITechnology {
 
     /**
      * Begins activating a unit which has been mothballed.
-     * 
+     *
      * @param activationTech The tech performing the activation.
      */
     public void startActivating(Person activationTech) {
@@ -4828,7 +4838,7 @@ public class Unit implements ITechnology {
     /**
      * Begins activating a unit which has been mothballed,
      * optionally as a GM action.
-     * 
+     *
      * @param activationTech The tech performing the activation.
      * @param isGM           A value indicating if the activation action should
      *                       be performed immediately by the GM.
@@ -4874,7 +4884,7 @@ public class Unit implements ITechnology {
 
     /**
      * Gets the time required to mothball or activate this unit.
-     * 
+     *
      * @return The time in minutes required to mothball or activate this unit.
      */
     private int getMothballOrActivationTime() {
@@ -4981,7 +4991,7 @@ public class Unit implements ITechnology {
 
     /**
      * Returns a personnel count for each marine platoon/squad assigned to this unit
-     * 
+     *
      * @return The number of marines aboard
      */
     public int getMarineCount() {
@@ -5416,13 +5426,13 @@ public class Unit implements ITechnology {
                 partsCost = partsCost.plus(6 * 0.002 * 10000);
             } else {
                 partsCost = partsCost.plus(entity.getWeight() * 0.002 * 10000);
-                LogManager.getLogger().error("{} is not a generic CI. Movement mode is {}", getName(),
+                logger.error("{} is not a generic CI. Movement mode is {}", getName(),
                         entity.getMovementModeAsString());
             }
         } else {
             // Only ProtoMeks should fall here. Anything else needs to be logged
             if (!(entity instanceof ProtoMek)) {
-                LogManager.getLogger().error("{} has no Spare Parts value for unit type {}", getName(),
+                logger.error("{} has no Spare Parts value for unit type {}", getName(),
                         Entity.getEntityTypeName(entity.getEntityType()));
             }
         }
@@ -5769,7 +5779,7 @@ public class Unit implements ITechnology {
             UUID id = tech.getId();
             tech = campaign.getPerson(id);
             if (tech == null) {
-                LogManager.getLogger().error(
+                logger.error(
                         String.format("Unit %s ('%s') references missing tech %s",
                                 getId(), getName(), id));
             }
@@ -5779,7 +5789,7 @@ public class Unit implements ITechnology {
             if (driver instanceof UnitPersonRef) {
                 drivers.set(ii, campaign.getPerson(driver.getId()));
                 if (drivers.get(ii) == null) {
-                    LogManager.getLogger().error(
+                    logger.error(
                             String.format("Unit %s ('%s') references missing driver %s",
                                     getId(), getName(), driver.getId()));
                     drivers.remove(ii);
@@ -5791,7 +5801,7 @@ public class Unit implements ITechnology {
             if (gunner instanceof UnitPersonRef) {
                 gunners.set(ii, campaign.getPerson(gunner.getId()));
                 if (gunners.get(ii) == null) {
-                    LogManager.getLogger().error(
+                    logger.error(
                             String.format("Unit %s ('%s') references missing gunner %s",
                                     getId(), getName(), gunner.getId()));
                     gunners.remove(ii);
@@ -5803,7 +5813,7 @@ public class Unit implements ITechnology {
             if (crew instanceof UnitPersonRef) {
                 vesselCrew.set(ii, campaign.getPerson(crew.getId()));
                 if (vesselCrew.get(ii) == null) {
-                    LogManager.getLogger().error(
+                    logger.error(
                             String.format("Unit %s ('%s') references missing vessel crew %s",
                                     getId(), getName(), crew.getId()));
                     vesselCrew.remove(ii);
@@ -5815,7 +5825,7 @@ public class Unit implements ITechnology {
             UUID id = engineer.getId();
             engineer = campaign.getPerson(id);
             if (engineer == null) {
-                LogManager.getLogger().error(
+                logger.error(
                         String.format("Unit %s ('%s') references missing engineer %s",
                                 getId(), getName(), id));
             }
@@ -5825,7 +5835,7 @@ public class Unit implements ITechnology {
             UUID id = navigator.getId();
             navigator = campaign.getPerson(id);
             if (navigator == null) {
-                LogManager.getLogger().error(
+                logger.error(
                         String.format("Unit %s ('%s') references missing navigator %s",
                                 getId(), getName(), id));
             }
@@ -5835,7 +5845,7 @@ public class Unit implements ITechnology {
             final UUID id = getTechOfficer().getId();
             techOfficer = campaign.getPerson(id);
             if (getTechOfficer() == null) {
-                LogManager.getLogger().error(
+                logger.error(
                         String.format("Unit %s ('%s') references missing tech officer %s",
                                 getId(), getName(), id));
             }
@@ -5852,7 +5862,7 @@ public class Unit implements ITechnology {
                 transportShipAssignment = new TransportShipAssignment(transportShip,
                         transportShipAssignment.getBayNumber());
             } else {
-                LogManager.getLogger().error(
+                logger.error(
                         String.format("Unit %s ('%s') references missing transport ship %s",
                                 getId(), getName(), transportShipAssignment.getTransportShip().getId()));
 
@@ -5868,7 +5878,7 @@ public class Unit implements ITechnology {
                     if (realUnit != null) {
                         newTransportedUnits.add(realUnit);
                     } else {
-                        LogManager.getLogger().error(
+                        logger.error(
                                 String.format("Unit %s ('%s') references missing transported unit %s",
                                         getId(), getName(), transportedUnit.getId()));
                     }

@@ -1,21 +1,30 @@
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MekView;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ResourceBundle;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @since July 15, 2009, 9:30 PM
  */
 public class MekViewDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(MekViewDialog.class);
+
     private MekView mview;
     private JButton btnOkay;
     private JScrollPane jScrollPane2;
@@ -66,7 +75,7 @@ public class MekViewDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

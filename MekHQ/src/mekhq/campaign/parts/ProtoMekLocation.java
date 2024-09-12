@@ -20,8 +20,21 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.CriticalSlot;
+import megamek.common.IArmorState;
+import megamek.common.ILocationExposureStatus;
+import megamek.common.Mounted;
+import megamek.common.ProtoMek;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -30,16 +43,13 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ProtoMekLocation extends Part {
+    private static final MMLogger logger = MMLogger.create(ProtoMekLocation.class);
+
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setClanAdvancement(3055, 3060, 3060).setClanApproximate(true, false, false)
             .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
@@ -207,7 +217,7 @@ public class ProtoMekLocation extends Part {
                     breached = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }

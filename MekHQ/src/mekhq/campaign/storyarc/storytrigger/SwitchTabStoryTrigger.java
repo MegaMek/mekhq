@@ -20,23 +20,26 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryTrigger;
-import mekhq.gui.enums.MHQTabType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.gui.enums.MHQTabType;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * This StoryTrigger will switch the active tab in the main CampaignGUI. It is useful if you want to direct the player's
+ * This StoryTrigger will switch the active tab in the main CampaignGUI. It is
+ * useful if you want to direct the player's
  * attention somewhere.
  */
 public class SwitchTabStoryTrigger extends StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(SwitchTabStoryTrigger.class);
 
     MHQTabType tab;
 
@@ -64,7 +67,7 @@ public class SwitchTabStoryTrigger extends StoryTrigger {
                     tab = MHQTabType.parseFromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

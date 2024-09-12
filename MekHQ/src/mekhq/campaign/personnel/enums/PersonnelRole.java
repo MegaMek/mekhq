@@ -24,8 +24,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 
 public enum PersonnelRole {
@@ -450,7 +449,8 @@ public enum PersonnelRole {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a PersonnelRole. Returning NONE.");
+        MMLogger.create(PersonnelRole.class)
+                .error("Unable to parse " + text + " into a PersonnelRole. Returning NONE.");
         return NONE;
     }
     // endregion File I/O

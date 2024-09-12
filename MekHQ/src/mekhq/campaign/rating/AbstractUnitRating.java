@@ -20,15 +20,6 @@
  */
 package mekhq.campaign.rating;
 
-import megamek.common.*;
-import megamek.common.enums.SkillLevel;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -36,12 +27,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import megamek.common.*;
+import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.unit.Unit;
+
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
  * @since 3/15/2012
  */
 @SuppressWarnings(value = "SameParameterValue")
 public abstract class AbstractUnitRating implements IUnitRating {
+    private static final MMLogger logger = MMLogger.create(AbstractUnitRating.class);
 
     static final int HEADER_LENGTH = 19;
     static final int SUBHEADER_LENGTH = 23;
@@ -197,7 +198,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 return null;
             }
 
-            //Sort the list of personnel by rank from highest to lowest
+            // Sort the list of personnel by rank from highest to lowest
             // Whoever has the highest rank is the commander
             commanderList.sort((p1, p2) -> {
                 // Active personnel outrank inactive personnel
@@ -233,7 +234,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     *  Returns the Commander's Skill Level with Bonus for the specified skill
+     * Returns the Commander's Skill Level with Bonus for the specified skill
      */
     int getCommanderSkillLevelWithBonus(String skillName) {
         Person commander = getCommander();
@@ -289,24 +290,24 @@ public abstract class AbstractUnitRating implements IUnitRating {
             return 0;
         }
 
-        //Find the percentage of units that are transported.
+        // Find the percentage of units that are transported.
         setTransportPercent(getTransportPercent());
 
-        //Compute the score.
+        // Compute the score.
         BigDecimal scoredPercent = getTransportPercent().subtract(
                 new BigDecimal(50));
         if (scoredPercent.compareTo(BigDecimal.ZERO) < 0) {
             return value;
         }
         BigDecimal percentageScore = scoredPercent.divide(new BigDecimal(10),
-                                                          0,
-                                                          RoundingMode.DOWN);
+                0,
+                RoundingMode.DOWN);
         value += percentageScore.multiply(new BigDecimal(5))
-                                .setScale(0, RoundingMode.DOWN)
-                                .intValue();
+                .setScale(0, RoundingMode.DOWN)
+                .intValue();
         value = Math.min(value, 25);
 
-        //Only the highest of these values should be used, regardless of how
+        // Only the highest of these values should be used, regardless of how
         // many are actually owned.
         if (isWarShipWithDocsOwner()) {
             value += 30;
@@ -430,7 +431,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     protected abstract int calculateUnitRatingScore();
 
     /**
-     * Recalculates the dragoons rating.  If this has already been done, the
+     * Recalculates the dragoons rating. If this has already been done, the
      * initialized flag should already be set true
      * and this method will immediately exit.
      */
@@ -481,9 +482,11 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Updates the count of storage bays that may be used in Interstellar transport (part of transport capacity calculations)
+     * Updates the count of storage bays that may be used in Interstellar transport
+     * (part of transport capacity calculations)
      *
-     * @param e is the unit that may or may not contain bays that need to be included in the count
+     * @param e is the unit that may or may not contain bays that need to be
+     *          included in the count
      */
     void updateBayCount(Entity e) {
         if (((e instanceof Jumpship) || (e instanceof Dropship)) && !(e instanceof SpaceStation)) {
@@ -502,11 +505,11 @@ public abstract class AbstractUnitRating implements IUnitRating {
                     setHeavyVeeBayCount(getHeavyVeeBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof LightVehicleBay) {
                     setLightVeeBayCount(getLightVeeBayCount() + (int) bay.getCapacity());
-                }  else if (bay instanceof BattleArmorBay) {
+                } else if (bay instanceof BattleArmorBay) {
                     setBaBayCount(getBaBayCount() + (int) bay.getCapacity());
                 } else if (bay instanceof InfantryBay) {
-                    setInfantryBayCount(getInfantryBayCount() + (int)
-                            Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
+                    setInfantryBayCount(getInfantryBayCount()
+                            + (int) Math.floor(bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
                 }
             }
         }
@@ -682,9 +685,12 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Calculate the number of infantry "platoons" present in the company, based on the numbers
-     * of various infantry present. Per CamOps, the simplification is that an infantry cube can
+     * Calculate the number of infantry "platoons" present in the company, based on
+     * the numbers
+     * of various infantry present. Per CamOps, the simplification is that an
+     * infantry cube can
      * house 28 infantry.
+     * 
      * @return Number of infantry "platoons" in the company.
      */
     int calcInfantryPlatoons() {
@@ -862,6 +868,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private void setPartialCount(int partialCount) {
         this.partialCount = partialCount;
     }
+
     void setSupportPercent(BigDecimal supportPercent) {
         this.supportPercent = supportPercent;
     }
@@ -879,16 +886,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
         if (u.isMothballed()) {
             return;
         }
-        LogManager.getLogger().debug("Adding " + u.getName() + " to unit counts.");
+        logger.debug("Adding " + u.getName() + " to unit counts.");
 
         Entity e = u.getEntity();
         if (null == e) {
-            LogManager.getLogger().debug("Unit " + u.getName() + " is not an Entity.  Skipping.");
+            logger.debug("Unit " + u.getName() + " is not an Entity.  Skipping.");
             return;
         }
 
         int unitType = e.getUnitType();
-        LogManager.getLogger().debug("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
+        logger.debug("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
         // TODO : Add Airship when MegaMek supports it.
         switch (unitType) {
             case UnitType.MEK:
@@ -900,7 +907,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.VTOL:
             case UnitType.TANK:
-                LogManager.getLogger().debug("Unit " + u.getName() + " weight is " + e.getWeight());
+                logger.debug("Unit " + u.getName() + " weight is " + e.getWeight());
                 if (e.getWeight() <= 50f) {
                     incrementLightVeeCount();
                 } else if (e.getWeight() <= 100f) {

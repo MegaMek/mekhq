@@ -1,24 +1,29 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Award;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Award;
+
 public class ScenarioKillAwards {
+    private static final MMLogger logger = MMLogger.create(ScenarioKillAwards.class);
+
     /**
-     * This function loops through Scenario Kill Awards, checking whether the person is eligible to receive each type of award.
+     * This function loops through Scenario Kill Awards, checking whether the person
+     * is eligible to receive each type of award.
      *
-     * @param campaign the campaign to be processed
-     * @param person the Person to check award eligibility for
+     * @param campaign  the campaign to be processed
+     * @param person    the Person to check award eligibility for
      * @param killCount the number of relevant kills scored by 'person'
-     * @param awards awards the awards to be processed (should only include awards where item == kill && ranges == scenario)
+     * @param awards    awards the awards to be processed (should only include
+     *                  awards where item == kill && ranges == scenario)
      */
-    public static Map<Integer, List<Object>> ScenarioKillAwardsProcessor(Campaign campaign, UUID person, List<Award> awards, int killCount) {
+    public static Map<Integer, List<Object>> ScenarioKillAwardsProcessor(Campaign campaign, UUID person,
+            List<Award> awards, int killCount) {
         int killsNeeded;
 
         List<Award> eligibleAwards = new ArrayList<>();
@@ -30,7 +35,7 @@ public class ScenarioKillAwards {
                 try {
                     killsNeeded = award.getQty();
                 } catch (Exception e) {
-                    LogManager.getLogger().warn("Kill(Scenario) Award {} from the {} set has invalid range qty {}",
+                    logger.warn("Kill(Scenario) Award {} from the {} set has invalid range qty {}",
                             award.getName(), award.getSet(), award.getQty());
                     continue;
                 }

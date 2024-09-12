@@ -20,6 +20,21 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ResourceBundle;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -27,14 +42,10 @@ import megamek.common.MekSummary;
 import megamek.common.MekSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.CampaignGUI;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
 
 /**
  * Manages searches for DropShips or JumpShips for Against the Bot.
@@ -42,6 +53,8 @@ import java.util.ResourceBundle;
  * @author Neoancient
  */
 public class ShipSearchDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(ShipSearchDialog.class);
+
     private JRadioButton btnDropship = new JRadioButton();
     private JRadioButton btnJumpship = new JRadioButton();
     private JRadioButton btnWarship = new JRadioButton();
@@ -227,7 +240,7 @@ public class ShipSearchDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

@@ -20,9 +20,15 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -31,25 +37,29 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.ArrayList;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Battle Armor suits are crazy - you can't crit the equipment in them, so
- * if we remove the suit we should remove all the equipment with the same trooper and
- * track its value and tonnage in the suit object. As of 0.3.16, we are doing this differently. We are
- * now using the linked child and parent part ids from the Part java to link the suit to all of its
- * constituent equipment and armor. This stuff is then pulled off the unit and put back on with the
- * BattleArmorSuit.remove and MissingBattleArmorSuit.fix methods. This allows us to adjust for the fact
- * that modular equipment can now be removed separately. We still need to figure out how to acquire
+ * if we remove the suit we should remove all the equipment with the same
+ * trooper and
+ * track its value and tonnage in the suit object. As of 0.3.16, we are doing
+ * this differently. We are
+ * now using the linked child and parent part ids from the Part java to link the
+ * suit to all of its
+ * constituent equipment and armor. This stuff is then pulled off the unit and
+ * put back on with the
+ * BattleArmorSuit.remove and MissingBattleArmorSuit.fix methods. This allows us
+ * to adjust for the fact
+ * that modular equipment can now be removed separately. We still need to figure
+ * out how to acquire
  * new suits that come pre-packaged with all of their equipment.
+ * 
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorSuit extends Part {
+    private static final MMLogger logger = MMLogger.create(BattleArmorSuit.class);
+
     protected String chassis;
     protected String model;
     protected boolean clan;
@@ -68,7 +78,7 @@ public class BattleArmorSuit extends Part {
         super(0, null);
         this.trooper = 0;
         this.quad = false;
-        this.weightClass= 0;
+        this.weightClass = 0;
         this.groundMP = 0;
         this.jumpMP = 0;
         this.clan = false;
@@ -81,7 +91,7 @@ public class BattleArmorSuit extends Part {
         super((int) ba.getWeight(), c);
         this.trooper = loc;
         this.quad = ba.getChassisType() == BattleArmor.CHASSIS_TYPE_QUAD;
-        this.weightClass= ba.getWeightClass();
+        this.weightClass = ba.getWeightClass();
         this.groundMP = ba.getOriginalWalkMP();
         this.jumpMP = ba.getOriginalJumpMP();
         this.clan = ba.isClan();
@@ -93,11 +103,11 @@ public class BattleArmorSuit extends Part {
     }
 
     public BattleArmorSuit(String ch, String m, int ton, int t, int w, int gmp, int jmp, boolean q,
-                           boolean clan, EntityMovementMode mode, Campaign c) {
+            boolean clan, EntityMovementMode mode, Campaign c) {
         super(ton, c);
         this.trooper = t;
         this.quad = q;
-        this.weightClass= w;
+        this.weightClass = w;
         this.groundMP = gmp;
         this.jumpMP = jmp;
         this.clan = clan;
@@ -253,7 +263,7 @@ public class BattleArmorSuit extends Part {
                 cost = cost.plus(50000 * (jumpMP + 1));
                 break;
         }
-        cost = cost.plus(25000 * (groundMP-1));
+        cost = cost.plus(25000 * (groundMP - 1));
         for (Part p : getChildParts()) {
             if (p instanceof BaArmor) {
                 cost = cost.plus(p.getActualValue());
@@ -268,7 +278,8 @@ public class BattleArmorSuit extends Part {
     private void initializeExtraCostsAndTons() {
         alternateCost = Money.zero();
         alternateTon = 0;
-        // Simplest way to do this is just get the full cost and tonnage of a new unit and divide by
+        // Simplest way to do this is just get the full cost and tonnage of a new unit
+        // and divide by
         // squad size
         MekSummary summary = MekSummaryCache.getInstance().getMek(getChassis() + " " + getModel());
         if (null != summary) {
@@ -310,8 +321,9 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        //because of the linked children parts, we always need to consider these as different
-        //return false;
+        // because of the linked children parts, we always need to consider these as
+        // different
+        // return false;
         return part instanceof BattleArmorSuit
                 && chassis.equals(((BattleArmorSuit) part).getChassis())
                 && model.equals(((BattleArmorSuit) part).getModel())
@@ -367,7 +379,7 @@ public class BattleArmorSuit extends Part {
                     alternateTon = Double.parseDouble(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -382,7 +394,8 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingBattleArmorSuit(chassis, model, getUnitTonnage(), trooper, weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
+        return new MissingBattleArmorSuit(chassis, model, getUnitTonnage(), trooper, weightClass, groundMP, jumpMP,
+                quad, clan, jumpType, campaign);
     }
 
     @Override
@@ -393,7 +406,7 @@ public class BattleArmorSuit extends Part {
             if (unit.getEntity().getInternal(trooper) > 0) {
                 // then there is a trooper here, so remove a crewmember
                 if (!unit.getCrew().isEmpty()) {
-                    trooperToRemove = unit.getCrew().get(unit.getCrew().size()-1);
+                    trooperToRemove = unit.getCrew().get(unit.getCrew().size() - 1);
                     // don't remove yet - we need to first set the internal to
                     // destroyed so, this slot gets skipped over when we reset the pilot
                 }
@@ -445,7 +458,7 @@ public class BattleArmorSuit extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             if (trooper < 0) {
-                LogManager.getLogger().error("Trooper location -1 found on BattleArmorSuit attached to unit");
+                logger.error("Trooper location -1 found on BattleArmorSuit attached to unit");
                 return;
             }
 
@@ -556,7 +569,8 @@ public class BattleArmorSuit extends Part {
     }
 
     /**
-     * This method will load up a TestUnit in order to identify the parts that need to be
+     * This method will load up a TestUnit in order to identify the parts that need
+     * to be
      * added to the suit
      */
     private void addSubParts() {
@@ -569,7 +583,7 @@ public class BattleArmorSuit extends Part {
         try {
             newEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
         Unit newUnit = null;
         if (null != newEntity) {
@@ -577,7 +591,8 @@ public class BattleArmorSuit extends Part {
         }
 
         if (null != newUnit) {
-            // This now works, except when GM Mode is used to procure which must not be using the
+            // This now works, except when GM Mode is used to procure which must not be
+            // using the
             // find method
             for (Part part : newUnit.getParts()) {
                 if ((part instanceof BattleArmorEquipmentPart)
@@ -599,7 +614,8 @@ public class BattleArmorSuit extends Part {
     }
 
     /**
-     * Sets a value indicating whether or not this part is being used as a replacement.
+     * Sets a value indicating whether or not this part is being used as a
+     * replacement.
      */
     public void isReplacement(boolean value) {
         isReplacement = value;

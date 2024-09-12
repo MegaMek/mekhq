@@ -18,26 +18,35 @@
  */
 package mekhq.campaign.universe;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.common.MekSummary;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.campaign.rating.IUnitRating;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.*;
 
 /**
  * Base class for unit generators containing common functionality.
  * Currently, only turret-related code.
+ * 
  * @author NickAragua
  */
 public abstract class AbstractUnitGenerator implements IUnitGenerator {
+    private static final MMLogger logger = MMLogger.create(AbstractUnitGenerator.class);
+
     private Map<Integer, String> ratRatingMappings = null;
     private TreeSet<Integer> turretRatYears = new TreeSet<>();
     private Map<Integer, Map<String, String>> turretRatNames = new HashMap<>();
 
     /**
-     * Worker function to initialize the mapping between a numeric quality rating level
+     * Worker function to initialize the mapping between a numeric quality rating
+     * level
      * and an alphabetic one (such as one used in the RATs)
      */
     private void initializeRatRatingMappings() {
@@ -55,9 +64,10 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
 
     /**
      * Generates a list of turrets given a skill level, quality and year
-     * @param num How many turrets to generate
-     * @param skill The skill level of the turret operator
-     * @param quality The quality level of the turret
+     * 
+     * @param num         How many turrets to generate
+     * @param skill       The skill level of the turret operator
+     * @param quality     The quality level of the turret
      * @param currentYear The current year
      * @return List of turrets
      */
@@ -71,7 +81,8 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
         // turret rat file names appear to follow the pattern of "Turrets YYYY Q"
         // where YYYY is the four-digit year
         // and Q is the quality level of the force.
-        // This way, as long as the turret RAT names follow the above-described pattern, we can handle any number of them.
+        // This way, as long as the turret RAT names follow the above-described pattern,
+        // we can handle any number of them.
         initializeRatRatingMappings();
 
         for (Iterator<String> rats = RandomUnitGenerator.getInstance().getRatList(); rats.hasNext();) {
@@ -90,20 +101,22 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
             }
         }
 
-        // We don't have rats for *every* year, so we find the nearest previous one. If there is no
+        // We don't have rats for *every* year, so we find the nearest previous one. If
+        // there is no
         // RAT for the current or previous year, use the earliest available.
         // If there are no turret RATs, return an empty list
         if (turretRatYears.isEmpty()) {
-            LogManager.getLogger().warn("No turret RATs found.");
+            logger.warn("No turret RATs found.");
             return Collections.emptyList();
         } else if (currentYear < turretRatYears.first()) {
-            LogManager.getLogger().warn("Earliest turret RAT is later than campaign year.");
+            logger.warn("Earliest turret RAT is later than campaign year.");
             ratYear = turretRatYears.first();
         } else {
             ratYear = turretRatYears.floor(currentYear);
         }
 
-        // now that we have the year, we need to determine which turret RAT we're going to use
+        // now that we have the year, we need to determine which turret RAT we're going
+        // to use
         String ratName = turretRatNames.get(ratYear).get(ratRatingMappings.get(quality));
 
         RandomUnitGenerator.getInstance().setChosenRAT(ratName);

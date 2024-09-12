@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.StringJoiner;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.StringJoiner;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author MKerensky
  */
 public class KFChargingSystem extends Part {
+    private static final MMLogger logger = MMLogger.create(KFChargingSystem.class);
+
     public static final TechAdvancement TA_CHARGING_SYSTEM = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
@@ -101,10 +104,10 @@ public class KFChargingSystem extends Part {
     public int getBaseTime() {
         int time;
         if (isSalvaging()) {
-            //10 * repair time
+            // 10 * repair time
             time = 1200;
         } else {
-            //Battlespace p28
+            // Battlespace p28
             time = 120;
         }
         return time;
@@ -112,7 +115,7 @@ public class KFChargingSystem extends Part {
 
     @Override
     public int getDifficulty() {
-        //Battlespace p28
+        // Battlespace p28
         if (isSalvaging()) {
             return 4;
         }
@@ -122,7 +125,7 @@ public class KFChargingSystem extends Part {
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship) unit.getEntity()).setKFChargingSystemHit(needsFixing());
+            ((Jumpship) unit.getEntity()).setKFChargingSystemHit(needsFixing());
         }
     }
 
@@ -132,8 +135,9 @@ public class KFChargingSystem extends Part {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
             Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFChargingSystemHit(false);
-            //Also repair your KF Drive integrity - +1 point if you have other components to fix
-            //Otherwise, fix it all.
+            // Also repair your KF Drive integrity - +1 point if you have other components
+            // to fix
+            // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
             } else {
@@ -150,9 +154,11 @@ public class KFChargingSystem extends Part {
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setKFChargingSystemHit(true);
             }
-            //All the BT lore says you can't jump while carrying around another KF Drive, therefore
-            //you can't salvage and keep this in the warehouse, just remove/scrap and replace it
-            //See SO p130 for reference
+            // All the BT lore says you can't jump while carrying around another KF Drive,
+            // therefore
+            // you can't salvage and keep this in the warehouse, just remove/scrap and
+            // replace it
+            // See SO p130 for reference
             campaign.getWarehouse().removePart(this);
             unit.removePart(this);
             Part missing = getMissingPart();
@@ -232,7 +238,7 @@ public class KFChargingSystem extends Part {
                     docks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -250,7 +256,7 @@ public class KFChargingSystem extends Part {
             joiner.add(details);
         }
         joiner.add(getUnitTonnage() + " tons")
-              .add(getDocks() + " collars");
+                .add(getDocks() + " collars");
         return joiner.toString();
     }
 

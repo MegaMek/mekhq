@@ -18,46 +18,46 @@
  */
 package mekhq.campaign.finances.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum FinancialYearDuration {
-    //region Enum Declarations
+    // region Enum Declarations
     SEMIANNUAL("FinancialYearDuration.SEMIANNUAL.text", "FinancialYearDuration.SEMIANNUAL.toolTipText"),
     ANNUAL("FinancialYearDuration.ANNUAL.text", "FinancialYearDuration.ANNUAL.toolTipText"),
     BIENNIAL("FinancialYearDuration.BIENNIAL.text", "FinancialYearDuration.BIENNIAL.toolTipText"),
     QUINQUENNIAL("FinancialYearDuration.QUINQUENNIAL.text", "FinancialYearDuration.QUINQUENNIAL.toolTipText"),
     DECENNIAL("FinancialYearDuration.DECENNIAL.text", "FinancialYearDuration.DECENNIAL.toolTipText"),
     FOREVER("FinancialYearDuration.FOREVER.text", "FinancialYearDuration.FOREVER.toolTipText");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     FinancialYearDuration(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isSemiannual() {
         return this == SEMIANNUAL;
     }
@@ -81,7 +81,7 @@ public enum FinancialYearDuration {
     public boolean isForever() {
         return this == FOREVER;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     public boolean isEndOfFinancialYear(final LocalDate today) {
         switch (this) {
@@ -103,10 +103,13 @@ public enum FinancialYearDuration {
     }
 
     /**
-     * This is called to get the export after the financial year has concluded according to the
-     * previous check returns true. Because of that, this is called with tomorrow's date.
+     * This is called to get the export after the financial year has concluded
+     * according to the
+     * previous check returns true. Because of that, this is called with tomorrow's
+     * date.
      *
-     * @param tomorrow tomorrow's date. Because of how this is passed in, we are provided that
+     * @param tomorrow tomorrow's date. Because of how this is passed in, we are
+     *                 provided that
      *                 instead of today
      * @return the filename to use for the date during financial export
      */
@@ -118,9 +121,11 @@ public enum FinancialYearDuration {
                 return isStartOfYear
                         ? String.format("%d %s - %s", year,
                                 Month.JULY.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""),
-                                Month.DECEMBER.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""))
+                                Month.DECEMBER.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]",
+                                        ""))
                         : String.format("%d %s - %s", year + 1,
-                                Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""),
+                                Month.JANUARY.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]",
+                                        ""),
                                 Month.JUNE.getDisplayName(TextStyle.SHORT, Locale.getDefault()).replaceAll("[.]", ""));
             case BIENNIAL:
                 return String.format("%d - %d", year - 1, year);
@@ -135,9 +140,10 @@ public enum FinancialYearDuration {
         }
     }
 
-    //region File I/O
+    // region File I/O
     /**
-     * This allows for the legacy parsing method of financial durations, outdated in 0.49.X
+     * This allows for the legacy parsing method of financial durations, outdated in
+     * 0.49.X
      */
     public static FinancialYearDuration parseFromString(final String text) {
         try {
@@ -151,10 +157,11 @@ public enum FinancialYearDuration {
             return BIENNIAL;
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a FinancialYearDuration. Returning ANNUAL.");
+        MMLogger.create(FinancialYearDuration.class)
+                .error("Unable to parse " + text + " into a FinancialYearDuration. Returning ANNUAL.");
         return ANNUAL;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

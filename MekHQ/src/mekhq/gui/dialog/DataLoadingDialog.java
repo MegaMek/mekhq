@@ -18,12 +18,30 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.time.LocalDate;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingWorker;
+
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
+import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
@@ -46,20 +64,11 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.gui.baseComponents.AbstractMHQDialog;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.time.LocalDate;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
 public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChangeListener {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
+
+    // region Variable Declarations
     private final MekHQ application;
     private final File campaignFile;
     private final Task task;
@@ -67,16 +76,16 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
     private JProgressBar progressBar;
     private StoryArcStub storyArcStub;
 
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public DataLoadingDialog(final JFrame frame, final MekHQ application,
-                             final @Nullable File campaignFile) {
-            this(frame, application, campaignFile, null);
+            final @Nullable File campaignFile) {
+        this(frame, application, campaignFile, null);
     }
 
     public DataLoadingDialog(final JFrame frame, final MekHQ application,
-                             final @Nullable File campaignFile, StoryArcStub stub) {
+            final @Nullable File campaignFile, StoryArcStub stub) {
         super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
         this.application = application;
         this.campaignFile = campaignFile;
@@ -86,9 +95,9 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
         initialize();
         getTask().execute();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public MekHQ getApplication() {
         return application;
     }
@@ -116,9 +125,9 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
     public void setProgressBar(final JProgressBar progressBar) {
         this.progressBar = progressBar;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region Initialization
+    // region Initialization
     @Override
     protected void initialize() {
         setUndecorated(true);
@@ -152,9 +161,9 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
         fitAndCenter();
         getFrame().setVisible(false);
     }
-    //endregion Initialization
+    // endregion Initialization
 
-    //region PropertyChangeListener
+    // region PropertyChangeListener
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
         int progress = task.getProgress();
@@ -181,10 +190,12 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 progressBar.setString(resources.getString("loadingUnits.text"));
                 break;
             case 6:
-                progressBar.setString(resources.getString((getCampaignFile() == null) ? "initializingNewCampaign.text" : "loadingCampaign.text"));
+                progressBar.setString(resources.getString(
+                        (getCampaignFile() == null) ? "initializingNewCampaign.text" : "loadingCampaign.text"));
                 break;
             case 7:
-                progressBar.setString(resources.getString((getCampaignFile() == null) ? "applyingNewCampaign.text" : "applyingLoadedCampaign.text"));
+                progressBar.setString(resources.getString(
+                        (getCampaignFile() == null) ? "applyingNewCampaign.text" : "applyingLoadedCampaign.text"));
                 break;
             default:
                 progressBar.setString(resources.getString("Error.text"));
@@ -195,16 +206,18 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 resources.getString("DataLoadingDialog.progress.accessibleDescription"),
                 progressBar.getString()));
     }
-    //endregion PropertyChangeListener
+    // endregion PropertyChangeListener
 
     /**
      * Main task. This is executed in a background thread.
      */
     private class Task extends SwingWorker<Campaign, Campaign> {
         JDialog dialog;
+
         public Task(JDialog dialog) {
             this.dialog = dialog;
         }
+
         /**
          * This uses the following stages of loading:
          * 0 : Basics
@@ -215,12 +228,13 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
          * 5 : Units
          * 6 : New Campaign / Campaign Loading
          * 7 : Campaign Application
+         * 
          * @return The loaded campaign
          * @throws Exception if anything goes wrong
          */
         @Override
         public Campaign doInBackground() throws Exception {
-            //region Progress 0
+            // region Progress 0
             setProgress(0);
             CurrencyManager.getInstance().loadCurrencies();
             Eras.initializeEras();
@@ -230,31 +244,31 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
             RATManager.populateCollectionNames();
             SkillType.initializeTypes();
             SpecialAbility.initializeSPA();
-            //endregion Progress 0
+            // endregion Progress 0
 
-            //region Progress 1
+            // region Progress 1
             setProgress(1);
             Factions.setInstance(Factions.loadDefault());
-            //endregion Progress 1
+            // endregion Progress 1
 
-            //region Progress 2
+            // region Progress 2
             setProgress(2);
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();
             Bloodname.loadBloodnameData();
-            //endregion Progress 2
+            // endregion Progress 2
 
-            //region Progress 3
+            // region Progress 3
             setProgress(3);
             Systems.setInstance(Systems.loadDefault());
-            //endregion Progress 3
+            // endregion Progress 3
 
-            //region Progress 4
+            // region Progress 4
             setProgress(4);
             MHQStaticDirectoryManager.initialize();
-            //endregion Progress 4
+            // endregion Progress 4
 
-            //region Progress 5
+            // region Progress 5
             setProgress(5);
             while (!MekSummaryCache.getInstance().isInitialized()) {
                 try {
@@ -263,17 +277,18 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
                 }
             }
-            //endregion Progress 5
+            // endregion Progress 5
 
             setProgress(6);
             final Campaign campaign;
             if (getCampaignFile() == null) {
-                //region Progress 6
-                LogManager.getLogger().info("Starting a new campaign");
+                // region Progress 6
+                logger.info("Starting a new campaign");
                 campaign = new Campaign();
 
                 // Campaign Preset
-                final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(dialog, getFrame());
+                final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(dialog,
+                        getFrame());
                 if (presetSelectionDialog.showDialog().isCancelled()) {
                     return null;
                 }
@@ -281,7 +296,8 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
                 // Date
                 final LocalDate date = ((preset == null) || (preset.getDate() == null))
-                        ? campaign.getLocalDate() : preset.getDate();
+                        ? campaign.getLocalDate()
+                        : preset.getDate();
                 final DateChooser dc = new DateChooser(dialog, date);
                 dc.setLocationRelativeTo(getFrame());
                 // user can either choose a date or cancel by closing
@@ -311,21 +327,26 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 ReputationController reputationController = new ReputationController();
                 reputationController.initializeReputation(campaign);
                 campaign.setReputation(reputationController);
-                //endregion Progress 6
+                // endregion Progress 6
 
-                //region Progress 7
+                // region Progress 7
                 setProgress(7);
-                campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
+                campaign.beginReport(
+                        "<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(campaign.getLocalDate()) + "</b>");
 
                 // Setup Personnel Modules
-                campaign.setMarriage(campaign.getCampaignOptions().getRandomMarriageMethod().getMethod(campaign.getCampaignOptions()));
-                campaign.setDivorce(campaign.getCampaignOptions().getRandomDivorceMethod().getMethod(campaign.getCampaignOptions()));
-                campaign.setProcreation(campaign.getCampaignOptions().getRandomProcreationMethod().getMethod(campaign.getCampaignOptions()));
+                campaign.setMarriage(campaign.getCampaignOptions().getRandomMarriageMethod()
+                        .getMethod(campaign.getCampaignOptions()));
+                campaign.setDivorce(campaign.getCampaignOptions().getRandomDivorceMethod()
+                        .getMethod(campaign.getCampaignOptions()));
+                campaign.setProcreation(campaign.getCampaignOptions().getRandomProcreationMethod()
+                        .getMethod(campaign.getCampaignOptions()));
 
                 // Setup Markets
                 campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
                 // TODO : AbstractContractMarket : Uncomment
-                //campaign.getContractMarket().generateContractOffers(campaign, (preset == null) ? 2 : preset.getContractCount());
+                // campaign.getContractMarket().generateContractOffers(campaign, (preset ==
+                // null) ? 2 : preset.getContractCount());
                 if (!campaign.getCampaignOptions().getUnitMarketMethod().isNone()) {
                     campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);
@@ -345,10 +366,10 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
                 // Turnover
                 campaign.initTurnover();
-                //endregion Progress 7
+                // endregion Progress 7
             } else {
-                //region Progress 6
-                LogManager.getLogger().info(String.format("Loading campaign file from XML file %s", getCampaignFile()));
+                // region Progress 6
+                logger.info(String.format("Loading campaign file from XML file %s", getCampaignFile()));
 
                 // And then load the campaign object from it.
                 try (FileInputStream fis = new FileInputStream(getCampaignFile())) {
@@ -357,9 +378,9 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                     campaign.restore();
                     campaign.cleanUp();
                 }
-                //endregion Progress 6
+                // endregion Progress 6
 
-                //region Progress 7
+                // region Progress 7
                 setProgress(7);
                 // Make sure campaign options event handlers get their data
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
@@ -370,7 +391,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                     reputationController.initializeReputation(campaign);
                     campaign.setReputation(reputationController);
                 }
-                //endregion Progress 7
+                // endregion Progress 7
             }
             campaign.setApp(getApplication());
             return campaign;
@@ -387,7 +408,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
             } catch (InterruptedException | CancellationException ignored) {
                 campaign = null;
             } catch (ExecutionException ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
                 if (ex.getCause() instanceof NullEntityException) {
                     JOptionPane.showMessageDialog(null,
                             String.format(resources.getString("DataLoadingDialog.NullEntityException.text"),

@@ -1,20 +1,5 @@
 package mekhq.campaign.mission;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
@@ -23,14 +8,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+
+import org.w3c.dom.Node;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import megamek.logging.MMLogger;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * This is the root data structure for organizing information related to a scenario template.
+ * This is the root data structure for organizing information related to a
+ * scenario template.
+ * 
  * @author NickAragua
  */
-@XmlRootElement(name="ScenarioTemplate")
+@XmlRootElement(name = "ScenarioTemplate")
 public class ScenarioTemplate implements Cloneable {
+    private static final MMLogger logger = MMLogger.create(ScenarioTemplate.class);
+
     public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
     public static final String PRIMARY_PLAYER_FORCE_ID = "Player";
 
@@ -46,8 +52,8 @@ public class ScenarioTemplate implements Cloneable {
 
     private Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
 
-    @XmlElementWrapper(name="scenarioObjectives")
-    @XmlElement(name="scenarioObjective")
+    @XmlElementWrapper(name = "scenarioObjectives")
+    @XmlElement(name = "scenarioObjective")
     public List<ScenarioObjective> scenarioObjectives = new ArrayList<>();
 
     @Override
@@ -72,12 +78,13 @@ public class ScenarioTemplate implements Cloneable {
 
         st.mapParameters = (ScenarioMapParameters) mapParameters.clone();
 
-
         return st;
     }
 
     /**
-     * Returns the "primary" player force. This is always the force with the name "Player".
+     * Returns the "primary" player force. This is always the force with the name
+     * "Player".
+     * 
      * @return Primary player force.
      */
     public ScenarioForceTemplate getPrimaryPlayerForce() {
@@ -88,8 +95,8 @@ public class ScenarioTemplate implements Cloneable {
         return scenarioForces.values().stream().collect(Collectors.toList());
     }
 
-    @XmlElementWrapper(name="scenarioForces")
-    @XmlElement(name="scenarioForce")
+    @XmlElementWrapper(name = "scenarioForces")
+    @XmlElement(name = "scenarioForce")
     public Map<String, ScenarioForceTemplate> getScenarioForces() {
         return scenarioForces;
     }
@@ -111,34 +118,39 @@ public class ScenarioTemplate implements Cloneable {
     }
 
     public List<ScenarioForceTemplate> getAllBotControlledAllies() {
-        return scenarioForces.values().stream().filter(forceTemplate ->
-            (forceTemplate.getForceAlignment() == ForceAlignment.Allied.ordinal()) &&
-            (forceTemplate.getGenerationMethod() != ForceGenerationMethod.PlayerSupplied.ordinal()))
+        return scenarioForces.values().stream()
+                .filter(forceTemplate -> (forceTemplate.getForceAlignment() == ForceAlignment.Allied.ordinal()) &&
+                        (forceTemplate.getGenerationMethod() != ForceGenerationMethod.PlayerSupplied.ordinal()))
                 .collect(Collectors.toList());
     }
 
     public List<ScenarioForceTemplate> getAllBotControlledHostiles() {
-        return scenarioForces.values().stream().filter(forceTemplate ->
-            (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) ||
-            (forceTemplate.getForceAlignment() == ForceAlignment.Third.ordinal()))
+        return scenarioForces.values().stream()
+                .filter(forceTemplate -> (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) ||
+                        (forceTemplate.getForceAlignment() == ForceAlignment.Third.ordinal()))
                 .collect(Collectors.toList());
     }
 
     /**
-     * All force templates that are controlled and supplied, or potentially supplied, by the player, that are not reinforcements
+     * All force templates that are controlled and supplied, or potentially
+     * supplied, by the player, that are not reinforcements
+     * 
      * @return List of scenario force templates
      */
     public List<ScenarioForceTemplate> getAllPrimaryPlayerForces() {
-        return scenarioForces.values().stream().filter(forceTemplate ->
-            (forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
-            (forceTemplate.getArrivalTurn() != ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
-                ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
-                 (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())))
+        return scenarioForces.values().stream()
+                .filter(forceTemplate -> (forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
+                        (forceTemplate.getArrivalTurn() != ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
+                        ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
+                                (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount
+                                        .ordinal())))
                 .collect(Collectors.toList());
     }
 
     /**
-     * All force templates that are controlled and supplied, or potentially supplied, by the player, that are not reinforcements
+     * All force templates that are controlled and supplied, or potentially
+     * supplied, by the player, that are not reinforcements
+     * 
      * @return List of scenario force templates
      */
     public List<ScenarioForceTemplate> getAllPlayerReinforcementForces() {
@@ -148,14 +160,15 @@ public class ScenarioTemplate implements Cloneable {
             if ((forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()) &&
                     (forceTemplate.getArrivalTurn() == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) &&
                     ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) ||
-                     (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()))) {
+                            (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount
+                                    .ordinal()))) {
                 retVal.add(forceTemplate);
             }
         }
 
         return retVal;
     }
-    
+
     /**
      * Is this template for a ground-side scenario?
      */
@@ -167,47 +180,52 @@ public class ScenarioTemplate implements Cloneable {
     /**
      * Serialize this instance of a scenario template to a File
      * Please pass in a non-null file.
+     * 
      * @param outputFile The destination file.
      */
     public void Serialize(File outputFile) {
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
-            JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioTemplate.class, this);
+            JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME),
+                    ScenarioTemplate.class, this);
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, outputFile);
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
     /**
      * Serialize this instance of a scenario template to a PrintWriter
      * Omits initial xml declaration
+     * 
      * @param pw The destination print writer
      */
     public void Serialize(PrintWriter pw) {
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
-            JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioTemplate.class, this);
+            JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME),
+                    ScenarioTemplate.class, this);
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(templateElement, pw);
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
     /**
      * Attempt to deserialize a file at the given path.
+     * 
      * @param filePath The location of the file
      * @return Possibly an instance of a scenario template.
      */
     public static ScenarioTemplate Deserialize(String filePath) {
         File inputFile = new File(filePath);
         if (!inputFile.exists()) {
-            LogManager.getLogger().error(String.format("Cannot deserialize file %s, does not exist", filePath));
+            logger.error(String.format("Cannot deserialize file %s, does not exist", filePath));
             return null;
         }
 
@@ -215,7 +233,9 @@ public class ScenarioTemplate implements Cloneable {
     }
 
     /**
-     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in file
+     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in
+     * file
+     * 
      * @param inputFile The source file
      * @return Possibly an instance of a ScenarioTemplate
      */
@@ -231,14 +251,16 @@ public class ScenarioTemplate implements Cloneable {
                 resultingTemplate = templateElement.getValue();
             }
         } catch (Exception e) {
-            LogManager.getLogger().error("Error Deserializing Scenario Template", e);
+            logger.error("Error Deserializing Scenario Template", e);
         }
 
         return resultingTemplate;
     }
 
     /**
-     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in XML Node
+     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in
+     * XML Node
+     * 
      * @param xmlNode The node with the scenario template
      * @return Possibly an instance of a ScenarioTemplate
      */
@@ -251,7 +273,7 @@ public class ScenarioTemplate implements Cloneable {
             JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(xmlNode, ScenarioTemplate.class);
             resultingTemplate = templateElement.getValue();
         } catch (Exception e) {
-            LogManager.getLogger().error("Error Deserializing Scenario Template", e);
+            logger.error("Error Deserializing Scenario Template", e);
         }
 
         return resultingTemplate;

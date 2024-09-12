@@ -36,14 +36,13 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
-import org.apache.logging.log4j.LogManager;
-
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -70,6 +69,8 @@ import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 
 public class TOEMouseAdapter extends JPopupMenuAdapter {
+    private static final MMLogger logger = MMLogger.create(TOEMouseAdapter.class);
+
     private final CampaignGUI gui;
     private final JTree tree;
 
@@ -1235,7 +1236,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     try {
                         nodesFree = Integer.parseInt(network[1]);
                     } catch (Exception ex) {
-                        LogManager.getLogger().error("", ex);
+                        logger.error("", ex);
                         continue;
                     }
 
@@ -1263,7 +1264,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     try {
                         nodesFree = Integer.parseInt(network[1]);
                     } catch (Exception ex) {
-                        LogManager.getLogger().error("", ex);
+                        logger.error("", ex);
                         continue;
                     }
 
@@ -1312,7 +1313,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         try {
                             nodesFree = Integer.parseInt(network[1]);
                         } catch (Exception ex) {
-                            LogManager.getLogger().error("", ex);
+                            logger.error("", ex);
                             continue;
                         }
 
@@ -1361,7 +1362,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                         try {
                             nodesFree = Integer.parseInt(network[1]);
                         } catch (Exception ex) {
-                            LogManager.getLogger().error("", ex);
+                            logger.error("", ex);
                             continue;
                         }
 
@@ -1618,7 +1619,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     /**
      * Worker function to make sure transport assignment data gets cleared out when
      * unit(s) are removed from the TO&E
-     * 
+     *
      * @param unitsToUpdate A vector of UUIDs of the units that we need to update.
      *                      This can be either a collection that the player
      *                      has selected or all units in a given force
@@ -1635,7 +1636,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
     /**
      * Worker function to make sure transport assignment data gets cleared out when
      * unit(s) are removed from the TO&E
-     * 
+     *
      * @param currentUnit The unit currently being processed
      */
     private void clearTransportAssignment(@Nullable Unit currentUnit) {

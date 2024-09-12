@@ -1,23 +1,39 @@
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ResourceBundle;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.gui.utilities.JMoneyTextField;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.ResourceBundle;
 
 /**
  * @author natit
  */
 public class AddFundsDialog extends JDialog implements FocusListener {
+    private static final MMLogger logger = MMLogger.create(AddFundsDialog.class);
+
     private JButton btnAddFunds;
     private JMoneyTextField fundsQuantityField;
     private JFormattedTextField descriptionField;
@@ -57,7 +73,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -108,7 +124,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
 
     @Override
     public void focusLost(FocusEvent e) {
-        //not used
+        // not used
     }
 
     public int getClosedType() {

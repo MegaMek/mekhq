@@ -21,21 +21,22 @@
  */
 package mekhq.campaign.force;
 
+import java.io.PrintWriter;
+import java.util.UUID;
+import java.util.Vector;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.unit.Unit;
 import mekhq.io.migration.ForceIconMigrator;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.UUID;
-import java.util.Vector;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * this is a hierarchical object that represents forces from the TO&amp;E using
@@ -45,14 +46,16 @@ import java.util.Vector;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceStub {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(ForceStub.class);
+
+    // region Variable Declarations
     private String name;
     private StandardForceIcon forceIcon;
     private Vector<ForceStub> subForces;
     private Vector<UnitStub> units;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public ForceStub() {
         this(null, null);
     }
@@ -79,9 +82,9 @@ public class ForceStub {
             }
         }
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public StandardForceIcon getForceIcon() {
         return forceIcon;
     }
@@ -89,7 +92,7 @@ public class ForceStub {
     public void setForceIcon(final StandardForceIcon forceIcon) {
         this.forceIcon = forceIcon;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     public Vector<Object> getAllChildren() {
         Vector<Object> children = new Vector<>();
@@ -99,7 +102,7 @@ public class ForceStub {
         return children;
     }
 
-    //region File I/O
+    // region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forceStub");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
@@ -152,7 +155,8 @@ public class ForceStub {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            logger
+                                    .error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -165,7 +169,8 @@ public class ForceStub {
                         if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
                         } else if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
+                            logger
+                                    .error("Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName());
                             continue;
                         }
 
@@ -174,7 +179,7 @@ public class ForceStub {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         if (version.isLowerThan("0.49.6")) {
@@ -185,7 +190,7 @@ public class ForceStub {
 
         return retVal;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

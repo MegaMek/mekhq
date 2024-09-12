@@ -18,26 +18,33 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.BayMunitionsChoicePanel;
 import megamek.common.Mounted;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Neoancient
  */
 public class LargeCraftAmmoSwapDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(LargeCraftAmmoSwapDialog.class);
+
     private final Unit unit;
     private final BayMunitionsChoicePanel mainPanel;
     private boolean canceled = true;
@@ -69,7 +76,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

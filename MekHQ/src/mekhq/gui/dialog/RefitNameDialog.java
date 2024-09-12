@@ -20,22 +20,34 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MekSummaryCache;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
  */
 public class RefitNameDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(RefitNameDialog.class);
+
     private JFrame frame;
     private Refit refit;
     private boolean cancelled;
@@ -84,7 +96,7 @@ public class RefitNameDialog extends JDialog {
 
         txtChassis.setText(refit.getNewEntity().getChassis());
         txtChassis.setMinimumSize(new Dimension(150, 28));
-        //only allow chassis renaming for conventional infantry
+        // only allow chassis renaming for conventional infantry
         if (!refit.getNewEntity().isConventionalInfantry()) {
             txtChassis.setEditable(false);
             txtChassis.setEnabled(false);
@@ -152,7 +164,7 @@ public class RefitNameDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

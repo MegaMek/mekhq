@@ -20,24 +20,27 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMekGyro extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingMekGyro.class);
+
     protected int type;
     protected double gyroTonnage;
     protected boolean isClan;
@@ -98,11 +101,11 @@ public class MissingMekGyro extends MissingPart {
                     walkMP = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
 
             if (walkMP > -1) {
-                //need to calculate gyroTonnage for reverse compatibility
+                // need to calculate gyroTonnage for reverse compatibility
                 gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, getUnitTonnage());
             }
         }

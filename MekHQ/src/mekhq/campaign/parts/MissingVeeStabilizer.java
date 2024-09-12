@@ -20,28 +20,31 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.Tank;
-import megamek.common.TechAdvancement;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.Tank;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class MissingVeeStabiliser extends MissingPart {
+public class MissingVeeStabilizer extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingVeeStabilizer.class);
+
     private int loc;
 
-    public MissingVeeStabiliser() {
+    public MissingVeeStabilizer() {
         this(0, 0, null);
     }
 
-    public MissingVeeStabiliser(int tonnage, int loc, Campaign c) {
+    public MissingVeeStabilizer(int tonnage, int loc, Campaign c) {
         super(0, c);
         this.name = "Vehicle Stabiliser";
         this.loc = loc;
@@ -64,12 +67,12 @@ public class MissingVeeStabiliser extends MissingPart {
 
     @Override
     public Part getNewPart() {
-        return new VeeStabiliser(getUnitTonnage(), loc, campaign);
+        return new VeeStabilizer(getUnitTonnage(), loc, campaign);
     }
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof VeeStabiliser;
+        return part instanceof VeeStabilizer;
     }
 
     @Override
@@ -96,22 +99,22 @@ public class MissingVeeStabiliser extends MissingPart {
                     loc = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
 
     @Override
     public void fix() {
-        VeeStabiliser replacement = (VeeStabiliser) findReplacement(false);
+        VeeStabilizer replacement = (VeeStabilizer) findReplacement(false);
         if (null != replacement) {
-            VeeStabiliser actualReplacement = replacement.clone();
+            VeeStabilizer actualReplacement = replacement.clone();
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             actualReplacement.setLocation(loc);
             remove(false);
-            //assign the replacement part to the unit
+            // assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
         }
     }

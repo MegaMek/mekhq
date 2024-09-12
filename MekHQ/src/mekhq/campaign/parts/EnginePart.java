@@ -20,25 +20,28 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.verifier.TestEntity;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class EnginePart extends Part {
+    private static final MMLogger logger = MMLogger.create(EnginePart.class);
+
     protected Engine engine;
     protected boolean forHover;
 
@@ -185,7 +188,7 @@ public class EnginePart extends Part {
                     forHover = wn2.getTextContent().equalsIgnoreCase("true");
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
 
@@ -460,11 +463,11 @@ public class EnginePart extends Part {
         }
         boolean needsSideTorso = false;
         switch (getEngine().getEngineType()) {
-        case Engine.XL_ENGINE:
-        case Engine.LIGHT_ENGINE:
-        case Engine.XXL_ENGINE:
-            needsSideTorso = true;
-            break;
+            case Engine.XL_ENGINE:
+            case Engine.LIGHT_ENGINE:
+            case Engine.XXL_ENGINE:
+                needsSideTorso = true;
+                break;
         }
         if (needsSideTorso && (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT
                 || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT)) {

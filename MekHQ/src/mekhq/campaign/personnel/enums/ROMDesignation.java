@@ -20,11 +20,10 @@ package mekhq.campaign.personnel.enums;
 
 import java.util.ResourceBundle;
 
-import org.apache.logging.log4j.LogManager;
-
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -216,7 +215,8 @@ public enum ROMDesignation {
         }
 
         // Could not parse based on either method, so return NONE
-        LogManager.getLogger().error("Unable to parse " + text + " into a ROMDesignation. Returning NONE");
+        MMLogger.create(ROMDesignation.class)
+                .error("Unable to parse " + text + " into a ROMDesignation. Returning NONE");
         return ROMDesignation.NONE;
     }
     // endregion File I/O

@@ -21,35 +21,45 @@
  */
 package mekhq.campaign.universe;
 
-import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ratgenerator.MissionRole;
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import megamek.common.event.Subscribe;
-import mekhq.MekHQ;
-import mekhq.MHQConstants;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.event.OptionsChangedEvent;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
 import java.util.function.Predicate;
 
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ratgenerator.MissionRole;
+import megamek.common.Compute;
+import megamek.common.EntityMovementMode;
+import megamek.common.EntityWeightClass;
+import megamek.common.MekSummary;
+import megamek.common.UnitType;
+import megamek.common.annotations.Nullable;
+import megamek.common.event.Subscribe;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * Provides a front end to RandomUnitGenerator that allows the user to generate units
- * based on criteria such as faction, unit type, and weight class. May be restricted to
+ * Provides a front end to RandomUnitGenerator that allows the user to generate
+ * units
+ * based on criteria such as faction, unit type, and weight class. May be
+ * restricted to
  * a certain subset of all available RATs.
  *
  * @author Neoancient
  */
 public class RATManager extends AbstractUnitGenerator {
+    private static final MMLogger logger = MMLogger.create(RATManager.class);
+
     // allRATs.get(collectionName).get(era); eras are sorted from latest to earliest
     private final Map<String, LinkedHashMap<Integer, List<RAT>>> allRATs;
     private final ArrayList<String> selectedCollections;
@@ -73,6 +83,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /**
      * Replaces selected RAT collections with new list
+     * 
      * @param selected List of RAT collection names
      */
     public void setSelectedRATs(List<String> selected) {
@@ -84,6 +95,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /**
      * Replaces selected RAT collections with new list
+     * 
      * @param selected Array of RAT collection names
      */
     public void setSelectedRATs(String[] selected) {
@@ -95,6 +107,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /**
      * Append RAT collection to list of selected RATs
+     * 
      * @param collection Name of RAT collection to add
      */
     private void addRAT(String collection) {
@@ -105,6 +118,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     /**
      * Remove RAT collection from list of selected RATs
+     * 
      * @param collection Name of RAT collection to remove
      */
     public void removeRAT(String collection) {
@@ -117,7 +131,7 @@ public class RATManager extends AbstractUnitGenerator {
 
     private boolean loadCollection(String name) {
         if (!fileNames.containsKey(name)) {
-            LogManager.getLogger().error("RAT collection " + name + " not found in " + MHQConstants.RATINFO_DIR);
+            logger.error("RAT collection " + name + " not found in " + MHQConstants.RATINFO_DIR);
             return false;
         }
         /* Need RUG to be loaded for validation */
@@ -125,7 +139,7 @@ public class RATManager extends AbstractUnitGenerator {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
         File f = new File(MHQConstants.RATINFO_DIR, fileNames.get(name));
@@ -137,7 +151,7 @@ public class RATManager extends AbstractUnitGenerator {
             db = MHQXMLUtility.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            LogManager.getLogger().error("While loading RAT info from " + f.getName() + ": ", ex);
+            logger.error("While loading RAT info from " + f.getName() + ": ", ex);
             return false;
         }
 
@@ -162,16 +176,16 @@ public class RATManager extends AbstractUnitGenerator {
                             allRATs.get(name).put(era, new ArrayList<>());
                             parseEraNode(eraNode, name, era);
                         } catch (NumberFormatException ex) {
-                            LogManager.getLogger().error("Could not parse year " + year + " in " + name);
+                            logger.error("Could not parse year " + year + " in " + name);
                         }
                     } else {
-                        LogManager.getLogger().error("year attribute not found for era in RAT collection " + name);
+                        logger.error("year attribute not found for era in RAT collection " + name);
                     }
                 }
             }
             return !allRATs.get(name).isEmpty();
         } else {
-            LogManager.getLogger().error("source attribute not found for RAT data in " + f.getName());
+            logger.error("source attribute not found for RAT data in " + f.getName());
             return false;
         }
     }
@@ -194,7 +208,7 @@ public class RATManager extends AbstractUnitGenerator {
      *
      * @return A map of all collections available with a list of eras included
      */
-    public static Map<String,List<Integer>> getAllRATCollections() {
+    public static Map<String, List<Integer>> getAllRATCollections() {
         if (allCollections == null) {
             populateCollectionNames();
         }
@@ -202,7 +216,8 @@ public class RATManager extends AbstractUnitGenerator {
     }
 
     /**
-     * Scans ratdata directory for list of available RATs that can be used by CampaignOptions
+     * Scans ratdata directory for list of available RATs that can be used by
+     * CampaignOptions
      * to provide a list.
      */
     public static void populateCollectionNames() {
@@ -210,7 +225,7 @@ public class RATManager extends AbstractUnitGenerator {
 
         File dir = new File(MHQConstants.RATINFO_DIR);
         if (!dir.isDirectory()) {
-            LogManager.getLogger().error("Ratinfo directory not found");
+            logger.error("Ratinfo directory not found");
             return;
         }
 
@@ -222,7 +237,7 @@ public class RATManager extends AbstractUnitGenerator {
             try (FileInputStream fis = new FileInputStream(f)) {
                 xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(fis);
             } catch (Exception ex) {
-                LogManager.getLogger().error("While loading RAT info from " + f.getName() + ": ", ex);
+                logger.error("While loading RAT info from " + f.getName() + ": ", ex);
                 continue;
             }
             Element elem = xmlDoc.getDocumentElement();
@@ -242,10 +257,10 @@ public class RATManager extends AbstractUnitGenerator {
                             try {
                                 eras.add(Integer.parseInt(year));
                             } catch (NumberFormatException ex) {
-                                LogManager.getLogger().error("Could not parse year " + year + " in " + f.getName());
+                                logger.error("Could not parse year " + year + " in " + f.getName());
                             }
                         } else {
-                            LogManager.getLogger().error("year attribute not found for era in " + f.getName());
+                            logger.error("year attribute not found for era in " + f.getName());
                         }
                     }
                 }
@@ -253,7 +268,7 @@ public class RATManager extends AbstractUnitGenerator {
                 Collections.sort(eras);
                 allCollections.put(name, eras);
             } else {
-                LogManager.getLogger().error("source attribute not found for RAT data in " + f.getName());
+                logger.error("source attribute not found for RAT data in " + f.getName());
             }
         }
     }
@@ -261,7 +276,7 @@ public class RATManager extends AbstractUnitGenerator {
     private RAT findRAT(String faction, int unitType, int weightClass, int year, int quality) {
         List<String> factionList = factionTree(faction);
         for (String collectionName : selectedCollections) {
-            Map<Integer,List<RAT>> collection = allRATs.get(collectionName);
+            Map<Integer, List<RAT>> collection = allRATs.get(collectionName);
             if (collection == null) {
                 continue;
             }
@@ -281,7 +296,7 @@ public class RATManager extends AbstractUnitGenerator {
         }
         if (canIgnoreEra) {
             for (String collectionName : selectedCollections) {
-                Map<Integer,List<RAT>> collection = allRATs.get(collectionName);
+                Map<Integer, List<RAT>> collection = allRATs.get(collectionName);
                 if (collection == null) {
                     continue;
                 }
@@ -313,7 +328,8 @@ public class RATManager extends AbstractUnitGenerator {
 
         final Faction faction = Factions.getInstance().getFaction(factionCode);
         if (faction.getAlternativeFactionCodes() != null) {
-            final List<String> alternativeFactionCodes = new ArrayList<>(Arrays.asList(faction.getAlternativeFactionCodes()));
+            final List<String> alternativeFactionCodes = new ArrayList<>(
+                    Arrays.asList(faction.getAlternativeFactionCodes()));
             while (!alternativeFactionCodes.isEmpty()) {
                 factionTree.add(alternativeFactionCodes.remove(Compute.randomInt(alternativeFactionCodes.size())));
             }
@@ -326,7 +342,9 @@ public class RATManager extends AbstractUnitGenerator {
         return factionTree;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see mekhq.campaign.universe.IUnitGenerator#isSupportedUnitType(int)
      */
     @Override
@@ -340,32 +358,38 @@ public class RATManager extends AbstractUnitGenerator {
                 || (unitType == UnitType.PROTOMEK);
     }
 
-    /* (non-Javadoc)
-     * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int, int, int, int, java.util.function.Predicate)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see mekhq.campaign.universe.IUnitGenerator#generate(java.lang.String, int,
+     * int, int, int, java.util.function.Predicate)
      */
     @Override
     public @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
-                                          final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
+            final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
         final List<MekSummary> list = generate(1, faction, unitType, weightClass, year, quality, filter);
         return list.isEmpty() ? null : list.get(0);
     }
 
     @Override
     public @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
-                                          final int year, final int quality,
-                                          final Collection<EntityMovementMode> movementModes,
-                                          final Collection<MissionRole> missionRoles,
-                                          @Nullable Predicate<MekSummary> filter) {
+            final int year, final int quality,
+            final Collection<EntityMovementMode> movementModes,
+            final Collection<MissionRole> missionRoles,
+            @Nullable Predicate<MekSummary> filter) {
         final List<MekSummary> list = generate(1, faction, unitType, weightClass, year, quality, movementModes, filter);
         return list.isEmpty() ? null : list.get(0);
     }
 
-    /* (non-Javadoc)
-     * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String, int, int, int, int, java.util.function.Predicate)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see mekhq.campaign.universe.IUnitGenerator#generate(int, java.lang.String,
+     * int, int, int, int, java.util.function.Predicate)
      */
     @Override
     public List<MekSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
-                                      final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
+            final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
         final RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
             if (unitType == UnitType.TANK) {
@@ -388,15 +412,15 @@ public class RATManager extends AbstractUnitGenerator {
 
     @Override
     public List<MekSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
-                                      final int year, final int quality,
-                                      final Collection<EntityMovementMode> movementModes,
-                                      final Collection<MissionRole> missionRoles,
-                                      @Nullable Predicate<MekSummary> filter) {
+            final int year, final int quality,
+            final Collection<EntityMovementMode> movementModes,
+            final Collection<MissionRole> missionRoles,
+            @Nullable Predicate<MekSummary> filter) {
         final RAT rat = findRAT(faction, unitType, weightClass, year, quality);
         if (rat != null) {
             if (!movementModes.isEmpty()) {
-                final Predicate<MekSummary> moveFilter = ms ->
-                        movementModes.contains(EntityMovementMode.parseFromString(ms.getUnitSubType()));
+                final Predicate<MekSummary> moveFilter = ms -> movementModes
+                        .contains(EntityMovementMode.parseFromString(ms.getUnitSubType()));
                 filter = (filter == null) ? moveFilter : filter.and(moveFilter);
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
@@ -405,8 +429,11 @@ public class RATManager extends AbstractUnitGenerator {
     }
 
     /**
-     * Generates a single unit, for the given faction, using the given set of parameters.
-     * Note that some of the properties of the parameters may be ignored for generation mechanisms that aren't the RAT Generator
+     * Generates a single unit, for the given faction, using the given set of
+     * parameters.
+     * Note that some of the properties of the parameters may be ignored for
+     * generation mechanisms that aren't the RAT Generator
+     * 
      * @param parameters data structure containing unit generation parameters
      * @return Generated units. Null if none generated.
      */
@@ -417,10 +444,14 @@ public class RATManager extends AbstractUnitGenerator {
     }
 
     /**
-     * Generates a list of mek summaries from a RAT determined by the given faction, quality and other parameters.
-     * Note that for the purposes of this implementation, the only properties of "parameters" used are
-     * unit type, year, weight classes and movement modes. We also expect the rating to be a number 1-5, rather than A-F.
-     * @param count How many units to generate
+     * Generates a list of mek summaries from a RAT determined by the given faction,
+     * quality and other parameters.
+     * Note that for the purposes of this implementation, the only properties of
+     * "parameters" used are
+     * unit type, year, weight classes and movement modes. We also expect the rating
+     * to be a number 1-5, rather than A-F.
+     * 
+     * @param count      How many units to generate
      * @param parameters RATGenerator parameters (some are ignored)
      */
     @Override
@@ -446,7 +477,7 @@ public class RATManager extends AbstractUnitGenerator {
         public static RAT createFromXml(Node node) {
             RAT retVal = new RAT();
             if (node.getAttributes().getNamedItem("name") == null) {
-                LogManager.getLogger().error("Name attribute missing");
+                logger.error("Name attribute missing");
                 return null;
             }
             retVal.ratName = node.getAttributes().getNamedItem("name").getTextContent();

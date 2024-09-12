@@ -20,23 +20,26 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMekCockpit extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingMekCockpit.class);
+
     private int type;
     protected boolean isClan;
 
@@ -44,7 +47,7 @@ public class MissingMekCockpit extends MissingPart {
         this(0, Mek.COCKPIT_STANDARD, false, null);
     }
 
-    public MissingMekCockpit(int tonnage, int t, boolean isClan,Campaign c) {
+    public MissingMekCockpit(int tonnage, int t, boolean isClan, Campaign c) {
         super(tonnage, c);
         this.type = t;
         this.isClan = isClan;
@@ -112,7 +115,7 @@ public class MissingMekCockpit extends MissingPart {
                     type = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }

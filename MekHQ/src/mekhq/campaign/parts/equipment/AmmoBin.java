@@ -20,9 +20,17 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import java.io.PrintWriter;
+import java.util.EnumSet;
+import java.util.Objects;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -35,18 +43,13 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.EnumSet;
-import java.util.Objects;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
+    private static final MMLogger logger = MMLogger.create(AmmoBin.class);
+
     protected int shotsNeeded;
     protected boolean oneShot;
 
@@ -232,7 +235,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                     oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
 
@@ -288,7 +291,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     /**
      * Gets the underlying {@link Mounted} which manages
      * this {@code AmmoBin} on the {@link Unit}.
-     * 
+     *
      * @return The {@code Mounted} or {@code null} if no valid
      *         piece of equipment exists on the {@code Unit}.
      */
@@ -300,7 +303,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 return mounted;
             }
 
-            LogManager.getLogger().warn(
+            logger.warn(
                     "Missing valid equipment for " + getName() + " to manage ammo on unit " + getUnit().getName());
         }
 
@@ -323,7 +326,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     /**
      * Sets the number of shots needed in the {@code AmmoBin}.
-     * 
+     *
      * @param shots The number of shots needed.
      */
     public void setShotsNeeded(int shots) {

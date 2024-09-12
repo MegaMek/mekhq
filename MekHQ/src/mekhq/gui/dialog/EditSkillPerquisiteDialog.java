@@ -1,5 +1,5 @@
 /*
- * NewSkillPrereqDialog.java
+ * NewSkillPerquisiteDialog.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
  *
@@ -20,23 +20,36 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.util.Hashtable;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.SkillPrereq;
+import mekhq.campaign.personnel.SkillPerquisite;
 import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.Hashtable;
 
 /**
  * @author Taharqa
  */
-public class EditSkillPrereqDialog extends JDialog {
-    private SkillPrereq prereq;
+public class EditSkillPerquisiteDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(EditSkillPerquisiteDialog.class);
+
+    private SkillPerquisite prereq;
 
     private JButton btnClose;
     private JButton btnOK;
@@ -45,7 +58,7 @@ public class EditSkillPrereqDialog extends JDialog {
     private Hashtable<String, JComboBox<SkillLevel>> skillLevels = new Hashtable<>();
     private Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
 
-    public EditSkillPrereqDialog(final JFrame frame, final SkillPrereq pre) {
+    public EditSkillPerquisiteDialog(final JFrame frame, final SkillPerquisite pre) {
         super(frame, true);
         cancelled = false;
         prereq = pre;
@@ -86,7 +99,7 @@ public class EditSkillPrereqDialog extends JDialog {
             panMain.add(choiceLvl);
         }
 
-        JPanel panButtons = new JPanel(new GridLayout(0,2));
+        JPanel panButtons = new JPanel(new GridLayout(0, 2));
         btnOK.setText("Done");
         btnOK.addActionListener(evt -> done());
 
@@ -103,7 +116,7 @@ public class EditSkillPrereqDialog extends JDialog {
         getContentPane().add(new JScrollPane(panMain), BorderLayout.CENTER);
         getContentPane().add(panButtons, BorderLayout.SOUTH);
 
-        this.setPreferredSize(new Dimension(400,700));
+        this.setPreferredSize(new Dimension(400, 700));
 
         pack();
     }
@@ -111,16 +124,16 @@ public class EditSkillPrereqDialog extends JDialog {
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSkillPrereqDialog.class);
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditSkillPerquisiteDialog.class);
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
     private void done() {
-        prereq = new SkillPrereq();
+        prereq = new SkillPerquisite();
         for (String type : SkillType.skillList) {
             if (skillChks.get(type).isSelected()) {
                 prereq.addPrereq(type, skillLevels.get(type).getSelectedIndex());
@@ -129,7 +142,7 @@ public class EditSkillPrereqDialog extends JDialog {
         this.setVisible(false);
     }
 
-    public SkillPrereq getPrereq() {
+    public SkillPerquisite getPrereq() {
         return prereq;
     }
 

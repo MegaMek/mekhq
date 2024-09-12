@@ -18,6 +18,14 @@
  */
 package mekhq.campaign.stratcon;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Node;
+
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
@@ -26,22 +34,18 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
+import megamek.logging.MMLogger;
 import mekhq.campaign.mission.AtBContract;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import javax.xml.namespace.QName;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Contract-level state object for a StratCon campaign.
- * 
+ *
  * @author NickAragua
  */
 @XmlRootElement(name = "StratconCampaignState")
 public class StratconCampaignState {
+    private static final MMLogger logger = MMLogger.create(StratconCampaignState.class);
+
     public static final String ROOT_XML_ELEMENT_NAME = "StratconCampaignState";
 
     @XmlTransient
@@ -81,7 +85,7 @@ public class StratconCampaignState {
 
     /**
      * The opfor BV multiplier. Intended to be additive.
-     * 
+     *
      * @return The additive opfor BV multiplier.
      */
     public double getGlobalOpforBVMultiplier() {
@@ -160,7 +164,7 @@ public class StratconCampaignState {
     /**
      * Convenience/speed method of determining whether or not a force with the given
      * ID has been deployed to a track in this campaign.
-     * 
+     *
      * @param forceID the force ID to check
      * @return Deployed or not.
      */
@@ -187,7 +191,7 @@ public class StratconCampaignState {
     /**
      * Serialize this instance of a campaign state to a PrintWriter
      * Omits initial xml declaration
-     * 
+     *
      * @param pw The destination print writer
      */
     public void Serialize(PrintWriter pw) {
@@ -200,14 +204,14 @@ public class StratconCampaignState {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(stateElement, pw);
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
     /**
      * Attempt to deserialize an instance of a Campaign State from the passed-in XML
      * Node
-     * 
+     *
      * @param xmlNode The node with the campaign state
      * @return Possibly an instance of a StratconCampaignState
      */
@@ -220,7 +224,7 @@ public class StratconCampaignState {
             JAXBElement<StratconCampaignState> templateElement = um.unmarshal(xmlNode, StratconCampaignState.class);
             resultingCampaignState = templateElement.getValue();
         } catch (Exception e) {
-            LogManager.getLogger().error("Error Deserializing Campaign State", e);
+            logger.error("Error Deserializing Campaign State", e);
         }
 
         // Hack: LocalDate doesn't serialize/deserialize nicely within a map, so we

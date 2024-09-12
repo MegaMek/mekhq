@@ -20,20 +20,23 @@
  */
 package mekhq.campaign.storyarc;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
+
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-
-import java.util.*;
-import java.util.List;
-import java.util.Map.Entry;
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * <p>
@@ -81,6 +84,7 @@ import java.util.Map.Entry;
  * StoryTriggers specified will be replaced by those from the StoryOutcome.
  */
 public abstract class StoryPoint {
+    private static final MMLogger logger = MMLogger.create(StoryPoint.class);
 
     /** The story arc that this story point is a part of **/
     private StoryArc storyArc;
@@ -202,7 +206,7 @@ public abstract class StoryPoint {
      * results, when multiple results are possible. If different results are not
      * possible, an empty string can be
      * returned.
-     * 
+     *
      * @return A String specifying the result
      */
     protected abstract String getResult();
@@ -210,7 +214,7 @@ public abstract class StoryPoint {
     /**
      * Returns a string to be used in the "Objectives" panel so players know what
      * they should be doing next.
-     * 
+     *
      * @return a <code>String</code> indicating what to show in the objective
      *         screen.
      */
@@ -312,7 +316,7 @@ public abstract class StoryPoint {
                         if (!wn3.getNodeName().equalsIgnoreCase("storyOutcome")) {
                             // Error condition of sorts!
                             // Error, what should we do here?
-                            LogManager.getLogger()
+                            logger
                                     .error("Unknown node type not loaded in storyOutcomes nodes: " + wn3.getNodeName());
 
                             continue;
@@ -326,7 +330,7 @@ public abstract class StoryPoint {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            logger.error(ex);
         }
 
         return retVal;

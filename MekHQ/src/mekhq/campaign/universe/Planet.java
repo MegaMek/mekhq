@@ -22,8 +22,6 @@ package mekhq.campaign.universe;
 import java.time.LocalDate;
 import java.util.*;
 
-import org.apache.logging.log4j.LogManager;
-
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -36,6 +34,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
+import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.adapter.AtmosphereAdapter;
 import mekhq.adapter.BooleanValueAdapter;
@@ -58,6 +57,8 @@ import mekhq.campaign.universe.Faction.Tag;
 @XmlRootElement(name = "planet")
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class Planet {
+    private static final MMLogger logger = MMLogger.create(Planet.class);
+
     @XmlElement(name = "xcood")
     private Double x;
     @XmlElement(name = "ycood")
@@ -751,7 +752,7 @@ public class Planet {
     /** @return the average distance to the system's jump point in km */
     public double getDistanceToJumpPoint() {
         if (null == parentSystem) {
-            LogManager.getLogger().error("reference to planet with no parent system");
+            logger.error("reference to planet with no parent system");
             return 0;
         }
         return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));

@@ -25,7 +25,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -39,6 +38,7 @@ import megamek.common.Jumpship;
 import megamek.common.ProtoMek;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
+import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -49,6 +49,8 @@ import mekhq.utilities.MHQXMLUtility;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
+    private static final MMLogger logger = MMLogger.create(SkillType.class);
+
     // combat skills
     public static final String S_PILOT_MEK = "Piloting/Mek";
     public static final String S_PILOT_AERO = "Piloting/Aerospace";
@@ -468,7 +470,7 @@ public class SkillType {
 
             lookupHash.put(retVal.name, retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -508,7 +510,7 @@ public class SkillType {
 
             hash.put(retVal.name, retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 

@@ -18,9 +18,20 @@
  */
 package mekhq.campaign.unit.actions;
 
-import megamek.common.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import megamek.common.Aero;
+import megamek.common.CriticalSlot;
+import megamek.common.Entity;
+import megamek.common.Mek;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
 import megamek.common.annotations.Nullable;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.UnitChangedEvent;
@@ -30,16 +41,12 @@ import mekhq.campaign.parts.MissingThrusters;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Restores a unit to an undamaged state.
  */
 public class RestoreUnitAction implements IUnitAction {
+    private static final MMLogger logger = MMLogger.create(RestoreUnitAction.class);
 
     private final IEntityCopyFactory entityCopyFactory;
 
@@ -54,6 +61,7 @@ public class RestoreUnitAction implements IUnitAction {
     /**
      * Creates a new {@code RestoreUnitAction} instance using
      * the provided {@link IEntityCopyFactory}.
+     * 
      * @param entityCopyFactory The factory to create entity copies with.
      */
     public RestoreUnitAction(IEntityCopyFactory entityCopyFactory) {
@@ -76,8 +84,9 @@ public class RestoreUnitAction implements IUnitAction {
 
     /**
      * Restore a unit by swapping out its entity and replacing its parts.
-     * @param campaign The campaign which owns the unit.
-     * @param unit The unit to restore.
+     * 
+     * @param campaign  The campaign which owns the unit.
+     * @param unit      The unit to restore.
      * @param newEntity The new entity to assign to the unit.
      */
     private void restoreUnit(Campaign campaign, Unit unit, Entity newEntity) {
@@ -108,6 +117,7 @@ public class RestoreUnitAction implements IUnitAction {
 
     /**
      * Copies the C3 network setup from the source to the target.
+     * 
      * @param source The source {@link Entity}.
      * @param target The target {@link Entity}.
      */
@@ -140,11 +150,12 @@ public class RestoreUnitAction implements IUnitAction {
 
     /**
      * Restores a unit using the old per-part logic.
+     * 
      * @param campaign The campaign which owns the unit.
-     * @param unit The unit to restore.
+     * @param unit     The unit to restore.
      */
     private void oldUnitRestoration(Campaign campaign, Unit unit) {
-        LogManager.getLogger().warn("Falling back to old unit restoration logic");
+        logger.warn("Falling back to old unit restoration logic");
 
         unit.setSalvage(false);
 
@@ -154,7 +165,7 @@ public class RestoreUnitAction implements IUnitAction {
             List<Part> parts = new ArrayList<>(unit.getParts());
             for (Part part : parts) {
                 if (part instanceof MissingPart) {
-                    //Make sure we restore both left and right thrusters
+                    // Make sure we restore both left and right thrusters
                     if (part instanceof MissingThrusters) {
                         if (((Aero) unit.getEntity()).getLeftThrustHits() > 0) {
                             ((MissingThrusters) part).setLeftThrusters(true);
@@ -182,7 +193,8 @@ public class RestoreUnitAction implements IUnitAction {
                     part.cancelReservation();
                 }
 
-                // replace damaged armor and reload ammo bins after fixing their respective locations
+                // replace damaged armor and reload ammo bins after fixing their respective
+                // locations
                 if (part instanceof Armor) {
                     final Armor armor = (Armor) part;
                     armor.setAmount(armor.getTotalAmount());
@@ -203,9 +215,9 @@ public class RestoreUnitAction implements IUnitAction {
             Entity entity = unit.getEntity();
             if (entity instanceof Mek) {
                 for (int loc : new int[] {
-                    Mek.LOC_CLEG, Mek.LOC_LLEG, Mek.LOC_RLEG, Mek.LOC_LARM, Mek.LOC_RARM}) {
+                        Mek.LOC_CLEG, Mek.LOC_LLEG, Mek.LOC_RLEG, Mek.LOC_LARM, Mek.LOC_RARM }) {
                     int numberOfCriticals = entity.getNumberOfCriticals(loc);
-                    for (int crit = 0; crit < numberOfCriticals; ++ crit) {
+                    for (int crit = 0; crit < numberOfCriticals; ++crit) {
                         CriticalSlot slot = entity.getCritical(loc, crit);
                         if (null != slot) {
                             slot.setHit(false);
@@ -223,10 +235,12 @@ public class RestoreUnitAction implements IUnitAction {
     public interface IEntityCopyFactory {
         /**
          * Gets a copy of the entity.
+         * 
          * @param entity The entity to copy.
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
-        @Nullable Entity copy(Entity entity);
+        @Nullable
+        Entity copy(Entity entity);
     }
 
     /**
@@ -236,6 +250,7 @@ public class RestoreUnitAction implements IUnitAction {
     private static class FileSystemEntityCopyFactory implements IEntityCopyFactory {
         /**
          * Get a copy of the entity from the {@link MekSummaryCache}.
+         * 
          * @param entity The entity to copy.
          * @return A copy of the entity, or {@code null} if a copy could not be made.
          */
@@ -247,7 +262,7 @@ public class RestoreUnitAction implements IUnitAction {
                     return new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                 }
             } catch (EntityLoadingException e) {
-                LogManager.getLogger().error("Cannot restore unit from entity, could not find: " + entity.getShortNameRaw(), e);
+                logger.error("Cannot restore unit from entity, could not find: " + entity.getShortNameRaw(), e);
             }
 
             return null;

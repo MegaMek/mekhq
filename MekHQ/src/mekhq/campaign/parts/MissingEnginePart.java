@@ -20,22 +20,33 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import megamek.common.verifier.TestEntity;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.Aero;
+import megamek.common.CriticalSlot;
+import megamek.common.Engine;
+import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
+import megamek.common.Mek;
+import megamek.common.ProtoMek;
+import megamek.common.Tank;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.common.verifier.TestEntity;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingEnginePart extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingEnginePart.class);
+
     protected Engine engine;
     protected boolean forHover;
 
@@ -104,7 +115,7 @@ public class MissingEnginePart extends MissingPart {
         }
         double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
         if (forHover) {
-            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage()/5.0, TestEntity.Ceil.HALFTON), toReturn);
+            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage() / 5.0, TestEntity.Ceil.HALFTON), toReturn);
         }
         return toReturn;
     }
@@ -138,7 +149,7 @@ public class MissingEnginePart extends MissingPart {
                     engineFlags = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
 
@@ -181,24 +192,26 @@ public class MissingEnginePart extends MissingPart {
         this.name = engine.getEngineName() + " Engine";
     }
 
-     @Override
-     public @Nullable String checkFixable() {
-         if (null == unit) {
-             return null;
-         }
-         for (int i = 0; i < unit.getEntity().locations(); i++) {
-             if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
-                     && unit.isLocationDestroyed(i)) {
-                 return unit.getEntity().getLocationName(i) + " is destroyed.";
-             }
-         }
-         return null;
-     }
+    @Override
+    public @Nullable String checkFixable() {
+        if (null == unit) {
+            return null;
+        }
+        for (int i = 0; i < unit.getEntity().locations(); i++) {
+            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_ENGINE, i) > 0
+                    && unit.isLocationDestroyed(i)) {
+                return unit.getEntity().getLocationName(i) + " is destroyed.";
+            }
+        }
+        return null;
+    }
 
     @Override
     public Part getNewPart() {
-        boolean useHover = null != unit && unit.getEntity().getMovementMode() == EntityMovementMode.HOVER && unit.getEntity() instanceof Tank;
-        return new EnginePart(getUnitTonnage(), new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, useHover);
+        boolean useHover = null != unit && unit.getEntity().getMovementMode() == EntityMovementMode.HOVER
+                && unit.getEntity() instanceof Tank;
+        return new EnginePart(getUnitTonnage(),
+                new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, useHover);
     }
 
     @Override
@@ -236,27 +249,28 @@ public class MissingEnginePart extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return engine.getTechAdvancement();
     }
+
     @Override
     public boolean isInLocation(String loc) {
-         if (null == unit || null == unit.getEntity()) {
-             return false;
-         }
-         if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CT) {
-             return true;
-         }
-         boolean needsSideTorso = false;
-         switch (getEngine().getEngineType()) {
-             case Engine.XL_ENGINE:
-             case Engine.LIGHT_ENGINE:
-             case Engine.XXL_ENGINE:
-                 needsSideTorso = true;
-                 break;
-             default:
-                 break;
-         }
+        if (null == unit || null == unit.getEntity()) {
+            return false;
+        }
+        if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CT) {
+            return true;
+        }
+        boolean needsSideTorso = false;
+        switch (getEngine().getEngineType()) {
+            case Engine.XL_ENGINE:
+            case Engine.LIGHT_ENGINE:
+            case Engine.XXL_ENGINE:
+                needsSideTorso = true;
+                break;
+            default:
+                break;
+        }
         return needsSideTorso
                 && ((unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT)
-                || (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT));
+                        || (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT));
     }
 
     @Override

@@ -22,8 +22,6 @@ import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.logging.log4j.LogManager;
-
 import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
@@ -36,6 +34,7 @@ import megamek.common.MekSummaryCache;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
@@ -56,6 +55,8 @@ import mekhq.campaign.universe.RandomFactionGenerator;
  * @author Neoancient
  */
 public class AtBEventProcessor {
+    private static final MMLogger logger = MMLogger.create(AtBEventProcessor.class);
+
     private final Campaign campaign;
 
     public AtBEventProcessor(Campaign campaign) {
@@ -139,7 +140,7 @@ public class AtBEventProcessor {
     /**
      * Listens for new personnel to be added to the market and determines which
      * should come with units.
-     * 
+     *
      * @param ev
      */
     @Subscribe
@@ -205,17 +206,17 @@ public class AtBEventProcessor {
             if (Factions.getInstance().getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
                 String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");
                 ms = MekSummaryCache.getInstance().getMek(name);
-                LogManager.getLogger().info("looking for Clan infantry " + name);
+                logger.info("looking for Clan infantry " + name);
             }
             try {
                 en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             } catch (EntityLoadingException ex) {
                 en = null;
-                LogManager.getLogger().error("Unable to load entity: "
+                logger.error("Unable to load entity: "
                         + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage(), ex);
             }
         } else {
-            LogManager.getLogger().error("Personnel market could not find "
+            logger.error("Personnel market could not find "
                     + UnitType.getTypeName(unitType) + " for recruit from faction " + faction);
             return;
         }

@@ -21,8 +21,7 @@ package mekhq.campaign.personnel.enums;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.apache.logging.log4j.LogManager;
-
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -242,7 +241,7 @@ public enum Profession {
             case "--CIVILIAN":
                 return CIVILIAN;
             default:
-                LogManager.getLogger().debug("Cannot get alternate profession for unknown alternative "
+                MMLogger.create(Profession.class).debug("Cannot get alternate profession for unknown alternative "
                         + name + " returning MEKWARRIOR.");
                 return MEKWARRIOR;
         }

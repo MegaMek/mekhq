@@ -18,23 +18,24 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.WeaponMounted;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
 
 /**
  * Ammo bin for a weapon bay that combines multiple tons of ammo into a single
@@ -50,6 +51,8 @@ import java.io.PrintWriter;
  * @author Neoancient
  */
 public class LargeCraftAmmoBin extends AmmoBin {
+    private static final MMLogger logger = MMLogger.create(LargeCraftAmmoBin.class);
+
     private int bayEqNum = -1;
 
     transient private Mounted<?> bay;
@@ -101,7 +104,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
             }
         }
 
-        LogManager.getLogger().warn("Could not find weapon bay for " + typeName + " for " + unit.getName());
+        logger.warn("Could not find weapon bay for " + typeName + " for " + unit.getName());
         return null;
     }
 
@@ -116,7 +119,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     /**
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is
      * actually in the bay.
-     * 
+     *
      * @param bay the bay that will contain this ammo bin
      */
     public void setBay(Mounted<?> bay) {
@@ -129,7 +132,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     /**
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is
      * actually in the bay.
-     * 
+     *
      * @param bayEqNum the number of the bay that will contain this ammo bin
      */
     public void setBay(int bayEqNum) {
@@ -203,7 +206,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
                     bayEqNum = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
 

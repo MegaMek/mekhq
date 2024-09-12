@@ -21,24 +21,33 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.*;
+import java.io.PrintWriter;
+import java.util.Objects;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.CriticalSlot;
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
+import megamek.common.TechAdvancement;
+import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.Objects;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingEquipmentPart extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingEquipmentPart.class);
+
     // crap equipmenttype is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
@@ -111,7 +120,7 @@ public class MissingEquipmentPart extends MissingPart {
         }
 
         if (type == null) {
-            LogManager.getLogger().error("Mounted.restore: could not restore equipment type \"" + name + "\"");
+            logger.error("Mounted.restore: could not restore equipment type \"" + name + "\"");
         }
     }
 
@@ -202,7 +211,7 @@ public class MissingEquipmentPart extends MissingPart {
                 return mounted;
             }
 
-            LogManager.getLogger().warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
+            logger.warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
         }
 
         return null;

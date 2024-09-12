@@ -18,8 +18,23 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -27,17 +42,13 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
  */
 public class CustomizeMissionDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(CustomizeMissionDialog.class);
+
     private Mission mission;
     private Campaign campaign;
     private boolean newMission;
@@ -207,7 +218,7 @@ public class CustomizeMissionDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

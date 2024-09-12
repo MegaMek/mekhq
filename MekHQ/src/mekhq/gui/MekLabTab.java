@@ -37,11 +37,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.LogManager;
-
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.*;
+import megamek.logging.MMLogger;
 import megameklab.MMLConstants;
 import megameklab.ui.EntitySource;
 import megameklab.ui.battleArmor.BABuildTab;
@@ -80,6 +79,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.enums.MHQTabType;
 
 public class MekLabTab extends CampaignGuiTab {
+    private static final MMLogger logger = MMLogger.create(MekLabTab.class);
+
     CampaignGUI campaignGUI;
 
     Unit unit;
@@ -124,7 +125,7 @@ public class MekLabTab extends CampaignGuiTab {
                                                                                                         // path
         CConfig.load();
         UnitUtil.loadFonts();
-        LogManager.getLogger().info("Starting MegaMekLab version: " + MMLConstants.VERSION);
+        logger.info("Starting MegaMekLab version: " + MMLConstants.VERSION);
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
@@ -222,7 +223,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());
@@ -256,7 +257,7 @@ public class MekLabTab extends CampaignGuiTab {
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unit.getEntity().getShortName());
 
         if (mekSummary == null) {
-            LogManager.getLogger().error(String.format(
+            logger.error(String.format(
                     "Cannot reset unit %s as it cannot be found in the cache.",
                     unit.getEntity().getDisplayName()));
             return;
@@ -266,7 +267,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = new MekFileParser(mekSummary.getSourceFile(), mekSummary.getEntryName()).getEntity();
         } catch (EntityLoadingException ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return;
         }
         entity.setYear(unit.getCampaign().getGameYear());
