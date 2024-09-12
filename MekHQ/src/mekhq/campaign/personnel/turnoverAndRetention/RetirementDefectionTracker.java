@@ -675,7 +675,15 @@ public class RetirementDefectionTracker {
      */
     private int getBaseTargetNumber(Campaign campaign, Person person) {
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
-            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() + person.getLoyalty();
+            int loyaltyScore = person.getLoyalty();
+
+            if (person.isCommander()) {
+                loyaltyScore += 2;
+            }
+
+            int loyaltyModifier = person.getLoyaltyModifier(loyaltyScore);
+
+            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() + loyaltyModifier;
         } else {
             return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
         }
