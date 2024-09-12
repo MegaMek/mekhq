@@ -208,40 +208,12 @@ public enum PersonnelRole {
     }
 
     public boolean isCombat() {
-        switch (this) {
-            case MECHWARRIOR:
-            case LAM_PILOT:
-            case GROUND_VEHICLE_DRIVER:
-            case NAVAL_VEHICLE_DRIVER:
-            case VTOL_PILOT:
-            case VEHICLE_GUNNER:
-            case VEHICLE_CREW:
-            case AEROSPACE_PILOT:
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-            case PROTOMECH_PILOT:
-            case BATTLE_ARMOUR:
-            case SOLDIER:
-            case VESSEL_PILOT:
-            case VESSEL_GUNNER:
-            case VESSEL_CREW:
-            case VESSEL_NAVIGATOR:
-                return true;
-            case MECH_TECH:
-            case MECHANIC:
-            case AERO_TECH:
-            case BA_TECH:
-            case ASTECH:
-            case DOCTOR:
-            case MEDIC:
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_TRANSPORT:
-            case ADMINISTRATOR_HR:
-            case DEPENDENT:
-            case NONE:
-            default:
-                return false;
-        }
+        return switch (this) {
+            case MECHWARRIOR, LAM_PILOT, GROUND_VEHICLE_DRIVER, NAVAL_VEHICLE_DRIVER, VTOL_PILOT, VEHICLE_GUNNER, VEHICLE_CREW,
+                 AEROSPACE_PILOT, CONVENTIONAL_AIRCRAFT_PILOT, PROTOMECH_PILOT, BATTLE_ARMOUR, SOLDIER, VESSEL_PILOT, VESSEL_GUNNER,
+                 VESSEL_CREW, VESSEL_NAVIGATOR -> true;
+            default -> false;
+        };
     }
 
     public boolean isMechWarriorGrouping() {
@@ -253,7 +225,7 @@ public enum PersonnelRole {
     }
 
     public boolean isConventionalAirGrouping() {
-        return isAerospaceGrouping() || isConventionalAircraftPilot();
+        return isConventionalAircraftPilot();
     }
 
     public boolean isGroundVehicleCrew() {
@@ -447,7 +419,7 @@ public enum PersonnelRole {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a PersonnelRole. Returning NONE.");
+        LogManager.getLogger().error("Unable to parse {} into a PersonnelRole. Returning NONE.", text);
         return NONE;
     }
     //endregion File I/O
