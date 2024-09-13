@@ -537,7 +537,7 @@
 		<scenarioModMax>3</scenarioModMax>
 		<scenarioModChance>25</scenarioModChance>
 		<scenarioModBV>25</scenarioModBV>
-		<autoconfigMunitions>true</autoconfigMunitions>
+		<autoConfigMunitions>true</autoConfigMunitions>
 		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
 		<planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
 		<planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
@@ -546,7 +546,7 @@
 	<randomSkillPreferences>
 		<overallRecruitBonus>0</overallRecruitBonus>
 		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
-		<specialAbilBonus>-10,-10,-10,-10,-10</specialAbilBonus>
+		<specialAbilityBonus>-10,-10,-10,-10,-10</specialAbilityBonus>
 		<tacticsMod>-10,-10,-10,-10,-10</tacticsMod>
 		<randomizeSkill>false</randomizeSkill>
 		<useClanBonuses>true</useClanBonuses>
@@ -690,7 +690,7 @@
 			<costs>16,8,8,8,8,8,8,8,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/Battlesuit</name>
+			<name>Gunnery/BattleArmor</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -760,7 +760,7 @@
 			<costs>12,6,6,6,6,6,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Tech/BA</name>
+			<name>Tech/BattleArmor</name>
 			<target>10</target>
 			<countUp>false</countUp>
 			<greenLvl>1</greenLvl>
@@ -800,7 +800,7 @@
 			<costs>16,8,8,8,8,8,-1,-1,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Medtech</name>
+			<name>MedTech</name>
 			<target>11</target>
 			<countUp>false</countUp>
 			<greenLvl>1</greenLvl>
@@ -893,9 +893,9 @@
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
-				<skill>Anti-Mech::Veteran</skill>
-				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
+				<skill>Anti-Mek::Veteran</skill>
+				<skill>Piloting/Mek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -909,13 +909,13 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
+				<skill>Gunnery/BattleArmor::Veteran</skill>
 				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Mek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -957,13 +957,13 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -977,8 +977,8 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/ProtoMech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -993,13 +993,13 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1013,13 +1013,13 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1033,13 +1033,13 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1054,7 +1054,7 @@
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Aerospace::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1071,8 +1071,8 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/ProtoMech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1087,7 +1087,7 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Piloting/Spacecraft::Regular</skill>
@@ -1095,10 +1095,10 @@
 				<skill>Piloting/Naval::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Piloting/Aerospace::Regular</skill>
-				<skill>Anti-Mech::Regular</skill>
-				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Anti-Mek::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
@@ -1115,13 +1115,13 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
+				<skill>Gunnery/BattleArmor::Veteran</skill>
 				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Mek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1143,9 +1143,9 @@
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Piloting/Spacecraft::Regular</skill>
 				<skill>Piloting/VTOL::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1161,9 +1161,9 @@
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
-				<skill>Anti-Mech::Veteran</skill>
-				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
+				<skill>Anti-Mek::Veteran</skill>
+				<skill>Piloting/Mek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1178,11 +1178,11 @@
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Artillery::Regular</skill>
 			</skillPrereq>
@@ -1198,7 +1198,7 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Piloting/Spacecraft::Regular</skill>
@@ -1206,10 +1206,10 @@
 				<skill>Piloting/Naval::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Piloting/Aerospace::Regular</skill>
-				<skill>Anti-Mech::Regular</skill>
-				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Anti-Mek::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
@@ -1229,9 +1229,9 @@
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
-				<skill>Anti-Mech::Veteran</skill>
-				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
+				<skill>Anti-Mek::Veteran</skill>
+				<skill>Piloting/Mek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1245,8 +1245,8 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/ProtoMech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1260,7 +1260,7 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Piloting/Spacecraft::Regular</skill>
@@ -1268,10 +1268,10 @@
 				<skill>Piloting/Naval::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Piloting/Aerospace::Regular</skill>
-				<skill>Anti-Mech::Regular</skill>
-				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Anti-Mek::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
@@ -1288,7 +1288,7 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Piloting/Spacecraft::Regular</skill>
@@ -1296,10 +1296,10 @@
 				<skill>Piloting/Naval::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Piloting/Aerospace::Regular</skill>
-				<skill>Anti-Mech::Regular</skill>
-				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Anti-Mek::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
@@ -1318,7 +1318,7 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Piloting/Mek::Veteran</skill>
 				<skill>Piloting/Aircraft::Veteran</skill>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Piloting/Spacecraft::Veteran</skill>
@@ -1326,10 +1326,10 @@
 				<skill>Piloting/Naval::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Piloting/Aerospace::Veteran</skill>
-				<skill>Anti-Mech::Veteran</skill>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Anti-Mek::Veteran</skill>
+				<skill>Gunnery/BattleArmor::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
+				<skill>Gunnery/Mek::Veteran</skill>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
 				<skill>Gunnery/Aircraft::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
@@ -1346,7 +1346,7 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1377,8 +1377,8 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/ProtoMech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1392,13 +1392,13 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1414,9 +1414,9 @@
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
-				<skill>Anti-Mech::Veteran</skill>
-				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
+				<skill>Anti-Mek::Veteran</skill>
+				<skill>Piloting/Mek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1431,13 +1431,13 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Green</skill>
+				<skill>Gunnery/BattleArmor::Green</skill>
 				<skill>Gunnery/Aircraft::Green</skill>
 				<skill>Gunnery/Spacecraft::Green</skill>
 				<skill>Gunnery/Aerospace::Green</skill>
-				<skill>Gunnery/ProtoMech::Green</skill>
+				<skill>Gunnery/ProtoMek::Green</skill>
 				<skill>Gunnery/Vehicle::Green</skill>
-				<skill>Gunnery/Mech::Green</skill>
+				<skill>Gunnery/Mek::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1451,13 +1451,13 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
+				<skill>Gunnery/BattleArmor::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/ProtoMech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1489,8 +1489,8 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/ProtoMech::Veteran</skill>
-				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
+				<skill>Piloting/Mek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1525,8 +1525,8 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/ProtoMech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 	</specialAbilities>
