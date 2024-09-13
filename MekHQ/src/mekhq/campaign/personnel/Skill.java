@@ -62,7 +62,7 @@ import mekhq.utilities.MHQXMLUtility;
  * able to recreate any of the rpg versions or their own homebrew system. The
  * default setup
  * will follow the core rulebooks (not aToW).
- * 
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Skill {
@@ -93,7 +93,7 @@ public class Skill {
 
     /**
      * Creates a new {@link Skill} from the given experience level and bonus.
-     * 
+     *
      * @param type            The {@link SkillType} name.
      * @param experienceLevel An experience level (e.g.
      *                        {@link SkillType#EXP_GREEN}).
@@ -110,7 +110,7 @@ public class Skill {
 
     /**
      * Creates a new {@link Skill} with a randomized level.
-     * 
+     *
      * @param type            The {@link SkillType} name.
      * @param experienceLevel An experience level (e.g.
      *                        {@link SkillType#EXP_GREEN}).
@@ -235,8 +235,8 @@ public class Skill {
 
                 if (wn2.getNodeName().equalsIgnoreCase("type")) {
                     String text = wn2.getTextContent();
-                    if ("Gunnery/Protomech".equals(text)) { // Renamed in 0.49.12
-                        text = "Gunnery/ProtoMech";
+                    if ("Gunnery/ProtoMech".equals(text)) { // Remove milestone after 0.49.19
+                        text = "Gunnery/ProtoMek";
                     }
                     retVal.type = SkillType.getType(text);
                 } else if (wn2.getNodeName().equalsIgnoreCase("level")) {

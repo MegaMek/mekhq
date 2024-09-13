@@ -20,8 +20,12 @@ package mekhq.campaign.universe;
 
 public enum Atmosphere {
     NONE("None"),
-    TAINTEDPOISON("Tainted (Poisonous)"), TAINTEDCAUSTIC("Tainted (Caustic)"), TAINTEDFLAME("Tainted (Flammable)"),
-    TOXICPOISON("Toxic (Poisonous)"), TOXICCAUSTIC("Toxic (Caustic)"), TOXICFLAME("Toxic (Flammable)"),
+    TAINTEDPOISON("Tainted (Poisonous)"),
+    TAINTEDCAUSTIC("Tainted (Caustic)"),
+    TAINTEDFLAME("Tainted (Flammable)"),
+    TOXICPOISON("Toxic (Poisonous)"),
+    TOXICCAUSTIC("Toxic (Caustic)"),
+    TOXICFLAME("Toxic (Flammable)"),
     BREATHABLE("Breathable");
 
     // For old life form data

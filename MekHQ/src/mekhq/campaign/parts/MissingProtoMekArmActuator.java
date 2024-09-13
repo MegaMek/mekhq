@@ -52,7 +52,7 @@ public class MissingProtoMekArmActuator extends MissingPart {
 
     public MissingProtoMekArmActuator(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
-        this.name = "Protomech Arm Actuator";
+        this.name = "ProtoMech Arm Actuator";
         this.location = loc;
     }
 

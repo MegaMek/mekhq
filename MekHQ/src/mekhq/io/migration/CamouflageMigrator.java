@@ -513,7 +513,7 @@ public class CamouflageMigrator {
             case "1st Medusans.jpg":
                 return "Command Squadron.jpg";
             case "2nd Medusans.jpg":
-                    return "Hydra Assault Squadron.jpg";
+                return "Hydra Assault Squadron.jpg";
             case "3rd Medusans.jpg":
                 return "Basilisk Assault Squadron.jpg";
             default:
@@ -763,7 +763,7 @@ public class CamouflageMigrator {
     private static String migrateStarLeagueDefenceForce(final String text) {
         switch (text) {
             case "1st Royal Battlemech Regiment.jpg":
-                return "1st Royal BattleMech Regiment.jpg";
+                return "1st Royal BattleMek Regiment.jpg";
             case "SLDF drab.jpg":
                 return "SLDF Drab.jpg";
             default:
@@ -838,7 +838,8 @@ public class CamouflageMigrator {
     }
 
     /**
-     * This handles anything that cannot be done in the above normal migration, like filename-based category swaps
+     * This handles anything that cannot be done in the above normal migration, like
+     * filename-based category swaps
      */
     private static void finalizeMigration(final Camouflage camouflage) {
         switch (camouflage.getCategory()) {

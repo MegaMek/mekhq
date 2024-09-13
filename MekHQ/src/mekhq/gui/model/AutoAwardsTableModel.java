@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.model;
 
 import java.awt.Component;
@@ -21,14 +39,14 @@ import mekhq.gui.utilities.MekHqTableCellRenderer;
 public class AutoAwardsTableModel extends AbstractTableModel {
     private static final MMLogger logger = MMLogger.create(AutoAwardsTableModel.class);
 
-    public final static int COL_PERSON = 0;
-    public final static int COL_NAME = 1;
-    public final static int COL_SET = 2;
-    public final static int COL_AWARD = 3;
-    public final static int COL_DESCRIPTION = 4;
-    public final static int N_COL = 5;
+    public static final int COL_PERSON = 0;
+    public static final int COL_NAME = 1;
+    public static final int COL_SET = 2;
+    public static final int COL_AWARD = 3;
+    public static final int COL_DESCRIPTION = 4;
+    public static final int N_COL = 5;
 
-    private final static String[] colNames = {
+    private static final String[] colNames = {
             "Person", "Name", "Set", "Award", "Description"
     };
 

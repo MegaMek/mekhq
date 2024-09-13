@@ -527,7 +527,7 @@ public class AtBContract extends Contract {
                 c.addReport("Bonus: civilian APC");
                 break;
             case 6: /* civilian 'Mek */
-                rat = "CivilianUnits_PrimMech";
+                rat = "CivilianUnits_PrimMek";
                 c.addReport("Bonus: civilian Mek");
                 break;
             default:
@@ -967,7 +967,7 @@ public class AtBContract extends Contract {
 
     /**
      * Restores any references to other contracts.
-     * 
+     *
      * @param c The Campaign which holds this contract.
      */
     public void restore(Campaign c) {

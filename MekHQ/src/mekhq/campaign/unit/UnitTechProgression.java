@@ -47,7 +47,7 @@ import megamek.logging.MMLogger;
 public class UnitTechProgression {
     private static final MMLogger logger = MMLogger.create(UnitTechProgression.class);
 
-    private final static UnitTechProgression instance = new UnitTechProgression();
+    private static final UnitTechProgression instance = new UnitTechProgression();
 
     private Map<Integer, FutureTask<Map<MekSummary, ITechnology>>> techMap = new HashMap<>();
 

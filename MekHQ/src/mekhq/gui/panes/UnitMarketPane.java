@@ -63,7 +63,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
     // region Left Panel
     // Filters
-    private JCheckBox chkShowMechs;
+    private JCheckBox chkShowMeks;
     private JCheckBox chkShowVehicles;
     private JCheckBox chkShowAerospace;
     private JCheckBox chkShowConvAero;
@@ -99,12 +99,12 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
     // region Left Panel
     // region Filters
-    public JCheckBox getChkShowMechs() {
-        return chkShowMechs;
+    public JCheckBox getChkShowMeks() {
+        return chkShowMeks;
     }
 
-    public void setChkShowMechs(final JCheckBox chkShowMechs) {
-        this.chkShowMechs = chkShowMechs;
+    public void setChkShowMeks(final JCheckBox chkShowMeks) {
+        this.chkShowMeks = chkShowMeks;
     }
 
     public JCheckBox getChkShowVehicles() {
@@ -237,11 +237,11 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
     private JPanel createFiltersPanel() {
         // Create Panel Components
-        setChkShowMechs(new JCheckBox(resources.getString("chkShowMechs.text")));
-        getChkShowMechs().setToolTipText(resources.getString("chkShowMechs.toolTipText"));
-        getChkShowMechs().setName("chkShowMechs");
-        getChkShowMechs().setSelected(true);
-        getChkShowMechs().addActionListener(evt -> filterOffers());
+        setChkShowMeks(new JCheckBox(resources.getString("chkShowMeks.text")));
+        getChkShowMeks().setToolTipText(resources.getString("chkShowMeks.toolTipText"));
+        getChkShowMeks().setName("chkShowMeks");
+        getChkShowMeks().setSelected(true);
+        getChkShowMeks().addActionListener(evt -> filterOffers());
 
         setChkShowVehicles(new JCheckBox(resources.getString("chkShowVehicles.text")));
         getChkShowVehicles().setToolTipText(resources.getString("chkShowVehicles.toolTipText"));
@@ -292,7 +292,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(getChkShowMechs())
+                                .addComponent(getChkShowMeks())
                                 .addComponent(getChkShowVehicles())
                                 .addComponent(getChkShowAerospace())
                                 .addComponent(getChkShowConvAero(), Alignment.LEADING))
@@ -304,7 +304,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(getChkShowMechs())
+                                .addComponent(getChkShowMeks())
                                 .addComponent(getChkShowVehicles())
                                 .addComponent(getChkShowAerospace())
                                 .addComponent(getChkShowConvAero()))
@@ -371,7 +371,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     @Override
     protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         // Left Component
-        preferences.manage(new JToggleButtonPreference(getChkShowMechs()));
+        preferences.manage(new JToggleButtonPreference(getChkShowMeks()));
         preferences.manage(new JToggleButtonPreference(getChkShowVehicles()));
         preferences.manage(new JToggleButtonPreference(getChkShowAerospace()));
         preferences.manage(new JToggleButtonPreference(getChkShowConvAero()));
@@ -522,7 +522,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
                 switch (offer.get().getUnitType()) {
                     case UnitType.MEK:
-                        return getChkShowMechs().isSelected();
+                        return getChkShowMeks().isSelected();
                     case UnitType.TANK:
                         return getChkShowVehicles().isSelected();
                     case UnitType.AEROSPACEFIGHTER:

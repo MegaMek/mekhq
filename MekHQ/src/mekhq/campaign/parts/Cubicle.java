@@ -33,7 +33,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
- * A transport bay cubicle for a Mech, ProtoMech, vehicle, fighter, or small
+ * A transport bay cubicle for a Mek, ProtoMek, vehicle, fighter, or small
  * craft.
  *
  * @author Neoancient

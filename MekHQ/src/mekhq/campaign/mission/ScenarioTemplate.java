@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MegaMek.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.mission;
 
 import java.io.File;
@@ -30,7 +49,7 @@ import mekhq.utilities.MHQXMLUtility;
 /**
  * This is the root data structure for organizing information related to a
  * scenario template.
- * 
+ *
  * @author NickAragua
  */
 @XmlRootElement(name = "ScenarioTemplate")
@@ -84,7 +103,7 @@ public class ScenarioTemplate implements Cloneable {
     /**
      * Returns the "primary" player force. This is always the force with the name
      * "Player".
-     * 
+     *
      * @return Primary player force.
      */
     public ScenarioForceTemplate getPrimaryPlayerForce() {
@@ -134,7 +153,7 @@ public class ScenarioTemplate implements Cloneable {
     /**
      * All force templates that are controlled and supplied, or potentially
      * supplied, by the player, that are not reinforcements
-     * 
+     *
      * @return List of scenario force templates
      */
     public List<ScenarioForceTemplate> getAllPrimaryPlayerForces() {
@@ -150,7 +169,7 @@ public class ScenarioTemplate implements Cloneable {
     /**
      * All force templates that are controlled and supplied, or potentially
      * supplied, by the player, that are not reinforcements
-     * 
+     *
      * @return List of scenario force templates
      */
     public List<ScenarioForceTemplate> getAllPlayerReinforcementForces() {
@@ -180,7 +199,7 @@ public class ScenarioTemplate implements Cloneable {
     /**
      * Serialize this instance of a scenario template to a File
      * Please pass in a non-null file.
-     * 
+     *
      * @param outputFile The destination file.
      */
     public void Serialize(File outputFile) {
@@ -199,7 +218,7 @@ public class ScenarioTemplate implements Cloneable {
     /**
      * Serialize this instance of a scenario template to a PrintWriter
      * Omits initial xml declaration
-     * 
+     *
      * @param pw The destination print writer
      */
     public void Serialize(PrintWriter pw) {
@@ -218,7 +237,7 @@ public class ScenarioTemplate implements Cloneable {
 
     /**
      * Attempt to deserialize a file at the given path.
-     * 
+     *
      * @param filePath The location of the file
      * @return Possibly an instance of a scenario template.
      */
@@ -235,7 +254,7 @@ public class ScenarioTemplate implements Cloneable {
     /**
      * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in
      * file
-     * 
+     *
      * @param inputFile The source file
      * @return Possibly an instance of a ScenarioTemplate
      */
@@ -260,7 +279,7 @@ public class ScenarioTemplate implements Cloneable {
     /**
      * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in
      * XML Node
-     * 
+     *
      * @param xmlNode The node with the scenario template
      * @return Possibly an instance of a ScenarioTemplate
      */

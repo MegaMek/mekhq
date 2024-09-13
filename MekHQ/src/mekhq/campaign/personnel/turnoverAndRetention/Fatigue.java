@@ -1,4 +1,27 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.personnel.turnoverAndRetention;
+
+import java.time.DayOfWeek;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
 
 import megamek.common.MiscType;
 import megamek.common.equipment.MiscMounted;
@@ -8,13 +31,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 
-import java.time.DayOfWeek;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
-
 /**
- * The Fatigue class contains static methods for calculating and processing fatigue levels and actions.
+ * The Fatigue class contains static methods for calculating and processing
+ * fatigue levels and actions.
  */
 public class Fatigue {
     /**
@@ -50,9 +69,9 @@ public class Fatigue {
         return fieldKitchenCount * campaign.getCampaignOptions().getFieldKitchenCapacity();
     }
 
-
     /**
-     * Reports the fatigue level of a person and perform actions based on the fatigue level.
+     * Reports the fatigue level of a person and perform actions based on the
+     * fatigue level.
      *
      * @param person The person for which the fatigue level is reported.
      */
@@ -104,13 +123,15 @@ public class Fatigue {
      * Decreases the fatigue of all active personnel.
      * Fatigue recovery is determined based on the following criteria:
      * - Fatigue is adjusted based on various conditions:
-     *     - If it is Monday
-     *         - Fatigue is decreased by an 1
-     *         - If 'person' is on leave, decreased fatigue by an additional 1
-     *         - If there are no active contracts, decreased fatigue by an additional 1
-     * - If campaign options include fatigue usage and 'person' is recovering from fatigue:
-     *     - If fatigue reaches 0, trigger a report indicating fatigue recovery
-     *     - If fatigue leave threshold is not 0, and 'person' is on leave, change status to active
+     * - If it is Monday
+     * - Fatigue is decreased by an 1
+     * - If 'person' is on leave, decreased fatigue by an additional 1
+     * - If there are no active contracts, decreased fatigue by an additional 1
+     * - If campaign options include fatigue usage and 'person' is recovering from
+     * fatigue:
+     * - If fatigue reaches 0, trigger a report indicating fatigue recovery
+     * - If fatigue leave threshold is not 0, and 'person' is on leave, change
+     * status to active
      */
     public static void processFatigueRecovery(Campaign campaign) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Fatigue",
@@ -133,7 +154,7 @@ public class Fatigue {
                         fatigueAdjustment++;
                     }
 
-                    person.increaseFatigue(- fatigueAdjustment);
+                    person.increaseFatigue(-fatigueAdjustment);
 
                     if (person.getFatigue() < 0) {
                         person.setFatigue(0);
@@ -155,7 +176,8 @@ public class Fatigue {
 
                         person.setIsRecoveringFromFatigue(false);
 
-                        if ((campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0) && (person.getStatus().isOnLeave())) {
+                        if ((campaign.getCampaignOptions().getFatigueLeaveThreshold() != 0)
+                                && (person.getStatus().isOnLeave())) {
                             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
                         }
                     }

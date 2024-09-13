@@ -36,7 +36,6 @@ import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
@@ -1124,8 +1123,8 @@ public class CampaignOptions {
         phenotypeProbabilities[Phenotype.NAVAL.ordinal()] = 25;
 
         // Remove Milestone after 0.49.19
-        phenotypeProbabilities[Phenotype.MECHWARRIOR.ordinal()] = 95;
-        phenotypeProbabilities[Phenotype.PROTOMECH.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.PROTOMEK.ordinal()] = 95;
         // endregion Skill Randomization Tab
 
         // region Rank System Tab
@@ -6194,190 +6193,10 @@ public class CampaignOptions {
                     retVal.setScenarioModBV(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoConfigMunitions")) {
                     retVal.setAutoConfigMunitions(Boolean.parseBoolean(wn2.getTextContent().trim()));
-
-                    // region Legacy
-                    // Removed in 0.49.*
-                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) { // Legacy, 0.49.12 removal
-                    String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.getSalaryXPMultipliers().put(Skills.SKILL_LEVELS[i + 1], Double.parseDouble(values[i]));
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) { // Legacy, 0.49.12
-                                                                                                      // removal
-                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ELITE,
-                            Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) { // Legacy,
-                                                                                                        // 0.49.12
-                                                                                                        // removal
-                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.VETERAN,
-                            Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) { // Legacy,
-                                                                                                        // 0.49.12
-                                                                                                        // removal
-                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.REGULAR,
-                            Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) { // Legacy, 0.49.12
-                                                                                                      // removal
-                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.GREEN,
-                            Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) { // Legacy,
-                                                                                                           // 0.49.12
-                                                                                                           // removal
-                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ULTRA_GREEN,
-                            Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) { // Legacy, 0.49.7 Removal
-                    retVal.getRandomOriginOptions().setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) { // Legacy, 0.49.7 Removal
-                    retVal.getRandomOriginOptions()
-                            .setRandomizeDependentOrigin(Boolean.parseBoolean(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) { // Legacy, 0.49.7 Removal
-                    retVal.getRandomOriginOptions().setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("extraRandomOrigin")) { // Legacy, 0.49.7 Removal
-                    retVal.getRandomOriginOptions()
-                            .setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
-                    retVal.getRandomOriginOptions()
-                            .setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) { // Legacy - 0.49.7 Removal
-                    final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
-                    retVal.setRandomDependentMethod((value && retVal.isUseAtB()) ? RandomDependentMethod.AGAINST_THE_BOT
-                            : RandomDependentMethod.NONE);
-                    retVal.setUseRandomDependentAddition(value);
-                } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
-                    retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomMarriages")) { // Legacy - 0.49.6 Removal
-                    retVal.setPercentageRandomMarriageOppositeSexChance(
-                            Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("chanceRandomSameSexMarriages")) { // Legacy - 0.49.6
-                                                                                                 // Removal
-                    retVal.setPercentageRandomMarriageSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.6 Removal
-                    retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) { // Legacy - 0.49.6 Removal
-                    retVal.setRandomMarriageMethod(Boolean.parseBoolean(wn2.getTextContent().trim())
-                            ? RandomMarriageMethod.PERCENTAGE
-                            : RandomMarriageMethod.NONE);
-                } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) { // Legacy - 0.49.6 Removal
-                    retVal.setLogMarriageNameChanges(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) { // Legacy - 0.49.6
-                                                                                                 // Removal
-                    final String[] values = wn2.getTextContent().split(",");
-                    if (values.length == 13) {
-                        final MergingSurnameStyle[] marriageSurnameStyles = MergingSurnameStyle.values();
-                        for (int i = 0; i < values.length; i++) {
-                            retVal.getMarriageSurnameWeights().put(marriageSurnameStyles[i],
-                                    Integer.parseInt(values[i]));
-                        }
-                    } else if (values.length == 9) {
-                        retVal.migrateMarriageSurnameWeights47(values);
-                    } else {
-                        logger.error("Unknown length of randomMarriageSurnameWeights");
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreation") // Legacy - 0.49.0 Removal
-                        || wn2.getNodeName().equalsIgnoreCase("useProcreation")) { // Legacy - 0.49.4 Removal
-                    retVal.setRandomProcreationMethod(RandomProcreationMethod.PERCENTAGE);
-                    retVal.setUseManualProcreation(true);
-                } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreation")) { // Legacy - 0.49.4 Removal
-                    retVal.setPercentageRandomProcreationRelationshipChance(
-                            Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialProcreationNoRelationship") // Legacy -
-                                                                                                        // 0.49.0
-                                                                                                        // Removal
-                        || wn2.getNodeName().equalsIgnoreCase("useProcreationNoRelationship")) { // Legacy - 0.49.4
-                                                                                                 // Removal
-                    retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("chanceProcreationNoRelationship")) { // Legacy - 0.49.4
-                                                                                                    // Removal
-                    retVal.setPercentageRandomProcreationRelationshiplessChance(
-                            Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) { // Legacy - 0.49.4 Removal
-                    retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) { // Legacy - 0.49.4 Removal
-                    retVal.setUseStaticRATs(true);
-                } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) { // Legacy - 0.49.4 Removal
-                    retVal.setIgnoreRATEra(true);
-                } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) { // Legacy - 0.49.3 Removal
-                    final double value = Double.parseDouble(wn2.getTextContent());
-                    retVal.setClanUnitPriceMultiplier(value);
-                    retVal.setClanPartPriceMultiplier(value);
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) { // Legacy - 0.49.3 Removal
-                    retVal.getUsedPartPriceMultipliers()[0] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) { // Legacy - 0.49.3 Removal
-                    retVal.getUsedPartPriceMultipliers()[1] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) { // Legacy - 0.49.3 Removal
-                    retVal.getUsedPartPriceMultipliers()[2] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) { // Legacy - 0.49.3 Removal
-                    retVal.getUsedPartPriceMultipliers()[3] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) { // Legacy - 0.49.3 Removal
-                    retVal.getUsedPartPriceMultipliers()[4] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) { // Legacy - 0.49.3 Removal
-                    retVal.getUsedPartPriceMultipliers()[5] = Double.parseDouble(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) { // Legacy - 0.49.3 Removal
-                    retVal.setDamagedPartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) { // Legacy - 0.49.3
-                                                                                               // Removal
-                    retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-
-                    // Removed in 0.47.*
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
-                    retVal.setPersonnelMarketName(
-                            PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
-                    if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
-                        retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);
-                        retVal.setUseAtBPrisonerDefection(true);
-                        retVal.setUseAtBPrisonerRansom(true);
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
-                    double intensity = Double.parseDouble(wn2.getTextContent().trim());
-
-                    retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math
-                            .round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math
-                            .round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math
-                            .round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
-                    retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math
-                            .round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
-                    retVal.personnelMarketName = PersonnelMarket
-                            .getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
-                    retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
-                            ? PrisonerCaptureStyle.TAHARQA
-                            : PrisonerCaptureStyle.NONE);
-                } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
-                    MekHQ.getMHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
-                    MekHQ.getMHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") // Legacy
-                        || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
-                    if (!Boolean.parseBoolean(wn2.getTextContent())) {
-                        retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = Integer
-                            .parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = Integer
-                            .parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()] = Integer
-                            .parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = Integer
-                            .parseInt(wn2.getTextContent().trim());
                 }
-                // endregion Legacy
             } catch (Exception ex) {
                 logger.error(ex, "Unknown Exception: generationCampaignOptionsFromXML");
             }
-        }
-
-        // Fixing Old Data
-        if (version.isLowerThan("0.49.3") && retVal.isUseAtB()) {
-            retVal.setUnitMarketMethod(UnitMarketMethod.ATB_MONTHLY);
-            retVal.setContractMarketMethod(ContractMarketMethod.ATB_MONTHLY);
         }
 
         logger.debug("Load Campaign Options Complete!");
