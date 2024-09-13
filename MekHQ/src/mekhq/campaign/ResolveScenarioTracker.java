@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
  * This object will be the main workhorse for the scenario
  * resolution wizard. It will keep track of information and be
  * fed back and forth between the various wizards
- * 
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ResolveScenarioTracker {
@@ -442,7 +442,7 @@ public class ResolveScenarioTracker {
      * This method should be run the first time an entity is loaded into the
      * tracker,
      * either from the game or from a MUL file.
-     * 
+     *
      * @param en
      * @param controlsField
      */
@@ -709,7 +709,7 @@ public class ResolveScenarioTracker {
      * Helper function that handles crew and passengers ejected from a large
      * spacecraft,
      * which may be scattered about on numerous other entities
-     * 
+     *
      * @param ship       The large craft unit we're currently processing
      * @param en         The entity associated with the unit Ship
      * @param personnel  The list of persons assigned to the ship as crew and
@@ -897,7 +897,7 @@ public class ResolveScenarioTracker {
      * Helper function that contains the logic for processing prisoner capture.
      * Copy and pasted from checkStatusOfPersonnel, so the internal logic is kind of
      * opaque.
-     * 
+     *
      * @param unitsToProcess The list of TestUnit entities to process. Note that
      *                       in order to be processed, a unit must be in the
      *                       salvageStatus hashtable.
@@ -1527,7 +1527,7 @@ public class ResolveScenarioTracker {
                 // Then, we need to determine if they are a defector
                 if (prisonerStatus.isCurrentPrisoner()
                         && getCampaign().getCampaignOptions().isUseAtBPrisonerDefection()) {
-                    int campaignUnitRating = getCampaign().getUnitRatingAsInteger();
+                    int campaignUnitRating = getCampaign().getUnitRatingMod();
 
                     // if this isn't an AtB Contract, we use the individual's experience level,
                     // instead of enemy skill
@@ -1537,7 +1537,7 @@ public class ResolveScenarioTracker {
                         enemyRating = ((AtBContract) mission).getEnemySkill().ordinal();
                     }
 
-                    int requiredValue = 8 + enemyRating - campaignUnitRating;
+                    int requiredValue = 10 + enemyRating - campaignUnitRating;
 
                     if (getCampaign().getCampaignOptions().isUseLoyaltyModifiers()) {
                         requiredValue += person.getLoyaltyModifier(person.getLoyalty());
@@ -1850,7 +1850,7 @@ public class ResolveScenarioTracker {
      * This object is used to track the status of a particular personnel. At the
      * present,
      * we track the person's missing status, hits, and XP
-     * 
+     *
      * @author Jay Lawson
      *
      */
@@ -1981,7 +1981,7 @@ public class ResolveScenarioTracker {
      * This object is used to track the status of a opposition personnel. We need to
      * actually put the whole
      * person object here because we are not already tracking it on the campaign
-     * 
+     *
      * @author Jay Lawson
      *
      */
@@ -2019,7 +2019,7 @@ public class ResolveScenarioTracker {
 
     /**
      * This object is used to track the status of a particular unit.
-     * 
+     *
      * @author Jay Lawson
      *
      */
