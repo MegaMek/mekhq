@@ -3906,7 +3906,7 @@ public class CampaignOptions {
     }
 
     public int getMissionXpSuccess() {
-        return missionXpFail;
+        return missionXpSuccess;
     }
 
     public void setMissionXpSuccess(final int missionXpSuccess) {
