@@ -18,33 +18,41 @@
  */
 package mekhq.gui.panes;
 
+import java.awt.Dimension;
+import java.awt.GridLayout;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+
 import megamek.client.ui.preferences.JListPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.renderers.CampaignPresetRenderer;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class CampaignPresetPane extends AbstractMHQScrollPane {
-    //region Variable Declarations
-    private JList<CampaignPreset> presets;
-    //endregion Variable Declarations
+    private static final MMLogger logger = MMLogger.create(CampaignPresetPane.class);
 
-    //region Constructors
+    // region Variable Declarations
+    private JList<CampaignPreset> presets;
+    // endregion Variable Declarations
+
+    // region Constructors
     public CampaignPresetPane(final JFrame frame) {
         super(frame, "CampaignPresetPane", JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         initialize();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public JList<CampaignPreset> getPresets() {
         return presets;
     }
@@ -56,9 +64,9 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
     public @Nullable CampaignPreset getSelectedPreset() {
         return getPresets().getSelectedValue();
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region Initialization
+    // region Initialization
     @Override
     protected void initialize() {
         final DefaultListModel<CampaignPreset> listModel = new DefaultListModel<>();
@@ -81,7 +89,9 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
         try {
             setPreferences();
         } catch (Exception ex) {
-            LogManager.getLogger().error("Error setting the Campaign Preset Pane's preferences. Keeping the created pane, but this is likely to cause some oddities.", ex);
+            logger.error(
+                    "Error setting the Campaign Preset Pane's preferences. Keeping the created pane, but this is likely to cause some oddities.",
+                    ex);
         }
     }
 
@@ -90,5 +100,5 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
         super.setCustomPreferences(preferences);
         preferences.manage(new JListPreference(getPresets()));
     }
-    //endregion Initialization
+    // endregion Initialization
 }

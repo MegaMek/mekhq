@@ -1,10 +1,11 @@
 <StratconFacility>
-	<capturedDefinition>AlliedAirBase.xml</capturedDefinition>
-	<displayableName>Air Base</displayableName>
-        <facilityType>AirBase</facilityType>
-        <localModifiers>EnemyAirGarrison.xml</localModifiers>
-        <owner>Opposing</owner>
-        <sharedModifiers>EnemyAirSupport.xml</sharedModifiers>
-	<userDescription>Hostile aircraft will participate in scenarios on this track and defend this facility.</userDescription>
-        <visible>false</visible>
+    <capturedDefinition>AlliedAirBase.xml</capturedDefinition>
+    <displayableName>Air Base</displayableName>
+    <facilityType>AirBase</facilityType>
+    <localModifiers>EnemyAirGarrison.xml</localModifiers>
+    <owner>Opposing</owner>
+    <sharedModifiers>EnemyAirSupport.xml</sharedModifiers>
+    <userDescription>Hostile aircraft will participate in scenarios on this track and defend this
+        facility.</userDescription>
+    <visible>false</visible>
 </StratconFacility>

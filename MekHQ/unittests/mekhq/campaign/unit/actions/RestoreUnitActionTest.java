@@ -18,6 +18,20 @@
  */
 package mekhq.campaign.unit.actions;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.UUID;
+
+import org.junit.jupiter.api.Test;
+
 import megamek.common.Entity;
 import megamek.common.Game;
 import megamek.common.Player;
@@ -29,11 +43,6 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.RestoreUnitAction.IEntityCopyFactory;
-import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
-
-import static org.mockito.Mockito.*;
 
 public class RestoreUnitActionTest {
     @Test
@@ -45,13 +54,13 @@ public class RestoreUnitActionTest {
         when(mockCampaign.getPlayer()).thenReturn(mockPlayer);
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
-        
+
         int entityId = 42;
-        String shortName = "Test Mech TST-01X";
+        String shortName = "Test Mek TST-01X";
         Entity mockEntity = mock(Entity.class);
         when(mockEntity.getId()).thenReturn(entityId);
         when(mockEntity.getShortNameRaw()).thenReturn(shortName);
-        
+
         UUID id = UUID.randomUUID();
         Unit unit = mock(Unit.class);
         when(unit.getId()).thenReturn(id);
@@ -74,7 +83,7 @@ public class RestoreUnitActionTest {
         verify(mockNewEntity, times(1)).setOwner(eq(mockPlayer));
         verify(mockNewEntity, times(1)).setGame(eq(mockGame));
         verify(mockNewEntity, times(1)).setExternalIdAsString(eq(id.toString()));
-        
+
         verify(mockGame, times(1)).removeEntity(eq(entityId), anyInt());
         verify(mockGame, times(1)).addEntity(eq(entityId), eq(mockNewEntity));
 
@@ -94,7 +103,7 @@ public class RestoreUnitActionTest {
         Quartermaster mockQuartermaster = mock(Quartermaster.class);
         when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         Entity mockEntity = mock(Entity.class);
-        when(mockEntity.getShortNameRaw()).thenReturn("Test Mech TST-01X");
+        when(mockEntity.getShortNameRaw()).thenReturn("Test Mek TST-01X");
         Unit unit = new Unit(mockEntity, mockCampaign);
 
         Part part0 = mock(Part.class);

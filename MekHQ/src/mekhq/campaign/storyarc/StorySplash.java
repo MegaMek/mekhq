@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.storyarc;
 
-import megamek.common.annotations.Nullable;
-import megamek.common.icons.AbstractIcon;
-import mekhq.MHQStaticDirectoryManager;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import java.awt.*;
+import java.awt.Image;
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.icons.AbstractIcon;
+import megamek.logging.MMLogger;
+import mekhq.MHQStaticDirectoryManager;
+
 /**
- * Extension of AbstractIcon to handle splash images associated with a StoryDialog
+ * Extension of AbstractIcon to handle splash images associated with a
+ * StoryDialog
  */
 public class StorySplash extends AbstractIcon {
+    private static final MMLogger logger = MMLogger.create(StorySplash.class);
 
-    //region Variable Declarations
-    //TODO: We could declare a default image here
+    // region Variable Declarations
+    // TODO: We could declare a default image here
     public static final String XML_TAG = "storySplash";
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public StorySplash() {
         super();
     }
@@ -47,7 +50,7 @@ public class StorySplash extends AbstractIcon {
     public StorySplash(final @Nullable String category, final @Nullable String filename) {
         super(category, filename);
     }
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     public Image getBaseImage() {
@@ -64,25 +67,25 @@ public class StorySplash extends AbstractIcon {
         try {
             storyIcon = (Image) MHQStaticDirectoryManager.getStorySplash().getItem(category, filename);
             if (storyIcon == null) {
-                //ok lets see if this image is in the story arc data
+                // ok lets see if this image is in the story arc data
                 if (null != MHQStaticDirectoryManager.getUserStorySplash()) {
                     storyIcon = (Image) MHQStaticDirectoryManager.getUserStorySplash().getItem(category, filename);
                 }
 
                 if (storyIcon == null) {
-                    //if still null, then try default
+                    // if still null, then try default
                     storyIcon = (Image) MHQStaticDirectoryManager.getStorySplash().getItem("",
                             DEFAULT_ICON_FILENAME);
                 }
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            logger.error(e);
         }
 
         return storyIcon;
     }
 
-    //region File I/O
+    // region File I/O
     @Override
     public void writeToXML(PrintWriter pw, int indent) {
         writeToXML(pw, indent, XML_TAG);
@@ -93,12 +96,12 @@ public class StorySplash extends AbstractIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception e) {
-            LogManager.getLogger().error(e);
+            logger.error(e);
             return new StorySplash();
         }
         return icon;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public StorySplash clone() {

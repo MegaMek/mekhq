@@ -2,7 +2,8 @@
 <!--
 for a given key the chance is value / sum(odds values)
 example 10 / sum(100) = 0.1 or 10%
-mekhq.log contains TerrainConditionsOddsManifest validations to help find errors. only runs once on startup
+mekhq.log contains TerrainConditionsOddsManifest validations to help find errors. only runs once on
+startup
 can delete this file to reload defaults
 -->
 

@@ -17,18 +17,25 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.codeUtilities.StringUtility;
-import megamek.common.Compute;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.xml.parsers.DocumentBuilder;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import java.io.FileInputStream;
-import java.util.*;
+import megamek.codeUtilities.StringUtility;
+import megamek.common.Compute;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * This is used to supply clan data needed to generate bloodnames
@@ -36,7 +43,9 @@ import java.util.*;
  */
 @Deprecated
 public class Clan {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Clan.class);
+
+    // region Variable Declarations
     private static Map<String, Clan> allClans;
 
     private String code;
@@ -48,7 +57,7 @@ public class Clan {
     private List<DatedRecord> rivals;
     private List<DatedRecord> nameChanges;
     private boolean homeClan;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
     public Clan() {
         startDate = 2807;
@@ -80,7 +89,8 @@ public class Clan {
 
     /**
      * @param code The code to get a Clan for
-     * @return the Clan object for the code, or null if there isn't a Clan with that code
+     * @return the Clan object for the code, or null if there isn't a Clan with that
+     *         code
      */
     public static Clan getClan(String code) {
         return allClans.get(code);
@@ -196,7 +206,7 @@ public class Clan {
     }
 
     /**
-     * @param year the year to get a random Clan for
+     * @param year     the year to get a random Clan for
      * @param homeClan whether or not the Clan is a Home Clan
      * @return a random Clan
      */
@@ -218,11 +228,12 @@ public class Clan {
 
         Document doc;
 
-        try (FileInputStream fis = new FileInputStream("data/names/bloodnames/clans.xml")) { // TODO : Remove inline file path
+        try (FileInputStream fis = new FileInputStream("data/names/bloodnames/clans.xml")) { // TODO : Remove inline
+                                                                                             // file path
             DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
             doc = db.parse(fis);
         } catch (Exception ex) {
-            LogManager.getLogger().error("Could not parse clans.xml", ex);
+            logger.error("Could not parse clans.xml", ex);
             return;
         }
 
@@ -287,7 +298,7 @@ public class Clan {
                     retVal.generationCode = wn.getTextContent().trim();
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
 

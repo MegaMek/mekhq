@@ -18,31 +18,42 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.*;
+import megamek.common.Board;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.EntityListFile;
+import megamek.common.IStartingPositions;
+import megamek.common.UnitNameTracker;
 import megamek.common.icons.Camouflage;
+import megamek.logging.MMLogger;
 import mekhq.Utilities;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.io.migration.CamouflageMigrator;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.stream.Collectors;
+import mekhq.utilities.MHQXMLUtility;
 
 public class BotForce implements IPlayerSettings {
+    private static final MMLogger logger = MMLogger.create(BotForce.class);
+
     private transient final UnitNameTracker nameTracker = new UnitNameTracker();
     private String name;
     private List<Entity> fixedEntityList;
@@ -71,7 +82,7 @@ public class BotForce implements IPlayerSettings {
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            LogManager.getLogger().error("Error getting Princess default behaviors", ex);
+            logger.error("Error getting Princess default behaviors", ex);
         }
         bfRandomizer = null;
     }
@@ -89,7 +100,7 @@ public class BotForce implements IPlayerSettings {
     }
 
     public BotForce(String name, int team, int start, int home, List<Entity> entityList,
-                    Camouflage camouflage, PlayerColour colour) {
+            Camouflage camouflage, PlayerColour colour) {
         this.name = name;
         this.team = team;
         this.startingPos = start;
@@ -101,7 +112,7 @@ public class BotForce implements IPlayerSettings {
         try {
             behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
         } catch (PrincessException ex) {
-            LogManager.getLogger().error("Error getting Princess default behaviors", ex);
+            logger.error("Error getting Princess default behaviors", ex);
         }
         behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST);
         behaviorSettings.setDestinationEdge(CardinalEdge.NONE);
@@ -236,44 +247,72 @@ public class BotForce implements IPlayerSettings {
     }
 
     @Override
-    public int getStartOffset() { return startOffset; }
+    public int getStartOffset() {
+        return startOffset;
+    }
 
     @Override
-    public void setStartOffset(int startOffset) { this.startOffset = startOffset; }
+    public void setStartOffset(int startOffset) {
+        this.startOffset = startOffset;
+    }
 
     @Override
-    public int getStartWidth() { return startWidth; }
+    public int getStartWidth() {
+        return startWidth;
+    }
 
     @Override
-    public void setStartWidth(int startWidth) { this.startWidth = startWidth; }
+    public void setStartWidth(int startWidth) {
+        this.startWidth = startWidth;
+    }
 
     @Override
-    public int getStartingAnyNWx() { return startingAnyNWx; }
+    public int getStartingAnyNWx() {
+        return startingAnyNWx;
+    }
 
     @Override
-    public void setStartingAnyNWx(int startingAnyNWx) { this.startingAnyNWx = startingAnyNWx; }
+    public void setStartingAnyNWx(int startingAnyNWx) {
+        this.startingAnyNWx = startingAnyNWx;
+    }
 
     @Override
-    public int getStartingAnyNWy() { return startingAnyNWy; }
+    public int getStartingAnyNWy() {
+        return startingAnyNWy;
+    }
 
     @Override
-    public void setStartingAnyNWy(int startingAnyNWy) { this.startingAnyNWy = startingAnyNWy; }
+    public void setStartingAnyNWy(int startingAnyNWy) {
+        this.startingAnyNWy = startingAnyNWy;
+    }
 
     @Override
-    public int getStartingAnySEx() { return startingAnySEx; }
+    public int getStartingAnySEx() {
+        return startingAnySEx;
+    }
 
     @Override
-    public void setStartingAnySEx(int startingAnySEx) { this.startingAnySEx = startingAnySEx; }
+    public void setStartingAnySEx(int startingAnySEx) {
+        this.startingAnySEx = startingAnySEx;
+    }
 
     @Override
-    public int getStartingAnySEy() { return startingAnySEy; }
+    public int getStartingAnySEy() {
+        return startingAnySEy;
+    }
 
     @Override
-    public void setStartingAnySEy(int startingAnySEy) { this.startingAnySEy = startingAnySEy; }
+    public void setStartingAnySEy(int startingAnySEy) {
+        this.startingAnySEy = startingAnySEy;
+    }
 
-    public int getDeployRound() { return deployRound; }
+    public int getDeployRound() {
+        return deployRound;
+    }
 
-    public void setDeployRound(int round) { this.deployRound = round; }
+    public void setDeployRound(int round) {
+        this.deployRound = round;
+    }
 
     public String getTemplateName() {
         return templateName;
@@ -290,6 +329,7 @@ public class BotForce implements IPlayerSettings {
     public void setCamouflage(Camouflage camouflage) {
         this.camouflage = Objects.requireNonNull(camouflage);
     }
+
     public PlayerColour getColour() {
         return colour;
     }
@@ -311,7 +351,8 @@ public class BotForce implements IPlayerSettings {
 
         for (Entity entity : getFullEntityList(c)) {
             if (entity == null) {
-                LogManager.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+                logger.error(
+                        "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
@@ -324,7 +365,8 @@ public class BotForce implements IPlayerSettings {
 
         for (Entity entity : getFixedEntityList()) {
             if (entity == null) {
-                LogManager.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+                logger.error(
+                        "Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
             } else {
                 bv += entity.calculateBattleValue(true, false);
             }
@@ -348,9 +390,13 @@ public class BotForce implements IPlayerSettings {
         behaviorSettings.setRetreatEdge(findCardinalEdge(i));
     }
 
-    public void setBotForceRandomizer(BotForceRandomizer randomizer) { this.bfRandomizer = randomizer; }
+    public void setBotForceRandomizer(BotForceRandomizer randomizer) {
+        this.bfRandomizer = randomizer;
+    }
 
-    public BotForceRandomizer getBotForceRandomizer() { return bfRandomizer; }
+    public BotForceRandomizer getBotForceRandomizer() {
+        return bfRandomizer;
+    }
 
     public void generateRandomForces(List<Unit> playerUnits, Campaign c) {
         if (null == bfRandomizer) {
@@ -358,7 +404,7 @@ public class BotForce implements IPlayerSettings {
         }
         // reset the generated units
         generatedEntityList = new ArrayList<>();
-        //get existing units
+        // get existing units
         List<Entity> existingEntityList = new ArrayList<>();
         existingEntityList.addAll(fixedEntityList);
         existingEntityList.addAll(getTraitorEntities(c));
@@ -371,6 +417,7 @@ public class BotForce implements IPlayerSettings {
 
     /**
      * Turn traitor UUIDs into an entity list by checking for associated units
+     *
      * @return a List of Entities associated with the traitor personnel UUIDs
      */
     public List<Entity> getTraitorEntities(Campaign campaign) {
@@ -386,6 +433,7 @@ public class BotForce implements IPlayerSettings {
 
     /**
      * Turn traitor UUIDs into a Unit list by checking for associated units
+     *
      * @return a List of Units associated with the traitor personnel UUIDs
      */
     public List<Unit> getTraitorUnits(Campaign campaign) {
@@ -400,8 +448,10 @@ public class BotForce implements IPlayerSettings {
     }
 
     /**
-     * Checks to see if a given unit has a crew member among the traitor personnel IDs. This is used
+     * Checks to see if a given unit has a crew member among the traitor personnel
+     * IDs. This is used
      * primarily to determine if a unit can be deployed to a scenario.
+     *
      * @param unit
      * @return a boolean indicating whether this unit is a traitor
      */
@@ -444,7 +494,7 @@ public class BotForce implements IPlayerSettings {
         try {
             EntityListFile.writeEntityList(pw, (ArrayList<Entity>) getFixedEntityListDirect());
         } catch (IOException ex) {
-            LogManager.getLogger().error("Error loading entities for BotForce " + this.getName(), ex);
+            logger.error("Error loading entities for BotForce " + this.getName(), ex);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "entities");
 
@@ -458,7 +508,8 @@ public class BotForce implements IPlayerSettings {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "behaviorSettings");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoFlee", behaviorSettings.shouldAutoFlee());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "selfPreservationIndex", behaviorSettings.getSelfPreservationIndex());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "selfPreservationIndex",
+                behaviorSettings.getSelfPreservationIndex());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallShameIndex", behaviorSettings.getFallShameIndex());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hyperAggressionIndex", behaviorSettings.getHyperAggressionIndex());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destinationEdge", behaviorSettings.getDestinationEdge().ordinal());
@@ -478,8 +529,7 @@ public class BotForce implements IPlayerSettings {
                     name = MHQXMLUtility.unEscape(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("team")) {
                     team = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("start") // Legacy - 0.49.19 removal
-                        || wn2.getNodeName().equalsIgnoreCase("startingPos")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingPos")) {
                     startingPos = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("startOffset")) {
                     startOffset = Integer.parseInt(wn2.getTextContent());
@@ -497,24 +547,13 @@ public class BotForce implements IPlayerSettings {
                     deployRound = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
                     setCamouflage(Camouflage.parseFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("camoCategory")) { // Legacy - 0.49.3 removal
-                    getCamouflage().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("camoFileName")) { // Legacy - 0.49.3 removal
-                    getCamouflage().setFilename(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("colour")) {
-                    setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("colorIndex")) { // Legacy - 0.47.15 removal
-                    setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                    if (Camouflage.NO_CAMOUFLAGE.equals(getCamouflage().getCategory())) {
-                        getCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                        getCamouflage().setFilename(getColour().name());
-                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("templateName")) {
                     setTemplateName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("traitor")) {
                     traitors.add(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("botForceRandomizer")) {
-                    BotForceRandomizer bfRandomizer = BotForceRandomizer.generateInstanceFromXML(wn2, campaign, version);
+                    BotForceRandomizer bfRandomizer = BotForceRandomizer.generateInstanceFromXML(wn2, campaign,
+                            version);
                     setBotForceRandomizer(bfRandomizer);
                 } else if (wn2.getNodeName().equalsIgnoreCase("entities")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -525,7 +564,7 @@ public class BotForce implements IPlayerSettings {
                             try {
                                 en = MHQXMLUtility.parseSingleEntityMul((Element) wn3, campaign);
                             } catch (Exception ex) {
-                                LogManager.getLogger().error("Error loading allied unit in scenario", ex);
+                                logger.error("Error loading allied unit in scenario", ex);
                             }
 
                             if (en != null) {
@@ -559,12 +598,8 @@ public class BotForce implements IPlayerSettings {
                     }
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
-        }
-
-        if (version.isLowerThan("0.49.3")) {
-            CamouflageMigrator.migrateCamouflage(version, getCamouflage());
         }
     }
 }

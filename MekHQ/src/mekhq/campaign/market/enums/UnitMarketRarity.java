@@ -18,68 +18,64 @@
  */
 package mekhq.campaign.market.enums;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 public enum UnitMarketRarity {
 
-    //region Enum Declarations
+    // region Enum Declarations
     VERY_RARE("UnitMarketRarity.VERY_RARE.name"),
     RARE("UnitMarketRarity.RARE.name"),
     UNCOMMON("UnitMarketRarity.UNCOMMON.name"),
     COMMON("UnitMarketRarity.COMMON.name"),
     VERY_COMMON("UnitMarketRarity.VERY_COMMON.name");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     UnitMarketRarity(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
-    @SuppressWarnings(value = "unused")
+    // region Getters
+
     public String getName() {
         return name;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    @SuppressWarnings(value = "unused")
+    // region Boolean Comparison Methods
+
     public boolean isVeryRare() {
         return this == VERY_RARE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isRare() {
         return this == RARE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUncommon() {
         return this == UNCOMMON;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCommon() {
         return this == COMMON;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isVeryCommon() {
         return this == VERY_COMMON;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
-    @SuppressWarnings(value = "unused")
+    // region File I/O
+
     public static UnitMarketRarity parseFromString(final String text) {
         return switch (text) {
             case "0", "Very Rare" -> VERY_RARE;
@@ -87,11 +83,12 @@ public enum UnitMarketRarity {
             case "2", "Uncommon" -> UNCOMMON;
             case "3", "Common" -> COMMON;
             case "4", "Very Common" -> VERY_COMMON;
-            default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/market/enums/UnitMarketRarity.java/parseFromString: "
-                    + text);
+            default -> throw new IllegalStateException(
+                    "Unexpected value in mekhq/campaign/market/enums/UnitMarketRarity.java/parseFromString: "
+                            + text);
         };
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

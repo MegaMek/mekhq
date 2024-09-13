@@ -20,70 +20,108 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.Version;
-import megamek.common.*;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
+import megamek.common.ConvFighter;
+import megamek.common.Entity;
+import megamek.common.Infantry;
+import megamek.common.Jumpship;
+import megamek.common.ProtoMek;
+import megamek.common.SmallCraft;
+import megamek.common.Tank;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * Skill type will hold static information for each skill type like base target number,
+ * Skill type will hold static information for each skill type like base target
+ * number,
  * whether to count up, and XP costs for advancement.
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
+    private static final MMLogger logger = MMLogger.create(SkillType.class);
+
     // combat skills
-    public static final String S_PILOT_MECH  = "Piloting/Mech";
-    public static final String S_PILOT_AERO  = "Piloting/Aerospace";
-    public static final String S_PILOT_JET   = "Piloting/Aircraft";
-    public static final String S_PILOT_GVEE  = "Piloting/Ground Vehicle";
-    public static final String S_PILOT_VTOL  = "Piloting/VTOL";
-    public static final String S_PILOT_NVEE  = "Piloting/Naval";
+    public static final String S_PILOT_MEK = "Piloting/Mek";
+    public static final String S_PILOT_AERO = "Piloting/Aerospace";
+    public static final String S_PILOT_JET = "Piloting/Aircraft";
+    public static final String S_PILOT_GVEE = "Piloting/Ground Vehicle";
+    public static final String S_PILOT_VTOL = "Piloting/VTOL";
+    public static final String S_PILOT_NVEE = "Piloting/Naval";
     public static final String S_PILOT_SPACE = "Piloting/Spacecraft";
-    public static final String S_GUN_MECH    = "Gunnery/Mech";
-    public static final String S_GUN_AERO    = "Gunnery/Aerospace";
-    public static final String S_GUN_JET     = "Gunnery/Aircraft";
-    public static final String S_GUN_VEE     = "Gunnery/Vehicle";
-    public static final String S_GUN_SPACE   = "Gunnery/Spacecraft";
-    public static final String S_GUN_BA      = "Gunnery/Battlesuit";
-    public static final String S_GUN_PROTO   = "Gunnery/ProtoMech";
-    public static final String S_ARTILLERY   = "Artillery";
-    public static final String S_SMALL_ARMS  = "Small Arms";
-    public static final String S_ANTI_MECH   = "Anti-Mech";
-    public static final String S_TACTICS     = "Tactics";
+    public static final String S_GUN_MEK = "Gunnery/Mek";
+    public static final String S_GUN_AERO = "Gunnery/Aerospace";
+    public static final String S_GUN_JET = "Gunnery/Aircraft";
+    public static final String S_GUN_VEE = "Gunnery/Vehicle";
+    public static final String S_GUN_SPACE = "Gunnery/Spacecraft";
+    public static final String S_GUN_BA = "Gunnery/BattleArmor";
+    public static final String S_GUN_PROTO = "Gunnery/ProtoMek";
+    public static final String S_ARTILLERY = "Artillery";
+    public static final String S_SMALL_ARMS = "Small Arms";
+    public static final String S_ANTI_MEK = "Anti-Mek";
+    public static final String S_TACTICS = "Tactics";
+
     // non-combat skills
-    public static final String S_TECH_MECH     = "Tech/Mech";
+    public static final String S_TECH_MEK = "Tech/Mek";
     public static final String S_TECH_MECHANIC = "Tech/Mechanic";
-    public static final String S_TECH_AERO     = "Tech/Aero";
-    public static final String S_TECH_BA       = "Tech/BA";
-    public static final String S_TECH_VESSEL   = "Tech/Vessel";
-    public static final String S_ASTECH        = "Astech";
-    public static final String S_DOCTOR        = "Doctor";
-    public static final String S_MEDTECH       = "Medtech";
-    public static final String S_NAV           = "Hyperspace Navigation";
-    public static final String S_ADMIN         = "Administration";
-    public static final String S_NEG           = "Negotiation";
-    public static final String S_LEADER        = "Leadership";
-    public static final String S_SCROUNGE      = "Scrounge";
-    public static final String S_STRATEGY      = "Strategy";
+    public static final String S_TECH_AERO = "Tech/Aero";
+    public static final String S_TECH_BA = "Tech/BattleArmor";
+    public static final String S_TECH_VESSEL = "Tech/Vessel";
+    public static final String S_ASTECH = "Astech";
+    public static final String S_DOCTOR = "Doctor";
+    public static final String S_MEDTECH = "MedTech";
+    public static final String S_NAV = "Hyperspace Navigation";
+    public static final String S_ADMIN = "Administration";
+    public static final String S_NEG = "Negotiation";
+    public static final String S_LEADER = "Leadership";
+    public static final String S_SCROUNGE = "Scrounge";
+    public static final String S_STRATEGY = "Strategy";
 
     public static final int NUM_LEVELS = 11;
 
-    public static final String[] skillList = {S_PILOT_MECH,S_GUN_MECH,S_PILOT_AERO,S_GUN_AERO,
-                                              S_PILOT_GVEE,S_PILOT_VTOL,S_PILOT_NVEE,S_GUN_VEE,
-                                              S_PILOT_JET,S_GUN_JET,S_PILOT_SPACE,S_GUN_SPACE,S_ARTILLERY,
-                                              S_GUN_BA,S_GUN_PROTO,S_SMALL_ARMS,S_ANTI_MECH,
-                                              S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_TECH_VESSEL,S_ASTECH,
-                                              S_DOCTOR,S_MEDTECH,S_NAV,
-                                              S_ADMIN,
-                                              S_TACTICS,S_STRATEGY,
-                                              S_NEG,S_LEADER,S_SCROUNGE};
+    public static final String[] skillList = {
+            S_PILOT_MEK,
+            S_GUN_MEK,
+            S_PILOT_AERO,
+            S_GUN_AERO,
+            S_PILOT_GVEE,
+            S_PILOT_VTOL,
+            S_PILOT_NVEE,
+            S_GUN_VEE,
+            S_PILOT_JET,
+            S_GUN_JET,
+            S_PILOT_SPACE,
+            S_GUN_SPACE,
+            S_ARTILLERY,
+            S_GUN_BA,
+            S_GUN_PROTO,
+            S_SMALL_ARMS,
+            S_ANTI_MEK,
+            S_TECH_MEK,
+            S_TECH_MECHANIC,
+            S_TECH_AERO,
+            S_TECH_BA,
+            S_TECH_VESSEL,
+            S_ASTECH,
+            S_DOCTOR,
+            S_MEDTECH,
+            S_NAV,
+            S_ADMIN,
+            S_TACTICS,
+            S_STRATEGY,
+            S_NEG,
+            S_LEADER,
+            S_SCROUNGE
+    };
 
     public static Map<String, SkillType> lookupHash;
 
@@ -125,7 +163,8 @@ public class SkillType {
     private Integer[] costs;
 
     public static void setSkillTypes(Map<String, SkillType> skills) {
-        // we are going to cycle through all skills in case ones have been added since this hash
+        // we are going to cycle through all skills in case ones have been added since
+        // this hash
         // was created
         for (String name : skillList) {
             if (null != skills.get(name)) {
@@ -231,15 +270,18 @@ public class SkillType {
     /** get the cost to acquire this skill at the given level from scratch **/
     public int getTotalCost(int lvl) {
         int totalCost = 0;
-        for (int i = 0; i<=lvl; i++) {
+        for (int i = 0; i <= lvl; i++) {
             totalCost = totalCost + costs[i];
         }
         return totalCost;
     }
 
-    /** @return the maximum level of that skill (the last one not set to cost = -1, or 10) */
+    /**
+     * @return the maximum level of that skill (the last one not set to cost = -1,
+     *         or 10)
+     */
     public int getMaxLevel() {
-        for (int lvl = 0; lvl < costs.length; ++ lvl) {
+        for (int lvl = 0; lvl < costs.length; ++lvl) {
             if (costs[lvl] < 0) {
                 return lvl - 1;
             }
@@ -256,18 +298,18 @@ public class SkillType {
     }
 
     public boolean isPiloting() {
-        return name.equals(S_PILOT_MECH) || name.equals(S_PILOT_AERO)
-                    || name.equals(S_PILOT_GVEE) || name.equals(S_PILOT_VTOL)
-                    || name.equals(S_PILOT_NVEE) || name.equals(S_PILOT_JET)
-                    || name.equals(S_PILOT_SPACE);
+        return name.equals(S_PILOT_MEK) || name.equals(S_PILOT_AERO)
+                || name.equals(S_PILOT_GVEE) || name.equals(S_PILOT_VTOL)
+                || name.equals(S_PILOT_NVEE) || name.equals(S_PILOT_JET)
+                || name.equals(S_PILOT_SPACE);
     }
 
     public boolean isGunnery() {
-        return name.equals(S_GUN_MECH) || name.equals(S_GUN_AERO)
-                    || name.equals(S_GUN_VEE) || name.equals(S_GUN_BA)
-                    || name.equals(S_SMALL_ARMS) || name.equals(S_GUN_JET)
-                    || name.equals(S_GUN_SPACE) || name.equals(S_GUN_PROTO)
-                    || name.equals(S_ARTILLERY);
+        return name.equals(S_GUN_MEK) || name.equals(S_GUN_AERO)
+                || name.equals(S_GUN_VEE) || name.equals(S_GUN_BA)
+                || name.equals(S_SMALL_ARMS) || name.equals(S_GUN_JET)
+                || name.equals(S_GUN_SPACE) || name.equals(S_GUN_PROTO)
+                || name.equals(S_ARTILLERY);
     }
 
     public int getExperienceLevel(int lvl) {
@@ -286,8 +328,8 @@ public class SkillType {
 
     public static void initializeTypes() {
         lookupHash = new Hashtable<>();
-        lookupHash.put(S_PILOT_MECH, createPilotingMech());
-        lookupHash.put(S_GUN_MECH, createGunneryMech());
+        lookupHash.put(S_PILOT_MEK, createPilotingMek());
+        lookupHash.put(S_GUN_MEK, createGunneryMek());
         lookupHash.put(S_PILOT_AERO, createPilotingAero());
         lookupHash.put(S_GUN_AERO, createGunneryAero());
         lookupHash.put(S_PILOT_JET, createPilotingJet());
@@ -302,15 +344,15 @@ public class SkillType {
         lookupHash.put(S_GUN_BA, createGunneryBA());
         lookupHash.put(S_GUN_PROTO, createGunneryProto());
         lookupHash.put(S_SMALL_ARMS, createSmallArms());
-        lookupHash.put(S_ANTI_MECH, createAntiMech());
-        lookupHash.put(S_TECH_MECH, createTechMech());
+        lookupHash.put(S_ANTI_MEK, createAntiMek());
+        lookupHash.put(S_TECH_MEK, createTechMek());
         lookupHash.put(S_TECH_MECHANIC, createTechMechanic());
         lookupHash.put(S_TECH_AERO, createTechAero());
         lookupHash.put(S_TECH_BA, createTechBA());
         lookupHash.put(S_TECH_VESSEL, createTechVessel());
         lookupHash.put(S_ASTECH, createAstech());
         lookupHash.put(S_DOCTOR, createDoctor());
-        lookupHash.put(S_MEDTECH, createMedtech());
+        lookupHash.put(S_MEDTECH, createMedTech());
         lookupHash.put(S_NAV, createNav());
         lookupHash.put(S_TACTICS, createTactics());
         lookupHash.put(S_STRATEGY, createStrategy());
@@ -318,6 +360,17 @@ public class SkillType {
         lookupHash.put(S_LEADER, createLeadership());
         lookupHash.put(S_NEG, createNegotiation());
         lookupHash.put(S_SCROUNGE, createScrounge());
+
+        // Remove below after Milestone Release post 0.49.19
+        lookupHash.put("Piloting/Mech", createPilotingMek());
+        lookupHash.put("Gunnery/Mech", createGunneryMek());
+        lookupHash.put("Anti-Mech", createAntiMek());
+        lookupHash.put("Tech/Mech", createTechMek());
+        lookupHash.put("Gunnery/ProtoMech", createGunneryProto());
+        lookupHash.put("Medtech", createMedTech());
+        lookupHash.put("Gunnery/Battlesuit", createGunneryBA());
+        lookupHash.put("Tech/BA", createTechBA());
+
     }
 
     public static SkillType getType(String t) {
@@ -343,11 +396,11 @@ public class SkillType {
         } else if (en instanceof Aero) {
             return S_PILOT_AERO;
         } else if (en instanceof Infantry) {
-            return S_ANTI_MECH;
-        } else if (en instanceof Protomech) {
+            return S_ANTI_MEK;
+        } else if (en instanceof ProtoMek) {
             return S_GUN_PROTO;
         } else {
-            return S_PILOT_MECH;
+            return S_PILOT_MEK;
         }
     }
 
@@ -366,10 +419,10 @@ public class SkillType {
             } else {
                 return S_SMALL_ARMS;
             }
-        } else if (en instanceof Protomech) {
+        } else if (en instanceof ProtoMek) {
             return S_GUN_PROTO;
         } else {
-            return S_GUN_MECH;
+            return S_GUN_MEK;
         }
     }
 
@@ -386,7 +439,7 @@ public class SkillType {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillType");
     }
 
-    public static void generateInstanceFromXML(Node wn, Version version) {
+    public static void generateInstanceFromXML(Node wn) {
         try {
             SkillType retVal = new SkillType();
             NodeList nl = wn.getChildNodes();
@@ -413,20 +466,16 @@ public class SkillType {
                         retVal.costs[i] = Integer.parseInt(values[i]);
                     }
                 }
-            }
-
-            if ("Gunnery/Protomech".equals(retVal.getName())) { // Renamed in 0.49.12
-                retVal.name = "Gunnery/ProtoMech";
             }
 
             lookupHash.put(retVal.name, retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
     public static void generateSeparateInstanceFromXML(final Node wn,
-                                                       final Map<String, SkillType> hash) {
+            final Map<String, SkillType> hash) {
         try {
             SkillType retVal = new SkillType();
             NodeList nl = wn.getChildNodes();
@@ -455,34 +504,34 @@ public class SkillType {
                 }
             }
 
-            if ("Gunnery/Protomech".equals(retVal.getName())) { // Renamed in 0.49.12
-                retVal.name = "Gunnery/ProtoMech";
+            if ("Gunnery/Protomek".equals(retVal.getName())) { // Renamed in 0.49.12
+                retVal.name = "Gunnery/ProtoMek";
             }
 
             hash.put(retVal.name, retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
-    public static SkillType createPilotingMech() {
+    public static SkillType createPilotingMek() {
         SkillType skill = new SkillType();
-        skill.name = S_PILOT_MECH;
+        skill.name = S_PILOT_MEK;
         skill.target = 8;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
 
         return skill;
     }
 
-    public static SkillType createGunneryMech() {
+    public static SkillType createGunneryMek() {
         SkillType skill = new SkillType();
-        skill.name = S_GUN_MECH;
+        skill.name = S_GUN_MEK;
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
+        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
 
         return skill;
     }
@@ -493,7 +542,7 @@ public class SkillType {
         skill.target = 8;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
 
         return skill;
     }
@@ -504,7 +553,7 @@ public class SkillType {
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
+        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
 
         return skill;
     }
@@ -515,7 +564,7 @@ public class SkillType {
         skill.target = 8;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
 
         return skill;
     }
@@ -526,7 +575,7 @@ public class SkillType {
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
+        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
 
         return skill;
     }
@@ -537,7 +586,7 @@ public class SkillType {
         skill.target = 8;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
 
         return skill;
     }
@@ -548,7 +597,7 @@ public class SkillType {
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
+        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
 
         return skill;
     }
@@ -559,7 +608,7 @@ public class SkillType {
         skill.target = 8;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
 
         return skill;
     }
@@ -570,7 +619,7 @@ public class SkillType {
         skill.target = 8;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
 
         return skill;
     }
@@ -581,7 +630,7 @@ public class SkillType {
         skill.target = 8;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
 
         return skill;
     }
@@ -592,7 +641,7 @@ public class SkillType {
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
+        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
 
         return skill;
     }
@@ -603,7 +652,7 @@ public class SkillType {
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
+        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
 
         return skill;
     }
@@ -614,7 +663,7 @@ public class SkillType {
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
+        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
 
         return skill;
     }
@@ -625,7 +674,7 @@ public class SkillType {
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
+        skill.costs = new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, -1, -1, -1 };
 
         return skill;
     }
@@ -636,28 +685,28 @@ public class SkillType {
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
 
         return skill;
     }
 
-    public static SkillType createAntiMech() {
+    public static SkillType createAntiMek() {
         SkillType skill = new SkillType();
-        skill.name = S_ANTI_MECH;
+        skill.name = S_ANTI_MEK;
         skill.target = 8;
         skill.greenLvl = 2;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,-1,-1};
+        skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, -1, -1 };
 
         return skill;
     }
 
-    public static SkillType createTechMech() {
+    public static SkillType createTechMek() {
         SkillType skill = new SkillType();
-        skill.name = S_TECH_MECH;
+        skill.name = S_TECH_MEK;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};
+        skill.costs = new Integer[] { 12, 6, 0, 6, 6, 6, -1, -1, -1, -1, -1 };
 
         return skill;
     }
@@ -667,7 +716,7 @@ public class SkillType {
         skill.name = S_TECH_MECHANIC;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};
+        skill.costs = new Integer[] { 12, 6, 0, 6, 6, 6, -1, -1, -1, -1, -1 };
 
         return skill;
     }
@@ -677,7 +726,7 @@ public class SkillType {
         skill.name = S_TECH_AERO;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};
+        skill.costs = new Integer[] { 12, 6, 0, 6, 6, 6, -1, -1, -1, -1, -1 };
 
         return skill;
     }
@@ -687,7 +736,7 @@ public class SkillType {
         skill.name = S_TECH_BA;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};
+        skill.costs = new Integer[] { 12, 6, 0, 6, 6, 6, -1, -1, -1, -1, -1 };
 
         return skill;
     }
@@ -697,7 +746,7 @@ public class SkillType {
         skill.name = S_TECH_VESSEL;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};
+        skill.costs = new Integer[] { 12, 6, 0, 6, 6, 6, -1, -1, -1, -1, -1 };
 
         return skill;
     }
@@ -707,7 +756,7 @@ public class SkillType {
         skill.name = S_ASTECH;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+        skill.costs = new Integer[] { 12, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         return skill;
     }
@@ -717,17 +766,17 @@ public class SkillType {
         skill.name = S_DOCTOR;
         skill.target = 11;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,0,8,8,8,-1,-1,-1,-1,-1};
+        skill.costs = new Integer[] { 16, 8, 0, 8, 8, 8, -1, -1, -1, -1, -1 };
 
         return skill;
     }
 
-    public static SkillType createMedtech() {
+    public static SkillType createMedTech() {
         SkillType skill = new SkillType();
         skill.name = S_MEDTECH;
         skill.target = 11;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+        skill.costs = new Integer[] { 16, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
         return skill;
     }
@@ -737,7 +786,7 @@ public class SkillType {
         skill.name = S_NAV;
         skill.target = 8;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1 };
 
         return skill;
     }
@@ -747,7 +796,7 @@ public class SkillType {
         skill.name = S_TACTICS;
         skill.target = 0;
         skill.countUp = true;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+        skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
 
         return skill;
     }
@@ -757,7 +806,7 @@ public class SkillType {
         skill.name = S_STRATEGY;
         skill.target = 0;
         skill.countUp = true;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+        skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
 
         return skill;
     }
@@ -767,7 +816,7 @@ public class SkillType {
         skill.name = S_ADMIN;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,0,4,4,4,-1,-1,-1,-1,-1};
+        skill.costs = new Integer[] { 8, 4, 0, 4, 4, 4, -1, -1, -1, -1, -1 };
 
         return skill;
     }
@@ -777,7 +826,7 @@ public class SkillType {
         skill.name = S_LEADER;
         skill.target = 0;
         skill.countUp = true;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+        skill.costs = new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
 
         return skill;
     }
@@ -787,7 +836,7 @@ public class SkillType {
         skill.name = S_NEG;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
 
         return skill;
     }
@@ -797,7 +846,7 @@ public class SkillType {
         skill.name = S_SCROUNGE;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.costs = new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 };
 
         return skill;
     }

@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Enemy VTOLs laden with infantry are on the approach.  Hoo-ah!</additionalBriefingText>
+	<additionalBriefingText>Enemy VTOLs laden with infantry are on the approach. Hoo-ah!</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -32,9 +32,9 @@
 		<forceAlignment>2</forceAlignment>
 		<forceName>Enemy Air Mobile Infantry</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>VTOLBlackhawks.mul</fixedMul>	
+		<fixedMul>VTOLBlackhawks.mul</fixedMul>
 		<generationOrder>1</generationOrder>
-		<maxWeightClass>4</maxWeightClass>			
+		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>1</startingAltitude>
 		<objectiveLinkedForces>

@@ -18,20 +18,27 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
+import java.util.ArrayList;
+
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class BreakthroughBuiltInScenario extends AtBScenario {
+    private static final MMLogger logger = MMLogger.create(BreakthroughBuiltInScenario.class);
+
     @Override
     public int getScenarioType() {
         return BREAKTHROUGH;
@@ -65,7 +72,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+            ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int playerHome;
 
@@ -96,7 +103,8 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
         try {
             if (isAttacker()) {
                 if (null != allyEntitiesForce) {
-                    allyEntitiesForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+                    allyEntitiesForce
+                            .setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
                     allyEntitiesForce.setDestinationEdge(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos()));
                 }
             } else {
@@ -104,7 +112,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(getEnemyHome());
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         addBotForce(botForce, campaign);

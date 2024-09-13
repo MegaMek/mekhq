@@ -18,15 +18,6 @@
  */
 package mekhq.campaign.personnel.education;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
-import megamek.client.ui.swing.CommonSettingsDialog;
-import megamek.common.preference.PreferenceManager;
-import mekhq.MHQConstants;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,17 +27,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import megamek.client.ui.swing.CommonSettingsDialog;
+import megamek.common.preference.PreferenceManager;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * The AcademyFactory class is responsible for generating academy blueprints by reading the data from XML sources.
- * It provides methods to retrieve a list of set names and a list of academies for a given set name.
+ * The AcademyFactory class is responsible for generating academy blueprints by
+ * reading the data from XML sources.
+ * It provides methods to retrieve a list of set names and a list of academies
+ * for a given set name.
  */
 public class AcademyFactory {
+    private static final MMLogger logger = MMLogger.create(AcademyFactory.class);
+
     private static AcademyFactory instance = null;
     private final Map<String, Map<String, Academy>> academyMap;
 
     /**
-     * This class is responsible for generating academy blueprint by reading the data from XML sources.
+     * This class is responsible for generating academy blueprint by reading the
+     * data from XML sources.
      */
     private AcademyFactory() {
         academyMap = new HashMap<>();
@@ -97,7 +101,7 @@ public class AcademyFactory {
             try (InputStream inputStream = new FileInputStream(file)) {
                 loadAcademyFromStream(inputStream, new File(file).getName());
             } catch (IOException e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -106,7 +110,7 @@ public class AcademyFactory {
      * Loads academy data from an input stream and adds it to the academy map.
      *
      * @param inputStream the input stream containing the academy data
-     * @param fileName the name of the file containing the academy data
+     * @param fileName    the name of the file containing the academy data
      */
     public void loadAcademyFromStream(InputStream inputStream, String fileName) {
         AcademySet academySet;
@@ -115,7 +119,8 @@ public class AcademyFactory {
             JAXBContext jaxbContext = JAXBContext.newInstance(AcademySet.class, Academy.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-            academySet = unmarshaller.unmarshal(MHQXMLUtility.createSafeXmlSource(inputStream), AcademySet.class).getValue();
+            academySet = unmarshaller.unmarshal(MHQXMLUtility.createSafeXmlSource(inputStream), AcademySet.class)
+                    .getValue();
 
             Map<String, Academy> tempAcademyMap = new HashMap<>();
             String currentSetName = fileName.replaceFirst("[.][^.]+$", "");
@@ -128,7 +133,7 @@ public class AcademyFactory {
             }
             academyMap.put(currentSetName, tempAcademyMap);
         } catch (JAXBException e) {
-            LogManager.getLogger().error("Error loading XML for academies", e);
+            logger.error("Error loading XML for academies", e);
         }
     }
 }

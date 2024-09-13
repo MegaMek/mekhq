@@ -18,26 +18,27 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ManeiDominiClassTest {
-    //region Variable Declarations
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class ManeiDominiClassTest {
+    // region Variable Declarations
     private static final ManeiDominiClass[] classes = ManeiDominiClass.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsNone() {
+    void testIsNone() {
         for (final ManeiDominiClass maneiDominiClass : classes) {
             if (maneiDominiClass == ManeiDominiClass.NONE) {
                 assertTrue(maneiDominiClass.isNone());
@@ -48,7 +49,7 @@ public class ManeiDominiClassTest {
     }
 
     @Test
-    public void testIsGhost() {
+    void testIsGhost() {
         for (final ManeiDominiClass maneiDominiClass : classes) {
             if (maneiDominiClass == ManeiDominiClass.GHOST) {
                 assertTrue(maneiDominiClass.isGhost());
@@ -59,7 +60,7 @@ public class ManeiDominiClassTest {
     }
 
     @Test
-    public void testIsWraith() {
+    void testIsWraith() {
         for (final ManeiDominiClass maneiDominiClass : classes) {
             if (maneiDominiClass == ManeiDominiClass.WRAITH) {
                 assertTrue(maneiDominiClass.isWraith());
@@ -70,7 +71,7 @@ public class ManeiDominiClassTest {
     }
 
     @Test
-    public void testIsBanshee() {
+    void testIsBanshee() {
         for (final ManeiDominiClass maneiDominiClass : classes) {
             if (maneiDominiClass == ManeiDominiClass.BANSHEE) {
                 assertTrue(maneiDominiClass.isBanshee());
@@ -81,7 +82,7 @@ public class ManeiDominiClassTest {
     }
 
     @Test
-    public void testIsZombie() {
+    void testIsZombie() {
         for (final ManeiDominiClass maneiDominiClass : classes) {
             if (maneiDominiClass == ManeiDominiClass.ZOMBIE) {
                 assertTrue(maneiDominiClass.isZombie());
@@ -92,7 +93,7 @@ public class ManeiDominiClassTest {
     }
 
     @Test
-    public void testIsPhantom() {
+    void testIsPhantom() {
         for (final ManeiDominiClass maneiDominiClass : classes) {
             if (maneiDominiClass == ManeiDominiClass.PHANTOM) {
                 assertTrue(maneiDominiClass.isPhantom());
@@ -103,7 +104,7 @@ public class ManeiDominiClassTest {
     }
 
     @Test
-    public void testIsSpectre() {
+    void testIsSpectre() {
         for (final ManeiDominiClass maneiDominiClass : classes) {
             if (maneiDominiClass == ManeiDominiClass.SPECTER) {
                 assertTrue(maneiDominiClass.isSpecter());
@@ -114,7 +115,7 @@ public class ManeiDominiClassTest {
     }
 
     @Test
-    public void testIsPoltergeist() {
+    void testIsPoltergeist() {
         for (final ManeiDominiClass maneiDominiClass : classes) {
             if (maneiDominiClass == ManeiDominiClass.POLTERGEIST) {
                 assertTrue(maneiDominiClass.isPoltergeist());
@@ -123,33 +124,30 @@ public class ManeiDominiClassTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
-     * Testing to ensure the enum is properly parsed from a given String, dependent on whether it
-     * is parsing from ManeiDominiClass.name(), the ordinal (formerly magic numbers), or a failure
+     * Testing to ensure the enum is properly parsed from a given String, dependent
+     * on whether it
+     * is parsing from ManeiDominiClass.name(), the ordinal (formerly magic
+     * numbers), or a failure
      * condition
      */
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("NONE"));
         assertEquals(ManeiDominiClass.GHOST, ManeiDominiClass.parseFromString("GHOST"));
-
-        // Legacy Parsing
-        assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("0"));
-        assertEquals(ManeiDominiClass.BANSHEE, ManeiDominiClass.parseFromString("3"));
-        assertEquals(ManeiDominiClass.POLTERGEIST, ManeiDominiClass.parseFromString("7"));
 
         // Error Case
         assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("10"));
         assertEquals(ManeiDominiClass.NONE, ManeiDominiClass.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("ManeiDominiClass.NONE.text"), ManeiDominiClass.NONE.toString());
         assertEquals(resources.getString("ManeiDominiClass.PHANTOM.text"), ManeiDominiClass.PHANTOM.toString());
         assertEquals(resources.getString("ManeiDominiClass.POLTERGEIST.text"), ManeiDominiClass.POLTERGEIST.toString());

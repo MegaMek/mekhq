@@ -22,7 +22,7 @@ import megamek.Version;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.Mounted;
-import megamek.common.Protomech;
+import megamek.common.ProtoMek;
 import megamek.common.equipment.AmmoMounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -332,7 +332,7 @@ public class AmmoBinTest {
     }
 
     @Test
-    public void getFullShotsForProtomechsReducedInHalfForNonStandardMunitions() {
+    public void getFullShotsForProtoMeksReducedInHalfForNonStandardMunitions() {
         Campaign mockCampaign = mock(Campaign.class);
 
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
@@ -341,9 +341,9 @@ public class AmmoBinTest {
         int equipmentNum = 42;
         AmmoBin ammoBin = new AmmoBin(0, ammoType, equipmentNum, 0, false, false, mockCampaign);
 
-        // ... place the ammo bin on a ProtoMech unit ...
+        // ... place the ammo bin on a ProtoMek unit ...
         Unit mockUnit = mock(Unit.class);
-        Protomech mockEntity = mock(Protomech.class);
+        ProtoMek mockEntity = mock(ProtoMek.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
         Mounted mockMounted = mock(Mounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);

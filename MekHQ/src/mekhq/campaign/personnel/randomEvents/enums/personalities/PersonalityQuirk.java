@@ -18,12 +18,12 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
 
+import mekhq.MekHQ;
+
 public enum PersonalityQuirk {
-    //region Enum Declarations
+    // region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description"),
     ADJUSTS_CLOTHES("PersonalityQuirk.ADJUSTS_CLOTHES.text", "PersonalityQuirk.ADJUSTS_CLOTHES.description"),
     AFFECTIONATE("PersonalityQuirk.AFFECTIONATE.text", "PersonalityQuirk.AFFECTIONATE.description"),
@@ -42,7 +42,8 @@ public enum PersonalityQuirk {
     DOOLITTLE("PersonalityQuirk.DOOLITTLE.text", "PersonalityQuirk.DOOLITTLE.description"),
     DRAMATIC("PersonalityQuirk.DRAMATIC.text", "PersonalityQuirk.DRAMATIC.description"),
     EATING_HABITS("PersonalityQuirk.EATING_HABITS.text", "PersonalityQuirk.EATING_HABITS.description"),
-    ENVIRONMENTAL_SENSITIVITY("PersonalityQuirk.ENVIRONMENTAL_SENSITIVITY.text", "PersonalityQuirk.ENVIRONMENTAL_SENSITIVITY.description"),
+    ENVIRONMENTAL_SENSITIVITY("PersonalityQuirk.ENVIRONMENTAL_SENSITIVITY.text",
+            "PersonalityQuirk.ENVIRONMENTAL_SENSITIVITY.description"),
     EXCESSIVE_CAUTION("PersonalityQuirk.EXCESSIVE_CAUTION.text", "PersonalityQuirk.EXCESSIVE_CAUTION.description"),
     EXCESSIVE_GREETING("PersonalityQuirk.EXCESSIVE_GREETING.text", "PersonalityQuirk.EXCESSIVE_GREETING.description"),
     EYE_CONTACT("PersonalityQuirk.EYE_CONTACT.text", "PersonalityQuirk.EYE_CONTACT.description"),
@@ -79,7 +80,8 @@ public enum PersonalityQuirk {
     NOTE_TAKER("PersonalityQuirk.NOTE_TAKER.text", "PersonalityQuirk.NOTE_TAKER.description"),
     NOTEBOOK("PersonalityQuirk.NOTEBOOK.text", "PersonalityQuirk.NOTEBOOK.description"),
     OBJECT("PersonalityQuirk.OBJECT.text", "PersonalityQuirk.OBJECT.description"),
-    ORGANIZATIONAL_TENDENCIES("PersonalityQuirk.ORGANIZATIONAL_TENDENCIES.text", "PersonalityQuirk.ORGANIZATIONAL_TENDENCIES.description"),
+    ORGANIZATIONAL_TENDENCIES("PersonalityQuirk.ORGANIZATIONAL_TENDENCIES.text",
+            "PersonalityQuirk.ORGANIZATIONAL_TENDENCIES.description"),
     ORGANIZER("PersonalityQuirk.ORGANIZER.text", "PersonalityQuirk.ORGANIZER.description"),
     ORIGAMI("PersonalityQuirk.ORIGAMI.text", "PersonalityQuirk.ORIGAMI.description"),
     OVER_PLANNER("PersonalityQuirk.OVER_PLANNER.text", "PersonalityQuirk.OVER_PLANNER.description"),
@@ -108,7 +110,8 @@ public enum PersonalityQuirk {
     SNACKS("PersonalityQuirk.SNACKS.text", "PersonalityQuirk.SNACKS.description"),
     STORYTELLING("PersonalityQuirk.STORYTELLING.text", "PersonalityQuirk.STORYTELLING.description"),
     STRETCHING("PersonalityQuirk.STRETCHING.text", "PersonalityQuirk.STRETCHING.description"),
-    SUPERSTITIOUS_RITUALS("PersonalityQuirk.SUPERSTITIOUS_RITUALS.text", "PersonalityQuirk.SUPERSTITIOUS_RITUALS.description"),
+    SUPERSTITIOUS_RITUALS("PersonalityQuirk.SUPERSTITIOUS_RITUALS.text",
+            "PersonalityQuirk.SUPERSTITIOUS_RITUALS.description"),
     SUPERVISED_HABITS("PersonalityQuirk.SUPERVISED_HABITS.text", "PersonalityQuirk.SUPERVISED_HABITS.description"),
     TECH_TALK("PersonalityQuirk.TECH_TALK.text", "PersonalityQuirk.TECH_TALK.description"),
     TECHNOPHOBIA("PersonalityQuirk.TECHNOPHOBIA.text", "PersonalityQuirk.TECHNOPHOBIA.description"),
@@ -117,554 +120,457 @@ public enum PersonalityQuirk {
     TIME_MANAGEMENT("PersonalityQuirk.TIME_MANAGEMENT.text", "PersonalityQuirk.TIME_MANAGEMENT.description"),
     TINKERER("PersonalityQuirk.TINKERER.text", "PersonalityQuirk.TINKERER.description"),
     TRUTH_TELLER("PersonalityQuirk.TRUTH_TELLER.text", "PersonalityQuirk.TRUTH_TELLER.description"),
-    UNNECESSARY_CAUTION("PersonalityQuirk.UNNECESSARY_CAUTION.text", "PersonalityQuirk.UNNECESSARY_CAUTION.description"),
-    UNPREDICTABLE_SPEECH("PersonalityQuirk.UNPREDICTABLE_SPEECH.text", "PersonalityQuirk.UNPREDICTABLE_SPEECH.description"),
+    UNNECESSARY_CAUTION("PersonalityQuirk.UNNECESSARY_CAUTION.text",
+            "PersonalityQuirk.UNNECESSARY_CAUTION.description"),
+    UNPREDICTABLE_SPEECH("PersonalityQuirk.UNPREDICTABLE_SPEECH.text",
+            "PersonalityQuirk.UNPREDICTABLE_SPEECH.description"),
     UNUSUAL_HOBBIES("PersonalityQuirk.UNUSUAL_HOBBIES.text", "PersonalityQuirk.UNUSUAL_HOBBIES.description"),
     WATCH("PersonalityQuirk.WATCH.text", "PersonalityQuirk.WATCH.description"),
     WEATHERMAN("PersonalityQuirk.WEATHERMAN.text", "PersonalityQuirk.WEATHERMAN.description"),
     WHISTLER("PersonalityQuirk.WHISTLER.text", "PersonalityQuirk.WHISTLER.description"),
     WORRIER("PersonalityQuirk.WORRIER.text", "PersonalityQuirk.WORRIER.description"),
     WRITER("PersonalityQuirk.WRITER.text", "PersonalityQuirk.WRITER.description");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String description;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     PersonalityQuirk(final String name, final String description) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.description = resources.getString(description);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
-    @SuppressWarnings(value = "unused")
+    // region Getters
+
     public String getDescription() {
         return description;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    @SuppressWarnings(value = "unused")
+    // region Boolean Comparison Methods
+
     public boolean isNone() {
         return this == NONE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAdjustsClothes() {
         return this == ADJUSTS_CLOTHES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAffectionate() {
         return this == AFFECTIONATE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isApologetic() {
         return this == APOLOGETIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBookworm() {
         return this == BOOKWORM;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCalendar() {
         return this == CALENDAR;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCandles() {
         return this == CANDLES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isChewingGum() {
         return this == CHEWING_GUM;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isChronicLateness() {
         return this == CHRONIC_LATENESS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCleaner() {
         return this == CLEANER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCollector() {
         return this == COLLECTOR;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCompetitiveNature() {
         return this == COMPETITIVE_NATURE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCompliments() {
         return this == COMPLIMENTS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDaydreamer() {
         return this == DAYDREAMER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDoodler() {
         return this == DOODLER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDoolittle() {
         return this == DOOLITTLE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDramatic() {
         return this == DRAMATIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isEatingHabits() {
         return this == EATING_HABITS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isEnvironmentalSensitivity() {
         return this == ENVIRONMENTAL_SENSITIVITY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isExcessiveCaution() {
         return this == EXCESSIVE_CAUTION;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isExcessiveGreeting() {
         return this == EXCESSIVE_GREETING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isEyeContact() {
         return this == EYE_CONTACT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFashionChoices() {
         return this == FASHION_CHOICES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFidgets() {
         return this == FIDGETS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFitness() {
         return this == FITNESS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFixates() {
         return this == FIXATES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFlask() {
         return this == FLASK;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFootTapper() {
         return this == FOOT_TAPPER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isForgetful() {
         return this == FORGETFUL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFormalSpeech() {
         return this == FORMAL_SPEECH;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFurniture() {
         return this == FURNITURE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isGlasses() {
         return this == GLASSES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isGloves() {
         return this == GLOVES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHandGestures() {
         return this == HAND_GESTURES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHandWringer() {
         return this == HAND_WRINGER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHandshake() {
         return this == HANDSHAKE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHeadphones() {
         return this == HEADPHONES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHealthySnacks() {
         return this == HEALTHY_SNACKS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHistorian() {
         return this == HISTORIAN;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHummer() {
         return this == HUMMER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHygienic() {
         return this == HYGIENIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isIrregularSleeper() {
         return this == IRREGULAR_SLEEPER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isJoker() {
         return this == JOKER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLists() {
         return this == LISTS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLiteral() {
         return this == LITERAL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLocks() {
         return this == LOCKS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isMeasuredTalker() {
         return this == MEASURED_TALKER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isMinimalist() {
         return this == MINIMALIST;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isMug() {
         return this == MUG;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isNailBiter() {
         return this == NAIL_BITER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isNicknames() {
         return this == NICKNAMING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isNightOwl() {
         return this == NIGHT_OWL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isNoteTaker() {
         return this == NOTE_TAKER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isNotebook() {
         return this == NOTEBOOK;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isObject() {
         return this == OBJECT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isOrganizationalTendencies() {
         return this == ORGANIZATIONAL_TENDENCIES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isOrganizer() {
         return this == ORGANIZER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isOrigami() {
         return this == ORIGAMI;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isOverPlanner() {
         return this == OVER_PLANNER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isOverExplainer() {
         return this == OVEREXPLAINER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPenClicker() {
         return this == PEN_CLICKER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPenTwirler() {
         return this == PEN_TWIRLER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPersonification() {
         return this == PERSONIFICATION;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPessimist() {
         return this == PESSIMIST;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPhrases() {
         return this == PHRASES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPlants() {
         return this == PLANTS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPolite() {
         return this == POLITE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPracticalJoker() {
         return this == PRACTICAL_JOKER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPrepared() {
         return this == PREPARED;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPunctual() {
         return this == PUNCTUAL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPuzzles() {
         return this == PUZZLES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isQuotes() {
         return this == QUOTES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isRarelySleeps() {
         return this == RARELY_SLEEPS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isRoutine() {
         return this == ROUTINE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSeeksApproval() {
         return this == SEEKS_APPROVAL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSentimental() {
         return this == SENTIMENTAL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSharpening() {
         return this == SHARPENING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSings() {
         return this == SINGS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSkeptical() {
         return this == SKEPTICAL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSleepTalker() {
         return this == SLEEP_TALKER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSmiler() {
         return this == SMILER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSnacks() {
         return this == SNACKS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean iStoryteller() {
         return this == STORYTELLING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isStretching() {
         return this == STRETCHING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSuperstitiousRituals() {
         return this == SUPERSTITIOUS_RITUALS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSupervisedHabits() {
         return this == SUPERVISED_HABITS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTechTalk() {
         return this == TECH_TALK;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTechnophobia() {
         return this == TECHNOPHOBIA;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isThesaurus() {
         return this == THESAURUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isThirdPerson() {
         return this == THIRD_PERSON;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTimeManagement() {
         return this == TIME_MANAGEMENT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTinkerer() {
         return this == TINKERER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTruthTeller() {
         return this == TRUTH_TELLER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUnnecessaryCaution() {
         return this == UNNECESSARY_CAUTION;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUnpredictableSpeech() {
         return this == UNPREDICTABLE_SPEECH;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUnusualHobbies() {
         return this == UNUSUAL_HOBBIES;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isWatch() {
         return this == WATCH;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isWeatherman() {
         return this == WEATHERMAN;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isWhistler() {
         return this == WHISTLER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isWorrier() {
         return this == WORRIER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isWriter() {
         return this == WRITER;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
      * Parses a given string and returns the corresponding Quirk enum.
      * Accepts either the ENUM ordinal value, or its name
      *
      * @param quirk the string to be parsed
      * @return the Greed enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid Quirk
+     * @throws IllegalStateException if the given string does not match any valid
+     *                               Quirk
      */
-    @SuppressWarnings(value = "unused")
+
     public static PersonalityQuirk parseFromString(final String quirk) {
         return switch (quirk) {
             case "0", "none" -> NONE;
@@ -769,8 +675,9 @@ public enum PersonalityQuirk {
             case "99", "Persistent Worrier" -> WORRIER;
             case "100", "Writes Everything Down" -> WRITER;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/PersonalityQuirk.java/parseFromString: "
-                            + quirk);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/PersonalityQuirk.java/parseFromString: "
+                                + quirk);
         };
     }
 
