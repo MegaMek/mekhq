@@ -21,25 +21,34 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.*;
+import java.io.PrintWriter;
+import java.util.Objects;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.CriticalSlot;
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
+import megamek.common.TechAdvancement;
+import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.Objects;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingEquipmentPart extends MissingPart {
-    //crap equipmenttype is not serialized!
+    private static final MMLogger logger = MMLogger.create(MissingEquipmentPart.class);
+
+    // crap equipmenttype is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
     protected int equipmentNum;
@@ -111,7 +120,7 @@ public class MissingEquipmentPart extends MissingPart {
         }
 
         if (type == null) {
-            LogManager.getLogger().error("Mounted.restore: could not restore equipment type \"" + name + "\"");
+            logger.error("Mounted.restore: could not restore equipment type \"" + name + "\"");
         }
     }
 
@@ -194,15 +203,15 @@ public class MissingEquipmentPart extends MissingPart {
                 && Objects.equals(newPart.getStickerPrice(), equipmentPart.getStickerPrice());
     }
 
-    protected @Nullable Mounted getMounted() {
+    protected @Nullable Mounted<?> getMounted() {
         final Unit unit = getUnit();
         if ((unit != null) && (unit.getEntity() != null) && (getEquipmentNum() >= 0)) {
-            final Mounted mounted = unit.getEntity().getEquipment(getEquipmentNum());
+            final Mounted<?> mounted = unit.getEntity().getEquipment(getEquipmentNum());
             if (mounted != null) {
                 return mounted;
             }
 
-            LogManager.getLogger().warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
+            logger.warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
         }
 
         return null;
@@ -217,7 +226,7 @@ public class MissingEquipmentPart extends MissingPart {
 
         // The part is only fixable if the location is not destroyed.
         // be sure to check location and second location
-        final Mounted m = getMounted();
+        final Mounted<?> m = getMounted();
         if ((unit != null) && (m != null)) {
             int loc = m.getLocation();
             if (unit.isLocationBreached(loc)) {
@@ -245,7 +254,7 @@ public class MissingEquipmentPart extends MissingPart {
     @Override
     public boolean onBadHipOrShoulder() {
         final Unit unit = getUnit();
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if ((unit != null) && (mounted != null)) {
             return unit.hasBadHipOrShoulder(mounted.getLocation())
                     || (mounted.isSplit() && unit.hasBadHipOrShoulder(mounted.getSecondLocation()));
@@ -271,7 +280,7 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public int getLocation() {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         return (mounted != null) ? mounted.getLocation() : Entity.LOC_NONE;
     }
 
@@ -280,7 +289,7 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     public boolean isRearFacing() {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         return (mounted != null) && mounted.isRearMounted();
     }
 
@@ -292,7 +301,7 @@ public class MissingEquipmentPart extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         final Unit unit = getUnit();
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if ((unit != null) && (mounted != null)) {
             mounted.setHit(true);
             mounted.setDestroyed(true);
@@ -307,11 +316,11 @@ public class MissingEquipmentPart extends MissingPart {
             return false;
         }
         if (type instanceof MiscType) {
-            return type.hasFlag(MiscType.F_MECH_EQUIPMENT)
+            return type.hasFlag(MiscType.F_MEK_EQUIPMENT)
                     || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
                     || type.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
         } else if (type instanceof WeaponType) {
-            return (type.hasFlag(WeaponType.F_MECH_WEAPON)
+            return (type.hasFlag(WeaponType.F_MEK_WEAPON)
                     || type.hasFlag(WeaponType.F_TANK_WEAPON)
                     || type.hasFlag(WeaponType.F_AERO_WEAPON))
                     && !((WeaponType) type).isCapital();
@@ -321,7 +330,7 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public String getLocationName() {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if ((mounted != null) && (mounted.getLocation() != Entity.LOC_NONE)) {
             return getUnit().getEntity().getLocationName(mounted.getLocation());
         }
@@ -331,7 +340,7 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public boolean isInLocation(String loc) {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if (mounted == null) {
             return false;
         }

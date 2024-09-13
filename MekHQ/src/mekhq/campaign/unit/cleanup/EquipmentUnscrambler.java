@@ -30,15 +30,15 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
 
 public abstract class EquipmentUnscrambler {
-    //region Variable Declarations
+    // region Variable Declarations
     protected final Unit unit;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     protected EquipmentUnscrambler(final Unit unit) {
         this.unit = Objects.requireNonNull(unit);
     }
-    //endregion Constructors
+    // endregion Constructors
 
     public EquipmentUnscramblerResult unscramble() {
         final EquipmentProposal proposal = createProposal();
@@ -76,7 +76,7 @@ public abstract class EquipmentUnscrambler {
             proposal.consider(part);
         }
 
-        for (final Mounted m : unit.getEntity().getEquipment()) {
+        for (final Mounted<?> m : unit.getEntity().getEquipment()) {
             proposal.includeEquipment(unit.getEntity().getEquipmentNum(m), m);
         }
 

@@ -18,41 +18,41 @@
  */
 package mekhq.campaign.mission.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum AtBLanceRole {
-    //region Enum Declarations
+    // region Enum Declarations
     FIGHTING("AtBLanceRole.FIGHTING.text", "AtBLanceRole.FIGHTING.toolTipText"),
     DEFENCE("AtBLanceRole.DEFENCE.text", "AtBLanceRole.DEFENCE.toolTipText"),
     SCOUTING("AtBLanceRole.SCOUTING.text", "AtBLanceRole.SCOUTING.toolTipText"),
     TRAINING("AtBLanceRole.TRAINING.text", "AtBLanceRole.TRAINING.toolTipText"),
     UNASSIGNED("AtBLanceRole.UNASSIGNED.text", "AtBLanceRole.UNASSIGNED.toolTipText");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     AtBLanceRole(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isFighting() {
         return this == FIGHTING;
     }
@@ -72,9 +72,9 @@ public enum AtBLanceRole {
     public boolean isUnassigned() {
         return this == UNASSIGNED;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     public static AtBLanceRole parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -101,11 +101,12 @@ public enum AtBLanceRole {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into an AtBLanceRole. Returning FIGHTING.");
+        MMLogger.create(AtBLanceRole.class)
+                .error("Unable to parse " + text + " into an AtBLanceRole. Returning FIGHTING.");
 
         return FIGHTING;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

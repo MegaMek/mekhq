@@ -27,18 +27,18 @@ import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.unit.Unit;
 
 public class EquipmentProposal {
-    //region Variable Declarations
+    // region Variable Declarations
     protected final Unit unit;
     protected final Map<Integer, Mounted> equipment = new HashMap<>();
     protected final Map<Part, Integer> original = new HashMap<>();
     protected final Map<Part, Integer> mapped = new HashMap<>();
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public EquipmentProposal(final Unit unit) {
         this.unit = Objects.requireNonNull(unit);
     }
-    //endregion Constructors
+    // endregion Constructors
 
     public Unit getUnit() {
         return unit;
@@ -52,7 +52,7 @@ public class EquipmentProposal {
         }
     }
 
-    public void includeEquipment(final int equipmentNum, final Mounted mount) {
+    public void includeEquipment(final int equipmentNum, final Mounted<?> mount) {
         equipment.put(equipmentNum, Objects.requireNonNull(mount));
     }
 
@@ -69,7 +69,7 @@ public class EquipmentProposal {
         return Collections.unmodifiableSet(equipment.entrySet());
     }
 
-    public @Nullable Mounted getEquipment(final int equipmentNum) {
+    public @Nullable Mounted<?> getEquipment(final int equipmentNum) {
         return equipment.get(equipmentNum);
     }
 

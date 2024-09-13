@@ -18,12 +18,12 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
 
+import mekhq.MekHQ;
+
 public enum Aggression {
-    //region Enum Declarations
+    // region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
     AGGRESSIVE("Aggression.AGGRESSIVE.text", "Aggression.AGGRESSIVE.description", false, false),
     ASSERTIVE("Aggression.ASSERTIVE.text", "Aggression.ASSERTIVE.description", true, false),
@@ -56,16 +56,16 @@ public enum Aggression {
     TENACIOUS("Aggression.TENACIOUS.text", "Aggression.TENACIOUS.description", true, false),
     VIGILANT("Aggression.VIGILANT.text", "Aggression.VIGILANT.description", true, false);
 
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String description;
     private final boolean isPositive;
     private final boolean isMajor;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     Aggression(final String name, final String description, boolean isPositive, boolean isMajor) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
                 MekHQ.getMHQOptions().getLocale());
@@ -74,199 +74,171 @@ public enum Aggression {
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
-    @SuppressWarnings(value = "unused")
+    // region Getters
+
     public String getDescription() {
         return description;
     }
 
     /**
-     * @return {@code true} if the personality trait is considered positive, {@code false} otherwise.
+     * @return {@code true} if the personality trait is considered positive,
+     *         {@code false} otherwise.
      */
-    @SuppressWarnings(value = "unused")
+
     public boolean isTraitPositive() {
         return isPositive;
     }
 
     /**
-     * @return {@code true} if the personality trait is considered a major trait, {@code false} otherwise.
+     * @return {@code true} if the personality trait is considered a major trait,
+     *         {@code false} otherwise.
      */
-    @SuppressWarnings(value = "unused")
+
     public boolean isTraitMajor() {
         return isMajor;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    @SuppressWarnings(value = "unused")
+    // region Boolean Comparison Methods
+
     public boolean isNone() {
         return this == NONE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBloodthirsty() {
         return this == BLOODTHIRSTY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBold() {
         return this == BOLD;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAggressive() {
         return this == AGGRESSIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAssertive() {
         return this == ASSERTIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBelligerent() {
         return this == BELLIGERENT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBrash() {
         return this == BRASH;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isConfident() {
         return this == CONFIDENT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCourageous() {
         return this == COURAGEOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDaring() {
         return this == DARING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDecisive() {
         return this == DECISIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDetermined() {
         return this == DETERMINED;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDiplomatic() {
         return this == DIPLOMATIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDomineering() {
         return this == DOMINEERING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFearless() {
         return this == FEARLESS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHostile() {
         return this == HOSTILE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHotHeaded() {
         return this == HOT_HEADED;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isImpetuous() {
         return this == IMPETUOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isImpulsive() {
         return this == IMPULSIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isInflexible() {
         return this == INFLEXIBLE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isIntrepid() {
         return this == INTREPID;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isMurderous() {
         return this == MURDEROUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isOverbearing() {
         return this == OVERBEARING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPacifistic() {
         return this == PACIFISTIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isReckless() {
         return this == RECKLESS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isResolute() {
         return this == RESOLUTE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSadistic() {
         return this == SADISTIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSavage() {
         return this == SAVAGE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isStubborn() {
         return this == STUBBORN;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTenacious() {
         return this == TENACIOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isVigilant() {
         return this == VIGILANT;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
      * Parses a given string and returns the corresponding Aggression enum.
      * Accepts either the ENUM ordinal value or its name
      *
      * @param aggression the string to be parsed
      * @return the Aggression enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid Aggression
+     * @throws IllegalStateException if the given string does not match any valid
+     *                               Aggression
      */
 
-    @SuppressWarnings(value = "unused")
     public static Aggression parseFromString(final String aggression) {
         return switch (aggression) {
             case "0", "None" -> NONE;
@@ -303,8 +275,9 @@ public enum Aggression {
             case "29", "Sadistic" -> SADISTIC;
             case "30", "Savage" -> SAVAGE;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Aggression.java/parseFromString: "
-                            + aggression);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Aggression.java/parseFromString: "
+                                + aggression);
         };
     }
 
@@ -313,10 +286,10 @@ public enum Aggression {
      *
      * @param aggression the integer value representing the Aggression level
      * @return the corresponding Aggression enum value
-     * @throws IllegalStateException if the integer value does not correspond to any valid Aggression enum value
+     * @throws IllegalStateException if the integer value does not correspond to any
+     *                               valid Aggression enum value
      */
 
-    @SuppressWarnings(value = "unused")
     public static Aggression parseFromInt(final int aggression) {
         return switch (aggression) {
             case 0 -> NONE;
@@ -353,8 +326,9 @@ public enum Aggression {
             case 29 -> SADISTIC;
             case 30 -> SAVAGE;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Aggression.java/parseFromInt: "
-                            + aggression);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Aggression.java/parseFromInt: "
+                                + aggression);
         };
     }
 

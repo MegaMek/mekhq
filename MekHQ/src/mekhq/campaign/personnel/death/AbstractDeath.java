@@ -18,22 +18,6 @@
  */
 package mekhq.campaign.personnel.death;
 
-import megamek.Version;
-import megamek.common.annotations.Nullable;
-import megamek.common.enums.Gender;
-import megamek.common.util.weightedMaps.WeightedDoubleMap;
-import mekhq.MHQConstants;
-import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.*;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -42,8 +26,30 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
+import megamek.common.util.weightedMaps.WeightedDoubleMap;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.AgeGroup;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.RandomDeathMethod;
+import mekhq.campaign.personnel.enums.TenYearAgeRange;
+import mekhq.utilities.MHQXMLUtility;
+
 public abstract class AbstractDeath {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(AbstractDeath.class);
+
+    // region Variable Declarations
     private final RandomDeathMethod method;
     private Map<AgeGroup, Boolean> enabledAgeGroups;
     private boolean useRandomClanPersonnelDeath;
@@ -53,11 +59,11 @@ public abstract class AbstractDeath {
 
     private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     protected AbstractDeath(final RandomDeathMethod method, final CampaignOptions options,
-                            final boolean initializeCauses) {
+            final boolean initializeCauses) {
         this.method = method;
         setEnabledAgeGroups(options.getEnabledRandomDeathAgeGroups());
         setUseRandomClanPersonnelDeath(options.isUseRandomClanPersonnelDeath());
@@ -68,9 +74,9 @@ public abstract class AbstractDeath {
             initializeCauses();
         }
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public RandomDeathMethod getMethod() {
         return method;
     }
@@ -106,17 +112,18 @@ public abstract class AbstractDeath {
     public Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> getCauses() {
         return causes;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     /**
      * This is used to determine if a person can die.
-     * @param person the person to determine for
-     * @param ageGroup the age group of the person in question
+     * 
+     * @param person      the person to determine for
+     * @param ageGroup    the age group of the person in question
      * @param randomDeath if this is for random death or manual death
      * @return null if they can, otherwise the reason they cannot
      */
     public @Nullable String canDie(final Person person, final AgeGroup ageGroup,
-                                   final boolean randomDeath) {
+            final boolean randomDeath) {
         if (person.getStatus().isDead()) {
             return resources.getString("cannotDie.Dead.text");
         } else if (randomDeath) {
@@ -134,15 +141,16 @@ public abstract class AbstractDeath {
         return null;
     }
 
-    //region New Day
+    // region New Day
     /**
      * Processes new day random death for an individual.
+     * 
      * @param campaign the campaign to process
-     * @param today the current day
-     * @param person the person to process
+     * @param today    the current day
+     * @param person   the person to process
      */
     public boolean processNewDay(final Campaign campaign, final LocalDate today,
-                                 final Person person) {
+            final Person person) {
         final int age = person.getAge(today);
         final AgeGroup ageGroup = AgeGroup.determineAgeGroup(age);
         if (canDie(person, ageGroup, true) != null) {
@@ -157,21 +165,21 @@ public abstract class AbstractDeath {
         }
     }
 
-    //region Random Death
+    // region Random Death
     /**
-     * @param age the person's age
+     * @param age    the person's age
      * @param gender the person's gender
      * @return true if the person is selected to randomly die, otherwise false
      */
     public abstract boolean randomlyDies(final int age, final Gender gender);
-    //endregion Random Death
-    //endregion New Day
+    // endregion Random Death
+    // endregion New Day
 
-    //region Cause
+    // region Cause
     /**
-     * @param person the person who has died
+     * @param person   the person who has died
      * @param ageGroup the person's age group
-     * @param age the person's age
+     * @param age      the person's age
      * @return the cause of the Person's random death
      */
     public PersonnelStatus getCause(final Person person, final AgeGroup ageGroup, final int age) {
@@ -188,12 +196,14 @@ public abstract class AbstractDeath {
             return PersonnelStatus.PREGNANCY_COMPLICATIONS;
         }
 
-        final Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>> genderedCauses = getCauses().get(person.getGender());
+        final Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>> genderedCauses = getCauses()
+                .get(person.getGender());
         if (genderedCauses == null) {
             return getDefaultCause(ageGroup);
         }
 
-        final WeightedDoubleMap<PersonnelStatus> ageRangeCauses = genderedCauses.get(TenYearAgeRange.determineAgeRange(age));
+        final WeightedDoubleMap<PersonnelStatus> ageRangeCauses = genderedCauses
+                .get(TenYearAgeRange.determineAgeRange(age));
         if (ageRangeCauses == null) {
             return getDefaultCause(ageGroup);
         }
@@ -204,27 +214,32 @@ public abstract class AbstractDeath {
 
     /**
      * @param ageGroup the age group to get the default random death cause for
-     * @return the default cause, which is old age for elders and natural causes for everyone else
+     * @return the default cause, which is old age for elders and natural causes for
+     *         everyone else
      */
     private PersonnelStatus getDefaultCause(final AgeGroup ageGroup) {
         return ageGroup.isElder() ? PersonnelStatus.OLD_AGE : PersonnelStatus.NATURAL_CAUSES;
     }
 
     /**
-     * @param person the person from whom may have died of injuries (which may be diseases, once
+     * @param person the person from whom may have died of injuries (which may be
+     *               diseases, once
      *               that is implemented)
-     * @return the personnel status applicable to the form of injury that caused the death, or
-     * ACTIVE if it wasn't determined that injuries caused the death
+     * @return the personnel status applicable to the form of injury that caused the
+     *         death, or
+     *         ACTIVE if it wasn't determined that injuries caused the death
      */
     private PersonnelStatus determineIfInjuriesCausedTheDeath(final Person person) {
-        // We care about injuries that are major or deadly. We do not want any chronic conditions
+        // We care about injuries that are major or deadly. We do not want any chronic
+        // conditions
         // nor scratches
         return person.getInjuries().stream().anyMatch(injury -> injury.getLevel().isMajorOrDeadly())
-                ? PersonnelStatus.WOUNDS : PersonnelStatus.ACTIVE;
+                ? PersonnelStatus.WOUNDS
+                : PersonnelStatus.ACTIVE;
     }
-    //endregion Cause
+    // endregion Cause
 
-    //region File I/O
+    // region File I/O
     public void initializeCauses() {
         getCauses().clear();
         initializeCausesFromFile(new File(MHQConstants.RANDOM_DEATH_CAUSES_FILE_PATH));
@@ -242,14 +257,14 @@ public abstract class AbstractDeath {
         try (InputStream is = new FileInputStream(file)) {
             element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to open file", ex);
+            logger.error("Failed to open file", ex);
             return;
         }
         element.normalize();
         final Version version = new Version(element.getAttribute("version"));
         final NodeList nl = element.getChildNodes();
 
-        LogManager.getLogger().info("Parsing Random Death Causes from " + version + "-origin xml");
+        logger.info("Parsing Random Death Causes from " + version + "-origin xml");
         for (int i = 0; i < nl.getLength(); i++) {
             final Node wn = nl.item(i);
             if (!wn.hasChildNodes()) {
@@ -295,5 +310,5 @@ public abstract class AbstractDeath {
             }
         }
     }
-    //endregion File I/O
+    // endregion File I/O
 }

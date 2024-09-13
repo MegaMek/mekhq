@@ -18,16 +18,17 @@
  */
 package mekhq.adapter;
 
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import megamek.common.EquipmentType;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import megamek.common.EquipmentType;
+
 public class HPGRatingAdapter extends XmlAdapter<String, Integer> {
-    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<>(6);
-    private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<>(6);
+    private static final Map<String, Integer> stringToEquipmentTypeMap = new HashMap<>(6);
+    private static final Map<Integer, String> equipmentTypeToStringMap = new HashMap<>(6);
+
     static {
         stringToEquipmentTypeMap.put("A", EquipmentType.RATING_A);
         stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B);

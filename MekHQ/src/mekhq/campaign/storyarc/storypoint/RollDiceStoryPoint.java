@@ -18,22 +18,25 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
-import megamek.Version;
-import megamek.common.Compute;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryPoint;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.common.Compute;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * This StoryPoint rolls some dice and returns the result. It can be used when some randomization is required.
+ * This StoryPoint rolls some dice and returns the result. It can be used when
+ * some randomization is required.
  */
 public class RollDiceStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(RollDiceStoryPoint.class);
 
     private int ndice;
     private int sides;
@@ -82,7 +85,7 @@ public class RollDiceStoryPoint extends StoryPoint {
                     sides = Integer.parseInt(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

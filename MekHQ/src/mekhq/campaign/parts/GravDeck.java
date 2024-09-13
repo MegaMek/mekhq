@@ -20,22 +20,29 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.Jumpship;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author MKerensky
  */
 public class GravDeck extends Part {
+    private static final MMLogger logger = MMLogger.create(GravDeck.class);
+
     static final TechAdvancement TA_GRAV_DECK = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
             .setTechRating(RATING_B)
@@ -176,7 +183,7 @@ public class GravDeck extends Part {
 
     @Override
     public double getTonnage() {
-        //TO tables p 407
+        // TO tables p 407
         if (deckType == GRAV_DECK_TYPE_STANDARD) {
             return 50;
         } else if (deckType == GRAV_DECK_TYPE_LARGE) {
@@ -214,7 +221,7 @@ public class GravDeck extends Part {
                     deckNumber = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
     }

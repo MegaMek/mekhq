@@ -20,9 +20,17 @@
  */
 package mekhq.campaign.market;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.ProcurementEvent;
@@ -32,43 +40,44 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A list of IAcquisitionWork
  *
- * When a new acquisition is requested (via the parts store or the acquisition tab), we
- * iterate through this list and look for the MissingPart.getNewPart that matches
+ * When a new acquisition is requested (via the parts store or the acquisition
+ * tab), we
+ * iterate through this list and look for the MissingPart.getNewPart that
+ * matches
  * the desired part. Here are the possible outcomes:
  *
  * - We find it, but we cannot check today, so we add the quantity requested
  * - We don't find it, we immediately check and add to the list if we fail
  *
- * On Campaign.newDay, we also cycle through the list and check any items that have no
+ * On Campaign.newDay, we also cycle through the list and check any items that
+ * have no
  * more days to wait for the next check.
  *
  * Checking procedure
- * Using a while loop, we keep checking using an acquisition roll until we fail or we hit
- * zero quantity. If we hit zero quantity, then we can remove the item. If we fail, then
+ * Using a while loop, we keep checking using an acquisition roll until we fail
+ * or we hit
+ * zero quantity. If we hit zero quantity, then we can remove the item. If we
+ * fail, then
  * we reset the dayCounter to the max.
  *
- * We also now only use one person to make all checks. We allow the user to set the skill
+ * We also now only use one person to make all checks. We allow the user to set
+ * the skill
  * and other options for who makes the check in the campaign options.,
  *
  * Do we use a separate shopping list for new units?
  */
 public class ShoppingList {
-    //region Variable Declarations
-    private List<IAcquisitionWork> shoppingList;
-    //endregion Variable Declarations
+    private static final MMLogger logger = MMLogger.create(ShoppingList.class);
 
-    //region Constructors
+    // region Variable Declarations
+    private List<IAcquisitionWork> shoppingList;
+    // endregion Variable Declarations
+
+    // region Constructors
     public ShoppingList() {
         setShoppingList(new ArrayList<>());
     }
@@ -76,9 +85,9 @@ public class ShoppingList {
     public ShoppingList(List<IAcquisitionWork> shoppingList) {
         setShoppingList(shoppingList);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public List<IAcquisitionWork> getShoppingList() {
         return shoppingList;
     }
@@ -86,7 +95,7 @@ public class ShoppingList {
     public void setShoppingList(List<IAcquisitionWork> shoppingList) {
         this.shoppingList = shoppingList;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     public @Nullable IAcquisitionWork getShoppingItem(final Object newEquipment) {
         return getShoppingList().stream()
@@ -115,7 +124,8 @@ public class ShoppingList {
     }
 
     public void addShoppingItem(IAcquisitionWork newWork, int quantity, Campaign campaign) {
-        // check to see if this is already on the shopping list. If so, then add quantity to the list
+        // check to see if this is already on the shopping list. If so, then add
+        // quantity to the list
         // and return
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
             if (isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())) {
@@ -128,7 +138,8 @@ public class ShoppingList {
             }
         }
 
-        // if not on the shopping list then try to acquire it with a temporary short shopping list.
+        // if not on the shopping list then try to acquire it with a temporary short
+        // shopping list.
         // If we fail, then add it to the shopping list
         int origQuantity = quantity;
         while (quantity > 1) {
@@ -137,12 +148,14 @@ public class ShoppingList {
         }
 
         if (newWork.getQuantity() > 0) {
-            // if using planetary acquisition check with low verbosity, check to see if nothing was found
+            // if using planetary acquisition check with low verbosity, check to see if
+            // nothing was found
             // because it is not reported elsewhere
             if ((newWork.getQuantity() == origQuantity)
                     && campaign.getCampaignOptions().isUsePlanetaryAcquisition()
                     && !campaign.getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>You failed to find " + newWork.getAcquisitionName()
+                campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                        + "'><b>You failed to find " + newWork.getAcquisitionName()
                         + " within " + campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition()
                         + " jumps</b></font>");
             }
@@ -161,8 +174,8 @@ public class ShoppingList {
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "shoppingList");
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
-            //don't write refits to the shopping list - we will add them manually
-            //when we parse units and find refit kits that have not been found
+            // don't write refits to the shopping list - we will add them manually
+            // when we parse units and find refit kits that have not been found
             if ((shoppingItem instanceof Part) && !(shoppingItem instanceof Refit)) {
                 ((Part) shoppingItem).writeToXML(pw, indent);
             } else if (shoppingItem instanceof UnitOrder) {
@@ -195,7 +208,7 @@ public class ShoppingList {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         return retVal;

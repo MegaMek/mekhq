@@ -205,7 +205,7 @@
 		<clanVehicles>false</clanVehicles>
 		<doubleVehicles>true</doubleVehicles>
 		<adjustPlayerVehicles>false</adjustPlayerVehicles>
-		<opforLanceTypeMechs>1</opforLanceTypeMechs>
+		<opforLanceTypeMeks>1</opforLanceTypeMeks>
 		<opforLanceTypeMixed>2</opforLanceTypeMixed>
 		<opforLanceTypeVehicles>3</opforLanceTypeVehicles>
 		<opforUsesVTOLs>true</opforUsesVTOLs>
@@ -223,7 +223,7 @@
 		<trackUnitFatigue>false</trackUnitFatigue>
 		<mercSizeLimited>false</mercSizeLimited>
 		<trackOriginalUnit>false</trackOriginalUnit>
-		<regionalMechVariations>false</regionalMechVariations>
+		<regionalMekVariations>false</regionalMekVariations>
 		<attachedPlayerCamouflage>true</attachedPlayerCamouflage>
 		<playerControlsAttachedUnits>false</playerControlsAttachedUnits>
 		<searchRadius>800</searchRadius>
@@ -335,17 +335,22 @@
 		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
 		<planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
 		<planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
-		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960 CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
+		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960
+			CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500
+			CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
 		<salaryXpMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXpMultiplier>
-		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
+		<usePortraitForType>
+			false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
 		<useAtBUnitMarket>false</useAtBUnitMarket>
 		<rats>Xotl,Total Warfare</rats>
 	</campaignOptions>
 	<units>
 		<unit id="69b910f6-ef6c-42ec-b5f4-6529351a11ff" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Nexus II" model="NXS2-A" type="Biped" commander="false" externalId="69b910f6-ef6c-42ec-b5f4-6529351a11ff" c3UUID="d755f990-4f4c-46b0-8eda-4c56ef19c685">
+			<entity chassis="Nexus II" model="NXS2-A" type="Biped" commander="false"
+				externalId="69b910f6-ef6c-42ec-b5f4-6529351a11ff"
+				c3UUID="d755f990-4f4c-46b0-8eda-4c56ef19c685">
 				<c3iset>
-					<c3i_link link="d755f990-4f4c-46b0-8eda-4c56ef19c685"/>
+					<c3i_link link="d755f990-4f4c-46b0-8eda-4c56ef19c685" />
 				</c3iset>
 			</entity>
 			<driverId>a1b9ff1b-040e-4e31-afbd-499a96ea0ba4</driverId>
@@ -353,17 +358,19 @@
 			<forceId>4</forceId>
 		</unit>
 		<unit id="30619ef0-64f2-42db-b7ec-3055da88f393" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Rifleman" model="RFL-8D" type="Biped" commander="false" externalId="30619ef0-64f2-42db-b7ec-3055da88f393">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="7" type="ISRotaryAC5 Ammo" shots="20"/>
-					<slot index="8" type="ISRotaryAC5 Ammo" shots="20"/>
-					<slot index="9" type="ISRotaryAC5 Ammo" shots="20"/>
+			<entity chassis="Rifleman" model="RFL-8D" type="Biped" commander="false"
+				externalId="30619ef0-64f2-42db-b7ec-3055da88f393"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="7" type="ISRotaryAC5 Ammo"
+						shots="20" />
+					<slot index="8" type="ISRotaryAC5 Ammo" shots="20" />
+					<slot index="9"
+						type="ISRotaryAC5 Ammo" shots="20" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="7" type="ISRotaryAC5 Ammo" shots="20"/>
-					<slot index="8" type="ISRotaryAC5 Ammo" shots="20"/>
-					<slot index="9" type="ISRotaryAC5 Ammo" shots="20"/>
+				<location index="3"> Left Torso <slot
+						index="7" type="ISRotaryAC5 Ammo" shots="20" />
+					<slot index="8" type="ISRotaryAC5 Ammo"
+						shots="20" />
+					<slot index="9" type="ISRotaryAC5 Ammo" shots="20" />
 				</location>
 			</entity>
 			<driverId>57a86935-ccc3-475e-8402-0613af28995e</driverId>
@@ -371,17 +378,19 @@
 			<forceId>3</forceId>
 		</unit>
 		<unit id="c0a5a68a-3223-43d5-bd5e-fda292a4e848" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Mad Cat Mk II" model="(Standard)" type="Biped" commander="false" externalId="c0a5a68a-3223-43d5-bd5e-fda292a4e848">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="7" type="Clan Ammo LRM-10" shots="12"/>
-					<slot index="8" type="Clan Gauss Ammo" shots="8"/>
-					<slot index="9" type="Clan Gauss Ammo" shots="8"/>
+			<entity chassis="Mad Cat Mk II" model="(Standard)" type="Biped" commander="false"
+				externalId="c0a5a68a-3223-43d5-bd5e-fda292a4e848"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="7" type="Clan Ammo LRM-10"
+						shots="12" />
+					<slot index="8" type="Clan Gauss Ammo" shots="8" />
+					<slot index="9"
+						type="Clan Gauss Ammo" shots="8" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="7" type="Clan Ammo LRM-10" shots="12"/>
-					<slot index="8" type="Clan Gauss Ammo" shots="8"/>
-					<slot index="9" type="Clan Gauss Ammo" shots="8"/>
+				<location index="3"> Left Torso <slot
+						index="7" type="Clan Ammo LRM-10" shots="12" />
+					<slot index="8" type="Clan Gauss Ammo"
+						shots="8" />
+					<slot index="9" type="Clan Gauss Ammo" shots="8" />
 				</location>
 			</entity>
 			<driverId>a0fba482-6b60-4074-bd75-3fb7736824ea</driverId>
@@ -389,13 +398,15 @@
 			<forceId>3</forceId>
 		</unit>
 		<unit id="6cad1e5c-86f7-45d8-b705-d89bac8813fa" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Blitzkrieg" model="BTZ-3F" type="Biped" commander="false" externalId="6cad1e5c-86f7-45d8-b705-d89bac8813fa">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="4" type="IS Ultra AC/20 Ammo" shots="5"/>
-					<slot index="5" type="IS Ultra AC/20 Ammo" shots="5"/>
-					<slot index="6" type="IS Ultra AC/20 Ammo" shots="5"/>
-					<slot index="7" type="IS Ultra AC/20 Ammo" shots="5"/>
+			<entity chassis="Blitzkrieg" model="BTZ-3F" type="Biped" commander="false"
+				externalId="6cad1e5c-86f7-45d8-b705-d89bac8813fa"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="4" type="IS Ultra AC/20 Ammo"
+						shots="5" />
+					<slot index="5" type="IS Ultra AC/20 Ammo" shots="5" />
+					<slot index="6"
+						type="IS Ultra AC/20 Ammo" shots="5" />
+					<slot index="7" type="IS Ultra AC/20 Ammo"
+						shots="5" />
 				</location>
 			</entity>
 			<driverId>208b7330-459e-4dd0-b9ff-bf7f3b7a0f6e</driverId>
@@ -404,15 +415,16 @@
 			<scenarioId>1</scenarioId>
 		</unit>
 		<unit id="f96775d9-4ae3-4428-854c-6f92f826814b" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Emperor" model="EMP-6A" type="Biped" commander="false" externalId="f96775d9-4ae3-4428-854c-6f92f826814b">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="8" type="IS LB 10-X AC Ammo" shots="10"/>
-					<slot index="9" type="IS LB 10-X Cluster Ammo" shots="10"/>
+			<entity chassis="Emperor" model="EMP-6A" type="Biped" commander="false"
+				externalId="f96775d9-4ae3-4428-854c-6f92f826814b"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="8" type="IS LB 10-X AC Ammo"
+						shots="10" />
+					<slot index="9" type="IS LB 10-X Cluster Ammo" shots="10" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="8" type="IS LB 10-X AC Ammo" shots="10"/>
-					<slot index="9" type="IS LB 10-X Cluster Ammo" shots="10"/>
+				<location
+					index="3"> Left Torso <slot index="8" type="IS LB 10-X AC Ammo" shots="10" />
+					<slot
+						index="9" type="IS LB 10-X Cluster Ammo" shots="10" />
 				</location>
 			</entity>
 			<driverId>3a8b9557-3f49-44e4-a071-e4e10a0e26e4</driverId>
@@ -420,16 +432,17 @@
 			<forceId>3</forceId>
 		</unit>
 		<unit id="e916d765-b5b7-424f-a6c3-e6f1c3f4f145" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Atlas" model="AS7-K" type="Biped" commander="false" externalId="e916d765-b5b7-424f-a6c3-e6f1c3f4f145">
-      The first slot in a location is at index="1".
-				<location index="3"> Left Torso
-					<slot index="9" type="IS Ammo LRM-20" shots="6"/>
-					<slot index="10" type="IS Ammo LRM-20" shots="6"/>
-					<slot index="11" type="ISAMS Ammo" shots="12"/>
+			<entity chassis="Atlas" model="AS7-K" type="Biped" commander="false"
+				externalId="e916d765-b5b7-424f-a6c3-e6f1c3f4f145"> The first slot in a location is at
+				index="1". <location index="3"> Left Torso <slot index="9" type="IS Ammo LRM-20" shots="6" />
+					<slot
+						index="10" type="IS Ammo LRM-20" shots="6" />
+					<slot index="11" type="ISAMS Ammo"
+						shots="12" />
 				</location>
-				<location index="4"> Right Arm
-					<slot index="9" type="IS Gauss Ammo" shots="8"/>
-					<slot index="10" type="IS Gauss Ammo" shots="8"/>
+				<location index="4"> Right Arm <slot index="9"
+						type="IS Gauss Ammo" shots="8" />
+					<slot index="10" type="IS Gauss Ammo" shots="8" />
 				</location>
 			</entity>
 			<driverId>5bd468ce-2cc4-4493-8dcd-e853feb5f4f1</driverId>
@@ -437,16 +450,18 @@
 			<forceId>3</forceId>
 		</unit>
 		<unit id="c9071d05-377b-48ba-ac86-ef08374d4716" type="mekhq.campaign.unit.Unit">
-			<entity chassis="BattleMaster" model="BLR-4S" type="Biped" commander="false" externalId="c9071d05-377b-48ba-ac86-ef08374d4716">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="6" type="IS Gauss Ammo" shots="8"/>
-					<slot index="7" type="IS Gauss Ammo" shots="8"/>
-					<slot index="8" type="IS Gauss Ammo" shots="8"/>
+			<entity chassis="BattleMaster" model="BLR-4S" type="Biped" commander="false"
+				externalId="c9071d05-377b-48ba-ac86-ef08374d4716"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="6" type="IS Gauss Ammo" shots="8" />
+					<slot
+						index="7" type="IS Gauss Ammo" shots="8" />
+					<slot index="8" type="IS Gauss Ammo"
+						shots="8" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="9" type="IS Ammo SRM-6 Artemis-capable" shots="15"/>
-					<slot index="10" type="IS Ammo SRM-6 Artemis-capable" shots="15"/>
+				<location index="3"> Left Torso <slot index="9"
+						type="IS Ammo SRM-6 Artemis-capable" shots="15" />
+					<slot index="10"
+						type="IS Ammo SRM-6 Artemis-capable" shots="15" />
 				</location>
 			</entity>
 			<driverId>ff504793-713b-4bf6-b55c-a3ce99d04c36</driverId>
@@ -455,19 +470,18 @@
 			<scenarioId>1</scenarioId>
 		</unit>
 		<unit id="8874defd-485a-445f-8ff0-aa3d22c454db" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Dervish" model="DV-1S" type="Biped" commander="false" externalId="8874defd-485a-445f-8ff0-aa3d22c454db">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="3" type="IS Ammo LRM-10" shots="12"/>
+			<entity chassis="Dervish" model="DV-1S" type="Biped" commander="false"
+				externalId="8874defd-485a-445f-8ff0-aa3d22c454db"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="3" type="IS Ammo LRM-10" shots="12" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="3" type="IS Ammo LRM-10" shots="12"/>
+				<location
+					index="3"> Left Torso <slot index="3" type="IS Ammo LRM-10" shots="12" />
 				</location>
-				<location index="4"> Right Arm
-					<slot index="5" type="IS Ammo SRM-2" shots="50"/>
+				<location
+					index="4"> Right Arm <slot index="5" type="IS Ammo SRM-2" shots="50" />
 				</location>
-				<location index="5"> Left Arm
-					<slot index="5" type="IS Ammo SRM-2" shots="50"/>
+				<location
+					index="5"> Left Arm <slot index="5" type="IS Ammo SRM-2" shots="50" />
 				</location>
 			</entity>
 			<driverId>d67d405f-b67c-4ebf-a3e5-0bf22001b97d</driverId>
@@ -476,15 +490,16 @@
 			<scenarioId>1</scenarioId>
 		</unit>
 		<unit id="7d7ed6fc-dbe0-4c7f-ae29-4fc357cac9ca" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Barghest" model="BGS-1T" type="Quad" commander="false" externalId="7d7ed6fc-dbe0-4c7f-ae29-4fc357cac9ca">
-      The first slot in a location is at index="1".
-				<location index="6"> Rear Right Leg
-					<slot index="5" type="IS LB 20-X AC Ammo" shots="5"/>
-					<slot index="6" type="IS LB 20-X Cluster Ammo" shots="5"/>
+			<entity chassis="Barghest" model="BGS-1T" type="Quad" commander="false"
+				externalId="7d7ed6fc-dbe0-4c7f-ae29-4fc357cac9ca"> The first slot in a location is at
+				index="1". <location index="6"> Rear Right Leg <slot index="5" type="IS LB 20-X AC Ammo"
+						shots="5" />
+					<slot index="6" type="IS LB 20-X Cluster Ammo" shots="5" />
 				</location>
-				<location index="7"> Rear Left Leg
-					<slot index="5" type="IS LB 20-X AC Ammo" shots="5"/>
-					<slot index="6" type="IS LB 20-X Cluster Ammo" shots="5"/>
+				<location
+					index="7"> Rear Left Leg <slot index="5" type="IS LB 20-X AC Ammo" shots="5" />
+					<slot
+						index="6" type="IS LB 20-X Cluster Ammo" shots="5" />
 				</location>
 			</entity>
 			<driverId>9a38dbb8-4034-45dc-a75c-d2e3e4fe6c94</driverId>
@@ -493,7 +508,8 @@
 			<scenarioId>1</scenarioId>
 		</unit>
 		<unit id="73902adb-f690-4086-9780-c189c89ebd94" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Gallowglas" model="GAL-1GLS" type="Biped" commander="false" externalId="73902adb-f690-4086-9780-c189c89ebd94">
+			<entity chassis="Gallowglas" model="GAL-1GLS" type="Biped" commander="false"
+				externalId="73902adb-f690-4086-9780-c189c89ebd94">
 			</entity>
 			<driverId>812d9034-103f-44a9-9e75-a4c620ebc9d2</driverId>
 			<gunnerId>812d9034-103f-44a9-9e75-a4c620ebc9d2</gunnerId>
@@ -501,10 +517,9 @@
 			<scenarioId>1</scenarioId>
 		</unit>
 		<unit id="5ff50c94-8f0f-4c20-8a00-ffad59f3ffb6" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Starslayer" model="STY-3C" type="Biped" commander="false" externalId="5ff50c94-8f0f-4c20-8a00-ffad59f3ffb6">
-      The first slot in a location is at index="1".
-				<location index="3"> Left Torso
-					<slot index="6" type="IS Ammo SRM-4" shots="25"/>
+			<entity chassis="Starslayer" model="STY-3C" type="Biped" commander="false"
+				externalId="5ff50c94-8f0f-4c20-8a00-ffad59f3ffb6"> The first slot in a location is at
+				index="1". <location index="3"> Left Torso <slot index="6" type="IS Ammo SRM-4" shots="25" />
 				</location>
 			</entity>
 			<driverId>da439749-f3bd-4f65-ad9d-3f270d6f8dbc</driverId>
@@ -512,7 +527,8 @@
 			<forceId>4</forceId>
 		</unit>
 		<unit id="f5a9556a-5be8-45fc-86be-45b86fae701f" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Wolfhound" model="WLF-2" type="Biped" commander="false" externalId="f5a9556a-5be8-45fc-86be-45b86fae701f">
+			<entity chassis="Wolfhound" model="WLF-2" type="Biped" commander="false"
+				externalId="f5a9556a-5be8-45fc-86be-45b86fae701f">
 			</entity>
 			<driverId>4dc86036-2258-40f6-b0ae-8487e0bfddcc</driverId>
 			<gunnerId>4dc86036-2258-40f6-b0ae-8487e0bfddcc</gunnerId>
@@ -528,17 +544,45 @@
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>Barrett Cole enlisted in the Armed Forces of the Federated Commonwealth the day after word of Tamar’s fall to Clan Wolf reached Tomans. He initially served in a Tomans-based free tank regiment as a Manticore gunner, but aptitude testing in the mid-
-3050s sent him to the Nagelring on a scholarship for accelerated MechWarrior training and then a stint in the Penobscot theater militia. In 3068 he was transferred from the militia to the Arcturan Guards’ replacement pool on Arcturus, and then forwarded to the Twenty-fifth Guards in 3070. He missed the action on Mkuranga and arrived on the same DropShip as Hauptmann Guillaume. His placement in the Anvil Lance was as much because of his skill as his piloting of an upgraded hundred-ton Atlas.
+			<biography>Barrett Cole enlisted in the Armed Forces of the Federated Commonwealth the day
+				after word of Tamar’s fall to Clan Wolf reached Tomans. He initially served in a
+				Tomans-based free tank regiment as a Manticore gunner, but aptitude testing in the mid-
+				3050s sent him to the Nagelring on a scholarship for accelerated MekWarrior training and
+				then a stint in the Penobscot theater militia. In 3068 he was transferred from the militia
+				to the Arcturan Guards’ replacement pool on Arcturus, and then forwarded to the Twenty-fifth
+				Guards in 3070. He missed the action on Mkuranga and arrived on the same DropShip as
+				Hauptmann Guillaume. His placement in the Anvil Lance was as much because of his skill as
+				his piloting of an upgraded hundred-ton Atlas.
 
-As a soldier Barrett affects the thousand-meter stare of the combat veteran. He will tell anyone who asks him that he’s seen it all, done it all, and heard it all before. As the “old man” of Company C, he is a natural choice for the younger MechWarriors to cluster around, and Barrett doesn’t mind the attention. His rise to MechWarrior from the armored corps means he understands more than most the necessity of other battlefield units, and tries to pass this knowledge on to the younger warriors around
-him by using anecdotes of combat against pirates with the Penobscot militia. One of his favorite tales claims that when he was a Manticore gunner, his tank was responsible for killing the hauptmann-general of a frontline RCT three separate times during war games, by putting a PPC round through the general’s cockpit. “Rank don’t mean nothing to a bullet,” he tells them.
+				As a soldier Barrett affects the thousand-meter stare of the combat veteran. He will tell
+				anyone who asks him that he’s seen it all, done it all, and heard it all before. As the “old
+				man” of Company C, he is a natural choice for the younger MekWarriors to cluster around, and
+				Barrett doesn’t mind the attention. His rise to MekWarrior from the armored corps means he
+				understands more than most the necessity of other battlefield units, and tries to pass this
+				knowledge on to the younger warriors around
+				him by using anecdotes of combat against pirates with the Penobscot militia. One of his
+				favorite tales claims that when he was a Manticore gunner, his tank was responsible for
+				killing the hauptmann-general of a frontline RCT three separate times during war games, by
+				putting a PPC round through the general’s cockpit. “Rank don’t mean nothing to a bullet,” he
+				tells them.
 
-Thus far Barrett’s performance in Company C has been
-competent, if uninspiring. He eschews complicated tactics, not so much because he doesn’t understand them but because he doesn’t figure he can get his club-footed Atlas around the battlefield fast enough to make a difference. “It’s got armor and guns enough that when they find me, I can deal with them,”
-he says. This has caused a bit of friction with First Leutnant von Riddenour, who routinely rails against what she calls Barrett’s “indifference to the attitude needed for combat.” Hauptmann Guillaume, however, ignores most of these comments, as all of Barrett’s scores in simulator battles (which his records from earlier combat back up) are well within acceptable limits. He may not be fast, or flashy, but he gets the job done.
+				Thus far Barrett’s performance in Company C has been
+				competent, if uninspiring. He eschews complicated tactics, not so much because he doesn’t
+				understand them but because he doesn’t figure he can get his club-footed Atlas around the
+				battlefield fast enough to make a difference. “It’s got armor and guns enough that when they
+				find me, I can deal with them,”
+				he says. This has caused a bit of friction with First Leutnant von Riddenour, who routinely
+				rails against what she calls Barrett’s “indifference to the attitude needed for combat.”
+				Hauptmann Guillaume, however, ignores most of these comments, as all of Barrett’s scores in
+				simulator battles (which his records from earlier combat back up) are well within acceptable
+				limits. He may not be fast, or flashy, but he gets the job done.
 
-The Atlas is a familiar ’Mech in the Lyran Armed Forces. One of the many BattleMechs built in the massive foundries of Hesperus II, it is perhaps the most commonly-recognized BattleMech on the field (although the Clan Mad Cat is challenging that title). Barrett’s Atlas, an advanced K-model machine, was manufactured in 3051 and fought with the Twenty-fifth Arcturan Guards since that date. It has seen four pilots, including Barrett, and all three previous pilots were killed in combat.</biography>
+				The Atlas is a familiar ’Mek in the Lyran Armed Forces. One of the many BattleMeks built in
+				the massive foundries of Hesperus II, it is perhaps the most commonly-recognized BattleMek
+				on the field (although the Clan Mad Cat is challenging that title). Barrett’s Atlas, an
+				advanced K-model machine, was manufactured in 3051 and fought with the Twenty-fifth Arcturan
+				Guards since that date. It has seen four pilots, including Barrett, and all three previous
+				pilots were killed in combat.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Barrett Cole.jpg</portraitFile>
 			<xp>0</xp>
@@ -549,7 +593,7 @@ The Atlas is a familiar ’Mech in the Lyran Armed Forces. One of the many Battl
 			<status>ACTIVE</status>
 			<birthday>3031-04-11</birthday>
 			<skill>
-				<type>Tech/Mech</type>
+				<type>Tech/Mek</type>
 				<level>2</level>
 				<bonus>0</bonus>
 			</skill>
@@ -574,7 +618,7 @@ The Atlas is a familiar ’Mech in the Lyran Armed Forces. One of the many Battl
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -589,7 +633,7 @@ The Atlas is a familiar ’Mech in the Lyran Armed Forces. One of the many Battl
 				<bonus>-1</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -602,22 +646,53 @@ The Atlas is a familiar ’Mech in the Lyran Armed Forces. One of the many Battl
 			<faction>LA</faction>
 			<clan>false</clan>
 			<biography>Michael Guillaume was promoted from first leutnant to
-hauptmann barely a month before he arrived on Great X, and is still feeling his way through his first company command. Formerly a lance leader in the Fourteenth Donegal Guards, he is still adapting to the culture of the Arcturan Guard, a task made more difficult by the lingering resentment over the Wolfhounds’ defeat at the hands of the Jade Falcons on Mkuranga. Thrust into command of the newly-formed Company C, Third ’Mech Battalion, Hauptmann Guillaume immediately appeared in over his head. 
+				hauptmann barely a month before he arrived on Great X, and is still feeling his way through
+				his first company command. Formerly a lance leader in the Fourteenth Donegal Guards, he is
+				still adapting to the culture of the Arcturan Guard, a task made more difficult by the
+				lingering resentment over the Wolfhounds’ defeat at the hands of the Jade Falcons on
+				Mkuranga. Thrust into command of the newly-formed Company C, Third ’Mek Battalion, Hauptmann
+				Guillaume immediately appeared in over his head.
 
-His problems were compounded by his background. Several of his MechWarriors were minor noblemen from the Alliance’s interior, and they weren’t especially interested in taking orders from a hick from a backwoods world like Adelaide. His accent soonbecame the butt of quiet jokes among the lances and the company’s technical support—jokes the Hauptmann ignored, for the most part. It wasn’t until two days before the Jade Falcons arrived in orbit over Great X that he took matters into his own hands, accepting a simulator challenge from First Leutnant von
-Riddenour. In a short, four-minute engagement Hauptmann Guillaume’s BattleMaster pounded the leutnant’s Mad Cat Mk II into scrap. The ROMs of the battle—which had supposedly been sealed—quickly made the rounds amongst the rest of the company, and the grumbling soon ceased.
+				His problems were compounded by his background. Several of his MekWarriors were minor
+				noblemen from the Alliance’s interior, and they weren’t especially interested in taking
+				orders from a hick from a backwoods world like Adelaide. His accent soonbecame the butt of
+				quiet jokes among the lances and the company’s technical support—jokes the Hauptmann
+				ignored, for the most part. It wasn’t until two days before the Jade Falcons arrived in
+				orbit over Great X that he took matters into his own hands, accepting a simulator challenge
+				from First Leutnant von
+				Riddenour. In a short, four-minute engagement Hauptmann Guillaume’s BattleMaster pounded the
+				leutnant’s Mad Cat Mk II into scrap. The ROMs of the battle—which had supposedly been
+				sealed—quickly made the rounds amongst the rest of the company, and the grumbling soon
+				ceased.
 
-With the Jade Falcons now in orbit, the young Hauptmann is a man quietly hiding his fears. The Jade Falcons are familiar opponents of the Fourteenth Donegal Guards, personal unit of General of the
-Armies Adam Steiner himself, and Michael has fought them before. What has him worried is the responsibility of leading an untested company into combat, with hardly any preparation or time to work
-up. His superiors appear immune to his pleas for training time, distracted as they are by the incoming Falcons. With the Fourteenth his old hauptmann trained incessantly, until the company was like
-a family. Guillaume’s new company feels like a new orphanage, full of bullies and half-understood bedmates.
+				With the Jade Falcons now in orbit, the young Hauptmann is a man quietly hiding his fears.
+				The Jade Falcons are familiar opponents of the Fourteenth Donegal Guards, personal unit of
+				General of the
+				Armies Adam Steiner himself, and Michael has fought them before. What has him worried is the
+				responsibility of leading an untested company into combat, with hardly any preparation or
+				time to work
+				up. His superiors appear immune to his pleas for training time, distracted as they are by
+				the incoming Falcons. With the Fourteenth his old hauptmann trained incessantly, until the
+				company was like
+				a family. Guillaume’s new company feels like a new orphanage, full of bullies and
+				half-understood bedmates.
 
-As an officer and a commander Guillaume took the example of Adam Steiner to heart; before he was appointed General of the Armies he often led the Fourteenth Donegal Guards from the front in his ’Mech. Although every hauptmann is expected to lead
-his or her company from the front in combat, Guillaume applies this ideal to every aspect of his command. He is the first to lead his company into any new duty, from patrolling to combat to a trip to
-the medical tent. He knows that it is essential that his MechWarriors be willing to follow wherever he leads, and Guillaume misses no opportunity to earn his pilots’ trust and respect.
+				As an officer and a commander Guillaume took the example of Adam Steiner to heart; before he
+				was appointed General of the Armies he often led the Fourteenth Donegal Guards from the
+				front in his ’Mek. Although every hauptmann is expected to lead
+				his or her company from the front in combat, Guillaume applies this ideal to every aspect of
+				his command. He is the first to lead his company into any new duty, from patrolling to
+				combat to a trip to
+				the medical tent. He knows that it is essential that his MekWarriors be willing to follow
+				wherever he leads, and Guillaume misses no opportunity to earn his pilots’ trust and
+				respect.
 
-The BattleMaster Guillaume pilots was one of the last
-manufactured on Pandora before the Falcons took the world, and it was refitted to the -4S standard in the refit pens on Arcturus. He has piloted it his entire career, claiming three OmniMech kills as a leutnant with the Fourteenth. He is particularly accurate with the massive Gauss rifle, often claiming hits at ranges that many other MechWarriors wouldn’t even dream of firing.</biography>
+				The BattleMaster Guillaume pilots was one of the last
+				manufactured on Pandora before the Falcons took the world, and it was refitted to the -4S
+				standard in the refit pens on Arcturus. He has piloted it his entire career, claiming three
+				OmniMek kills as a leutnant with the Fourteenth. He is particularly accurate with the
+				massive Gauss rifle, often claiming hits at ranges that many other MekWarriors wouldn’t even
+				dream of firing.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Michael.jpg</portraitFile>
 			<xp>0</xp>
@@ -628,7 +703,7 @@ manufactured on Pandora before the Falcons took the world, and it was refitted t
 			<status>ACTIVE</status>
 			<birthday>3046-02-01</birthday>
 			<skill>
-				<type>Tech/Mech</type>
+				<type>Tech/Mek</type>
 				<level>1</level>
 				<bonus>-1</bonus>
 			</skill>
@@ -668,7 +743,7 @@ manufactured on Pandora before the Falcons took the world, and it was refitted t
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -678,7 +753,7 @@ manufactured on Pandora before the Falcons took the world, and it was refitted t
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -690,16 +765,43 @@ manufactured on Pandora before the Falcons took the world, and it was refitted t
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>A graduate of the Royal New Capetown Military Academy, Christine Watkins is an apparently calm, confident MechWarrior who hides a hot temper and a total inability to excuse discrimination. Her time on notably-discriminatory New Capetown was filled with disciplinary reports and brief bouts in the medical hall recuperating from fights with other students, but her instructors largely refused to discharge her: she had requested the school, after all. After graduation—which she led as honor graduate—she had her choice of postings, and chose to fight with the Sixth Lyran Guards. That posting, and its battles during the Federated Commonwealth Civil War, were her baptism of fire. Injured during the fighting, she was sent to a recuperation facility on Garrison where she remained until 3070, when she was called forward as a replacement for the Twenty-fifth Arcturan Guards.
+			<biography>A graduate of the Royal New Capetown Military Academy, Christine Watkins is an
+				apparently calm, confident MekWarrior who hides a hot temper and a total inability to excuse
+				discrimination. Her time on notably-discriminatory New Capetown was filled with disciplinary
+				reports and brief bouts in the medical hall recuperating from fights with other students,
+				but her instructors largely refused to discharge her: she had requested the school, after
+				all. After graduation—which she led as honor graduate—she had her choice of postings, and
+				chose to fight with the Sixth Lyran Guards. That posting, and its battles during the
+				Federated Commonwealth Civil War, were her baptism of fire. Injured during the fighting, she
+				was sent to a recuperation facility on Garrison where she remained until 3070, when she was
+				called forward as a replacement for the Twenty-fifth Arcturan Guards.
 
-In Company C Christine is still trying to fit in. She immediately bonded with her commanding officer, First Leutnant von Riddenour. Both women are proud officers, although Christine has a tendency to see sexism where von Riddenour does not. Her closeness with von Riddenour, whom many in the company do
-not get along with, has made her few friends outside the lance but paid dividends in the infrequent lance exercises. In fact, during the final lance-on-lance battle Hauptmann Guillaume called before the Falcons entered orbit, he specifically praised the way Christine and von Riddenour worked together and told the
-rest of the company they should all try to be as good lancemates. Christine was flattered by the praise but doesn’t quite understand von Riddenour’s sneering contempt for the young officer. The only member of the Company Christine actively clashes with is
-Striker Lance’s Kristoff Semmes, who made a romantic advance on her the first day she arrived in the company. She turned him down, which has only made him try harder—something Christine has no patience for.
+				In Company C Christine is still trying to fit in. She immediately bonded with her commanding
+				officer, First Leutnant von Riddenour. Both women are proud officers, although Christine has
+				a tendency to see sexism where von Riddenour does not. Her closeness with von Riddenour,
+				whom many in the company do
+				not get along with, has made her few friends outside the lance but paid dividends in the
+				infrequent lance exercises. In fact, during the final lance-on-lance battle Hauptmann
+				Guillaume called before the Falcons entered orbit, he specifically praised the way Christine
+				and von Riddenour worked together and told the
+				rest of the company they should all try to be as good lancemates. Christine was flattered by
+				the praise but doesn’t quite understand von Riddenour’s sneering contempt for the young
+				officer. The only member of the Company Christine actively clashes with is
+				Striker Lance’s Kristoff Semmes, who made a romantic advance on her the first day she
+				arrived in the company. She turned him down, which has only made him try harder—something
+				Christine has no patience for.
 
-Christine’s BattleMech, a ninety-ton Emperor, is one of the newer assault ‘Mechs rapidly climbing in popularity in the Lyran Alliance Armed Forces. Christine has taken to it well, favoring her LB-X autocannons over the ’Mech’s other weapons. She routinely carries a mixed load of ammunition for each gun, using the
-standard high-explosive rounds to punch through her opponent’s armor and then switching to the more precise submunitions to exploit any weaknesses. This practice often results in salvageable enemy equipment, which makes the Twenty-fifth’s technical
-corps quite happy, but also increases the average engagement time. While her lance commander is quite happy to allow her the time to finish her enemies off, Hauptmann Guillaume’s more mobile style of combat is forcing her to rush her shots, which is making her accuracy suffer.</biography>
+				Christine’s BattleMek, a ninety-ton Emperor, is one of the newer assault ‘Meks rapidly
+				climbing in popularity in the Lyran Alliance Armed Forces. Christine has taken to it well,
+				favoring her LB-X autocannons over the ’Mek’s other weapons. She routinely carries a mixed
+				load of ammunition for each gun, using the
+				standard high-explosive rounds to punch through her opponent’s armor and then switching to
+				the more precise submunitions to exploit any weaknesses. This practice often results in
+				salvageable enemy equipment, which makes the Twenty-fifth’s technical
+				corps quite happy, but also increases the average engagement time. While her lance commander
+				is quite happy to allow her the time to finish her enemies off, Hauptmann Guillaume’s more
+				mobile style of combat is forcing her to rush her shots, which is making her accuracy
+				suffer.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Christine Watkins.jpg</portraitFile>
 			<xp>0</xp>
@@ -710,7 +812,7 @@ corps quite happy, but also increases the average engagement time. While her lan
 			<status>ACTIVE</status>
 			<birthday>3045-01-17</birthday>
 			<skill>
-				<type>Tech/Mech</type>
+				<type>Tech/Mek</type>
 				<level>1</level>
 				<bonus>-1</bonus>
 			</skill>
@@ -740,7 +842,7 @@ corps quite happy, but also increases the average engagement time. While her lan
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -750,7 +852,7 @@ corps quite happy, but also increases the average engagement time. While her lan
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -762,17 +864,41 @@ corps quite happy, but also increases the average engagement time. While her lan
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>Arthur Quibble was preparing to enter the university on Arcturus when the Word of Blake seized Tharkad. As the news of that action and the soon-to-follow attacks on Skye reached him, he changed his mind and enlisted in the LAAF instead. His aptitude for ’Mech piloting was quickly noted and he was sent to an ad-hoc training battalion to learn BattleMech skills. His first
-posting was with the Twenty-fifth Arcturan Guards, and he was present at the action on Mkuranga when the Jade Falcons drove the Kewran Wolfhounds off-world. Transferred to the newly-raised Company C, Third Battalion when the unit reorganized on Great X,
-he was posted to First Leutnant von Riddenour’s lance—where he quickly learned that his pragmatic approach to warfare didn’t mesh with his aristocratic lance commander’s.
+			<biography>Arthur Quibble was preparing to enter the university on Arcturus when the Word of
+				Blake seized Tharkad. As the news of that action and the soon-to-follow attacks on Skye
+				reached him, he changed his mind and enlisted in the LAAF instead. His aptitude for ’Mek
+				piloting was quickly noted and he was sent to an ad-hoc training battalion to learn
+				BattleMek skills. His first
+				posting was with the Twenty-fifth Arcturan Guards, and he was present at the action on
+				Mkuranga when the Jade Falcons drove the Kewran Wolfhounds off-world. Transferred to the
+				newly-raised Company C, Third Battalion when the unit reorganized on Great X,
+				he was posted to First Leutnant von Riddenour’s lance—where he quickly learned that his
+				pragmatic approach to warfare didn’t mesh with his aristocratic lance commander’s.
 
-Not having been through one of the Alliance’s elite MechWarrior academies, Quibble views warfare as just another task. He’s a crack shot with his eight-delta Rifleman’s paired rotary autocannons and ignores the quiet Steiner criticism of his “lightweight Davion toy.” In combat he can be counted on to stand at or just behind the line of battle, burning his barrels and ammunition supply out supporting his lancemates. While his Rifleman is far more protected than many of its antecedents, it doesn’t have the armor to stand in the line with his assault-class lancemates. Quibble has
-been chastised several times by First Leutnant von Riddenour for suggesting tactics “unbecoming a Lyran MechWarrior,” such as taking cover behind hillocks and allowing the enemy to wander into a lance-scale kill zone. There are several notations in his personnel jackets from the times he’s lost his temper with his
-lance commander and gotten into a shouting match—notations which will certainly hurt his career in the image-conscious LAAF.  Not that Quibble cares much for his career—he plans to retire once Tharkad is freed and the Jade Falcons are driven back.
+				Not having been through one of the Alliance’s elite MekWarrior academies, Quibble views
+				warfare as just another task. He’s a crack shot with his eight-delta Rifleman’s paired
+				rotary autocannons and ignores the quiet Steiner criticism of his “lightweight Davion toy.”
+				In combat he can be counted on to stand at or just behind the line of battle, burning his
+				barrels and ammunition supply out supporting his lancemates. While his Rifleman is far more
+				protected than many of its antecedents, it doesn’t have the armor to stand in the line with
+				his assault-class lancemates. Quibble has
+				been chastised several times by First Leutnant von Riddenour for suggesting tactics
+				“unbecoming a Lyran MekWarrior,” such as taking cover behind hillocks and allowing the enemy
+				to wander into a lance-scale kill zone. There are several notations in his personnel jackets
+				from the times he’s lost his temper with his
+				lance commander and gotten into a shouting match—notations which will certainly hurt his
+				career in the image-conscious LAAF. Not that Quibble cares much for his career—he plans to
+				retire once Tharkad is freed and the Jade Falcons are driven back.
 
-In garrison Quibble doesn’t mix much with his lancemates, preferring to spend his time with Lorenz and Semmes of the Striker Lance. The young men have formed a rough clique, despite being in separate lances. Quibble is often the odd-manout of the group, arguing against one or more of the academy bred
-attitudes the other two warriors display for him. With the Jade Falcons arriving on Great X Quibble has retreated somewhat inside himself while his mind replays the long retreat from Mkuranga. For several nights while the Falcons were burning insystem
-Quibble’s sleep was interrupted by nightmares of burning ’Mechs, jammed cannons, and empty ammunition bins, but he hasn’t let the lack of sleep affect him.</biography>
+				In garrison Quibble doesn’t mix much with his lancemates, preferring to spend his time with
+				Lorenz and Semmes of the Striker Lance. The young men have formed a rough clique, despite
+				being in separate lances. Quibble is often the odd-manout of the group, arguing against one
+				or more of the academy bred
+				attitudes the other two warriors display for him. With the Jade Falcons arriving on Great X
+				Quibble has retreated somewhat inside himself while his mind replays the long retreat from
+				Mkuranga. For several nights while the Falcons were burning insystem
+				Quibble’s sleep was interrupted by nightmares of burning ’Meks, jammed cannons, and empty
+				ammunition bins, but he hasn’t let the lack of sleep affect him.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Arthur Quibble.jpg</portraitFile>
 			<xp>0</xp>
@@ -803,12 +929,12 @@ Quibble’s sleep was interrupted by nightmares of burning ’Mechs, jammed cann
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -825,20 +951,42 @@ Quibble’s sleep was interrupted by nightmares of burning ’Mechs, jammed cann
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>Reginald Hoffmann grew up hearing about the superiority of the Federated Commonwealth. His parents, both educators on New Earth, were strongly in favor of the union between the Federated Suns and the Lyran Commonwealth and took every opportunity to remind their child of that favor. The dissolution
-of the Federated Commonwealth when Reginald was nine was a rather difficult blow for his parents, who soon divorced. His mother, Theresa, was killed in 3059 when a Free Worlds League sponsored mercenary company raided New Earth, and his father passed soon after while lecturing in the Chaos March. With
-little other family, Reginald entered Sanglamore on Skye on a scholarship and entered the LAAF.
+			<biography>Reginald Hoffmann grew up hearing about the superiority of the Federated
+				Commonwealth. His parents, both educators on New Earth, were strongly in favor of the union
+				between the Federated Suns and the Lyran Commonwealth and took every opportunity to remind
+				their child of that favor. The dissolution
+				of the Federated Commonwealth when Reginald was nine was a rather difficult blow for his
+				parents, who soon divorced. His mother, Theresa, was killed in 3059 when a Free Worlds
+				League sponsored mercenary company raided New Earth, and his father passed soon after while
+				lecturing in the Chaos March. With
+				little other family, Reginald entered Sanglamore on Skye on a scholarship and entered the
+				LAAF.
 
-Although he was a competent cadet and excelled in classroom and staff work, Hoffmann’s battlefield skills were only rudimentary. He graduated Sanglamore in time to be pressed into service in the final days of Skye’s offensive into the Free Worlds League, where he managed to avoid combat. His Barghest has never taken more than armor damage in combat, and Hoffmann’s records list no kills. His transfer to the Arcturan Guards was a result of his dissatisfaction with Skye forces—with the Word of Blake holding
-Tharkad, he feels there are more important battles to fight than ancient feuds.
+				Although he was a competent cadet and excelled in classroom and staff work, Hoffmann’s
+				battlefield skills were only rudimentary. He graduated Sanglamore in time to be pressed into
+				service in the final days of Skye’s offensive into the Free Worlds League, where he managed
+				to avoid combat. His Barghest has never taken more than armor damage in combat, and
+				Hoffmann’s records list no kills. His transfer to the Arcturan Guards was a result of his
+				dissatisfaction with Skye forces—with the Word of Blake holding
+				Tharkad, he feels there are more important battles to fight than ancient feuds.
 
-Appointed lance commander of Company C’s Striker Lance by dint of his commission and date of rank, Hoffmann finds himself swimming in waters too deep for him. Although he has had the OCS courses necessary to lead ’Mechs in combat, his self confidence
-is far beneath what a line officer requires. Hauptmann
-Guillaume has been working as much as possible with him, but there hasn’t been time to bring the young officer along. Hoffmann suffers from second-guessing and inaction. One of his previous commanders noted “… in combat Hoffmann often makes the worst possible decision: no decision.” Whether or not the young man can rise into his role now that the Jade Falcons have arrived remains to be seen.
+				Appointed lance commander of Company C’s Striker Lance by dint of his commission and date of
+				rank, Hoffmann finds himself swimming in waters too deep for him. Although he has had the
+				OCS courses necessary to lead ’Meks in combat, his self confidence
+				is far beneath what a line officer requires. Hauptmann
+				Guillaume has been working as much as possible with him, but there hasn’t been time to bring
+				the young officer along. Hoffmann suffers from second-guessing and inaction. One of his
+				previous commanders noted “… in combat Hoffmann often makes the worst possible decision: no
+				decision.” Whether or not the young man can rise into his role now that the Jade Falcons
+				have arrived remains to be seen.
 
-Hoffmann’s Barghest is a heavier ’Mech than standard doctrine usually assigns to striker lances, but it has sufficient speed to keep up with his lancemates and the stronger firepower has proven decisive in simulations. The ’Mech itself is part of the scholarship
-that sent him to Sanglamore in the first place; one of his father’s early positions was on the staff of Coventry Metal Works, and he was fondly remembered there when the younger Hoffman
-entered the LAAF</biography>
+				Hoffmann’s Barghest is a heavier ’Mek than standard doctrine usually assigns to striker
+				lances, but it has sufficient speed to keep up with his lancemates and the stronger
+				firepower has proven decisive in simulations. The ’Mek itself is part of the scholarship
+				that sent him to Sanglamore in the first place; one of his father’s early positions was on
+				the staff of Coventry Metal Works, and he was fondly remembered there when the younger
+				Hoffman
+				entered the LAAF</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Reginald Hoffman.jpg</portraitFile>
 			<xp>0</xp>
@@ -849,7 +997,7 @@ entered the LAAF</biography>
 			<status>ACTIVE</status>
 			<birthday>3048-04-02</birthday>
 			<skill>
-				<type>Tech/Mech</type>
+				<type>Tech/Mek</type>
 				<level>1</level>
 				<bonus>0</bonus>
 			</skill>
@@ -884,7 +1032,7 @@ entered the LAAF</biography>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -894,7 +1042,7 @@ entered the LAAF</biography>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -906,18 +1054,43 @@ entered the LAAF</biography>
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>Sergeant Tricia Cannon has spent her entire military career in the Twenty-fifth Arcturan Guards RCT, after having run away from home on Skye and joining a second-tier military academy on Arcturus. She is a steady MechWarrior and an excellent lance leader, having had opportunity to prove her command ability during the Kewran Wolfhounds’ withdrawal from Mkuranga when her leutnant was killed by the Jade Falcons. The assignment of commissioned officers over her when she was posted to Company C might have been a slight her career never recovered from,
-except for the small matter that Tricia Cannon has no desire for command. She has spent nine years as a MechWarrior sergeant and is quite happy in that role.
+			<biography>Sergeant Tricia Cannon has spent her entire military career in the Twenty-fifth
+				Arcturan Guards RCT, after having run away from home on Skye and joining a second-tier
+				military academy on Arcturus. She is a steady MekWarrior and an excellent lance leader,
+				having had opportunity to prove her command ability during the Kewran Wolfhounds’ withdrawal
+				from Mkuranga when her leutnant was killed by the Jade Falcons. The assignment of
+				commissioned officers over her when she was posted to Company C might have been a slight her
+				career never recovered from,
+				except for the small matter that Tricia Cannon has no desire for command. She has spent nine
+				years as a MekWarrior sergeant and is quite happy in that role.
 
-Off-duty Tricia is a quiet woman who is intensely loyal to her friends. She doesn’t socialize much outside of her lance, even within the company as a whole. This tendency has given her problems since the formation of Company C, since the hauptmann is too busy, von Seedow too much a snob, and Ostgaard too taciturn
-too spend too much time with a quiet woman who doesn’t go out of her way to be sociable. This has left Tricia accepting the approaches of Striker Lance’s Victoria Earnestine, who is also at a loss for companionship in her own lance. The two women are slowly building a friendship, but the hectic tempo of operations in preparation for the Jade Falcons’ arrival limits their opportunities.
+				Off-duty Tricia is a quiet woman who is intensely loyal to her friends. She doesn’t
+				socialize much outside of her lance, even within the company as a whole. This tendency has
+				given her problems since the formation of Company C, since the hauptmann is too busy, von
+				Seedow too much a snob, and Ostgaard too taciturn
+				too spend too much time with a quiet woman who doesn’t go out of her way to be sociable.
+				This has left Tricia accepting the approaches of Striker Lance’s Victoria Earnestine, who is
+				also at a loss for companionship in her own lance. The two women are slowly building a
+				friendship, but the hectic tempo of operations in preparation for the Jade Falcons’ arrival
+				limits their opportunities.
 
-In combat Sergeant Cannon is a skilled MechWarrior. Her Blitzkrieg is a swift machine, even more so when compared to the stumbling assault ’Mechs so popular in the Lyran Alliance Armed Forces, but it packs a significant wallop with its Ultra autocannon. One of Cannon’s favored tactics is to let her heavier lancemates draw an opponent’s attention and then sprint around behind them, unleashing the devastating cannon into their weaker rear armor before escaping back out of range. She has been working with Hauptmann Guillaume and his BattleMaster to refine this tactic—the hauptmann’s uncanny accuracy with his Gauss rifle makes it even easier for Cannon to slip behind the lines and sow
-havoc.
+				In combat Sergeant Cannon is a skilled MekWarrior. Her Blitzkrieg is a swift machine, even
+				more so when compared to the stumbling assault ’Meks so popular in the Lyran Alliance Armed
+				Forces, but it packs a significant wallop with its Ultra autocannon. One of Cannon’s favored
+				tactics is to let her heavier lancemates draw an opponent’s attention and then sprint around
+				behind them, unleashing the devastating cannon into their weaker rear armor before escaping
+				back out of range. She has been working with Hauptmann Guillaume and his BattleMaster to
+				refine this tactic—the hauptmann’s uncanny accuracy with his Gauss rifle makes it even
+				easier for Cannon to slip behind the lines and sow
+				havoc.
 
-The Blitzkrieg Tricia Cannon pilots enjoyed a lackluster career before it was assigned to her. Its first deployment after the factory was the Lyran Guards, but those warriors were all desperate to get into heavier and thicker ’Mechs and didn’t even try to
-understand the Blitzkreig’s strengths. Once it was assigned to Tricia, however, the technicians noticed an immediate jump in necessary maintenance on the ’Mech’s motive systems; Sergeant Cannon always runs it to (and sometimes a little beyond) its fullest
-potential.</biography>
+				The Blitzkrieg Tricia Cannon pilots enjoyed a lackluster career before it was assigned to
+				her. Its first deployment after the factory was the Lyran Guards, but those warriors were
+				all desperate to get into heavier and thicker ’Meks and didn’t even try to
+				understand the Blitzkreig’s strengths. Once it was assigned to Tricia, however, the
+				technicians noticed an immediate jump in necessary maintenance on the ’Mek’s motive systems;
+				Sergeant Cannon always runs it to (and sometimes a little beyond) its fullest
+				potential.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Tricia Cannon.jpg</portraitFile>
 			<xp>0</xp>
@@ -928,7 +1101,7 @@ potential.</biography>
 			<status>ACTIVE</status>
 			<birthday>3042-01-01</birthday>
 			<skill>
-				<type>Tech/Mech</type>
+				<type>Tech/Mek</type>
 				<level>0</level>
 				<bonus>0</bonus>
 			</skill>
@@ -958,12 +1131,12 @@ potential.</biography>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -976,17 +1149,38 @@ potential.</biography>
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>The youngest MechWarrior in Company C, Jasper Lorenz is fresh from the classrooms of the Sanglamore on Skye in his first deployment. A native of Khon Kaen, near the Periphery and the bandit nation known as the Circinus Federation, Jasper attended the prestigious academy as a legacy; his father,Kommandant Peter Lorenz, who died in action in the Clan invasion, was a graduate. Jasper grew up knowing the Jade Falcons had killed his father and fought hard in his academy days to win a posting
-to a unit stationed on the Clan frontier. His arrival in the Twenty-fifth Arcturan Guards on Great X has made him an anxious wreck. He is desperate to prove himself against the invaders, a fact not lost on his lancemates. Kristoff Semmes, nearly as young as he,
-never fails to urge Lorenz to prove himself against the Falcons, but Anvil Lance’s Barrett Cole is attempting to dissuade him from rushing headstrong into combat with the elite Falcons. Lorenz seems receptive to both points of view—like many young men— but only combat will tell whether or not he will heed the veteran’s advice.
+			<biography>The youngest MekWarrior in Company C, Jasper Lorenz is fresh from the classrooms of
+				the Sanglamore on Skye in his first deployment. A native of Khon Kaen, near the Periphery
+				and the bandit nation known as the Circinus Federation, Jasper attended the prestigious
+				academy as a legacy; his father,Kommandant Peter Lorenz, who died in action in the Clan
+				invasion, was a graduate. Jasper grew up knowing the Jade Falcons had killed his father and
+				fought hard in his academy days to win a posting
+				to a unit stationed on the Clan frontier. His arrival in the Twenty-fifth Arcturan Guards on
+				Great X has made him an anxious wreck. He is desperate to prove himself against the
+				invaders, a fact not lost on his lancemates. Kristoff Semmes, nearly as young as he,
+				never fails to urge Lorenz to prove himself against the Falcons, but Anvil Lance’s Barrett
+				Cole is attempting to dissuade him from rushing headstrong into combat with the elite
+				Falcons. Lorenz seems receptive to both points of view—like many young men— but only combat
+				will tell whether or not he will heed the veteran’s advice.
 
-His placement in the Striker Lance was necessitated by
-the weight and speed of his ’Mech—a reconditioned WLF-2 Wolfhound—and his inexperience with larger set-piece battles. The warriors of the Striker Lance can expect more independent action than those piloting the heavier, slower machines of the other two lances, and if Lorenz doesn’t appear in just the right
-formation in a skirmish line it won’t cost his lance the engagement.  Many younger warriors on their first campaign are assigned similar roles, in the hopes that combat will teach them the necessity of teamwork on the battlefield. Hauptmann Guillaume has been
-pushing Leutnant Hoffmann and his lance hard in the scattered simulator bouts, trying to introduce them to that concept before the Falcons land, but the results are not encouraging.
-
-In combat Lorenz is an aggressive warrior who likes to keep his Wolfhound moving at its top speed. He specialized in light ‘Mechs at Sanglamore, something many Lyran MechWarriors are loathe to do. The lack of competition allowed him to place highly enough in
-his graduation class to have some say in his posting, but did little to instill in him the camaraderie many heavier ’Mech pilots learn instinctively. Although he’s not a crack shot, the Wolfhound has the heat sinks to allow him to snipe pretty much at will with its ER large laser, but Lorenz is proving a surprising gunner with the three forward-facing medium lasers that provide the Woflhound’s close-in weaponry.</biography>
+				His placement in the Striker Lance was necessitated by
+				the weight and speed of his ’Mek—a reconditioned WLF-2 Wolfhound—and his inexperience with
+				larger set-piece battles. The warriors of the Striker Lance can expect more independent
+				action than those piloting the heavier, slower machines of the other two lances, and if
+				Lorenz doesn’t appear in just the right
+				formation in a skirmish line it won’t cost his lance the engagement. Many younger warriors
+				on their first campaign are assigned similar roles, in the hopes that combat will teach them
+				the necessity of teamwork on the battlefield. Hauptmann Guillaume has been
+				pushing Leutnant Hoffmann and his lance hard in the scattered simulator bouts, trying to
+				introduce them to that concept before the Falcons land, but the results are not encouraging.
+				In combat Lorenz is an aggressive warrior who likes to keep his Wolfhound moving at its top
+				speed. He specialized in light ‘Meks at Sanglamore, something many Lyran MekWarriors are
+				loathe to do. The lack of competition allowed him to place highly enough in
+				his graduation class to have some say in his posting, but did little to instill in him the
+				camaraderie many heavier ’Mek pilots learn instinctively. Although he’s not a crack shot,
+				the Wolfhound has the heat sinks to allow him to snipe pretty much at will with its ER large
+				laser, but Lorenz is proving a surprising gunner with the three forward-facing medium lasers
+				that provide the Woflhound’s close-in weaponry.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Jasper Lorenz.jpg</portraitFile>
 			<xp>0</xp>
@@ -997,7 +1191,7 @@ his graduation class to have some say in his posting, but did little to instill 
 			<status>ACTIVE</status>
 			<birthday>3050-05-19</birthday>
 			<skill>
-				<type>Tech/Mech</type>
+				<type>Tech/Mek</type>
 				<level>1</level>
 				<bonus>-1</bonus>
 			</skill>
@@ -1027,12 +1221,12 @@ his graduation class to have some say in his posting, but did little to instill 
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1044,20 +1238,44 @@ his graduation class to have some say in his posting, but did little to instill 
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>On Gallery the von Seedows are very close in class and peerage to the Steiners of that world (Nondi Steiner, former General of the Armies and Lyran regent, was Duchess of Gallery) but recent business failures have all but bankrupted them. Erich von Seedow is the youngest scion of the family, freshly graduated from the Coventry Military Academy and posted to the Twenty-fifth for his first field deployment. He is the epitome of the noble scion
-that has given the Lyran Alliance (and the Commonwealth before it) the reputation for social generalship. Effete, distant, and disdainful, von Seedow acts as if his family’s reversals had never
-happened.
+			<biography>On Gallery the von Seedows are very close in class and peerage to the Steiners of
+				that world (Nondi Steiner, former General of the Armies and Lyran regent, was Duchess of
+				Gallery) but recent business failures have all but bankrupted them. Erich von Seedow is the
+				youngest scion of the family, freshly graduated from the Coventry Military Academy and
+				posted to the Twenty-fifth for his first field deployment. He is the epitome of the noble
+				scion
+				that has given the Lyran Alliance (and the Commonwealth before it) the reputation for social
+				generalship. Effete, distant, and disdainful, von Seedow acts as if his family’s reversals
+				had never
+				happened.
 
-Growing up on Gallery, Erich was taught the glorious military traditions of the Steiners and how the von Seedows fit into their quilt. A von Seedow fought with Katrina Steiner on Hesperus II during the Tenth Battle of Hesperus. A von Seedow died with the Tenth Lyran Guard on Dromini VI during the Fourth Succession War. A von Seedow died heroically on Tamar during
-the Clan invasion. All of Erich’s childhood was geared toward his enrollment as a MechWarrior, and it was only his brother’s botching of the family finances that relegated him to the CMA instead of Tharkad’s Nagelring. He is happy to regale anyone willing to listen—or whom he catches standing nearby with little chance of escape—at the drop of a pin, something which has not enamored him to his lancemates.
+				Growing up on Gallery, Erich was taught the glorious military traditions of the Steiners and
+				how the von Seedows fit into their quilt. A von Seedow fought with Katrina Steiner on
+				Hesperus II during the Tenth Battle of Hesperus. A von Seedow died with the Tenth Lyran
+				Guard on Dromini VI during the Fourth Succession War. A von Seedow died heroically on Tamar
+				during
+				the Clan invasion. All of Erich’s childhood was geared toward his enrollment as a
+				MekWarrior, and it was only his brother’s botching of the family finances that relegated him
+				to the CMA instead of Tharkad’s Nagelring. He is happy to regale anyone willing to listen—or
+				whom he catches standing nearby with little chance of escape—at the drop of a pin, something
+				which has not enamored him to his lancemates.
 
-Despite his attitude his lessons at the Coventry Military
-Academy took. He is a confident and capable MechWarrior with a flair for missile weapons and a good head for judging the likely moves of his opponents. There is a note in his personnel jacket
-indicating he should be watched for advancement to a battalion operations staff as soon as he gains his commission, although he is not aware of it.
+				Despite his attitude his lessons at the Coventry Military
+				Academy took. He is a confident and capable MekWarrior with a flair for missile weapons and
+				a good head for judging the likely moves of his opponents. There is a note in his personnel
+				jacket
+				indicating he should be watched for advancement to a battalion operations staff as soon as
+				he gains his commission, although he is not aware of it.
 
-Although he is successfully controlling his temper—for the most part—von Seedow’s arrival in Company C very nearly heralded his desertion. With his family’s fortunes on the wane he was unable to secure a BattleMech commensurate with his expectations, and
-was forced to accept whatever the LAAF provided. That provision was a dilapidated antique of a DV-1S Dervish, older nearly than the Lyran Commonwealth itself, caused him to fly into a rage. The stories of his childhood were filled with assault ’Mechs like
-the Zeus, Banshee, and Atlas. To be stuck in a fifty-ton primitive support ’Mech is the height of insult. He can often be found standing in the doorway to the Anvil Lance’s ’Mech bays, admiring von Riddenour’s Mad Cat II or Barrett Cole’s Atlas.</biography>
+				Although he is successfully controlling his temper—for the most part—von Seedow’s arrival in
+				Company C very nearly heralded his desertion. With his family’s fortunes on the wane he was
+				unable to secure a BattleMek commensurate with his expectations, and
+				was forced to accept whatever the LAAF provided. That provision was a dilapidated antique of
+				a DV-1S Dervish, older nearly than the Lyran Commonwealth itself, caused him to fly into a
+				rage. The stories of his childhood were filled with assault ’Meks like
+				the Zeus, Banshee, and Atlas. To be stuck in a fifty-ton primitive support ’Mek is the
+				height of insult. He can often be found standing in the doorway to the Anvil Lance’s ’Mek
+				bays, admiring von Riddenour’s Mad Cat II or Barrett Cole’s Atlas.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Erich von Seedow.jpg</portraitFile>
 			<xp>0</xp>
@@ -1093,12 +1311,12 @@ the Zeus, Banshee, and Atlas. To be stuck in a fifty-ton primitive support ’Me
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1110,14 +1328,36 @@ the Zeus, Banshee, and Atlas. To be stuck in a fifty-ton primitive support ’Me
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>Born on Loric, one would expect Victoria Earnestine’s natural enemies to be House Marik’s Free Worlds League. Much of Loric’s population is (depending on geographic location) either pro or anti-Marik (or Steiner), but Victoria tried to remain above such distinctions when she was a child. Her parents didn’t want her to grow up to be one of the many blindly loyal Steiner subjects they saw around them, and tried to teach her to think for herself. For the most part they succeeded, although they were somewhat disappointed by her decision to join the Lyran Alliance Armed Forces. They supported their daughter, however, after she explained her reasoning, and Victoria began a respectable, if not showy, military career.
+			<biography>Born on Loric, one would expect Victoria Earnestine’s natural enemies to be House
+				Marik’s Free Worlds League. Much of Loric’s population is (depending on geographic location)
+				either pro or anti-Marik (or Steiner), but Victoria tried to remain above such distinctions
+				when she was a child. Her parents didn’t want her to grow up to be one of the many blindly
+				loyal Steiner subjects they saw around them, and tried to teach her to think for herself.
+				For the most part they succeeded, although they were somewhat disappointed by her decision
+				to join the Lyran Alliance Armed Forces. They supported their daughter, however, after she
+				explained her reasoning, and Victoria began a respectable, if not showy, military career.
 
-All that changed in 3068 when a small Word of Blake raid on Loric killed her parents. Victoria, who was then serving with the Lyran Regulars, became a changed woman. Her unit was one of those tasked to responding to outlying Word of Blake raids in 3068 and 3069, and she tore into the Blakists with a ferocity that
-surprised her superiors and her lancemates. The Nexus II she pilots is one of the spoils of those battles, taken from a defeated Blakist in late 3069 after she killed him and two of his Level II mates.
-After that battle she was tranferrred to the Arcturan Guards and the Clan front “due to the needs of the service.“ In reality, she was transferred because her battalion commander feared what she was becoming when fighting the Word of Blake. At least one investigation into the death of a captured Blakist tanker was quashed by her CO, and he didn’t want to have to do that again.
+				All that changed in 3068 when a small Word of Blake raid on Loric killed her parents.
+				Victoria, who was then serving with the Lyran Regulars, became a changed woman. Her unit was
+				one of those tasked to responding to outlying Word of Blake raids in 3068 and 3069, and she
+				tore into the Blakists with a ferocity that
+				surprised her superiors and her lancemates. The Nexus II she pilots is one of the spoils of
+				those battles, taken from a defeated Blakist in late 3069 after she killed him and two of
+				his Level II mates.
+				After that battle she was tranferrred to the Arcturan Guards and the Clan front “due to the
+				needs of the service.“ In reality, she was transferred because her battalion commander
+				feared what she was becoming when fighting the Word of Blake. At least one investigation
+				into the death of a captured Blakist tanker was quashed by her CO, and he didn’t want to
+				have to do that again.
 
-With the Jade Falcons approaching Great X Victoria is an angry woman. She doesn’t want to fight the Jade Falcons, despite their much-longer feud with the Alliance. Her entire being is filled with hate for the Word of Blake, and she sees fighting the Jade Falcons
-as a waste of her time and the Alliance’s time. Her friendship with Tricia Cannon is the only tenuous link she has with her new company-mates, and she’s smart enough to realize that she has to hold onto that connection if she’s going to survive the coming battles, but in the back of her mind she knows the Jade Falcons are just an obstacle in the way of her true revenge on the Word of Blake.</biography>
+				With the Jade Falcons approaching Great X Victoria is an angry woman. She doesn’t want to
+				fight the Jade Falcons, despite their much-longer feud with the Alliance. Her entire being
+				is filled with hate for the Word of Blake, and she sees fighting the Jade Falcons
+				as a waste of her time and the Alliance’s time. Her friendship with Tricia Cannon is the
+				only tenuous link she has with her new company-mates, and she’s smart enough to realize that
+				she has to hold onto that connection if she’s going to survive the coming battles, but in
+				the back of her mind she knows the Jade Falcons are just an obstacle in the way of her true
+				revenge on the Word of Blake.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Victoria Earnestine.jpg</portraitFile>
 			<xp>0</xp>
@@ -1128,7 +1368,7 @@ as a waste of her time and the Alliance’s time. Her friendship with Tricia Can
 			<status>ACTIVE</status>
 			<birthday>3044-02-28</birthday>
 			<skill>
-				<type>Tech/Mech</type>
+				<type>Tech/Mek</type>
 				<level>2</level>
 				<bonus>-1</bonus>
 			</skill>
@@ -1158,7 +1398,7 @@ as a waste of her time and the Alliance’s time. Her friendship with Tricia Can
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1168,7 +1408,7 @@ as a waste of her time and the Alliance’s time. Her friendship with Tricia Can
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1180,18 +1420,41 @@ as a waste of her time and the Alliance’s time. Her friendship with Tricia Can
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>Hans Ostgaard is from the planet Anywhere, which fell to the Jade Falcons during the initial Clan invasion. He was on the planet at the time, and only escaped the world in 3066 when a mercenary company under contract to the Arc-Royal Defense Cordon penetrated the Jade Falcon-held system to stage a raid. Hans was at that time a member of the Anywhere resistance
-group operating in the city of Right There. When the mercenaries hit the city, defeating the single Star of light Jade Falcon ’Mechs quartered there, they were immediately swarmed by civilians wanting to be evacuated with them. The mercenaries, imagining
-the largesse that might fall from Grand Duke Morgan Kell’s fingers if they returned to Arc-Royal with refugees and new intelligence, agreed to take all that would fit. Hans volunteered to help guard the convoy of trucks that carried the civilians—mostly children
-and young mothers—to the mercenaries’ landing zone.
+			<biography>Hans Ostgaard is from the planet Anywhere, which fell to the Jade Falcons during
+				the initial Clan invasion. He was on the planet at the time, and only escaped the world in
+				3066 when a mercenary company under contract to the Arc-Royal Defense Cordon penetrated the
+				Jade Falcon-held system to stage a raid. Hans was at that time a member of the Anywhere
+				resistance
+				group operating in the city of Right There. When the mercenaries hit the city, defeating the
+				single Star of light Jade Falcon ’Meks quartered there, they were immediately swarmed by
+				civilians wanting to be evacuated with them. The mercenaries, imagining
+				the largesse that might fall from Grand Duke Morgan Kell’s fingers if they returned to
+				Arc-Royal with refugees and new intelligence, agreed to take all that would fit. Hans
+				volunteered to help guard the convoy of trucks that carried the civilians—mostly children
+				and young mothers—to the mercenaries’ landing zone.
 
-Along the way the convoy was attacked by a Star of Elementals who’d been sent by VTOL to investigate. Hans, still a trainee inexperienced on the resistance’s sole ’Mech simulator, was a gunner on a flatbed truck converted into a gun truck. Although the mercenaries managed to defeat the Elementals and escape, Hans
-was injured when the ammunition for his door gun exploded. He was evacuated to Arc-Royal and enlisted in the LAAF as soon as he recovered. After a year in one of the tank regiments attached to the Twenty-fifth, Hans tested into ’Mech training and was issued his Gallowglas in 3070 during the jump transits from Mkuranga to Great X. Company C is his first ’Mech unit, but he is hardly a newcomer to combat with the Clans. He is careful to listen to Hauptmann Guillaume and the others during the company’s
-infrequent training sessions; his experience with the mercenaries on Anywhere showed him exactly how powerful—and how vulnerable—a BattleMech can be, and he tries to learn all he can.
+				Along the way the convoy was attacked by a Star of Elementals who’d been sent by VTOL to
+				investigate. Hans, still a trainee inexperienced on the resistance’s sole ’Mek simulator,
+				was a gunner on a flatbed truck converted into a gun truck. Although the mercenaries managed
+				to defeat the Elementals and escape, Hans
+				was injured when the ammunition for his door gun exploded. He was evacuated to Arc-Royal and
+				enlisted in the LAAF as soon as he recovered. After a year in one of the tank regiments
+				attached to the Twenty-fifth, Hans tested into ’Mek training and was issued his Gallowglas
+				in 3070 during the jump transits from Mkuranga to Great X. Company C is his first ’Mek unit,
+				but he is hardly a newcomer to combat with the Clans. He is careful to listen to Hauptmann
+				Guillaume and the others during the company’s
+				infrequent training sessions; his experience with the mercenaries on Anywhere showed him
+				exactly how powerful—and how vulnerable—a BattleMek can be, and he tries to learn all he
+				can.
 
-Hans’ Gallowglas was seized from a mercenary who defaulted on his contract with the LAAF in 3069, and sent to the Kewran Wolfhounds as a replacement ’Mech. A powerful ’Mech, Hans has taken to it well, learning to pot-shot well with his PPC. He has
-become adept at the close-in ambush, often training in urban terrain to strike an enemy and then use his ’Mech’ jump jets to break contact while his heat sinks get matters under control. Lately he’s been ducking his lancemate von Seedow who, unable to procure an assault ’Mech, is eyeing Hans’ Gallowglas as a step
-in the right direction.</biography>
+				Hans’ Gallowglas was seized from a mercenary who defaulted on his contract with the LAAF in
+				3069, and sent to the Kewran Wolfhounds as a replacement ’Mek. A powerful ’Mek, Hans has
+				taken to it well, learning to pot-shot well with his PPC. He has
+				become adept at the close-in ambush, often training in urban terrain to strike an enemy and
+				then use his ’Mek’ jump jets to break contact while his heat sinks get matters under
+				control. Lately he’s been ducking his lancemate von Seedow who, unable to procure an assault
+				’Mek, is eyeing Hans’ Gallowglas as a step
+				in the right direction.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Hans Ostgaard.jpg</portraitFile>
 			<xp>0</xp>
@@ -1232,12 +1495,12 @@ in the right direction.</biography>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1249,16 +1512,38 @@ in the right direction.</biography>
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>Kristoff Semmes is insane. He is a functioning sociopath, and were the LAAF in any less dire straits he would have certainly been ejected from the MechWarrior corps. He was arrested several
-times during his childhood on Kelenfold, and again twice more during his time at the Coventry Military Academy, for attacking his fellow students over imagined slights. Semmes is functional in that he recognizes the constraints of society, but he is incapable of applying them to himself. So far as Semmes is concerned, no one else in the universe is real—he suffers from a complete lack of empathy. This attitude is a nightmare in a civilian, but something
-drill instructors train for—although not to the extreme Semmes exhibits—in boot camp. Were he able to function in society, Semmes might have become a near-perfect soldier.
+			<biography>Kristoff Semmes is insane. He is a functioning sociopath, and were the LAAF in any
+				less dire straits he would have certainly been ejected from the MekWarrior corps. He was
+				arrested several
+				times during his childhood on Kelenfold, and again twice more during his time at the
+				Coventry Military Academy, for attacking his fellow students over imagined slights. Semmes
+				is functional in that he recognizes the constraints of society, but he is incapable of
+				applying them to himself. So far as Semmes is concerned, no one else in the universe is
+				real—he suffers from a complete lack of empathy. This attitude is a nightmare in a civilian,
+				but something
+				drill instructors train for—although not to the extreme Semmes exhibits—in boot camp. Were
+				he able to function in society, Semmes might have become a near-perfect soldier.
 
-Of course, with the Word of Blake’s Jihad raging around them and the Jade Falcons probing deeply into the Alliance’s interior, the LAAF is prepared to look the other way unless Semmes really steps over the line. His skill in the Starslayer he pilots, as well as his recognition of his lance as the only way for him to survive in combat, makes him a valuable lancemate. Both Hauptmann Guillaume and the battalion’s kommandant are uneasy placing Semmes under so junior—and innocent—an officer as Reginald Hoffmann, but so far Semmes has accepted the young officer’s authority. In fact, Semmes seems to be going out of his way to actually try and form bonds with his lancemates in Striker Lance. The Wolfhounds’ medical staff is convinced Semmes is up to no good ends with this practice, seeing as they believe he is physically incapable of forming real friendships. One unit
-psychologist summed up the group’s beliefs: “Maybe he thinks the others are his pets.”
-
-Semmes’ Starslayer was a reserve ’Mech requisitioned from a militia on Australia and shipped to the Arcturan Guards. It was assigned to Semmes on the theory that it was a powerful enough ’Mech to let him be effective in a lance but not strong enough
-that he could get away from his lancemates if he “snapped.” Hauptmann Guillaume has given Leutnant Hoffmann strict— and secret—orders to deal with Semmes at the first sign of trouble, but thus far the man has been a model MechWarrior. In simulations he’s been seen covering his lancemates and exposing
-himself to fire to protect them—behavior the psychologists said he was patently incapable of.</biography>
+				Of course, with the Word of Blake’s Jihad raging around them and the Jade Falcons probing
+				deeply into the Alliance’s interior, the LAAF is prepared to look the other way unless
+				Semmes really steps over the line. His skill in the Starslayer he pilots, as well as his
+				recognition of his lance as the only way for him to survive in combat, makes him a valuable
+				lancemate. Both Hauptmann Guillaume and the battalion’s kommandant are uneasy placing Semmes
+				under so junior—and innocent—an officer as Reginald Hoffmann, but so far Semmes has accepted
+				the young officer’s authority. In fact, Semmes seems to be going out of his way to actually
+				try and form bonds with his lancemates in Striker Lance. The Wolfhounds’ medical staff is
+				convinced Semmes is up to no good ends with this practice, seeing as they believe he is
+				physically incapable of forming real friendships. One unit
+				psychologist summed up the group’s beliefs: “Maybe he thinks the others are his pets.”
+				Semmes’ Starslayer was a reserve ’Mek requisitioned from a militia on Australia and shipped
+				to the Arcturan Guards. It was assigned to Semmes on the theory that it was a powerful
+				enough ’Mek to let him be effective in a lance but not strong enough
+				that he could get away from his lancemates if he “snapped.” Hauptmann Guillaume has given
+				Leutnant Hoffmann strict— and secret—orders to deal with Semmes at the first sign of
+				trouble, but thus far the man has been a model MekWarrior. In simulations he’s been seen
+				covering his lancemates and exposing
+				himself to fire to protect them—behavior the psychologists said he was patently incapable
+				of.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Kristoff Semmes.jpg</portraitFile>
 			<xp>0</xp>
@@ -1294,12 +1579,12 @@ himself to fire to protect them—behavior the psychologists said he was patentl
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1311,12 +1596,37 @@ himself to fire to protect them—behavior the psychologists said he was patentl
 			<primaryRole>1</primaryRole>
 			<faction>LA</faction>
 			<clan>false</clan>
-			<biography>First Leutnant Nadine von Riddenour’s family has served in the Lyran armed forces for two hundred years. The original Colonel Idris Riddenour, who earned the family landhold on Garrison (and the von in the name) was a tanker who led a charge against a Kurita ’Mech column and died in combat. Succeeding generations of von Riddenours have been raised on the tales of martial glory of Idris and his descendants, and Nadine’s performance at the Nagelring and her first tour with the Kewran Wolfhounds was in keeping with her family’s traditions. On Mkuranga she was responsible for the destruction of three heavy Jade Falcon OmniMechs on her own, and her lance for more than a Star’s worth more despite their losses. When the reorganizational phase began on Great X, she fully expected to be placed in charge of Company C with a promotion to hauptmann. The assignment of Michael Guillaume and her placement as his executive officer kindled a smoldering bone of contention in her chest.
+			<biography>First Leutnant Nadine von Riddenour’s family has served in the Lyran armed forces
+				for two hundred years. The original Colonel Idris Riddenour, who earned the family landhold
+				on Garrison (and the von in the name) was a tanker who led a charge against a Kurita ’Mek
+				column and died in combat. Succeeding generations of von Riddenours have been raised on the
+				tales of martial glory of Idris and his descendants, and Nadine’s performance at the
+				Nagelring and her first tour with the Kewran Wolfhounds was in keeping with her family’s
+				traditions. On Mkuranga she was responsible for the destruction of three heavy Jade Falcon
+				OmniMeks on her own, and her lance for more than a Star’s worth more despite their losses.
+				When the reorganizational phase began on Great X, she fully expected to be placed in charge
+				of Company C with a promotion to hauptmann. The assignment of Michael Guillaume and her
+				placement as his executive officer kindled a smoldering bone of contention in her chest.
 
-As a lance commander von Riddenour is a harsh leader, accepting no excuses for failure from her subordinates. She is well aware that she leads the heaviest lance in the company and tries to uphold the more “Lyran” traditions of her family. Her method is to attack, always attack, and crush her enemies beneath the weight and ferocity of Lyran steel. This attitude melds well with Sergeant Watkins, who idolizes the first leutnant, but falls on deaf ears when it comes to Sergeant Cole and outright derision by Sergeant Quibble, who likes to tweak von Riddenour for her adherence to “outdated and disproven” tactics and methods. It is only Quibble’s skill in his Rifleman that keeps von Riddenour from demanding his transfer out of her lance.
+				As a lance commander von Riddenour is a harsh leader, accepting no excuses for failure from
+				her subordinates. She is well aware that she leads the heaviest lance in the company and
+				tries to uphold the more “Lyran” traditions of her family. Her method is to attack, always
+				attack, and crush her enemies beneath the weight and ferocity of Lyran steel. This attitude
+				melds well with Sergeant Watkins, who idolizes the first leutnant, but falls on deaf ears
+				when it comes to Sergeant Cole and outright derision by Sergeant Quibble, who likes to tweak
+				von Riddenour for her adherence to “outdated and disproven” tactics and methods. It is only
+				Quibble’s skill in his Rifleman that keeps von Riddenour from demanding his transfer out of
+				her lance.
 
-Nadine’s Mad Cat Mk II is one of the few Clan ‘Mechs the Lyran Alliance Armed Forces purchased from the Diamond Sharks before the outbreak of the Jihad. She won the right to pilot it in a series of simulator duels fought amongst the various RCTs of the Arcturan Guards in 3067, defeating two hauptmanns and a kommandant to win its possession. The ’Mech suits her well; she often uses her Gauss rifles like hammers to pound on her opponents, then hits them with plunging missile fire to exploit any weaknesses the Gauss rifles may have found. The logistical tail necessary to support the Clan-built machine is an added strain on 
-the Kewran Wolfhounds but they bear that strain willingly; a Mad Cat Mk II is too powerful a ’Mech to pass up.</biography>
+				Nadine’s Mad Cat Mk II is one of the few Clan ‘Meks the Lyran Alliance Armed Forces
+				purchased from the Diamond Sharks before the outbreak of the Jihad. She won the right to
+				pilot it in a series of simulator duels fought amongst the various RCTs of the Arcturan
+				Guards in 3067, defeating two hauptmanns and a kommandant to win its possession. The ’Mek
+				suits her well; she often uses her Gauss rifles like hammers to pound on her opponents, then
+				hits them with plunging missile fire to exploit any weaknesses the Gauss rifles may have
+				found. The logistical tail necessary to support the Clan-built machine is an added strain on
+				the Kewran Wolfhounds but they bear that strain willingly; a Mad Cat Mk II is too powerful a
+				’Mek to pass up.</biography>
 			<portraitCategory>Kewran Wolfhounds/</portraitCategory>
 			<portraitFile>Nadine Von Riddenour.jpg</portraitFile>
 			<xp>0</xp>
@@ -1327,7 +1637,7 @@ the Kewran Wolfhounds but they bear that strain willingly; a Mad Cat Mk II is to
 			<status>ACTIVE</status>
 			<birthday>3041-05-30</birthday>
 			<skill>
-				<type>Tech/Mech</type>
+				<type>Tech/Mek</type>
 				<level>1</level>
 				<bonus>-1</bonus>
 			</skill>
@@ -1367,12 +1677,12 @@ the Kewran Wolfhounds but they bear that strain willingly; a Mad Cat Mk II is to
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
@@ -1384,18 +1694,29 @@ the Kewran Wolfhounds but they bear that strain willingly; a Mad Cat Mk II is to
 			<type>Defend the Depot</type>
 			<systemId>Unknown System</systemId>
 			<status>0</status>
-			<desc>The fighting on Bastion in 3071 was characterized by maneuver and short, sharp clashes between the Lyran Alliance regulars and the Jade Falcon Clansmen.  Hauptmann Guillaume’s your goal is to stop the Falcons without losing your company or forcing your commander to further weaken Spot’s defenders. To this end, You are two split your command into two demi-companies. Stay in constant movement and rely on the Great X militia auxiliaries to keep tabs on the Falcons’ movements.</desc>
+			<desc>The fighting on Bastion in 3071 was characterized by maneuver and short, sharp clashes
+				between the Lyran Alliance regulars and the Jade Falcon Clansmen. Hauptmann Guillaume’s your
+				goal is to stop the Falcons without losing your company or forcing your commander to further
+				weaken Spot’s defenders. To this end, You are two split your command into two
+				demi-companies. Stay in constant movement and rely on the Great X militia auxiliaries to
+				keep tabs on the Falcons’ movements.</desc>
 			<id>1</id>
 			<scenarios>
 				<scenario id="1" type="mekhq.campaign.mission.Scenario">
 					<name>Setting the Tone</name>
-					<desc>I can hear the hauptmann tapping on his console. He doesn’t know his mike is hot and it’s broadcasting his noise. If the first leutnant were here I’m sure she’d say something, but I don’t know what I’m supposed to do. How do you tell your CO that his nervousness is being broadcast to the troops? At OCS they told us you never let your troops know you’re scared. They also told us you never—ever—undermine your
-CO in front of the troops. I’m getting tired of hearing it.
+					<desc>I can hear the hauptmann tapping on his console. He doesn’t know his mike is hot and
+						it’s broadcasting his noise. If the first leutnant were here I’m sure she’d say
+						something, but I don’t know what I’m supposed to do. How do you tell your CO that his
+						nervousness is being broadcast to the troops? At OCS they told us you never let your
+						troops know you’re scared. They also told us you never—ever—undermine your
+						CO in front of the troops. I’m getting tired of hearing it.
 
-The Falcons will be here soon, and we’ll see if the Old Man’s sim scores translate to the battlefield. He sure put von Riddenour in her place, but these are Jade Falcons. God, I hope I don’t mess up.
+						The Falcons will be here soon, and we’ll see if the Old Man’s sim scores translate to
+						the battlefield. He sure put von Riddenour in her place, but these are Jade Falcons.
+						God, I hope I don’t mess up.
 
-—from the cockpit recorder of Leutnant Reginald
-Hoffmann, 14 May 3071</desc>
+						—from the cockpit recorder of Leutnant Reginald
+						Hoffmann, 14 May 3071</desc>
 					<report></report>
 					<status>0</status>
 					<id>1</id>
@@ -1406,15 +1727,18 @@ Hoffmann, 14 May 3071</desc>
 	<forces>
 		<force id="0" type="mekhq.campaign.force.Force">
 			<name>The Kewran Wolfhounds</name>
-			<desc>This is C Company, 3rd Battalion as set up at the start of the campaign for the Starter Book: Fist and Falcon.
+			<desc>This is C Company, 3rd Battalion as set up at the start of the campaign for the Starter
+				Book: Fist and Falcon.
 
-Anyone that wants to use these will need to add the additional support personal and define the rules as they want them.
+				Anyone that wants to use these will need to add the additional support personal and define
+				the rules as they want them.
 
-In addition this starter book included Character sheets so those have been added to the Personnel.
+				In addition this starter book included Character sheets so those have been added to the
+				Personnel.
 
-Enjoy.
+				Enjoy.
 
-Conversion by Hammer</desc>
+				Conversion by Hammer</desc>
 			<combatForce>true</combatForce>
 			<iconCategory>Units/</iconCategory>
 			<iconFileName>Arturanguards25th.jpg</iconFileName>
@@ -1424,42 +1748,42 @@ Conversion by Hammer</desc>
 					<name>Command Lance</name>
 					<desc></desc>
 					<combatForce>true</combatForce>
-					<iconCategory>Mech/</iconCategory>
-					<iconFileName>hmech.png</iconFileName>
+					<iconCategory>Mek/</iconCategory>
+					<iconFileName>hmek.png</iconFileName>
 					<scenarioId>1</scenarioId>
 					<units>
-						<unit id="c9071d05-377b-48ba-ac86-ef08374d4716"/>
-						<unit id="6cad1e5c-86f7-45d8-b705-d89bac8813fa"/>
-						<unit id="8874defd-485a-445f-8ff0-aa3d22c454db"/>
-						<unit id="73902adb-f690-4086-9780-c189c89ebd94"/>
+						<unit id="c9071d05-377b-48ba-ac86-ef08374d4716" />
+						<unit id="6cad1e5c-86f7-45d8-b705-d89bac8813fa" />
+						<unit id="8874defd-485a-445f-8ff0-aa3d22c454db" />
+						<unit id="73902adb-f690-4086-9780-c189c89ebd94" />
 					</units>
 				</force>
 				<force id="3" type="mekhq.campaign.force.Force">
 					<name>Anvil Lance</name>
 					<desc></desc>
 					<combatForce>true</combatForce>
-					<iconCategory>Mech/</iconCategory>
-					<iconFileName>amech.png</iconFileName>
+					<iconCategory>Mek/</iconCategory>
+					<iconFileName>amek.png</iconFileName>
 					<scenarioId>-1</scenarioId>
 					<units>
-						<unit id="c0a5a68a-3223-43d5-bd5e-fda292a4e848"/>
-						<unit id="e916d765-b5b7-424f-a6c3-e6f1c3f4f145"/>
-						<unit id="f96775d9-4ae3-4428-854c-6f92f826814b"/>
-						<unit id="30619ef0-64f2-42db-b7ec-3055da88f393"/>
+						<unit id="c0a5a68a-3223-43d5-bd5e-fda292a4e848" />
+						<unit id="e916d765-b5b7-424f-a6c3-e6f1c3f4f145" />
+						<unit id="f96775d9-4ae3-4428-854c-6f92f826814b" />
+						<unit id="30619ef0-64f2-42db-b7ec-3055da88f393" />
 					</units>
 				</force>
 				<force id="4" type="mekhq.campaign.force.Force">
 					<name>Striker Lance</name>
 					<desc></desc>
 					<combatForce>true</combatForce>
-					<iconCategory>Mech/</iconCategory>
-					<iconFileName>mmech.png</iconFileName>
+					<iconCategory>Mek/</iconCategory>
+					<iconFileName>mmek.png</iconFileName>
 					<scenarioId>-1</scenarioId>
 					<units>
-						<unit id="7d7ed6fc-dbe0-4c7f-ae29-4fc357cac9ca"/>
-						<unit id="5ff50c94-8f0f-4c20-8a00-ffad59f3ffb6"/>
-						<unit id="69b910f6-ef6c-42ec-b5f4-6529351a11ff"/>
-						<unit id="f5a9556a-5be8-45fc-86be-45b86fae701f"/>
+						<unit id="7d7ed6fc-dbe0-4c7f-ae29-4fc357cac9ca" />
+						<unit id="5ff50c94-8f0f-4c20-8a00-ffad59f3ffb6" />
+						<unit id="69b910f6-ef6c-42ec-b5f4-6529351a11ff" />
+						<unit id="f5a9556a-5be8-45fc-86be-45b86fae701f" />
 					</units>
 				</force>
 			</subforces>
@@ -1480,7 +1804,7 @@ Conversion by Hammer</desc>
 	</kills>
 	<skillTypes>
 		<skillType>
-			<name>Piloting/Mech</name>
+			<name>Piloting/Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1490,7 +1814,7 @@ Conversion by Hammer</desc>
 			<costs>8,4,4,4,4,4,4,4,4,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/Mech</name>
+			<name>Gunnery/Mek</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1620,7 +1944,7 @@ Conversion by Hammer</desc>
 			<costs>16,8,8,8,8,8,8,8,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/Protomech</name>
+			<name>Gunnery/Protomek</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1640,7 +1964,7 @@ Conversion by Hammer</desc>
 			<costs>8,4,4,4,4,4,4,4,4,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Anti-Mech</name>
+			<name>Anti-Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1650,7 +1974,7 @@ Conversion by Hammer</desc>
 			<costs>12,6,6,6,6,6,6,6,6,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Tech/Mech</name>
+			<name>Tech/Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>1</greenLvl>
@@ -1827,7 +2151,7 @@ Conversion by Hammer</desc>
 			<displayName>Sandblaster (AToW)</displayName>
 			<lookupName>sandblaster</lookupName>
 			<desc>A pilot with this ability gets a +4, +3, or +2 to the cluster table
-at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
+				at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
 			<xpCost>6</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1839,8 +2163,8 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<displayName>Tactical Genius (aToW)</displayName>
 			<lookupName>tactical_genius</lookupName>
 			<desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
- The second roll must be accepted.
-Note: Only one Tactical Genius may be utilized per team.</desc>
+				The second roll must be accepted.
+				Note: Only one Tactical Genius may be utilized per team.</desc>
 			<xpCost>8</xpCost>
 			<weight>1</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1852,9 +2176,9 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			<displayName>Dodge (MaxTech)</displayName>
 			<lookupName>dodge_maneuver</lookupName>
 			<desc>Enables the unit to make a dodge maneuver instead of a physical attack.
-This maneuver adds +2 to the BTH to physical attacks against the unit.
-NOTE: The dodge maneuver is declared during the weapons phase.
-Note: This ability is only used for BattleMechs.</desc>
+				This maneuver adds +2 to the BTH to physical attacks against the unit.
+				NOTE: The dodge maneuver is declared during the weapons phase.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>2</xpCost>
 			<weight>1</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1876,7 +2200,8 @@ Note: This ability is only used for BattleMechs.</desc>
 		<ability>
 			<displayName>Weapon Specialist (aToW)</displayName>
 			<lookupName>weapon_specialist</lookupName>
-			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all attacks with that weapon.</desc>
+			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all
+				attacks with that weapon.</desc>
 			<xpCost>12</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1909,7 +2234,8 @@ Note: This ability is only used for BattleMechs.</desc>
 		<ability>
 			<displayName>Weathered (Unofficial)</displayName>
 			<lookupName>weathered</lookupName>
-			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather conditions.</desc>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather
+				conditions.</desc>
 			<xpCost>6</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1932,7 +2258,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<displayName>Sensor Geek (Unofficial)</displayName>
 			<lookupName>sensor_geek</lookupName>
 			<desc>A pilot with this ability gets a -2 bonus on sensor checks.
- Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
+				Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
 			<xpCost>3</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1955,9 +2281,10 @@ Note: This ability is only used for BattleMechs.</desc>
 			<displayName>Maneuvering Ace (aToW)</displayName>
 			<lookupName>maneuvering_ace</lookupName>
 			<desc>Enables the unit to move laterally like a Quad.
-Quads can move laterally for 1 less MP.
-Aerospace units can perform maneuvers for 1 less thrust point.
-Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.</desc>
+				Quads can move laterally for 1 less MP.
+				Aerospace units can perform maneuvers for 1 less thrust point.
+				Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of
+				control.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1990,8 +2317,9 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 		<ability>
 			<displayName>Melee Specialist (aToW)</displayName>
 			<lookupName>melee_specialist</lookupName>
-			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
-Note: This ability is only used for BattleMechs.</desc>
+			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a
+				-1 to-hit modifier to physical attacks.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -2002,8 +2330,9 @@ Note: This ability is only used for BattleMechs.</desc>
 		<ability>
 			<displayName>Gunnery Specialization (aToW)</displayName>
 			<lookupName>specialist</lookupName>
-			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
- +1 to-hit modifier when using other types of weapons.</desc>
+			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using
+				weapons of that type and a
+				+1 to-hit modifier when using other types of weapons.</desc>
 			<xpCost>6</xpCost>
 			<weight>4</weight>
 			<prereqAbilities></prereqAbilities>
@@ -2015,10 +2344,10 @@ Note: This ability is only used for BattleMechs.</desc>
 			<displayName>Pain Resistance (MaxTech)</displayName>
 			<lookupName>pain_resistance</lookupName>
 			<desc>When making consciousness rolls,
-1 is added to all rolls.
-Also,
-damage received from ammo explosions is reduced to 1.
-Note: This ability is only used for BattleMechs.</desc>
+				1 is added to all rolls.
+				Also,
+				damage received from ammo explosions is reduced to 1.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>4</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>

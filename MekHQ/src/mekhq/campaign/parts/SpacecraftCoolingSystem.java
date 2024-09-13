@@ -20,32 +20,43 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.Aero;
+import megamek.common.Entity;
+import megamek.common.Jumpship;
+import megamek.common.SmallCraft;
+import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.verifier.TestAdvancedAerospace;
 import megamek.common.verifier.TestSmallCraft;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
 
 /**
- * Container for SC/DS/JS/WS/SS heat sinks. Eliminates need for tracking hundreds/thousands
+ * Container for SC/DS/JS/WS/SS heat sinks. Eliminates need for tracking
+ * hundreds/thousands
  * of individual heat sink parts for spacecraft.
  *
- * The remove action adds a single heatsink of the appropriate type to the warehouse.
+ * The remove action adds a single heatsink of the appropriate type to the
+ * warehouse.
  * Fix action replaces one.
- * Small craft and up don't actually track damage to heatsinks, so you only fix this part if you're salvaging/replacing.
+ * Small craft and up don't actually track damage to heatsinks, so you only fix
+ * this part if you're salvaging/replacing.
  * There might be 5,000 heatsinks in here. Have fun with that.
+ * 
  * @author MKerensky
  */
 public class SpacecraftCoolingSystem extends Part {
+    private static final MMLogger logger = MMLogger.create(SpacecraftCoolingSystem.class);
+
     private int sinkType;
     private int sinksNeeded;
     private int currentSinks;
@@ -75,7 +86,7 @@ public class SpacecraftCoolingSystem extends Part {
         return clone;
     }
 
-    //Getters for our various internal values
+    // Getters for our various internal values
     public int getSinkType() {
         return sinkType;
     }
@@ -95,14 +106,15 @@ public class SpacecraftCoolingSystem extends Part {
             currentSinks = ((Aero) unit.getEntity()).getHeatSinks();
             setEngineHeatSinks();
             removeableSinks = Math.max(0, (totalSinks - engineSinks));
-            //You shouldn't be able to replace or remove heatsinks built into the vessel's engine
+            // You shouldn't be able to replace or remove heatsinks built into the vessel's
+            // engine
             sinksNeeded = Math.min(removeableSinks, (totalSinks - currentSinks));
         }
     }
 
     @Override
     public int getBaseTime() {
-        //60m per 50 heatsinks, per 6-2019 SO errata
+        // 60m per 50 heatsinks, per 6-2019 SO errata
         return 60;
     }
 
@@ -131,36 +143,43 @@ public class SpacecraftCoolingSystem extends Part {
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> salvaged.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+                    + "'><b> salvaged.</b></font>";
         } else {
             fix();
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> replaced.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+                    + "'><b> replaced.</b></font>";
         }
     }
 
     /**
-     * Pulls up to 50 heatsinks of the appropriate type from the warehouse and adds them to the cooling system
+     * Pulls up to 50 heatsinks of the appropriate type from the warehouse and adds
+     * them to the cooling system
      */
     public void replaceHeatSinks() {
         if (unit != null && unit.getEntity() instanceof Aero) {
-            //Spare part is usually 'this', but we're looking for spare heatsinks here...
+            // Spare part is usually 'this', but we're looking for spare heatsinks here...
             Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
-           if (null != spare) {
+            if (null != spare) {
                 spare.setQuantity(spare.getQuantity() - Math.min(sinksNeeded, 50));
-                ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
-           }
+                ((Aero) unit.getEntity())
+                        .setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + Math.min(sinksNeeded, 50));
+            }
         }
         updateConditionFromEntity(false);
     }
 
     /**
-     * Calculates 'weight free' heatsinks included with this spacecraft's engine. You can't remove or replace these
+     * Calculates 'weight free' heatsinks included with this spacecraft's engine.
+     * You can't remove or replace these
      *
      */
     public void setEngineHeatSinks() {
-        //Only calculate this again if we've managed to keep a value of 0 engineSinks or go negative.
-        //According to the construction rules, this *should* always be a positive value.
+        // Only calculate this again if we've managed to keep a value of 0 engineSinks
+        // or go negative.
+        // According to the construction rules, this *should* always be a positive
+        // value.
         if (engineSinks <= 0 && null != unit) {
             if (unit.getEntity() instanceof Jumpship) {
                 engineSinks = TestAdvancedAerospace.weightFreeHeatSinks((Jumpship) unit.getEntity());
@@ -176,28 +195,31 @@ public class SpacecraftCoolingSystem extends Part {
     }
 
     /**
-     * Pulls up to 50 heatsinks of the appropriate type from the cooling system and adds them to the warehouse
+     * Pulls up to 50 heatsinks of the appropriate type from the cooling system and
+     * adds them to the warehouse
      *
      */
     public void removeHeatSinks(boolean salvage) {
         if (unit != null && unit.getEntity() instanceof Aero) {
-            //Spare part is usually 'this', but we're looking for spare heatsinks here...
+            // Spare part is usually 'this', but we're looking for spare heatsinks here...
             Part spareHeatSink = new AeroHeatSink(0, sinkType, false, campaign);
             Part spare = campaign.getWarehouse().checkForExistingSparePart(spareHeatSink);
-            //How many sinks are we trying to remove? It'll be between 0 and 50.
+            // How many sinks are we trying to remove? It'll be between 0 and 50.
             int sinkBatch = Math.max(0, Math.min((currentSinks - engineSinks), 50));
             if (!salvage) {
-                //Scrapping. Shouldn't be able to get here, but don't do anything just in case.
+                // Scrapping. Shouldn't be able to get here, but don't do anything just in case.
             } else if (null != spare) {
-                //Add some to our spare stocks, but make sure we don't pull them out of the engine
+                // Add some to our spare stocks, but make sure we don't pull them out of the
+                // engine
                 spare.setQuantity(spare.getQuantity() + Math.min(removeableSinks, sinkBatch));
                 spare.setUnit(null);
-           } else {
-               //Start a new collection, but make sure we don't pull them out of the engine
-               spareHeatSink.setQuantity(Math.min(removeableSinks, sinkBatch));
-               campaign.getQuartermaster().addPart(spareHeatSink, 0);
-           }
-           ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
+            } else {
+                // Start a new collection, but make sure we don't pull them out of the engine
+                spareHeatSink.setQuantity(Math.min(removeableSinks, sinkBatch));
+                campaign.getQuartermaster().addPart(spareHeatSink, 0);
+            }
+            ((Aero) unit.getEntity())
+                    .setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() - Math.min(removeableSinks, sinkBatch));
         }
         updateConditionFromEntity(false);
     }
@@ -232,7 +254,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public Money getStickerPrice() {
-        //Cooling system itself has no price
+        // Cooling system itself has no price
         return Money.zero();
     }
 
@@ -248,13 +270,13 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public double getTonnage() {
-        //1 ton for each non-weight-free heatsink
+        // 1 ton for each non-weight-free heatsink
         return getRemoveableSinks();
     }
 
     @Override
     public boolean isSamePartType(Part part) {
-        //You don't ever replace or remove the whole cooling system, just modify it
+        // You don't ever replace or remove the whole cooling system, just modify it
         return false;
     }
 
@@ -287,7 +309,7 @@ public class SpacecraftCoolingSystem extends Part {
                     currentSinks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }

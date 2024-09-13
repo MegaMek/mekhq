@@ -1,4 +1,32 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.adapter;
+
+import java.awt.event.ActionEvent;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 
 import mekhq.MekHQ;
 import mekhq.campaign.event.LoanRemovedEvent;
@@ -8,11 +36,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PayCollateralDialog;
 import mekhq.gui.model.LoanTableModel;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-import java.util.UUID;
 
 public class LoanTableMouseAdapter extends JPopupMenuAdapter {
     private CampaignGUI gui;

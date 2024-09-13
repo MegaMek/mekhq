@@ -1,5 +1,6 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An overwhelming enemy aerospace force has been detected approaching the area.</additionalBriefingText>
+	<additionalBriefingText>An overwhelming enemy aerospace force has been detected approaching the
+		area.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>Space</allowedMapLocation>
 		<allowedMapLocation>LowAtmosphere</allowedMapLocation>
@@ -36,8 +37,8 @@
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>
 		<objectiveLinkedForces>
-                    <objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
-                </objectiveLinkedForces>
+			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+		</objectiveLinkedForces>
 		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>None</syncDeploymentType>
 		<syncedForceName />

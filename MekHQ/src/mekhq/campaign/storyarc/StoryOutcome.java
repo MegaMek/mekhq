@@ -20,24 +20,28 @@
  */
 package mekhq.campaign.storyarc;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.UUID;
-import java.util.ArrayList;
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * This class controls what happens when a story point is completed and a certain result is achieved. Basically, it
- * tracks an alternate `nextStoryPointId` and a list of {@link StoryTrigger StoryTrigger} objects that will replace
- *  the default
+ * This class controls what happens when a story point is completed and a
+ * certain result is achieved. Basically, it
+ * tracks an alternate `nextStoryPointId` and a list of {@link StoryTrigger
+ * StoryTrigger} objects that will replace
+ * the default
  */
 public class StoryOutcome {
+    private static final MMLogger logger = MMLogger.create(StoryOutcome.class);
 
     /** result this outcome is tied too **/
     String result;
@@ -48,7 +52,7 @@ public class StoryOutcome {
     /** A list of StoryTriggers to replace the defaults on this outcome */
     List<StoryTrigger> storyTriggers;
 
-    StoryOutcome()  {
+    StoryOutcome() {
         storyTriggers = new ArrayList<>();
     }
 
@@ -66,6 +70,7 @@ public class StoryOutcome {
 
     /**
      * Set the StoryArc on all StoryTriggers here
+     * 
      * @param a a {@link StoryArc StoryArc}
      */
     public void setStoryArc(StoryArc a) {
@@ -74,7 +79,7 @@ public class StoryOutcome {
         }
     }
 
-    //region File I/O
+    // region File I/O
     public void writeToXml(PrintWriter pw1, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcome", "result", result);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
@@ -102,13 +107,13 @@ public class StoryOutcome {
 
                 if (wn2.getNodeName().equalsIgnoreCase("nextStoryPointId")) {
                     retVal.nextStoryPointId = UUID.fromString(wn2.getTextContent().trim());
-                } else if(wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
                     StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c, v);
                     retVal.storyTriggers.add(trigger);
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            logger.error(ex);
         }
 
         return retVal;

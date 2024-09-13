@@ -18,35 +18,40 @@
  */
 package mekhq.gui.menus;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.common.icons.Camouflage;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.GUI;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.io.FileType;
-import org.apache.logging.log4j.LogManager;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 
 /**
- * This is a standard menu that takes a unit and lets the user export their icon with the camouflage
+ * This is a standard menu that takes a unit and lets the user export their icon
+ * with the camouflage
  * applied to it.
  */
 public class ExportUnitSpriteMenu extends JScrollableMenu {
-    //region Constructors
+    private static final MMLogger logger = MMLogger.create(ExportUnitSpriteMenu.class);
+
+    // region Constructors
     public ExportUnitSpriteMenu(final JFrame frame, final Campaign campaign, final Unit unit) {
         super("ExportUnitSpriteMenu");
         initialize(frame, campaign, unit);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Initialization
+    // region Initialization
     private void initialize(final JFrame frame, final Campaign campaign, final Unit unit) {
         // Initialize Menu
         setText(resources.getString("ExportUnitSpriteMenu.title"));
@@ -55,30 +60,30 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         final JMenuItem miCurrentCamouflage = new JMenuItem(resources.getString("miCurrentCamouflage.text"));
         miCurrentCamouflage.setToolTipText(resources.getString("miCurrentCamouflage.toolTipText"));
         miCurrentCamouflage.setName("miCurrentCamouflage");
-        miCurrentCamouflage.addActionListener(evt ->
-                exportSprite(frame, unit, unit.getUtilizedCamouflage(campaign), false));
+        miCurrentCamouflage
+                .addActionListener(evt -> exportSprite(frame, unit, unit.getUtilizedCamouflage(campaign), false));
         add(miCurrentCamouflage);
 
         final JMenuItem miCurrentDamage = new JMenuItem(resources.getString("miCurrentDamage.text"));
         miCurrentDamage.setToolTipText(resources.getString("miCurrentDamage.toolTipText"));
         miCurrentDamage.setName("miCurrentDamage");
-        miCurrentDamage.addActionListener(evt ->
-                exportSprite(frame, unit, new Camouflage(), true));
+        miCurrentDamage.addActionListener(evt -> exportSprite(frame, unit, new Camouflage(), true));
         add(miCurrentDamage);
 
         final JMenuItem miCurrentCamouflageAndDamage = new JMenuItem(
                 resources.getString("miCurrentCamouflageAndDamage.text"));
         miCurrentCamouflageAndDamage.setToolTipText(resources.getString("miCurrentCamouflageAndDamage.toolTipText"));
         miCurrentCamouflageAndDamage.setName("miCurrentCamouflageAndDamage");
-        miCurrentCamouflageAndDamage.addActionListener(evt ->
-                exportSprite(frame, unit, unit.getUtilizedCamouflage(campaign), true));
+        miCurrentCamouflageAndDamage
+                .addActionListener(evt -> exportSprite(frame, unit, unit.getUtilizedCamouflage(campaign), true));
         add(miCurrentCamouflageAndDamage);
 
         final JMenuItem miSelectedCamouflage = new JMenuItem(resources.getString("miSelectedCamouflage.text"));
         miSelectedCamouflage.setToolTipText(resources.getString("miSelectedCamouflage.toolTipText"));
         miSelectedCamouflage.setName("miSelectedCamouflage");
         miSelectedCamouflage.addActionListener(evt -> {
-            final CamoChooserDialog camoChooserDialog = new CamoChooserDialog(frame, unit.getUtilizedCamouflage(campaign));
+            final CamoChooserDialog camoChooserDialog = new CamoChooserDialog(frame,
+                    unit.getUtilizedCamouflage(campaign));
             if (camoChooserDialog.showDialog().isConfirmed()) {
                 exportSprite(frame, unit, camoChooserDialog.getSelectedItem(), false);
             }
@@ -91,17 +96,18 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
                 resources.getString("miSelectedCamouflageAndCurrentDamage.toolTipText"));
         miSelectedCamouflageAndCurrentDamage.setName("miSelectedCamouflageAndCurrentDamage");
         miSelectedCamouflageAndCurrentDamage.addActionListener(evt -> {
-            final CamoChooserDialog camoChooserDialog = new CamoChooserDialog(frame, unit.getUtilizedCamouflage(campaign));
+            final CamoChooserDialog camoChooserDialog = new CamoChooserDialog(frame,
+                    unit.getUtilizedCamouflage(campaign));
             if (camoChooserDialog.showDialog().isConfirmed()) {
                 exportSprite(frame, unit, camoChooserDialog.getSelectedItem(), true);
             }
         });
         add(miSelectedCamouflageAndCurrentDamage);
     }
-    //endregion Initialization
+    // endregion Initialization
 
     private void exportSprite(final JFrame frame, final Unit unit, final Camouflage camouflage,
-                              final boolean showDamage) {
+            final boolean showDamage) {
         // Save Location
         File file = GUI.fileDialogSave(frame, resources.getString("ExportUnitSpriteDialog.title"), FileType.PNG,
                 MekHQ.getMHQOptions().getUnitSpriteExportPath(), unit.getName() + ".png").orElse(null);
@@ -119,7 +125,7 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         // Get the Sprite
         final Image sprite = unit.getImage(this, camouflage, showDamage);
         if (sprite == null) {
-            LogManager.getLogger().error("Null sprite");
+            logger.error("Null sprite");
             return;
         }
 
@@ -127,7 +133,7 @@ public class ExportUnitSpriteMenu extends JScrollableMenu {
         try {
             ImageIO.write((BufferedImage) sprite, "png", file);
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to export to file", ex);
+            logger.error("Failed to export to file", ex);
         }
     }
 }
