@@ -25,12 +25,12 @@ import megamek.common.weapons.infantry.InfantryWeapon;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AmmoUtilities {
     /**
      * Gets an AmmoType by name (performing any initialization required
      * on the MM side).
+     * 
      * @param name The lookup name for the AmmoType.
      * @return The ammo type for the given name.
      */
@@ -44,6 +44,7 @@ public class AmmoUtilities {
     /**
      * Gets a BombType by name (performing any initialization required
      * on the MM side).
+     * 
      * @param name The lookup name for the BombType.
      * @return The bomb type for the given name.
      */
@@ -57,6 +58,7 @@ public class AmmoUtilities {
     /**
      * Gets a InfantryWeapon by name (performing any initialization required
      * on the MM side).
+     * 
      * @param name The lookup name for the InfantryWeapon.
      * @return The bomb type for the given name.
      */

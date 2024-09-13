@@ -18,20 +18,22 @@
  */
 package mekhq.campaign.finances.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum TransactionType {
-    //region Enum Declarations
-    BATTLE_LOSS_COMPENSATION("TransactionType.BATTLE_LOSS_COMPENSATION.text", "TransactionType.BATTLE_LOSS_COMPENSATION.toolTipText"),
+    // region Enum Declarations
+    BATTLE_LOSS_COMPENSATION("TransactionType.BATTLE_LOSS_COMPENSATION.text",
+            "TransactionType.BATTLE_LOSS_COMPENSATION.toolTipText"),
     CONSTRUCTION("TransactionType.CONSTRUCTION.text", "TransactionType.CONSTRUCTION.toolTipText"),
     CONTRACT_PAYMENT("TransactionType.CONTRACT_PAYMENT.text", "TransactionType.CONTRACT_PAYMENT.toolTipText"),
     EDUCATION("TransactionType.EDUCATION.text", "TransactionType.EDUCATION.toolTipText"),
     EQUIPMENT_PURCHASE("TransactionType.EQUIPMENT_PURCHASE.text", "TransactionType.EQUIPMENT_PURCHASE.toolTipText"),
     EQUIPMENT_SALE("TransactionType.EQUIPMENT_SALE.text", "TransactionType.EQUIPMENT_SALE.toolTipText"),
-    FINANCIAL_TERM_END_CARRYOVER("TransactionType.FINANCIAL_TERM_END_CARRYOVER.text", "TransactionType.FINANCIAL_TERM_END_CARRYOVER.toolTipText"),
+    FINANCIAL_TERM_END_CARRYOVER("TransactionType.FINANCIAL_TERM_END_CARRYOVER.text",
+            "TransactionType.FINANCIAL_TERM_END_CARRYOVER.toolTipText"),
     FINE("TransactionType.FINE.text", "TransactionType.FINE.toolTipText"),
     LOAN_PAYMENT("TransactionType.LOAN_PAYMENT.text", "TransactionType.LOAN_PAYMENT.toolTipText"),
     LOAN_PRINCIPAL("TransactionType.LOAN_PRINCIPAL.text", "TransactionType.LOAN_PRINCIPAL.toolTipText"),
@@ -54,29 +56,29 @@ public enum TransactionType {
     UNIT_PURCHASE("TransactionType.UNIT_PURCHASE.text", "TransactionType.UNIT_PURCHASE.toolTipText"),
     UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText"),
     BONUS_EXCHANGE("TransactionType.BONUS_EXCHANGE.text", "TransactionType.BONUS_EXCHANGE.toolTipText");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     TransactionType(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isBattleLossCompensation() {
         return this == BATTLE_LOSS_COMPENSATION;
     }
@@ -192,9 +194,9 @@ public enum TransactionType {
     public boolean isBonusExchange() {
         return this == BONUS_EXCHANGE;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     public static TransactionType parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -260,10 +262,11 @@ public enum TransactionType {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a TransactionType. Returning MISCELLANEOUS.");
+        MMLogger.create(TransactionType.class)
+                .error("Unable to parse " + text + " into a TransactionType. Returning MISCELLANEOUS.");
         return MISCELLANEOUS;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

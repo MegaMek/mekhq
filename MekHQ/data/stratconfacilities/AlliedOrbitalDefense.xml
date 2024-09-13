@@ -1,9 +1,9 @@
 <StratconFacility>
 	<capturedDefinition>HostileOrbitalDefense.xml</capturedDefinition>
 	<displayableName>Orbital Defense</displayableName>
-        <facilityType>OrbitalDefense</facilityType>
-        <owner>Allied</owner>
+	<facilityType>OrbitalDefense</facilityType>
+	<owner>Allied</owner>
 	<preventAerospace>true</preventAerospace>
 	<userDescription>Prevents hostile air units from operating on this track.</userDescription>
-        <visible>true</visible>
+	<visible>true</visible>
 </StratconFacility>

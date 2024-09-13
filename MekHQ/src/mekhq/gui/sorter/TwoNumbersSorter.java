@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.sorter;
 
 import java.util.Comparator;
@@ -11,12 +29,12 @@ import java.util.regex.Pattern;
  * Numbers without a second number are sorted before all those with them,
  * the same way FormattedNumberSorter would do so.
  */
-public final class TwoNumbersSorter implements Comparator<String>{
+public final class TwoNumbersSorter implements Comparator<String> {
     private static final Comparator<String> NUM_SORTER = new FormattedNumberSorter();
-    private static final Pattern NUM_PATTERN =
-        Pattern.compile("^([+-]?\\d*)\\s+\\[([+-]?\\d*)\\]\\s*$");
+    private static final Pattern NUM_PATTERN = Pattern.compile("^([+-]?\\d*)\\s+\\[([+-]?\\d*)\\]\\s*$");
 
-    @Override public int compare(String s1, String s2) {
+    @Override
+    public int compare(String s1, String s2) {
         Matcher match1 = NUM_PATTERN.matcher(s1);
         Matcher match2 = NUM_PATTERN.matcher(s2);
         boolean hasSecondNumber1 = match1.matches();

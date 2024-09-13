@@ -19,13 +19,13 @@ Against the Bot (AtB) can be used directly as written, but in practice most play
 Any new campaign or existing campaign can be played using the AtB rules by going to the Against the Bot tab in the campaign options and clicking the checkbox at the top of the window. If the purpose of any of the options is not obvious through the label or the tip that appears when hovering over it, more explanation will be found below. It can be safely left at the default value for the time being.
 
 2.1.1 Converting an existing campaign
-When the AtB rules are enabled, MekHQ will fill in whatever default values are necessary for the system to function, but the player should adjust these. Any active contract will need to be edited to verify employer and mission type, and to set the enemy faction, skill levels, and equipment ratings. Completed contracts will only need to have the employer set correctly, and only if you want it to count toward a possible retainer contract. Mechwarriors (and ASF pilots, if you use the "treat ASF pilots as MWs option) will need to be edited to make sure that MekHQ has correctly guessed whether that pilot had a unit when he or she arrived. This is found on the GM Mode>Edit... menu on the Personnel tab. The default is to assume the oldest date in any of the personnel logs is the founding date of the unit, and anyone hired on that date is a founder (important if using the shares system). A Mechwarrior is assumed to have brought his or her own 'Mech if assigned to a non-Assault unit on the hire date (or any weight class if a founder).
+When the AtB rules are enabled, MekHQ will fill in whatever default values are necessary for the system to function, but the player should adjust these. Any active contract will need to be edited to verify employer and mission type, and to set the enemy faction, skill levels, and equipment ratings. Completed contracts will only need to have the employer set correctly, and only if you want it to count toward a possible retainer contract. Mekwarriors (and ASF pilots, if you use the "treat ASF pilots as MWs option) will need to be edited to make sure that MekHQ has correctly guessed whether that pilot had a unit when he or she arrived. This is found on the GM Mode>Edit... menu on the Personnel tab. The default is to assume the oldest date in any of the personnel logs is the founding date of the unit, and anyone hired on that date is a founder (important if using the shares system). A Mekwarrior is assumed to have brought his or her own 'Mek if assigned to a non-Assault unit on the hire date (or any weight class if a founder).
 
 2.1.2 Starting a new AtB campaign
-I did not write any unit creation code. MekHQ will keep track of the original unit of any Mechwarrior hired through the Personnel Market, but those hired through the Hire menu who start with a 'Mech will need to be edited as above. Alternatively, you can wait until after creating the unit to enable the AtB rules and MekHQ will fill those values in as it converts the campaign to use the AtB rules (or disable then reenable AtB).
+I did not write any unit creation code. MekHQ will keep track of the original unit of any Mekwarrior hired through the Personnel Market, but those hired through the Hire menu who start with a 'Mek will need to be edited as above. Alternatively, you can wait until after creating the unit to enable the AtB rules and MekHQ will fill those values in as it converts the campaign to use the AtB rules (or disable then reenable AtB).
 
 2.2 Recruits
-The Personnel Market now includes Against the Bot as an option, but the AtB rules can be used with any of the market types. If playing with AtB rules, any infantry recruit represents a platoon/point/BA squad and MechWarriors and ProtoMech pilots (and optionally ASF pilots) have a chance of already having a unit. If using the employer/employee system, half the cost of the unit will need to be paid to hire the person.
+The Personnel Market now includes Against the Bot as an option, but the AtB rules can be used with any of the market types. If playing with AtB rules, any infantry recruit represents a platoon/point/BA squad and MekWarriors and ProtoMek pilots (and optionally ASF pilots) have a chance of already having a unit. If using the employer/employee system, half the cost of the unit will need to be paid to hire the person.
 
 The Personnel Market is also used when not in contract for paid recruitment rolls and Dropship/Jumpship searches. The search will be made according to whatever values are set when advancing from Sunday to Monday.
 
@@ -55,7 +55,7 @@ AtB 2.29 states that a Employee Turnover roll must be made if a year passes with
 
 The Employee Turnover dialog is also used for personnel who are sacked or killed in battle.
 
-When assigning units to dead or departing personnel, the required unit is presented as a class. Light-Assault units are class 1-4 if IS1; one higher if IS2 or Clan; and one lower if inoperable (an inoperable IS1 light 'Mech cannot be used as part of a final payout).
+When assigning units to dead or departing personnel, the required unit is presented as a class. Light-Assault units are class 1-4 if IS1; one higher if IS2 or Clan; and one lower if inoperable (an inoperable IS1 light 'Mek cannot be used as part of a final payout).
 
 The rules do not say what to do if there is no unit of the correct class. My solution is to allow lesser units to be given and to increase the payout amount by 3M C-bills per level of difference. Better units can be given, but there is no benefit to doing so. Units can also be given to other departing/deceased personnel to offset part or all of the payout amount, but any excess is lost. It is not possible to pay more than one unit per person simply to keep the interface manageable.
 
@@ -72,7 +72,7 @@ MekHQ does not (yet) implement the following parts of the AtB rules:
 * Noble rules
 * "Other" factions (partial: independent planets and mercenary subcontracts are implemented, but corporations/regional governments/private citizens are not)
 * Special event related to Lostech units
-* Defections from 'Mech reassignments
+* Defections from 'Mek reassignments
 * The enemy capture rules are partially implemented from v2.18. If the option is enabled, MekHQ will determine which enemy personnel have been captured and which escape, but does not make defection rolls.
 
 3.2 Additional features
@@ -87,7 +87,7 @@ The AtB rules are built around mercenary units, with optional rules for pirates 
 
 ComStar/Word of Blake units should set the unit organization in the campaign options to Level II, which increases the limit on lance size and weight by 50%. To run a ComStar campaign properly would required rules for covert missions, but ComStar is still a usable faction under the existing rules. It works best if played after the ComGuard was officially made public in 3030 and before they were disbanded in 3081. Opponents will include pirates, bandit kingdoms, rebels, independent worlds, Clans (after Tukayyid) and Word of Blake (after the loss of Terra). ComStar will also occasionally appear as an employer for mercernaries.
 
-Clan units should set the unit organization to Star, which not only increases the limits by 25%, but counts points rather than individual units. Players can also form novas (either standard 'Mechs and Battlearmor or vehicle+conventional infantry novas fielded by Hell's Horses) without crossing the limits.
+Clan units should set the unit organization to Star, which not only increases the limits by 25%, but counts points rather than individual units. Players can also form novas (either standard 'Meks and Battlearmor or vehicle+conventional infantry novas fielded by Hell's Horses) without crossing the limits.
 
 3.4 Features changed from the official AtB ruleset
 I tried to avoid making any outright changes (as opposed to alternatives) from the AtB rules, but there were two situations where I thought there was a compelling reason to do so.
@@ -116,7 +116,7 @@ MekHQ+AtB is capable of selecting an appropriate table based on a set of criteri
 3. Does this source contain tables for the type of unit sought?
 When all these conditions are met, the selected RAT will be used to select the unit. If not, the first step is to check alternate factions (such as CC for St Ives), then any appropriate generic factions (periphery, Clan, general). If an appropriate table is not found, then next step is to look for tables from an earlier era within the same source, then finally to move to the next source.
 
-If after all these steps an acceptable table is not found, it is most likely because the campaign is set before 3025 or MekHQ is trying to determine pre-3050 aerospace fighters. The fallback behavior is to roll any aerospace fighters on the War of '39 tables (randomly selecting one of the five successor states for other factions), then other units on Xotl 3028, and if there is still not match use the Total Warfare tables. If there is still no match, log an error and proceed without the unit. The only reason I can see it getting there is if for some reason it is trying to find a ProtoMech for a non-Clan faction, but I don't see a path to that possibility.
+If after all these steps an acceptable table is not found, it is most likely because the campaign is set before 3025 or MekHQ is trying to determine pre-3050 aerospace fighters. The fallback behavior is to roll any aerospace fighters on the War of '39 tables (randomly selecting one of the five successor states for other factions), then other units on Xotl 3028, and if there is still not match use the Total Warfare tables. If there is still no match, log an error and proceed without the unit. The only reason I can see it getting there is if for some reason it is trying to find a ProtoMek for a non-Clan faction, but I don't see a path to that possibility.
 
 4.2.2 Using custom RATs
 Because MekHQ+AtB selects tables based on certain criteria, you will need to provide details about any additional RATs you intend to use. This can be done by editing the data/universe/ratinfo.xml file and adding information about your custom RAT.

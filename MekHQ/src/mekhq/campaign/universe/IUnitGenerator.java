@@ -29,7 +29,7 @@ import java.util.function.Predicate;
 
 import megamek.client.ratgenerator.MissionRole;
 import megamek.common.EntityMovementMode;
-import megamek.common.MechSummary;
+import megamek.common.MekSummary;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -69,7 +69,7 @@ public interface IUnitGenerator {
 
     /**
      * For convenience in generating battle armor/infantry, when the tonnage does not matter
-     * (a dedicated DropShip bay, battle armor riding on a 'Mech, etc)
+     * (a dedicated DropShip bay, battle armor riding on a 'Mek, etc)
      */
     double NO_WEIGHT_LIMIT = -1.0;
 
@@ -98,7 +98,7 @@ public interface IUnitGenerator {
      * @param quality Index of equipment rating, with zero being the lowest quality.
      * @return A unit that matches the criteria, or null if none can be generated
      */
-    default @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
+    default @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
                                            final int year, final int quality) {
         return generate(faction, unitType, weightClass, year, quality, null);
     }
@@ -114,8 +114,8 @@ public interface IUnitGenerator {
      * @param filter All generated units return true when the filter function is applied.
      * @return A unit that matches the criteria
      */
-    default @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
-                                           final int year, final int quality, @Nullable Predicate<MechSummary> filter) {
+    default @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
+                                           final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
         return generate(faction, unitType, weightClass, year, quality, new ArrayList<>(), filter);
     }
 
@@ -131,10 +131,10 @@ public interface IUnitGenerator {
      * @param filter All generated units return true when the filter function is applied.
      * @return A unit that matches the criteria
      */
-    default @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
+    default @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
                                            final int year, final int quality,
                                            final Collection<EntityMovementMode> movementModes,
-                                           @Nullable Predicate<MechSummary> filter) {
+                                           @Nullable Predicate<MekSummary> filter) {
         return generate(faction, unitType, weightClass, year, quality, movementModes, new ArrayList<>(), filter);
     }
 
@@ -150,7 +150,7 @@ public interface IUnitGenerator {
      * @param missionRoles A collection of various mission roles
      * @return A unit that matches the criteria
      */
-    default @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass,
+    default @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass,
                                            final int year, final int quality,
                                            final Collection<EntityMovementMode> movementModes,
                                            final Collection<MissionRole> missionRoles) {
@@ -170,9 +170,9 @@ public interface IUnitGenerator {
      * @param filter All generated units return true when the filter function is applied.
      * @return A unit that matches the criteria
      */
-    @Nullable MechSummary generate(final String faction, final int unitType, final int weightClass, final int year,
+    @Nullable MekSummary generate(final String faction, final int unitType, final int weightClass, final int year,
                                    final int quality, final Collection<EntityMovementMode> movementModes,
-                                   final Collection<MissionRole> missionRoles, @Nullable Predicate<MechSummary> filter);
+                                   final Collection<MissionRole> missionRoles, @Nullable Predicate<MekSummary> filter);
 
     /**
      * Generates a list of units.
@@ -185,7 +185,7 @@ public interface IUnitGenerator {
      * @param quality Index of equipment rating, with zero being the lowest quality.
      * @return A list of units matching the criteria.
      */
-    default List<MechSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
+    default List<MekSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
                                        final int year, final int quality) {
         return generate(count, faction, unitType, weightClass, year, quality, null);
     }
@@ -202,8 +202,8 @@ public interface IUnitGenerator {
      * @param filter All generated units return true when the filter function is applied.
      * @return A list of units matching the criteria.
      */
-    default List<MechSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
-                                       final int year, final int quality, @Nullable Predicate<MechSummary> filter) {
+    default List<MekSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
+                                       final int year, final int quality, @Nullable Predicate<MekSummary> filter) {
         return generate(count, faction, unitType, weightClass, year, quality, new ArrayList<>(), filter);
     }
 
@@ -220,10 +220,10 @@ public interface IUnitGenerator {
      * @param filter All generated units return true when the filter function is applied.
      * @return A list of units matching the criteria.
      */
-    default List<MechSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
+    default List<MekSummary> generate(final int count, final String faction, final int unitType, final int weightClass,
                                        final int year, final int quality,
                                        final Collection<EntityMovementMode> movementModes,
-                                       @Nullable Predicate<MechSummary> filter) {
+                                       @Nullable Predicate<MekSummary> filter) {
         return generate(count, faction, unitType, weightClass, year, quality, movementModes, new ArrayList<>(), filter);
     }
 
@@ -240,7 +240,7 @@ public interface IUnitGenerator {
      * @param missionRoles A collection of various mission roles
      * @return A list of units matching the criteria.
      */
-    default @Nullable List<MechSummary> generate(final int count, final String faction, final int unitType,
+    default @Nullable List<MekSummary> generate(final int count, final String faction, final int unitType,
                                                  final int weightClass, final int year, final int quality,
                                                  final Collection<EntityMovementMode> movementModes,
                                                  final Collection<MissionRole> missionRoles) {
@@ -261,11 +261,11 @@ public interface IUnitGenerator {
      * @param filter All generated units return true when the filter function is applied.
      * @return A list of units matching the criteria.
      */
-    @Nullable List<MechSummary> generate(final int count, final String faction, final int unitType,
+    @Nullable List<MekSummary> generate(final int count, final String faction, final int unitType,
                                          final int weightClass, final int year, final int quality,
                                          final Collection<EntityMovementMode> movementModes,
                                          final Collection<MissionRole> missionRoles,
-                                         @Nullable Predicate<MechSummary> filter);
+                                         @Nullable Predicate<MekSummary> filter);
 
     /**
      * Generates a single unit to be used in an OpFor using the given set of parameters.
@@ -274,7 +274,7 @@ public interface IUnitGenerator {
      * @param parameters data structure containing unit generation parameters
      * @return The generated unit, or null if none are generated.
      */
-    @Nullable MechSummary generate(final UnitGeneratorParameters parameters);
+    @Nullable MekSummary generate(final UnitGeneratorParameters parameters);
 
     /**
      * Generates the given count of units to be used in an OpFor using the given set of parameters.
@@ -284,7 +284,7 @@ public interface IUnitGenerator {
      * @param parameters data structure containing unit generation parameters
      * @return List of generated units. Empty if none are generated.
      */
-    List<MechSummary> generate(final int count, final UnitGeneratorParameters parameters);
+    List<MekSummary> generate(final int count, final UnitGeneratorParameters parameters);
 
     /**
      * Generates a list of turrets given a skill level, quality and year
@@ -294,5 +294,5 @@ public interface IUnitGenerator {
      * @param currentYear The current year
      * @return List of turrets
      */
-    List<MechSummary> generateTurrets(final int num, final SkillLevel skill, final int quality, final int currentYear);
+    List<MekSummary> generateTurrets(final int num, final SkillLevel skill, final int quality, final int currentYear);
 }

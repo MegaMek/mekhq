@@ -1,5 +1,6 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Opfor Mercenary Skirmishers with veteran markings are in the area. Don't get flanked.</additionalBriefingText>
+	<additionalBriefingText>Opfor Mercenary Skirmishers with veteran markings are in the area. Don't
+		get flanked.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -32,9 +33,9 @@
 		<forceAlignment>2</forceAlignment>
 		<forceName>Enemy Merc Skirmishers</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>MercSkirm.mul</fixedMul>	
+		<fixedMul>MercSkirm.mul</fixedMul>
 		<generationOrder>1</generationOrder>
-		<maxWeightClass>4</maxWeightClass>			
+		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>

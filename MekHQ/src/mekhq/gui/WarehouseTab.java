@@ -18,6 +18,19 @@
  */
 package mekhq.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -25,6 +38,7 @@ import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.event.Subscribe;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.parts.*;
@@ -40,20 +54,14 @@ import mekhq.gui.model.TechTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 /**
- * Displays all spare parts in stock, parts on order, and permits repair of damaged parts.
+ * Displays all spare parts in stock, parts on order, and permits repair of
+ * damaged parts.
  */
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
+    private static final MMLogger logger = MMLogger.create(WarehouseTab.class);
+
     // parts filter groups
     private static final int SG_ALL = 0;
     private static final int SG_ARMOR = 1;
@@ -99,13 +107,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private int partId = -1;
     private Person selectedTech;
 
-    //region Constructors
+    // region Constructors
     public WarehouseTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
-    //endregion Constructors
+    // endregion Constructors
 
     /*
      * (non-Javadoc)
@@ -321,7 +329,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             partsTable.setName("partsTable");
             preferences.manage(new JTablePreference(partsTable));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -531,7 +539,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshTechsList() {
-        // The next gets all techs who have more than 0 minutes free, and sorted by skill descending (elites at bottom)
+        // The next gets all techs who have more than 0 minutes free, and sorted by
+        // skill descending (elites at bottom)
         techsModel.setData(getCampaign().getTechs(true));
         String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {

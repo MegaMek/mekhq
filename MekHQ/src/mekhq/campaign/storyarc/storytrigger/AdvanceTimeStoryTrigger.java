@@ -20,21 +20,23 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryTrigger;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+import java.text.ParseException;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * This StoryTrigger will advance time a certain number of days.
  */
 public class AdvanceTimeStoryTrigger extends StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(AdvanceTimeStoryTrigger.class);
 
     int days;
 
@@ -67,7 +69,7 @@ public class AdvanceTimeStoryTrigger extends StoryTrigger {
                 }
 
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

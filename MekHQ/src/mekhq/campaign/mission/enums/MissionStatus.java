@@ -18,41 +18,41 @@
  */
 package mekhq.campaign.mission.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum MissionStatus {
-    //region Enum Declarations
+    // region Enum Declarations
     ACTIVE("MissionStatus.ACTIVE.text", "MissionStatus.ACTIVE.toolTipText"),
     SUCCESS("MissionStatus.SUCCESS.text", "MissionStatus.SUCCESS.toolTipText"),
     PARTIAL("MissionStatus.PARTIAL.text", "MissionStatus.PARTIAL.toolTipText"),
     FAILED("MissionStatus.FAILED.text", "MissionStatus.FAILED.toolTipText"),
     BREACH("MissionStatus.BREACH.text", "MissionStatus.BREACH.toolTipText");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     MissionStatus(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isActive() {
         return this == ACTIVE;
     }
@@ -74,16 +74,19 @@ public enum MissionStatus {
     }
 
     /**
-     * This is used to determine whether a status means that the mission is completed.
-     * This is purposefully not a check to see if it is active for future proofing reasons
+     * This is used to determine whether a status means that the mission is
+     * completed.
+     * This is purposefully not a check to see if it is active for future proofing
+     * reasons
+     * 
      * @return true if the mission has been completed, otherwise false
      */
     public boolean isCompleted() {
         return isSuccess() || isPartialSuccess() || isFailed() || isBreach();
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
      * @param text containing the MissionStatus
      * @return the saved MissionStatus
@@ -114,10 +117,11 @@ public enum MissionStatus {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a MissionStatus. Returning ACTIVE.");
+        MMLogger.create(MissionStatus.class)
+                .error("Unable to parse " + text + " into a MissionStatus. Returning ACTIVE.");
         return ACTIVE;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

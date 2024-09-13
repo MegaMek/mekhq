@@ -18,12 +18,12 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
 
+import mekhq.MekHQ;
+
 public enum Ambition {
-    //region Enum Declarations
+    // region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
     AMBITIOUS("Ambition.AMBITIOUS.text", "Ambition.AMBITIOUS.description", true, false),
     ARROGANT("Ambition.ARROGANT.text", "Ambition.ARROGANT.description", false, false),
@@ -55,16 +55,16 @@ public enum Ambition {
     UNAMBITIOUS("Ambition.UNAMBITIOUS.text", "Ambition.UNAMBITIOUS.description", false, false),
     UNSCRUPULOUS("Ambition.UNSCRUPULOUS.text", "Ambition.UNSCRUPULOUS.description", false, false),
     VISIONARY("Ambition.VISIONARY.text", "Ambition.VISIONARY.description", true, true);
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String description;
     private final boolean isPositive;
     private final boolean isMajor;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     Ambition(final String name, final String description, boolean isPositive, boolean isMajor) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
                 MekHQ.getMHQOptions().getLocale());
@@ -73,198 +73,171 @@ public enum Ambition {
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
-    @SuppressWarnings(value = "unused")
+    // region Getters
+
     public String getDescription() {
         return description;
     }
 
     /**
-     * @return {@code true} if the personality trait is considered positive, {@code false} otherwise.
+     * @return {@code true} if the personality trait is considered positive,
+     *         {@code false} otherwise.
      */
-    @SuppressWarnings(value = "unused")
+
     public boolean isTraitPositive() {
         return isPositive;
     }
 
     /**
-     * @return {@code true} if the personality trait is considered a major trait, {@code false} otherwise.
+     * @return {@code true} if the personality trait is considered a major trait,
+     *         {@code false} otherwise.
      */
-    @SuppressWarnings(value = "unused")
+
     public boolean isTraitMajor() {
         return isMajor;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    @SuppressWarnings(value = "unused")
+    // region Boolean Comparison Methods
+
     public boolean isNone() {
         return this == NONE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAmbitious() {
         return this == AMBITIOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isArrogant() {
         return this == ARROGANT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAspiring() {
         return this == ASPIRING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCalculating() {
         return this == CALCULATING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isConniving() {
         return this == CONNIVING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isControlling() {
         return this == CONTROLLING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCutthroat() {
         return this == CUTTHROAT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDishonest() {
         return this == DISHONEST;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDiligent() {
         return this == DILIGENT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDriven() {
         return this == DRIVEN;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isEnergetic() {
         return this == ENERGETIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isExcessive() {
         return this == EXCESSIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFocused() {
         return this == FOCUSED;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isGoalOriented() {
         return this == GOAL_ORIENTED;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isInnovative() {
         return this == INNOVATIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isManipulative() {
         return this == MANIPULATIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isMotivated() {
         return this == MOTIVATED;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isOpportunistic() {
         return this == OPPORTUNISTIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isOverconfident() {
         return this == OVERCONFIDENT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPersistent() {
         return this == PERSISTENT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isProactive() {
         return this == PROACTIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isResilient() {
         return this == RESILIENT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isResourceful() {
         return this == RESOURCEFUL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isRuthless() {
         return this == RUTHLESS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSelfish() {
         return this == SELFISH;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isStrategic() {
         return this == STRATEGIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTyrannical() {
         return this == TYRANNICAL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUnambitious() {
         return this == UNAMBITIOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUnscrupulous() {
         return this == UNSCRUPULOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isVisionary() {
         return this == VISIONARY;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
      * Parses a given string and returns the corresponding Ambition enum.
      * Accepts either the ENUM ordinal value or its name
      *
      * @param ambition the string to be parsed
      * @return the Ambition enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid Ambition
+     * @throws IllegalStateException if the given string does not match any valid
+     *                               Ambition
      */
-    @SuppressWarnings(value = "unused")
+
     public static Ambition parseFromString(final String ambition) {
         return switch (ambition) {
             case "0", "None" -> NONE;
@@ -301,8 +274,9 @@ public enum Ambition {
             case "29", "Tyrannical" -> TYRANNICAL;
             case "30", "Visionary" -> VISIONARY;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Ambition.java/parseFromString: "
-                            + ambition);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Ambition.java/parseFromString: "
+                                + ambition);
         };
     }
 
@@ -311,9 +285,10 @@ public enum Ambition {
      *
      * @param ambition the integer value representing the Ambition level
      * @return the corresponding Ambition enum value
-     * @throws IllegalStateException if the integer value does not correspond to any valid Ambition enum value
+     * @throws IllegalStateException if the integer value does not correspond to any
+     *                               valid Ambition enum value
      */
-    @SuppressWarnings(value = "unused")
+
     public static Ambition parseFromInt(final int ambition) {
         return switch (ambition) {
             case 0 -> NONE;
@@ -350,8 +325,9 @@ public enum Ambition {
             case 29 -> TYRANNICAL;
             case 30 -> VISIONARY;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Ambition.java/parseFromInt: "
-                            + ambition);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Ambition.java/parseFromInt: "
+                                + ambition);
         };
     }
 

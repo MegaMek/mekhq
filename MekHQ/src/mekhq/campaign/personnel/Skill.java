@@ -20,39 +20,57 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.Compute;
-import megamek.common.enums.SkillLevel;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.Compute;
+import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * As ov v0.1.9, we will be tracking a group of skills on the person. These skills will define
- * personnel rather than subtypes wrapped around pilots and teams. This will allow for considerably
- * more flexibility in the kinds of personnel available.
+ * As ov v0.1.9, we will be tracking a group of skills on the person. These
+ * skills will define personnel rather than subtypes wrapped around pilots and
+ * teams. This will allow for considerably more flexibility in the kinds of
+ * personnel available.
  * <p>
  * Four important characteristics will determine how each skill works
- * level - this is the level of the skill. By default this will go from 0 to 10, but the max will
- *         be customizable. These won't necessarily correspond to named levels (e.g. Green, Elite)
- *         By assigning skill costs of 0 to some levels, these can basically be skipped and by
- *         assigning skill costs of -1, they can be made inaccessible.
- * bonus - this is a bonus that the given person has for this skill which is separable from level.
- *         Primarily this allows for rpg-style attribute bonuses to come into play.
- * target - this is the baseline target number for the skill when level and bonus are zero.
- * countUp - this is a boolean that defines whether this skill's target is a btech style
- *           "roll greater than or equal to" (false) or an rpg-style bonus to a roll (true)
+ *
+ * level - this is the level of the skill. By default this will go from 0 to 10,
+ * but the max will be customizable. These won't necessarily correspond to named
+ * levels (e.g. Green, Elite).
+ *
+ * By assigning skill costs of 0 to some levels, these can basically be skipped
+ * and by assigning skill costs of -1, they can be made inaccessible.
+ *
+ * bonus - this is a bonus that the given person has for this skill which is
+ * separable from level. Primarily this allows for rpg-style attribute bonuses
+ * to come into play.
+ *
+ * target - this is the baseline target number for the skill when level and
+ * bonus are zero.
+ *
+ * countUp - this is a boolean that defines whether this skill's target is a
+ * "roll greater than or equal to" (false) or an rpg-style bonus to a roll
+ * (true)
+ *
  * The actual target number for a skill is given by
- *         countUp: target+lvl+bonus
- *         !countUp: target - level - bonus
- * by clever manipulation of these values and skillcosts in campaignOptions, players should be
- * able to recreate any of the rpg versions or their own homebrew system. The default setup
- * will follow the core rulebooks (not aToW).
+ *
+ * countUp: target + lvl + bonus
+ * !countUp: target - level - bonus
+ *
+ * by clever manipulation of these values and skill costs in campaignOptions,
+ * players should be able to recreate any of the rpg versions or their own
+ * homebrew system. The default setup will follow the core rule books (not
+ * aToW).
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Skill {
+    private static final MMLogger logger = MMLogger.create(Skill.class);
+
     private SkillType type;
     private int level;
     private int bonus;
@@ -78,10 +96,13 @@ public class Skill {
 
     /**
      * Creates a new {@link Skill} from the given experience level and bonus.
-     * @param type The {@link SkillType} name.
-     * @param experienceLevel An experience level (e.g. {@link SkillType#EXP_GREEN}).
-     * @param bonus The bonus for the resulting {@link Skill}.
-     * @return A new {@link Skill} of the appropriate type, with a level based on {@code experienceLevel}
+     *
+     * @param type            The {@link SkillType} name.
+     * @param experienceLevel An experience level (e.g.
+     *                        {@link SkillType#EXP_GREEN}).
+     * @param bonus           The bonus for the resulting {@link Skill}.
+     * @return A new {@link Skill} of the appropriate type, with a level based on
+     *         {@code experienceLevel}
      *         and the bonus.
      */
     public static Skill createFromExperience(String type, int experienceLevel, int bonus) {
@@ -92,11 +113,14 @@ public class Skill {
 
     /**
      * Creates a new {@link Skill} with a randomized level.
-     * @param type The {@link SkillType} name.
-     * @param experienceLevel An experience level (e.g. {@link SkillType#EXP_GREEN}).
-     * @param bonus The bonus for the resulting {@link Skill}.
-     * @param rollModifier The roll modifier on a 1D6.
-     * @return A new {@link Skill} of the appropriate type, with a randomized level based on
+     *
+     * @param type            The {@link SkillType} name.
+     * @param experienceLevel An experience level (e.g.
+     *                        {@link SkillType#EXP_GREEN}).
+     * @param bonus           The bonus for the resulting {@link Skill}.
+     * @param rollModifier    The roll modifier on a 1D6.
+     * @return A new {@link Skill} of the appropriate type, with a randomized level
+     *         based on
      *         the experience level and a 1D6 roll.
      */
     public static Skill randomizeLevel(String type, int experienceLevel, int bonus, int rollModifier) {
@@ -156,8 +180,8 @@ public class Skill {
             return;
         }
         level = level + 1;
-        //if the cost for the next level is zero (or less than zero), then
-        //keep improve until you hit a non-zero cost
+        // if the cost for the next level is zero (or less than zero), then
+        // keep improve until you hit a non-zero cost
         if (type.getCost(level) <= 0) {
             improve();
         }
@@ -166,15 +190,16 @@ public class Skill {
     public int getCostToImprove() {
         int cost = 0;
         int i = 1;
-        while (cost <= 0 && (level+i) < SkillType.NUM_LEVELS) {
-            cost = type.getCost(level+i);
+        while (cost <= 0 && (level + i) < SkillType.NUM_LEVELS) {
+            cost = type.getCost(level + i);
             ++i;
         }
         return cost;
     }
 
     public SkillLevel getSkillLevel() {
-        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
+        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic
+        // Number
         return Skills.SKILL_LEVELS[getExperienceLevel() + 1];
     }
 
@@ -213,9 +238,6 @@ public class Skill {
 
                 if (wn2.getNodeName().equalsIgnoreCase("type")) {
                     String text = wn2.getTextContent();
-                    if ("Gunnery/Protomech".equals(text)) { // Renamed in 0.49.12
-                        text = "Gunnery/ProtoMech";
-                    }
                     retVal.type = SkillType.getType(text);
                 } else if (wn2.getNodeName().equalsIgnoreCase("level")) {
                     retVal.level = Integer.parseInt(wn2.getTextContent());
@@ -224,7 +246,7 @@ public class Skill {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         return retVal;

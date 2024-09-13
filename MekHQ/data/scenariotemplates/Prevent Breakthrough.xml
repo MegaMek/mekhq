@@ -6,7 +6,7 @@
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
-        <allowedTerrainTypes/>
+        <allowedTerrainTypes />
         <allowRotation>true</allowRotation>
         <baseHeight>50</baseHeight>
         <baseWidth>17</baseWidth>
@@ -40,7 +40,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -71,7 +71,7 @@
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -90,7 +90,7 @@
                 <contributesToMapSize>false</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -100,7 +100,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
@@ -114,7 +114,7 @@
             <associatedForceNames>
                 <associatedForceName>Primary Opfor</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -129,8 +129,9 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
-            <description>Destroy 50% of the following force(s) and unit(s) before they can reach the destination
+            <additionalDetails />
+            <description>Destroy 50% of the following force(s) and unit(s) before they can reach the
+                destination
                 edge:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Destroy</objectiveCriterion>

@@ -20,16 +20,17 @@ package mekhq;
 
 import java.io.File;
 
-import org.apache.logging.log4j.LogManager;
-
 import megamek.client.ui.swing.tileset.MMStaticDirectoryManager;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.fileUtils.AbstractDirectory;
 import megamek.common.util.fileUtils.DirectoryItems;
 import megamek.common.util.fileUtils.ImageFileFactory;
+import megamek.logging.MMLogger;
 import mekhq.io.AwardFileFactory;
 
 public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
+    private static final MMLogger logger = MMLogger.create(MHQStaticDirectoryManager.class);
+
     // region Variable Declarations
     private static AbstractDirectory forceIconDirectory;
     private static AbstractDirectory awardIconDirectory;
@@ -82,7 +83,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                 forceIconDirectory = new DirectoryItems(new File("data/images/force"), // TODO : Remove inline file path
                         new ImageFileFactory());
             } catch (Exception e) {
-                LogManager.getLogger().error("Could not parse the force icon directory!", e);
+                logger.error("Could not parse the force icon directory!", e);
             }
         }
     }
@@ -104,7 +105,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                                                                                         // path
                         new AwardFileFactory());
             } catch (Exception e) {
-                LogManager.getLogger().error("Could not parse the award icon directory!", e);
+                logger.error("Could not parse the award icon directory!", e);
             }
         }
     }
@@ -128,7 +129,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     storySplashDirectory = new DirectoryItems(f, new ImageFileFactory());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("Could not parse the storyarc icon directory!", e);
+                logger.error("Could not parse the storyarc icon directory!", e);
             }
         }
     }
@@ -151,7 +152,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     userStoryPortraitDirectory = new DirectoryItems(f, new ImageFileFactory());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("Could not parse the storyarc portrait directory!", e);
+                logger.error("Could not parse the storyarc portrait directory!", e);
             }
         }
     }
@@ -174,7 +175,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
                     userStorySplashDirectory = new DirectoryItems(f, new ImageFileFactory());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("Could not parse the storyarc splash image directory!", e);
+                logger.error("Could not parse the storyarc splash image directory!", e);
             }
         }
     }

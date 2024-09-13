@@ -18,25 +18,34 @@
  */
 package mekhq.campaign.personnel.ranks;
 
-import megamek.Version;
-import megamek.common.annotations.Nullable;
-import mekhq.MHQConstants;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.personnel.enums.RankSystemType;
-import mekhq.io.migration.PersonMigrator;
-import org.apache.logging.log4j.LogManager;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
+import megamek.Version;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import megamek.utilities.xml.MMXMLUtility;
+import mekhq.MHQConstants;
+import mekhq.campaign.personnel.enums.RankSystemType;
+import mekhq.utilities.MHQXMLUtility;
 
 public class RankSystem {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(RankSystem.class);
+
+    // region Variable Declarations
     private String code; // Primary Key, must be unique
     private transient RankSystemType type; // no need to serialize
     private String name;
@@ -44,9 +53,9 @@ public class RankSystem {
     private boolean useROMDesignation;
     private boolean useManeiDomini;
     private List<Rank> ranks;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     private RankSystem(final RankSystemType type) {
         this("UNK", "Unknown", "", type);
     }
@@ -62,7 +71,7 @@ public class RankSystem {
     }
 
     public RankSystem(final String code, final String name,
-                      final String description, final RankSystemType type) {
+            final String description, final RankSystemType type) {
         setCode(code);
         setType(type);
         setName(name);
@@ -72,9 +81,9 @@ public class RankSystem {
         final RankSystem system = Ranks.getRankSystemFromCode(code);
         setRanks((system == null) ? new ArrayList<>() : new ArrayList<>(system.getRanks()));
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public String getCode() {
         return code;
     }
@@ -126,11 +135,11 @@ public class RankSystem {
     public void setRanks(final List<Rank> ranks) {
         this.ranks = ranks;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     public Rank getRank(int index) {
         if (index >= getRanks().size()) {
-            //assign the highest rank
+            // assign the highest rank
             index = getRanks().size() - 1;
         }
         return getRanks().get(index);
@@ -148,7 +157,7 @@ public class RankSystem {
         return getRanks().size() - 1;
     }
 
-    //region File I/O
+    // region File I/O
     public void writeToFile(File file) {
         if (file == null) {
             return;
@@ -160,16 +169,16 @@ public class RankSystem {
         }
         int indent = 0;
         try (OutputStream fos = new FileOutputStream(file);
-             OutputStream bos = new BufferedOutputStream(fos);
-             OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
-             PrintWriter pw = new PrintWriter(osw)) {
+                OutputStream bos = new BufferedOutputStream(fos);
+                OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
+                PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "individualRankSystem", "version", MHQConstants.VERSION);
             writeToXML(pw, indent, true);
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "individualRankSystem");
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -177,7 +186,8 @@ public class RankSystem {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rankSystem");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "code", getCode());
 
-        // Only write out any other information if we are exporting the system or we are using a
+        // Only write out any other information if we are exporting the system or we are
+        // using a
         // campaign-specific custom system
         if (export || getType().isCampaign()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", toString());
@@ -201,9 +211,11 @@ public class RankSystem {
 
     /**
      * This generates a single Rank System from an XML file
+     *
      * @param file the file to load, or null if none are to be loaded
-     * @return the single (or first) rank system located within the file, or null if no file is
-     * provided or there is an error
+     * @return the single (or first) rank system located within the file, or null if
+     *         no file is
+     *         provided or there is an error
      */
     public static @Nullable RankSystem generateIndividualInstanceFromXML(final @Nullable File file) {
         if (file == null) {
@@ -216,7 +228,7 @@ public class RankSystem {
         try (InputStream is = new FileInputStream(file)) {
             element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to open file, returning null", ex);
+            logger.error("Failed to open file, returning null", ex);
             return null;
         }
         element.normalize();
@@ -225,57 +237,51 @@ public class RankSystem {
         for (int i = 0; i < nl.getLength(); i++) {
             final Node wn = nl.item(i);
             if ("rankSystem".equals(wn.getNodeName()) && wn.hasChildNodes()) {
-                // We can assume a RankSystemType of Campaign, as any other would be returned with
+                // We can assume a RankSystemType of Campaign, as any other would be returned
+                // with
                 // the proper type through the already loaded rank systems
                 return generateInstanceFromXML(wn.getChildNodes(), version);
             }
         }
-        LogManager.getLogger().error("Failed to parse file, returning null");
+        logger.error("Failed to parse file, returning null");
         return null;
     }
 
     /**
      * This loads a Rank System after the initial load of the rank system data.
-     * @param nl the node list to parse the rank system from
+     *
+     * @param nl      the node list to parse the rank system from
      * @param version the version to parse the rank system at
-     * @return the unvalidated parsed rank system, or null if there is an issue in parsing
+     * @return the unvalidated parsed rank system, or null if there is an issue in
+     *         parsing
      */
     public static @Nullable RankSystem generateInstanceFromXML(final NodeList nl,
-                                                               final Version version) {
+            final Version version) {
         return generateInstanceFromXML(nl, version, false, RankSystemType.CAMPAIGN);
     }
 
     /**
-     * @param nl the node list to parse the rank system from
-     * @param version the version to parse the rank system at
+     * @param nl          the node list to parse the rank system from
+     * @param version     the version to parse the rank system at
      * @param initialLoad whether this is the initial load or a later load
-     * @param type the type of rank system being loaded
-     * @return the unvalidated parsed rank system, or null if there is an issue in parsing
+     * @param type        the type of rank system being loaded
+     * @return the un-validated parsed rank system, or null if there is an issue in
+     *         parsing
      */
     public static @Nullable RankSystem generateInstanceFromXML(final NodeList nl,
-                                                               final Version version,
-                                                               final boolean initialLoad,
-                                                               final RankSystemType type) {
+            final Version version,
+            final boolean initialLoad,
+            final RankSystemType type) {
         final RankSystem rankSystem = new RankSystem(type);
         // Dump the ranks ArrayList so we can re-use it.
         rankSystem.setRanks(new ArrayList<>());
 
         try {
-            final boolean preWindchild = version.isLowerThan("0.49.0");
-            int rankSystemId = -1; // migration, from pre-0.49.0
-            boolean e0 = true; // migration, from pre-0.49.0
-
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
 
-                if (Stream.of("system", "rankSystem", "systemId").anyMatch(s -> wn.getNodeName().equalsIgnoreCase(s))) { // Legacy, 0.49.0 removal
-                    rankSystemId = Integer.parseInt(wn.getTextContent().trim());
-                    if (!initialLoad && (rankSystemId != 12)) {
-                        final String code = PersonMigrator.migrateRankSystemCode(rankSystemId);
-                        return Ranks.getRankSystemFromCode(code);
-                    }
-                } else if (wn.getNodeName().equalsIgnoreCase("code")) {
-                    final String systemCode = MHQXMLUtility.unEscape(wn.getTextContent().trim());
+                if (wn.getNodeName().equalsIgnoreCase("code")) {
+                    final String systemCode = MMXMLUtility.unEscape(wn.getTextContent().trim());
                     // If this isn't the initial load and we already have a loaded system with the
                     // provided key, just return the rank system saved by the key in question.
                     // This does not need to be validated to ensure it is a proper rank system
@@ -284,30 +290,24 @@ public class RankSystem {
                     }
                     rankSystem.setCode(systemCode);
                 } else if (wn.getNodeName().equalsIgnoreCase("name")) {
-                    rankSystem.setName(MHQXMLUtility.unEscape(wn.getTextContent().trim()));
+                    rankSystem.setName(MMXMLUtility.unEscape(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("description")) {
-                    rankSystem.setDescription(MHQXMLUtility.unEscape(wn.getTextContent().trim()));
+                    rankSystem.setDescription(MMXMLUtility.unEscape(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("useROMDesignation")) {
                     rankSystem.setUseROMDesignation(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("useManeiDomini")) {
                     rankSystem.setUseManeiDomini(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("rank")) {
-                    rankSystem.getRanks().add(Rank.generateInstanceFromXML(wn, version, e0));
-                    e0 = false;
+                    rankSystem.getRanks().add(Rank.generateInstanceFromXML(wn, version, true));
                 }
             }
-
-            if (preWindchild && (rankSystemId >= 0)) {
-                rankSystem.setCode(PersonMigrator.migrateRankSystemCode(rankSystemId));
-                rankSystem.setName(PersonMigrator.migrateRankSystemName(rankSystemId));
-            }
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
             return null;
         }
         return rankSystem;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

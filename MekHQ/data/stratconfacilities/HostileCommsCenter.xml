@@ -1,9 +1,9 @@
 <StratconFacility>
-	<capturedDefinition>AlliedCommsCenter.xml</capturedDefinition>
-	<displayableName>Comms Center</displayableName>
-        <facilityType>CommandCenter</facilityType>
-        <owner>Opposing</owner>
-	<sharedModifiers>BadEvent.xml</sharedModifiers>
-	<userDescription>Coordinates additional hostile reinforcements for scenarios on this track.</userDescription>	
-        <visible>true</visible>
+    <capturedDefinition>AlliedCommsCenter.xml</capturedDefinition>
+    <displayableName>Comms Center</displayableName>
+    <facilityType>CommandCenter</facilityType>
+    <owner>Opposing</owner>
+    <sharedModifiers>BadEvent.xml</sharedModifiers>
+    <userDescription>Coordinates additional hostile reinforcements for scenarios on this track.</userDescription>
+    <visible>true</visible>
 </StratconFacility>

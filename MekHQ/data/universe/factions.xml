@@ -16,25 +16,41 @@ IllianiCBT
 Modified 2024-08-06
 Jeremy Saklad (Saklad5)
 
-This file defines the factions used by MekHQ. Keep in mind that the faction shortnames are used by the planets.xml file, so if you remove a faction here, you need to remove all references to it in that file. Not all of the factions listed here are available to play by default. To add a faction as playable, just add the playable tag.
+This file defines the factions used by MekHQ. Keep in mind that the faction shortnames are used by
+the planets.xml file, so if you remove a faction here, you need to remove all references to it in
+that file. Not all of the factions listed here are available to play by default. To add a faction
+as
+playable, just add the playable tag.
 
 Here is a description of what goes in each faction tag
-shortname - this is the abbreviation that is used to identify each faction in planets.xml and within MekHQ itself. This code must be unique.
+shortname - this is the abbreviation that is used to identify each faction in planets.xml and
+within MekHQ itself. This code must be unique.
 fullname  - the full display name for the faction.
-altNamesByYear - Identifies alternate names for a given year. Format: <altNamesByYear year='XXXX'>Faction name</altNamesByYear>
-altNames - A list of alternate names for a faction, 'also known as' type of names, not official designations.
+altNamesByYear - Identifies alternate names for a given year. Format: <altNamesByYear
+year='XXXX'>Faction name</altNamesByYear>
+altNames - A list of alternate names for a faction, 'also known as' type of names, not official
+designations.
 alternativeFactionCodes - A list of alternativeFactionCodes used as a fallback when using RATs.
-startingPlanet - Identifies the starting planet if you begin a new campaign with this faction. The name of the planet must be the name as it is recognized in MekHQ. If left out, then this defaults to Terra.
-changePlanet - Identifies the starting planet after the given year. Format: <changePlanet year='XXXX'>Planet name</changePlanet>. Years given in this first revision are best guesses.
-eraMods - A comma-separated 11-item list of optional modifiers to repair/replacement rolls as per the fourth printing of Campaign Operations. If left out, then this defaults to 0 for all eras.
-nameGenerator - The name of the faction name generator that should be used for this faction. If left out, then this defaults to "General."
-colorRGB - a comma-separated 3-item list defining the RGB codes for the color used on the map for this faction. Defaults to light gray if missing.
+startingPlanet - Identifies the starting planet if you begin a new campaign with this faction. The
+name of the planet must be the name as it is recognized in MekHQ. If left out, then this defaults
+to
+Terra.
+changePlanet - Identifies the starting planet after the given year. Format: <changePlanet
+year='XXXX'>Planet name</changePlanet>. Years given in this first revision are best guesses.
+eraMods - A comma-separated 11-item list of optional modifiers to repair/replacement rolls as per
+the fourth printing of Campaign Operations. If left out, then this defaults to 0 for all eras.
+nameGenerator - The name of the faction name generator that should be used for this faction. If
+left out, then this defaults to "General."
+colorRGB - a comma-separated 3-item list defining the RGB codes for the color used on the map for
+this faction. Defaults to light gray if missing.
 currencyCode - partially implemented (likely buggy) currency code value used by the faction.
 layeredForceIconBackgroundCategory - the category of the faction's background piece
 layeredForceIconBackgroundFilename - the filename of the faction's background piece
 layeredForceIconLogoCategory - the category of the faction's logo piece
 layeredForceIconLogoFilename - the filename of the faction's logo piece
-tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery", "deep_periphery", "clan", "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos", "playable", "super"
+tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery",
+"deep_periphery", "clan", "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden",
+"abandoned", "chaos", "playable", "super"
 start - the founding date of the faction
 end - the date the faction ceases to exist
 successor - unimplemented tag describing another faction code as the specified faction's successor
@@ -136,7 +152,8 @@ successor - unimplemented tag describing another faction code as the specified f
     <layeredForceIconBackgroundFilename>Draconis Combine.png</layeredForceIconBackgroundFilename>
     <layeredForceIconLogoCategory>Inner Sphere/</layeredForceIconLogoCategory>
     <layeredForceIconLogoFilename>Draconis Combine.png</layeredForceIconLogoFilename>
-    <tags>is,major,playable</tags><start>2319</start>
+    <tags>is,major,playable</tags>
+    <start>2319</start>
   </faction>
   <faction>
     <shortname>FS</shortname>
@@ -580,7 +597,8 @@ successor - unimplemented tag describing another faction code as the specified f
     <layeredForceIconLogoFilename>Calderon Protectorate.png</layeredForceIconLogoFilename>
     <tags>periphery,playable</tags>
     <start>2253</start>
-    <!-- Per Reunification War PDF, Protectorate existed prior to the Concordat, changing start from 3066 to 2253 per that source -->
+    <!-- Per Reunification War PDF, Protectorate existed prior to the Concordat, changing start from
+    3066 to 2253 per that source -->
   </faction>
   <faction>
     <shortname>CI</shortname>
@@ -765,7 +783,8 @@ successor - unimplemented tag describing another faction code as the specified f
   <faction>
     <shortname>CHH</shortname>
     <fullname>Clan Hell's Horses</fullname>
-    <!--Original data shows CHH back on Niles during the Jihad, but I am unable to find data for that -->
+    <!--Original
+    data shows CHH back on Niles during the Jihad, but I am unable to find data for that -->
     <startingPlanet>Niles (Clan)</startingPlanet>
     <changePlanet year="3074">Csesztreg</changePlanet>
     <!-- Using era modifiers of Clans -->
@@ -2319,7 +2338,8 @@ successor - unimplemented tag describing another faction code as the specified f
     <tags>is,minor</tags>
     <start>3151</start>
   </faction>
-  <!--Shattered Fortress Factions-->
+  <!--Shattered
+  Fortress Factions-->
   <faction>
     <shortname>BC</shortname>
     <fullname>Buena Collective</fullname>

@@ -203,7 +203,7 @@
 		<clanVehicles>false</clanVehicles>
 		<doubleVehicles>false</doubleVehicles>
 		<adjustPlayerVehicles>false</adjustPlayerVehicles>
-		<opforLanceTypeMechs>1</opforLanceTypeMechs>
+		<opforLanceTypeMeks>1</opforLanceTypeMeks>
 		<opforLanceTypeMixed>2</opforLanceTypeMixed>
 		<opforLanceTypeVehicles>3</opforLanceTypeVehicles>
 		<opforUsesVTOLs>true</opforUsesVTOLs>
@@ -221,7 +221,7 @@
 		<trackUnitFatigue>false</trackUnitFatigue>
 		<mercSizeLimited>false</mercSizeLimited>
 		<trackOriginalUnit>false</trackOriginalUnit>
-		<regionalMechVariations>false</regionalMechVariations>
+		<regionalMekVariations>false</regionalMekVariations>
 		<attachedPlayerCamouflage>true</attachedPlayerCamouflage>
 		<playerControlsAttachedUnits>false</playerControlsAttachedUnits>
 		<searchRadius>800</searchRadius>
@@ -341,18 +341,21 @@
 		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
 		<planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
 		<planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
-		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960 CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
+		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960
+			CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500
+			CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
 		<salaryXpMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXpMultiplier>
-		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
+		<usePortraitForType>
+			false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
 		<useAtBUnitMarket>false</useAtBUnitMarket>
 		<rats>Xotl,Total Warfare</rats>
 	</campaignOptions>
 	<units>
 		<unit id="911f2f13-6cba-4c46-8e9e-bed92f5f2c26" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Firefly" model="FFL-4DA" type="Biped" commander="false" externalId="911f2f13-6cba-4c46-8e9e-bed92f5f2c26">
-      The first slot in a location is at index="1".
-				<location index="3"> Left Torso
-					<slot index="8" type="IS Ammo LRM-5 Artemis-capable" shots="24"/>
+			<entity chassis="Firefly" model="FFL-4DA" type="Biped" commander="false"
+				externalId="911f2f13-6cba-4c46-8e9e-bed92f5f2c26"> The first slot in a location is at
+				index="1". <location index="3"> Left Torso <slot index="8"
+						type="IS Ammo LRM-5 Artemis-capable" shots="24" />
 				</location>
 			</entity>
 			<driverId>a7205af4-2fc9-4bb0-9369-29c519f2796b</driverId>
@@ -360,11 +363,11 @@
 			<forceId>4</forceId>
 		</unit>
 		<unit id="bd2ec814-dcf7-4401-8b78-7eeb90fd648b" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Zeus-X" model="ZEU-9WD (Stacy)" type="Biped" commander="false" externalId="bd2ec814-dcf7-4401-8b78-7eeb90fd648b">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="7" type="IS LB 10-X AC Ammo" shots="10"/>
-					<slot index="8" type="IS LB 10-X Cluster Ammo" shots="10"/>
+			<entity chassis="Zeus-X" model="ZEU-9WD (Stacy)" type="Biped" commander="false"
+				externalId="bd2ec814-dcf7-4401-8b78-7eeb90fd648b"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="7" type="IS LB 10-X AC Ammo"
+						shots="10" />
+					<slot index="8" type="IS LB 10-X Cluster Ammo" shots="10" />
 				</location>
 			</entity>
 			<driverId>27c90d97-63c3-48a6-81fa-b7fe219d83a1</driverId>
@@ -372,16 +375,17 @@
 			<forceId>2</forceId>
 		</unit>
 		<unit id="59b03970-9d5b-42cb-a6a5-cfaad341c37e" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Uziel" model="UZL-2S (Jacob II)" type="Biped" commander="false" externalId="59b03970-9d5b-42cb-a6a5-cfaad341c37e">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="5" type="IS Ammo LAC/5" shots="20"/>
-					<slot index="6" type="IS Ammo LAC/5" shots="20"/>
+			<entity chassis="Uziel" model="UZL-2S (Jacob II)" type="Biped" commander="false"
+				externalId="59b03970-9d5b-42cb-a6a5-cfaad341c37e"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="5" type="IS Ammo LAC/5" shots="20" />
+					<slot
+						index="6" type="IS Ammo LAC/5" shots="20" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="7" type="IS Streak SRM 6 Ammo" shots="15"/>
-					<slot index="8" type="IS Ammo LAC/5" shots="20"/>
-					<slot index="9" type="IS Ammo LAC/5" shots="20"/>
+				<location index="3"> Left
+				Torso <slot index="7" type="IS Streak SRM 6 Ammo" shots="15" />
+					<slot index="8"
+						type="IS Ammo LAC/5" shots="20" />
+					<slot index="9" type="IS Ammo LAC/5" shots="20" />
 				</location>
 			</entity>
 			<driverId>ba121a6f-8d86-48e7-8f6e-21e981d13d04</driverId>
@@ -389,11 +393,11 @@
 			<forceId>2</forceId>
 		</unit>
 		<unit id="ef33e6a4-66e7-41e4-92a1-32f4984dd1be" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Griffin" model="GRF-6S (Francine II)" type="Biped" commander="false" externalId="ef33e6a4-66e7-41e4-92a1-32f4984dd1be">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="6" type="IS Ammo LRM-15" shots="8"/>
-					<slot index="7" type="IS Ammo LRM-15" shots="8"/>
+			<entity chassis="Griffin" model="GRF-6S (Francine II)" type="Biped" commander="false"
+				externalId="ef33e6a4-66e7-41e4-92a1-32f4984dd1be"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="6" type="IS Ammo LRM-15" shots="8" />
+					<slot
+						index="7" type="IS Ammo LRM-15" shots="8" />
 				</location>
 			</entity>
 			<driverId>fbc73bbd-7d10-464f-a073-408da3bddbcc</driverId>
@@ -401,20 +405,22 @@
 			<forceId>2</forceId>
 		</unit>
 		<unit id="4bb543a1-17a2-4e87-97e0-a0387d5342e3" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Locust" model="LCT-6M" type="Biped" commander="false" externalId="4bb543a1-17a2-4e87-97e0-a0387d5342e3">
+			<entity chassis="Locust" model="LCT-6M" type="Biped" commander="false"
+				externalId="4bb543a1-17a2-4e87-97e0-a0387d5342e3">
 			</entity>
 			<driverId>a8a3e447-857a-4dc7-a127-ca059fddb165</driverId>
 			<gunnerId>a8a3e447-857a-4dc7-a127-ca059fddb165</gunnerId>
 			<forceId>4</forceId>
 		</unit>
 		<unit id="2e8a23b8-9aaf-4f10-b44a-980430882957" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Cobra" model="CBR-02" type="Biped" commander="false" externalId="2e8a23b8-9aaf-4f10-b44a-980430882957">
-      The first slot in a location is at index="1".
-				<location index="3"> Left Torso
-					<slot index="4" type="IS Ammo LRM-15" shots="8"/>
-					<slot index="5" type="IS Ammo LRM-15" shots="8"/>
-					<slot index="6" type="IS Ammo LRM-15" shots="8"/>
-					<slot index="7" type="IS Ammo LRM-15" shots="8"/>
+			<entity chassis="Cobra" model="CBR-02" type="Biped" commander="false"
+				externalId="2e8a23b8-9aaf-4f10-b44a-980430882957"> The first slot in a location is at
+				index="1". <location index="3"> Left Torso <slot index="4" type="IS Ammo LRM-15" shots="8" />
+					<slot
+						index="5" type="IS Ammo LRM-15" shots="8" />
+					<slot index="6" type="IS Ammo LRM-15"
+						shots="8" />
+					<slot index="7" type="IS Ammo LRM-15" shots="8" />
 				</location>
 			</entity>
 			<driverId>f3427ab6-af14-467d-a581-681ee48c9c84</driverId>
@@ -423,11 +429,11 @@
 			<scenarioId>2</scenarioId>
 		</unit>
 		<unit id="3135179e-e120-4092-ad88-9a8eb798d6c5" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Gallowglas" model="GAL-4GLSA" type="Biped" commander="false" externalId="3135179e-e120-4092-ad88-9a8eb798d6c5">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="5" type="IS Gauss Ammo" shots="8"/>
-					<slot index="6" type="IS Gauss Ammo" shots="8"/>
+			<entity chassis="Gallowglas" model="GAL-4GLSA" type="Biped" commander="false"
+				externalId="3135179e-e120-4092-ad88-9a8eb798d6c5"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="5" type="IS Gauss Ammo" shots="8" />
+					<slot
+						index="6" type="IS Gauss Ammo" shots="8" />
 				</location>
 			</entity>
 			<driverId>7528ade2-ed1e-4e11-9011-80642016aab7</driverId>
@@ -436,15 +442,16 @@
 			<scenarioId>2</scenarioId>
 		</unit>
 		<unit id="23b4db00-fe8d-480a-9e00-572bbce19ae2" type="mekhq.campaign.unit.Unit">
-			<entity chassis="BattleMaster" model="BLR-4S (Calvin II)" type="Biped" commander="false" externalId="23b4db00-fe8d-480a-9e00-572bbce19ae2">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="9" type="IS Machine Gun Ammo - Half" shots="100"/>
-					<slot index="10" type="ISRotaryAC5 Ammo" shots="20"/>
-					<slot index="11" type="ISRotaryAC5 Ammo" shots="20"/>
+			<entity chassis="BattleMaster" model="BLR-4S (Calvin II)" type="Biped" commander="false"
+				externalId="23b4db00-fe8d-480a-9e00-572bbce19ae2"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="9"
+						type="IS Machine Gun Ammo - Half" shots="100" />
+					<slot index="10" type="ISRotaryAC5 Ammo"
+						shots="20" />
+					<slot index="11" type="ISRotaryAC5 Ammo" shots="20" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="11" type="IS Streak SRM 6 Ammo" shots="15"/>
+				<location
+					index="3"> Left Torso <slot index="11" type="IS Streak SRM 6 Ammo" shots="15" />
 				</location>
 			</entity>
 			<driverId>235df119-e815-41ca-879a-495409b6b493</driverId>
@@ -452,17 +459,21 @@
 			<forceId>2</forceId>
 		</unit>
 		<unit id="a867a292-b650-4a43-8cd0-e9d8c19320e1" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Archer" model="ARC-6S" type="Biped" commander="false" externalId="a867a292-b650-4a43-8cd0-e9d8c19320e1">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="9" type="IS Ammo LRM-20 Artemis-capable" shots="6"/>
-					<slot index="10" type="IS Ammo LRM-20 Artemis-capable" shots="6"/>
-					<slot index="11" type="IS Streak SRM 2 Ammo" shots="50"/>
+			<entity chassis="Archer" model="ARC-6S" type="Biped" commander="false"
+				externalId="a867a292-b650-4a43-8cd0-e9d8c19320e1"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="9"
+						type="IS Ammo LRM-20 Artemis-capable" shots="6" />
+					<slot index="10"
+						type="IS Ammo LRM-20 Artemis-capable" shots="6" />
+					<slot index="11"
+						type="IS Streak SRM 2 Ammo" shots="50" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="9" type="IS Ammo LRM-20 Artemis-capable" shots="6"/>
-					<slot index="10" type="IS Ammo LRM-20 Artemis-capable" shots="6"/>
-					<slot index="11" type="IS Streak SRM 2 Ammo" shots="50"/>
+				<location index="3"> Left
+				Torso <slot index="9" type="IS Ammo LRM-20 Artemis-capable" shots="6" />
+					<slot index="10"
+						type="IS Ammo LRM-20 Artemis-capable" shots="6" />
+					<slot index="11"
+						type="IS Streak SRM 2 Ammo" shots="50" />
 				</location>
 			</entity>
 			<driverId>59924a78-3449-49bb-9223-ea10548aee90</driverId>
@@ -471,22 +482,24 @@
 			<scenarioId>2</scenarioId>
 		</unit>
 		<unit id="6264eba2-6652-4896-9869-8f5bfa57a60c" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Wolfhound" model="WLF-4WA" type="Biped" commander="false" externalId="6264eba2-6652-4896-9869-8f5bfa57a60c">
+			<entity chassis="Wolfhound" model="WLF-4WA" type="Biped" commander="false"
+				externalId="6264eba2-6652-4896-9869-8f5bfa57a60c">
 			</entity>
 			<driverId>e29b4c3e-d328-4d04-9643-355c72e42c20</driverId>
 			<gunnerId>e29b4c3e-d328-4d04-9643-355c72e42c20</gunnerId>
 			<forceId>4</forceId>
 		</unit>
 		<unit id="614f0037-84fc-4f99-91f3-32e8f78560b0" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Dervish" model="DV-7D" type="Biped" commander="false" externalId="614f0037-84fc-4f99-91f3-32e8f78560b0">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="3" type="IS Ammo LRM-10" shots="12"/>
-					<slot index="4" type="IS Streak SRM 2 Ammo" shots="50"/>
-					<slot index="5" type="IS Streak SRM 2 Ammo" shots="50"/>
+			<entity chassis="Dervish" model="DV-7D" type="Biped" commander="false"
+				externalId="614f0037-84fc-4f99-91f3-32e8f78560b0"> The first slot in a location is at
+				index="1". <location index="2"> Right Torso <slot index="3" type="IS Ammo LRM-10" shots="12" />
+					<slot
+						index="4" type="IS Streak SRM 2 Ammo" shots="50" />
+					<slot index="5"
+						type="IS Streak SRM 2 Ammo" shots="50" />
 				</location>
-				<location index="3"> Left Torso
-					<slot index="3" type="IS Ammo LRM-10" shots="12"/>
+				<location index="3"> Left
+				Torso <slot index="3" type="IS Ammo LRM-10" shots="12" />
 				</location>
 			</entity>
 			<driverId>a3bf4d85-cf9d-4c58-ac44-819ce4d44226</driverId>
@@ -495,7 +508,8 @@
 			<scenarioId>2</scenarioId>
 		</unit>
 		<unit id="402a62d3-8e51-4a86-a2a7-8796860ca86b" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Talon" model="TLN-5W" type="Biped" commander="false" externalId="402a62d3-8e51-4a86-a2a7-8796860ca86b">
+			<entity chassis="Talon" model="TLN-5W" type="Biped" commander="false"
+				externalId="402a62d3-8e51-4a86-a2a7-8796860ca86b">
 			</entity>
 			<driverId>5b23bb30-3553-4e55-a216-6b302603fe2d</driverId>
 			<gunnerId>5b23bb30-3553-4e55-a216-6b302603fe2d</gunnerId>
@@ -510,14 +524,31 @@
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>true</clan>
-			<biography>MechWarrior Profile
-Michael Ramirez is a second-generation Dragoon, the son of a lance commander in Epsilon Regiment who died during Elson’s Challenge. The Archer he pilots was originally hers (though he was lucky enough to receive a fully “phoenix upgrade” for the ‘Mech), and he takes the legacy he inherited with the ’Mech very seriously. Loyalty is the most important thing in the world to Michael, and he trades his loyalty with Stacy Church willingly because she does the same with him.
+			<biography>MekWarrior Profile
+				Michael Ramirez is a second-generation Dragoon, the son of a lance commander in Epsilon
+				Regiment who died during Elson’s Challenge. The Archer he pilots was originally hers (though
+				he was lucky enough to receive a fully “phoenix upgrade” for the ‘Mek), and he takes the
+				legacy he inherited with the ’Mek very seriously. Loyalty is the most important thing in the
+				world to Michael, and he trades his loyalty with Stacy Church willingly because she does the
+				same with him.
 
-The year 3068 found Michael marooned in the ruins of Am Numsan after the bulk of the Dragoons evacuated. He managed to find other guerillas in the form of Elson Novacat’s Elemental Strike Cluster, and together with the Toads From Hell he spent the next two years making life difficult for the Blakist occupiers across Romulus. When Novacat died and Tara Lucas took command, he followed her as well and welcomed the shift from Elemental based to ’Mech-based warfare.
+				The year 3068 found Michael marooned in the ruins of Am Numsan after the bulk of the
+				Dragoons evacuated. He managed to find other guerillas in the form of Elson Novacat’s
+				Elemental Strike Cluster, and together with the Toads From Hell he spent the next two years
+				making life difficult for the Blakist occupiers across Romulus. When Novacat died and Tara
+				Lucas took command, he followed her as well and welcomed the shift from Elemental based to
+				’Mek-based warfare.
 
-’MECH History
-Michael was the first Ghost to volunteer to serve with the Black Widows when Stacy Church announced her intention to leave Outreach and prosecute the war inside the Blakist Protectorate.His Archer often pairs with Orrin Fletcher’s Dervish to bombard unlucky enemies with a hailstorm of long-range missiles. It’s not uncommon for him to load half or even more of his ammunition bins with Thunder ammunition, allowing him to box in the Widow’s enemies with high-power minefields from which they cannot escape. He has repeatedly refused further upgrades to his Archer’s weaponry, citing his familiarity with what he has and an insistence that “those things just aren’t Archers any more.”
-</biography>
+				’MEK History
+				Michael was the first Ghost to volunteer to serve with the Black Widows when Stacy Church
+				announced her intention to leave Outreach and prosecute the war inside the Blakist
+				Protectorate.His Archer often pairs with Orrin Fletcher’s Dervish to bombard unlucky enemies
+				with a hailstorm of long-range missiles. It’s not uncommon for him to load half or even more
+				of his ammunition bins with Thunder ammunition, allowing him to box in the Widow’s enemies
+				with high-power minefields from which they cannot escape. He has repeatedly refused further
+				upgrades to his Archer’s weaponry, citing his familiarity with what he has and an insistence
+				that “those things just aren’t Archers any more.”
+			</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Michael_Ramirez.jpg</portraitFile>
 			<xp>0</xp>
@@ -528,12 +559,12 @@ Michael was the first Ghost to volunteer to serve with the Black Widows when Sta
 			<status>ACTIVE</status>
 			<birthday>3034-01-22</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -545,10 +576,24 @@ Michael was the first Ghost to volunteer to serve with the Black Widows when Sta
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>false</clan>
-			<biography>MechWarrior Profile
-Wyatt Rolfe was not born nor trained as a Dragoon. He grew up on Arc-Royal and joined the Kell Hounds Second Regiment. As part of a small detachment that accompanied the Wolf (in-Exile)rescue force to Outreach, Wyatt fought against the Word of Blake outside of Harlech to help buy the depleted warriors of Gamma Brigade time to escape. During the retreat he was surrounded and his Verfolger destroyed as he ejected. While the rest of the Hounds and Wolves were escaping, however, Wyatt was hiding from Word of Blake patrols. In the end, he was marooned on Outreach.
+			<biography>MekWarrior Profile
+				Wyatt Rolfe was not born nor trained as a Dragoon. He grew up on Arc-Royal and joined the
+				Kell Hounds Second Regiment. As part of a small detachment that accompanied the Wolf
+				(in-Exile)rescue force to Outreach, Wyatt fought against the Word of Blake outside of
+				Harlech to help buy the depleted warriors of Gamma Brigade time to escape. During the
+				retreat he was surrounded and his Verfolger destroyed as he ejected. While the rest of the
+				Hounds and Wolves were escaping, however, Wyatt was hiding from Word of Blake patrols. In
+				the end, he was marooned on Outreach.
 
-Not long after the Wolves’ withdrawal, Wyatt managed to join up with Elson Novacat’s resistance group. As a non-Dragoon he was suspected by the predominantly Clan-adoptee Elemental Cluster but soon earned his place and a captured Wolfhound. After Tara Lucas assumed command, Wyatt was officially brought into the Dragoons and offered a lance command in her Ghosts. He fought the rest of the Outreach campaign with distinction, but it wasn’t until the final assault on the administration center on Remus that he rose to prominence. His lance was the lead unit supporting the Widows while they drew the bulk of the Widowmakers away from the admin center. Afterward, Stacy Church personally requested that he join the Widows as a lance commander.</biography>
+				Not long after the Wolves’ withdrawal, Wyatt managed to join up with Elson Novacat’s
+				resistance group. As a non-Dragoon he was suspected by the predominantly Clan-adoptee
+				Elemental Cluster but soon earned his place and a captured Wolfhound. After Tara Lucas
+				assumed command, Wyatt was officially brought into the Dragoons and offered a lance command
+				in her Ghosts. He fought the rest of the Outreach campaign with distinction, but it wasn’t
+				until the final assault on the administration center on Remus that he rose to prominence.
+				His lance was the lead unit supporting the Widows while they drew the bulk of the
+				Widowmakers away from the admin center. Afterward, Stacy Church personally requested that he
+				join the Widows as a lance commander.</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Wyatt_Rolfe.jpg</portraitFile>
 			<xp>0</xp>
@@ -559,12 +604,12 @@ Not long after the Wolves’ withdrawal, Wyatt managed to join up with Elson Nov
 			<status>ACTIVE</status>
 			<birthday>3043-10-11</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
@@ -576,14 +621,30 @@ Not long after the Wolves’ withdrawal, Wyatt managed to join up with Elson Nov
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>true</clan>
-			<biography>MechWarrior Profile
-Eirene Rondema is the niece of Dragoon legend Danielle Rondema, a company commander who performed admirably in the crucible of Misery against House Kurita. Eirene served two tours with Alpha Brigade before The Day and the Day After, where she rose to command her own assault company in Charlie Battalion. Her company fought bravely during the Second Battle of Harlech and was the rearguard during the last withdrawal to the DropShips. Eirene herself held the final line, ejecting just as her Marauder II was destroyed by concentrated Blakist fire. Tragically, she was the only member of her company to survive; after ejecting she was picked up and routed to a different Drop- Ship while her company’s Union-class vessel was destroyed by orbiting Blakist WarShips.
+			<biography>MekWarrior Profile
+				Eirene Rondema is the niece of Dragoon legend Danielle Rondema, a company commander who
+				performed admirably in the crucible of Misery against House Kurita. Eirene served two tours
+				with Alpha Brigade before The Day and the Day After, where she rose to command her own
+				assault company in Charlie Battalion. Her company fought bravely during the Second Battle of
+				Harlech and was the rearguard during the last withdrawal to the DropShips. Eirene herself
+				held the final line, ejecting just as her Marauder II was destroyed by concentrated Blakist
+				fire. Tragically, she was the only member of her company to survive; after ejecting she was
+				picked up and routed to a different Drop- Ship while her company’s Union-class vessel was
+				destroyed by orbiting Blakist WarShips.
 
-Eirene took the loss hard and spent the better part of sixteen months in a hospital on Arc-Royal before finally recovering. Her recovery was such that she was one of the warriors Stacy Church chose to accompany her from Arc-Royal to Outreach. In combat on the plains between the Ridges and New Wyatt, Eirene found herself wielding her Gallowglas as if it were an avatar of her anguish.
+				Eirene took the loss hard and spent the better part of sixteen months in a hospital on
+				Arc-Royal before finally recovering. Her recovery was such that she was one of the warriors
+				Stacy Church chose to accompany her from Arc-Royal to Outreach. In combat on the plains
+				between the Ridges and New Wyatt, Eirene found herself wielding her Gallowglas as if it were
+				an avatar of her anguish.
 
-’MECH History
-Eirene’s Gallowglas, “Feral”, was one of the last -4GLS models produced (a newly debuting subtle variant, the -4GLSA) before the sack of Blackwell’s production facilities in 3067. It bears the scars of the Outreach campaign with pride, and Eirene keeps memorable scars recorded in the paint scheme. Many Blakists and Blake-affiliated mercenaries have died staring at the scarred
-black and red Gallowglas.</biography>
+				’MEK History
+				Eirene’s Gallowglas, “Feral”, was one of the last -4GLS models produced (a newly debuting
+				subtle variant, the -4GLSA) before the sack of Blackwell’s production facilities in 3067. It
+				bears the scars of the Outreach campaign with pride, and Eirene keeps memorable scars
+				recorded in the paint scheme. Many Blakists and Blake-affiliated mercenaries have died
+				staring at the scarred
+				black and red Gallowglas.</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Eirene_Rondema.jpg</portraitFile>
 			<xp>0</xp>
@@ -594,12 +655,12 @@ black and red Gallowglas.</biography>
 			<status>ACTIVE</status>
 			<birthday>3038-10-23</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
@@ -611,15 +672,31 @@ black and red Gallowglas.</biography>
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>false</clan>
-			<biography>MechWarrior Profile
-Orrin Fletcher is an enigma amongst the Widows. Barely old enough to have learned to pilot a ’Mech, Orrin emerged among Francine’s resistance cell in the Ridges as a coldly competent and deadly MechWarrior. His first recorded engagement was the rescue of Stacy Church and the other Widows at Royal Pass, where his Lineholder accounted for several of the downed Broadsword machines. He moved to a Dervish after his Lineholder was destroyed in the final battle with the Broadsword Legion just prior to the Widows’ move to Remus in 3070.
-Out of the cockpit, Orrin is an engaging man with a penchant for old-style stand-up comedy routines. Any time he is not engaged in his duties, he can be found in the common room of the Widows’DropShip, watching trivid comedies and laughing uproariously. Inside the cockpit, however, Orrin is a completely different man:  surly, silent, and prone to bouts of ferocious rage. His accuracy with the Dervish’s long-range missiles makes him indispensable to Lieutenant Rondema’s lance.
+			<biography>MekWarrior Profile
+				Orrin Fletcher is an enigma amongst the Widows. Barely old enough to have learned to pilot a
+				’Mek, Orrin emerged among Francine’s resistance cell in the Ridges as a coldly competent and
+				deadly MekWarrior. His first recorded engagement was the rescue of Stacy Church and the
+				other Widows at Royal Pass, where his Lineholder accounted for several of the downed
+				Broadsword machines. He moved to a Dervish after his Lineholder was destroyed in the final
+				battle with the Broadsword Legion just prior to the Widows’ move to Remus in 3070.
+				Out of the cockpit, Orrin is an engaging man with a penchant for old-style stand-up comedy
+				routines. Any time he is not engaged in his duties, he can be found in the common room of
+				the Widows’DropShip, watching trivid comedies and laughing uproariously. Inside the cockpit,
+				however, Orrin is a completely different man: surly, silent, and prone to bouts of ferocious
+				rage. His accuracy with the Dervish’s long-range missiles makes him indispensable to
+				Lieutenant Rondema’s lance.
 
-’MECH history
-Orrin’s Dervish, which he calls “Onager,” is two hundred years old. The ’Mech spent most of its lifetime as a member of Com- Star’s Com Guards before ending up in the ranks of the Broadsword
-Legion. Upgrades to Star League-era technology kept the medium support ’Mech a viable machine, and Orrin treats it kindly. He prefers to remain out of range of most of his opponents, showering them with long-range missiles, but at times his rage overtakes him and the Dervish can be seen in the thick of the action, blasting away with short-range missiles and lasers.
+				’MEK history
+				Orrin’s Dervish, which he calls “Onager,” is two hundred years old. The ’Mek spent most of
+				its lifetime as a member of Com- Star’s Com Guards before ending up in the ranks of the
+				Broadsword
+				Legion. Upgrades to Star League-era technology kept the medium support ’Mek a viable
+				machine, and Orrin treats it kindly. He prefers to remain out of range of most of his
+				opponents, showering them with long-range missiles, but at times his rage overtakes him and
+				the Dervish can be seen in the thick of the action, blasting away with short-range missiles
+				and lasers.
 
-</biography>
+			</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Orrin_Fletcher.jpg</portraitFile>
 			<xp>0</xp>
@@ -630,12 +707,12 @@ Legion. Upgrades to Star League-era technology kept the medium support ’Mech a
 			<status>ACTIVE</status>
 			<birthday>3051-07-02</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
@@ -647,10 +724,21 @@ Legion. Upgrades to Star League-era technology kept the medium support ’Mech a
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>false</clan>
-			<biography>MechWarrior Profile
-Halle Yost served six years in Gamma Regiment before Second Harlech and the guerilla campaign that followed. She is unique amongst her comrades in that she refused to be evacuated in 3068 with the rest of Gamma. Halle elected to remain behind and wage a one-woman war on the Word of Blake for eighteen months, only mixing with the other resistance groups when her Talon desperately needed repairs or she needed supplies.
+			<biography>MekWarrior Profile
+				Halle Yost served six years in Gamma Regiment before Second Harlech and the guerilla
+				campaign that followed. She is unique amongst her comrades in that she refused to be
+				evacuated in 3068 with the rest of Gamma. Halle elected to remain behind and wage a
+				one-woman war on the Word of Blake for eighteen months, only mixing with the other
+				resistance groups when her Talon desperately needed repairs or she needed supplies.
 
-A lifelong loner, Halle is the best scout in the Widows. She uses her Talon for heavy reconnaissance, often striking the first blow with her PPC before the enemy even knows she is there. She pairs often with Madison and his Locust, knowing that most enemies will expect to see a lightweight Locust on recon duty and stop looking for the deadly Talon. The two exploit this advantage at every opportunity, often drawing each other’s opponents into ambush after ambush. Even with these advantages, however, Halle is at her best when she operates alone. Lieutenant Rolfe often allows her a great deal of latitude on the battlefield, where she can use her long gun to greatest effect. </biography>
+				A lifelong loner, Halle is the best scout in the Widows. She uses her Talon for heavy
+				reconnaissance, often striking the first blow with her PPC before the enemy even knows she
+				is there. She pairs often with Madison and his Locust, knowing that most enemies will expect
+				to see a lightweight Locust on recon duty and stop looking for the deadly Talon. The two
+				exploit this advantage at every opportunity, often drawing each other’s opponents into
+				ambush after ambush. Even with these advantages, however, Halle is at her best when she
+				operates alone. Lieutenant Rolfe often allows her a great deal of latitude on the
+				battlefield, where she can use her long gun to greatest effect. </biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Halle_Yost.jpg</portraitFile>
 			<xp>0</xp>
@@ -661,12 +749,12 @@ A lifelong loner, Halle is the best scout in the Widows. She uses her Talon for 
 			<status>ACTIVE</status>
 			<birthday>3043-11-12</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
@@ -678,14 +766,28 @@ A lifelong loner, Halle is the best scout in the Widows. She uses her Talon for 
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>true</clan>
-			<biography>MechWarrior Profile
-Neil Gibson’s Trial of Position was Second Harlech. His sibko was called from Remus just before the first Word of Blake ground troops attacked, and he and his sibs drove their Chameleons right into the teeth of the attack. Neil was the only member of his sibko to survive. After the withdrawals he ended up in the same resistance cell as Francine, operating out of the Ridges near Harlech.
+			<biography>MekWarrior Profile
+				Neil Gibson’s Trial of Position was Second Harlech. His sibko was called from Remus just
+				before the first Word of Blake ground troops attacked, and he and his sibs drove their
+				Chameleons right into the teeth of the attack. Neil was the only member of his sibko to
+				survive. After the withdrawals he ended up in the same resistance cell as Francine,
+				operating out of the Ridges near Harlech.
 
-After the Widows’ arrival, Neil followed Stacy Church across the Ridges to harass the Broadsword Legion and other Blakist troops. He became one of her strongest supporters, even going so far as calling her “the new Black Widow” during unit meetings. After reading the histories available, he has adopted original Widow Colin MacLaren’s habit of referring to Church only in the third person, as “the Captain.” He drives his Firefly as if it were a machine three times its mass, using its strong (for a light ’Mech) firepower to get himself out of jams.
+				After the Widows’ arrival, Neil followed Stacy Church across the Ridges to harass the
+				Broadsword Legion and other Blakist troops. He became one of her strongest supporters, even
+				going so far as calling her “the new Black Widow” during unit meetings. After reading the
+				histories available, he has adopted original Widow Colin MacLaren’s habit of referring to
+				Church only in the third person, as “the Captain.” He drives his Firefly as if it were a
+				machine three times its mass, using its strong (for a light ’Mek) firepower to get himself
+				out of jams.
 
-’MECH History
-Neil’s Firefly is a salvaged Home Guard machine that was destroyed in a skirmish between a small merc unit called Daley’s Destroyers and a mixed group of Home Guard ’Mechs and infantry that was caught outside Am Numsan in February of 3068. The Widows salvaged the ’Mech in late 3070 and Neil has piloted it ever since. In honor of its sterling service Neil has kept the previous pilot’s name for the machine: “Jaime.”
-</biography>
+				’MEK History
+				Neil’s Firefly is a salvaged Home Guard machine that was destroyed in a skirmish between a
+				small merc unit called Daley’s Destroyers and a mixed group of Home Guard ’Meks and infantry
+				that was caught outside Am Numsan in February of 3068. The Widows salvaged the ’Mek in late
+				3070 and Neil has piloted it ever since. In honor of its sterling service Neil has kept the
+				previous pilot’s name for the machine: “Jaime.”
+			</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Neil_Gibson.jpg</portraitFile>
 			<xp>0</xp>
@@ -696,12 +798,12 @@ Neil’s Firefly is a salvaged Home Guard machine that was destroyed in a skirmi
 			<status>ACTIVE</status>
 			<birthday>3048-02-04</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -713,17 +815,36 @@ Neil’s Firefly is a salvaged Home Guard machine that was destroyed in a skirmi
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>true</clan>
-			<biography>MechWarrior Profile Stacy Church was raised in a Dragoon sibko but came from an Inner Sphere family. She was one of many orphans adopted
-during the years between the Fourth Succession War and the Clan Invasion. She tested very highly during her initial testing and those scores won her a place in the Spider’s Web Battalion just in time for Elson’s Challenge. She chose to side with the majority of the Battalion and fought against the Dragoon rebels.
+			<biography>MekWarrior Profile Stacy Church was raised in a Dragoon sibko but came from an
+				Inner Sphere family. She was one of many orphans adopted
+				during the years between the Fourth Succession War and the Clan Invasion. She tested very
+				highly during her initial testing and those scores won her a place in the Spider’s Web
+				Battalion just in time for Elson’s Challenge. She chose to side with the majority of the
+				Battalion and fought against the Dragoon rebels.
 
-As a reward for her service in that and other conflicts, Stacy was given command of the prestigious Black Widow Trinary of the Wolf Spider Battalion in 3064. Her Trinary was the only one to survive the Broadswords’ treachery, and although she was injured she pleaded to remain behind when Alpha Brigade pulled the majority of the remaining Dragoons off of Outreach in late December.
+				As a reward for her service in that and other conflicts, Stacy was given command of the
+				prestigious Black Widow Trinary of the Wolf Spider Battalion in 3064. Her Trinary was the
+				only one to survive the Broadswords’ treachery, and although she was injured she pleaded to
+				remain behind when Alpha Brigade pulled the majority of the remaining Dragoons off of
+				Outreach in late December.
 
-Mech history
-The Zeus Stacy pilots was a gift from the Kell Hounds upon the Dragoons arrival on Arc-Royal, a gift meant to give them a fighting chance of regaining something of what they lost. One of the first decisions Maeve Wolf made in 3068 was not to try and resurrect the Dragoon’s lost manufacturing capabilities in the uncertainty of the Jihad. This made re-equipping the Dragoons a strictly Inner Sphere proposition, and the Zeus is a perfect example.
+				Mek history
+				The Zeus Stacy pilots was a gift from the Kell Hounds upon the Dragoons arrival on
+				Arc-Royal, a gift meant to give them a fighting chance of regaining something of what they
+				lost. One of the first decisions Maeve Wolf made in 3068 was not to try and resurrect the
+				Dragoon’s lost manufacturing capabilities in the uncertainty of the Jihad. This made
+				re-equipping the Dragoons a strictly Inner Sphere proposition, and the Zeus is a perfect
+				example.
 
-The Zeus-X is a test-bed BattleMech that mounts some of the most advanced Inner Sphere weapons available to the Kell Hounds and Dragoons. While it is a far cry from the Clan-made Mad Cat she had previously piloted, Stacy finds the Zeus’ accuracy and high-tech defenses just as deadly as her OmniMech.
+				The Zeus-X is a test-bed BattleMek that mounts some of the most advanced Inner Sphere
+				weapons available to the Kell Hounds and Dragoons. While it is a far cry from the Clan-made
+				Mad Cat she had previously piloted, Stacy finds the Zeus’ accuracy and high-tech defenses
+				just as deadly as her OmniMek.
 
-More importantly, that advanced technology will allow Stacy to go head-to-head with the best technologies fielded by the Word of Blake. That more than balances the risk of fielding such experimental equipment when the Widows will often be far from extensive repair facilities should things go wrong.</biography>
+				More importantly, that advanced technology will allow Stacy to go head-to-head with the best
+				technologies fielded by the Word of Blake. That more than balances the risk of fielding such
+				experimental equipment when the Widows will often be far from extensive repair facilities
+				should things go wrong.</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Stacy_Church.jpg</portraitFile>
 			<xp>0</xp>
@@ -734,12 +855,12 @@ More importantly, that advanced technology will allow Stacy to go head-to-head w
 			<status>ACTIVE</status>
 			<birthday>3036-10-21</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>6</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>6</level>
 				<bonus>0</bonus>
 			</skill>
@@ -751,14 +872,28 @@ More importantly, that advanced technology will allow Stacy to go head-to-head w
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>true</clan>
-			<biography>MechWarrior Profile
-When the Word of Blake struck at Outreach,Francine was two weeks out of her sibko. Her training company was thrown into combat against the invading Word of Blake divisions in and around Harlech until The Day After. She proved herself a testament to Dragoon training by single-handedly taking down six Blakist ’Mechs while defending a convoy of dependents trying to escape across the Ridges to Am Numsan. When the rest of the Dragoons escaped in December, Francine stayed behind.
+			<biography>MekWarrior Profile
+				When the Word of Blake struck at Outreach,Francine was two weeks out of her sibko. Her
+				training company was thrown into combat against the invading Word of Blake divisions in and
+				around Harlech until The Day After. She proved herself a testament to Dragoon training by
+				single-handedly taking down six Blakist ’Meks while defending a convoy of dependents trying
+				to escape across the Ridges to Am Numsan. When the rest of the Dragoons escaped in December,
+				Francine stayed behind.
 
-It wasn’t until 3070 when Stacy Church returned to Outreach to build her new Black Widows that Francine found her place. She’d been fighting with a small group around the ruins of New Wyatt, and when they discovered a small group of Dragoons fighting their way through the Royal Pass of the Ridges, they helped turn the tide against the Blakist mercenaries. Francine was the first of the Resistance warriors to formally join the Black Widows.
+				It wasn’t until 3070 when Stacy Church returned to Outreach to build her new Black Widows
+				that Francine found her place. She’d been fighting with a small group around the ruins of
+				New Wyatt, and when they discovered a small group of Dragoons fighting their way through the
+				Royal Pass of the Ridges, they helped turn the tide against the Blakist mercenaries.
+				Francine was the first of the Resistance warriors to formally join the Black Widows.
 
 
-’MECH PROFILE
-Francine’s Griffin is not a new machine, but she has taken advantage of the smorgasbord of captured Blakist technology (some of it captured from other sources, making its use against the Blakists sweet justice) to retrofit the vintage BattleMech into a deadly tool of revenge. Most enemies never suspect the deadly snub-nose PPC replacing the old Fusigon model, the supercharged fusion engine, or the experimental “glazed armor” that is so effective against the Blakists’ new variable pulse lasers.</biography>
+				’MEK PROFILE
+				Francine’s Griffin is not a new machine, but she has taken advantage of the smorgasbord of
+				captured Blakist technology (some of it captured from other sources, making its use against
+				the Blakists sweet justice) to retrofit the vintage BattleMek into a deadly tool of revenge.
+				Most enemies never suspect the deadly snub-nose PPC replacing the old Fusigon model, the
+				supercharged fusion engine, or the experimental “glazed armor” that is so effective against
+				the Blakists’ new variable pulse lasers.</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Francine.jpg</portraitFile>
 			<xp>0</xp>
@@ -769,12 +904,12 @@ Francine’s Griffin is not a new machine, but she has taken advantage of the sm
 			<status>ACTIVE</status>
 			<birthday>3049-09-09</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -786,13 +921,24 @@ Francine’s Griffin is not a new machine, but she has taken advantage of the sm
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>true</clan>
-			<biography>Jacob Kincaid is the first Dragoon to bear the Honorname Kincaid.  The Founder, Captain Ralph Kincaid of Delta Regiment, died on Wapakoneta in the Fourth Succession War. Notorious as the only Dragoon to ever command his family in combat, Kincaid’s famous raging hatred of House Kurita brought about his death against the Twelfth Galedon Regulars.
+			<biography>Jacob Kincaid is the first Dragoon to bear the Honorname Kincaid. The Founder,
+				Captain Ralph Kincaid of Delta Regiment, died on Wapakoneta in the Fourth Succession War.
+				Notorious as the only Dragoon to ever command his family in combat, Kincaid’s famous raging
+				hatred of House Kurita brought about his death against the Twelfth Galedon Regulars.
 
-Jacob Kincaid shares many features with his progenitor but the most poignant is hatred. As a Dragoon sibkid Jacob viewed the Dragoons as his only family and Jaime Wolf as his grandfather, a trait shared by many young Dragoons. Jacob hates the Word of Blake—and the Broadsword Legion especially—with a white-hot rage that he keeps just beneath the surface. A superb MechWarrior and administrator, Jacob was Stacy Church’s first choice for her XO. She convinced him to leave the Trial fields of Arc-Royal behind and begin to take his revenge.
-
-’MECH history
-Although entitled to a heavier machine, Jacob has kept the Uziel he won in combat on Arc-Royal soon after the Dragoons’ arrival. Given the availability of equipment that flows through Arc-Royal he has managed to upgrade the machine significantly, including using some experimental equipment. He named the ’Mech “Michael” soon after he won it, in honor of the son of Ralph Kincaid, who died against the Kuritans.
-</biography>
+				Jacob Kincaid shares many features with his progenitor but the most poignant is hatred. As a
+				Dragoon sibkid Jacob viewed the Dragoons as his only family and Jaime Wolf as his
+				grandfather, a trait shared by many young Dragoons. Jacob hates the Word of Blake—and the
+				Broadsword Legion especially—with a white-hot rage that he keeps just beneath the surface. A
+				superb MekWarrior and administrator, Jacob was Stacy Church’s first choice for her XO. She
+				convinced him to leave the Trial fields of Arc-Royal behind and begin to take his revenge.
+				’MEK history
+				Although entitled to a heavier machine, Jacob has kept the Uziel he won in combat on
+				Arc-Royal soon after the Dragoons’ arrival. Given the availability of equipment that flows
+				through Arc-Royal he has managed to upgrade the machine significantly, including using some
+				experimental equipment. He named the ’Mek “Michael” soon after he won it, in honor of the
+				son of Ralph Kincaid, who died against the Kuritans.
+			</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Jacob_Kincaid.jpg</portraitFile>
 			<xp>0</xp>
@@ -803,12 +949,12 @@ Although entitled to a heavier machine, Jacob has kept the Uziel he won in comba
 			<status>ACTIVE</status>
 			<birthday>3043-07-30</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
@@ -820,15 +966,30 @@ Although entitled to a heavier machine, Jacob has kept the Uziel he won in comba
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>false</clan>
-			<biography>MechWarrior Profile
-Max Henricksen loves being a Black Widow. He sees it as the culmination of his childhood. Max grew up in TempTown, the lurid, shady quarter of Harlech, the son of a down-on-his-luck negotiator and a has-been tinkerer. He joined the Dragoons’ Home Guard as soon as he was old enough and, to even his own surprise, found that he excelled at it. He quickly rose to command a lance in the Guard, and his lance fought some of the hardest battles of First and Second Harlech. Max’s lance watched Battle Magic die at the Harlech DropPort, and it was his lance (or the remnants of it) that escorted the honor guard to Jaime Wolf’s grave.
+			<biography>MekWarrior Profile
+				Max Henricksen loves being a Black Widow. He sees it as the culmination of his childhood.
+				Max grew up in TempTown, the lurid, shady quarter of Harlech, the son of a down-on-his-luck
+				negotiator and a has-been tinkerer. He joined the Dragoons’ Home Guard as soon as he was old
+				enough and, to even his own surprise, found that he excelled at it. He quickly rose to
+				command a lance in the Guard, and his lance fought some of the hardest battles of First and
+				Second Harlech. Max’s lance watched Battle Magic die at the Harlech DropPort, and it was his
+				lance (or the remnants of it) that escorted the honor guard to Jaime Wolf’s grave.
 
-A born scrounger, Max has allowed those talents to thrive now that the Widows are on their own inside the Protectorate.  Most criminals find the Blakists’ measures even more repressive than the Clans’and are happy to help Max find whatever he needs.Captain Church and Lieutenant Rondema have given up asking where he gets the items that he procures; the fact that they are always desperately needed and always in short supply, more than offset any lingering concerns over the legality of his actions.
+				A born scrounger, Max has allowed those talents to thrive now that the Widows are on their
+				own inside the Protectorate. Most criminals find the Blakists’ measures even more repressive
+				than the Clans’and are happy to help Max find whatever he needs.Captain Church and
+				Lieutenant Rondema have given up asking where he gets the items that he procures; the fact
+				that they are always desperately needed and always in short supply, more than offset any
+				lingering concerns over the legality of his actions.
 
-’MECH History
-Max’s Cobra is a captured Word of Blake machine, one taken in the fighting in Harlech just before The Day After. Although he is a fine MechWarrior, Max does not buy into most of the idiosyncrasies of his comrades. He has no interest in naming his ’Mech,
-only calling it “Marilyn” when it doesn’t cooperate. Systems have a habit of failing at inopportune moments and the Widow technicians cannot identify why. Max is secretly hoping to capture a different ’Mech, as he is starting to suspect that the Cobra is cursed.
-</biography>
+				’MEK History
+				Max’s Cobra is a captured Word of Blake machine, one taken in the fighting in Harlech just
+				before The Day After. Although he is a fine MekWarrior, Max does not buy into most of the
+				idiosyncrasies of his comrades. He has no interest in naming his ’Mek,
+				only calling it “Marilyn” when it doesn’t cooperate. Systems have a habit of failing at
+				inopportune moments and the Widow technicians cannot identify why. Max is secretly hoping to
+				capture a different ’Mek, as he is starting to suspect that the Cobra is cursed.
+			</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Max_Henricksen.jpg</portraitFile>
 			<xp>0</xp>
@@ -839,12 +1000,12 @@ only calling it “Marilyn” when it doesn’t cooperate. Systems have a habit 
 			<status>ACTIVE</status>
 			<birthday>3042-05-10</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -856,10 +1017,21 @@ only calling it “Marilyn” when it doesn’t cooperate. Systems have a habit 
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>false</clan>
-			<biography>MechWarrior Profile
-Russel Madison is a speed freak. He was a student at the Outreach Mercenary Training Command when First Harlech erupted, and he immediately joined with his classmates in defending the city against the mercenary assault. In the wake of Jaime Wolf’s death, Russel gained a singular honor: he is the only man able to claim that he “outran” Condition Feral. While not a Dragoon, he took his Locust and escaped into the Ridges while the Dragoons destroyed anything that refused to surrender.
+			<biography>MekWarrior Profile
+				Russel Madison is a speed freak. He was a student at the Outreach Mercenary Training Command
+				when First Harlech erupted, and he immediately joined with his classmates in defending the
+				city against the mercenary assault. In the wake of Jaime Wolf’s death, Russel gained a
+				singular honor: he is the only man able to claim that he “outran” Condition Feral. While not
+				a Dragoon, he took his Locust and escaped into the Ridges while the Dragoons destroyed
+				anything that refused to surrender.
 
-After Second Harlech, Russel emerged and joined a small ’Mech-equipped force that operated in the flatlands between Am Numsan and New Wyatt. By late 3070 Russel’s group had been whittled down to the point of asking to join the Black Widows. Stacy attached them as an auxiliary unit to her command and used them as a swift recon force. The majority of the unit died in the long running battle with Wannamaker’s Widowmakers in 3071, but Russel again survived on the basis of his speed. After the battle he accepted a commission in the Black Widows and enjoys being the “fastest man in the Inner Sphere.”</biography>
+				After Second Harlech, Russel emerged and joined a small ’Mek-equipped force that operated in
+				the flatlands between Am Numsan and New Wyatt. By late 3070 Russel’s group had been whittled
+				down to the point of asking to join the Black Widows. Stacy attached them as an auxiliary
+				unit to her command and used them as a swift recon force. The majority of the unit died in
+				the long running battle with Wannamaker’s Widowmakers in 3071, but Russel again survived on
+				the basis of his speed. After the battle he accepted a commission in the Black Widows and
+				enjoys being the “fastest man in the Inner Sphere.”</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Russel_Madison.jpg</portraitFile>
 			<xp>0</xp>
@@ -870,12 +1042,12 @@ After Second Harlech, Russel emerged and joined a small ’Mech-equipped force t
 			<status>ACTIVE</status>
 			<birthday>3049-06-26</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
@@ -887,15 +1059,29 @@ After Second Harlech, Russel emerged and joined a small ’Mech-equipped force t
 			<primaryRole>1</primaryRole>
 			<faction>MERC</faction>
 			<clan>true</clan>
-			<biography>MechWarrior Profile
-Calvin Magdaleno is another Honornamed Dragoon sibkid, the offspring of a Dragoon hero from the Fourth Succession War.  Ramon Magdaleno was a hero of Deshler and Wapakoneta, and died saving other Dragoons. Calvin is the only surviving member of his ageframe, but he won the name before The Day. Injured during the bombardment of Harlech, Calvin languished in a MASH unit for most a year until he healed well enough to join Tara Lucas’ Ghosts. He fought with distinction through most of the campaign harassing the Broadswords. During the final engagement he captured his BattleMaster from a Broadsword Level II commander.
+			<biography>MekWarrior Profile
+				Calvin Magdaleno is another Honornamed Dragoon sibkid, the offspring of a Dragoon hero from
+				the Fourth Succession War. Ramon Magdaleno was a hero of Deshler and Wapakoneta, and died
+				saving other Dragoons. Calvin is the only surviving member of his ageframe, but he won the
+				name before The Day. Injured during the bombardment of Harlech, Calvin languished in a MASH
+				unit for most a year until he healed well enough to join Tara Lucas’ Ghosts. He fought with
+				distinction through most of the campaign harassing the Broadswords. During the final
+				engagement he captured his BattleMaster from a Broadsword Level II commander.
 
-Calvin, like most of his brothers, is a quiet man who carries most of his emotions below the surface. Although card games are popular among the Magdaleno sibkos, Calvin shuns them. He keeps busy with books and maintenance on his BattleMech, helping the Black Widow technicians keep the other ’Mechs in top shape.
+				Calvin, like most of his brothers, is a quiet man who carries most of his emotions below the
+				surface. Although card games are popular among the Magdaleno sibkos, Calvin shuns them. He
+				keeps busy with books and maintenance on his BattleMek, helping the Black Widow technicians
+				keep the other ’Meks in top shape.
 
-’MECH history
-Calvin’s BattleMaster, Ramon, was one of the machines refurbished on Hall in the Word of Blake refit yards there. Calvin has taken many of the modifications the Blakists installed in stride but has also added his own touches. The BattleMaster he’s crafted is one of the hardiest BattleMechs ever built, and Calvin trusts his machine’s heavy “glazed” armor to keep him and the rest of the Black Widows safe. He can often be found in the thick of the fighting, making sure to keep the pressure off of his lancemates.
+				’MEK history
+				Calvin’s BattleMaster, Ramon, was one of the machines refurbished on Hall in the Word of
+				Blake refit yards there. Calvin has taken many of the modifications the Blakists installed
+				in stride but has also added his own touches. The BattleMaster he’s crafted is one of the
+				hardiest BattleMeks ever built, and Calvin trusts his machine’s heavy “glazed” armor to keep
+				him and the rest of the Black Widows safe. He can often be found in the thick of the
+				fighting, making sure to keep the pressure off of his lancemates.
 
-</biography>
+			</biography>
 			<portraitCategory>Black Widow Company/</portraitCategory>
 			<portraitFile>Calvin_Magdaleno.jpg</portraitFile>
 			<xp>0</xp>
@@ -906,12 +1092,12 @@ Calvin’s BattleMaster, Ramon, was one of the machines refurbished on Hall in t
 			<status>ACTIVE</status>
 			<birthday>3043-03-13</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
@@ -924,45 +1110,74 @@ Calvin’s BattleMaster, Ramon, was one of the machines refurbished on Hall in t
 			<systemId>Outreach</systemId>
 			<status>0</status>
 			<desc>DropShip Widow’s Web
-Outbound to Pirate Point
-Outreach
-2 January 3073
+				Outbound to Pirate Point
+				Outreach
+				2 January 3073
 
-As I write this, the Black Widows are on the hunt. Outreach is a dead world, a place of memories of fire and pain and loss. So many of our ghosts still walk those blasted lands, so many of our dead uninterred. So many pictures on the wall. I’ve left the Ghosts enough to carry on, but I don’t have much hope for them. Outreach was our home, but now it’s just a wasteland. Dragoons do not live in wastelands. No one does, except the dead.
+				As I write this, the Black Widows are on the hunt. Outreach is a dead world, a place of
+				memories of fire and pain and loss. So many of our ghosts still walk those blasted lands, so
+				many of our dead uninterred. So many pictures on the wall. I’ve left the Ghosts enough to
+				carry on, but I don’t have much hope for them. Outreach was our home, but now it’s just a
+				wasteland. Dragoons do not live in wastelands. No one does, except the dead.
 
-I wish I could carry Jacob’s rage. I wish I could capture Eirene’s determination, or at least a piece of the stone-hard certainty that the rest of them have. I don’t know what we’ll find in this damnable Protectorate of theirs. I’ve walked the wasted hollows of Outreach; how can the rest of their handiwork be worse? I’m angry, certainly, and determined, but it doesn’t define me like the other Widows. It gives me a purpose. It gives me a goal.
+				I wish I could carry Jacob’s rage. I wish I could capture Eirene’s determination, or at
+				least a piece of the stone-hard certainty that the rest of them have. I don’t know what
+				we’ll find in this damnable Protectorate of theirs. I’ve walked the wasted hollows of
+				Outreach; how can the rest of their handiwork be worse? I’m angry, certainly, and
+				determined, but it doesn’t define me like the other Widows. It gives me a purpose. It gives
+				me a goal.
 
-For too long the Word of Blake has been safely ensconced behind their wall of terror. For too long they’ve taken the souls of millions and twisted them into hatred and fear. The people need new legends; new heroes they can rally around, to fight back against the nightfall that is Blake’s twisted Word. I don’t know if Maeve is right, and the Widows are that symbol.
+				For too long the Word of Blake has been safely ensconced behind their wall of terror. For
+				too long they’ve taken the souls of millions and twisted them into hatred and fear. The
+				people need new legends; new heroes they can rally around, to fight back against the
+				nightfall that is Blake’s twisted Word. I don’t know if Maeve is right, and the Widows are
+				that symbol.
 
-But I know the Word will come to know us, and to fear us. I
-know the Word will feel pain and terror before I am done. I know the Master’s hands will be made to curl in agony, as he watches his children burn and die.
+				But I know the Word will come to know us, and to fear us. I
+				know the Word will feel pain and terror before I am done. I know the Master’s hands will be
+				made to curl in agony, as he watches his children burn and die.
 
-On the souls of Outreach I swear it.
-—From the mission log of Stacy Chruch</desc>
+				On the souls of Outreach I swear it.
+				—From the mission log of Stacy Chruch</desc>
 			<id>1</id>
 			<scenarios>
 				<scenario id="2" type="mekhq.campaign.mission.Scenario">
 					<name>Touchpoint : Elgin</name>
-					<desc>We learned from Whitehorse that the rest of the Sevens had preceded us into the Protectorate. I was surprised to learn that, given that Maeve had written the Sevens off in 3069 after they
-refused the last recall order. It seems that Dragoons always find a way, as we had been taught in the sibkos.
+					<desc>We learned from Whitehorse that the rest of the Sevens had preceded us into the
+						Protectorate. I was surprised to learn that, given that Maeve had written the Sevens off
+						in 3069 after they
+						refused the last recall order. It seems that Dragoons always find a way, as we had been
+						taught in the sibkos.
 
-Whitehorse put us into the Sevens’ com systems and we heard about a team—White Wolf—in a spot of trouble on Elgin. We’re putting down there in ten hours or so, and I’ll have one
-of the lances try to get the boys and girls out if they can. The rest of us are going to go and find something with a broadsword on it and kill it. Unity, but we could use more allies down here. I hope they can hold out long enough.
-—From the mission log of Stacy Church
-
-
-SITUATION
-Outside Vikram
-Elgin, WOB Protectorate
-29 January 3073
-
-The Dragoons’ Seventh Kommando has long been considered
-one of the elite special operations groups in the Inner Sphere, on par with the Combine’s DEST commandos or the men and women of MI-6. Most of those assets were presumed lost when Outreach was razed, but persistent reports of sabotage and guerrilla warfare throughout the Protectorate have put lie to those presumptions.
-
-A team of Sevens was present on Elgin when one of the few remaining Wolfnet operatives made contact with them, offering vital intelligence on Word of Blake troop movements in nearby space in return for a safe extraction to Arc-Royal. Although the Sevens were able to link up with the Wolfnet operative and his team, their transport was discovered and destroyed by the Protectorate Militia. It was only luck, then, that the Widows’ JumpShip was recharging innocuously at the nadir jump point when the Sevens sent their call for help.
+						Whitehorse put us into the Sevens’ com systems and we heard about a team—White Wolf—in a
+						spot of trouble on Elgin. We’re putting down there in ten hours or so, and I’ll have one
+						of the lances try to get the boys and girls out if they can. The rest of us are going to
+						go and find something with a broadsword on it and kill it. Unity, but we could use more
+						allies down here. I hope they can hold out long enough.
+						—From the mission log of Stacy Church
 
 
-</desc>
+						SITUATION
+						Outside Vikram
+						Elgin, WOB Protectorate
+						29 January 3073
+
+						The Dragoons’ Seventh Kommando has long been considered
+						one of the elite special operations groups in the Inner Sphere, on par with the
+						Combine’s DEST commandos or the men and women of MI-6. Most of those assets were
+						presumed lost when Outreach was razed, but persistent reports of sabotage and guerrilla
+						warfare throughout the Protectorate have put lie to those presumptions.
+
+						A team of Sevens was present on Elgin when one of the few remaining Wolfnet operatives
+						made contact with them, offering vital intelligence on Word of Blake troop movements in
+						nearby space in return for a safe extraction to Arc-Royal. Although the Sevens were able
+						to link up with the Wolfnet operative and his team, their transport was discovered and
+						destroyed by the Protectorate Militia. It was only luck, then, that the Widows’ JumpShip
+						was recharging innocuously at the nadir jump point when the Sevens sent their call for
+						help.
+
+
+					</desc>
 					<report></report>
 					<status>0</status>
 					<id>2</id>
@@ -973,16 +1188,20 @@ A team of Sevens was present on Elgin when one of the few remaining Wolfnet oper
 	<forces>
 		<force id="0" type="mekhq.campaign.force.Force">
 			<name>Black Widow Company</name>
-			<desc>This is the Black Widow Company as per the start of the campaign in the Starter Book: Wolf vs. Blake by Catalyst Game Labs.
+			<desc>This is the Black Widow Company as per the start of the campaign in the Starter Book:
+				Wolf vs. Blake by Catalyst Game Labs.
 
-All mechs and personal are set up exactly like the book.  Anyone that wants to use these will need to add the additional support personal and equipment and will need to define what MHQ and MM rules they want to use with the Campaign.
+				All meks and personal are set up exactly like the book. Anyone that wants to use these will
+				need to add the additional support personal and equipment and will need to define what MHQ
+				and MM rules they want to use with the Campaign.
 
-It should be noted that this starter book did not included skills beyond piloting and gunnery and any other skills will need set.
+				It should be noted that this starter book did not included skills beyond piloting and
+				gunnery and any other skills will need set.
 
-Enjoy.
+				Enjoy.
 
-Conversion by Hammer
-</desc>
+				Conversion by Hammer
+			</desc>
 			<combatForce>true</combatForce>
 			<iconCategory>Units/</iconCategory>
 			<iconFileName>Black_Widow_Company.jpg</iconFileName>
@@ -992,42 +1211,42 @@ Conversion by Hammer
 					<name>Command Lance</name>
 					<desc></desc>
 					<combatForce>true</combatForce>
-					<iconCategory>Mech/</iconCategory>
-					<iconFileName>hmech.png</iconFileName>
+					<iconCategory>Mek/</iconCategory>
+					<iconFileName>hmek.png</iconFileName>
 					<scenarioId>-1</scenarioId>
 					<units>
-						<unit id="bd2ec814-dcf7-4401-8b78-7eeb90fd648b"/>
-						<unit id="59b03970-9d5b-42cb-a6a5-cfaad341c37e"/>
-						<unit id="ef33e6a4-66e7-41e4-92a1-32f4984dd1be"/>
-						<unit id="23b4db00-fe8d-480a-9e00-572bbce19ae2"/>
+						<unit id="bd2ec814-dcf7-4401-8b78-7eeb90fd648b" />
+						<unit id="59b03970-9d5b-42cb-a6a5-cfaad341c37e" />
+						<unit id="ef33e6a4-66e7-41e4-92a1-32f4984dd1be" />
+						<unit id="23b4db00-fe8d-480a-9e00-572bbce19ae2" />
 					</units>
 				</force>
 				<force id="3" type="mekhq.campaign.force.Force">
 					<name>Fire Lance</name>
 					<desc></desc>
 					<combatForce>true</combatForce>
-					<iconCategory>Mech/</iconCategory>
-					<iconFileName>hmech.png</iconFileName>
+					<iconCategory>Mek/</iconCategory>
+					<iconFileName>hmek.png</iconFileName>
 					<scenarioId>2</scenarioId>
 					<units>
-						<unit id="3135179e-e120-4092-ad88-9a8eb798d6c5"/>
-						<unit id="614f0037-84fc-4f99-91f3-32e8f78560b0"/>
-						<unit id="a867a292-b650-4a43-8cd0-e9d8c19320e1"/>
-						<unit id="2e8a23b8-9aaf-4f10-b44a-980430882957"/>
+						<unit id="3135179e-e120-4092-ad88-9a8eb798d6c5" />
+						<unit id="614f0037-84fc-4f99-91f3-32e8f78560b0" />
+						<unit id="a867a292-b650-4a43-8cd0-e9d8c19320e1" />
+						<unit id="2e8a23b8-9aaf-4f10-b44a-980430882957" />
 					</units>
 				</force>
 				<force id="4" type="mekhq.campaign.force.Force">
 					<name>Recon Lance</name>
 					<desc></desc>
 					<combatForce>true</combatForce>
-					<iconCategory>Mech/</iconCategory>
-					<iconFileName>lmech.png</iconFileName>
+					<iconCategory>Mek/</iconCategory>
+					<iconFileName>lmek.png</iconFileName>
 					<scenarioId>-1</scenarioId>
 					<units>
-						<unit id="6264eba2-6652-4896-9869-8f5bfa57a60c"/>
-						<unit id="911f2f13-6cba-4c46-8e9e-bed92f5f2c26"/>
-						<unit id="402a62d3-8e51-4a86-a2a7-8796860ca86b"/>
-						<unit id="4bb543a1-17a2-4e87-97e0-a0387d5342e3"/>
+						<unit id="6264eba2-6652-4896-9869-8f5bfa57a60c" />
+						<unit id="911f2f13-6cba-4c46-8e9e-bed92f5f2c26" />
+						<unit id="402a62d3-8e51-4a86-a2a7-8796860ca86b" />
+						<unit id="4bb543a1-17a2-4e87-97e0-a0387d5342e3" />
 					</units>
 				</force>
 			</subforces>
@@ -1048,7 +1267,7 @@ Conversion by Hammer
 	</kills>
 	<skillTypes>
 		<skillType>
-			<name>Piloting/Mech</name>
+			<name>Piloting/Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1058,7 +1277,7 @@ Conversion by Hammer
 			<costs>8,4,4,4,4,4,4,4,4,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/Mech</name>
+			<name>Gunnery/Mek</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1188,7 +1407,7 @@ Conversion by Hammer
 			<costs>16,8,8,8,8,8,8,8,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/Protomech</name>
+			<name>Gunnery/ProtoMek</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1208,7 +1427,7 @@ Conversion by Hammer
 			<costs>8,4,4,4,4,4,4,4,4,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Anti-Mech</name>
+			<name>Anti-Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1218,7 +1437,7 @@ Conversion by Hammer
 			<costs>12,6,6,6,6,6,6,6,6,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Tech/Mech</name>
+			<name>Tech/Mek</name>
 			<target>10</target>
 			<countUp>false</countUp>
 			<greenLvl>1</greenLvl>
@@ -1380,8 +1599,8 @@ Conversion by Hammer
 			<removeAbilities>hopping_jack</removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1400,15 +1619,15 @@ Conversion by Hammer
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Sandblaster (AToW)</displayName>
 			<lookupName>sandblaster</lookupName>
 			<desc>A pilot with this ability gets a +4, +3, or +2 to the cluster table
-at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
+				at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
 			<xpCost>6</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1421,16 +1640,16 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Tactical Genius (aToW)</displayName>
 			<lookupName>tactical_genius</lookupName>
 			<desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
- The second roll must be accepted.
-Note: Only one Tactical Genius may be utilized per team.</desc>
+				The second roll must be accepted.
+				Note: Only one Tactical Genius may be utilized per team.</desc>
 			<xpCost>8</xpCost>
 			<weight>1</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1445,9 +1664,9 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			<displayName>Dodge (MaxTech)</displayName>
 			<lookupName>dodge_maneuver</lookupName>
 			<desc>Enables the unit to make a dodge maneuver instead of a physical attack.
-This maneuver adds +2 to the BTH to physical attacks against the unit.
-NOTE: The dodge maneuver is declared during the weapons phase.
-Note: This ability is only used for BattleMechs.</desc>
+				This maneuver adds +2 to the BTH to physical attacks against the unit.
+				NOTE: The dodge maneuver is declared during the weapons phase.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>2</xpCost>
 			<weight>1</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1455,8 +1674,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1475,14 +1694,15 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
+				<skill>Gunnery/Mek::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Weapon Specialist (aToW)</displayName>
 			<lookupName>weapon_specialist</lookupName>
-			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all attacks with that weapon.</desc>
+			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all
+				attacks with that weapon.</desc>
 			<xpCost>12</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1495,8 +1715,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
+				<skill>Gunnery/Mek::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1515,8 +1735,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft</skill>
 				<skill>Gunnery/Aerospace</skill>
 				<skill>Gunnery/Vehicle</skill>
-				<skill>Gunnery/Mech</skill>
-				<skill>Gunnery/Protomech</skill>
+				<skill>Gunnery/Mek</skill>
+				<skill>Gunnery/ProtoMek</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1535,14 +1755,15 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Weathered (Unofficial)</displayName>
 			<lookupName>weathered</lookupName>
-			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather conditions.</desc>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather
+				conditions.</desc>
 			<xpCost>6</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1555,8 +1776,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1571,14 +1792,14 @@ Note: This ability is only used for BattleMechs.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Sensor Geek (Unofficial)</displayName>
 			<lookupName>sensor_geek</lookupName>
 			<desc>A pilot with this ability gets a -2 bonus on sensor checks.
- Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
+				Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
 			<xpCost>3</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1592,8 +1813,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Piloting/VTOL::Green</skill>
 				<skill>Piloting/Aircraft::Green</skill>
-				<skill>Gunnery/Protomech::Green</skill>
-				<skill>Piloting/Mech::Green</skill>
+				<skill>Gunnery/ProtoMek::Green</skill>
+				<skill>Piloting/Mek::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1611,17 +1832,18 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Maneuvering Ace (aToW)</displayName>
 			<lookupName>maneuvering_ace</lookupName>
 			<desc>Enables the unit to move laterally like a Quad.
-Quads can move laterally for 1 less MP.
-Aerospace units can perform maneuvers for 1 less thrust point.
-Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.</desc>
+				Quads can move laterally for 1 less MP.
+				Aerospace units can perform maneuvers for 1 less thrust point.
+				Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of
+				control.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1634,8 +1856,8 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Piloting/VTOL::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1649,8 +1871,8 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1669,15 +1891,16 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
+				<skill>Gunnery/Mek::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Melee Specialist (aToW)</displayName>
 			<lookupName>melee_specialist</lookupName>
-			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
-Note: This ability is only used for BattleMechs.</desc>
+			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a
+				-1 to-hit modifier to physical attacks.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1685,15 +1908,16 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Gunnery Specialization (aToW)</displayName>
 			<lookupName>specialist</lookupName>
-			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
- +1 to-hit modifier when using other types of weapons.</desc>
+			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using
+				weapons of that type and a
+				+1 to-hit modifier when using other types of weapons.</desc>
 			<xpCost>6</xpCost>
 			<weight>4</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1706,18 +1930,18 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Pain Resistance (MaxTech)</displayName>
 			<lookupName>pain_resistance</lookupName>
 			<desc>When making consciousness rolls,
-1 is added to all rolls.
-Also,
-damage received from ammo explosions is reduced to 1.
-Note: This ability is only used for BattleMechs.</desc>
+				1 is added to all rolls.
+				Also,
+				damage received from ammo explosions is reduced to 1.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>4</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1741,8 +1965,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Piloting/VTOL::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1757,7 +1981,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Aerospace::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1775,8 +1999,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1790,8 +2014,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 	</specialAbilities>
@@ -10078,7 +10302,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
-			<name>armed_mechwarriors</name>
+			<name>armed_mekwarriors</name>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
@@ -10266,7 +10490,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
-			<name>tacops_advanced_mech_hit_locations</name>
+			<name>tacops_advanced_mek_hit_locations</name>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
@@ -10750,19 +10974,28 @@ Note: This ability is only used for BattleMechs.</desc>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
-				<level>3</level>
-				<bonus>0</bonus>
-			</skill>
-		</person>
-		<daysSinceRolled>0</daysSinceRolled>
-		<paidRecruitType>1</paidRecruitType>
-	</personnelMarket>
-	<customPlanetaryEvents>
-	</customPlanetaryEvents>
-</campaign>
+				<type>Gunnery/Mek</type>
+				<
+				level>3</level>
+				<
+				bonus>0</bonus>
+			<
+			/skill>
+		<
+		/person>
+		<
+		daysSinceRolled>0</daysSinceRolled>
+		<
+		paidRecruitType>1</paidRecruitType>
+	<
+	/personnelMarket>
+	<
+	customPlanetaryEvents>
+		</customPlanetaryEvents>
+<
+/campaign>
