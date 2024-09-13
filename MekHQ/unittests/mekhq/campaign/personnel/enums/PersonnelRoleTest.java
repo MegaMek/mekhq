@@ -447,9 +447,7 @@ class PersonnelRoleTest {
     @Test
     void testIsConventionalAirGrouping() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.LAM_PILOT)
-                    || (personnelRole == PersonnelRole.AEROSPACE_PILOT)
-                    || (personnelRole == PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT)) {
+            if (personnelRole == PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT) {
                 assertTrue(personnelRole.isConventionalAirGrouping());
             } else {
                 assertFalse(personnelRole.isConventionalAirGrouping());

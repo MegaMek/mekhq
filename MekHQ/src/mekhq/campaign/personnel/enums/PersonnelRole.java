@@ -253,7 +253,7 @@ public enum PersonnelRole {
     }
 
     public boolean isConventionalAirGrouping() {
-        return isAerospaceGrouping() || isConventionalAircraftPilot();
+        return isConventionalAircraftPilot();
     }
 
     public boolean isGroundVehicleCrew() {
