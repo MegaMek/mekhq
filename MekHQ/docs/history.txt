@@ -3,6 +3,27 @@ MEKHQ VERSION HISTORY:
 0.50.01-SNAPSHOT
 + PR #4810: Respecting Trademarks (Mech to Mek)
 + FIX #4417, #4764, #4774: Updated Campaign Presets & Addressed Relevant Name Change Issues
++ PR #4655: Refactored Random Company Name Generator to Use CSV
++ PR #4691: Revised CamOps Reputation Derived AtB Modifier, Renamed getUnitRatingMod Method
++ PR #4693: Refactored Personality Characteristic Display in Personnel Table
++ PR #4699: Refactor Initial Education Level Assignment
++ PR #4719: Adjusted Target BV Percentage Logic for BVScaled OpFor Generation
++ PR #4720: Replaced TaharqaSkillGenerator with StratConSkillGenerator in Force Generation Calculations
++ PR #4722: Refactored Difficulty Multiplier Calculation
++ FIX #4535: Improved limits on generating infantry for APCs
++ FIX #4649: Removed Ability to Assign AeroSpace Pilots to Conventional Aircraft
++ FIX #4744: Fixed Formatting Issues in EducationController
++ FIX #4763: Added Army Group Formation Level
++ PR #4777: Include more information about available personnel in Camops Personnel Market Refresh Report
++ FIX #4783: Fixed Hidden Loyalty Calculation in RetirementDefectionTracker
++ FIX #4784: Refactored Personnel Filtering and Added Last Mission Date Check
++ FIX #4787: Updated Prisoner Defection Base TN
++ PR #4792: Sell Parts from Parts in Use Dialog
++ FIX #4765: Fix error in camlann system faction ownership
++ FIX #4789: Remove untreated personnel nag for prisoner-defectors and add unit tests
++ FIX #4790: Fix Mission XP Reward Setting
++ FIX #4803, #4802: Corrected Experience Rating Calculation in Reputation
++ PR #4830: Corrected terminology in Academy XMLs
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
