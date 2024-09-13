@@ -1050,15 +1050,14 @@ public class Campaign implements ITechManager {
     /**
      * Add a mission to the campaign
      *
-     * @param m The mission to be added
-     * @return the id of the mission
+     * @param mission The mission to be added
      */
-    public void addMission(Mission m) {
-        int id = lastMissionId + 1;
-        m.setId(id);
-        missions.put(id, m);
-        lastMissionId = id;
-        MekHQ.triggerEvent(new MissionNewEvent(m));
+    public void addMission(Mission mission) {
+        int missionID = lastMissionId + 1;
+        mission.setId(missionID);
+        missions.put(missionID, mission);
+        lastMissionId = missionID;
+        MekHQ.triggerEvent(new MissionNewEvent(mission));
     }
 
     /**

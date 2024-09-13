@@ -373,7 +373,7 @@ public class Utilities {
      * roll 1d6 results in:
      * 1: target - 2
      * 2: target - 1
-     * 3 & 4: target
+     * 3 &amp; 4: target
      * 5: target + 1
      * 6: target + 2
      */

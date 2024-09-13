@@ -38,7 +38,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
  * This class handles randomly generating SPAs for bot-controlled entities
- * 
+ *
  * @author NickAragua
  */
 public class CrewSkillUpgrader {
@@ -56,9 +56,9 @@ public class CrewSkillUpgrader {
 
     /**
      * Constructor. Initializes updated SPA list, broken down by unit type.
-     * 
+     *
      * @param upgradeIntensity how likely a pilot is to receive consideration for an
-     *                         SPA (<0 means none, 3+ means every time)
+     *                         SPA (&lt;0 means none, 3+ means every time)
      */
     public CrewSkillUpgrader(int upgradeIntensity) {
         this.upgradeIntensity = upgradeIntensity;
@@ -89,7 +89,7 @@ public class CrewSkillUpgrader {
 
     /**
      * Upgrades an entity's crew as per Campaign Ops rules.
-     * 
+     *
      * @param entity The entity to potentially upgrade.
      */
     public void upgradeCrew(Entity entity) {
@@ -137,7 +137,7 @@ public class CrewSkillUpgrader {
 
     /**
      * Upgrade an entity with a single SPA
-     * 
+     *
      * @param entity
      * @return the xp cost of the added SPA
      */
@@ -220,7 +220,7 @@ public class CrewSkillUpgrader {
     /**
      * Utility function that returns all the SPAs for the given unit type at or
      * below the given cap
-     * 
+     *
      * @param unitType Unit type
      * @param xpCap    maximum xp cost
      * @return coalesced list
@@ -240,7 +240,7 @@ public class CrewSkillUpgrader {
     /**
      * Contains "special" logic to ensure SPA is appropriate for the entity, beyond
      * the simple unit type check.
-     * 
+     *
      * @param spa
      * @param entity
      * @return
@@ -258,7 +258,7 @@ public class CrewSkillUpgrader {
      * Picks a random weapon specialization for a weapon that the entity has
      * mounted,
      * and returns the weapon's name so that a weapon specialist value may be set.
-     * 
+     *
      * @param entity The entity being manipulated
      * @return Weapon name
      */
@@ -284,7 +284,7 @@ public class CrewSkillUpgrader {
      * Picks a random gunnery specialization for the given entity. Naturally
      * weighted
      * towards weapon categories contained in the entity.
-     * 
+     *
      * @param entity The entity being examined.
      * @return Gunnery specialization name
      */

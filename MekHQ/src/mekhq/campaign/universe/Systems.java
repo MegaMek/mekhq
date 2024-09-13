@@ -19,12 +19,10 @@
 package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -258,8 +256,6 @@ public class Systems {
      *
      * @throws DOMException
      * @throws IOException
-     * @throws FileNotFoundException
-     * @throws ParseException
      */
     public static Systems loadDefault() throws DOMException, IOException {
         logger.info("Starting load of system data from XML...");
@@ -283,8 +279,6 @@ public class Systems {
      *
      * @throws DOMException
      * @throws IOException
-     * @throws FileNotFoundException
-     * @throws ParseException
      */
     public static Systems load(String planetsPath, String defaultFilePath) throws DOMException, IOException {
         Systems systems = new Systems();

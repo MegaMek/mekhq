@@ -38,7 +38,7 @@ public class ScenarioKillAwards {
      * @param person    the Person to check award eligibility for
      * @param killCount the number of relevant kills scored by 'person'
      * @param awards    awards the awards to be processed (should only include
-     *                  awards where item == kill && ranges == scenario)
+     *                  awards where item == kill &amp;&amp; ranges == scenario)
      */
     public static Map<Integer, List<Object>> ScenarioKillAwardsProcessor(Campaign campaign, UUID person,
             List<Award> awards, int killCount) {
