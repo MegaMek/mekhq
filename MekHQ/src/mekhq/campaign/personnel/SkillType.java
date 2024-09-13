@@ -28,7 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.Version;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.ConvFighter;
@@ -64,21 +63,22 @@ public class SkillType {
     public static final String S_GUN_JET = "Gunnery/Aircraft";
     public static final String S_GUN_VEE = "Gunnery/Vehicle";
     public static final String S_GUN_SPACE = "Gunnery/Spacecraft";
-    public static final String S_GUN_BA = "Gunnery/Battlesuit";
+    public static final String S_GUN_BA = "Gunnery/BattleArmor";
     public static final String S_GUN_PROTO = "Gunnery/ProtoMek";
     public static final String S_ARTILLERY = "Artillery";
     public static final String S_SMALL_ARMS = "Small Arms";
     public static final String S_ANTI_MEK = "Anti-Mek";
     public static final String S_TACTICS = "Tactics";
+
     // non-combat skills
     public static final String S_TECH_MEK = "Tech/Mek";
     public static final String S_TECH_MECHANIC = "Tech/Mechanic";
     public static final String S_TECH_AERO = "Tech/Aero";
-    public static final String S_TECH_BA = "Tech/BA";
+    public static final String S_TECH_BA = "Tech/BattleArmor";
     public static final String S_TECH_VESSEL = "Tech/Vessel";
     public static final String S_ASTECH = "Astech";
     public static final String S_DOCTOR = "Doctor";
-    public static final String S_MEDTECH = "Medtech";
+    public static final String S_MEDTECH = "MedTech";
     public static final String S_NAV = "Hyperspace Navigation";
     public static final String S_ADMIN = "Administration";
     public static final String S_NEG = "Negotiation";
@@ -352,7 +352,7 @@ public class SkillType {
         lookupHash.put(S_TECH_VESSEL, createTechVessel());
         lookupHash.put(S_ASTECH, createAstech());
         lookupHash.put(S_DOCTOR, createDoctor());
-        lookupHash.put(S_MEDTECH, createMedtech());
+        lookupHash.put(S_MEDTECH, createMedTech());
         lookupHash.put(S_NAV, createNav());
         lookupHash.put(S_TACTICS, createTactics());
         lookupHash.put(S_STRATEGY, createStrategy());
@@ -365,7 +365,11 @@ public class SkillType {
         lookupHash.put("Piloting/Mech", createPilotingMek());
         lookupHash.put("Gunnery/Mech", createGunneryMek());
         lookupHash.put("Anti-Mech", createAntiMek());
-        lookupHash.put("Tech/Mek", createTechMek());
+        lookupHash.put("Tech/Mech", createTechMek());
+        lookupHash.put("Gunnery/ProtoMech", createGunneryProto());
+        lookupHash.put("Medtech", createMedTech());
+        lookupHash.put("Gunnery/Battlesuit", createGunneryBA());
+        lookupHash.put("Tech/BA", createTechBA());
 
     }
 
@@ -435,7 +439,7 @@ public class SkillType {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillType");
     }
 
-    public static void generateInstanceFromXML(Node wn, Version version) {
+    public static void generateInstanceFromXML(Node wn) {
         try {
             SkillType retVal = new SkillType();
             NodeList nl = wn.getChildNodes();
@@ -462,10 +466,6 @@ public class SkillType {
                         retVal.costs[i] = Integer.parseInt(values[i]);
                     }
                 }
-            }
-
-            if ("Gunnery/Protomek".equals(retVal.getName())) { // Renamed in 0.49.12
-                retVal.name = "Gunnery/ProtoMek";
             }
 
             lookupHash.put(retVal.name, retVal);
@@ -771,7 +771,7 @@ public class SkillType {
         return skill;
     }
 
-    public static SkillType createMedtech() {
+    public static SkillType createMedTech() {
         SkillType skill = new SkillType();
         skill.name = S_MEDTECH;
         skill.target = 11;
