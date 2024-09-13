@@ -2521,20 +2521,21 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Helper function that calculates the BV budget multiplier based on AtB skill
-     * level
+     * Calculates the difficulty multiplier based on campaign options.
      *
-     * @param c
-     * @return
+     * @param campaign the campaign for which to calculate the difficulty multiplier
+     * @return the difficulty multiplier
      */
-    private static double getDifficultyMultiplier(Campaign c) {
-        // skill level is between Ultra-Green (0) and Legendary (6), with Elite being
-        // the highest
-        // primary skill level.
-        // We want a number between 0.8 and 1.2 for the primary skill levels, so the
-        // formula is:
-        // 1 + ((skill level - 2) / 10)
-        return 1.0 + ((c.getCampaignOptions().getSkillLevel().getAdjustedValue() - 2) * 0.1);
+    private static double getDifficultyMultiplier(Campaign campaign) {
+        return switch (campaign.getCampaignOptions().getSkillLevel()) {
+            case NONE, ULTRA_GREEN -> 0.5;
+            case GREEN -> 0.75;
+            case REGULAR -> 1.0;
+            case VETERAN -> 1.25;
+            case ELITE -> 1.5;
+            case HEROIC -> 1.75;
+            case LEGENDARY -> 2.0;
+        };
     }
 
     /**
