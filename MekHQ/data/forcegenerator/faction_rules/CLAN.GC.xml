@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ruleset faction="CLAN.GC" ratingSystem="CLAN" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="formationRulesetSchema.xsd">
+<ruleset faction="CLAN.GC" ratingSystem="CLAN" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="formationRulesetSchema.xsd">
 
 	<defaults>
 		<eschelon>%CLUSTER%</eschelon>
@@ -130,7 +131,7 @@
 			</subforceOption>
 			<subforceOption>
 				<option num="2">%CLUSTER%</option>
-				<option num="3" >%CLUSTER%</option>
+				<option num="3">%CLUSTER%</option>
 				<option num="4" weight="4">%CLUSTER%</option>
 			</subforceOption>
 			<subforceOption>
@@ -189,7 +190,8 @@
 		</subforces>
 	</force>
 
-	<!--Typical Horses clusters (assault, cavalry, strike) have three
+	<!--Typical
+	Horses clusters (assault, cavalry, strike) have three
 	trinaries of mixed Mek/BA, with 2/3 of Mek stars being novas, plus a
 	trinary of ASF and a supernova trinary of vehicles and conventional
 	infantry. Ad-hoc clusters, found in SL and Solahma galaxies, are more
@@ -230,7 +232,7 @@
 				<option ifWeightClass="L" role="cavalry">+cavalry</option>
 				<option ifWeightClass="L" ifRating="SL|PG|Sol"
 					ifDateBetween="3090,3130" role="cavalry,fire_support"
-					>+ranger</option>
+				>+ranger</option>
 				<option ifRating="FL" ifDateBetween="3080,"
 					weight="2">+horde</option>
 				<option ifRating="FL" ifDateBetween="3100,"
@@ -340,7 +342,7 @@
 
 		<subforces ifFlags="horde">
 			<subforce weightClass="L"
-					role="+cavalry">%TRINARY%</subforce>
+				role="+cavalry">%TRINARY%</subforce>
 			<subforceOption>
 				<option weightClass="H" weight="2">%TRINARY%</option>
 				<option weightClass="A">%TRINARY%</option>
@@ -407,7 +409,7 @@
 					weight="3">%STAR%</option>
 			</subforceOption>
 			<subforceOption ifWeightClass="H">
-				<option weightClass="A,H,M"  ifAugmented="1"
+				<option weightClass="A,H,M" ifAugmented="1"
 					flags="mekTankStar" weight="3">%STAR%</option>
 				<option weightClass="A,H,L" flags="+mekTankStar"
 					ifAugmented="1">%STAR%</option>
@@ -427,7 +429,8 @@
 		</subforces>
 	</force>
 
-	<!--Per FMCC, all Mek trinaries are mixed Mek/BA and about 2/3 of
+	<!--Per
+	FMCC, all Mek trinaries are mixed Mek/BA and about 2/3 of
 	Mek stars are part of a nova formation. Since novas require omnis
 	we should expect novas to be more concentrated in FL clusters. This
 	rule gives a 50% chance for any FL Mek trinary or 33% chance for SL
@@ -439,14 +442,15 @@
 	Ad-hoc clusters have a chance of having binaries instead of trinaries,
 	as do other clusters after the relocation to the IS.-->
 
-	<!--FL trinaries have a 50% chance of being a supernova, with the
+	<!--FL
+	trinaries have a 50% chance of being a supernova, with the
 	remaining trinaries made up of one star that is either nova or Mek,
 	one that is nova, Mek, or BA, and one BA with an equal chance in
 	each star with the exception of striker clusters, which have twice
 	the chance of the second star being Meks. After 3070, the chance of
 	BA in the second star increases.-->
 	<force eschelon="%TRINARY%" eschName="Trinary" ifUnitType="Mek" ifAugmented="0"
-			ifRating="FL">
+		ifRating="FL">
 		<name ifRole="command">Command Trinary</name>
 		<name>Trinary {greek}</name>
 		<co>%STAR_CAPTAIN%</co>
@@ -706,10 +710,11 @@
 		</subforces>
 	</force>
 
-	<!--SL trinaries are similar to FL but with a reduced chance of one
+	<!--SL
+	trinaries are similar to FL but with a reduced chance of one
 	of the stars being a nova.-->
 	<force eschelon="%TRINARY%" eschName="Trinary" ifUnitType="Mek" ifAugmented="0"
-			ifRating="SL|PG">
+		ifRating="SL|PG">
 		<name ifRole="command">Command Trinary</name>
 		<name>Trinary {greek}</name>
 		<co>%STAR_CAPTAIN%</co>
@@ -976,11 +981,12 @@
 		</subforces>
 	</force>
 
-	<!--Solahma trinaries have no novas and use conventional infantry
+	<!--Solahma
+	trinaries have no novas and use conventional infantry
 	instead of BA.-->
 
 	<force eschelon="%TRINARY%" eschName="Trinary" ifUnitType="Mek" ifAugmented="0"
-			ifRating="PG|Sol">
+		ifRating="PG|Sol">
 		<name ifRole="command">Command Trinary</name>
 		<name>Trinary {greek}</name>
 		<co>%STAR_CAPTAIN%</co>
@@ -1158,7 +1164,7 @@
 	</force>
 
 	<force eschelon="%TRINARY%" eschName="Supernova Trinary" ifUnitType="Mek" ifAugmented="1"
-			ifRating="FL">
+		ifRating="FL">
 		<name ifRole="command">Command Trinary</name>
 		<name>Trinary {greek}</name>
 		<co>%NOVA_CAPTAIN%</co>
@@ -1254,7 +1260,7 @@
 	</force>
 
 	<force eschelon="%BINARY%" eschName="Supernova Binary" ifUnitType="Mek" ifAugmented="1"
-			ifRating="FL">
+		ifRating="FL">
 		<name ifRole="command">Command Binary</name>
 		<name>Binary {greek}</name>
 		<co>%NOVA_CAPTAIN%</co>
@@ -1273,13 +1279,14 @@
 		</subforces>
 	</force>
 
-	<!--A mixed Mek binary can be nova+Mek, nova+BA, or Mek+BA. FL binaries
+	<!--A
+	mixed Mek binary can be nova+Mek, nova+BA, or Mek+BA. FL binaries
 	include one of the nova options about half the time, SL binaries about
 	a third of the time, and Solahma binaries include only Mek+BA. Strike
 	clusters are less likely to have an independent BA star.-->
 
 	<force eschelon="%TRINARY%" eschName="Binary" ifUnitType="Mek" ifAugmented="0"
-			ifRating="FL">
+		ifRating="FL">
 		<name ifRole="command">Command Binary</name>
 		<name>Binary {greek}</name>
 		<co>%STAR_CAPTAIN%</co>
@@ -1511,7 +1518,7 @@
 				<option weight="10" ifWeightClass="H" role="+recon">Heavy Recon</option>
 				<option weight="10" ifWeightClass="L" role="+recon">Light Recon</option>
 			</formation>
- 		</ruleGroup>
+		</ruleGroup>
 
 		<subforces>
 			<subforceOption ifWeightClass="A">
@@ -1544,7 +1551,8 @@
 		</subforces>
 	</force>
 
-	<!--Horses vehicles are deployed in tank/infantry novas. In the keshiks
+	<!--Horses
+	vehicles are deployed in tank/infantry novas. In the keshiks
 	the infantry is replaced by heavy BA.-->
 
 	<force eschelon="%STAR%" eschName="Nova" ifUnitType="Tank" ifAugmented="1">
@@ -1588,7 +1596,7 @@
 				<option weight="10" ifWeightClass="H" role="+recon">Heavy Recon</option>
 				<option weight="10" ifWeightClass="L" role="+recon">Light Recon</option>
 			</formation>
- 		</ruleGroup>
+		</ruleGroup>
 
 		<subforces>
 			<subforceOption ifWeightClass="A">
@@ -1669,7 +1677,7 @@
 			<option ifRole="command" weight="1">H</option>
 		</weightClass>
 
-        <ruleGroup>
+		<ruleGroup>
 			<formation ifIndex="0">
 				<option weight="30">Battle</option>
 				<option weight="12" ifWeightClass="H|A">Heavy Battle</option>
@@ -1803,7 +1811,8 @@
 		</subforces>
 	</force>
 
-	<!--Vehicles in cavalry clusters are mostly hover and VTOL infantry
+	<!--Vehicles
+	in cavalry clusters are mostly hover and VTOL infantry
 	transports.-->
 
 	<force eschelon="%POINT%" eschName="Point" ifUnitType="Tank|VTOL" ifFlags="cavalry">
