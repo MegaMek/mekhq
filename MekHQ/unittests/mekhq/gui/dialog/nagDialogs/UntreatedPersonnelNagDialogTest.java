@@ -14,9 +14,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 import static mekhq.gui.dialog.nagDialogs.UntreatedPersonnelNagDialog.isUntreatedInjury;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UntreatedPersonnelNagDialogTest {
     Campaign campaign;
@@ -37,7 +37,7 @@ class UntreatedPersonnelNagDialogTest {
     @BeforeEach
     public void init() {
         campaign = new Campaign();
-        person = campaign.newPerson(PersonnelRole.MECHWARRIOR);
+        person = campaign.newPerson(PersonnelRole.MEKWARRIOR);
         person.setHits(1);
     }
 
