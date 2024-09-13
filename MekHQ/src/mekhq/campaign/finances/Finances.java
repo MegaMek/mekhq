@@ -624,17 +624,6 @@ public class Finances {
                     case "wentIntoDebt":
                         retVal.setWentIntoDebt(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                         break;
-                    // region Legacy
-                    case "transaction": // Removed in 0.49.8
-                        retVal.getTransactions().add(Transaction.generateInstanceFromXML(wn2));
-                        break;
-                    case "loan": // Removed in 0.49.8
-                        retVal.getLoans().add(Loan.generateInstanceFromXML(wn2));
-                        break;
-                    case "asset": // Removed in 0.49.8
-                        retVal.getAssets().add(Asset.generateInstanceFromXML(wn2));
-                        break;
-                    // endregion Legacy
                     default:
                         break;
                 }

@@ -49,7 +49,6 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.io.migration.CamouflageMigrator;
 import mekhq.utilities.MHQXMLUtility;
 
 public class BotForce implements IPlayerSettings {
@@ -418,7 +417,7 @@ public class BotForce implements IPlayerSettings {
 
     /**
      * Turn traitor UUIDs into an entity list by checking for associated units
-     * 
+     *
      * @return a List of Entities associated with the traitor personnel UUIDs
      */
     public List<Entity> getTraitorEntities(Campaign campaign) {
@@ -434,7 +433,7 @@ public class BotForce implements IPlayerSettings {
 
     /**
      * Turn traitor UUIDs into a Unit list by checking for associated units
-     * 
+     *
      * @return a List of Units associated with the traitor personnel UUIDs
      */
     public List<Unit> getTraitorUnits(Campaign campaign) {
@@ -452,7 +451,7 @@ public class BotForce implements IPlayerSettings {
      * Checks to see if a given unit has a crew member among the traitor personnel
      * IDs. This is used
      * primarily to determine if a unit can be deployed to a scenario.
-     * 
+     *
      * @param unit
      * @return a boolean indicating whether this unit is a traitor
      */
@@ -530,8 +529,7 @@ public class BotForce implements IPlayerSettings {
                     name = MHQXMLUtility.unEscape(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("team")) {
                     team = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("start") // Legacy - 0.49.19 removal
-                        || wn2.getNodeName().equalsIgnoreCase("startingPos")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingPos")) {
                     startingPos = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("startOffset")) {
                     startOffset = Integer.parseInt(wn2.getTextContent());
@@ -549,18 +547,6 @@ public class BotForce implements IPlayerSettings {
                     deployRound = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
                     setCamouflage(Camouflage.parseFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("camoCategory")) { // Legacy - 0.49.3 removal
-                    getCamouflage().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("camoFileName")) { // Legacy - 0.49.3 removal
-                    getCamouflage().setFilename(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("colour")) {
-                    setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("colorIndex")) { // Legacy - 0.47.15 removal
-                    setColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                    if (Camouflage.NO_CAMOUFLAGE.equals(getCamouflage().getCategory())) {
-                        getCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                        getCamouflage().setFilename(getColour().name());
-                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("templateName")) {
                     setTemplateName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("traitor")) {
@@ -614,10 +600,6 @@ public class BotForce implements IPlayerSettings {
             } catch (Exception e) {
                 logger.error("", e);
             }
-        }
-
-        if (version.isLowerThan("0.49.3")) {
-            CamouflageMigrator.migrateCamouflage(version, getCamouflage());
         }
     }
 }

@@ -1367,7 +1367,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Potentially generates and adds a force of enemy aircraft to the mix of
      * opposing force.
-     * 
+     *
      * @param campaign The campaign for which the aircraft are being generated.
      */
     protected void addAeroReinforcements(Campaign campaign) {
@@ -1453,7 +1453,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Potentially generates some scrubs (turrets and/or infantry) to be randomly
      * added to the opposing force.
-     * 
+     *
      * @param campaign The campaign for which the scrubs are being generated.
      */
     protected void addScrubReinforcements(Campaign campaign) {
@@ -1557,7 +1557,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     /**
      * Worker method that adds a DropShip and related objective to the scenario.
-     * 
+     *
      * @param campaign
      */
     protected void addDropship(Campaign campaign) {
@@ -1772,8 +1772,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             }
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("specMissionEnemies") // Legacy - 0.49.11 removal
-                        || wn2.getNodeName().equalsIgnoreCase("specialScenarioEnemies")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("specialScenarioEnemies")) {
                     specialScenarioEnemies = new ArrayList<>();
 
                     for (int i = EntityWeightClass.WEIGHT_ULTRA_LIGHT; i <= EntityWeightClass.WEIGHT_COLOSSAL; i++) {
@@ -2045,7 +2044,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     /**
      * Adds a transport-cargo pair to the internal transport relationship store.
-     * 
+     *
      * @param transport
      * @param cargo
      */

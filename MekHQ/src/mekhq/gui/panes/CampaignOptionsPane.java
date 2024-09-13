@@ -767,6 +767,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     // region Legacy Initialization
+    // Define what is legacy and not and remove in Milestone after 0.49.19
+
     private JScrollPane createGeneralTab() {
         int gridy = 0;
         int gridx = 0;
@@ -9726,6 +9728,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // endregion Options
 
     // region Unsorted Or Legacy Methods
+    // Define what is legacy and not and remove in Milestone after 0.49.19
     public void applyPreset(final @Nullable CampaignPreset preset) {
         if (preset == null) {
             return;

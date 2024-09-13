@@ -200,24 +200,10 @@ public enum ROMDesignation {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
-
+            MMLogger.create(ROMDesignation.class)
+                    .error(ignored, "Unable to parse " + text + " into a ROMDesignation. Returning NONE");
+            return ROMDesignation.NONE;
         }
-
-        // Parse from Ordinal Int - Legacy save method
-        final ROMDesignation[] values = values();
-        try {
-            final int designation = Integer.parseInt(text);
-            if (values.length > designation) {
-                return values[designation];
-            }
-        } catch (Exception ignored) {
-
-        }
-
-        // Could not parse based on either method, so return NONE
-        MMLogger.create(ROMDesignation.class)
-                .error("Unable to parse " + text + " into a ROMDesignation. Returning NONE");
-        return ROMDesignation.NONE;
     }
     // endregion File I/O
 

@@ -47,10 +47,16 @@ import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.*;
+import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
+import megamek.common.Jumpship;
+import megamek.common.Mek;
+import megamek.common.MekSummaryCache;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
+import megamek.common.SmallCraft;
+import megamek.common.Tank;
 import megamek.common.annotations.Nullable;
-import megamek.common.equipment.AmmoMounted;
-import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.logging.MMLogger;
@@ -80,17 +86,14 @@ import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
-import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -110,11 +113,6 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
-import mekhq.io.migration.CamouflageMigrator;
-import mekhq.io.migration.FactionMigrator;
-import mekhq.io.migration.ForceIconMigrator;
-import mekhq.io.migration.GameOptionsMigrator;
-import mekhq.io.migration.PersonMigrator;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
 
@@ -284,8 +282,6 @@ public class CampaignXmlParser {
                     // TODO: hoist registerAll out of this
                     InjuryTypes.registerAll();
                     processPersonnelNodes(retVal, wn, version);
-                } else if (xn.equalsIgnoreCase("ancestors")) { // Legacy
-                    migrateAncestorNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("units")) {
                     processUnitNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("missions")) {
@@ -346,23 +342,6 @@ public class CampaignXmlParser {
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
         final CampaignOptions options = retVal.getCampaignOptions();
-
-        // Apply Migration
-        if (version.isLowerThan("0.49.3")) {
-            CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
-        }
-
-        if (version.isLowerThan("0.49.6")) {
-            retVal.setUnitIcon(ForceIconMigrator.migrateForceIconToKailans(retVal.getUnitIcon()));
-        } else if (version.isLowerThan("0.49.7")) {
-            retVal.setUnitIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getUnitIcon()));
-        }
-
-        if (version.isLowerThan("0.49.7")) {
-            FactionMigrator.migrateFactionCode(retVal);
-        }
-
-        GameOptionsMigrator.migrate(version, retVal.getGameOptions());
 
         // We need to do a post-process pass to restore a number of references.
         // Fix any Person Id References
@@ -562,10 +541,6 @@ public class CampaignXmlParser {
             retVal.setAtBEventProcessor(new AtBEventProcessor(retVal));
         }
 
-        // Load Completed. Time for final migration and sanity checks.
-        // Final migration
-        PersonMigrator.finalPersonMigration(version, retVal.getPersonnel());
-
         // Sanity Checks
         fixupUnitTechProblems(retVal);
 
@@ -689,24 +664,8 @@ public class CampaignXmlParser {
                     }
                 } else if (xn.equalsIgnoreCase("colour")) {
                     retVal.setColour(PlayerColour.parseFromString(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("colorIndex")) { // Legacy - 0.47.15 removal
-                    retVal.setColour(PlayerColour.parseFromString(wn.getTextContent().trim()));
-                    if (Camouflage.NO_CAMOUFLAGE.equals(retVal.getCamouflage().getCategory())) {
-                        retVal.getCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                        retVal.getCamouflage().setFilename(retVal.getColour().name());
-                    }
                 } else if (xn.equalsIgnoreCase(UnitIcon.XML_TAG)) {
                     retVal.setUnitIcon(UnitIcon.parseFromXML(wn));
-                } else if (xn.equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
-                    final String value = wn.getTextContent().trim();
-                    retVal.getUnitIcon().setCategory(value.equals("null") ? null : value);
-                } else if (xn.equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.6 removal
-                    final String value = wn.getTextContent().trim();
-                    if (value.equals("null") || value.equals(AbstractIcon.DEFAULT_ICON_FILENAME)) {
-                        retVal.getUnitIcon().setFilename(null);
-                    } else {
-                        retVal.getUnitIcon().setFilename(value);
-                    }
                 } else if (xn.equalsIgnoreCase("nameGen")) {
                     // First, get all the child nodes;
                     NodeList nl2 = wn.getChildNodes();
@@ -1325,7 +1284,7 @@ public class CampaignXmlParser {
                 continue;
             }
 
-            // deal with equipmentparts that are now subtyped
+            // deal with equipment parts that are now subtyped
             if (isLegacyMASC(prt)) {
                 Part replacement = new MASC(prt.getUnitTonnage(), ((EquipmentPart) prt).getType(),
                         ((EquipmentPart) prt).getEquipmentNum(), retVal, 0, prt.isOmniPodded());
@@ -1341,44 +1300,6 @@ public class CampaignXmlParser {
                 replacement.setId(prt.getId());
                 replacement.setUnit(prt.getUnit());
                 replaceParts.put(prt.getId(), replacement);
-            }
-
-            // Fixup LargeCraftAmmoBins from old versions
-            if ((prt.getUnit() != null) && (prt.getUnit().getEntity() != null)
-                    && version.isLowerThan("0.43.5")
-                    && ((prt instanceof AmmoBin) || (prt instanceof MissingAmmoBin))) {
-                if (prt.getUnit().getEntity().usesWeaponBays()) {
-                    AmmoMounted ammo;
-                    if (prt instanceof EquipmentPart) {
-                        ammo = (AmmoMounted) prt.getUnit().getEntity()
-                                .getEquipment(((EquipmentPart) prt).getEquipmentNum());
-                    } else {
-                        ammo = (AmmoMounted) prt.getUnit().getEntity()
-                                .getEquipment(((MissingEquipmentPart) prt).getEquipmentNum());
-                    }
-                    if (null != ammo) {
-                        if (prt instanceof AmmoBin) {
-                            LargeCraftAmmoBin replacement = new LargeCraftAmmoBin(prt.getUnitTonnage(),
-                                    ((AmmoBin) prt).getType(),
-                                    ((AmmoBin) prt).getEquipmentNum(),
-                                    ((AmmoBin) prt).getShotsNeeded(),
-                                    ammo.getSize(), retVal);
-                            replacement.setId(prt.getId());
-                            replacement.setUnit(prt.getUnit());
-                            replacement.setBay(prt.getUnit().getEntity().getBayByAmmo(ammo));
-                            replaceParts.put(prt.getId(), replacement);
-                        } else {
-                            MissingLargeCraftAmmoBin replacement = new MissingLargeCraftAmmoBin(prt.getUnitTonnage(),
-                                    ((MissingAmmoBin) prt).getType(),
-                                    ((MissingAmmoBin) prt).getEquipmentNum(),
-                                    ammo.getSize(), retVal);
-                            replacement.setId(prt.getId());
-                            replacement.setUnit(prt.getUnit());
-                            replacement.setBay(prt.getUnit().getEntity().getBayByAmmo(ammo));
-                            replaceParts.put(prt.getId(), replacement);
-                        }
-                    }
-                }
             }
         }
 
@@ -1524,22 +1445,6 @@ public class CampaignXmlParser {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
 
-            if (version.isLowerThan("0.44.0")) {
-                if ((prt instanceof MekLocation)
-                        && (((MekLocation) prt).getStructureType() == EquipmentType.T_STRUCTURE_ENDO_STEEL)) {
-                    if (null != u) {
-                        ((MekLocation) prt).setClan(TechConstants.isClan(u.getEntity().getStructureTechLevel()));
-                    } else {
-                        ((MekLocation) prt).setClan(retVal.getFaction().isClan());
-                    }
-                } else if ((prt instanceof MissingMekLocation)
-                        && (((MissingMekLocation) prt).getStructureType() == EquipmentType.T_STRUCTURE_ENDO_STEEL)) {
-                    if (null != u) {
-                        ((MissingMekLocation) prt).setClan(TechConstants.isClan(u.getEntity().getStructureTechLevel()));
-                    }
-                }
-            }
-
             // Spare Ammo bins are useless
             if ((prt instanceof AmmoBin) && prt.isSpare()) {
                 removeParts.add(prt);
@@ -1553,8 +1458,7 @@ public class CampaignXmlParser {
 
     /**
      * Determines if the supplied part is a MASC from an older save. This means that
-     * it needs to be converted
-     * to an actual MASC part.
+     * it needs to be converted to an actual MASC part.
      *
      * @param p The part to check.
      * @return Whether it's an old MASC.
@@ -1568,8 +1472,7 @@ public class CampaignXmlParser {
 
     /**
      * Determines if the supplied part is a "missing" MASC from an older save. This
-     * means that it needs to be converted
-     * to an actual "missing" MASC part.
+     * means that it needs to be converted to an actual "missing" MASC part.
      *
      * @param p The part to check.
      * @return Whether it's an old "missing" MASC.

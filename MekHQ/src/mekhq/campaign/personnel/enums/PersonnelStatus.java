@@ -317,9 +317,9 @@ public enum PersonnelStatus {
         } catch (Exception ignored) {
 
         }
-
-        MMLogger.create(PersonnelStatus.class).error("Unable to parse {} into a PersonnelStatus. Returning ACTIVE.",
+        String message = String.format("Unable to parse %s into a PersonnelStatus. Returning ACTIVE.",
                 text);
+        MMLogger.create(PersonnelStatus.class).error(message);
         return ACTIVE;
     }
     // endregion File I/O

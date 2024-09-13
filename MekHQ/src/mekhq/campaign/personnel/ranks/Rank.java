@@ -212,9 +212,6 @@ public class Rank {
 
                 if (wn2.getNodeName().equalsIgnoreCase("rankNames")) {
                     String names = wn2.getTextContent();
-                    if (version.isLowerThan("0.49.0")) {
-                        names += e0 ? ",--TECH,--TECH,--ADMIN" : ",-,-,-";
-                    }
                     rank.initializeRank(names.split(",", -1));
                 } else if (wn2.getNodeName().equalsIgnoreCase("officer")) {
                     rank.setOfficer(Boolean.parseBoolean(wn2.getTextContent().trim()));

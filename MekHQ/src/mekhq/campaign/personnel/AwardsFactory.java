@@ -40,7 +40,6 @@ import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.AwardSet;
-import mekhq.io.migration.PersonMigrator;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -143,11 +142,6 @@ public class AwardsFactory {
 
         if (defaultSetMigration && "Default Set".equalsIgnoreCase(set)) {
             name = (name == null) ? "" : name;
-            final String newName = PersonMigrator.awardDefaultSetMigrator(name);
-            if (newName != null) {
-                set = "standard";
-                name = newName;
-            }
         }
 
         final Award award = generateNew(set, name);

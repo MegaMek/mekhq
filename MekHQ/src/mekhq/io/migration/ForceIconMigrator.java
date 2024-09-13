@@ -20,13 +20,7 @@ package mekhq.io.migration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -9339,45 +9333,4 @@ public class ForceIconMigrator {
         }
     }
     // endregion Standard Force Icon
-
-    // region Legacy Save Format
-    public static void migrateLegacyIconMapNodes(final LayeredForceIcon icon, final Node wn) {
-        final NodeList nl = wn.getChildNodes();
-        for (int x = 0; x < nl.getLength(); x++) {
-            final Node wn2 = nl.item(x);
-            if ((wn2.getNodeType() != Node.ELEMENT_NODE) || !wn2.hasChildNodes()) {
-                continue;
-            }
-            final String oldKey = wn2.getAttributes().getNamedItem("key").getTextContent();
-            LayeredForceIconLayer key;
-            if ("Pieces/Type/".equalsIgnoreCase(oldKey)) {
-                key = LayeredForceIconLayer.TYPE;
-            } else {
-                key = Arrays.stream(LayeredForceIconLayer.values())
-                        .filter(layer -> layer.getLayerPath().equalsIgnoreCase(oldKey))
-                        .findFirst().orElse(null);
-            }
-
-            if (key == null) {
-                continue;
-            }
-            final List<ForcePieceIcon> values = processIconMapSubNodes(wn2.getChildNodes(), key);
-            if (!values.isEmpty()) {
-                icon.getPieces().put(key, values);
-            }
-        }
-    }
-
-    private static List<ForcePieceIcon> processIconMapSubNodes(final NodeList nl,
-            final LayeredForceIconLayer layer) {
-        return IntStream.range(0, nl.getLength())
-                .mapToObj(nl::item)
-                .filter(wn2 -> wn2.getNodeType() == Node.ELEMENT_NODE)
-                .map(wn2 -> wn2.getAttributes().getNamedItem("name").getTextContent())
-                .filter(value -> (value != null) && !value.isEmpty())
-                .map(value -> new ForcePieceIcon(layer, "", value))
-                .collect(Collectors.toList());
-    }
-    // endregion Legacy Save Format
-    // endregion 0.49.6
 }

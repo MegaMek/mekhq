@@ -149,17 +149,12 @@ public enum FinancialYearDuration {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
+            MMLogger.create(FinancialYearDuration.class)
+                    .error(ignored, "Unable to parse " + text + " into a FinancialYearDuration. Returning ANNUAL.");
+            return ANNUAL;
 
         }
 
-        // Legacy Parsing format
-        if ("BIANNUAL".equals(text)) {
-            return BIENNIAL;
-        }
-
-        MMLogger.create(FinancialYearDuration.class)
-                .error("Unable to parse " + text + " into a FinancialYearDuration. Returning ANNUAL.");
-        return ANNUAL;
     }
     // endregion File I/O
 

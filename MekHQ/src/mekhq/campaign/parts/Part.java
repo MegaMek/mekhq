@@ -83,7 +83,7 @@ import mekhq.utilities.MHQXMLUtility;
  * most of the actual work that can be done on parts. There is a lot of
  * variability in how parts actually handle
  * this work
- * 
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public abstract class Part implements IPartWork, ITechnology {
@@ -279,7 +279,7 @@ public abstract class Part implements IPartWork, ITechnology {
     /**
      * This is the value of the part that may be affected by characteristics and
      * campaign options
-     * 
+     *
      * @return the part's actual value
      */
     public Money getActualValue() {
@@ -292,7 +292,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * Adjusts the cost of a part based on one's campaign options
-     * 
+     *
      * @param cost the part's base cost
      * @return the part's cost adjusted for campaign options
      */
@@ -731,8 +731,7 @@ public abstract class Part implements IPartWork, ITechnology {
                     retVal.mode = WorkTime.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("teamId") // Legacy, 0.49.4 removal
-                        || wn2.getNodeName().equalsIgnoreCase("techId")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
                     if (!wn2.getTextContent().equals("null")) {
                         retVal.tech = new PartPersonRef(UUID.fromString(wn2.getTextContent()));
                     }
@@ -994,7 +993,7 @@ public abstract class Part implements IPartWork, ITechnology {
     /**
      * adds the quality modifiers for repair and maintenance of this part to a
      * TargetRoll
-     * 
+     *
      * @param mods - the {@link TargetRoll} that quality modifiers should be added
      *             to
      * @param tech - the {@link Person} that will make the repair or maintenance
@@ -1061,7 +1060,7 @@ public abstract class Part implements IPartWork, ITechnology {
     /**
      * Sets the the team member who has reserved this part for work they are
      * performing overnight.
-     * 
+     *
      * @param tech The team member.
      */
     public void setReservedBy(@Nullable Person tech) {
@@ -1123,7 +1122,7 @@ public abstract class Part implements IPartWork, ITechnology {
      * Gets a string containing details regarding the part,
      * e.g. OmniPod or how many hits it has taken and its
      * repair cost.
-     * 
+     *
      * @return A string containing details regarding the part.
      */
     @Override
@@ -1135,7 +1134,7 @@ public abstract class Part implements IPartWork, ITechnology {
      * Gets a string containing details regarding the part,
      * and optionally include information on its repair
      * status.
-     * 
+     *
      * @param includeRepairDetails {@code true} if the details
      *                             should include information such as the number of
      *                             hits or how much it would cost to repair the
@@ -1166,7 +1165,7 @@ public abstract class Part implements IPartWork, ITechnology {
      * Converts the array of strings normally returned by a call to
      * campaign.getInventory()
      * to a string that reads like "(x in transit, y on order)"
-     * 
+     *
      * @param inventories The inventory array, see campaign.getInventory() for
      *                    details.
      * @return Human readable string.
@@ -1243,7 +1242,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * Sets the unit which has reserved this part for a refit.
-     * 
+     *
      * @param unit The unit reserving this part for a refit.
      */
     public void setRefitUnit(@Nullable Unit unit) {
@@ -1252,7 +1251,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * Gets the unit which reserved this part for a refit.
-     * 
+     *
      * @return The unit reserving this part.
      */
     public @Nullable Unit getRefitUnit() {
@@ -1284,7 +1283,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * Sets the number of days until the part arrives.
-     * 
+     *
      * @param days The number of days until the part arrives.
      */
     public void setDaysToArrival(int days) {
@@ -1351,7 +1350,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * A method to set the number of parts en masse.
-     * 
+     *
      * @param number The new number of spares in the pile.
      */
     public void setQuantity(int number) {
@@ -1416,7 +1415,7 @@ public abstract class Part implements IPartWork, ITechnology {
     /**
      * Get the acquisition work to acquire a new part of this type
      * For most parts this is just getMissingPart(), but some override it
-     * 
+     *
      * @return
      */
     public IAcquisitionWork getAcquisitionWork() {
@@ -1460,7 +1459,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * Sets the parent part.
-     * 
+     *
      * @param part The parent part.
      */
     public void setParentPart(@Nullable Part part) {
@@ -1498,7 +1497,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * Adds a child part to this part.
-     * 
+     *
      * @param childPart The part to add as a child.
      */
     public void addChildPart(Part childPart) {
@@ -1508,7 +1507,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * Removes a child part from this part.
-     * 
+     *
      * @param childPart The child part to remove.
      */
     public void removeChildPart(Part childPart) {

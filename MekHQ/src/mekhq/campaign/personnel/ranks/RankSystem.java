@@ -29,7 +29,6 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,9 +37,9 @@ import org.w3c.dom.NodeList;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import megamek.utilities.xml.MMXMLUtility;
 import mekhq.MHQConstants;
 import mekhq.campaign.personnel.enums.RankSystemType;
-import mekhq.io.migration.PersonMigrator;
 import mekhq.utilities.MHQXMLUtility;
 
 public class RankSystem {
@@ -266,7 +265,7 @@ public class RankSystem {
      * @param version     the version to parse the rank system at
      * @param initialLoad whether this is the initial load or a later load
      * @param type        the type of rank system being loaded
-     * @return the unvalidated parsed rank system, or null if there is an issue in
+     * @return the un-validated parsed rank system, or null if there is an issue in
      *         parsing
      */
     public static @Nullable RankSystem generateInstanceFromXML(final NodeList nl,
@@ -278,23 +277,11 @@ public class RankSystem {
         rankSystem.setRanks(new ArrayList<>());
 
         try {
-            final boolean preWindchild = version.isLowerThan("0.49.0");
-            int rankSystemId = -1; // migration, from pre-0.49.0
-            boolean e0 = true; // migration, from pre-0.49.0
-
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
 
-                if (Stream.of("system", "rankSystem", "systemId").anyMatch(s -> wn.getNodeName().equalsIgnoreCase(s))) { // Legacy,
-                                                                                                                         // 0.49.0
-                                                                                                                         // removal
-                    rankSystemId = Integer.parseInt(wn.getTextContent().trim());
-                    if (!initialLoad && (rankSystemId != 12)) {
-                        final String code = PersonMigrator.migrateRankSystemCode(rankSystemId);
-                        return Ranks.getRankSystemFromCode(code);
-                    }
-                } else if (wn.getNodeName().equalsIgnoreCase("code")) {
-                    final String systemCode = MHQXMLUtility.unEscape(wn.getTextContent().trim());
+                if (wn.getNodeName().equalsIgnoreCase("code")) {
+                    final String systemCode = MMXMLUtility.unEscape(wn.getTextContent().trim());
                     // If this isn't the initial load and we already have a loaded system with the
                     // provided key, just return the rank system saved by the key in question.
                     // This does not need to be validated to ensure it is a proper rank system
@@ -303,22 +290,16 @@ public class RankSystem {
                     }
                     rankSystem.setCode(systemCode);
                 } else if (wn.getNodeName().equalsIgnoreCase("name")) {
-                    rankSystem.setName(MHQXMLUtility.unEscape(wn.getTextContent().trim()));
+                    rankSystem.setName(MMXMLUtility.unEscape(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("description")) {
-                    rankSystem.setDescription(MHQXMLUtility.unEscape(wn.getTextContent().trim()));
+                    rankSystem.setDescription(MMXMLUtility.unEscape(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("useROMDesignation")) {
                     rankSystem.setUseROMDesignation(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("useManeiDomini")) {
                     rankSystem.setUseManeiDomini(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("rank")) {
-                    rankSystem.getRanks().add(Rank.generateInstanceFromXML(wn, version, e0));
-                    e0 = false;
+                    rankSystem.getRanks().add(Rank.generateInstanceFromXML(wn, version, true));
                 }
-            }
-
-            if (preWindchild && (rankSystemId >= 0)) {
-                rankSystem.setCode(PersonMigrator.migrateRankSystemCode(rankSystemId));
-                rankSystem.setName(PersonMigrator.migrateRankSystemName(rankSystemId));
             }
         } catch (Exception e) {
             logger.error("", e);

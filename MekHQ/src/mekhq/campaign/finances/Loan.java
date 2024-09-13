@@ -36,7 +36,7 @@ import mekhq.utilities.MHQXMLUtility;
 
 /**
  * TODO : Update loan baseline based on latest Campaign Operations Rules
- * 
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Loan {
@@ -368,14 +368,6 @@ public class Loan {
                     loan.setNextPayment(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
                     loan.setOverdue(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) { // Legacy - 0.49.3 Removal
-                    loan.setPaymentAmount(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("refNumber")) { // Legacy - 0.49.3 Removal
-                    loan.setReferenceNumber(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) { // Legacy - 0.49.3 Removal
-                    loan.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("nPayments")) { // Legacy - 0.49.3 Removal
-                    loan.setRemainingPayments(Integer.parseInt(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
                 logger.error("", e);

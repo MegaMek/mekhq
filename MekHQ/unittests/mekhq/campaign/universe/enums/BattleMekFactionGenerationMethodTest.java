@@ -33,7 +33,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 
-public class BattleMekFactionGenerationMethodTest {
+class BattleMekFactionGenerationMethodTest {
     // region Variable Declarations
     private static final BattleMekFactionGenerationMethod[] methods = BattleMekFactionGenerationMethod.values();
 
@@ -43,7 +43,7 @@ public class BattleMekFactionGenerationMethodTest {
 
     // region Getters
     @Test
-    public void testGetToolTipText() {
+    void testGetToolTipText() {
         assertEquals(resources.getString("BattleMekFactionGenerationMethod.ORIGIN_FACTION.toolTipText"),
                 BattleMekFactionGenerationMethod.ORIGIN_FACTION.getToolTipText());
         assertEquals(resources.getString("BattleMekFactionGenerationMethod.SPECIFIED_FACTION.toolTipText"),
@@ -53,7 +53,7 @@ public class BattleMekFactionGenerationMethodTest {
 
     // region Boolean Comparison Methods
     @Test
-    public void testIsOriginFaction() {
+    void testIsOriginFaction() {
         for (final BattleMekFactionGenerationMethod battleMekFactionGenerationMethod : methods) {
             if (battleMekFactionGenerationMethod == BattleMekFactionGenerationMethod.ORIGIN_FACTION) {
                 assertTrue(battleMekFactionGenerationMethod.isOriginFaction());
@@ -64,7 +64,7 @@ public class BattleMekFactionGenerationMethodTest {
     }
 
     @Test
-    public void testIsCampaignFaction() {
+    void testIsCampaignFaction() {
         for (final BattleMekFactionGenerationMethod battleMekFactionGenerationMethod : methods) {
             if (battleMekFactionGenerationMethod == BattleMekFactionGenerationMethod.CAMPAIGN_FACTION) {
                 assertTrue(battleMekFactionGenerationMethod.isCampaignFaction());
@@ -75,7 +75,7 @@ public class BattleMekFactionGenerationMethodTest {
     }
 
     @Test
-    public void testIsSpecifiedFaction() {
+    void testIsSpecifiedFaction() {
         for (final BattleMekFactionGenerationMethod battleMekFactionGenerationMethod : methods) {
             if (battleMekFactionGenerationMethod == BattleMekFactionGenerationMethod.SPECIFIED_FACTION) {
                 assertTrue(battleMekFactionGenerationMethod.isSpecifiedFaction());
@@ -87,7 +87,7 @@ public class BattleMekFactionGenerationMethodTest {
     // region Boolean Comparison Methods
 
     @Test
-    public void testGenerateFaction() {
+    void testGenerateFaction() {
         final Person mockPerson = mock(Person.class);
         final Faction mockOriginFaction = mock(Faction.class);
         when(mockPerson.getOriginFaction()).thenReturn(mockOriginFaction);
@@ -113,7 +113,7 @@ public class BattleMekFactionGenerationMethodTest {
     }
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.text"),
                 BattleMekFactionGenerationMethod.CAMPAIGN_FACTION.toString());
         assertEquals(resources.getString("BattleMekFactionGenerationMethod.SPECIFIED_FACTION.text"),

@@ -233,7 +233,8 @@ public class CustomizeMissionDialog extends JDialog {
             mission.setSystemId(canonSystem.getId());
         } else {
             mission.setSystemId(null);
-            mission.setLegacyPlanetName(suggestPlanet.getText());
+            mission.setLegacyPlanetName(suggestPlanet.getText()); // Is this method actual Legacy or just related to
+                                                                  // history of planet
         }
 
         mission.setDesc(txtDesc.getText());

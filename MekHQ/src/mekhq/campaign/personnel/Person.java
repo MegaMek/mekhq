@@ -55,7 +55,6 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.PersonalLogger;
@@ -91,9 +90,6 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.work.IPartWork;
-import mekhq.io.idReferenceClasses.PersonIdReference;
-import mekhq.io.migration.FactionMigrator;
-import mekhq.io.migration.PersonMigrator;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -2277,12 +2273,7 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
                     retVal.setCallsignDirect(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-                    if (version.isLowerThan("0.49.7")) {
-                        retVal.setOriginFaction(Factions.getInstance().getFaction(
-                                FactionMigrator.migrateCodePINDRemoval(wn2.getTextContent().trim())));
-                    } else {
-                        retVal.setOriginFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
-                    }
+                    retVal.setOriginFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
                     String systemId = "", planetId = "";
                     try {
@@ -2308,11 +2299,7 @@ public class Person {
                     retVal.biography = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
                     final PersonnelRole primaryRole = PersonnelRole.parseFromString(wn2.getTextContent().trim());
-                    if (version.isLowerThan("0.49.1") && primaryRole.isNone()) {
-                        retVal.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
-                    } else {
-                        retVal.setPrimaryRoleDirect(primaryRole);
-                    }
+                    retVal.setPrimaryRoleDirect(primaryRole);
                 } else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
                     retVal.setSecondaryRoleDirect(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("acquisitions")) {
@@ -2346,15 +2333,7 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
-                    final RankSystem rankSystem;
-
-                    if (version.isLowerThan("0.49.0")) {
-                        final int rankSystemNumeric = Integer.parseInt(wn2.getTextContent().trim());
-                        rankSystem = (rankSystemNumeric >= 0) ? Ranks.getRankSystemFromCode(PersonMigrator
-                                .migrateRankSystemCode(rankSystemNumeric)) : retVal.getRankSystem();
-                    } else {
-                        rankSystem = Ranks.getRankSystemFromCode(wn2.getTextContent().trim());
-                    }
+                    final RankSystem rankSystem = Ranks.getRankSystemFromCode(wn2.getTextContent().trim());
 
                     if (rankSystem != null) {
                         retVal.setRankSystemDirect(rankSystem);
@@ -2456,8 +2435,7 @@ public class Person {
                             retVal.addLogEntry(logEntry);
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("missionLog") // Legacy - 0.49.11 removal
-                        || wn2.getNodeName().equalsIgnoreCase("scenarioLog")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioLog")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -2477,7 +2455,6 @@ public class Person {
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
-                    final boolean defaultSetMigrationRequired = version.isLowerThan("0.47.15");
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -2489,9 +2466,6 @@ public class Person {
                             logger.error("Unknown node type not loaded in personnel log nodes: {}", wn3.getNodeName());
                             continue;
                         }
-
-                        retVal.getAwardController().addAwardFromXml(AwardsFactory.getInstance()
-                                .generateNewFromXML(wn3, defaultSetMigrationRequired));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -2569,8 +2543,7 @@ public class Person {
                     retVal.intelligence = Intelligence.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personalityDescription")) {
                     retVal.personalityDescription = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
-                        || wn2.getNodeName().equalsIgnoreCase("clan")) { // Legacy - 0.49.9 removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")) {
                     retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
                     retVal.setCommander(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -2586,41 +2559,10 @@ public class Person {
                     retVal.setTryingToConceive(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
                     retVal.extraData = ExtraData.createFromXml(wn2);
-                } else if (wn2.getNodeName().equalsIgnoreCase("tryingToMarry")) { // Legacy - 0.49.4 removal
-                    retVal.setMarriageable(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("honorific")) { // Legacy, removed in 0.49.3
-                    retVal.setPostNominalDirect(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) { // Legacy - 0.49.3 removal
-                    retVal.getPortrait().setCategory(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) { // Legacy - 0.49.3 removal
-                    retVal.getPortrait().setFilename(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) { // Legacy, 0.49.1 removal
-                    // Legacy setup was as Astechs, but people (including me) often forgot to remove
-                    // the flag so... just ignoring if they aren't astechs
-                    if (retVal.getPrimaryRole().isAstech()) {
-                        retVal.setPrimaryRoleDirect(PersonnelRole.DEPENDENT);
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) { // Legacy
-                    if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
-                        retVal.prisonerStatus = PrisonerStatus.PRISONER_DEFECTOR;
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) { // legacy - 0.47.6 removal
-                    CampaignXmlParser.addToAncestryMigrationMap(UUID.fromString(wn2.getTextContent().trim()), retVal);
-                } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) { // legacy - 0.47.6 removal
-                    retVal.getGenealogy().setSpouse(new PersonIdReference(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("formerSpouses")) { // legacy - 0.47.6 removal
-                    retVal.getGenealogy().loadFormerSpouses(wn2.getChildNodes());
-                } else if (wn2.getNodeName().equalsIgnoreCase("name")) { // legacy - 0.47.5 removal
-                    retVal.migrateName(wn2.getTextContent());
                 }
             }
 
             retVal.setFullName(); // this sets the name based on the loaded values
-
-            if (version.isLowerThan("0.47.5") && (retVal.getExpectedDueDate() == null)
-                    && (retVal.getDueDate() != null)) {
-                retVal.setExpectedDueDate(retVal.getDueDate());
-            }
 
             if ((advantages != null) && !advantages.isBlank()) {
                 StringTokenizer st = new StringTokenizer(advantages, "::");

@@ -24,7 +24,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.Version;
-import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MekFileParser;
 import megamek.common.MekSummary;
@@ -159,8 +158,7 @@ public class UnitMarketOffer {
                                 "Failed to find unit with name " + unitName + ", removing the offer from the market.");
                         return null;
                     }
-                } else if (wn3.getNodeName().equalsIgnoreCase("pct") // Legacy, 0.49.3 removal
-                        || wn3.getNodeName().equalsIgnoreCase("percent")) {
+                } else if (wn3.getNodeName().equalsIgnoreCase("percent")) {
                     retVal.setPercent(Integer.parseInt(wn3.getTextContent().trim()));
                 } else if (wn3.getNodeName().equalsIgnoreCase("transitDuration")) {
                     retVal.setTransitDuration(Integer.parseInt(wn3.getTextContent().trim()));
@@ -169,12 +167,6 @@ public class UnitMarketOffer {
         } catch (Exception ex) {
             logger.error("", ex);
             return null;
-        }
-
-        if (version.isLowerThan("0.49.3")) {
-            retVal.setTransitDuration(campaign.getCampaignOptions().isInstantUnitMarketDelivery()
-                    ? 0
-                    : campaign.calculatePartTransitTime(Compute.d6(2) - 2));
         }
 
         return retVal;

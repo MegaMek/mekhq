@@ -84,7 +84,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.io.migration.CamouflageMigrator;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -2104,10 +2103,6 @@ public class Unit implements ITechnology {
         } catch (Exception ex) {
             logger.error("Could not parse unit {}", idNode.getTextContent().trim(), ex);
             return null;
-        }
-
-        if (version.isLowerThan("0.49.3")) {
-            CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
         }
 
         if (retVal.id == null) {

@@ -701,36 +701,6 @@ class PersonnelRoleTest {
         assertEquals(PersonnelRole.BATTLE_ARMOUR, PersonnelRole.parseFromString("BATTLE_ARMOUR"));
         assertEquals(PersonnelRole.ADMINISTRATOR_LOGISTICS, PersonnelRole.parseFromString("ADMINISTRATOR_LOGISTICS"));
 
-        // Legacy Parsing
-        assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("0"));
-        assertEquals(PersonnelRole.MEKWARRIOR, PersonnelRole.parseFromString("1"));
-        assertEquals(PersonnelRole.AEROSPACE_PILOT, PersonnelRole.parseFromString("2"));
-        assertEquals(PersonnelRole.GROUND_VEHICLE_DRIVER, PersonnelRole.parseFromString("3"));
-        assertEquals(PersonnelRole.NAVAL_VEHICLE_DRIVER, PersonnelRole.parseFromString("4"));
-        assertEquals(PersonnelRole.VTOL_PILOT, PersonnelRole.parseFromString("5"));
-        assertEquals(PersonnelRole.VEHICLE_GUNNER, PersonnelRole.parseFromString("6"));
-        assertEquals(PersonnelRole.BATTLE_ARMOUR, PersonnelRole.parseFromString("7"));
-        assertEquals(PersonnelRole.SOLDIER, PersonnelRole.parseFromString("8"));
-        assertEquals(PersonnelRole.PROTOMEK_PILOT, PersonnelRole.parseFromString("9"));
-        assertEquals(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, PersonnelRole.parseFromString("10"));
-        assertEquals(PersonnelRole.VESSEL_PILOT, PersonnelRole.parseFromString("11"));
-        assertEquals(PersonnelRole.VESSEL_CREW, PersonnelRole.parseFromString("12"));
-        assertEquals(PersonnelRole.VESSEL_GUNNER, PersonnelRole.parseFromString("13"));
-        assertEquals(PersonnelRole.VESSEL_NAVIGATOR, PersonnelRole.parseFromString("14"));
-        assertEquals(PersonnelRole.MEK_TECH, PersonnelRole.parseFromString("15"));
-        assertEquals(PersonnelRole.MECHANIC, PersonnelRole.parseFromString("16"));
-        assertEquals(PersonnelRole.AERO_TEK, PersonnelRole.parseFromString("17"));
-        assertEquals(PersonnelRole.BA_TECH, PersonnelRole.parseFromString("18"));
-        assertEquals(PersonnelRole.ASTECH, PersonnelRole.parseFromString("19"));
-        assertEquals(PersonnelRole.DOCTOR, PersonnelRole.parseFromString("20"));
-        assertEquals(PersonnelRole.MEDIC, PersonnelRole.parseFromString("21"));
-        assertEquals(PersonnelRole.ADMINISTRATOR_COMMAND, PersonnelRole.parseFromString("22"));
-        assertEquals(PersonnelRole.ADMINISTRATOR_LOGISTICS, PersonnelRole.parseFromString("23"));
-        assertEquals(PersonnelRole.ADMINISTRATOR_TRANSPORT, PersonnelRole.parseFromString("24"));
-        assertEquals(PersonnelRole.ADMINISTRATOR_HR, PersonnelRole.parseFromString("25"));
-        assertEquals(PersonnelRole.LAM_PILOT, PersonnelRole.parseFromString("26"));
-        assertEquals(PersonnelRole.VEHICLE_CREW, PersonnelRole.parseFromString("27"));
-
         // Error Case
         assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("28"));
         assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("blah"));

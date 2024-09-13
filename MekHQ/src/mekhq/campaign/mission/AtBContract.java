@@ -882,9 +882,7 @@ public class AtBContract extends Contract {
                     enemyCode = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyName")) {
                     enemyName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("contractType")
-                        || wn2.getNodeName().equalsIgnoreCase("missionType")) { // Mission Type is Legacy - 0.49.2
-                                                                                // removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("contractType")) {
                     setContractType(AtBContractType.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("allySkill")) {
                     setAllySkill(SkillLevel.parseFromString(wn2.getTextContent().trim()));
@@ -904,24 +902,12 @@ public class AtBContract extends Contract {
                     getAllyCamouflage().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getTextContent().equalsIgnoreCase("allyColour")) {
                     setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("allyColorIndex")) { // Legacy - 0.47.15 removal
-                    setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                    if (Camouflage.NO_CAMOUFLAGE.equals(getAllyCamouflage().getCategory())) {
-                        getAllyCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                        getAllyCamouflage().setFilename(getAllyColour().name());
-                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoCategory")) {
                     getEnemyCamouflage().setCategory(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoFileName")) {
                     getEnemyCamouflage().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getTextContent().equalsIgnoreCase("enemyColour")) {
                     setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enemyColorIndex")) { // Legacy - 0.47.15 removal
-                    setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                    if (Camouflage.NO_CAMOUFLAGE.equals(getEnemyCamouflage().getCategory())) {
-                        getEnemyCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                        getEnemyCamouflage().setFilename(getEnemyColour().name());
-                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("requiredLances")) {
                     requiredLances = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("moraleLevel")) {

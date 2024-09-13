@@ -26,16 +26,18 @@ import static org.mockito.Mockito.when;
 
 import java.util.ResourceBundle;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import megamek.common.BipedMek;
 import megamek.common.Dropship;
+import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
-public class ROMDesignationTest {
+class ROMDesignationTest {
     // region Variable Declarations
     private static final ROMDesignation[] designations = ROMDesignation.values();
 
@@ -43,9 +45,14 @@ public class ROMDesignationTest {
             MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
 
+    @BeforeAll
+    public static void beforeAll() {
+        EquipmentType.initializeTypes();
+    }
+
     // region Boolean Comparison Methods
     @Test
-    public void testIsNone() {
+    void testIsNone() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.NONE) {
                 assertTrue(designation.isNone());
@@ -56,7 +63,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsEpsilon() {
+    void testIsEpsilon() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.EPSILON) {
                 assertTrue(designation.isEpsilon());
@@ -67,7 +74,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsPi() {
+    void testIsPi() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.PI) {
                 assertTrue(designation.isPi());
@@ -78,7 +85,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsIota() {
+    void testIsIota() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.IOTA) {
                 assertTrue(designation.isIota());
@@ -89,7 +96,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsXi() {
+    void testIsXi() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.XI) {
                 assertTrue(designation.isXi());
@@ -100,7 +107,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsTheta() {
+    void testIsTheta() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.THETA) {
                 assertTrue(designation.isTheta());
@@ -111,7 +118,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsZeta() {
+    void testIsZeta() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.ZETA) {
                 assertTrue(designation.isZeta());
@@ -122,7 +129,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsMu() {
+    void testIsMu() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.MU) {
                 assertTrue(designation.isMu());
@@ -133,7 +140,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsRho() {
+    void testIsRho() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.RHO) {
                 assertTrue(designation.isRho());
@@ -144,7 +151,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsLambda() {
+    void testIsLambda() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.LAMBDA) {
                 assertTrue(designation.isLambda());
@@ -155,7 +162,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsPsi() {
+    void testIsPsi() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.PSI) {
                 assertTrue(designation.isPsi());
@@ -166,7 +173,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsOmicron() {
+    void testIsOmicron() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.OMICRON) {
                 assertTrue(designation.isOmicron());
@@ -177,7 +184,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsChi() {
+    void testIsChi() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.CHI) {
                 assertTrue(designation.isChi());
@@ -188,7 +195,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsGamma() {
+    void testIsGamma() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.GAMMA) {
                 assertTrue(designation.isGamma());
@@ -199,7 +206,7 @@ public class ROMDesignationTest {
     }
 
     @Test
-    public void testIsKappa() {
+    void testIsKappa() {
         for (final ROMDesignation designation : designations) {
             if (designation == ROMDesignation.KAPPA) {
                 assertTrue(designation.isKappa());
@@ -211,7 +218,7 @@ public class ROMDesignationTest {
     // endregion Boolean Comparison Methods
 
     @Test
-    public void testGetComStarBranchDesignation() {
+    void testGetComStarBranchDesignation() {
         final Unit mockUnit = mock(Unit.class);
 
         final Person mockPerson = mock(Person.class);
@@ -348,14 +355,10 @@ public class ROMDesignationTest {
 
     // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(ROMDesignation.NONE, ROMDesignation.parseFromString("NONE"));
         assertEquals(ROMDesignation.LAMBDA, ROMDesignation.parseFromString("LAMBDA"));
-
-        // Legacy Parsing
-        assertEquals(ROMDesignation.NONE, ROMDesignation.parseFromString("0"));
-        assertEquals(ROMDesignation.EPSILON, ROMDesignation.parseFromString("1"));
 
         // Error Case
         assertEquals(ROMDesignation.NONE, ROMDesignation.parseFromString("15"));
@@ -364,7 +367,7 @@ public class ROMDesignationTest {
     // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("ROMDesignation.NONE.text"), ROMDesignation.NONE.toString());
         assertEquals(resources.getString("ROMDesignation.KAPPA.text"), ROMDesignation.KAPPA.toString());
     }

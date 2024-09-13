@@ -35,7 +35,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.unit.Unit;
-import mekhq.io.migration.ForceIconMigrator;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -140,14 +139,6 @@ public class ForceStub {
                     retVal.setForceIcon(StandardForceIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase(LayeredForceIcon.XML_TAG)) {
                     retVal.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
-                    retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.6 removal
-                    final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
-                    ForceIconMigrator.migrateLegacyIconMapNodes(layeredForceIcon, wn2);
-                    retVal.setForceIcon(layeredForceIcon);
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.6 removal
-                    retVal.getForceIcon().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
@@ -180,12 +171,6 @@ public class ForceStub {
             }
         } catch (Exception ex) {
             logger.error("", ex);
-        }
-
-        if (version.isLowerThan("0.49.6")) {
-            retVal.setForceIcon(ForceIconMigrator.migrateForceIconToKailans(retVal.getForceIcon()));
-        } else if (version.isLowerThan("0.49.7")) {
-            retVal.setForceIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getForceIcon()));
         }
 
         return retVal;

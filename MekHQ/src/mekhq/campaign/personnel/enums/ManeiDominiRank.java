@@ -81,31 +81,17 @@ public enum ManeiDominiRank {
     }
     // endregion Boolean Comparison Methods
 
-    // region File I/O
     public static ManeiDominiRank parseFromString(final String text) {
-        // Parse based on the enum name
         try {
             return valueOf(text);
         } catch (Exception ignored) {
+            MMLogger.create(ManeiDominiRank.class)
+                    .error(ignored, "Unable to parse " + text + "into a ManeiDominiRank. Returning NONE.");
+            return NONE;
 
         }
 
-        // Parse from Ordinal Int - Legacy save method
-        final ManeiDominiRank[] values = values();
-        try {
-            int mdRank = Integer.parseInt(text) + 1;
-            if (values.length > mdRank) {
-                return values[mdRank];
-            }
-        } catch (Exception ignored) {
-
-        }
-
-        MMLogger.create(ManeiDominiRank.class)
-                .error("Unable to parse " + text + "into a ManeiDominiRank. Returning NONE.");
-        return NONE;
     }
-    // endregion File I/O
 
     @Override
     public String toString() {

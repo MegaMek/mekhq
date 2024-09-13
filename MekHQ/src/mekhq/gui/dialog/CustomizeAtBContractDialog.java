@@ -596,7 +596,8 @@ public class CustomizeAtBContractDialog extends JDialog {
             contract.setSystemId(canonSystem.getId());
         } else {
             contract.setSystemId(null);
-            contract.setLegacyPlanetName(suggestPlanet.getText());
+            contract.setLegacyPlanetName(suggestPlanet.getText());// Is this method actual Legacy or just related to
+                                                                  // history of planet
         }
 
         contract.setDesc(txtDesc.getText());

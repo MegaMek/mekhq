@@ -107,9 +107,8 @@ public class Mission {
     /**
      * Convenience property to return the name of the current planet.
      * Sometimes, the "current planet" doesn't match up with an existing planet in
-     * our planet database,
-     * in which case we return whatever was stored.
-     * 
+     * our planet database, in which case we return whatever was stored.
+     *
      * @return
      */
     public String getSystemName(LocalDate when) {

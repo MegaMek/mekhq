@@ -87,23 +87,12 @@ public enum ManeiDominiClass {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
+            MMLogger.create(ManeiDominiClass.class)
+                    .error(ignored, "Unable to parse " + text + "into a ManeiDominiClass. Returning NONE.");
+            return NONE;
 
         }
 
-        // Parse from Ordinal Int - Legacy save method
-        ManeiDominiClass[] values = values();
-        try {
-            int mdClass = Integer.parseInt(text);
-            if (values.length > mdClass) {
-                return values[mdClass];
-            }
-        } catch (Exception ignored) {
-
-        }
-
-        MMLogger.create(ManeiDominiClass.class)
-                .error("Unable to parse " + text + "into a ManeiDominiClass. Returning NONE.");
-        return NONE;
     }
     // endregion File I/O
 

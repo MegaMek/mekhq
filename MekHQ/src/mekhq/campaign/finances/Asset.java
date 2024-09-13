@@ -135,8 +135,6 @@ public class Asset {
                     asset.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("income")) {
                     asset.setIncome(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) { // Legacy - 0.49.3 Removal
-                    asset.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
                 logger.error("", e);

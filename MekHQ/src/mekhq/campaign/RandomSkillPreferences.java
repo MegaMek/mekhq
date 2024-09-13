@@ -237,15 +237,8 @@ public class RandomSkillPreferences {
                     retVal.secondSkillBonus = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitBonuses")) {
                     String[] values = wn2.getTextContent().split(",");
-                    if (version.isLowerThan("0.49.0")) {
-                        for (int i = 0; i < values.length; i++) {
-                            retVal.recruitBonuses[PersonnelRole.parseFromString(String.valueOf(i)).ordinal()] = Integer
-                                    .parseInt(values[i]);
-                        }
-                    } else {
-                        for (int i = 0; i < values.length; i++) {
-                            retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
-                        }
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
                     String[] values = wn2.getTextContent().split(",");
