@@ -54,24 +54,24 @@ public class HitLocationGen {
         GENERIC_RANDOM_HIT_TABLE.put(190, BodyLocation.CHEST);
         GENERIC_RANDOM_HIT_TABLE.put(200, BodyLocation.HEAD);
     }
-    private static NavigableMap<Integer, BodyLocation> MECH_RANDOM_HIT_TABLE = new TreeMap<>();
+    private static NavigableMap<Integer, BodyLocation> MEK_RANDOM_HIT_TABLE = new TreeMap<>();
     static {
-        MECH_RANDOM_HIT_TABLE.put(25, BodyLocation.HEAD);
-        MECH_RANDOM_HIT_TABLE.put(41, BodyLocation.CHEST);
-        MECH_RANDOM_HIT_TABLE.put(48, BodyLocation.ABDOMEN);
-        MECH_RANDOM_HIT_TABLE.put(61, BodyLocation.LEFT_ARM);
-        MECH_RANDOM_HIT_TABLE.put(74, BodyLocation.RIGHT_ARM);
-        MECH_RANDOM_HIT_TABLE.put(79, BodyLocation.LEFT_FOOT);
-        MECH_RANDOM_HIT_TABLE.put(100, BodyLocation.LEFT_LEG);
-        MECH_RANDOM_HIT_TABLE.put(105, BodyLocation.RIGHT_FOOT);
-        MECH_RANDOM_HIT_TABLE.put(126, BodyLocation.RIGHT_LEG);
-        MECH_RANDOM_HIT_TABLE.put(131, BodyLocation.RIGHT_HAND);
-        MECH_RANDOM_HIT_TABLE.put(139, BodyLocation.RIGHT_ARM);
-        MECH_RANDOM_HIT_TABLE.put(144, BodyLocation.LEFT_HAND);
-        MECH_RANDOM_HIT_TABLE.put(152, BodyLocation.LEFT_ARM);
-        MECH_RANDOM_HIT_TABLE.put(159, BodyLocation.ABDOMEN);
-        MECH_RANDOM_HIT_TABLE.put(176, BodyLocation.CHEST);
-        MECH_RANDOM_HIT_TABLE.put(200, BodyLocation.HEAD);
+        MEK_RANDOM_HIT_TABLE.put(25, BodyLocation.HEAD);
+        MEK_RANDOM_HIT_TABLE.put(41, BodyLocation.CHEST);
+        MEK_RANDOM_HIT_TABLE.put(48, BodyLocation.ABDOMEN);
+        MEK_RANDOM_HIT_TABLE.put(61, BodyLocation.LEFT_ARM);
+        MEK_RANDOM_HIT_TABLE.put(74, BodyLocation.RIGHT_ARM);
+        MEK_RANDOM_HIT_TABLE.put(79, BodyLocation.LEFT_FOOT);
+        MEK_RANDOM_HIT_TABLE.put(100, BodyLocation.LEFT_LEG);
+        MEK_RANDOM_HIT_TABLE.put(105, BodyLocation.RIGHT_FOOT);
+        MEK_RANDOM_HIT_TABLE.put(126, BodyLocation.RIGHT_LEG);
+        MEK_RANDOM_HIT_TABLE.put(131, BodyLocation.RIGHT_HAND);
+        MEK_RANDOM_HIT_TABLE.put(139, BodyLocation.RIGHT_ARM);
+        MEK_RANDOM_HIT_TABLE.put(144, BodyLocation.LEFT_HAND);
+        MEK_RANDOM_HIT_TABLE.put(152, BodyLocation.LEFT_ARM);
+        MEK_RANDOM_HIT_TABLE.put(159, BodyLocation.ABDOMEN);
+        MEK_RANDOM_HIT_TABLE.put(176, BodyLocation.CHEST);
+        MEK_RANDOM_HIT_TABLE.put(200, BodyLocation.HEAD);
     }
 
     private static BodyLocation queryRandomTable(NavigableMap<Integer, BodyLocation> table,
@@ -88,7 +88,7 @@ public class HitLocationGen {
         return queryRandomTable(GENERIC_RANDOM_HIT_TABLE, rnd, validCheck);
     }
 
-    public static BodyLocation mechAndAsf(IntUnaryOperator rnd, Function<BodyLocation, Boolean> validCheck) {
-        return queryRandomTable(MECH_RANDOM_HIT_TABLE, rnd, validCheck);
+    public static BodyLocation mekAndAsf(IntUnaryOperator rnd, Function<BodyLocation, Boolean> validCheck) {
+        return queryRandomTable(MEK_RANDOM_HIT_TABLE, rnd, validCheck);
     }
 }

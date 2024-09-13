@@ -21,8 +21,8 @@
 /MekHQ/data/images/portraits/Female/
 /MekHQ/data/images/portraits/Male/
 /MekHQ/data/images/temp/
-/MekHQ/data/mechfiles/units.cache
-/MekHQ/data/mechfiles/customs/
+/MekHQ/data/mekfiles/units.cache
+/MekHQ/data/mekfiles/customs/
 /MekHQ/data/universe/awards/
 !/MekHQ/data/universe/awards/standard.xml
 /MekHQ/logs/

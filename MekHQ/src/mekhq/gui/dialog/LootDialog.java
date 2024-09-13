@@ -20,30 +20,33 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import megamek.client.ui.swing.UnitLoadingDialog;
-import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
-import megamek.common.Entity;
-import megamek.common.MechSummaryCache;
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.parts.Part;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 
+import javax.swing.*;
+
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.UnitLoadingDialog;
+import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
+import megamek.common.Entity;
+import megamek.common.MekSummaryCache;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.Loot;
+import mekhq.campaign.parts.Part;
+
 /**
  * @author Taharqa
  */
 public class LootDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(LootDialog.class);
+
     private JFrame frame;
     private Loot loot;
     private boolean cancelled;
@@ -130,7 +133,8 @@ public class LootDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Cash"), gridBagConstraints);
 
-        spnCash = new JSpinner(new SpinnerNumberModel(loot.getCash().getAmount().intValue(), -300000000, 300000000, 10000));
+        spnCash = new JSpinner(
+                new SpinnerNumberModel(loot.getCash().getAmount().intValue(), -300000000, 300000000, 10000));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -258,7 +262,7 @@ public class LootDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -268,7 +272,7 @@ public class LootDialog extends JDialog {
 
     private void addUnit() {
         UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(frame);
-        if (!MechSummaryCache.getInstance().isInitialized()) {
+        if (!MekSummaryCache.getInstance().isInitialized()) {
             unitLoadingDialog.setVisible(true);
         }
         AbstractUnitSelectorDialog usd = new MekHQUnitSelectorDialog(frame, unitLoadingDialog,
@@ -353,7 +357,7 @@ public class LootDialog extends JDialog {
         if (selectedRow != -1) {
             if (((DefaultListModel<String>) listParts.getModel()).getSize() > 0) {
                 if (((DefaultListModel<String>) listParts.getModel()).getSize() == selectedRow) {
-                    listParts.setSelectedIndex(selectedRow-1);
+                    listParts.setSelectedIndex(selectedRow - 1);
                 } else {
                     listParts.setSelectedIndex(selectedRow);
                 }

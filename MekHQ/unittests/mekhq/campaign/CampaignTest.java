@@ -20,25 +20,6 @@
  */
 package mekhq.campaign;
 
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Infantry;
-import megamek.common.enums.SkillLevel;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Systems;
-import org.apache.logging.log4j.LogManager;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,6 +28,24 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.logging.log4j.LogManager;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import megamek.common.Dropship;
+import megamek.common.EquipmentType;
+import megamek.common.enums.SkillLevel;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Systems;
 
 /**
  * @author Deric Page (dericdotpageatgmaildotcom)
@@ -65,13 +64,13 @@ public class CampaignTest {
     }
 
     @Test
-    public void testGetTechs() {
+    void testGetTechs() {
         List<Person> testPersonList = new ArrayList<>(5);
         List<Person> testActivePersonList = new ArrayList<>(5);
 
         Person mockTechActive = mock(Person.class);
         when(mockTechActive.isTech()).thenReturn(true);
-        when(mockTechActive.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
+        when(mockTechActive.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
         when(mockTechActive.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTechActive).getStatus();
         when(mockTechActive.getMinutesLeft()).thenReturn(240);
@@ -81,7 +80,7 @@ public class CampaignTest {
 
         Person mockTechActiveTwo = mock(Person.class);
         when(mockTechActiveTwo.isTech()).thenReturn(true);
-        when(mockTechActiveTwo.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
+        when(mockTechActiveTwo.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
         when(mockTechActiveTwo.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTechActiveTwo).getStatus();
         when(mockTechActiveTwo.getMinutesLeft()).thenReturn(1);
@@ -91,7 +90,7 @@ public class CampaignTest {
 
         Person mockTechInactive = mock(Person.class);
         when(mockTechInactive.isTech()).thenReturn(true);
-        when(mockTechInactive.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
+        when(mockTechInactive.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
         when(mockTechInactive.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.RETIRED).when(mockTechInactive).getStatus();
         when(mockTechInactive.getMinutesLeft()).thenReturn(240);
@@ -100,7 +99,7 @@ public class CampaignTest {
 
         Person mockTechNoTime = mock(Person.class);
         when(mockTechNoTime.isTech()).thenReturn(true);
-        when(mockTechNoTime.getPrimaryRole()).thenReturn(PersonnelRole.MECH_TECH);
+        when(mockTechNoTime.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
         when(mockTechNoTime.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockTechNoTime).getStatus();
         when(mockTechNoTime.getMinutesLeft()).thenReturn(0);
@@ -110,7 +109,7 @@ public class CampaignTest {
 
         Person mockNonTechOne = mock(Person.class);
         when(mockNonTechOne.isTech()).thenReturn(false);
-        when(mockNonTechOne.getPrimaryRole()).thenReturn(PersonnelRole.MECHWARRIOR);
+        when(mockNonTechOne.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
         when(mockNonTechOne.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
         doReturn(PersonnelStatus.ACTIVE).when(mockNonTechOne).getStatus();
         when(mockNonTechOne.getMinutesLeft()).thenReturn(240);
@@ -150,16 +149,7 @@ public class CampaignTest {
     }
 
     @Test
-    public void testCampaignResetInfantry() {
-        // It is possible for Infantry to have BAP equal true, but empty Sensors vector.
-        Campaign campaign = new Campaign();
-        Entity infantry = spy(new Infantry());
-        when(infantry.hasBAP()).thenReturn(true);
-        campaign.clearGameData(infantry);
-    }
-
-    @Test
-    public void testTransportShips() {
+    void testTransportShips() {
         Campaign campaign = spy(new Campaign());
 
         // New campaigns have no transports

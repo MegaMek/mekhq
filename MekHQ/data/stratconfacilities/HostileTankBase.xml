@@ -1,10 +1,11 @@
 <StratconFacility>
-	<capturedDefinition>AlliedTankBase.xml</capturedDefinition>
-	<displayableName>Tank Base</displayableName>
-        <facilityType>TankBase</facilityType>
-        <localModifiers>EnemyTankGarrison.xml</localModifiers>
-        <owner>Opposing</owner>
-        <sharedModifiers>EnemyTankReinforcements.xml</sharedModifiers>
-	<userDescription>Hostile vehicles will participate in scenarios on this track and defend this facility.</userDescription>	
-        <visible>false</visible>
+    <capturedDefinition>AlliedTankBase.xml</capturedDefinition>
+    <displayableName>Tank Base</displayableName>
+    <facilityType>TankBase</facilityType>
+    <localModifiers>EnemyTankGarrison.xml</localModifiers>
+    <owner>Opposing</owner>
+    <sharedModifiers>EnemyTankReinforcements.xml</sharedModifiers>
+    <userDescription>Hostile vehicles will participate in scenarios on this track and defend
+        this facility.</userDescription>
+    <visible>false</visible>
 </StratconFacility>

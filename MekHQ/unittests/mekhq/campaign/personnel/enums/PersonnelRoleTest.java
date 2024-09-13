@@ -18,31 +18,36 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.awt.event.KeyEvent;
-import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PersonnelRoleTest {
-    //region Variable Declarations
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class PersonnelRoleTest {
+    // region Variable Declarations
     private static final PersonnelRole[] roles = PersonnelRole.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
-    public void testGetName() {
-        assertEquals(resources.getString("PersonnelRole.MECHWARRIOR.text"),
-                PersonnelRole.MECHWARRIOR.getName(false));
-        assertEquals(resources.getString("PersonnelRole.MECHWARRIOR.text"),
-                PersonnelRole.MECHWARRIOR.getName(true));
+    void testGetName() {
+        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"),
+                PersonnelRole.MEKWARRIOR.getName(false));
+        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"),
+                PersonnelRole.MEKWARRIOR.getName(true));
         assertEquals(resources.getString("PersonnelRole.BATTLE_ARMOUR.text"),
                 PersonnelRole.BATTLE_ARMOUR.getName(false));
         assertEquals(resources.getString("PersonnelRole.BATTLE_ARMOUR.clan.text"),
@@ -52,7 +57,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testGetMnemonicEnsureUniqueness() {
+    void testGetMnemonicEnsureUniqueness() {
         final Set<Integer> usedMnemonics = new HashSet<>();
         for (final PersonnelRole role : roles) {
             if (role.getMnemonic() == KeyEvent.VK_UNDEFINED) {
@@ -64,22 +69,22 @@ public class PersonnelRoleTest {
             usedMnemonics.add(role.getMnemonic());
         }
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsMechWarrior() {
+    void testIsMekWarrior() {
         for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.MECHWARRIOR) {
-                assertTrue(personnelRole.isMechWarrior());
+            if (personnelRole == PersonnelRole.MEKWARRIOR) {
+                assertTrue(personnelRole.isMekWarrior());
             } else {
-                assertFalse(personnelRole.isMechWarrior());
+                assertFalse(personnelRole.isMekWarrior());
             }
         }
     }
 
     @Test
-    public void testIsLAMPilot() {
+    void testIsLAMPilot() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.LAM_PILOT) {
                 assertTrue(personnelRole.isLAMPilot());
@@ -90,7 +95,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsGroundVehicleDriver() {
+    void testIsGroundVehicleDriver() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.GROUND_VEHICLE_DRIVER) {
                 assertTrue(personnelRole.isGroundVehicleDriver());
@@ -101,7 +106,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsNavalVehicleDriver() {
+    void testIsNavalVehicleDriver() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.NAVAL_VEHICLE_DRIVER) {
                 assertTrue(personnelRole.isNavalVehicleDriver());
@@ -112,7 +117,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsVTOLPilot() {
+    void testIsVTOLPilot() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.VTOL_PILOT) {
                 assertTrue(personnelRole.isVTOLPilot());
@@ -123,7 +128,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsVehicleGunner() {
+    void testIsVehicleGunner() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.VEHICLE_GUNNER) {
                 assertTrue(personnelRole.isVehicleGunner());
@@ -134,7 +139,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsVehicleCrew() {
+    void testIsVehicleCrew() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.VEHICLE_CREW) {
                 assertTrue(personnelRole.isVehicleCrew());
@@ -145,7 +150,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsAerospacePilot() {
+    void testIsAerospacePilot() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.AEROSPACE_PILOT) {
                 assertTrue(personnelRole.isAerospacePilot());
@@ -156,7 +161,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsConventionalAircraftPilot() {
+    void testIsConventionalAircraftPilot() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT) {
                 assertTrue(personnelRole.isConventionalAircraftPilot());
@@ -167,18 +172,18 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsProtoMechPilot() {
+    void testIsProtoMekPilot() {
         for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.PROTOMECH_PILOT) {
-                assertTrue(personnelRole.isProtoMechPilot());
+            if (personnelRole == PersonnelRole.PROTOMEK_PILOT) {
+                assertTrue(personnelRole.isProtoMekPilot());
             } else {
-                assertFalse(personnelRole.isProtoMechPilot());
+                assertFalse(personnelRole.isProtoMekPilot());
             }
         }
     }
 
     @Test
-    public void testIsBattleArmour() {
+    void testIsBattleArmour() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.BATTLE_ARMOUR) {
                 assertTrue(personnelRole.isBattleArmour());
@@ -189,7 +194,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsSoldier() {
+    void testIsSoldier() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.SOLDIER) {
                 assertTrue(personnelRole.isSoldier());
@@ -200,7 +205,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsVesselPilot() {
+    void testIsVesselPilot() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.VESSEL_PILOT) {
                 assertTrue(personnelRole.isVesselPilot());
@@ -211,7 +216,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsVesselGunner() {
+    void testIsVesselGunner() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.VESSEL_GUNNER) {
                 assertTrue(personnelRole.isVesselGunner());
@@ -222,7 +227,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsVesselCrew() {
+    void testIsVesselCrew() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.VESSEL_CREW) {
                 assertTrue(personnelRole.isVesselCrew());
@@ -233,7 +238,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsVesselNavigator() {
+    void testIsVesselNavigator() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.VESSEL_NAVIGATOR) {
                 assertTrue(personnelRole.isVesselNavigator());
@@ -244,18 +249,18 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsMechTech() {
+    void testIsMekTech() {
         for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.MECH_TECH) {
-                assertTrue(personnelRole.isMechTech());
+            if (personnelRole == PersonnelRole.MEK_TECH) {
+                assertTrue(personnelRole.isMekTech());
             } else {
-                assertFalse(personnelRole.isMechTech());
+                assertFalse(personnelRole.isMekTech());
             }
         }
     }
 
     @Test
-    public void testIsMechanic() {
+    void testIsMechanic() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.MECHANIC) {
                 assertTrue(personnelRole.isMechanic());
@@ -266,18 +271,18 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsAeroTech() {
+    void testIsAeroTek() {
         for (final PersonnelRole personnelRole : roles) {
-            if (personnelRole == PersonnelRole.AERO_TECH) {
-                assertTrue(personnelRole.isAeroTech());
+            if (personnelRole == PersonnelRole.AERO_TEK) {
+                assertTrue(personnelRole.isAeroTek());
             } else {
-                assertFalse(personnelRole.isAeroTech());
+                assertFalse(personnelRole.isAeroTek());
             }
         }
     }
 
     @Test
-    public void testIsBATech() {
+    void testIsBATech() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.BA_TECH) {
                 assertTrue(personnelRole.isBATech());
@@ -288,7 +293,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsAstech() {
+    void testIsAstech() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.ASTECH) {
                 assertTrue(personnelRole.isAstech());
@@ -299,7 +304,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsDoctor() {
+    void testIsDoctor() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.DOCTOR) {
                 assertTrue(personnelRole.isDoctor());
@@ -310,7 +315,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsMedic() {
+    void testIsMedic() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.MEDIC) {
                 assertTrue(personnelRole.isMedic());
@@ -321,7 +326,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsAdministratorCommand() {
+    void testIsAdministratorCommand() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.ADMINISTRATOR_COMMAND) {
                 assertTrue(personnelRole.isAdministratorCommand());
@@ -332,7 +337,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsAdministratorLogistics() {
+    void testIsAdministratorLogistics() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.ADMINISTRATOR_LOGISTICS) {
                 assertTrue(personnelRole.isAdministratorLogistics());
@@ -343,7 +348,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsAdministratorTransport() {
+    void testIsAdministratorTransport() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.ADMINISTRATOR_TRANSPORT) {
                 assertTrue(personnelRole.isAdministratorTransport());
@@ -354,7 +359,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsAdministratorHR() {
+    void testIsAdministratorHR() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.ADMINISTRATOR_HR) {
                 assertTrue(personnelRole.isAdministratorHR());
@@ -365,7 +370,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsDependent() {
+    void testIsDependent() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.DEPENDENT) {
                 assertTrue(personnelRole.isDependent());
@@ -376,7 +381,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsNone() {
+    void testIsNone() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.NONE) {
                 assertTrue(personnelRole.isNone());
@@ -387,10 +392,10 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsCombat() {
+    void testIsCombat() {
         for (final PersonnelRole personnelRole : roles) {
             switch (personnelRole) {
-                case MECHWARRIOR:
+                case MEKWARRIOR:
                 case LAM_PILOT:
                 case GROUND_VEHICLE_DRIVER:
                 case NAVAL_VEHICLE_DRIVER:
@@ -399,7 +404,7 @@ public class PersonnelRoleTest {
                 case VEHICLE_CREW:
                 case AEROSPACE_PILOT:
                 case CONVENTIONAL_AIRCRAFT_PILOT:
-                case PROTOMECH_PILOT:
+                case PROTOMEK_PILOT:
                 case BATTLE_ARMOUR:
                 case SOLDIER:
                 case VESSEL_PILOT:
@@ -416,19 +421,19 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsMechWarriorGrouping() {
+    void testIsMekWarriorGrouping() {
         for (final PersonnelRole personnelRole : roles) {
-            if ((personnelRole == PersonnelRole.MECHWARRIOR)
+            if ((personnelRole == PersonnelRole.MEKWARRIOR)
                     || (personnelRole == PersonnelRole.LAM_PILOT)) {
-                assertTrue(personnelRole.isMechWarriorGrouping());
+                assertTrue(personnelRole.isMekWarriorGrouping());
             } else {
-                assertFalse(personnelRole.isMechWarriorGrouping());
+                assertFalse(personnelRole.isMekWarriorGrouping());
             }
         }
     }
 
     @Test
-    public void testIsAerospaceGrouping() {
+    void testIsAerospaceGrouping() {
         for (final PersonnelRole personnelRole : roles) {
             if ((personnelRole == PersonnelRole.LAM_PILOT)
                     || (personnelRole == PersonnelRole.AEROSPACE_PILOT)) {
@@ -440,7 +445,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsConventionalAirGrouping() {
+    void testIsConventionalAirGrouping() {
         for (final PersonnelRole personnelRole : roles) {
             if (personnelRole == PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT) {
                 assertTrue(personnelRole.isConventionalAirGrouping());
@@ -451,7 +456,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsGroundVehicleCrew() {
+    void testIsGroundVehicleCrew() {
         for (final PersonnelRole personnelRole : roles) {
             if ((personnelRole == PersonnelRole.GROUND_VEHICLE_DRIVER)
                     || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
@@ -464,7 +469,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsNavalVehicleCrew() {
+    void testIsNavalVehicleCrew() {
         for (final PersonnelRole personnelRole : roles) {
             if ((personnelRole == PersonnelRole.NAVAL_VEHICLE_DRIVER)
                     || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
@@ -477,7 +482,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsVTOLCrew() {
+    void testIsVTOLCrew() {
         for (final PersonnelRole personnelRole : roles) {
             if ((personnelRole == PersonnelRole.VTOL_PILOT)
                     || (personnelRole == PersonnelRole.VEHICLE_GUNNER)
@@ -490,7 +495,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsVehicleCrewmember() {
+    void testIsVehicleCrewMember() {
         for (final PersonnelRole personnelRole : roles) {
             switch (personnelRole) {
                 case GROUND_VEHICLE_DRIVER:
@@ -498,17 +503,17 @@ public class PersonnelRoleTest {
                 case VTOL_PILOT:
                 case VEHICLE_GUNNER:
                 case VEHICLE_CREW:
-                    assertTrue(personnelRole.isVehicleCrewmember());
+                    assertTrue(personnelRole.isVehicleCrewMember());
                     break;
                 default:
-                    assertFalse(personnelRole.isVehicleCrewmember());
+                    assertFalse(personnelRole.isVehicleCrewMember());
                     break;
             }
         }
     }
 
     @Test
-    public void testIsSoldierOrBattleArmour() {
+    void testIsSoldierOrBattleArmour() {
         for (final PersonnelRole personnelRole : roles) {
             if ((personnelRole == PersonnelRole.SOLDIER)
                     || (personnelRole == PersonnelRole.BATTLE_ARMOUR)) {
@@ -520,34 +525,34 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsVesselCrewmember() {
+    void testIsVesselCrewMember() {
         for (final PersonnelRole personnelRole : roles) {
             switch (personnelRole) {
                 case VESSEL_PILOT:
                 case VESSEL_GUNNER:
                 case VESSEL_CREW:
                 case VESSEL_NAVIGATOR:
-                    assertTrue(personnelRole.isVesselCrewmember());
+                    assertTrue(personnelRole.isVesselCrewMember());
                     break;
                 default:
-                    assertFalse(personnelRole.isVesselCrewmember());
+                    assertFalse(personnelRole.isVesselCrewMember());
                     break;
             }
         }
     }
 
     @Test
-    public void testIsSupport() {
-        assertFalse(PersonnelRole.MECHWARRIOR.isSupport());
+    void testIsSupport() {
+        assertFalse(PersonnelRole.MEKWARRIOR.isSupport());
         assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport());
-        assertTrue(PersonnelRole.MECH_TECH.isSupport());
+        assertTrue(PersonnelRole.MEK_TECH.isSupport());
         assertTrue(PersonnelRole.ASTECH.isSupport());
         assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport());
         assertTrue(PersonnelRole.DEPENDENT.isSupport());
         assertTrue(PersonnelRole.NONE.isSupport());
-        assertFalse(PersonnelRole.MECHWARRIOR.isSupport(true));
+        assertFalse(PersonnelRole.MEKWARRIOR.isSupport(true));
         assertFalse(PersonnelRole.VESSEL_NAVIGATOR.isSupport(true));
-        assertTrue(PersonnelRole.MECH_TECH.isSupport(true));
+        assertTrue(PersonnelRole.MEK_TECH.isSupport(true));
         assertTrue(PersonnelRole.ASTECH.isSupport(true));
         assertTrue(PersonnelRole.ADMINISTRATOR_COMMAND.isSupport(true));
         assertFalse(PersonnelRole.DEPENDENT.isSupport(true));
@@ -555,12 +560,12 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsTech() {
+    void testIsTech() {
         for (final PersonnelRole personnelRole : roles) {
             switch (personnelRole) {
-                case MECH_TECH:
+                case MEK_TECH:
                 case MECHANIC:
-                case AERO_TECH:
+                case AERO_TEK:
                 case BA_TECH:
                 case VESSEL_CREW:
                     assertTrue(personnelRole.isTech());
@@ -573,12 +578,12 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsTechSecondary() {
+    void testIsTechSecondary() {
         for (final PersonnelRole personnelRole : roles) {
             switch (personnelRole) {
-                case MECH_TECH:
+                case MEK_TECH:
                 case MECHANIC:
-                case AERO_TECH:
+                case AERO_TEK:
                 case BA_TECH:
                     assertTrue(personnelRole.isTechSecondary());
                     break;
@@ -590,7 +595,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsMedicalStaff() {
+    void testIsMedicalStaff() {
         for (final PersonnelRole personnelRole : roles) {
             if ((personnelRole == PersonnelRole.DOCTOR)
                     || (personnelRole == PersonnelRole.MEDIC)) {
@@ -602,7 +607,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsAdministrator() {
+    void testIsAdministrator() {
         for (final PersonnelRole personnelRole : roles) {
             switch (personnelRole) {
                 case ADMINISTRATOR_COMMAND:
@@ -619,7 +624,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testIsCivilian() {
+    void testIsCivilian() {
         for (final PersonnelRole personnelRole : roles) {
             if ((personnelRole == PersonnelRole.DEPENDENT)
                     || (personnelRole == PersonnelRole.NONE)) {
@@ -629,18 +634,19 @@ public class PersonnelRoleTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region Static Methods
+    // region Static Methods
     @Test
-    public void testGetMilitaryRoles() {
+    void testGetMilitaryRoles() {
         final List<PersonnelRole> militaryRoles = PersonnelRole.getMilitaryRoles();
         assertEquals(roles.length - 2, militaryRoles.size());
         assertFalse(militaryRoles.contains(PersonnelRole.DEPENDENT));
         assertFalse(militaryRoles.contains(PersonnelRole.NONE));
     }
+
     @Test
-    public void testGetPrimaryRoles() {
+    void testGetPrimaryRoles() {
         // This should be all roles bar one, namely PersonnelRole.NONE
         final List<PersonnelRole> primaryRoles = PersonnelRole.getPrimaryRoles();
         assertEquals(roles.length - 1, primaryRoles.size());
@@ -648,7 +654,7 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testGetVesselRoles() {
+    void testGetVesselRoles() {
         final List<PersonnelRole> expected = new ArrayList<>();
         expected.add(PersonnelRole.VESSEL_PILOT);
         expected.add(PersonnelRole.VESSEL_GUNNER);
@@ -658,18 +664,18 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testGetTechRoles() {
+    void testGetTechRoles() {
         final List<PersonnelRole> expected = new ArrayList<>();
         expected.add(PersonnelRole.VESSEL_CREW);
-        expected.add(PersonnelRole.MECH_TECH);
+        expected.add(PersonnelRole.MEK_TECH);
         expected.add(PersonnelRole.MECHANIC);
-        expected.add(PersonnelRole.AERO_TECH);
+        expected.add(PersonnelRole.AERO_TEK);
         expected.add(PersonnelRole.BA_TECH);
         assertEquals(expected, PersonnelRole.getTechRoles());
     }
 
     @Test
-    public void testGetAdministratorRoles() {
+    void testGetAdministratorRoles() {
         final List<PersonnelRole> expected = new ArrayList<>();
         expected.add(PersonnelRole.ADMINISTRATOR_COMMAND);
         expected.add(PersonnelRole.ADMINISTRATOR_LOGISTICS);
@@ -679,60 +685,30 @@ public class PersonnelRoleTest {
     }
 
     @Test
-    public void testGetCivilianCount() {
+    void testGetCivilianCount() {
         // Civilian Roles: Dependent and None
         assertEquals(2, PersonnelRole.getCivilianCount());
     }
-    //endregion Static Methods
+    // endregion Static Methods
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("NONE"));
         assertEquals(PersonnelRole.BATTLE_ARMOUR, PersonnelRole.parseFromString("BATTLE_ARMOUR"));
         assertEquals(PersonnelRole.ADMINISTRATOR_LOGISTICS, PersonnelRole.parseFromString("ADMINISTRATOR_LOGISTICS"));
 
-        // Legacy Parsing
-        assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("0"));
-        assertEquals(PersonnelRole.MECHWARRIOR, PersonnelRole.parseFromString("1"));
-        assertEquals(PersonnelRole.AEROSPACE_PILOT, PersonnelRole.parseFromString("2"));
-        assertEquals(PersonnelRole.GROUND_VEHICLE_DRIVER, PersonnelRole.parseFromString("3"));
-        assertEquals(PersonnelRole.NAVAL_VEHICLE_DRIVER, PersonnelRole.parseFromString("4"));
-        assertEquals(PersonnelRole.VTOL_PILOT, PersonnelRole.parseFromString("5"));
-        assertEquals(PersonnelRole.VEHICLE_GUNNER, PersonnelRole.parseFromString("6"));
-        assertEquals(PersonnelRole.BATTLE_ARMOUR, PersonnelRole.parseFromString("7"));
-        assertEquals(PersonnelRole.SOLDIER, PersonnelRole.parseFromString("8"));
-        assertEquals(PersonnelRole.PROTOMECH_PILOT, PersonnelRole.parseFromString("9"));
-        assertEquals(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT, PersonnelRole.parseFromString("10"));
-        assertEquals(PersonnelRole.VESSEL_PILOT, PersonnelRole.parseFromString("11"));
-        assertEquals(PersonnelRole.VESSEL_CREW, PersonnelRole.parseFromString("12"));
-        assertEquals(PersonnelRole.VESSEL_GUNNER, PersonnelRole.parseFromString("13"));
-        assertEquals(PersonnelRole.VESSEL_NAVIGATOR, PersonnelRole.parseFromString("14"));
-        assertEquals(PersonnelRole.MECH_TECH, PersonnelRole.parseFromString("15"));
-        assertEquals(PersonnelRole.MECHANIC, PersonnelRole.parseFromString("16"));
-        assertEquals(PersonnelRole.AERO_TECH, PersonnelRole.parseFromString("17"));
-        assertEquals(PersonnelRole.BA_TECH, PersonnelRole.parseFromString("18"));
-        assertEquals(PersonnelRole.ASTECH, PersonnelRole.parseFromString("19"));
-        assertEquals(PersonnelRole.DOCTOR, PersonnelRole.parseFromString("20"));
-        assertEquals(PersonnelRole.MEDIC, PersonnelRole.parseFromString("21"));
-        assertEquals(PersonnelRole.ADMINISTRATOR_COMMAND, PersonnelRole.parseFromString("22"));
-        assertEquals(PersonnelRole.ADMINISTRATOR_LOGISTICS, PersonnelRole.parseFromString("23"));
-        assertEquals(PersonnelRole.ADMINISTRATOR_TRANSPORT, PersonnelRole.parseFromString("24"));
-        assertEquals(PersonnelRole.ADMINISTRATOR_HR, PersonnelRole.parseFromString("25"));
-        assertEquals(PersonnelRole.LAM_PILOT, PersonnelRole.parseFromString("26"));
-        assertEquals(PersonnelRole.VEHICLE_CREW, PersonnelRole.parseFromString("27"));
-
         // Error Case
         assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("28"));
         assertEquals(PersonnelRole.NONE, PersonnelRole.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
-        assertEquals(resources.getString("PersonnelRole.MECHWARRIOR.text"),
-                PersonnelRole.MECHWARRIOR.toString());
+    void testToStringOverride() {
+        assertEquals(resources.getString("PersonnelRole.MEKWARRIOR.text"),
+                PersonnelRole.MEKWARRIOR.toString());
         assertEquals(resources.getString("PersonnelRole.ADMINISTRATOR_LOGISTICS.text"),
                 PersonnelRole.ADMINISTRATOR_LOGISTICS.toString());
     }

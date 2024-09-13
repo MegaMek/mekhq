@@ -226,7 +226,7 @@ distributions {
 
             // MegaMekLab Includes
             from ("${mmlDir}/megameklab/build/files") {
-                exclude 'data/mechfiles'
+                exclude 'data/mekfiles'
             }
             from ("${mmlDir}/megameklab/build/launch4j/lib") {
                 into "${lib}"

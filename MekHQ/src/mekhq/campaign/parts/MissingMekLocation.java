@@ -20,25 +20,34 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.CriticalSlot;
+import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
+import megamek.common.LandAirMek;
+import megamek.common.Mek;
+import megamek.common.MiscType;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MissingMekLocation extends MissingPart {
+    private static final MMLogger logger = MMLogger.create(MissingMekLocation.class);
+
     protected int loc;
     protected int structureType;
     protected boolean clan; // Needed for Endo-steel
@@ -62,7 +71,8 @@ public class MissingMekLocation extends MissingPart {
         this.clan = clan;
     }
 
-    public MissingMekLocation(int loc, int tonnage, int structureType, boolean clan, boolean hasTSM, boolean quad, Campaign c) {
+    public MissingMekLocation(int loc, int tonnage, int structureType, boolean clan, boolean hasTSM, boolean quad,
+            Campaign c) {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
@@ -70,36 +80,36 @@ public class MissingMekLocation extends MissingPart {
         this.tsm = hasTSM;
         this.percent = 1.0;
         this.forQuad = quad;
-        //TODO: need to account for internal structure and myomer types
-        //crap, no static report for location names?
-        this.name = "Mech Location";
+        // TODO: need to account for internal structure and myomer types
+        // crap, no static report for location names?
+        this.name = "Mek Location";
         switch (loc) {
-            case Mech.LOC_HEAD:
-                this.name = "Mech Head";
+            case Mek.LOC_HEAD:
+                this.name = "Mek Head";
                 break;
-            case Mech.LOC_CT:
-                this.name = "Mech Center Torso";
+            case Mek.LOC_CT:
+                this.name = "Mek Center Torso";
                 break;
-            case Mech.LOC_LT:
-                this.name = "Mech Left Torso";
+            case Mek.LOC_LT:
+                this.name = "Mek Left Torso";
                 break;
-            case Mech.LOC_RT:
-                this.name = "Mech Right Torso";
+            case Mek.LOC_RT:
+                this.name = "Mek Right Torso";
                 break;
-            case Mech.LOC_LARM:
-                this.name = forQuad ? "Mech Front Left Leg" : "Mech Left Arm";
+            case Mek.LOC_LARM:
+                this.name = forQuad ? "Mek Front Left Leg" : "Mek Left Arm";
                 break;
-            case Mech.LOC_RARM:
-                this.name = forQuad ? "Mech Front Left Leg" : "Mech Right Arm";
+            case Mek.LOC_RARM:
+                this.name = forQuad ? "Mek Front Left Leg" : "Mek Right Arm";
                 break;
-            case Mech.LOC_LLEG:
-                this.name = forQuad ? "Mech Rear Left Leg" : "Mech Left Leg";
+            case Mek.LOC_LLEG:
+                this.name = forQuad ? "Mek Rear Left Leg" : "Mek Left Leg";
                 break;
-            case Mech.LOC_RLEG:
-                this.name = forQuad ? "Mech Rear Right Leg" : "Mech Right Leg";
+            case Mek.LOC_RLEG:
+                this.name = forQuad ? "Mek Rear Right Leg" : "Mek Right Leg";
                 break;
-            case Mech.LOC_CLEG:
-                this.name = "Mech Center Leg";
+            case Mek.LOC_CLEG:
+                this.name = "Mek Center Leg";
                 break;
         }
 
@@ -164,13 +174,13 @@ public class MissingMekLocation extends MissingPart {
                     forQuad = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
     }
 
     private boolean isArm() {
-        return loc == Mech.LOC_RARM || loc == Mech.LOC_LARM;
+        return loc == Mek.LOC_RARM || loc == Mek.LOC_LARM;
     }
 
     public boolean forQuad() {
@@ -179,8 +189,8 @@ public class MissingMekLocation extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        if ((loc == Mech.LOC_CT) && !refit) {
-            //you can't replace a center torso
+        if ((loc == Mek.LOC_CT) && !refit) {
+            // you can't replace a center torso
             return false;
         } else if (part instanceof MekLocation) {
             MekLocation mekLoc = (MekLocation) part;
@@ -200,13 +210,13 @@ public class MissingMekLocation extends MissingPart {
         if (null == unit) {
             return null;
         }
-        if (unit.getEntity() instanceof Mech) {
+        if (unit.getEntity() instanceof Mek) {
             // Can't replace appendages when corresponding torso is gone
-            if (loc == Mech.LOC_LARM
-                    && unit.getEntity().isLocationBad(Mech.LOC_LT)) {
+            if (loc == Mek.LOC_LARM
+                    && unit.getEntity().isLocationBad(Mek.LOC_LT)) {
                 return "must replace left torso first";
-            } else if (loc == Mech.LOC_RARM
-                    && unit.getEntity().isLocationBad(Mech.LOC_RT)) {
+            } else if (loc == Mek.LOC_RARM
+                    && unit.getEntity().isLocationBad(Mek.LOC_RT)) {
                 return "must replace right torso first";
             }
         }
@@ -222,27 +232,30 @@ public class MissingMekLocation extends MissingPart {
                 continue;
             }
 
-            // certain other specific crits need to be left out (uggh, must be a better way to do this!)
+            // certain other specific crits need to be left out (uggh, must be a better way
+            // to do this!)
             if (slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                 // Skip Hip and Shoulder actuators
-                if ((slot.getIndex() == Mech.ACTUATOR_HIP)
-                        || (slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
+                if ((slot.getIndex() == Mek.ACTUATOR_HIP)
+                        || (slot.getIndex() == Mek.ACTUATOR_SHOULDER)) {
                     continue;
                 }
-                if (unit.getEntity() instanceof LandAirMech) {
+                if (unit.getEntity() instanceof LandAirMek) {
                     // Skip Landing Gear if already gone
-                    if (slot.getIndex() == LandAirMech.LAM_LANDING_GEAR) {
+                    if (slot.getIndex() == LandAirMek.LAM_LANDING_GEAR) {
                         if (unit.findPart(p -> p instanceof MissingLandingGear) != null) {
                             continue;
                         } else {
-                            partsToSalvageOrScrap.add(String.format("Landing Gear (%s)", unit.getEntity().getLocationName(loc)));
+                            partsToSalvageOrScrap
+                                    .add(String.format("Landing Gear (%s)", unit.getEntity().getLocationName(loc)));
                         }
-                    // Skip Avionics if already gone
-                    } else if (slot.getIndex() == LandAirMech.LAM_AVIONICS) {
+                        // Skip Avionics if already gone
+                    } else if (slot.getIndex() == LandAirMek.LAM_AVIONICS) {
                         if (unit.findPart(p -> p instanceof MissingAvionics) != null) {
                             continue;
                         } else {
-                            partsToSalvageOrScrap.add(String.format("Avionics (%s)", unit.getEntity().getLocationName(loc)));
+                            partsToSalvageOrScrap
+                                    .add(String.format("Avionics (%s)", unit.getEntity().getLocationName(loc)));
                         }
                     }
                 }
@@ -270,7 +283,8 @@ public class MissingMekLocation extends MissingPart {
                         continue;
                     }
 
-                    Part repairablePart = unit.findPart(p -> (p instanceof EquipmentPart) && (((EquipmentPart) p).getEquipmentNum() == equipmentNum));
+                    Part repairablePart = unit.findPart(p -> (p instanceof EquipmentPart)
+                            && (((EquipmentPart) p).getEquipmentNum() == equipmentNum));
                     if (repairablePart != null) {
                         partName = repairablePart.getName();
                     }
@@ -289,12 +303,14 @@ public class MissingMekLocation extends MissingPart {
 
     @Override
     public Part getNewPart() {
-       /* int cockpitType = -1;
-        if (null != unit) {
-            cockpitType = ((Mech) unit.getEntity()).getCockpitType();
-        }*/
-        boolean lifeSupport = (loc == Mech.LOC_HEAD);
-        boolean sensors = (loc == Mech.LOC_HEAD);
+        /*
+         * int cockpitType = -1;
+         * if (null != unit) {
+         * cockpitType = ((Mek) unit.getEntity()).getCockpitType();
+         * }
+         */
+        boolean lifeSupport = (loc == Mek.LOC_HEAD);
+        boolean sensors = (loc == Mek.LOC_HEAD);
         return new MekLocation(loc, getUnitTonnage(), structureType, clan,
                 tsm, forQuad, sensors, lifeSupport, campaign);
     }
@@ -314,21 +330,21 @@ public class MissingMekLocation extends MissingPart {
             unit.addPart(actualReplacement);
             campaign.getQuartermaster().addPart(actualReplacement, 0);
             replacement.decrementQuantity();
-            // TODO : if this is a mech head, check to see if it had components
-            if ((loc == Mech.LOC_HEAD) && (actualReplacement instanceof MekLocation)) {
+            // TODO : if this is a mek head, check to see if it had components
+            if ((loc == Mek.LOC_HEAD) && (actualReplacement instanceof MekLocation)) {
                 updateHeadComponents((MekLocation) actualReplacement);
                 ((MekLocation) actualReplacement).setSensors(false);
                 ((MekLocation) actualReplacement).setLifeSupport(false);
             }
             // fix shoulders and hips
-            if (loc == Mech.LOC_RARM || loc == Mech.LOC_LARM) {
+            if (loc == Mek.LOC_RARM || loc == Mek.LOC_LARM) {
                 if (forQuad) {
-                    unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
+                    unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc);
                 } else {
-                    unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc);
+                    unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_SHOULDER, loc);
                 }
-            } else if ((loc == Mech.LOC_RLEG) || (loc == Mech.LOC_LLEG) || (loc == Mech.LOC_CLEG)) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
+            } else if ((loc == Mek.LOC_RLEG) || (loc == Mek.LOC_LLEG) || (loc == Mek.LOC_CLEG)) {
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mek.ACTUATOR_HIP, loc);
             }
             remove(false);
             actualReplacement.updateConditionFromPart();
@@ -357,13 +373,15 @@ public class MissingMekLocation extends MissingPart {
             missingSensor.remove(false);
             newPart.updateConditionFromPart();
         }
-        /*if (part.hasCockpit() && null != missingCockpit) {
-            newPart = missingCockpit.getNewPart();
-            unit.addPart(newPart);
-            campaign.getQuartermaster().addPart(newPart);
-            missingCockpit.remove(false);
-            newPart.updateConditionFromPart();
-        }*/
+        /*
+         * if (part.hasCockpit() && null != missingCockpit) {
+         * newPart = missingCockpit.getNewPart();
+         * unit.addPart(newPart);
+         * campaign.getQuartermaster().addPart(newPart);
+         * missingCockpit.remove(false);
+         * newPart.updateConditionFromPart();
+         * }
+         */
         if (part.hasLifeSupport() && null != missingLifeSupport) {
             newPart = missingLifeSupport.getNewPart();
             unit.addPart(newPart);

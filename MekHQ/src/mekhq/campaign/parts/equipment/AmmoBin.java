@@ -20,9 +20,17 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import java.io.PrintWriter;
+import java.util.EnumSet;
+import java.util.Objects;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -35,18 +43,13 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.EnumSet;
-import java.util.Objects;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
+    private static final MMLogger logger = MMLogger.create(AmmoBin.class);
+
     protected int shotsNeeded;
     protected boolean oneShot;
 
@@ -55,7 +58,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public AmmoBin(int tonnage, @Nullable AmmoType et, int equipNum, int shotsNeeded, boolean singleShot,
-                   boolean omniPodded, @Nullable Campaign c) {
+            boolean omniPodded, @Nullable Campaign c) {
         super(tonnage, et, equipNum, 1.0, omniPodded, c);
         this.shotsNeeded = shotsNeeded;
         this.oneShot = singleShot;
@@ -78,8 +81,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return (AmmoType) super.getType();
     }
 
-    /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
-     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */
+    /*
+     * Per TM, ammo for fighters is stored in the fuselage. This makes a difference
+     * for omnifighter
+     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are
+     */
     @Override
     public String getLocationName() {
         if (unit != null
@@ -112,15 +118,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
         int fullShots = getType().getShots();
 
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             if (mounted.getOriginalShots() > 0) {
                 fullShots = mounted.getOriginalShots();
             }
 
-            if (unit.getEntity() instanceof Protomech) {
-                // If protomechs are using alternate munitions then cut in half
-                if (!EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(getType().getMunitionType())){
+            if (unit.getEntity() instanceof ProtoMek) {
+                // If protomeks are using alternate munitions then cut in half
+                if (!EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(getType().getMunitionType())) {
                     fullShots = fullShots / 2;
                 }
             }
@@ -144,7 +150,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     protected Money getPricePerTon() {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
 
         // If on a unit, then use the ammo type on the existing entity,
         // to avoid getting it wrong due to ammo swaps
@@ -196,7 +202,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     protected boolean ammoTypeChanged() {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         return (mounted != null)
                 && !getType().equals(mounted.getType());
     }
@@ -229,7 +235,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                     oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
 
@@ -285,18 +291,20 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     /**
      * Gets the underlying {@link Mounted} which manages
      * this {@code AmmoBin} on the {@link Unit}.
+     *
      * @return The {@code Mounted} or {@code null} if no valid
      *         piece of equipment exists on the {@code Unit}.
      */
     @Override
-    protected @Nullable Mounted getMounted() {
+    protected @Nullable Mounted<?> getMounted() {
         if ((getUnit() != null) && (getUnit().getEntity() != null)) {
-            Mounted mounted = getUnit().getEntity().getEquipment(getEquipmentNum());
+            Mounted<?> mounted = getUnit().getEntity().getEquipment(getEquipmentNum());
             if ((mounted != null) && (mounted.getType() instanceof AmmoType)) {
                 return mounted;
             }
 
-            LogManager.getLogger().warn("Missing valid equipment for " + getName() + " to manage ammo on unit " + getUnit().getName());
+            logger.warn(
+                    "Missing valid equipment for " + getName() + " to manage ammo on unit " + getUnit().getName());
         }
 
         return null;
@@ -305,9 +313,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     /**
      * Requisitions ammo of a given type from the quartermaster.
      *
-     * @param ammoType The {@code AmmoType} being requisitioned.
+     * @param ammoType    The {@code AmmoType} being requisitioned.
      * @param shotsNeeded The number of shots needed from the quartermaster.
-     * @return The number of shots requisitioned. This may be less than {@code shotsNeeded}.
+     * @return The number of shots requisitioned. This may be less than
+     *         {@code shotsNeeded}.
      */
     protected int requisitionAmmo(AmmoType ammoType, int shotsNeeded) {
         Objects.requireNonNull(ammoType);
@@ -317,6 +326,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     /**
      * Sets the number of shots needed in the {@code AmmoBin}.
+     *
      * @param shots The number of shots needed.
      */
     public void setShotsNeeded(int shots) {
@@ -325,23 +335,25 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String find(int transitDays) {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'> You shouldn't be here (AmmoBin.find()).</font>";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                + "'> You shouldn't be here (AmmoBin.find()).</font>";
     }
 
     @Override
     public String failToFind() {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'> You shouldn't be here (AmmoBin.failToFind()).</font>";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                + "'> You shouldn't be here (AmmoBin.failToFind()).</font>";
     }
 
     public void unload() {
-        //FIXME: the following won't work for proto and Dropper bins if they
-        //are not attached to a unit. Currently the only place AmmoBins are loaded
-        //off of units is for refits, which neither of those units can do, but we
-        //may want to think about not having refits load ammo bins but rather reserve
-        //some AmmoStorage instead if we implement customization of these units
+        // FIXME: the following won't work for proto and Dropper bins if they
+        // are not attached to a unit. Currently the only place AmmoBins are loaded
+        // off of units is for refits, which neither of those units can do, but we
+        // may want to think about not having refits load ammo bins but rather reserve
+        // some AmmoStorage instead if we implement customization of these units
         int shots = getFullShots() - shotsNeeded;
 
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         AmmoType ammoType = (mounted != null) ? ((AmmoType) mounted.getType()) : getType();
         if (mounted != null) {
             shots = mounted.getBaseShotsLeft();
@@ -357,7 +369,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     /**
      * Returns ammo unloaded from the bin to the quartermaster.
      *
-     * @param ammoType The {@code AmmoType} unloaded.
+     * @param ammoType      The {@code AmmoType} unloaded.
      * @param shotsUnloaded The number of shots of ammo unloaded.
      */
     protected void returnAmmo(AmmoType ammoType, int shotsUnloaded) {
@@ -398,7 +410,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             if (mounted.isMissing() || mounted.isDestroyed()) {
                 mounted.setShotsLeft(0);
@@ -415,10 +427,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public int getBaseTime() {
         if (isSalvaging()) {
-            return isOmniPodded()? 30 : 120;
+            return isOmniPodded() ? 30 : 120;
         }
 
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if ((mounted != null) && !getType().equals(mounted.getType())) {
             // If we're not the same ammo type as our unit, it takes longer
             // to do work on the AmmoBin.
@@ -446,7 +458,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public void updateConditionFromPart() {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             mounted.setHit(false);
             mounted.setDestroyed(false);
@@ -508,11 +520,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             String orderTransitString = getOrderTransitStringForDetails(inventories);
 
             if (shotsAvailable == 0) {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No ammo " + orderTransitString + "</font>";
+                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No ammo "
+                        + orderTransitString + "</font>";
             } else if (shotsAvailable < getShotsNeeded()) {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only " + shotsAvailable + " available" + orderTransitString + "</font>";
+                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only "
+                        + shotsAvailable + " available" + orderTransitString + "</font>";
             } else {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>" + shotsAvailable + " available " + orderTransitString + "</font>";
+                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + shotsAvailable + " available " + orderTransitString + "</font>";
             }
 
             return getType().getDesc() + ", " + getShotsNeeded() + " shots needed" + availability;
@@ -593,7 +608,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         } else if (campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
-        //availability mod
+        // availability mod
         int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
@@ -640,11 +655,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     /**
      * Since ammo bins aren't real parts they can't be podded in the warehouse, and
-     * whether they're podded on the unit depends entirely on the unit they're installed on.
+     * whether they're podded on the unit depends entirely on the unit they're
+     * installed on.
      */
     @Override
     public boolean isOmniPodded() {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         return (mounted != null) && mounted.isOmniPodMounted();
     }
 

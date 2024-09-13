@@ -3,22 +3,42 @@
 factionhints.xml
 written by Neoancient
 
-This file details relationships between factions and is used in computing probabilities of conflicts between various factions.
+This file details relationships between factions and is used in computing probabilities of
+conflicts between various factions.
 
-<war> tags indicate limited periods of intense fighting. Bordering factions are twice as likely to fight if at war than otherwise.
+<war> tags indicate limited periods of intense fighting. Bordering factions are twice as likely to
+fight if at war than otherwise.
 
 <alliance> tags are used for bordering factions which are unlikely to
 fight each other. They are not necessarily formal alliances.
 
 <rivals> tags are used for Clan rivalries. They are cumulative with wars and alliances.
 
-<location> tags are used for factions which are located within another faction and do not control any worlds there, but have an independent military force that may attack or be attacked. Examples include Wolf-in-Exile (in ARDC and later LA) and Nova Cat (in DC), and even temporary situations like the Second Star League operating in DC space during Operation Bulldog.
+<location> tags are used for factions which are located within another faction and do not control
+any worlds there, but have an independent military force that may attack or be attacked. Examples
+include Wolf-in-Exile (in ARDC and later LA) and Nova Cat (in DC), and even temporary situations
+like the Second Star League operating in DC space during Operation Bulldog.
 
-War, alliance, and rivals nodes each have optional name, start, and end attributes. Those without start and end nodes are considered perpetual. Child nodes all have <parties> tags with a pair of faction codes separated by a comma. Any of the <parties> tags can have optional start or end attributes which override that value for that pair of factions. More than two factions may be listed in the same entry, provided that they are all at war with (or allied with or rivals of) each other. In cases of wars with two or more sides that do not attack each other, each combination must be given in a separate entry. In cases of civil wars, the same faction is listed twice in the entry.
+War, alliance, and rivals nodes each have optional name, start, and end attributes. Those without
+start and end nodes are considered perpetual. Child nodes all have <parties> tags with a pair of
+faction codes separated by a comma. Any of the <parties> tags can have optional start or end
+attributes which override that value for that pair of factions. More than two factions may be listed
+in the same entry, provided that they are all at war with (or allied with or rivals of) each other.
+In cases of wars with two or more sides that do not attack each other, each combination must be
+given in a separate entry. In cases of civil wars, the same faction is listed twice in the entry.
 
-<neutral> nodes work like the inverse of alliance nodes. The faction named in the required "faction" atribute is considered to be allied with all factions not explicitly named by one or more <exception> tags. The <neutral> tag does not take start or end dates, but the <exception> tags may.
+<neutral> nodes work like the inverse of alliance nodes. The faction named in the required
+"faction" atribute is considered to be allied with all factions not explicitly named by one or more
+<exception> tags. The <neutral> tag does not take start or end dates, but the <exception> tags may.
 
-<location> nodes have the same optional name, start, and end attributes as <war>, <alliance>, and <rivals> tags. The faction that controls the space in question is marked as <outer> and the faction contained within that space is marked as <inner>. An optional <fraction> tag indicates what portion of the outer faction's border should be apportioned to the inner faction. If empty, the full border is apportioned to both. The optional <opponents> tag restricts attacks by and against the inner faction to those listed (e.g. during Operation Bulldog, SL forces within the DC attack only Smoke Jaguar and not DC or any of its neighbors, and DC and its neighbors (other than SJ) do not attack SL forces).
+<location> nodes have the same optional name, start, and end attributes as <war>, <alliance>, and
+<rivals> tags. The faction that controls the space in question is marked as <outer> and the faction
+contained within that space is marked as <inner>. An optional <fraction> tag indicates what portion
+of the outer faction's border should be apportioned to the inner faction. If empty, the full border
+is apportioned to both. The optional <opponents> tag restricts attacks by and against the inner
+faction to those listed (e.g. during Operation Bulldog, SL forces within the DC attack only Smoke
+Jaguar and not DC or any of its neighbors, and DC and its neighbors (other than SJ) do not attack SL
+forces).
 -->
 <factionHints>
   <neutral faction="CS">
@@ -27,7 +47,9 @@ War, alliance, and rivals nodes each have optional name, start, and end attribut
     <exceptions start="3052-05-01">CJF,CW,CGB,CSJ,CSV,CNC,CDS</exceptions>
     <exceptions start="3068-01-21">WOB</exceptions>
   </neutral>
-  <!--This only applies to mercenaries not under contract, to prevent mercenaries being treated as potential rivals to factions near such planets as Outreach and Northwind.-->
+  <!--This
+  only applies to mercenaries not under contract, to prevent mercenaries being treated as potential
+  rivals to factions near such planets as Outreach and Northwind.-->
   <neutral faction="MERC">
     <exceptions>WOB</exceptions>
   </neutral>
@@ -65,7 +87,8 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
     <parties>CWOV,CSR</parties>
     <parties>CWOV,CW</parties>
   </rivals>
-  <!--Age of War-->
+  <!--Age
+  of War-->
   <war name="First Andurien War" start="2398-01-01" end="2404-12-31">
     <parties>FWL,CC</parties>
   </war>
@@ -88,7 +111,8 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
   <war name="Third Andurien War" start="2551-01-01" end="2556-12-31">
     <parties>FWL,CC</parties>
   </war>
-  <!--Star League-->
+  <!--Star
+  League-->
   <alliance name="Star League" start="2571-07-09" end="2781-08-12">
     <parties>SL,TH</parties>
     <parties>SL,CC</parties>
@@ -173,7 +197,8 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
   <war name="The Republic-Commonwealth War" start="2773-04-01" end="2775-12-31">
     <parties>LA,RWR</parties>
   </war>
-  <!--Succession Wars-->
+  <!--Succession
+  Wars-->
   <location start="2830-01-01">
     <outer>NC</outer>
     <inner>UC</inner>
@@ -204,7 +229,10 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
   <war name="Marik Civil War" start="3014-05-22" end="3015-05-31">
     <parties>FWL,FWLR</parties>
   </war>
-  <!-- Aurigan Civil War: setting for HBS' BattleTech game. The dates are very roughly estimated based on descriptions in game and in the sourcebook. That means they are semi-canon, and should be updated if possible. Ulysses Update: Changed these to match the planetary control dates better in MHQ to help contract generation. -->
+  <!-- Aurigan Civil War: setting for HBS' BattleTech game. The dates are very roughly estimated
+  based on descriptions in game and in the sourcebook. That means they are semi-canon, and should be
+  updated if possible. Ulysses Update: Changed these to match the planetary control dates better in
+  MHQ to help contract generation. -->
   <war name="Aurigan Civil War" start="3025-01-25" end="3025-12-30">
     <parties>ARC,ARD</parties>
     <parties start="3025-05-09" end="3025-08-15">ARC,TC</parties>
@@ -294,7 +322,8 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
     <parties end="3057-12-31">CGS,CW</parties>
     <parties end="3064-08-12">CHH,CW</parties>
   </alliance>
-  <!--Clan Invasion-->
+  <!--Clan
+  Invasion-->
   <war name="Clan Invasion" start="3049-08-01" end="3052-06-01">
     <parties>FC,CJF</parties>
     <parties>FC,CSV</parties>
@@ -400,7 +429,8 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
     <fraction>0.05</fraction>
     <opponents>CSJ</opponents>
   </location>
-  <!--Civil War-->
+  <!--Civil
+  War-->
   <war name="Falcon-Viper War" start="3061-04-01" end="3061-07-04">
     <parties>CJF,CSV</parties>
   </war>
@@ -478,16 +508,19 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
     <parties end="3081-07-31">ROS,DO</parties>
   </war>
   <war name="Capellan Conflict" start="3081-10-01" end="3085-06-01">
-    <!--dates approximate-->
+    <!--dates
+    approximate-->
     <parties>ROS,CC</parties>
   </war>
-  <!--Dark Age, Republic Era-->
+  <!--Dark
+  Age, Republic Era-->
   <alliance name="Escorpión Imperio" start="3080-04-01">
     <!-- start date is a guess based on conquest beginning late January 3080 -->
     <parties>CGS,NC,UC</parties>
   </alliance>
   <alliance name="Scorpion Empire" start="3141-03-03">
-    <!-- start date is based on the Hanseatic Crusade PDF stating the war started January 3rd of 3040 and lasted 15 months -->
+    <!-- start date is based on the Hanseatic Crusade PDF stating the war started January 3rd of
+    3040 and lasted 15 months -->
     <parties>CGS,NC,UC,HL</parties>
   </alliance>
   <war name="Second Dominion-Combine War" start="3098-07-01" end="3101-06-30">
@@ -496,7 +529,8 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
   <war name="Capellan-Republic War" start="3110-07-01" end="3113-06-30">
     <parties>CC,ROS</parties>
   </war>
-  <!--Dark Age-->
+  <!--Dark
+  Age-->
   <war name="Capellan Invasion" start="3134-05-01" end="3136-10-14">
     <parties>CC,ROS</parties>
   </war>

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
-    //region Constructors
+    // region Constructors
     public BattleArmorEquipmentUnscrambler(final Unit unit) {
         super(unit);
 
@@ -38,7 +38,7 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
             throw new IllegalArgumentException("Attempting to assign trooper values to parts for non-BA unit");
         }
     }
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     public EquipmentUnscramblerResult unscramble() {
@@ -60,15 +60,17 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
                 .map(p -> (EquipmentPart) p)
                 .collect(Collectors.toList());
 
-        for (final Mounted m : unit.getEntity().getEquipment()) {
+        for (final Mounted<?> m : unit.getEntity().getEquipment()) {
             final int eqNum = unit.getEntity().getEquipmentNum(m);
-            // Look for parts of the same type with the equipment number already set correctly
+            // Look for parts of the same type with the equipment number already set
+            // correctly
             List<EquipmentPart> parts = tempParts.stream()
                     .filter(part -> part.getType().getInternalName().equals(m.getType().getInternalName())
                             && part.getEquipmentNum() == eqNum)
                     .collect(Collectors.toList());
 
-            // If we don't find any, just match the internal name and set the equipment number.
+            // If we don't find any, just match the internal name and set the equipment
+            // number.
             if (parts.isEmpty()) {
                 parts = tempParts.stream()
                         .filter(part -> part.getType().getInternalName().equals(m.getType().getInternalName()))
@@ -78,8 +80,10 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
             }
 
             if (parts.stream().allMatch(part -> part instanceof BattleArmorEquipmentPart)) {
-                // Try to find one for each trooper; if the Entity has multiple pieces of equipment
-                // of this type this will make sure we're only setting one group to this eq number.
+                // Try to find one for each trooper; if the Entity has multiple pieces of
+                // equipment
+                // of this type this will make sure we're only setting one group to this eq
+                // number.
                 Part[] perTrooper = new Part[unit.getEntity().locations() - 1];
                 for (EquipmentPart p : parts) {
                     int trooper = ((BattleArmorEquipmentPart) p).getTrooper();
@@ -125,7 +129,7 @@ public class BattleArmorEquipmentUnscrambler extends EquipmentUnscrambler {
             proposal.consider(part);
         }
 
-        for (final Mounted m : unit.getEntity().getEquipment()) {
+        for (final Mounted<?> m : unit.getEntity().getEquipment()) {
             proposal.includeEquipment(unit.getEntity().getEquipmentNum(m), m);
         }
 

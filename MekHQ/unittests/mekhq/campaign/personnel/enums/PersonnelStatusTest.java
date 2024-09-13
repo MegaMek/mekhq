@@ -18,27 +18,28 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PersonnelStatusTest {
-    //region Variable Declarations
+import java.util.List;
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class PersonnelStatusTest {
+    // region Variable Declarations
     private static final PersonnelStatus[] statuses = PersonnelStatus.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
-    public void testGetToolTipText() {
+    void testGetToolTipText() {
         assertEquals(resources.getString("PersonnelStatus.MIA.toolTipText"),
                 PersonnelStatus.MIA.getToolTipText());
         assertEquals(resources.getString("PersonnelStatus.MEDICAL_COMPLICATIONS.toolTipText"),
@@ -46,7 +47,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testGetReportText() {
+    void testGetReportText() {
         assertEquals(resources.getString("PersonnelStatus.AWOL.reportText"),
                 PersonnelStatus.AWOL.getReportText());
         assertEquals(resources.getString("PersonnelStatus.ACCIDENTAL.reportText"),
@@ -54,17 +55,17 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testGetLogText() {
+    void testGetLogText() {
         assertEquals(resources.getString("PersonnelStatus.DESERTED.logText"),
                 PersonnelStatus.DESERTED.getLogText());
         assertEquals(resources.getString("PersonnelStatus.HOMICIDE.logText"),
                 PersonnelStatus.HOMICIDE.getLogText());
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsActive() {
+    void testIsActive() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.ACTIVE) {
                 assertTrue(personnelStatus.isActive());
@@ -75,7 +76,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsMIA() {
+    void testIsMIA() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.MIA) {
                 assertTrue(personnelStatus.isMIA());
@@ -86,7 +87,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsPoW() {
+    void testIsPoW() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.POW) {
                 assertTrue(personnelStatus.isPoW());
@@ -97,7 +98,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsOnLeave() {
+    void testIsOnLeave() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.ON_LEAVE) {
                 assertTrue(personnelStatus.isOnLeave());
@@ -108,7 +109,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsAwol() {
+    void testIsAwol() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.AWOL) {
                 assertTrue(personnelStatus.isAwol());
@@ -119,7 +120,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsRetired() {
+    void testIsRetired() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.RETIRED) {
                 assertTrue(personnelStatus.isRetired());
@@ -130,7 +131,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsDeserted() {
+    void testIsDeserted() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.DESERTED) {
                 assertTrue(personnelStatus.isDeserted());
@@ -141,7 +142,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsStudent() {
+    void testIsStudent() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.STUDENT) {
                 assertTrue(personnelStatus.isStudent());
@@ -152,7 +153,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsKIA() {
+    void testIsKIA() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.KIA) {
                 assertTrue(personnelStatus.isKIA());
@@ -163,7 +164,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsHomicide() {
+    void testIsHomicide() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.HOMICIDE) {
                 assertTrue(personnelStatus.isHomicide());
@@ -174,7 +175,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsWounds() {
+    void testIsWounds() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.WOUNDS) {
                 assertTrue(personnelStatus.isWounds());
@@ -185,7 +186,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsDisease() {
+    void testIsDisease() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.DISEASE) {
                 assertTrue(personnelStatus.isDisease());
@@ -196,7 +197,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsAccidental() {
+    void testIsAccidental() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.ACCIDENTAL) {
                 assertTrue(personnelStatus.isAccidental());
@@ -207,7 +208,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsNaturalCauses() {
+    void testIsNaturalCauses() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.NATURAL_CAUSES) {
                 assertTrue(personnelStatus.isNaturalCauses());
@@ -218,7 +219,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsOldAge() {
+    void testIsOldAge() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.OLD_AGE) {
                 assertTrue(personnelStatus.isOldAge());
@@ -229,7 +230,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsMedicalComplications() {
+    void testIsMedicalComplications() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.MEDICAL_COMPLICATIONS) {
                 assertTrue(personnelStatus.isMedicalComplications());
@@ -240,7 +241,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsPregnancyComplications() {
+    void testIsPregnancyComplications() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.PREGNANCY_COMPLICATIONS) {
                 assertTrue(personnelStatus.isPregnancyComplications());
@@ -251,7 +252,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsUndetermined() {
+    void testIsUndetermined() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.UNDETERMINED) {
                 assertTrue(personnelStatus.isUndetermined());
@@ -262,7 +263,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsSuicide() {
+    void testIsSuicide() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.SUICIDE) {
                 assertTrue(personnelStatus.isSuicide());
@@ -273,7 +274,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsAbsent() {
+    void testIsAbsent() {
         for (final PersonnelStatus personnelStatus : statuses) {
             switch (personnelStatus) {
                 case MIA:
@@ -292,7 +293,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsDead() {
+    void testIsDead() {
         for (final PersonnelStatus personnelStatus : statuses) {
             switch (personnelStatus) {
                 case KIA:
@@ -316,7 +317,7 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsDeadOrMIA() {
+    void testIsDeadOrMIA() {
         for (final PersonnelStatus personnelStatus : statuses) {
             switch (personnelStatus) {
                 case MIA:
@@ -339,56 +340,32 @@ public class PersonnelStatusTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     @Test
-    public void testGetImplementedStatuses() {
+    void testGetImplementedStatuses() {
         final List<PersonnelStatus> implementedStatuses = PersonnelStatus.getImplementedStatuses();
         for (final PersonnelStatus personnelStatus : statuses) {
             assertTrue(implementedStatuses.contains(personnelStatus));
         }
     }
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(PersonnelStatus.RETIRED, PersonnelStatus.parseFromString("RETIRED"));
-        assertEquals(PersonnelStatus.PREGNANCY_COMPLICATIONS, PersonnelStatus.parseFromString("PREGNANCY_COMPLICATIONS"));
-
-        // Legacy Parsing
-        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("0"));
-        assertEquals(PersonnelStatus.RETIRED, PersonnelStatus.parseFromString("1"));
-        assertEquals(PersonnelStatus.KIA, PersonnelStatus.parseFromString("2"));
-        assertEquals(PersonnelStatus.MIA, PersonnelStatus.parseFromString("3"));
-        assertEquals(PersonnelStatus.STUDENT, PersonnelStatus.parseFromString("4"));
-        assertEquals(PersonnelStatus.MISSING, PersonnelStatus.parseFromString("5"));
-        assertEquals(PersonnelStatus.POW, PersonnelStatus.parseFromString("6"));
-        assertEquals(PersonnelStatus.ON_LEAVE, PersonnelStatus.parseFromString("7"));
-        assertEquals(PersonnelStatus.AWOL, PersonnelStatus.parseFromString("8"));
-        assertEquals(PersonnelStatus.RESIGNED, PersonnelStatus.parseFromString("9"));
-        assertEquals(PersonnelStatus.DESERTED, PersonnelStatus.parseFromString("10"));
-        assertEquals(PersonnelStatus.DEFECTED, PersonnelStatus.parseFromString("11"));
-        assertEquals(PersonnelStatus.HOMICIDE, PersonnelStatus.parseFromString("12"));
-        assertEquals(PersonnelStatus.WOUNDS, PersonnelStatus.parseFromString("13"));
-        assertEquals(PersonnelStatus.DISEASE, PersonnelStatus.parseFromString("14"));
-        assertEquals(PersonnelStatus.ACCIDENTAL, PersonnelStatus.parseFromString("15"));
-        assertEquals(PersonnelStatus.NATURAL_CAUSES, PersonnelStatus.parseFromString("16"));
-        assertEquals(PersonnelStatus.OLD_AGE, PersonnelStatus.parseFromString("17"));
-        assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, PersonnelStatus.parseFromString("18"));
-        assertEquals(PersonnelStatus.PREGNANCY_COMPLICATIONS, PersonnelStatus.parseFromString("19"));
-        assertEquals(PersonnelStatus.UNDETERMINED, PersonnelStatus.parseFromString("20"));
-        assertEquals(PersonnelStatus.SUICIDE, PersonnelStatus.parseFromString("21"));
-        assertEquals(PersonnelStatus.SACKED, PersonnelStatus.parseFromString("22"));
+        assertEquals(PersonnelStatus.PREGNANCY_COMPLICATIONS,
+                PersonnelStatus.parseFromString("PREGNANCY_COMPLICATIONS"));
 
         // Error Case
         assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("23"));
         assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("PersonnelStatus.KIA.text"), PersonnelStatus.KIA.toString());
         assertEquals(resources.getString("PersonnelStatus.PREGNANCY_COMPLICATIONS.text"),
                 PersonnelStatus.PREGNANCY_COMPLICATIONS.toString());

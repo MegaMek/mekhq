@@ -108,7 +108,7 @@ public class UnitTransportTest {
         assertFalse(transport.isCarryingGround());
 
         // Add a ground unit
-        Entity mockGroundEntity = mock(Mech.class);
+        Entity mockGroundEntity = mock(Mek.class);
         when(mockGroundEntity.isAero()).thenReturn(false);
         Unit mockGroundUnit = mock(Unit.class);
         when(mockGroundUnit.getId()).thenReturn(UUID.randomUUID());

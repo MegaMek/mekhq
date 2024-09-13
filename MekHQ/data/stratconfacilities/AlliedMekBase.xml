@@ -1,10 +1,11 @@
 <StratconFacility>
-	<capturedDefinition>HostileMekBase.xml</capturedDefinition>
-	<displayableName>Mech Base</displayableName>
-        <facilityType>MekBase</facilityType>
-        <localModifiers>AlliedMechGarrison.xml</localModifiers>
-        <owner>Allied</owner>
-        <sharedModifiers>AlliedMechReinforcements.xml</sharedModifiers>
-	<userDescription>Allied mechs will participate in scenarios on this track and defend this facility.</userDescription>
-        <visible>true</visible>
+    <capturedDefinition>HostileMekBase.xml</capturedDefinition>
+    <displayableName>Mek Base</displayableName>
+    <facilityType>MekBase</facilityType>
+    <localModifiers>AlliedMekGarrison.xml</localModifiers>
+    <owner>Allied</owner>
+    <sharedModifiers>AlliedMekReinforcements.xml</sharedModifiers>
+    <userDescription>Allied Meks will participate in scenarios on this track and defend this
+        facility.</userDescription>
+    <visible>true</visible>
 </StratconFacility>

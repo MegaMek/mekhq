@@ -18,10 +18,10 @@
  */
 package mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator;
 
-import mekhq.MekHQ;
-
 import java.util.Random;
 import java.util.ResourceBundle;
+
+import mekhq.MekHQ;
 
 public enum PreFabHumorous {
     ACCIDENTALLY_AWESOME("PreFabHumorous.ACCIDENTALLY_AWESOME.text"),
@@ -271,7 +271,7 @@ public enum PreFabHumorous {
     FRAGGED_FIGHTERS("PreFabHumorous.FRAGGED_FIGHTERS.text"),
     FRAGILE_FIGHTERS("PreFabHumorous.FRAGILE_FIGHTERS.text"),
     FRAGMENTED_FORCES("PreFabHumorous.FRAGMENTED_FORCES.text"),
-    FRANKENMECHS("PreFabHumorous.FRANKENMECHS.text"),
+    FRANKENMEKS("PreFabHumorous.FRANKENMEKS.text"),
     FRAYED_FORCES("PreFabHumorous.FRAYED_FORCES.text"),
     FRAZZLED_FUSILIERS("PreFabHumorous.FRAZZLED_FUSILIERS.text"),
     FREELOADING_FIGHTERS("PreFabHumorous.FREELOADING_FIGHTERS.text"),
@@ -315,7 +315,7 @@ public enum PreFabHumorous {
     GRIDLOCK_GLADIATORS("PreFabHumorous.GRIDLOCK_GLADIATORS.text"),
     HALF_BAKED_HEROES("PreFabHumorous.HALF_BAKED_HEROES.text"),
     HALF_COCKED_HOTSHOTS("PreFabHumorous.HALF_COCKED_HOTSHOTS.text"),
-    HALF_MECH_HELLRAISERS("PreFabHumorous.HALF_MECH_HELLRAISERS.text"),
+    HALF_MEK_HELLRAISERS("PreFabHumorous.HALF_MEK_HELLRAISERS.text"),
     HALF_PINT_HEROES("PreFabHumorous.HALF_PINT_HEROES.text"),
     HALF_POWER_HEROES("PreFabHumorous.HALF_POWER_HEROES.text"),
     HALF_STEP_HEROES("PreFabHumorous.HALF_STEP_HEROES.text"),
@@ -398,14 +398,14 @@ public enum PreFabHumorous {
     MALFUNCTIONED_MILITIA("PreFabHumorous.MALFUNCTIONED_MILITIA.text"),
     MANGLED_MERCS("PreFabHumorous.MANGLED_MERCS.text"),
     MANUAL_OVERRIDE_MILITIA("PreFabHumorous.MANUAL_OVERRIDE_MILITIA.text"),
-    MECH_HEAD_MAYHEM("PreFabHumorous.MECH_HEAD_MAYHEM.text"),
-    MECH_MESSIAHS("PreFabHumorous.MECH_MESSIAHS.text"),
-    MECHA_MISFITS("PreFabHumorous.MECHA_MISFITS.text"),
-    MECHA_NICIANS("PreFabHumorous.MECHA_NICIANS.text"),
+    MEK_HEAD_MAYHEM("PreFabHumorous.MEK_HEAD_MAYHEM.text"),
+    MEK_MESSIAHS("PreFabHumorous.MEK_MESSIAHS.text"),
+    MEKA_MISFITS("PreFabHumorous.MEKA_MISFITS.text"),
+    MEKA_NICIANS("PreFabHumorous.MEKA_NICIANS.text"),
     MECHANICAL_MISHAPS("PreFabHumorous.MECHANICAL_MISHAPS.text"),
     MEDIOCRE_MILITIA("PreFabHumorous.MEDIOCRE_MILITIA.text"),
     MELTDOWN_MILITIA("PreFabHumorous.MELTDOWN_MILITIA.text"),
-    MENACE_MECHS("PreFabHumorous.MENACE_MECHS.text"),
+    MENACE_MEKS("PreFabHumorous.MENACE_MEKS.text"),
     METAL_MAYHEM_MARAUDERS("PreFabHumorous.METAL_MAYHEM_MARAUDERS.text"),
     METALHEAD_MALCONTENTS("PreFabHumorous.METALHEAD_MALCONTENTS.text"),
     MIDNIGHT_MARAUDERS("PreFabHumorous.MIDNIGHT_MARAUDERS.text"),
@@ -418,14 +418,14 @@ public enum PreFabHumorous {
     MISFIRED_MISSILES("PreFabHumorous.MISFIRED_MISSILES.text"),
     MISFIRED_ORDERS("PreFabHumorous.MISFIRED_ORDERS.text"),
     MISFIT_MANIACS("PreFabHumorous.MISFIT_MANIACS.text"),
-    MISFIT_MECH_SQUAD("PreFabHumorous.MISFIT_MECH_SQUAD.text"),
+    MISFIT_MEK_SQUAD("PreFabHumorous.MISFIT_MEK_SQUAD.text"),
     MISGUIDED_MISSILES("PreFabHumorous.MISGUIDED_MISSILES.text"),
     MISHAP_MILITIA("PreFabHumorous.MISHAP_MILITIA.text"),
     MISMATCHED_MERCENARIES("PreFabHumorous.MISMATCHED_MERCENARIES.text"),
     MISSED_CONNECTION_MILITIA("PreFabHumorous.MISSED_CONNECTION_MILITIA.text"),
     MISSILE_MALCONTENTS("PreFabHumorous.MISSILE_MALCONTENTS.text"),
     MISSING_MANUALS("PreFabHumorous.MISSING_MANUALS.text"),
-    MISSING_MECH_PARTS("PreFabHumorous.MISSING_MECH_PARTS.text"),
+    MISSING_MEK_PARTS("PreFabHumorous.MISSING_MEK_PARTS.text"),
     MISSTEP_MERCENARIES("PreFabHumorous.MISSTEP_MERCENARIES.text"),
     MIXED_MESSAGES("PreFabHumorous.MIXED_MESSAGES.text"),
     MOONSHINE_MARAUDERS("PreFabHumorous.MOONSHINE_MARAUDERS.text"),
@@ -758,21 +758,21 @@ public enum PreFabHumorous {
     WRECKS_AND_RUIN("PreFabHumorous.WRECKS_AND_RUIN.text"),
     YOUR_NAME_HERE("PreFabHumorous.YOUR_NAME_HERE.text"),
     ZAPPED_ZETA_SQUAD("PreFabHumorous.ZAPPED_ZETA_SQUAD.text");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String word;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     PreFabHumorous(final String word) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator",
-        MekHQ.getMHQOptions().getLocale());
+                MekHQ.getMHQOptions().getLocale());
         this.word = resources.getString(word);
     }
 
     private static final Random RANDOM = new Random();
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     public String toString() {

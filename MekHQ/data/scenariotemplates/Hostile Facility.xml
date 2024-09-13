@@ -3,7 +3,7 @@
     <name>Hostile Facility</name>
     <shortBriefing>Hostile facility</shortBriefing>
     <detailedBriefing>A hostile-controlled facility has been located.</detailedBriefing>
-	<isHostileFacility>true</isHostileFacility>
+    <isHostileFacility>true</isHostileFacility>
     <mapParameters>
         <allowedTerrainTypes>
             <allowedTerrainType>ColdFacility</allowedTerrainType>
@@ -43,7 +43,7 @@
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -82,7 +82,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -113,7 +113,7 @@
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -127,7 +127,7 @@
                 <associatedForceName>Base Turrets</associatedForceName>
                 <associatedForceName>Primary Opfor</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -142,7 +142,7 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails />
             <description>Destroy or rout 75% of all hostile units present:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>

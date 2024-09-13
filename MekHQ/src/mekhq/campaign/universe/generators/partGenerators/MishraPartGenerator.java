@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.universe.generators.partGenerators;
 
-import megamek.common.Mech;
+import megamek.common.Mek;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -51,7 +51,7 @@ public class MishraPartGenerator extends MultiplePartGenerator {
     @Override
     public List<Part> generate(final List<Unit> units, final boolean includeArmour,
                                final boolean includeAmmunition) {
-        units.removeIf(unit -> !(unit.getEntity() instanceof Mech));
+        units.removeIf(unit -> !(unit.getEntity() instanceof Mek));
         return super.generate(units, includeArmour, includeAmmunition);
     }
 
@@ -64,7 +64,7 @@ public class MishraPartGenerator extends MultiplePartGenerator {
                 part.setQuantity(Math.min(part.getQuantity(), 30));
             } else if ((part instanceof MekCockpit) || (part instanceof MekLifeSupport)
                     || (part instanceof MekSensor)
-                    || ((part instanceof MekLocation) && ((MekLocation) part).getLoc() == Mech.LOC_HEAD)) {
+                    || ((part instanceof MekLocation) && ((MekLocation) part).getLoc() == Mek.LOC_HEAD)) {
                 part.setQuantity(Math.min(part.getQuantity(), 2));
             } else if ((part instanceof MekGyro) || (part instanceof MASC)) {
                 part.setQuantity(Math.min(part.getQuantity(), 1));

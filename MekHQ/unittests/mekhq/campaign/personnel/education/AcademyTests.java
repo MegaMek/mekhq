@@ -146,9 +146,9 @@ class AcademyTests {
 
     @Test
     public void testSkillParser_ValidSkill() {
-        assertEquals(SkillType.S_PILOT_MECH, Academy.skillParser("piloting/mech"));
-        assertEquals(SkillType.S_GUN_MECH, Academy.skillParser("gunnery/mech"));
-        assertEquals(SkillType.S_GUN_MECH, Academy.skillParser("gunnery/mech"));
+        assertEquals(SkillType.S_PILOT_MEK, Academy.skillParser("piloting/mek"));
+        assertEquals(SkillType.S_GUN_MEK, Academy.skillParser("gunnery/mek"));
+        assertEquals(SkillType.S_GUN_MEK, Academy.skillParser("gunnery/mek"));
         assertEquals(SkillType.S_PILOT_AERO, Academy.skillParser("piloting/aerospace"));
         assertEquals(SkillType.S_GUN_AERO, Academy.skillParser("gunnery/aerospace"));
         assertEquals(SkillType.S_PILOT_GVEE, Academy.skillParser("piloting/ground vehicle"));
@@ -161,10 +161,10 @@ class AcademyTests {
         assertEquals(SkillType.S_GUN_SPACE, Academy.skillParser("gunnery/spacecraft"));
         assertEquals(SkillType.S_ARTILLERY, Academy.skillParser("artillery"));
         assertEquals(SkillType.S_GUN_BA, Academy.skillParser("gunnery/battlesuit"));
-        assertEquals(SkillType.S_GUN_PROTO, Academy.skillParser("gunnery/protomech"));
+        assertEquals(SkillType.S_GUN_PROTO, Academy.skillParser("gunnery/protomek"));
         assertEquals(SkillType.S_SMALL_ARMS, Academy.skillParser("small arms"));
-        assertEquals(SkillType.S_ANTI_MECH, Academy.skillParser("anti-mech"));
-        assertEquals(SkillType.S_TECH_MECH, Academy.skillParser("tech/mech"));
+        assertEquals(SkillType.S_ANTI_MEK, Academy.skillParser("anti-mek"));
+        assertEquals(SkillType.S_TECH_MEK, Academy.skillParser("tech/mek"));
         assertEquals(SkillType.S_TECH_MECHANIC, Academy.skillParser("tech/mechanic"));
         assertEquals(SkillType.S_TECH_AERO, Academy.skillParser("tech/aero"));
         assertEquals(SkillType.S_TECH_BA, Academy.skillParser("tech/ba"));

@@ -20,22 +20,24 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryPoint;
-import mekhq.gui.dialog.StoryNarrativeDialog;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.gui.dialog.StoryNarrativeDialog;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * This story point creates a {@link StoryNarrativeDialog StoryNarrativeDialog} with a simple narrative description.
+ * This story point creates a {@link StoryNarrativeDialog StoryNarrativeDialog}
+ * with a simple narrative description.
  */
 public class NarrativeStoryPoint extends DialogStoryPoint {
+    private static final MMLogger logger = MMLogger.create(NarrativeStoryPoint.class);
 
     String title;
     String narrative;
@@ -63,7 +65,7 @@ public class NarrativeStoryPoint extends DialogStoryPoint {
 
     @Override
     public String getResult() {
-        //this one has no variation
+        // this one has no variation
         return "";
     }
 
@@ -85,12 +87,12 @@ public class NarrativeStoryPoint extends DialogStoryPoint {
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("title")) {
-                    title =wn2.getTextContent().trim();
+                    title = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("narrative")) {
-                    narrative =wn2.getTextContent().trim();
+                    narrative = wn2.getTextContent().trim();
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

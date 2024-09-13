@@ -21,20 +21,28 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.*;
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.Compute;
+import megamek.common.CriticalSlot;
+import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
+import megamek.common.TechAdvancement;
+import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.WeaponMounted;
 import megamek.common.weapons.bayweapons.BayWeapon;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * This part covers most of the equipment types in WeaponType, AmmoType, and
@@ -48,6 +56,8 @@ import java.io.PrintWriter;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class EquipmentPart extends Part {
+    private static final MMLogger logger = MMLogger.create(EquipmentPart.class);
+
     // crap EquipmentType is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
@@ -90,7 +100,7 @@ public class EquipmentPart extends Part {
             try {
                 equipTonnage = type.getTonnage(null, size);
             } catch (NullPointerException ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
     }
@@ -131,7 +141,7 @@ public class EquipmentPart extends Part {
         }
 
         if (type == null) {
-            LogManager.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            logger.error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
         }
     }
 
@@ -191,7 +201,7 @@ public class EquipmentPart extends Part {
     public void fix() {
         super.fix();
 
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if (mounted != null) {
             mounted.setHit(false);
             mounted.setMissing(false);
@@ -212,7 +222,7 @@ public class EquipmentPart extends Part {
         final int equipmentNum = getEquipmentNum();
         final Unit unit = getUnit();
         if (unit != null) {
-            final Mounted mounted = getMounted();
+            final Mounted<?> mounted = getMounted();
             if (null != mounted) {
                 mounted.setHit(true);
                 mounted.setDestroyed(true);
@@ -245,7 +255,7 @@ public class EquipmentPart extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         final Unit unit = getUnit();
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if ((unit == null) || (mounted == null)) {
             return;
         }
@@ -326,15 +336,15 @@ public class EquipmentPart extends Part {
         return hits > 0;
     }
 
-    protected @Nullable Mounted getMounted() {
+    protected @Nullable Mounted<?> getMounted() {
         final Unit unit = getUnit();
         if ((unit != null) && (unit.getEntity() != null) && (getEquipmentNum() >= 0)) {
-            final Mounted mounted = unit.getEntity().getEquipment(getEquipmentNum());
+            final Mounted<?> mounted = unit.getEntity().getEquipment(getEquipmentNum());
             if (mounted != null) {
                 return mounted;
             }
 
-            LogManager.getLogger().warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
+            logger.warn("Missing valid equipment for " + getName() + " on unit " + getUnit().getName());
         }
 
         return null;
@@ -342,7 +352,7 @@ public class EquipmentPart extends Part {
 
     @Override
     public int getLocation() {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         return (mounted != null) ? mounted.getLocation() : Entity.LOC_NONE;
     }
 
@@ -351,7 +361,7 @@ public class EquipmentPart extends Part {
     }
 
     public boolean isRearFacing() {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         return (mounted != null) && mounted.isRearMounted();
     }
 
@@ -362,7 +372,7 @@ public class EquipmentPart extends Part {
             return;
         }
 
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if (mounted != null) {
             mounted.setMissing(false);
             if (getHits() > 0) {
@@ -392,7 +402,7 @@ public class EquipmentPart extends Part {
         // The part is only fixable if the location is not destroyed.
         // be sure to check location and second location
         final Unit unit = getUnit();
-        final Mounted m = getMounted();
+        final Mounted<?> m = getMounted();
         if ((unit != null) && (m != null)) {
             int loc = m.getLocation();
             if (unit.isLocationBreached(loc)) {
@@ -420,7 +430,7 @@ public class EquipmentPart extends Part {
     @Override
     public boolean isMountedOnDestroyedLocation() {
         final Unit unit = getUnit();
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if ((unit != null) && (mounted != null)) {
             return unit.isLocationDestroyed(mounted.getLocation())
                     || (mounted.isSplit() && unit.isLocationDestroyed(mounted.getSecondLocation()));
@@ -432,7 +442,7 @@ public class EquipmentPart extends Part {
     @Override
     public boolean onBadHipOrShoulder() {
         final Unit unit = getUnit();
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if ((unit != null) && (mounted != null)) {
             return unit.hasBadHipOrShoulder(mounted.getLocation())
                     || (mounted.isSplit() && unit.hasBadHipOrShoulder(mounted.getSecondLocation()));
@@ -451,7 +461,8 @@ public class EquipmentPart extends Part {
         // Ok, we can't use the resolveVariableCost methods from MegaMek, because they
         // rely on entity which may be null if this is a spare part. So we use our
         // own resolveVariableCost method
-        // TODO : we need a static method that returns whether this equipment type depends upon
+        // TODO : we need a static method that returns whether this equipment type
+        // depends upon
         // - unit tonnage
         // - item tonnage
         // - engine
@@ -468,7 +479,7 @@ public class EquipmentPart extends Part {
 
         if (unit != null) {
             en = unit.getEntity();
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            Mounted<?> mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted) {
                 isArmored = mounted.isArmored();
             }
@@ -557,7 +568,7 @@ public class EquipmentPart extends Part {
         }
         if (varCost.isZero()) {
             // if we don't know what it is...
-            LogManager.getLogger().debug("I don't know how much " + name + " costs.");
+            logger.debug("I don't know how much " + name + " costs.");
         }
         return varCost;
     }
@@ -592,7 +603,8 @@ public class EquipmentPart extends Part {
         } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
             return 5.5;
         } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
-            // direct fire weapon weight divided by 4 - what is reasonably the highest - 15 tons?
+            // direct fire weapon weight divided by 4 - what is reasonably the highest - 15
+            // tons?
             return 15;
         }
         return 1;
@@ -616,10 +628,10 @@ public class EquipmentPart extends Part {
             return false;
         }
         if (type instanceof MiscType) {
-            return type.hasFlag(MiscType.F_MECH_EQUIPMENT) || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
+            return type.hasFlag(MiscType.F_MEK_EQUIPMENT) || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
                     || type.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
         } else if (type instanceof WeaponType) {
-            return (type.hasFlag(WeaponType.F_MECH_WEAPON) || type.hasFlag(WeaponType.F_TANK_WEAPON)
+            return (type.hasFlag(WeaponType.F_MEK_WEAPON) || type.hasFlag(WeaponType.F_TANK_WEAPON)
                     || type.hasFlag(WeaponType.F_AERO_WEAPON)) && !((WeaponType) type).isCapital();
         }
         return true;
@@ -627,7 +639,7 @@ public class EquipmentPart extends Part {
 
     @Override
     public String getLocationName() {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if ((mounted != null) && (mounted.getLocation() != Entity.LOC_NONE)) {
             return getUnit().getEntity().getLocationName(mounted.getLocation());
         }
@@ -637,7 +649,7 @@ public class EquipmentPart extends Part {
 
     @Override
     public boolean isInLocation(String loc) {
-        final Mounted mounted = getMounted();
+        final Mounted<?> mounted = getMounted();
         if (mounted == null) {
             return false;
         }
@@ -695,7 +707,8 @@ public class EquipmentPart extends Part {
         }
 
         // if we are still here then we need to check the other weapons, if any of them
-        // are usable then we should do the same thing. Otherwise all weapons are destroyed
+        // are usable then we should do the same thing. Otherwise all weapons are
+        // destroyed
         // and we should mark the bay as unusuable.
         for (WeaponMounted m : weaponBay.getBayWeapons()) {
             if (!m.isDestroyed()) {

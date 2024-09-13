@@ -1,32 +1,33 @@
 <StratconFacility>
-	<capturedDefinition>AlliedMekBase.xml</capturedDefinition>
-	<displayableName>Mech Base</displayableName>
-        <facilityType>MekBase</facilityType>
-        <localModifiers>EnemyMechGarrison.xml</localModifiers>
-        <owner>Opposing</owner>
-        <sharedModifiers>EnemyMechReinforcements.xml</sharedModifiers>
-	<userDescription>Hostile mechs will participate in scenarios on this track and defend this facility.</userDescription>	
-        <visible>false</visible>
-<biomes>
-	<biomeCategory>TerranFacility</biomeCategory>
+    <capturedDefinition>AlliedMekBase.xml</capturedDefinition>
+    <displayableName>Mek Base</displayableName>
+    <facilityType>MekBase</facilityType>
+    <localModifiers>EnemyMekGarrison.xml</localModifiers>
+    <owner>Opposing</owner>
+    <sharedModifiers>EnemyMekReinforcements.xml</sharedModifiers>
+    <userDescription>Hostile Meks will participate in scenarios on this track and defend this
+        facility.</userDescription>
+    <visible>false</visible>
+    <biomes>
+        <biomeCategory>TerranFacility</biomeCategory>
         <allowedTemperatureLowerBound>0</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>267</allowedTemperatureUpperBound>
         <allowedTerrainTypes>FrozenFacility</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>TerranFacility</biomeCategory>
+        <biomeCategory>TerranFacility</biomeCategory>
         <allowedTemperatureLowerBound>268</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>277</allowedTemperatureUpperBound>
         <allowedTerrainTypes>ColdFacility</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>TerranFacility</biomeCategory>
+        <biomeCategory>TerranFacility</biomeCategory>
         <allowedTemperatureLowerBound>278</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>297</allowedTemperatureUpperBound>
         <allowedTerrainTypes>TemperateFacility</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>TerranFacility</biomeCategory>
+        <biomeCategory>TerranFacility</biomeCategory>
         <allowedTemperatureLowerBound>298</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>90000</allowedTemperatureUpperBound>
         <allowedTerrainTypes>HotFacility</allowedTerrainTypes>

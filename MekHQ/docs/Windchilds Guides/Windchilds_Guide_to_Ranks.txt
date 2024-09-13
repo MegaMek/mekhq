@@ -14,7 +14,7 @@ If you want to run a campaign with entirely custom ranks, remove all rank system
 Professions:
 Professions are used to determine the type of ranks a person has. They consist of a number of Personnel Roles that are a a part of the profession, and the profession code, which is used during alternate profession specification (explained below). The groupings of Personnel Roles cannot be customized. The professions are as followed:
 MekWarrior:
-	Personnel Roles: MekWarrior, LAM Pilot, ProtoMech Pilot
+	Personnel Roles: MekWarrior, LAM Pilot, ProtoMek Pilot
 	Profession Code: "MW"
 	This is the default profession, and thus it may not be an empty profession (see below for more information about this term).
 Aerospace:
@@ -30,7 +30,7 @@ Infantry:
 	Personnel Roles: Battle Armour Pilot, Elemental, Soldier
 	Profession Code: "INF"
 Tech:
-	Personnel Roles: Mech Tech, Mechanic, Aero Tech, Battle Armour Tech, Astech
+	Personnel Roles: Mek Tech, Mechanic, Aero Tech, Battle Armour Tech, Astech
 	Profession Code: "TECH"
 Medical:
 	Personnel Roles: Doctor, Medic
