@@ -18,15 +18,6 @@
  */
 package mekhq.campaign.personnel.education;
 
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
 import megamek.common.Compute;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -37,11 +28,16 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
 import mekhq.utilities.ReportingUtilities;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * The EducationController class is responsible for managing the education
