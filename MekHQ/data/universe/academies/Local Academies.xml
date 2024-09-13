@@ -150,7 +150,7 @@
         <curriculum>Astech, Tech/Aero</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Technician Apprenticeship</qualification>
-        <curriculum>Astech, Tech/BA</curriculum>
+        <curriculum>Astech, Tech/BattleArmor</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Black Naval Apprenticeship</qualification>
         <curriculum>Astech, Tech/Vessel</curriculum>
@@ -277,7 +277,7 @@
         <curriculum>Tech/Aero</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Technology &amp; Development</qualification>
-        <curriculum>Tech/BA</curriculum>
+        <curriculum>Tech/BattleArmor</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Black Naval Technologies</qualification>
         <curriculum>Tech/Vessel</curriculum>
@@ -303,7 +303,7 @@
         <curriculum>Negotiation, Scrounge</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Nursing School</qualification>
-        <curriculum>Medtech</curriculum>
+        <curriculum>MedTech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
     <academy>
@@ -333,7 +333,7 @@
         <curriculum>Tech/Aero</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Technology &amp; Development</qualification>
-        <curriculum>Tech/BA</curriculum>
+        <curriculum>Tech/BattleArmor</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Black Naval Technologies</qualification>
         <curriculum>Tech/Vessel</curriculum>
@@ -442,7 +442,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MekWarrior Academy</qualification>
+        <qualification>MechWarrior Academy</qualification>
         <curriculum>Gunnery/Mek, Piloting/Mek</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Mechanized Academy</qualification>
@@ -455,7 +455,7 @@
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Academy</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mek</curriculum>
+        <curriculum>Gunnery/BattleArmor, Anti-Mek</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Artillery College</qualification>
         <curriculum>Small Arms, Artillery</curriculum>

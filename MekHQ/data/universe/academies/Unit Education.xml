@@ -49,7 +49,7 @@
         <facultySkill>9</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MekWarrior Apprenticeship</qualification>
+        <qualification>MechWarrior Apprenticeship</qualification>
         <curriculum>Gunnery/Mek, Piloting/Mek</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Mechanized Apprenticeship</qualification>
@@ -74,7 +74,7 @@
         <curriculum>Astech, Tech/Aero</curriculum>
         <qualificationStartYear>2314</qualificationStartYear>
         <qualification>Battle Armor Technician Apprenticeship</qualification>
-        <curriculum>Astech, Tech/BA</curriculum>
+        <curriculum>Astech, Tech/BattleArmor</curriculum>
         <qualificationStartYear>3050</qualificationStartYear>
         <qualification>Black Naval Tech Apprenticeship</qualification>
         <curriculum>Astech, Tech/Vessel</curriculum>
@@ -83,7 +83,7 @@
         <curriculum>Administration, Scrounge</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Medical Apprenticeship</qualification>
-        <curriculum>Medtech, Doctor</curriculum>
+        <curriculum>MedTech, Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
@@ -127,7 +127,7 @@
         <durationDays>150</durationDays>
         <facultySkill>9</facultySkill>
         <ageMin>16</ageMin>
-        <qualification>Basic MekWarrior Training</qualification>
+        <qualification>Basic MechWarrior Training</qualification>
         <curriculum>Gunnery/Mek, Piloting/Mek</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Basic Aerospace Training</qualification>
@@ -137,7 +137,7 @@
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Basic Battle Armor Training</qualification>
-        <curriculum>Gunnery/Battlesuit</curriculum>
+        <curriculum>Gunnery/BattleArmor</curriculum>
         <qualificationStartYear>3050</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
