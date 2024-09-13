@@ -20,8 +20,15 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.UUID;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Mission;
@@ -29,34 +36,35 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.UUID;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * Adds a scenario to the identified mission. The listener in StoryArc will listen for the completion of the
+ * Adds a scenario to the identified mission. The listener in StoryArc will
+ * listen for the completion of the
  * added scenario and then complete the StoryPoint.
  */
 public class ScenarioStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(ScenarioStoryPoint.class);
 
     /** track the scenario itself **/
     private Scenario scenario;
 
-    /** The UUID of the MissionStoryPoint that this ScenarioStoryPoint is a part of **/
+    /**
+     * The UUID of the MissionStoryPoint that this ScenarioStoryPoint is a part of
+     **/
     private UUID missionStoryPointId;
 
     /**
-     * A force ID to deploy in this scenario. This should be used carefully as forces may shift depending
-     * on player changes. Primarily to be used for first mission where force ids should be known
+     * A force ID to deploy in this scenario. This should be used carefully as
+     * forces may shift depending
+     * on player changes. Primarily to be used for first mission where force ids
+     * should be known
      */
     private int deployedForceId;
 
     /**
-     * Days ahead to set the date of the scenario. Will default to current date if nothing is entered.
+     * Days ahead to set the date of the scenario. Will default to current date if
+     * nothing is entered.
      */
     private int days;
 
@@ -114,30 +122,33 @@ public class ScenarioStoryPoint extends StoryPoint {
         }
         ScenarioStatus status = scenario.getStatus();
 
-        //the StoryOutcomes may not include this particular outcome so if this is the case we want to find the next
-        //highest enum that is present.
+        // the StoryOutcomes may not include this particular outcome so if this is the
+        // case we want to find the next
+        // highest enum that is present.
 
-        //if storyOutcomes are empty, then it doesn't really matter. Also, if this status has an entry
-        //in storyOutcomes then return it
+        // if storyOutcomes are empty, then it doesn't really matter. Also, if this
+        // status has an entry
+        // in storyOutcomes then return it
         if (storyOutcomes.isEmpty() || null != storyOutcomes.get(status.name())) {
             return status.name();
         }
 
-        //ok if we are here then we have storyOutcomes but not an exact match. We want to compare ordinals to get
-        //the next best choice
-        for(ScenarioStatus nextStatus : ScenarioStatus.values()) {
+        // ok if we are here then we have storyOutcomes but not an exact match. We want
+        // to compare ordinals to get
+        // the next best choice
+        for (ScenarioStatus nextStatus : ScenarioStatus.values()) {
             if (nextStatus == ScenarioStatus.CURRENT) {
-                //shouldn't happen, but ok
+                // shouldn't happen, but ok
                 continue;
             }
             if (null != storyOutcomes.get(nextStatus.name())) {
-                if(status.ordinal() <= nextStatus.ordinal()) {
+                if (status.ordinal() <= nextStatus.ordinal()) {
                     return nextStatus.name();
                 }
             }
         }
 
-        //if we are still here, return nothing because we probably want defaults
+        // if we are still here, return nothing because we probably want defaults
         return "";
     }
 
@@ -153,8 +164,9 @@ public class ScenarioStoryPoint extends StoryPoint {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "deployedForceId", deployedForceId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "days", days);
         if (null != scenario) {
-            //if the scenario has a valid id, then just save this because the scenario is saved
-            //and loaded elsewhere so, we need to link it
+            // if the scenario has a valid id, then just save this because the scenario is
+            // saved
+            // and loaded elsewhere so, we need to link it
             if (scenario.getId() > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenario.getId());
             } else {
@@ -174,13 +186,13 @@ public class ScenarioStoryPoint extends StoryPoint {
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     int scenarioId = Integer.parseInt(wn2.getTextContent().trim());
-                    if(null != c) {
+                    if (null != c) {
                         Scenario s = c.getScenario(scenarioId);
                         this.setScenario(s);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenario")) {
                     Scenario s = Scenario.generateInstanceFromXML(wn2, c, version);
-                    if(null != s) {
+                    if (null != s) {
                         this.setScenario(s);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("missionStoryPointId")) {
@@ -191,7 +203,7 @@ public class ScenarioStoryPoint extends StoryPoint {
                     days = Integer.parseInt(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

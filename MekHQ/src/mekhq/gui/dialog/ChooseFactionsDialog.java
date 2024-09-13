@@ -18,37 +18,56 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.TreeMap;
+
+import javax.swing.AbstractAction;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.*;
 
 public class ChooseFactionsDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(ChooseFactionsDialog.class);
+
     private LocalDate date;
 
     private JList<Faction> factionList;
     private List<String> result;
     private boolean changed;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseFactionsDialog",
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.ChooseFactionsDialog",
             MekHQ.getMHQOptions().getLocale());
 
     public ChooseFactionsDialog(final JFrame frame, final LocalDate date,
-                                final List<String> defaults) {
+            final List<String> defaults) {
         this(frame, true, date, defaults);
     }
 
     public ChooseFactionsDialog(final JFrame frame, final boolean modal, final LocalDate date,
-                                final List<String> defaults) {
+            final List<String> defaults) {
         super(frame, modal);
         this.date = Objects.requireNonNull(date);
         this.result = defaults;
@@ -79,7 +98,8 @@ public class ChooseFactionsDialog extends JDialog {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
                     boolean cellHasFocus) {
-                DefaultListCellRenderer result = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                DefaultListCellRenderer result = (DefaultListCellRenderer) super.getListCellRendererComponent(list,
+                        value, index, isSelected, cellHasFocus);
                 if (value instanceof Faction) {
                     result.setText(((Faction) value).getFullName(date.getYear()));
                 }
@@ -125,7 +145,7 @@ public class ChooseFactionsDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

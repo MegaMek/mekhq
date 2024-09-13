@@ -18,42 +18,45 @@
  */
 package mekhq.campaign.mission.enums;
 
+import java.util.ResourceBundle;
+
 import megamek.common.Compute;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.universe.enums.EraFlag;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.ResourceBundle;
 
 public enum AtBContractType {
-    //region Enum Declarations
+    // region Enum Declarations
     GARRISON_DUTY("AtBContractType.GARRISON_DUTY.text", "AtBContractType.GARRISON_DUTY.toolTipText", 18, 1.0),
     CADRE_DUTY("AtBContractType.CADRE_DUTY.text", "AtBContractType.CADRE_DUTY.toolTipText", 12, 0.8),
     SECURITY_DUTY("AtBContractType.SECURITY_DUTY.text", "AtBContractType.SECURITY_DUTY.toolTipText", 6, 1.2),
     RIOT_DUTY("AtBContractType.RIOT_DUTY.text", "AtBContractType.RIOT_DUTY.toolTipText", 4, 1.0),
-    PLANETARY_ASSAULT("AtBContractType.PLANETARY_ASSAULT.text", "AtBContractType.PLANETARY_ASSAULT.toolTipText", 9, 1.5),
+    PLANETARY_ASSAULT("AtBContractType.PLANETARY_ASSAULT.text", "AtBContractType.PLANETARY_ASSAULT.toolTipText", 9,
+            1.5),
     RELIEF_DUTY("AtBContractType.RELIEF_DUTY.text", "AtBContractType.RELIEF_DUTY.toolTipText", 9, 1.4),
-    GUERRILLA_WARFARE("AtBContractType.GUERRILLA_WARFARE.text", "AtBContractType.GUERRILLA_WARFARE.toolTipText", 24, 2.1),
+    GUERRILLA_WARFARE("AtBContractType.GUERRILLA_WARFARE.text", "AtBContractType.GUERRILLA_WARFARE.toolTipText", 24,
+            2.1),
     PIRATE_HUNTING("AtBContractType.PIRATE_HUNTING.text", "AtBContractType.PIRATE_HUNTING.toolTipText", 6, 1.0),
-    DIVERSIONARY_RAID("AtBContractType.DIVERSIONARY_RAID.text", "AtBContractType.DIVERSIONARY_RAID.toolTipText", 3, 1.8),
+    DIVERSIONARY_RAID("AtBContractType.DIVERSIONARY_RAID.text", "AtBContractType.DIVERSIONARY_RAID.toolTipText", 3,
+            1.8),
     OBJECTIVE_RAID("AtBContractType.OBJECTIVE_RAID.text", "AtBContractType.OBJECTIVE_RAID.toolTipText", 3, 1.6),
     RECON_RAID("AtBContractType.RECON_RAID.text", "AtBContractType.RECON_RAID.toolTipText", 3, 1.6),
     EXTRACTION_RAID("AtBContractType.EXTRACTION_RAID.text", "AtBContractType.EXTRACTION_RAID.toolTipText", 3, 1.6);
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
     private final int constantLength;
     private final double paymentMultiplier;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     AtBContractType(final String name, final String toolTipText, final int constantLength,
-                    final double paymentMultiplier) {
+            final double paymentMultiplier) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
@@ -61,9 +64,9 @@ public enum AtBContractType {
         this.constantLength = constantLength;
         this.paymentMultiplier = paymentMultiplier;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
@@ -75,9 +78,9 @@ public enum AtBContractType {
     public double getPaymentMultiplier() {
         return paymentMultiplier;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isGarrisonDuty() {
         return this == GARRISON_DUTY;
     }
@@ -133,7 +136,7 @@ public enum AtBContractType {
     public boolean isRaidType() {
         return isDiversionaryRaid() || isObjectiveRaid() || isReconRaid() || isExtractionRaid();
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     public int calculateLength(final boolean variable, final AtBContract contract) {
         return variable ? calculateVariableLength(contract) : getConstantLength();
@@ -166,7 +169,8 @@ public enum AtBContractType {
     }
 
     /**
-     * AtB Rules apply an additional -1 from 2950 to 3040, which is superseded by MekHQ's era
+     * AtB Rules apply an additional -1 from 2950 to 3040, which is superseded by
+     * MekHQ's era
      * variation code
      */
     public int calculatePartsAvailabilityLevel() {
@@ -326,7 +330,8 @@ public enum AtBContractType {
     }
 
     public int generateSpecialScenarioType(final Campaign campaign) {
-        // Our roll is era-based. If it is pre-spaceflight, early spaceflight, or Age of War there
+        // Our roll is era-based. If it is pre-spaceflight, early spaceflight, or Age of
+        // War there
         // cannot be Star League Caches as the Star League hasn't formed
         final int roll = Compute.randomInt(campaign.getEra().hasFlag(EraFlag.PRE_SPACEFLIGHT,
                 EraFlag.EARLY_SPACEFLIGHT, EraFlag.AGE_OF_WAR) ? 12 : 20) + 1;
@@ -482,7 +487,7 @@ public enum AtBContractType {
         }
     }
 
-    //region File I/O
+    // region File I/O
     /**
      * @param text containing the AtBContractType
      * @return the saved AtBContractType
@@ -527,11 +532,12 @@ public enum AtBContractType {
 
         }
 
-        LogManager.getLogger().error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
+        MMLogger.create(AtBContractType.class)
+                .error("Failed to parse text " + text + " into an AtBContractType, returning GARRISON_DUTY.");
 
         return GARRISON_DUTY;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

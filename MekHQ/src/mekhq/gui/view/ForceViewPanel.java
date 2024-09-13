@@ -390,7 +390,7 @@ public class ForceViewPanel extends JScrollablePanel {
         int nexty = 0;
         for (Force subForce : force.getSubForces()) {
             lblForce = new JLabel();
-            lblForce.setText(getSummaryFor(subForce));
+            lblForce.setText(getForceSummary(subForce));
             lblForce.setIcon(subForce.getForceIcon().getImageIcon(72));
             nexty++;
             gridBagConstraints = new GridBagConstraints();
@@ -428,7 +428,7 @@ public class ForceViewPanel extends JScrollablePanel {
             lblPerson = new JLabel();
             lblUnit = new JLabel();
             if (null != p) {
-                lblPerson.setText(getSummaryFor(p, unit));
+                lblPerson.setText(getForceSummary(p, unit));
                 lblPerson.setIcon(p.getPortrait().getImageIcon());
             } else {
                 lblPerson.getAccessibleContext().setAccessibleName("Unmanned Unit");
@@ -442,7 +442,7 @@ public class ForceViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSubUnits.add(lblPerson, gridBagConstraints);
-            lblUnit.setText(getSummaryFor(unit));
+            lblUnit.setText(getForceSummary(unit));
             lblUnit.setIcon(new ImageIcon(unit.getImage(lblUnit)));
             lblPerson.setLabelFor(lblUnit);
             gridBagConstraints = new GridBagConstraints();
@@ -457,20 +457,20 @@ public class ForceViewPanel extends JScrollablePanel {
         }
     }
 
-    public String getSummaryFor(Person person, Unit unit) {
-        String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
+    public String getForceSummary(Person person, Unit unit) {
+        String toReturn = "<html><font size='3'><b>" + person.getFullTitle() + "</b><br/>";
         toReturn += person.getSkillLevel(campaign, false) + " " + person.getRoleDesc();
         if (null != unit && null != unit.getEntity()
                 && null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
-            toReturn += "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "' size='2'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
+            toReturn += "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
         }
         toReturn += "</font></html>";
         return toReturn;
     }
 
-    public String getSummaryFor(Unit unit) {
-        String toReturn = "<html><font size='3'><b>" + unit.getName() + "</b></font><br/>";
-        toReturn += "<font size='2'><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
+    public String getForceSummary(Unit unit) {
+        String toReturn = "<html><font size='4'><b>" + unit.getName() + "</b></font><br/>";
+        toReturn += "<font size='3'><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
         if (entity.hasNavalC3()) {
@@ -507,8 +507,8 @@ public class ForceViewPanel extends JScrollablePanel {
         if (!unit.getEntity().getTransportBays().isEmpty()) {
             int veeTotal = (int) (unit.getCurrentLightVehicleCapacity() + unit.getCurrentHeavyVehicleCapacity() + unit.getCurrentSuperHeavyVehicleCapacity());
             int aeroTotal = (int) (unit.getCurrentASFCapacity() + unit.getCurrentSmallCraftCapacity());
-            if (unit.getCurrentMechCapacity() > 0) {
-                toReturn += "<br><i>" + "Mech Bays: " + (int) unit.getCurrentMechCapacity() + " free.</i>";
+            if (unit.getCurrentMekCapacity() > 0) {
+                toReturn += "<br><i>" + "Mek Bays: " + (int) unit.getCurrentMekCapacity() + " free.</i>";
             }
             if (veeTotal > 0) {
                 toReturn += "<br><i>" + "Vehicle Bays: " + veeTotal + " free.</i>";
@@ -516,8 +516,8 @@ public class ForceViewPanel extends JScrollablePanel {
             if (aeroTotal > 0) {
                 toReturn += "<br><i>" + "ASF/SC Bays: " + aeroTotal + " free.</i>";
             }
-            if (unit.getCurrentProtomechCapacity() > 0) {
-                toReturn += "<br><i>" + "ProtoMech Bays: " + (int) unit.getCurrentProtomechCapacity() + " free.</i>";
+            if (unit.getCurrentProtoMekCapacity() > 0) {
+                toReturn += "<br><i>" + "ProtoMek Bays: " + (int) unit.getCurrentProtoMekCapacity() + " free.</i>";
             }
             if (unit.getCurrentBattleArmorCapacity() > 0) {
                 toReturn += "<br><i>" + "Battle Armor Bays: " + (int) unit.getCurrentBattleArmorCapacity() + " free.</i>";
@@ -530,43 +530,54 @@ public class ForceViewPanel extends JScrollablePanel {
         return toReturn;
     }
 
-    public String getSummaryFor(Force f) {
-        // we are not going to use the campaign methods here because we can be more efficient
-        // by only traversing once
-        int bv = 0;
+    /**
+     * Returns a summary of the given Force in HTML format.
+     *
+     * @param force the Force to generate the summary for
+     * @return a summary of the Force in HTML format
+     */
+    public String getForceSummary(Force force) {
+        int battleValue = 0;
         Money cost = Money.zero();
-        double ton = 0;
+        double tonnage = 0;
         int number = 0;
         String commander = "No personnel found";
-        ArrayList<Person> people = new ArrayList<>();
-        for (UUID uid : f.getAllUnits(false)) {
-            Unit u = campaign.getUnit(uid);
-            if (null != u) {
-                Person p = u.getCommander();
+
+        for (UUID uid : force.getAllUnits(false)) {
+            Unit unit = campaign.getUnit(uid);
+            if (null != unit) {
+                boolean crewExists = unit.getCommander() != null;
+                battleValue += unit.getEntity().calculateBattleValue(true, !crewExists);
+                cost = cost.plus(unit.getEntity().getCost(true));
+                tonnage += unit.getEntity().getWeight();
                 number++;
-                if (p != null) {
-                    bv += u.getEntity().calculateBattleValue(true, false);
-                } else {
-                    bv += u.getEntity().calculateBattleValue(true, true);
-                }
-                cost = cost.plus(u.getEntity().getCost(true));
-                ton += u.getEntity().getWeight();
-                if (p != null) {
-                    people.add(p);
-                }
             }
         }
-        // sort person vector by rank
-        people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if (!people.isEmpty()) {
-            commander = people.get(0).getFullTitle();
+
+        if (force.getForceCommanderID() != null) {
+            commander = campaign.getPerson(force.getForceCommanderID()).getFullTitle();
         }
-        String toReturn = "<html><font size='2'><b>" + f.getName() + "</b> (" + commander + ")<br/>";
-        toReturn += "<b>Number of Units:</b> " + number + "<br/>";
-        toReturn += bv + " BV, ";
-        toReturn += DecimalFormat.getInstance().format(ton) + " tons, ";
-        toReturn += cost.toAmountAndSymbolString();
-        toReturn += "</font></html>";
-        return toReturn;
+
+        StringBuilder summary = new StringBuilder();
+        summary.append("<html><font size='4'><b>").append(force.getName()).append("</b> (").append(commander).append(")</font><br/>");
+        summary.append("<font size='3'>");
+        appendSummary(summary, "Number of Units", number);
+        appendSummary(summary, "BV", battleValue);
+        appendSummary(summary, "Tonnage", DecimalFormat.getInstance().format(tonnage));
+        appendSummary(summary, "Value", cost.toAmountAndSymbolString());
+        summary.append("</font></html>");
+
+        return summary.toString();
+    }
+
+    /**
+     * Appends a summary line to the provided StringBuilder.
+     *
+     * @param string    the StringBuilder to append the summary line to
+     * @param attribute the attribute name to display in bold
+     * @param value     the value associated with the attribute
+     */
+    private void appendSummary(StringBuilder string, String attribute, Object value) {
+        string.append("<b>").append(attribute).append(":</b> ").append(value).append("<br/>");
     }
 }

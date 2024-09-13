@@ -18,6 +18,27 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.util.Collections;
+import java.util.Objects;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
@@ -27,16 +48,9 @@ import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
 
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.Collections;
-
 /**
- * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more
+ * A dialog to show parts in use, ordered, in transit with actionable buttons
+ * for buying or adding more
  * taken from the Overview tab originally but now a dialog.
  */
 public class PartsReportDialog extends JDialog {
@@ -83,8 +97,9 @@ public class PartsReportDialog extends JDialog {
         // Don't sort the buttons
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY_BULK, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_SELL, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_SELL_BULK, false);
+        // partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_SELL, false);
+        // partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_SELL_BULK,
+        // false);
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD, false);
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD_BULK, false);
         // Numeric columns
@@ -99,7 +114,6 @@ public class PartsReportDialog extends JDialog {
 
         // Add buttons and actions. TODO: Only refresh the row we are working
         // on, not the whole table
-        @SuppressWarnings("serial")
         Action buy = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -110,7 +124,7 @@ public class PartsReportDialog extends JDialog {
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
-        @SuppressWarnings("serial")
+
         Action buyInBulk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -118,7 +132,8 @@ public class PartsReportDialog extends JDialog {
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1,
+                        CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 if (quantity <= 0) {
@@ -135,16 +150,11 @@ public class PartsReportDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse partInUse = overviewPartsModel.getPartInUse(row);
-                Part part = campaign.getWarehouse().getPart(partInUse.getId());
-                if (part == null) {
-                    return;
-                }
-                Part spare = campaign.getWarehouse().checkForExistingSparePart(part);
-                if (spare != null) {
-                    campaign.getQuartermaster().sellPart(spare, 1);
-                }
+                campaign.getWarehouse().getSpareParts().stream()
+                        .filter(p -> Objects.equals(p.getName(), partInUse.getName()))
+                        .findFirst()
+                        .ifPresent(p -> campaign.getQuartermaster().sellPart(p, 1));
                 refreshOverviewPartsInUse();
-
             }
         };
 
@@ -153,27 +163,25 @@ public class PartsReportDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 int row = Integer.parseInt(e.getActionCommand());
                 PartInUse partInUse = overviewPartsModel.getPartInUse(row);
-                Part part = campaign.getWarehouse().getPart(partInUse.getId());
-                if (part == null) {
-                    return;
-                }
-                Part spare = campaign.getWarehouse().checkForExistingSparePart(part);
-                if (spare != null) {
-                    int quantity = 1;
-                    PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "Sell how many " + spare.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
-                    popupValueChoiceDialog.setVisible(true);
-                    quantity = popupValueChoiceDialog.getValue();
-                    if (quantity <= 0) {
-                        return;
-                    }
-                    campaign.getQuartermaster().sellPart(spare, quantity);
-                }
+                campaign.getWarehouse().getSpareParts().stream()
+                        .filter(p -> Objects.equals(p.getName(), partInUse.getName()))
+                        .findFirst()
+                        .ifPresent(p -> {
+                            int quantity = 1;
+                            PopupValueChoiceDialog popupValueChoiceDialog = new PopupValueChoiceDialog(gui.getFrame(),
+                                    true,
+                                    "Sell how many " + p.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                            popupValueChoiceDialog.setVisible(true);
+                            quantity = popupValueChoiceDialog.getValue();
+                            if (quantity <= 0) {
+                                return;
+                            }
+                            campaign.getQuartermaster().sellPart(p, quantity);
+                        });
                 refreshOverviewPartsInUse();
             }
         };
 
-        @SuppressWarnings("serial")
         Action add = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -184,7 +192,6 @@ public class PartsReportDialog extends JDialog {
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
-        @SuppressWarnings("serial")
         Action addInBulk = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -192,7 +199,8 @@ public class PartsReportDialog extends JDialog {
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(gui.getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1,
+                        CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
@@ -207,9 +215,10 @@ public class PartsReportDialog extends JDialog {
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, buy, PartsInUseTableModel.COL_BUTTON_BUY);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, buyInBulk,
                 PartsInUseTableModel.COL_BUTTON_BUY_BULK);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, sell, PartsInUseTableModel.COL_BUTTON_SELL);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, sellInBulk,
-            PartsInUseTableModel.COL_BUTTON_SELL_BULK);
+        // new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, sell,
+        // PartsInUseTableModel.COL_BUTTON_SELL);
+        // new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, sellInBulk,
+        // PartsInUseTableModel.COL_BUTTON_SELL_BULK);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, add, PartsInUseTableModel.COL_BUTTON_GMADD);
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, addInBulk,
                 PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
@@ -242,10 +251,12 @@ public class PartsReportDialog extends JDialog {
     private void refreshOverviewPartsInUse() {
         overviewPartsModel.setData(campaign.getPartsInUse());
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
-        PartsInUseTableModel.ButtonColumn column = (PartsInUseTableModel.ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD)
+        PartsInUseTableModel.ButtonColumn column = (PartsInUseTableModel.ButtonColumn) tcm
+                .getColumn(PartsInUseTableModel.COL_BUTTON_GMADD)
                 .getCellRenderer();
         column.setEnabled(campaign.isGM());
-        column = (PartsInUseTableModel.ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK).getCellRenderer();
+        column = (PartsInUseTableModel.ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK)
+                .getCellRenderer();
         column.setEnabled(campaign.isGM());
     }
 }

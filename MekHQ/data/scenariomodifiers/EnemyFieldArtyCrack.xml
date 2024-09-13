@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An enemy Crack Field Artillery Unit has been spotted in the area.  Beware.</additionalBriefingText>
+	<additionalBriefingText>An enemy Crack Field Artillery Unit has been spotted in the area. Beware.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -16,15 +16,15 @@
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
-        <deploymentZones/>
+		<deploymentZones />
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>8</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceName>Enemy Crack Field Arty</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>EnemyCrackFieldArty.mul</fixedMul>		
+		<fixedMul>EnemyCrackFieldArty.mul</fixedMul>
 		<generationOrder>1</generationOrder>
-		<maxWeightClass>4</maxWeightClass>		
+		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>

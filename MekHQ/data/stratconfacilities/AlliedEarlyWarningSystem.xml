@@ -1,10 +1,10 @@
 <StratconFacility>
-	<capturedDefinition>HostileEarlyWarningSystem.xml</capturedDefinition>
-	<displayableName>Early Warning Center</displayableName>
-        <facilityType>EarlyWarningSystem</facilityType>
-        <owner>Allied</owner>
-	<localModifiers>ReinforcementDelayReductionAllied.xml</localModifiers>
-        <sharedModifiers>ReinforcementDelayReductionAllied.xml</sharedModifiers>
-	<userDescription>Reduces reinforcement arrival times for allied and player forces.</userDescription>
-        <visible>true</visible>
+    <capturedDefinition>HostileEarlyWarningSystem.xml</capturedDefinition>
+    <displayableName>Early Warning Center</displayableName>
+    <facilityType>EarlyWarningSystem</facilityType>
+    <owner>Allied</owner>
+    <localModifiers>ReinforcementDelayReductionAllied.xml</localModifiers>
+    <sharedModifiers>ReinforcementDelayReductionAllied.xml</sharedModifiers>
+    <userDescription>Reduces reinforcement arrival times for allied and player forces.</userDescription>
+    <visible>true</visible>
 </StratconFacility>

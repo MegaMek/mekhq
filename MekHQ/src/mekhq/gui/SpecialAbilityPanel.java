@@ -1,16 +1,42 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.util.ResourceBundle;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.gui.dialog.EditSpecialAbilityDialog;
 import mekhq.gui.panes.CampaignOptionsPane;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ResourceBundle;
-
 /**
  * An extension of JPanel that displays information about special abilities
+ * 
  * @author Jay Lawson
  */
 public class SpecialAbilityPanel extends JPanel {
@@ -30,7 +56,6 @@ public class SpecialAbilityPanel extends JPanel {
 
         btnRemove.addActionListener(evt -> remove());
 
-
         setLayout(new GridBagLayout());
 
         initComponents();
@@ -46,7 +71,7 @@ public class SpecialAbilityPanel extends JPanel {
         txtDesc.setEditable(false);
         txtDesc.setBackground(this.getBackground());
 
-        JPanel pnlButton = new JPanel(new GridLayout(0,2));
+        JPanel pnlButton = new JPanel(new GridLayout(0, 2));
         pnlButton.add(btnEdit);
         pnlButton.add(btnRemove);
 

@@ -18,28 +18,43 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.Gender;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.randomEvents.PersonalityController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.view.PersonViewPanel;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.Objects;
-import java.util.ResourceBundle;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
  */
 public class NewRecruitDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(NewRecruitDialog.class);
 
     private Person person;
 
@@ -130,7 +145,8 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private JPanel createSidebar(ResourceBundle resourceMap) {
-        boolean randomizeOrigin = hqView.getCampaign().getCampaignOptions().getRandomOriginOptions().isRandomizeOrigin();
+        boolean randomizeOrigin = hqView.getCampaign().getCampaignOptions().getRandomOriginOptions()
+                .isRandomizeOrigin();
 
         JPanel panSidebar = new JPanel();
         panSidebar.setName("panButtons");
@@ -185,7 +201,7 @@ public class NewRecruitDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -218,6 +234,7 @@ public class NewRecruitDialog extends JDialog {
                 person.getGender(), person.isClanPersonnel(), factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
+        PersonalityController.writeDescription(person);
         refreshView();
     }
 

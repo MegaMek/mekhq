@@ -1,14 +1,15 @@
 <StratconFacility>
 	<capturedDefinition>HostileBaseOfOperations.xml</capturedDefinition>
 	<displayableName>Base of Operations</displayableName>
-        <facilityType>BaseOfOperations</facilityType>
-        <owner>Allied</owner>
+	<facilityType>BaseOfOperations</facilityType>
+	<owner>Allied</owner>
 	<localModifiers>Veterans.xml</localModifiers>
 	<localModifiers>GoodEquipment.xml</localModifiers>
 	<localModifiers>AlliedTurrets.xml</localModifiers>
-	<localModifiers>AlliedOfficerMech.xml</localModifiers>	
-        <sharedModifiers>AlliedOfficerMech.xml</sharedModifiers>
-	<userDescription>This base is defended by well-equipped veteran troops, turrets and a commander in a mech. &lt;br&gt;
-The commander will participate in scenarios on this track.</userDescription>		
-        <visible>true</visible>
+	<localModifiers>AlliedOfficerMek.xml</localModifiers>
+	<sharedModifiers>AlliedOfficerMek.xml</sharedModifiers>
+	<userDescription>This base is defended by well-equipped veteran troops, turrets and a commander in
+		a Mek. &lt;br&gt;
+		The commander will participate in scenarios on this track.</userDescription>
+	<visible>true</visible>
 </StratconFacility>

@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.parts;
 
 import java.util.Objects;
@@ -9,7 +28,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartInUse {
     private String description;
-    private int id;
+    private String name;
     private IAcquisitionWork partToBuy;
     private int useCount;
     private int storeCount;
@@ -35,13 +54,15 @@ public class PartInUse {
             appendDetails(sb, part);
         }
         part.setUnit(u);
-        this.id = part.getId();
+        this.name = part.getName();
         this.description = sb.toString();
         this.partToBuy = part.getAcquisitionWork();
         this.tonnagePerItem = part.getTonnage();
-        // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
+        // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo
+        // inside
         // We redo the description based on that
         if (partToBuy instanceof AmmoStorage) {
+            this.name = ((AmmoStorage) partToBuy).getName();
             sb.setLength(0);
             sb.append(((AmmoStorage) partToBuy).getName());
             appendDetails(sb, (Part) ((AmmoStorage) partToBuy).getAcquisitionWork());
@@ -76,8 +97,8 @@ public class PartInUse {
         return description;
     }
 
-    public int getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
     public IAcquisitionWork getPartToBuy() {
@@ -93,7 +114,7 @@ public class PartInUse {
     }
 
     public void incUseCount() {
-        ++ useCount;
+        ++useCount;
     }
 
     public int getStoreCount() {
@@ -109,7 +130,7 @@ public class PartInUse {
     }
 
     public void incStoreCount() {
-        ++ storeCount;
+        ++storeCount;
     }
 
     public int getTransferCount() {
@@ -117,7 +138,7 @@ public class PartInUse {
     }
 
     public void incTransferCount() {
-        ++ transferCount;
+        ++transferCount;
     }
 
     public void setTransferCount(int transferCount) {
@@ -133,7 +154,7 @@ public class PartInUse {
     }
 
     public void incPlannedCount() {
-        ++ plannedCount;
+        ++plannedCount;
     }
 
     public Money getCost() {

@@ -21,9 +21,26 @@
  */
 package mekhq.campaign.force;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.Vector;
+import java.util.stream.Collectors;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.OrganizationChangedEvent;
@@ -36,30 +53,24 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.io.migration.CamouflageMigrator;
-import mekhq.io.migration.ForceIconMigrator;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This is a hierarchical object to define forces for TO&amp;E. Each Force
  * object can have a parent force object and a vector of child force objects.
  * Each force can also have a vector of PilotPerson objects. The idea
- * is that any time TOE is refreshed in MekHQView, the force object can be traversed
- * to generate a set of TreeNodes that can be applied to the JTree showing the force
+ * is that any time TOE is refreshed in MekHQView, the force object can be
+ * traversed
+ * to generate a set of TreeNodes that can be applied to the JTree showing the
+ * force
  * TO&amp;E.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Force {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Force.class);
+
+    // region Variable Declarations
     // pathway to force icon
     public static final int FORCE_NONE = -1;
 
@@ -75,14 +86,14 @@ public class Force {
     private final Vector<UUID> units;
     private int scenarioId;
     private UUID forceCommanderID;
+    private UUID overrideForceCommanderID;
     protected UUID techId;
 
-
-    //an ID so that forces can be tracked in Campaign hash
+    // an ID so that forces can be tracked in Campaign hash
     private int id;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public Force(String name) {
         setName(name);
         setForceIcon(new LayeredForceIcon());
@@ -96,7 +107,7 @@ public class Force {
         this.units = new Vector<>();
         this.scenarioId = -1;
     }
-    //endregion Constructors
+    // endregion Constructors
 
     public String getName() {
         return name;
@@ -129,7 +140,7 @@ public class Force {
 
     public Camouflage getCamouflageOrElse(final Camouflage camouflage) {
         return getCamouflage().hasDefaultCategory()
-                ? ((getParentForce() == null ) ? camouflage : getParentForce().getCamouflageOrElse(camouflage))
+                ? ((getParentForce() == null) ? camouflage : getParentForce().getCamouflageOrElse(camouflage))
                 : getCamouflage();
     }
 
@@ -158,22 +169,18 @@ public class Force {
         }
     }
 
-    @SuppressWarnings(value = "unused")
     public FormationLevel getFormationLevel() {
         return formationLevel;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setFormationLevel(final FormationLevel formationLevel) {
         this.formationLevel = formationLevel;
     }
 
-    @SuppressWarnings(value = "unused")
     public FormationLevel getOverrideFormationLevel() {
         return overrideFormationLevel;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setOverrideFormationLevel(final FormationLevel overrideFormationLevel) {
         this.overrideFormationLevel = overrideFormationLevel;
     }
@@ -198,7 +205,7 @@ public class Force {
     }
 
     public boolean isDeployed() {
-        //forces are deployed if their parent force is
+        // forces are deployed if their parent force is
         if ((null != parentForce) && parentForce.isDeployed()) {
             return true;
         }
@@ -240,7 +247,8 @@ public class Force {
     }
 
     /**
-     * @return A String representation of the full hierarchical force including ID for MM export
+     * @return A String representation of the full hierarchical force including ID
+     *         for MM export
      */
     public String getFullMMName() {
         var ancestors = new ArrayList<Force>();
@@ -258,7 +266,8 @@ public class Force {
             id = 17 * id + ancestor.id + 1;
             result.append(ancestor.getName()).append('|').append(id);
             if (!ancestor.getCamouflage().isDefault()) {
-                result.append('|').append(ancestor.getCamouflage().getCategory()).append('|').append(ancestor.getCamouflage().getFilename());
+                result.append('|').append(ancestor.getCamouflage().getCategory()).append('|')
+                        .append(ancestor.getCamouflage().getFilename());
             }
             result.append("||");
         }
@@ -268,11 +277,14 @@ public class Force {
     /**
      * Add a subforce to the subforce vector. In general, this
      * should not be called directly to add forces to the campaign
-     * because they will not be assigned an id. Use {@link Campaign#addForce(Force, Force)}
+     * because they will not be assigned an id. Use
+     * {@link Campaign#addForce(Force, Force)}
      * instead
      * The boolean assignParent here is set to false when assigning forces from the
      * TOE to a scenario, because we don't want to switch this forces real parent
-     * @param sub the subforce to add, which may be null from a load failure. This returns without
+     *
+     * @param sub the subforce to add, which may be null from a load failure. This
+     *            returns without
      *            adding in that case
      */
     public void addSubForce(final @Nullable Force sub, boolean assignParent) {
@@ -291,7 +303,8 @@ public class Force {
     }
 
     /**
-     * @param combatForcesOnly to only include combat forces or to also include non-combat forces
+     * @param combatForcesOnly to only include combat forces or to also include
+     *                         non-combat forces
      * @return all the unit ids in this force and all of its subforces
      */
     public Vector<UUID> getAllUnits(boolean combatForcesOnly) {
@@ -313,6 +326,7 @@ public class Force {
      * should not be called directly to add unid because they will
      * not be assigned a force id. Use {@link Campaign#addUnitToForce(Unit, int)}
      * instead
+     *
      * @param uid
      */
     public void addUnit(UUID uid) {
@@ -341,8 +355,10 @@ public class Force {
     }
 
     /**
-     * This should not be directly called except by {@link Campaign#removeUnitFromForce(Unit)}
+     * This should not be directly called except by
+     * {@link Campaign#removeUnitFromForce(Unit)}
      * instead
+     *
      * @param id
      */
     public void removeUnit(Campaign campaign, UUID id, boolean log) {
@@ -392,7 +408,8 @@ public class Force {
                 sub.clearScenarioIds(c);
             }
         } else {
-            // If we're not killing the units from the scenario, then we need to assign them with the
+            // If we're not killing the units from the scenario, then we need to assign them
+            // with the
             // scenario ID and add them to the scenario.
             for (UUID uid : getUnits()) {
                 c.getUnit(uid).setScenarioId(getScenarioId());
@@ -418,52 +435,91 @@ public class Force {
         forceCommanderID = commanderID;
     }
 
-    public List<UUID> getEligibleCommanders(Campaign c) {
-        List<UUID> people = new ArrayList<>();
-        Person highestRankPerson = c.getPerson(getForceCommanderID());
+    public UUID getOverrideForceCommanderID() {
+        return overrideForceCommanderID;
+    }
 
-        // safety check: if the person is no longer assigned to a unit or the force,
-        // then they're not really the highest ranked person in the force.
-        if ((highestRankPerson != null) &&
-                ((highestRankPerson.getUnit() == null) ||
-                (!getUnits().contains(highestRankPerson.getUnit().getId())))) {
-            highestRankPerson = null;
+    public void setOverrideForceCommanderID(UUID overrideForceCommanderID) {
+        this.overrideForceCommanderID = overrideForceCommanderID;
+    }
+
+    /**
+     * Returns a list of unit or force commanders eligible to be considered for the
+     * position of force commander.
+     *
+     * @param campaign the campaign to get eligible commanders from
+     * @return a list of UUIDs representing the eligible commanders
+     */
+    public List<UUID> getEligibleCommanders(Campaign campaign) {
+        List<UUID> eligibleCommanders = new ArrayList<>();
+
+        // don't use a stream here, it's not worth the added risk of an NPE
+        for (UUID unitId : getUnits()) {
+            Unit unit = campaign.getUnit(unitId);
+
+            if ((unit != null) && (unit.getCommander() != null)) {
+                eligibleCommanders.add(unit.getCommander().getId());
+            }
         }
 
-        for (UUID uid : getUnits()) {
-            Unit u = c.getUnit(uid);
-            if (null != u) {
-                Person p = u.getCommander();
-                if (null != p) {
-                    // if we found someone with a higher rank, clear everything out and start again with the new highest rank person
-                    if (p.outRanks(highestRankPerson)) {
-                        people.clear();
-                        people.add(p.getId());
-                        highestRankPerson = p;
-                    // if we are looking at someone with a lower rank, ignore them and move on
-                    } else if ((highestRankPerson != null) && highestRankPerson.outRanks(p)) {
-                        continue;
-                    // someone with an equivalent rank can be commander
-                    } else {
-                        people.add(p.getId());
-                    }
+        // this means the force contains no Units, so we check against the leaders of
+        // the sub-forces
+        if (eligibleCommanders.isEmpty()) {
+            for (Force force : getSubForces()) {
+                UUID forceCommander = force.getForceCommanderID();
+
+                if (forceCommander != null) {
+                    eligibleCommanders.add(forceCommander);
                 }
             }
         }
 
-        return people;
+        return eligibleCommanders;
     }
 
     /**
-     * Automatically update the force's commander
+     * Updates the commander for a force based on the ranking of eligible
+     * commanders.
+     *
+     * @param campaign the current campaign
      */
-    public void updateCommander(Campaign c) {
-        List<UUID> eligibleCommanders = getEligibleCommanders(c);
+    public void updateCommander(Campaign campaign) {
+        List<UUID> eligibleCommanders = getEligibleCommanders(campaign);
 
-        // logic: if we found someone eligible who is a higher rank, the first one of those becomes the new commander
-        // otherwise, the existing commander remains the commander
-        if (!eligibleCommanders.contains(getForceCommanderID()) && (!eligibleCommanders.isEmpty())) {
-            forceCommanderID = eligibleCommanders.get(0);
+        if (eligibleCommanders.isEmpty()) {
+            overrideForceCommanderID = null;
+            return;
+        }
+
+        if (overrideForceCommanderID != null) {
+            if (eligibleCommanders.contains(overrideForceCommanderID)) {
+                forceCommanderID = overrideForceCommanderID;
+
+                if (getParentForce() != null) {
+                    getParentForce().updateCommander(campaign);
+                }
+
+                return;
+            } else {
+                overrideForceCommanderID = null;
+            }
+        }
+
+        Collections.shuffle(eligibleCommanders);
+        Person highestRankedPerson = campaign.getPerson(eligibleCommanders.get(0));
+
+        for (UUID eligibleCommanderId : eligibleCommanders) {
+            Person eligibleCommander = campaign.getPerson(eligibleCommanderId);
+
+            if (eligibleCommander.outRanksUsingSkillTiebreaker(campaign, highestRankedPerson)) {
+                highestRankedPerson = eligibleCommander;
+            }
+        }
+
+        forceCommanderID = highestRankedPerson.getId();
+
+        if (getParentForce() != null) {
+            getParentForce().updateCommander(campaign);
         }
     }
 
@@ -483,23 +539,30 @@ public class Force {
     }
 
     /**
-     * This determines the proper operational status icon to use for this force and sets it.
-     * @param campaign the campaign to determine the operational status of this force using
-     * @return a list of the operational statuses for units in this force and in all of its subForces.
+     * This determines the proper operational status icon to use for this force and
+     * sets it.
+     *
+     * @param campaign the campaign to determine the operational status of this
+     *                 force using
+     * @return a list of the operational statuses for units in this force and in all
+     *         of its subForces.
      */
-    public List<LayeredForceIconOperationalStatus> updateForceIconOperationalStatus(
-            final Campaign campaign) {
-        // First, update all subForces, collecting their unit statuses into a single list
+    public List<LayeredForceIconOperationalStatus> updateForceIconOperationalStatus(final Campaign campaign) {
+        // First, update all subForces, collecting their unit statuses into a single
+        // list
         final List<LayeredForceIconOperationalStatus> statuses = getSubForces().stream()
                 .flatMap(subForce -> subForce.updateForceIconOperationalStatus(campaign).stream())
                 .collect(Collectors.toList());
 
         // Then, Add the units assigned to this force
-        statuses.addAll(getUnits().stream().map(campaign::getUnit).filter(Objects::nonNull)
+        statuses.addAll(getUnits().stream()
+                .map(campaign::getUnit)
+                .filter(Objects::nonNull)
                 .map(LayeredForceIconOperationalStatus::determineLayeredForceIconOperationalStatus)
                 .toList());
 
-        // Can only update the icon for LayeredForceIcons, but still need to return the processed
+        // Can only update the icon for LayeredForceIcons, but still need to return the
+        // processed
         // units for parent force updates
         if (!(getForceIcon() instanceof LayeredForceIcon)) {
             return statuses;
@@ -509,13 +572,18 @@ public class Force {
             // No special modifier for empty forces
             ((LayeredForceIcon) getForceIcon()).getPieces().remove(LayeredForceIconLayer.SPECIAL_MODIFIER);
         } else {
-            // Sum the unit status ordinals, then divide by the overall number of statuses, to get
-            // the ordinal of the force's status. Then assign the operational status to this.
-            final int index = (int) Math.round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
+            // Sum the unit status ordinals, then divide by the overall number of statuses,
+            // to get
+            // the ordinal of the force's status. Then assign the operational status to
+            // this.
+            final int index = (int) Math
+                    .round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
             final LayeredForceIconOperationalStatus status = LayeredForceIconOperationalStatus.values()[index];
-            ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER, new ArrayList<>());
+            ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER,
+                    new ArrayList<>());
             ((LayeredForceIcon) getForceIcon()).getPieces().get(LayeredForceIconLayer.SPECIAL_MODIFIER)
-                    .add(new ForcePieceIcon(LayeredForceIconLayer.SPECIAL_MODIFIER,
+                    .add(new ForcePieceIcon(
+                            LayeredForceIconLayer.SPECIAL_MODIFIER,
                             MekHQ.getMHQOptions().getNewDayForceIconOperationalStatusStyle().getPath(),
                             status.getFilename()));
         }
@@ -524,7 +592,8 @@ public class Force {
     }
 
     public void writeToXML(PrintWriter pw1, int indent) {
-        pw1.println(MHQXMLUtility.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
+        pw1.println(MHQXMLUtility.indentStr(indent++) + "<force id=\"" + id + "\" type=\"" + this.getClass().getName()
+                + "\">");
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "name", name);
         getForceIcon().writeToXML(pw1, indent);
         getCamouflage().writeToXML(pw1, indent);
@@ -575,10 +644,6 @@ public class Force {
                     retVal.setForceIcon(LayeredForceIcon.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
                     retVal.setCamouflage(Camouflage.parseFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("camouflageCategory")) { // Legacy - 0.49.3 removal
-                    retVal.getCamouflage().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("camouflageFilename")) { // Legacy - 0.49.3 removal
-                    retVal.getCamouflage().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
                     retVal.setDescription(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatForce")) {
@@ -587,19 +652,11 @@ public class Force {
                     retVal.setFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("populateOriginNode")) {
                     retVal.setOverrideFormationLevel(FormationLevel.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) { // Legacy - 0.49.6 removal
-                    retVal.getForceIcon().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconHashMap")) { // Legacy - 0.49.6 removal
-                    final LayeredForceIcon layeredForceIcon = new LayeredForceIcon();
-                    ForceIconMigrator.migrateLegacyIconMapNodes(layeredForceIcon, wn2);
-                    retVal.setForceIcon(layeredForceIcon);
-                } else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) { // Legacy - 0.49.6 removal
-                    retVal.getForceIcon().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
                     retVal.techId = UUID.fromString(wn2.getTextContent());
-                }  else if (wn2.getNodeName().equalsIgnoreCase("forceCommanderID")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("forceCommanderID")) {
                     retVal.forceCommanderID = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
                     processUnitNodes(retVal, wn2, version);
@@ -613,7 +670,9 @@ public class Force {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in Forces nodes: {}", wn3.getNodeName());
+                            String message = String.format("Unknown node type not loaded in Forces nodes: %s",
+                                    wn3.getNodeName());
+                            logger.error(message);
                             continue;
                         }
 
@@ -623,18 +682,8 @@ public class Force {
             }
             c.importForce(retVal);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return null;
-        }
-
-        if (version.isLowerThan("0.49.3")) {
-            CamouflageMigrator.migrateCamouflage(version, retVal.getCamouflage());
-        }
-
-        if (version.isLowerThan("0.49.6")) {
-            retVal.setForceIcon(ForceIconMigrator.migrateForceIconToKailans(retVal.getForceIcon()));
-        } else if (version.isLowerThan("0.49.7")) {
-            retVal.setForceIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getForceIcon()));
         }
 
         retVal.updateCommander(c);
@@ -658,9 +707,9 @@ public class Force {
 
     public Vector<Object> getAllChildren(Campaign campaign) {
         Vector<Object> children = new Vector<>(subForces);
-        //add any units
+        // add any units
         Enumeration<UUID> uids = getUnits().elements();
-        //put them into a temporary array so I can sort it by rank
+        // put them into a temporary array so I can sort it by rank
         List<Unit> units = new ArrayList<>();
         List<Unit> unmannedUnits = new ArrayList<>();
         while (uids.hasMoreElements()) {
@@ -698,6 +747,7 @@ public class Force {
 
     /**
      * Calculates the force's total BV, including sub forces.
+     *
      * @param c The working campaign.
      * @return Total BV
      */
@@ -709,7 +759,8 @@ public class Force {
         }
 
         for (UUID id : getUnits()) {
-            // no idea how this would happen, but sometimes a unit in a forces unit ID list has an invalid ID?
+            // no idea how this would happen, but sometimes a unit in a forces unit ID list
+            // has an invalid ID?
             if (c.getUnit(id) == null) {
                 continue;
             }
@@ -723,6 +774,7 @@ public class Force {
     /**
      * Calculates the unit type most represented in this force
      * and all subforces.
+     *
      * @param c Working campaign
      * @return Majority unit type.
      */
@@ -745,9 +797,9 @@ public class Force {
         return biggestBucketID;
     }
 
-
     /**
      * Finds the distance (depth) from the origin force
+     *
      * @param force the force to get depth for
      */
     public static int getDepth(Force force) {
@@ -765,20 +817,17 @@ public class Force {
     }
 
     /**
-     * Uses a recursive search to find the maximum distance (depth) from the origin force
-     * @param force the current force. Should always equal campaign.getForce(0), if called remotely
-     * @param depth the current recursive depth. Can be left null, if called remotely
+     * Uses a recursive search to find the maximum distance (depth) from the origin
+     * force
+     *
+     * @param force the current force. Should always equal campaign.getForce(0), if
+     *              called remotely
+     * @param depth the current recursive depth.
      */
     public static int getMaximumDepth(Force force, Integer depth) {
-        if (depth == null) {
-            depth = 0;
-        }
-
         int maximumDepth = depth;
 
-        Vector<Force> subForces = force.getSubForces();
-
-        for (Force subforce : subForces) {
+        for (Force subforce : force.getSubForces()) {
             int nextDepth = getMaximumDepth(subforce, depth + 1);
 
             if (nextDepth > maximumDepth) {
@@ -790,9 +839,12 @@ public class Force {
     }
 
     /**
-     * Populates the formation levels of a force hierarchy starting from the origin force.
-     * For all subforces of the given force, it sets the formation level to one level lower than the current level.
-     * If the resulting formation level is below the lower boundary determined by available formation level enums,
+     * Populates the formation levels of a force hierarchy starting from the origin
+     * force.
+     * For all subforces of the given force, it sets the formation level to one
+     * level lower than the current level.
+     * If the resulting formation level is below the lower boundary determined by
+     * available formation level enums,
      * it sets the formation level to INVALID.
      *
      * @param campaign the campaign to determine the lower boundary
@@ -800,41 +852,32 @@ public class Force {
     public static void populateFormationLevelsFromOrigin(Campaign campaign) {
         Force force = campaign.getForce(0);
 
-        populateOriginNode(campaign, force);
+        int currentFormationLevel = populateOriginNode(campaign, force);
 
         // we then set lower boundaries (i.e., how far we can decrease formation level)
         int lowerBoundary = getLowerBoundary(campaign);
-        int currentFormationLevel = force.getFormationLevel().parseToInt();
 
-        for (Force subforce : force.getSubForces()) {
-            if (currentFormationLevel - 1 < lowerBoundary) {
-                subforce.setFormationLevel(FormationLevel.INVALID);
-                continue;
-            }
-
-            subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
-
-            changeFormationLevel(subforce, currentFormationLevel - 1, lowerBoundary);
-        }
+        changeFormationLevel(force, currentFormationLevel, lowerBoundary);
     }
 
     /**
      * Changes the formation level of a force and its sub-forces.
      *
-     * @param force               the force whose formation level is to be changed
+     * @param force                 the force whose formation level is to be changed
      * @param currentFormationLevel the current formation level of the force
-     * @param lowerBoundary       the lower boundary for the formation level
+     * @param lowerBoundary         the lower boundary for the formation level
      */
     private static void changeFormationLevel(Force force, int currentFormationLevel, int lowerBoundary) {
-        force.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel));
-
         for (Force subforce : force.getSubForces()) {
             if (currentFormationLevel - 1 < lowerBoundary) {
                 subforce.setFormationLevel(FormationLevel.INVALID);
-                continue;
+            } else {
+                subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
             }
 
-            subforce.setFormationLevel(FormationLevel.parseFromInt(currentFormationLevel - 1));
+            MekHQ.triggerEvent(new OrganizationChangedEvent(force));
+
+            changeFormationLevel(subforce, currentFormationLevel - 1, lowerBoundary);
         }
     }
 
@@ -858,7 +901,8 @@ public class Force {
                 isValid = true;
             } else if (campaign.getFaction().isComStarOrWoB()) {
                 isValid = true;
-            } if (!campaign.getFaction().isClan() && !campaign.getFaction().isComStarOrWoB()) {
+            }
+            if (!campaign.getFaction().isClan() && !campaign.getFaction().isComStarOrWoB()) {
                 isValid = level.isInnerSphere();
             }
 
@@ -870,12 +914,14 @@ public class Force {
     }
 
     /**
-     * Populates the origin node (the force normally named after the campaign) with an appropriate Formation Level.
+     * Populates the origin node (the force normally named after the campaign) with
+     * an appropriate Formation Level.
      *
      * @param campaign the current campaign
-     * @param origin the origin node
+     * @param origin   the origin node
+     * @return the parsed integer value of the origin node's formation level
      */
-    private static void populateOriginNode(Campaign campaign, Force origin) {
+    private static int populateOriginNode(Campaign campaign, Force origin) {
         FormationLevel overrideFormationLevel = origin.getOverrideFormationLevel();
         int maximumDepth = getMaximumDepth(origin, 0);
 
@@ -887,5 +933,7 @@ public class Force {
         }
 
         MekHQ.triggerEvent(new OrganizationChangedEvent(origin));
+
+        return origin.getFormationLevel().parseToInt();
     }
 }

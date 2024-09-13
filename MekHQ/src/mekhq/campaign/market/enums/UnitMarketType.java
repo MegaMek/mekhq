@@ -18,38 +18,38 @@
  */
 package mekhq.campaign.market.enums;
 
+import java.util.HashMap;
+import java.util.ResourceBundle;
+
 import megamek.common.Compute;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.HashMap;
-import java.util.ResourceBundle;
 
 public enum UnitMarketType {
-    //region Enum Declarations
+    // region Enum Declarations
     OPEN("UnitMarketType.OPEN.text"),
     EMPLOYER("UnitMarketType.EMPLOYER.text"),
     MERCENARY("UnitMarketType.MERCENARY.text"),
     FACTORY("UnitMarketType.FACTORY.text"),
     BLACK_MARKET("UnitMarketType.BLACK_MARKET.text");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     UnitMarketType(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isOpen() {
         return this == OPEN;
     }
@@ -69,9 +69,9 @@ public enum UnitMarketType {
     public boolean isBlackMarket() {
         return this == BLACK_MARKET;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     public static UnitMarketType parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -98,10 +98,11 @@ public enum UnitMarketType {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a UnitMarketType. Returning OPEN.");
+        MMLogger.create(UnitMarketType.class)
+                .error("Unable to parse " + text + " into a UnitMarketType. Returning OPEN.");
         return OPEN;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {
@@ -111,7 +112,8 @@ public enum UnitMarketType {
     /**
      * Calculates the price percentage based on a given modifier and d6 roll.
      *
-     * @param modifier the modifier to adjust the price (a negative modifier decreases price, positive increases price)
+     * @param modifier the modifier to adjust the price (a negative modifier
+     *                 decreases price, positive increases price)
      * @return the calculated price
      * @throws IllegalStateException if the roll value is unexpected
      */
@@ -146,7 +148,9 @@ public enum UnitMarketType {
                 value = modifier - 3;
                 break;
             default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: " + roll);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: "
+                                + roll);
         }
 
         return 100 + (value * 5);
@@ -161,7 +165,7 @@ public enum UnitMarketType {
     public static int getQuality(Campaign campaign, UnitMarketType market) {
         HashMap<String, Integer> qualityAndModifier = new HashMap<>();
 
-        switch(market) {
+        switch (market) {
             case OPEN:
             case MERCENARY:
                 qualityAndModifier.put("quality", Part.QUALITY_C);

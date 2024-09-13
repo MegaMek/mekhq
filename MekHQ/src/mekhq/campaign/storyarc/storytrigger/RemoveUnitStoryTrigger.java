@@ -20,24 +20,26 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryTrigger;
-import mekhq.campaign.unit.Unit;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
  * A StoryTrigger to remove a set of Units from the Campaign.
  */
 public class RemoveUnitStoryTrigger extends StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(RemoveUnitStoryTrigger.class);
 
     /** ArrayList of UUID unit ids to remove **/
     ArrayList<UUID> unitIds = new ArrayList<UUID>();
@@ -49,12 +51,12 @@ public class RemoveUnitStoryTrigger extends StoryTrigger {
     protected void execute() {
         if (removeAll) {
             unitIds = new ArrayList<UUID>();
-            for(Unit u : getCampaign().getUnits()) {
+            for (Unit u : getCampaign().getUnits()) {
                 unitIds.add(u.getId());
             }
         }
 
-        for(UUID unitId : unitIds) {
+        for (UUID unitId : unitIds) {
             getCampaign().removeUnit(unitId);
         }
     }
@@ -62,7 +64,7 @@ public class RemoveUnitStoryTrigger extends StoryTrigger {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
-        if(!unitIds.isEmpty()) {
+        if (!unitIds.isEmpty()) {
             for (UUID unitId : unitIds) {
                 MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "unitId", unitId);
             }
@@ -88,7 +90,7 @@ public class RemoveUnitStoryTrigger extends StoryTrigger {
                     removeAll = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

@@ -1,10 +1,11 @@
 <StratconFacility>
-	<capturedDefinition>AlliedArtilleryBase.xml</capturedDefinition>
-	<displayableName>Artillery Base</displayableName>
-        <facilityType>ArtilleryBase</facilityType>
-        <localModifiers>EnemyArtyGarrison.xml</localModifiers>
-        <owner>Opposing</owner>
-        <sharedModifiers>EnemyArty.xml</sharedModifiers>
-	<userDescription>Hostile artillery will participate in scenarios on this track and defend this facility.</userDescription>
-        <visible>false</visible>
+    <capturedDefinition>AlliedArtilleryBase.xml</capturedDefinition>
+    <displayableName>Artillery Base</displayableName>
+    <facilityType>ArtilleryBase</facilityType>
+    <localModifiers>EnemyArtyGarrison.xml</localModifiers>
+    <owner>Opposing</owner>
+    <sharedModifiers>EnemyArty.xml</sharedModifiers>
+    <userDescription>Hostile artillery will participate in scenarios on this track and defend this
+        facility.</userDescription>
+    <visible>false</visible>
 </StratconFacility>

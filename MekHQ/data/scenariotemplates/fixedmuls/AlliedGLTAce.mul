@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Guillotine" model="GLT-4L" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="0640c611-be61-4ab2-92bd-83aafac2eb27">
-			<pilot size="1" name="Ray Blankendal" nick="" gender="MALE" gunnery="3" piloting="3" externalId="12c5a60d-226e-4abc-812b-42e64878fc4c" ejected="false" advantages="hopping_jack::some_like_it_hot" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="2"> Right Torso
-				<slot index="7" type="IS Ammo SRM-6" shots="15"/>
-			</location>
-			<Game id="10"/>
-		</entity>
+	<entity chassis="Guillotine" model="GLT-4L" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="0640c611-be61-4ab2-92bd-83aafac2eb27">
+		<pilot size="1" name="Ray Blankendal" nick="" gender="MALE" gunnery="3" piloting="3"
+			externalId="12c5a60d-226e-4abc-812b-42e64878fc4c" ejected="false"
+			advantages="hopping_jack::some_like_it_hot"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="2"> Right
+		Torso <slot index="7" type="IS Ammo SRM-6" shots="15" />
+		</location>
+			<Game id="10" />
+	</entity>
 
 </unit>

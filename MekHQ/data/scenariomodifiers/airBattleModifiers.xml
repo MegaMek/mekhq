@@ -22,7 +22,7 @@
 		<modifier>
 			GoodEquipment.xml
 		</modifier>
-		<!--modifier> 
+		<!--modifier>
 			Need ability to allow player to specifically deploy dropships
 			HotDrop.xml
 		</modifier-->
@@ -71,17 +71,17 @@
 		<modifier>
 			AlliedTraineesAir.xml
 		</modifier>
-		<modifier>		
+		<modifier>
 			EnemyAirPatrol.xml
 		</modifier>
 		<modifier>
 			AlliedASFAce01.xml
-		</modifier>	
+		</modifier>
 		<modifier>
 			EnemyASFAce01.xml
-		</modifier>	
+		</modifier>
 		<modifier>
 			EnemyASFAce02.xml
-		</modifier>		
+		</modifier>
 	</modifiers>
 </scenarioModifierManifest>

@@ -18,9 +18,32 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.StringUtility;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
@@ -34,18 +57,13 @@ import mekhq.gui.RepairTab;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Kipsta
  */
 public class AcquisitionsDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(AcquisitionsDialog.class);
+
     private CampaignGUI campaignGUI;
     private Map<String, AcquisitionPanel> partPanelMap = new HashMap<>();
 
@@ -228,7 +246,7 @@ public class AcquisitionsDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -332,7 +350,8 @@ public class AcquisitionsDialog extends JDialog {
                 if (partCountInfo.getMissingCount() > 0) {
                     sbText.append(", ");
 
-                    sbText.append("<font color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>");
+                    sbText.append("<font color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                            .append("'>");
                     sbText.append("missing: ");
                     sbText.append(partCountInfo.getMissingCount());
                     sbText.append("</font>");
@@ -363,14 +382,16 @@ public class AcquisitionsDialog extends JDialog {
 
                 if (partCountInfo.getMissingCount() > 1) {
                     price = "Missing item price: " +
-                            partCountInfo.getStickerPrice().multipliedBy(partCountInfo.getMissingCount()).toAmountAndSymbolString();
+                            partCountInfo.getStickerPrice().multipliedBy(partCountInfo.getMissingCount())
+                                    .toAmountAndSymbolString();
 
                     sbText.append(price);
                     sbText.append("<br/>");
                 }
 
                 if (!partCountInfo.isCanBeAcquired()) {
-                    sbText.append("<br/><br/><font color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("' size='4'>");
+                    sbText.append("<br/><br/><font color='")
+                            .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("' size='4'>");
                     sbText.append(partCountInfo.getFailedMessage());
                     sbText.append("</font>");
                 }
@@ -511,13 +532,13 @@ public class AcquisitionsDialog extends JDialog {
             btnOrderInBulk.addActionListener(ev -> {
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(),
-                    true, "How Many " + part.getName() + '?', quantity,
-                    1, CampaignGUI.MAX_QUANTITY_SPINNER);
+                        true, "How Many " + part.getName() + '?', quantity,
+                        1, CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 if (quantity > 0) {
                     campaignGUI.getCampaign().getShoppingList()
-                        .addShoppingItem(part.getAcquisitionWork(), quantity, campaignGUI.getCampaign());
+                            .addShoppingItem(part.getAcquisitionWork(), quantity, campaignGUI.getCampaign());
                     refresh();
                 }
             });

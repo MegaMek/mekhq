@@ -1,48 +1,48 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Prevent at least 75% of the designated units from leaving the area.</additionalBriefingText>
-	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PostForceGeneration</eventTiming>
-	<modifierName>Prevent Evac</modifierName>
-	<forceDefinition>
-		<actualDeploymentZone>-1</actualDeploymentZone>
-                <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-1</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>true</canReinforceLinked>
-                <contributesToBV>false</contributesToBV>
-                <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>false</contributesToUnitCount>
-                <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>10</deploymentZone>
-                </deploymentZones>
-                <destinationZone>7</destinationZone>
-                <fixedUnitCount>0</fixedUnitCount>
-                <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Evacuating Units</forceName>
-                <generationMethod>2</generationMethod>
-                <generationOrder>3</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>1</minWeightClass>
-                <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
-                <useArtillery>false</useArtillery>
-	</forceDefinition>
-	<objectives>
+    <additionalBriefingText>Prevent at least 75% of the designated units from leaving the area.</additionalBriefingText>
+    <benefitsPlayer>false</benefitsPlayer>
+    <eventTiming>PostForceGeneration</eventTiming>
+    <modifierName>Prevent Evac</modifierName>
+    <forceDefinition>
+        <actualDeploymentZone>-1</actualDeploymentZone>
+        <allowAeroBombs>false</allowAeroBombs>
+        <allowedUnitType>-1</allowedUnitType>
+        <arrivalTurn>0</arrivalTurn>
+        <canReinforceLinked>true</canReinforceLinked>
+        <contributesToBV>false</contributesToBV>
+        <contributesToMapSize>true</contributesToMapSize>
+        <contributesToUnitCount>false</contributesToUnitCount>
+        <deployOffboard>false</deployOffboard>
+        <deploymentZones>
+            <deploymentZone>10</deploymentZone>
+        </deploymentZones>
+        <destinationZone>7</destinationZone>
+        <fixedUnitCount>0</fixedUnitCount>
+        <forceAlignment>2</forceAlignment>
+        <forceMultiplier>1.0</forceMultiplier>
+        <forceName>Evacuating Units</forceName>
+        <generationMethod>2</generationMethod>
+        <generationOrder>3</generationOrder>
+        <maxWeightClass>4</maxWeightClass>
+        <minWeightClass>1</minWeightClass>
+        <retreatThreshold>50</retreatThreshold>
+        <startingAltitude>0</startingAltitude>
+        <syncDeploymentType>None</syncDeploymentType>
+        <useArtillery>false</useArtillery>
+    </forceDefinition>
+    <objectives>
         <objective>
             <associatedForceNames>
                 <associatedForceName>Evacuating Units</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>
-		<failureEffect>
+                <failureEffect>
                     <effectType>FacilityRemoved</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
@@ -54,13 +54,13 @@
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </failureEffect>
-		<failureEffect>
+                <failureEffect>
                     <effectType>FacilityRemoved</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails />
             <description>Prevent 75% the following enemy unit(s) and force(s) from escaping:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>PreventReachMapEdge</objectiveCriterion>
@@ -69,5 +69,5 @@
             <timeLimitScaleFactor>2</timeLimitScaleFactor>
             <timeLimitType>None</timeLimitType>
         </objective>
-        </objectives>
+    </objectives>
 </AtBScenarioModifier>
