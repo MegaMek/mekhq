@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<defaultQuirks xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="defaultQuirksSchema.xsl">
+<defaultQuirks xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="defaultQuirksSchema.xsl">
     <unit>
         <chassis>Atlas</chassis>
         <model>AS7-C</model>
@@ -594,7 +595,7 @@
     </unit>
     <unit>
         <chassis>Cygnus</chassis>
-        <model/>
+        <model />
         <weaponQuirk>
             <weaponQuirkName>exposed_linkage</weaponQuirkName>
             <location>LA</location>
@@ -2011,7 +2012,7 @@
     </unit>
     <unit>
         <chassis>Balac Strike VTOL</chassis>
-        <model/>
+        <model />
         <quirk>vtol_rotor</quirk>
     </unit>
     <unit>
@@ -2026,13 +2027,13 @@
     </unit>
     <unit>
         <chassis>Estevez AA</chassis>
-        <model/>
+        <model />
         <quirk>gas_hog</quirk>
         <quirk>obsolete</quirk>
     </unit>
     <unit>
         <chassis>Estevez MBT</chassis>
-        <model/>
+        <model />
         <quirk>gas_hog</quirk>
         <quirk>obsolete</quirk>
     </unit>
@@ -2053,7 +2054,7 @@
     </unit>
     <unit>
         <chassis>Karnov UR Transport</chassis>
-        <model/>
+        <model />
         <quirk>vtol_rotor</quirk>
     </unit>
     <unit>
