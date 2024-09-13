@@ -14,27 +14,31 @@
 
 package mekhq.campaign.stratcon;
 
-import megamek.codeUtilities.ObjectUtility;
-import megamek.common.UnitType;
-import mekhq.MHQConstants;
-import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.campaign.mission.atb.AtBScenarioManifest;
-import org.apache.logging.log4j.LogManager;
-
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import megamek.codeUtilities.ObjectUtility;
+import megamek.common.UnitType;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.atb.AtBScenarioManifest;
+
 /**
- * This class handles functionality related to loading and sorting scenario templates.
+ * This class handles functionality related to loading and sorting scenario
+ * templates.
+ * 
  * @author NickAragua
  */
 public class StratconScenarioFactory {
-    // loaded dynamic scenario templates, sorted by location (ground, low atmosphere, space)
+    private static final MMLogger logger = MMLogger.create(StratconScenarioFactory.class);
+    // loaded dynamic scenario templates, sorted by location (ground, low
+    // atmosphere, space)
     private static Map<MapLocation, List<ScenarioTemplate>> dynamicScenarioLocationMap = new HashMap<>();
     private static Map<Integer, List<ScenarioTemplate>> dynamicScenarioUnitTypeMap = new HashMap<>();
     private static Map<String, ScenarioTemplate> dynamicScenarioNameMap = new HashMap<>();
@@ -54,7 +58,8 @@ public class StratconScenarioFactory {
         AtBScenarioManifest scenarioManifest = AtBScenarioManifest.Deserialize(MHQConstants.STRATCON_SCENARIO_MANIFEST);
 
         // load user-specified scenario list
-        AtBScenarioManifest userManifest = AtBScenarioManifest.Deserialize(MHQConstants.STRATCON_USER_SCENARIO_MANIFEST);
+        AtBScenarioManifest userManifest = AtBScenarioManifest
+                .Deserialize(MHQConstants.STRATCON_USER_SCENARIO_MANIFEST);
 
         if (scenarioManifest != null) {
             loadScenariosFromManifest(scenarioManifest);
@@ -67,6 +72,7 @@ public class StratconScenarioFactory {
 
     /**
      * Helper function that loads scenario templates from the given manifest.
+     * 
      * @param manifest The manifest to process
      */
     private static void loadScenariosFromManifest(AtBScenarioManifest manifest) {
@@ -103,14 +109,16 @@ public class StratconScenarioFactory {
                     dynamicScenarioNameMap.put(fileName, template);
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(String.format("Error loading file: %s", filePath), e);
+                logger.error(String.format("Error loading file: %s", filePath), e);
             }
         }
     }
 
     /**
      * Retrieves a random scenario template in the appropriate location.
-     * @param location The location (ground/low atmo/space) category of the scenario.
+     * 
+     * @param location The location (ground/low atmo/space) category of the
+     *                 scenario.
      * @return Random scenario template.
      */
     public static ScenarioTemplate getRandomScenario(MapLocation location) {
@@ -127,6 +135,7 @@ public class StratconScenarioFactory {
     /**
      * Retrieves a random scenario template appropriate for the given unit type.
      * This includes the more general ATB_MIX and ATB_AERO_MIX where appropriate
+     * 
      * @param unitType The desired unit type, as per megamek.common.UnitType
      * @return Random scenario template.
      */
@@ -137,7 +146,7 @@ public class StratconScenarioFactory {
         // then we can't generate a scenario.
         if (!dynamicScenarioUnitTypeMap.containsKey(unitType) &&
                 !dynamicScenarioUnitTypeMap.containsKey(generalUnitType)) {
-            LogManager.getLogger().warn(String.format("No scenarios configured for unit type %d", unitType));
+            logger.warn(String.format("No scenarios configured for unit type %d", unitType));
             return null;
         }
 
@@ -166,7 +175,9 @@ public class StratconScenarioFactory {
     }
 
     /**
-     * Converts a specific unit type (AERO, MEK, etc) to a generic unit type (ATB_MIX, ATB_AERO_MIX)
+     * Converts a specific unit type (AERO, MEK, etc) to a generic unit type
+     * (ATB_MIX, ATB_AERO_MIX)
+     * 
      * @param unitType The unit type to convert.
      * @return Generic unit type.
      */

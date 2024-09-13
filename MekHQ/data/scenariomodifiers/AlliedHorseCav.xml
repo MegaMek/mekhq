@@ -1,5 +1,6 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>From half a league onward a Mercenary Light Brigade of Horse Cavalry rides into the valley of death to assist.</additionalBriefingText>
+	<additionalBriefingText>From half a league onward a Mercenary Light Brigade of Horse Cavalry rides
+		into the valley of death to assist.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -16,7 +17,7 @@
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>true</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
-		<deploymentZones/>
+		<deploymentZones />
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>1</forceAlignment>
@@ -24,7 +25,7 @@
 		<fixedUnitCount>4</fixedUnitCount>
 		<forceName>Allied Light Brigade Horse Cavalry</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>MercThe600.mul</fixedMul>
+		<fixedMul>MercThe600.mul</fixedMul>
 		<generationOrder>1</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>

@@ -28,7 +28,7 @@ Male Portraits:					/Male
 Female Portraits:				/Female
 
 Primary Role Folders:
-MekWarrior:					/MechWarrior
+MekWarrior:					/MekWarrior
 LAM Pilot:						/LAM Pilot
 Ground Vehicle Driver:			/Vehicle Driver
 Naval Vehicle Driver:			/Naval Driver
@@ -37,7 +37,7 @@ Vehicle Gunner:					/Vehicle Gunner
 Vehicle Crew:					/Vehicle Crewmember
 Aerospace Pilot:				/Aerospace Pilot
 Conventional Aircraft Pilot:	/Conventional Aircraft Pilot
-ProtoMech Pilot:				/ProtoMech Pilot
+ProtoMek Pilot:				/ProtoMek Pilot
 Battle Armour:					/Battle Armor Pilot
 Battle Armour (Clan):			/Elemental
 Soldier:						/Soldier
@@ -45,7 +45,7 @@ Vessel Pilot:					/Vessel Pilot
 Vessel Gunner:					/Vessel Gunner
 Vessel Crewmember:				/Vessel Crewmember
 Hyperspace Navigator:			/Hyperspace Navigator
-Mech Tech:						/Mech Tech
+Mek Tech:						/Mek Tech
 Mechanic:						/Mechanic
 Aerospace Tech:					/Aerospace Tech
 Battle Armour Tech:				/Battle Armor Tech
@@ -73,6 +73,6 @@ Support Personnel:				/Support
 
 For the Specialist Grouping Folder, the following roles are included in the groupings:
 Administrators: Admin/Command, Admin/HR, Admin/Logistical, Admin/Transport
-Techs: Mech Tech, Mechanic, Aerospace Tech, Battle Armour Tech
+Techs: Mek Tech, Mechanic, Aerospace Tech, Battle Armour Tech
 Medical Staff: Doctor, Medic
 Vessel Crewmembers: Vessel Pilot, Vessel Gunner, Vessel Crewmember, Hyperspace Navigator

@@ -1,20 +1,20 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Conduct detailed scans of buildings at the designated locations.</additionalBriefingText>
-	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PostForceGeneration</eventTiming>
-	<linkedModifiers>
-		<entry>
-            		<key>FacilityHostileCapture.xml</key>
-            		<value>If captured, our forces can conduct their scans at will.</value>
-		</entry>
-	</linkedModifiers>
-	<modifierName>Recon</modifierName>
-	<objectives>
+    <additionalBriefingText>Conduct detailed scans of buildings at the designated locations.</additionalBriefingText>
+    <benefitsPlayer>false</benefitsPlayer>
+    <eventTiming>PostForceGeneration</eventTiming>
+    <linkedModifiers>
+        <entry>
+            <key>FacilityHostileCapture.xml</key>
+            <value>If captured, our forces can conduct their scans at will.</value>
+        </entry>
+    </linkedModifiers>
+    <modifierName>Recon</modifierName>
+    <objectives>
         <objective>
             <associatedForceNames>
                 <associatedForceName>Base Turrets</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -30,11 +30,13 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails>
-			<additionalDetail>Scans may be conducted by moving a unit within three hexes of the target and foregoing all attacks.</additionalDetail>
-                <additionalDetail>Any kind of probe, improved sensors quirk or sensor geek SPA extends the range to five hexes, and the unit may attack as normal.</additionalDetail>
-			<additionalDetail>Scans cannot be conducted on destroyed buildings.</additionalDetail>
-			<additionalDetail>Note: This objective needs to be tracked outside of MegaMek.</additionalDetail>
-		</additionalDetails>
+                <additionalDetail>Scans may be conducted by moving a unit within three hexes of the
+                    target and foregoing all attacks.</additionalDetail>
+                <additionalDetail>Any kind of probe, improved sensors quirk or sensor geek SPA
+                    extends the range to five hexes, and the unit may attack as normal.</additionalDetail>
+                <additionalDetail>Scans cannot be conducted on destroyed buildings.</additionalDetail>
+                <additionalDetail>Note: This objective needs to be tracked outside of MegaMek.</additionalDetail>
+            </additionalDetails>
             <description>Scan the buildings designated by placed turrets.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Custom</objectiveCriterion>
@@ -43,5 +45,5 @@
             <timeLimitScaleFactor>2</timeLimitScaleFactor>
             <timeLimitType>None</timeLimitType>
         </objective>
-        </objectives>
+    </objectives>
 </AtBScenarioModifier>

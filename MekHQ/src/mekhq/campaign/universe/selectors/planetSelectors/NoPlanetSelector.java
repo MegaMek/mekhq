@@ -23,17 +23,16 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 
 /**
  * Does not select a {@link Planet}.
  */
 public class NoPlanetSelector extends AbstractPlanetSelector {
-    //region Constructors
+    // region Constructors
     public NoPlanetSelector(final RandomOriginOptions options) {
         super(options);
     }
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     public @Nullable Planet selectPlanet(final Campaign campaign) {

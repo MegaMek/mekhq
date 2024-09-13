@@ -18,6 +18,20 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.xml.namespace.QName;
+
+import org.w3c.dom.Node;
+
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
@@ -25,19 +39,17 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import megamek.common.OffBoardDirection;
+import megamek.logging.MMLogger;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import javax.xml.namespace.QName;
-import java.io.PrintWriter;
-import java.util.*;
 
 /**
  * Contains metadata used to describe a scenario objective
+ * 
  * @author NickAragua
  */
 public class ScenarioObjective {
+    private static final MMLogger logger = MMLogger.create(ScenarioObjective.class);
+
     public static final String FORCE_SHORTCUT_ALL_PRIMARY_PLAYER_FORCES = "All Primary Player Forces";
     public static final String FORCE_SHORTCUT_ALL_ENEMY_FORCES = "All Enemy Forces";
 
@@ -96,32 +108,32 @@ public class ScenarioObjective {
      */
     public enum ObjectiveCriterion {
         /*
-        * entity must be destroyed:
-        * center torso/structure gone, crew killed, immobilized + battlefield control
-        */
+         * entity must be destroyed:
+         * center torso/structure gone, crew killed, immobilized + battlefield control
+         */
         Destroy,
         /*
-         *  entity must be crippled, destroyed or withdrawn off the wrong edge of the map
+         * entity must be crippled, destroyed or withdrawn off the wrong edge of the map
          */
         ForceWithdraw,
         /*
-         *  entity must be immobilized but not destroyed
+         * entity must be immobilized but not destroyed
          */
         Capture,
         /*
-         *  entity must be prevented from reaching a particular map edge
+         * entity must be prevented from reaching a particular map edge
          */
         PreventReachMapEdge,
         /*
-         *  entity must be intact (can be crippled, immobilized, crew-killed)
+         * entity must be intact (can be crippled, immobilized, crew-killed)
          */
         Preserve,
         /*
-         *  if an entity crossed a particular map edge without getting messed up en route
+         * if an entity crossed a particular map edge without getting messed up en route
          */
         ReachMapEdge,
         /*
-         *  this must be tracked manually by the player
+         * this must be tracked manually by the player
          */
         Custom;
 
@@ -311,12 +323,14 @@ public class ScenarioObjective {
     }
 
     public String getTimeLimitString() {
-        return (timeLimitType == TimeLimitType.None) ? "" :
-            String.format("%s %d turns", isTimeLimitAtMost() ? " within at most" : " for at least", getTimeLimit());
+        return (timeLimitType == TimeLimitType.None) ? ""
+                : String.format("%s %d turns", isTimeLimitAtMost() ? " within at most" : " for at least",
+                        getTimeLimit());
     }
 
     /**
-     * Generates a "short" string that describes the objective in a manner suitable for display in
+     * Generates a "short" string that describes the objective in a manner suitable
+     * for display in
      * the objective resolution screen.
      */
     public String toShortString() {
@@ -330,16 +344,20 @@ public class ScenarioObjective {
             case ForceWithdraw:
             case Capture:
             case Preserve:
-                return String.format("<html>%s %s%s<span color='black'>%s%s</span></html>", getObjectiveCriterion().toString(), amountString,
+                return String.format("<html>%s %s%s<span color='black'>%s%s</span></html>",
+                        getObjectiveCriterion().toString(), amountString,
                         timeLimitString, buildEffects(true), buildEffects(false));
             case ReachMapEdge:
-                return String.format("<html>Reach %s edge with %s%s<span color='black'>%s%s</span></html>", edgeString, amountString,
+                return String.format("<html>Reach %s edge with %s%s<span color='black'>%s%s</span></html>", edgeString,
+                        amountString,
                         timeLimitString, buildEffects(true), buildEffects(false));
             case PreventReachMapEdge:
-                return String.format("<html>Prevent %s from reaching %s%s<span color='black'>%s%s</span></html>", amountString, edgeString,
+                return String.format("<html>Prevent %s from reaching %s%s<span color='black'>%s%s</span></html>",
+                        amountString, edgeString,
                         timeLimitString, buildEffects(true), buildEffects(false));
             case Custom:
-                return String.format("<html>%s%s%s<span color='black'>%s%s</span></html>", getDescription(), amountString,
+                return String.format("<html>%s%s%s<span color='black'>%s%s</span></html>", getDescription(),
+                        amountString,
                         timeLimitString, buildEffects(true), buildEffects(false));
             default:
                 return "?";
@@ -426,12 +444,14 @@ public class ScenarioObjective {
             return true;
         }
 
-        // if the template force is linked to a force listed in this objective, we're good.
+        // if the template force is linked to a force listed in this objective, we're
+        // good.
         if (forceTemplate.getObjectiveLinkedForces() != null) {
             for (String linkedForceName : forceTemplate.getObjectiveLinkedForces()) {
                 boolean objectiveContainsLinkedForce = getAssociatedForceNames().contains(linkedForceName);
                 if (objectiveContainsLinkedForce) {
-                    ScenarioForceTemplate linkedForceTemplate = scenario.getTemplate().getScenarioForces().get(linkedForceName);
+                    ScenarioForceTemplate linkedForceTemplate = scenario.getTemplate().getScenarioForces()
+                            .get(linkedForceName);
                     return linkedForceTemplate.getForceAlignment() == forceTemplate.getForceAlignment();
                 }
             }
@@ -502,23 +522,27 @@ public class ScenarioObjective {
     /**
      * Serialize this instance of a ScenarioObjective to a PrintWriter
      * Omits initial xml declaration
+     * 
      * @param pw The destination print writer
      */
     public void Serialize(PrintWriter pw) {
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioObjective.class);
-            JAXBElement<ScenarioObjective> objectiveElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioObjective.class, this);
+            JAXBElement<ScenarioObjective> objectiveElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME),
+                    ScenarioObjective.class, this);
             Marshaller m = context.createMarshaller();
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(objectiveElement, pw);
         } catch (Exception ex) {
-            LogManager.getLogger().error("Error Serializing Scenario Objective", ex);
+            logger.error("Error Serializing Scenario Objective", ex);
         }
     }
 
     /**
-     * Attempt to deserialize an instance of a ScenarioObjective from the passed-in XML Node
+     * Attempt to deserialize an instance of a ScenarioObjective from the passed-in
+     * XML Node
+     * 
      * @param xmlNode The node with the scenario template
      * @return Possibly an instance of a ScenarioTemplate
      */
@@ -531,7 +555,7 @@ public class ScenarioObjective {
             JAXBElement<ScenarioObjective> templateElement = um.unmarshal(xmlNode, ScenarioObjective.class);
             resultingObjective = templateElement.getValue();
         } catch (Exception ex) {
-            LogManager.getLogger().error("Error Deserializing Scenario Objective", ex);
+            logger.error("Error Deserializing Scenario Objective", ex);
         }
 
         return resultingObjective;

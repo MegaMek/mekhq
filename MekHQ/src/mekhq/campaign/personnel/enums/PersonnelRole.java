@@ -18,18 +18,18 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum PersonnelRole {
-    //region Enum Declarations
-    MECHWARRIOR("PersonnelRole.MECHWARRIOR.text", KeyEvent.VK_M),
+    // region Enum Declarations
+    MEKWARRIOR("PersonnelRole.MEKWARRIOR.text", KeyEvent.VK_M),
     LAM_PILOT("PersonnelRole.LAM_PILOT.text", KeyEvent.VK_UNDEFINED),
     GROUND_VEHICLE_DRIVER("PersonnelRole.GROUND_VEHICLE_DRIVER.text", KeyEvent.VK_V),
     NAVAL_VEHICLE_DRIVER("PersonnelRole.NAVAL_VEHICLE_DRIVER.text", KeyEvent.VK_N),
@@ -38,16 +38,16 @@ public enum PersonnelRole {
     VEHICLE_CREW("PersonnelRole.VEHICLE_CREW.text", KeyEvent.VK_UNDEFINED),
     AEROSPACE_PILOT("PersonnelRole.AEROSPACE_PILOT.text", KeyEvent.VK_A),
     CONVENTIONAL_AIRCRAFT_PILOT("PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT.text", KeyEvent.VK_C),
-    PROTOMECH_PILOT("PersonnelRole.PROTOMECH_PILOT.text", KeyEvent.VK_P),
+    PROTOMEK_PILOT("PersonnelRole.PROTOMEK_PILOT.text", KeyEvent.VK_P),
     BATTLE_ARMOUR("PersonnelRole.BATTLE_ARMOUR.text", "PersonnelRole.BATTLE_ARMOUR.clan.text", KeyEvent.VK_B),
     SOLDIER("PersonnelRole.SOLDIER.text", KeyEvent.VK_S),
     VESSEL_PILOT("PersonnelRole.VESSEL_PILOT.text", KeyEvent.VK_I),
     VESSEL_GUNNER("PersonnelRole.VESSEL_GUNNER.text", KeyEvent.VK_U),
     VESSEL_CREW("PersonnelRole.VESSEL_CREW.text", KeyEvent.VK_W),
     VESSEL_NAVIGATOR("PersonnelRole.VESSEL_NAVIGATOR.text", KeyEvent.VK_Y),
-    MECH_TECH("PersonnelRole.MECH_TECH.text", KeyEvent.VK_T),
+    MEK_TECH("PersonnelRole.MEK_TECH.text", KeyEvent.VK_T),
     MECHANIC("PersonnelRole.MECHANIC.text", KeyEvent.VK_E),
-    AERO_TECH("PersonnelRole.AERO_TECH.text", KeyEvent.VK_O),
+    AERO_TEK("PersonnelRole.AERO_TEK.text", KeyEvent.VK_O),
     BA_TECH("PersonnelRole.BA_TECH.text", KeyEvent.VK_UNDEFINED),
     ASTECH("PersonnelRole.ASTECH.text", KeyEvent.VK_UNDEFINED),
     DOCTOR("PersonnelRole.DOCTOR.text", KeyEvent.VK_D),
@@ -58,15 +58,15 @@ public enum PersonnelRole {
     ADMINISTRATOR_HR("PersonnelRole.ADMINISTRATOR_HR.text", KeyEvent.VK_H),
     DEPENDENT("PersonnelRole.DEPENDENT.text", KeyEvent.VK_UNDEFINED),
     NONE("PersonnelRole.NONE.text", KeyEvent.VK_UNDEFINED);
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String clanName;
     private final int mnemonic; // Unused: J, K, Q, X, Z
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     PersonnelRole(final String name, final int mnemonic) {
         this(name, null, mnemonic);
     }
@@ -78,9 +78,9 @@ public enum PersonnelRole {
         this.clanName = (clanName == null) ? this.name : resources.getString(clanName);
         this.mnemonic = mnemonic;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getName(final boolean isClan) {
         return isClan ? clanName : name;
     }
@@ -88,11 +88,11 @@ public enum PersonnelRole {
     public int getMnemonic() {
         return mnemonic;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    public boolean isMechWarrior() {
-        return this == MECHWARRIOR;
+    // region Boolean Comparison Methods
+    public boolean isMekWarrior() {
+        return this == MEKWARRIOR;
     }
 
     public boolean isLAMPilot() {
@@ -127,8 +127,8 @@ public enum PersonnelRole {
         return this == CONVENTIONAL_AIRCRAFT_PILOT;
     }
 
-    public boolean isProtoMechPilot() {
-        return this == PROTOMECH_PILOT;
+    public boolean isProtoMekPilot() {
+        return this == PROTOMEK_PILOT;
     }
 
     public boolean isBattleArmour() {
@@ -155,16 +155,16 @@ public enum PersonnelRole {
         return this == VESSEL_NAVIGATOR;
     }
 
-    public boolean isMechTech() {
-        return this == MECH_TECH;
+    public boolean isMekTech() {
+        return this == MEK_TECH;
     }
 
     public boolean isMechanic() {
         return this == MECHANIC;
     }
 
-    public boolean isAeroTech() {
-        return this == AERO_TECH;
+    public boolean isAeroTek() {
+        return this == AERO_TEK;
     }
 
     public boolean isBATech() {
@@ -209,7 +209,7 @@ public enum PersonnelRole {
 
     public boolean isCombat() {
         switch (this) {
-            case MECHWARRIOR:
+            case MEKWARRIOR:
             case LAM_PILOT:
             case GROUND_VEHICLE_DRIVER:
             case NAVAL_VEHICLE_DRIVER:
@@ -218,7 +218,7 @@ public enum PersonnelRole {
             case VEHICLE_CREW:
             case AEROSPACE_PILOT:
             case CONVENTIONAL_AIRCRAFT_PILOT:
-            case PROTOMECH_PILOT:
+            case PROTOMEK_PILOT:
             case BATTLE_ARMOUR:
             case SOLDIER:
             case VESSEL_PILOT:
@@ -226,9 +226,9 @@ public enum PersonnelRole {
             case VESSEL_CREW:
             case VESSEL_NAVIGATOR:
                 return true;
-            case MECH_TECH:
+            case MEK_TECH:
             case MECHANIC:
-            case AERO_TECH:
+            case AERO_TEK:
             case BA_TECH:
             case ASTECH:
             case DOCTOR:
@@ -244,8 +244,8 @@ public enum PersonnelRole {
         }
     }
 
-    public boolean isMechWarriorGrouping() {
-        return isMechWarrior() || isLAMPilot();
+    public boolean isMekWarriorGrouping() {
+        return isMekWarrior() || isLAMPilot();
     }
 
     public boolean isAerospaceGrouping() {
@@ -268,7 +268,7 @@ public enum PersonnelRole {
         return isVTOLPilot() || isVehicleGunner() || isVehicleCrew();
     }
 
-    public boolean isVehicleCrewmember() {
+    public boolean isVehicleCrewMember() {
         return isGroundVehicleCrew() || isNavalVehicleDriver() || isVTOLPilot();
     }
 
@@ -276,7 +276,7 @@ public enum PersonnelRole {
         return isSoldier() || isBattleArmour();
     }
 
-    public boolean isVesselCrewmember() {
+    public boolean isVesselCrewMember() {
         return isVesselPilot() || isVesselGunner() || isVesselCrew() || isVesselNavigator();
     }
 
@@ -289,11 +289,11 @@ public enum PersonnelRole {
     }
 
     public boolean isTech() {
-        return isMechTech() || isMechanic() || isAeroTech() || isBATech() || isVesselCrew();
+        return isMekTech() || isMechanic() || isAeroTek() || isBATech() || isVesselCrew();
     }
 
     public boolean isTechSecondary() {
-        return isMechTech() || isMechanic() || isAeroTech() || isBATech();
+        return isMekTech() || isMechanic() || isAeroTek() || isBATech();
     }
 
     public boolean isMedicalStaff() {
@@ -315,9 +315,9 @@ public enum PersonnelRole {
     public boolean isCivilian() {
         return isDependent() || isNone();
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region Static Methods
+    // region Static Methods
     /**
      * @return a list of roles that can be included in the personnel market
      */
@@ -328,7 +328,8 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return a list of roles that are potential primary roles. Currently, this is all bar NONE
+     * @return a list of roles that are potential primary roles. Currently, this is
+     *         all bar NONE
      */
     public static List<PersonnelRole> getPrimaryRoles() {
         return Stream.of(values())
@@ -337,11 +338,12 @@ public enum PersonnelRole {
     }
 
     /**
-     * @return a list of roles that are considered to be vessel (as in spacecraft) crewmembers
+     * @return a list of roles that are considered to be vessel (as in spacecraft)
+     *         crew members
      */
     public static List<PersonnelRole> getVesselRoles() {
         return Stream.of(values())
-                .filter(PersonnelRole::isVesselCrewmember)
+                .filter(PersonnelRole::isVesselCrewMember)
                 .collect(Collectors.toList());
     }
 
@@ -371,9 +373,9 @@ public enum PersonnelRole {
                 .filter(PersonnelRole::isCivilian)
                 .count());
     }
-    //endregion Static Methods
+    // endregion Static Methods
 
-    //region File I/O
+    // region File I/O
     public static PersonnelRole parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -387,7 +389,7 @@ public enum PersonnelRole {
                 case 0:
                     return NONE;
                 case 1:
-                    return MECHWARRIOR;
+                    return MEKWARRIOR;
                 case 2:
                     return AEROSPACE_PILOT;
                 case 3:
@@ -403,7 +405,7 @@ public enum PersonnelRole {
                 case 8:
                     return SOLDIER;
                 case 9:
-                    return PROTOMECH_PILOT;
+                    return PROTOMEK_PILOT;
                 case 10:
                     return CONVENTIONAL_AIRCRAFT_PILOT;
                 case 11:
@@ -415,11 +417,11 @@ public enum PersonnelRole {
                 case 14:
                     return VESSEL_NAVIGATOR;
                 case 15:
-                    return MECH_TECH;
+                    return MEK_TECH;
                 case 16:
                     return MECHANIC;
                 case 17:
-                    return AERO_TECH;
+                    return AERO_TEK;
                 case 18:
                     return BA_TECH;
                 case 19:
@@ -447,13 +449,16 @@ public enum PersonnelRole {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a PersonnelRole. Returning NONE.");
+        MMLogger.create(PersonnelRole.class)
+                .error("Unable to parse " + text + " into a PersonnelRole. Returning NONE.");
         return NONE;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     /**
-     * This method is not recommend to be used in MekHQ, but is provided for non-specified utilization
+     * This method is not recommend to be used in MekHQ, but is provided for
+     * non-specified utilization
+     *
      * @return the base name of this role, without applying any overrides
      */
     @Override

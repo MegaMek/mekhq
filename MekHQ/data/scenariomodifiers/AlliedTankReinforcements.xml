@@ -35,7 +35,7 @@
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
-		<objectiveLinkedForces/>
+		<objectiveLinkedForces />
 		<syncDeploymentType>None</syncDeploymentType>
 		<syncedForceName />
 	</forceDefinition>

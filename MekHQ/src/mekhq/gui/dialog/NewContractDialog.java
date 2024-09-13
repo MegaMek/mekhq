@@ -20,9 +20,25 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.ItemListener;
+import java.util.ResourceBundle;
+
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -36,18 +52,13 @@ import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.ContractPaymentBreakdown;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
  */
 public class NewContractDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(NewContractDialog.class);
+
     protected JFrame frame;
     protected Contract contract;
     protected Campaign campaign;
@@ -188,7 +199,7 @@ public class NewContractDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -237,19 +248,20 @@ public class NewContractDialog extends JDialog {
         descPanel.add(lblPlanetName, gridBagConstraints);
 
         suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
-        /*suggestPlanet.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                contract.setPlanetName(suggestPlanet.getText());
-                // reset the start date so this can be recalculated
-                contract.setStartDate(campaign.getDate());
-                contract.calculateContract(campaign);
-                btnDate.setText(dateFormatter.format(contract.getStartDate()));
-                refreshTotals();
-            }
-        });*/
+        /*
+         * suggestPlanet.addActionListener(new ActionListener() {
+         * public void actionPerformed(ActionEvent evt) {
+         * contract.setPlanetName(suggestPlanet.getText());
+         * // reset the start date so this can be recalculated
+         * contract.setStartDate(campaign.getDate());
+         * contract.calculateContract(campaign);
+         * btnDate.setText(dateFormatter.format(contract.getStartDate()));
+         * refreshTotals();
+         * }
+         * });
+         */
         suggestPlanet.addFocusListener(contractUpdateFocusListener);
         suggestPlanet.addActionListener(contractUpdateActionListener);
-
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -360,7 +372,6 @@ public class NewContractDialog extends JDialog {
         JLabel lblSignBonus = new JLabel(resourceMap.getString("lblSignBonus.text"));
         JLabel lblAdvance = new JLabel(resourceMap.getString("lblAdvance.text"));
 
-
         btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(contract.getStartDate()));
         btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeStartDate());
@@ -368,7 +379,6 @@ public class NewContractDialog extends JDialog {
         checkMRBC = new JCheckBox(resourceMap.getString("checkMRBC.text"));
         checkMRBC.setSelected(contract.payMRBCFee());
         checkMRBC.addItemListener(contractUpdateItemListener);
-
 
         checkSalvageExchange = new JCheckBox(resourceMap.getString("checkSalvageExchange.text"));
         checkSalvageExchange.setSelected(contract.isSalvageExchange());
@@ -394,8 +404,8 @@ public class NewContractDialog extends JDialog {
         choiceCommand.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final int index, final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof ContractCommandRights) {
                     list.setToolTipText(((ContractCommandRights) value).getToolTipText());
@@ -659,7 +669,7 @@ public class NewContractDialog extends JDialog {
         contractPanel.add(spnAdvance, gridBagConstraints);
     }
 
-   protected void btnOKActionPerformed(ActionEvent evt) {
+    protected void btnOKActionPerformed(ActionEvent evt) {
         if (!btnOK.equals(evt.getSource())) {
             return;
         }
@@ -676,7 +686,7 @@ public class NewContractDialog extends JDialog {
         }
 
         contract.setName(txtName.getText());
-        //contract.setPlanetName(suggestPlanet.getText());
+        // contract.setPlanetName(suggestPlanet.getText());
         contract.setEmployer(txtEmployer.getText());
         contract.setType(txtType.getText());
         contract.setDesc(txtDesc.getText());
@@ -723,7 +733,7 @@ public class NewContractDialog extends JDialog {
     protected FocusListener contractUpdateFocusListener = new FocusListener() {
         @Override
         public void focusGained(FocusEvent e) {
-            //unused
+            // unused
         }
 
         @Override

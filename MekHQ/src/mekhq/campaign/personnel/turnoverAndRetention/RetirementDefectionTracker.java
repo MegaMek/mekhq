@@ -21,11 +21,25 @@
  */
 package mekhq.campaign.personnel.turnoverAndRetention;
 
+import static mekhq.campaign.personnel.Person.getLoyaltyName;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
@@ -41,30 +55,21 @@ import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static mekhq.campaign.personnel.Person.getLoyaltyName;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 /**
  * @author Neoancient
  *
- * Against the Bot
- * Utility class that handles Employee Turnover rolls and final payments
- * to personnel who retire/defect/get sacked and families of those killed
- * in battle.
+ *         Against the Bot
+ *         Utility class that handles Employee Turnover rolls and final payments
+ *         to personnel who retire/defect/get sacked and families of those
+ *         killed
+ *         in battle.
  */
 public class RetirementDefectionTracker {
-    /* In case the dialog is closed after making the retirement rolls
+    private static final MMLogger logger = MMLogger.create(RetirementDefectionTracker.class);
+
+    /*
+     * In case the dialog is closed after making the retirement rolls
      * and determining payouts, but before the retirees have been paid,
      * we store those results to avoid making the rolls again.
      */
@@ -87,8 +92,8 @@ public class RetirementDefectionTracker {
     private static Integer medicalCommanderModifier;
     private static Person administrationCommander;
     private static Integer administrationCommanderModifier;
-    private static Person mechWarriorCommander;
-    private static Integer mechWarriorCommanderModifier;
+    private static Person mekWarriorCommander;
+    private static Integer mekWarriorCommanderModifier;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionTracker");
 
@@ -100,16 +105,19 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Computes the target for retirement rolls for all eligible personnel; this includes
+     * Computes the target for retirement rolls for all eligible personnel; this
+     * includes
      * all active personnel who aren’t dependents, prisoners, or bondsmen.
      *
-     * @param mission The contract that is being resolved; if the retirement roll is not due to
-     *                 contract resolutions (e.g., &gt; 12 months since last roll), this can be null.
-     * @param campaign  The campaign to calculate target numbers for
+     * @param mission  The contract that is being resolved; if the retirement roll
+     *                 is not due to
+     *                 contract resolutions (e.g., &gt; 12 months since last roll),
+     *                 this can be null.
+     * @param campaign The campaign to calculate target numbers for
      * @return A map with person ids as key and calculated target roll as value.
      */
     public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable Mission mission, final Campaign campaign) {
-        final Map <UUID, TargetRoll> targets = new HashMap<>();
+        final Map<UUID, TargetRoll> targets = new HashMap<>();
 
         if (null != mission) {
             rollRequired.add(mission.getId());
@@ -120,7 +128,8 @@ public class RetirementDefectionTracker {
         }
 
         for (Person person : campaign.getActivePersonnel()) {
-            if ((person.getPrimaryRole().isCivilian()) || (!person.getPrisonerStatus().isFree()) || (person.isDeployed())) {
+            if ((person.getPrimaryRole().isCivilian()) || (!person.getPrisonerStatus().isFree())
+                    || (person.isDeployed())) {
                 continue;
             }
 
@@ -135,12 +144,14 @@ public class RetirementDefectionTracker {
             }
 
             if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
-                if ((person.getUnit() != null) && (person.getUnit().usesSoldiers()) && (!person.getUnit().isCommander(person))) {
+                if ((person.getUnit() != null) && (person.getUnit().usesSoldiers())
+                        && (!person.getUnit().isCommander(person))) {
                     continue;
                 }
             }
 
-            TargetRoll targetNumber = new TargetRoll(getBaseTargetNumber(campaign, person), resources.getString("base.text"));
+            TargetRoll targetNumber = new TargetRoll(getBaseTargetNumber(campaign, person),
+                    resources.getString("base.text"));
 
             // Founder Modifier
             if (person.isFounder()) {
@@ -148,17 +159,22 @@ public class RetirementDefectionTracker {
             }
 
             // Service Contract
-            if (isBreakingContract(person, campaign.getLocalDate(), campaign.getCampaignOptions().getServiceContractDuration())) {
-                targetNumber.addModifier(-campaign.getCampaignOptions().getServiceContractModifier(), resources.getString("contract.text"));
+            if (isBreakingContract(person, campaign.getLocalDate(),
+                    campaign.getCampaignOptions().getServiceContractDuration())) {
+                targetNumber.addModifier(-campaign.getCampaignOptions().getServiceContractModifier(),
+                        resources.getString("contract.text"));
             }
 
             // Desirability modifier
-            if ((campaign.getCampaignOptions().isUseSkillModifiers()) && (person.getAge(campaign.getLocalDate()) < 50)) {
-                targetNumber.addModifier(person.getExperienceLevel(campaign, false) - 2, resources.getString("desirability.text"));
+            if ((campaign.getCampaignOptions().isUseSkillModifiers())
+                    && (person.getAge(campaign.getLocalDate()) < 50)) {
+                targetNumber.addModifier(person.getExperienceLevel(campaign, false) - 2,
+                        resources.getString("desirability.text"));
             }
 
             // Fatigue modifier
-            if ((campaign.getCampaignOptions().isUseFatigue()) && (campaign.getCampaignOptions().isUseFatigueModifiers())) {
+            if ((campaign.getCampaignOptions().isUseFatigue())
+                    && (campaign.getCampaignOptions().isUseFatigueModifiers())) {
                 int fatigueModifier = MathUtility.clamp(((person.getFatigue() - 1) / 4) - 1, 0, 3);
 
                 if (fatigueModifier > 0) {
@@ -171,7 +187,8 @@ public class RetirementDefectionTracker {
                 int administrativeStrainModifier = getAdministrativeStrainModifier(campaign);
 
                 if (administrativeStrainModifier > 0) {
-                    targetNumber.addModifier(administrativeStrainModifier, resources.getString("administrativeStrain.text"));
+                    targetNumber.addModifier(administrativeStrainModifier,
+                            resources.getString("administrativeStrain.text"));
                 }
             }
 
@@ -192,9 +209,11 @@ public class RetirementDefectionTracker {
 
             // Shares Modifiers
             if (campaign.getCampaignOptions().isUseShareSystem()) {
-                // If this retirement roll is not being made at the end of a contract (e.g. >12 months since last roll),
+                // If this retirement roll is not being made at the end of a contract (e.g. >12
+                // months since last roll),
                 // the share percentage should still apply.
-                // In the case of multiple active contracts, pick the one with the best percentage.
+                // In the case of multiple active contracts, pick the one with the best
+                // percentage.
 
                 AtBContract contract;
 
@@ -217,7 +236,8 @@ public class RetirementDefectionTracker {
                 }
 
                 if (contract != null) {
-                    targetNumber.addModifier(- Math.max(0, ((contract.getSharesPercent() / 10) - 2)), resources.getString("shares.text"));
+                    targetNumber.addModifier(-Math.max(0, ((contract.getSharesPercent() / 10) - 2)),
+                            resources.getString("shares.text"));
                 }
             }
 
@@ -293,7 +313,8 @@ public class RetirementDefectionTracker {
                 }
 
                 // wartime modifier
-                if (FactionHints.defaultFactionHints().isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
+                if (FactionHints.defaultFactionHints().isAtWarWith(campaign.getFaction(), person.getOriginFaction(),
+                        campaign.getLocalDate())) {
                     targetNumber.addModifier(4, resources.getString("factionEnemy.text"));
                 }
             }
@@ -304,7 +325,8 @@ public class RetirementDefectionTracker {
 
                 if (ageMod < 0) {
                     targetNumber.addModifier(ageMod, resources.getString("ageYoung.text"));
-                } else if ((ageMod > 0) && (!isBreakingContract(person, campaign.getLocalDate(), campaign.getCampaignOptions().getServiceContractDuration()))) {
+                } else if ((ageMod > 0) && (!isBreakingContract(person, campaign.getLocalDate(),
+                        campaign.getCampaignOptions().getServiceContractDuration()))) {
                     targetNumber.addModifier(ageMod, resources.getString("ageRetirement.text"));
                 }
             }
@@ -352,7 +374,8 @@ public class RetirementDefectionTracker {
             if (person.getRank().isOfficer()) {
                 targetNumber.addModifier(-1, resources.getString("officer.text"));
             } else {
-                for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
+                for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i
+                        .hasMoreElements();) {
                     IOption ability = i.nextElement();
                     if (ability.booleanValue()) {
                         if (ability.getName().equals("tactical_genius")) {
@@ -366,19 +389,23 @@ public class RetirementDefectionTracker {
             targets.put(person.getId(), targetNumber);
         }
 
-        // we trim personnel so that anyone who has an impossible to fail TN doesn't appear on the table
+        // we trim personnel so that anyone who has an impossible to fail TN doesn't
+        // appear on the table
         targets.entrySet().removeIf(entry -> entry.getValue().getValue() <= 2);
 
         return targets;
     }
 
     /**
-     * Determines whether the campaign is in the middle of a contract in hostile territory.
-     * If AtB is disabled, this method only checks whether there is an active contract.
+     * Determines whether the campaign is in the middle of a contract in hostile
+     * territory.
+     * If AtB is disabled, this method only checks whether there is an active
+     * contract.
      *
      * @param campaign the campaign to check for hostile territory modifier
      * @return true if the campaign is in hostile territory modifier
-     * or (if AtB is disabled) whether the campaign is in an active contract, false otherwise
+     *         or (if AtB is disabled) whether the campaign is in an active
+     *         contract, false otherwise
      */
     private boolean isHostileTerritory(Campaign campaign) {
         List<AtBContractType> defensiveContracts = Arrays.asList(
@@ -393,7 +420,8 @@ public class RetirementDefectionTracker {
             if (campaign.getCampaignOptions().isUseAtB()) {
                 Optional<Contract> defensiveContract = activeContracts.stream()
                         .filter(contract -> contract instanceof AtBContract)
-                        .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
+                        .filter(atBContract -> !defensiveContracts
+                                .contains(((AtBContract) atBContract).getContractType()))
                         .findFirst();
 
                 return defensiveContract.isPresent();
@@ -419,12 +447,14 @@ public class RetirementDefectionTracker {
         if (person.getSecondaryRole() == PersonnelRole.NONE) {
             return getCommanderManagementSkill(person.getPrimaryRole());
         } else {
-            return ((getCommanderManagementSkill(person.getPrimaryRole()) + getCommanderManagementSkill(person.getSecondaryRole())) / 2);
+            return ((getCommanderManagementSkill(person.getPrimaryRole())
+                    + getCommanderManagementSkill(person.getSecondaryRole())) / 2);
         }
     }
 
     /**
-     * Returns the management skill modifier for a commander based on the given personnel role.
+     * Returns the management skill modifier for a commander based on the given
+     * personnel role.
      *
      * @param role the personnel role of the person we're fetching the modifier for
      * @return the management skill modifier for the commander
@@ -438,20 +468,25 @@ public class RetirementDefectionTracker {
             case TECH -> techCommanderModifier;
             case MEDICAL -> medicalCommanderModifier;
             case ADMINISTRATOR -> administrationCommanderModifier;
-            case MECHWARRIOR -> mechWarriorCommanderModifier;
+            case MEKWARRIOR -> mekWarriorCommanderModifier;
             case CIVILIAN -> 0;
         };
     }
 
     /**
-     * This method calculates the management skill values for the different commanding officers.
-     * Each commander's management skill value is calculated based on their role and rank within the campaign.
+     * This method calculates the management skill values for the different
+     * commanding officers.
+     * Each commander's management skill value is calculated based on their role and
+     * rank within the campaign.
      * The management skill modifier is calculated by adding the base modifier
-     * (retrieved from campaign options) and the commander's individual leadership skill.
+     * (retrieved from campaign options) and the commander's individual leadership
+     * skill.
      * If no suitable commander is found for a particular role,
-     * the management skill modifier for that role remains the same as the base modifier.
+     * the management skill modifier for that role remains the same as the base
+     * modifier.
      *
-     * @param campaign The Campaign object for which to calculate the management skill values.
+     * @param campaign The Campaign object for which to calculate the management
+     *                 skill values.
      */
     private void getManagementSkillValues(Campaign campaign) {
         for (Person person : campaign.getActivePersonnel()) {
@@ -504,10 +539,10 @@ public class RetirementDefectionTracker {
                         administrationCommanderModifier = getIndividualCommanderLeadership(administrationCommander);
                     }
                     break;
-                case MECHWARRIOR:
-                    if (person.outRanksUsingSkillTiebreaker(campaign, mechWarriorCommander)) {
-                        mechWarriorCommander = person;
-                        mechWarriorCommanderModifier = getIndividualCommanderLeadership(mechWarriorCommander);
+                case MEKWARRIOR:
+                    if (person.outRanksUsingSkillTiebreaker(campaign, mekWarriorCommander)) {
+                        mekWarriorCommander = person;
+                        mekWarriorCommanderModifier = getIndividualCommanderLeadership(mekWarriorCommander);
                     }
                     break;
                 case CIVILIAN:
@@ -552,9 +587,9 @@ public class RetirementDefectionTracker {
                         administrationCommanderModifier = 0;
                     }
                     break;
-                case MECHWARRIOR:
-                    if (mechWarriorCommander == null) {
-                        mechWarriorCommanderModifier = 0;
+                case MEKWARRIOR:
+                    if (mekWarriorCommander == null) {
+                        mekWarriorCommanderModifier = 0;
                     }
                     break;
                 case CIVILIAN:
@@ -564,7 +599,8 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Calculates the individual commander Leadership skill based on the provided commander.
+     * Calculates the individual commander Leadership skill based on the provided
+     * commander.
      *
      * @param commander the commander for which the skill is being calculated
      * @return the Leadership skill
@@ -578,7 +614,8 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * This method calculates the combatant strain modifier based on the active personnel assigned to units.
+     * This method calculates the combatant strain modifier based on the active
+     * personnel assigned to units.
      *
      * @param campaign the campaign for which to calculate the strain modifier
      * @return the strain modifier
@@ -586,7 +623,8 @@ public class RetirementDefectionTracker {
     public static int getAdministrativeStrainModifier(Campaign campaign) {
         int personnel = getAdministrativeStrain(campaign);
 
-        int maximumStrain = campaign.getCampaignOptions().getAdministrativeCapacity() * getCombinedSkillValues(campaign, SkillType.S_ADMIN);
+        int maximumStrain = campaign.getCampaignOptions().getAdministrativeCapacity()
+                * getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
         if (maximumStrain != 0) {
             return personnel / maximumStrain;
@@ -608,7 +646,8 @@ public class RetirementDefectionTracker {
         int other = 0;
 
         for (Person person : campaign.getActivePersonnel()) {
-            if ((person.getPrimaryRole().isCivilian()) || (person.getPrisonerStatus().isPrisoner()) || (person.getPrisonerStatus().isPrisonerDefector())) {
+            if ((person.getPrimaryRole().isCivilian()) || (person.getPrisonerStatus().isPrisoner())
+                    || (person.getPrisonerStatus().isPrisonerDefector())) {
                 other++;
             } else if (person.getUnit() != null) {
                 if (person.getUnit().isCommander(person)) {
@@ -644,7 +683,8 @@ public class RetirementDefectionTracker {
      * Calculates the combined skill values of active Admin/HR personnel.
      *
      * @param campaign the campaign for which to calculate the combined skill values
-     * @return the combined skill values of active Admin/HR personnel in the campaign
+     * @return the combined skill values of active Admin/HR personnel in the
+     *         campaign
      */
     public static int getCombinedSkillValues(Campaign campaign, String skillType) {
         int combinedSkillValues = 0;
@@ -758,23 +798,26 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Makes rolls for Employee Turnover based on previously calculated target rolls,
+     * Makes rolls for Employee Turnover based on previously calculated target
+     * rolls,
      * and tracks all retirees in the unresolvedPersonnel hash in case the dialog
      * is closed before payments are resolved, to avoid re-rolling the results.
      *
-     * @param mission Nullable mission value
-     * @param targets The hash previously generated by getTargetNumbers.
-     * @param shareValue The value of each share in the unit; if not using the share system, this is zero.
-     * @param campaign the current campaign
+     * @param mission    Nullable mission value
+     * @param targets    The hash previously generated by getTargetNumbers.
+     * @param shareValue The value of each share in the unit; if not using the share
+     *                   system, this is zero.
+     * @param campaign   the current campaign
      */
     public void rollRetirement(final @Nullable Mission mission, final Map<UUID, TargetRoll> targets,
-                               final Money shareValue, final Campaign campaign) {
+            final Money shareValue, final Campaign campaign) {
         if ((mission != null) && !unresolvedPersonnel.containsKey(mission.getId())) {
             unresolvedPersonnel.put(mission.getId(), new HashSet<>());
         }
 
         for (UUID id : targets.keySet()) {
-            // it's possible the person has already been added by soldier or marriage special handlers
+            // it's possible the person has already been added by soldier or marriage
+            // special handlers
             if (payouts.containsKey(id)) {
                 continue;
             }
@@ -786,15 +829,20 @@ public class RetirementDefectionTracker {
 
                 Person person = campaign.getPerson(id);
 
-                // if the retiree is the commander of an infantry platoon, all non-founders in the platoon follow them into retirement
+                // if the retiree is the commander of an infantry platoon, all non-founders in
+                // the platoon follow them into retirement
                 if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
-                    if ((person.getUnit() != null) && (person.getUnit().usesSoldiers()) && (person.getUnit().isCommander(person))) {
+                    if ((person.getUnit() != null) && (person.getUnit().usesSoldiers())
+                            && (person.getUnit().isCommander(person))) {
                         for (Person soldier : person.getUnit().getAllInfantry()) {
-                            if ((!soldier.isFounder()) || (campaign.getCampaignOptions().isUseRandomFounderTurnover())) {
+                            if ((!soldier.isFounder())
+                                    || (campaign.getCampaignOptions().isUseRandomFounderTurnover())) {
                                 // this shouldn't be an issue, but we include it here as insurance
                                 if (!payouts.containsKey(id)) {
-                                    payouts.put(soldier.getId(), new Payout(campaign, campaign.getPerson(soldier.getId()),
-                                            shareValue, false, false, campaign.getCampaignOptions().isSharesForAll()));
+                                    payouts.put(soldier.getId(),
+                                            new Payout(campaign, campaign.getPerson(soldier.getId()),
+                                                    shareValue, false, false,
+                                                    campaign.getCampaignOptions().isSharesForAll()));
                                 }
                             }
                         }
@@ -804,7 +852,7 @@ public class RetirementDefectionTracker {
                 }
 
                 payouts.put(id, new Payout(campaign, campaign.getPerson(id),
-                            shareValue, false, false, campaign.getCampaignOptions().isSharesForAll()));
+                        shareValue, false, false, campaign.getCampaignOptions().isSharesForAll()));
             }
         }
 
@@ -830,10 +878,13 @@ public class RetirementDefectionTracker {
      * @param killed   Indicates whether the person was killed.
      * @param sacked   Indicates whether the person was sacked.
      * @param campaign The campaign from which to remove the person.
-     * @param contract The contract associated with the event trigger, if applicable.
-     * @return True if the person was successfully removed from the campaign, false otherwise.
+     * @param contract The contract associated with the event trigger, if
+     *                 applicable.
+     * @return True if the person was successfully removed from the campaign, false
+     *         otherwise.
      */
-    public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign, Mission contract) {
+    public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign,
+            Mission contract) {
         if (!person.getPrisonerStatus().isFree()) {
             return false;
         }
@@ -855,6 +906,7 @@ public class RetirementDefectionTracker {
 
     /**
      * Clears out an individual entirely from this tracker.
+     *
      * @param person The person to remove
      */
     public void removePerson(Person person) {
@@ -880,7 +932,8 @@ public class RetirementDefectionTracker {
         return unresolvedPersonnel.containsKey(id);
     }
 
-    /** Called by when all payouts have been resolved for the contract.
+    /**
+     * Called by when all payouts have been resolved for the contract.
      * If the contract is null, the dialog has been invoked without a
      * specific contract and all outstanding payouts have been resolved.
      */
@@ -922,8 +975,9 @@ public class RetirementDefectionTracker {
 
     /**
      * @param campaign the campaign the person is a part of
-     * @param person the person to get the bonus cost for
-     * @return The amount in C-bills required to get a bonus to the Employee Turnover roll
+     * @param person   the person to get the bonus cost for
+     * @return The amount in C-bills required to get a bonus to the Employee
+     *         Turnover roll
      */
     public static Money getPayoutOrBonusValue(final Campaign campaign, Person person) {
         double bonusMultiplier = campaign.getCampaignOptions().getPayoutRateEnlisted();
@@ -933,14 +987,16 @@ public class RetirementDefectionTracker {
         }
 
         if (campaign.getCampaignOptions().isUsePayoutServiceBonus()) {
-            bonusMultiplier += person.getYearsInService(campaign) * ((double) campaign.getCampaignOptions().getPayoutServiceBonusRate() / 100);
+            bonusMultiplier += person.getYearsInService(campaign)
+                    * ((double) campaign.getCampaignOptions().getPayoutServiceBonusRate() / 100);
         }
 
         return person.getSalary(campaign).multipliedBy(bonusMultiplier);
     }
 
     /**
-     * Class used to record the required payout to each retired/defected/killed/sacked
+     * Class used to record the required payout to each
+     * retired/defected/killed/sacked
      * person.
      */
     public static class Payout {
@@ -953,8 +1009,9 @@ public class RetirementDefectionTracker {
 
         }
 
-        public Payout(final Campaign campaign, final Person person, final Money shareValue, final boolean killed, final boolean sacked,
-                      final boolean sharesForAll) {
+        public Payout(final Campaign campaign, final Person person, final Money shareValue, final boolean killed,
+                final boolean sacked,
+                final boolean sharesForAll) {
             if (killed) {
                 setWasKilled(true);
             } else if (sacked) {
@@ -968,30 +1025,35 @@ public class RetirementDefectionTracker {
             }
         }
 
-        private void calculatePayout(final Campaign campaign, final Person person, final boolean killed, final boolean sacked, final boolean shareSystem) {
+        private void calculatePayout(final Campaign campaign, final Person person, final boolean killed,
+                final boolean sacked, final boolean shareSystem) {
             final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
 
             // person was killed
             if (killed) {
-                payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
-            // person is getting medically discharged
+                payoutAmount = getPayoutOrBonusValue(campaign, person)
+                        .multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
+                // person is getting medically discharged
             } else if (!person.getPermanentInjuries().isEmpty()) {
-                payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
-            // person is defecting
-            } else if (isBreakingContract(person, campaign.getLocalDate(), campaign.getCampaignOptions().getServiceContractDuration())) {
+                payoutAmount = getPayoutOrBonusValue(campaign, person)
+                        .multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
+                // person is defecting
+            } else if (isBreakingContract(person, campaign.getLocalDate(),
+                    campaign.getCampaignOptions().getServiceContractDuration())) {
                 payoutAmount = Money.of(0);
-            // person is retiring
+                // person is retiring
             } else if (person.getAge(campaign.getLocalDate()) >= 50) {
-                payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
-            // person was sacked
+                payoutAmount = getPayoutOrBonusValue(campaign, person)
+                        .multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
+                // person was sacked
             } else if (sacked) {
                 payoutAmount = Money.of(0);
-            // person is resigning
+                // person is resigning
             } else {
                 payoutAmount = getPayoutOrBonusValue(campaign, person);
             }
 
-            if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
+            if (!shareSystem && (profession.isMekWarrior() || profession.isAerospace())
                     && (person.getOriginalUnitWeight() > 0)) {
                 weightClass = person.getOriginalUnitWeight() + person.getOriginalUnitTech();
             }
@@ -1004,7 +1066,6 @@ public class RetirementDefectionTracker {
         public void setWeightClass(int weight) {
             weightClass = weight;
         }
-
 
         public Money getPayoutAmount() {
             return payoutAmount;
@@ -1044,7 +1105,8 @@ public class RetirementDefectionTracker {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rollRequired", createCsv(rollRequired));
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unresolvedPersonnel");
         for (Integer i : unresolvedPersonnel.keySet()) {
-            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "contract", "id", i, createCsv(unresolvedPersonnel.get(i)));
+            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "contract", "id", i,
+                    createCsv(unresolvedPersonnel.get(i)));
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unresolvedPersonnel");
 
@@ -1084,7 +1146,7 @@ public class RetirementDefectionTracker {
 
                 if (wn2.getNodeName().equalsIgnoreCase("rollRequired")) {
                     if (!wn2.getTextContent().isBlank()) {
-                        String [] ids = wn2.getTextContent().split(",");
+                        String[] ids = wn2.getTextContent().split(",");
                         for (String id : ids) {
                             retVal.rollRequired.add(Integer.parseInt(id));
                         }
@@ -1098,7 +1160,7 @@ public class RetirementDefectionTracker {
                         }
                         if (wn3.getNodeName().equalsIgnoreCase("contract")) {
                             int id = Integer.parseInt(wn3.getAttributes().getNamedItem("id").getTextContent());
-                            String [] ids = wn3.getTextContent().split(",");
+                            String[] ids = wn3.getTextContent().split(",");
                             HashSet<UUID> pids = Arrays
                                     .stream(ids)
                                     .map(UUID::fromString)
@@ -1140,11 +1202,14 @@ public class RetirementDefectionTracker {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("RetirementDefectionTracker: either the class name is invalid or the listed name doesn't exist.", ex);
+            logger.error(
+                    "RetirementDefectionTracker: either the class name is invalid or the listed name doesn't exist.",
+                    ex);
         }
 
         if (retVal != null) {
-            // sometimes, a campaign may be loaded with orphan records in the Employee Turnover tracker
+            // sometimes, a campaign may be loaded with orphan records in the Employee
+            // Turnover tracker
             // let's clean those up here.
             retVal.cleanupOrphans(c);
         }

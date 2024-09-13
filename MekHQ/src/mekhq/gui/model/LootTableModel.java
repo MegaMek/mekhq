@@ -21,31 +21,33 @@
  */
 package mekhq.gui.model;
 
+import java.awt.Component;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+
 import megamek.common.Entity;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A table model for displaying loot for scenarios and missions
  */
 public class LootTableModel extends AbstractTableModel {
-    //region Variable Declarations
+    // region Variable Declarations
     protected String[] columnNames;
     protected List<Loot> data;
 
-    public final static int COL_NAME    = 0;
-    public final static int COL_MONEY   = 1;
-    public final static int COL_MECHS   = 2;
-    public final static int COL_PARTS   = 3;
-    public final static int N_COL       = 4;
-    //endregion Variable Declarations
+    public final static int COL_NAME = 0;
+    public final static int COL_MONEY = 1;
+    public final static int COL_MEKS = 2;
+    public final static int COL_PARTS = 3;
+    public final static int N_COL = 4;
+    // endregion Variable Declarations
 
     public LootTableModel(List<Loot> entries) {
         data = entries;
@@ -68,7 +70,7 @@ public class LootTableModel extends AbstractTableModel {
                 return "Name";
             case COL_MONEY:
                 return "Money";
-            case COL_MECHS:
+            case COL_MEKS:
                 return "# Units";
             case COL_PARTS:
                 return "# Parts";
@@ -91,7 +93,7 @@ public class LootTableModel extends AbstractTableModel {
                 return loot.getName();
             case COL_MONEY:
                 return loot.getCash().toAmountAndSymbolString();
-            case COL_MECHS:
+            case COL_MEKS:
                 return loot.getUnits().size();
             case COL_PARTS:
                 return loot.getParts().size();
@@ -139,7 +141,7 @@ public class LootTableModel extends AbstractTableModel {
 
     public String getTooltip(int row, int col) {
         switch (col) {
-            case COL_MECHS:
+            case COL_MEKS:
                 return getLootAt(row).getUnits().stream().map(Entity::getDisplayName)
                         .collect(Collectors.joining(", "));
             case COL_PARTS:
@@ -150,7 +152,7 @@ public class LootTableModel extends AbstractTableModel {
         }
     }
 
-    //fill table with values
+    // fill table with values
     public void setData(List<Loot> loot) {
         data = loot;
         fireTableDataChanged();
@@ -163,8 +165,8 @@ public class LootTableModel extends AbstractTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
+                boolean isSelected, boolean hasFocus,
+                int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);

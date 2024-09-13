@@ -20,23 +20,11 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.*;
-import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Refit;
-import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -44,11 +32,35 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.Entity;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
+import megamek.common.MekView;
+import megamek.common.ViewFormatting;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Refit;
+import mekhq.campaign.unit.Unit;
+
 /**
  * @author Taharqa
  */
 public class ChooseRefitDialog extends JDialog {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(ChooseRefitDialog.class);
+
+    // region Variable Declarations
     private Campaign campaign;
     private Unit unit;
     private RefitTableModel refitModel;
@@ -65,9 +77,9 @@ public class ChooseRefitDialog extends JDialog {
     private JScrollPane scrNewUnit;
 
     private boolean confirmed = false;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     /** Creates new form EditPersonnelLogDialog */
     public ChooseRefitDialog(JFrame parent, boolean modal, Campaign c, Unit unit) {
         super(parent, modal);
@@ -78,9 +90,9 @@ public class ChooseRefitDialog extends JDialog {
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Initialization
+    // region Initialization
     private void initComponents() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseRefitDialog",
@@ -120,8 +132,8 @@ public class ChooseRefitDialog extends JDialog {
 
         scrShoppingList = new JScrollPane();
         scrShoppingList.setBorder(BorderFactory.createCompoundBorder(
-                 BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")),
-                 BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -138,10 +150,10 @@ public class ChooseRefitDialog extends JDialog {
         txtOldUnit.setEditable(false);
         txtOldUnit.setContentType("text/html");
         txtOldUnit.setBorder(BorderFactory.createCompoundBorder(
-                 BorderFactory.createTitledBorder(resourceMap.getString("txtOldUnit.title")),
-                 BorderFactory.createEmptyBorder(5,5,5,5)));
-        MechView mv = new MechView(unit.getEntity(), false, true, true, ViewFormatting.HTML);
-        txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
+                BorderFactory.createTitledBorder(resourceMap.getString("txtOldUnit.title")),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        MekView mv = new MekView(unit.getEntity(), false, true, true, ViewFormatting.HTML);
+        txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         scrOldUnit = new JScrollPane(txtOldUnit);
         scrOldUnit.setMinimumSize(new Dimension(300, 400));
         scrOldUnit.setPreferredSize(new Dimension(300, 400));
@@ -161,8 +173,8 @@ public class ChooseRefitDialog extends JDialog {
         txtNewUnit.setEditable(false);
         txtNewUnit.setContentType("text/html");
         txtNewUnit.setBorder(BorderFactory.createCompoundBorder(
-                 BorderFactory.createTitledBorder(resourceMap.getString("txtNewUnit.title")),
-                 BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createTitledBorder(resourceMap.getString("txtNewUnit.title")),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         scrNewUnit = new JScrollPane(txtNewUnit);
         scrNewUnit.setMinimumSize(new Dimension(300, 400));
         scrNewUnit.setPreferredSize(new Dimension(300, 400));
@@ -214,10 +226,10 @@ public class ChooseRefitDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
-    //endregion Initialization
+    // endregion Initialization
 
     private void confirm() {
         confirmed = getSelectedRefit() != null;
@@ -251,26 +263,26 @@ public class ChooseRefitDialog extends JDialog {
         btnOK.setEnabled(true);
         lstShopping = new JList<>(r.getShoppingListDescription());
         scrShoppingList.setViewportView(lstShopping);
-        MechView mv = new MechView(r.getNewEntity(), false, true);
-        txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
+        MekView mv = new MekView(r.getNewEntity(), false, true);
+        txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadout() + "</div>");
         SwingUtilities.invokeLater(() -> scrNewUnit.getVerticalScrollBar().setValue(0));
     }
-
 
     private void populateRefits() {
         List<Refit> refits = new ArrayList<>();
         Entity e = unit.getEntity();
         for (String model : Utilities.getAllVariants(e, campaign)) {
-            MechSummary summary = MechSummaryCache.getInstance().getMech(e.getFullChassis() + " " + model);
+            MekSummary summary = MekSummaryCache.getInstance().getMek(e.getFullChassis() + " " + model);
             if (null == summary) {
                 // Attempt to deal with new naming scheme directly
-                summary = MechSummaryCache.getInstance().getMech(e.getChassis() + " (" + e.getClanChassisName() + ") " + model);
+                summary = MekSummaryCache.getInstance()
+                        .getMek(e.getChassis() + " (" + e.getClanChassisName() + ") " + model);
                 if (null == summary) {
                     continue;
                 }
             }
             try {
-                Entity refitEn = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                Entity refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 if (null != refitEn) {
                     Refit r = new Refit(unit, refitEn, false, false);
                     if (null == r.checkFixable()) {
@@ -278,14 +290,15 @@ public class ChooseRefitDialog extends JDialog {
                     }
                 }
             } catch (EntityLoadingException ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
         refitModel = new RefitTableModel(refits);
     }
 
     /**
-     * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
+     * A table model for displaying parts - similar to the one in CampaignGUI, but
+     * not exactly
      */
     public class RefitTableModel extends AbstractTableModel {
         protected String[] columnNames;
@@ -414,7 +427,7 @@ public class ChooseRefitDialog extends JDialog {
             }
         }
 
-        //fill table with values
+        // fill table with values
         public void setData(ArrayList<Refit> refits) {
             data = refits;
             fireTableDataChanged();
@@ -425,41 +438,42 @@ public class ChooseRefitDialog extends JDialog {
         }
 
         public class Renderer extends DefaultTableCellRenderer {
-           @Override
-           public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                          boolean hasFocus, int row, int column) {
-               super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-               setOpaque(true);
-               int actualCol = table.convertColumnIndexToModel(column);
-               int actualRow = table.convertRowIndexToModel(row);
-               setHorizontalAlignment(getAlignment(actualCol));
-               setToolTipText(getTooltip(actualRow, actualCol));
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setOpaque(true);
+                int actualCol = table.convertColumnIndexToModel(column);
+                int actualRow = table.convertRowIndexToModel(row);
+                setHorizontalAlignment(getAlignment(actualCol));
+                setToolTipText(getTooltip(actualRow, actualCol));
 
-               return this;
-           }
+                return this;
+            }
         }
     }
 
     /**
      * A comparator for numbers that have been formatted with DecimalFormat
+     * 
      * @author Jay Lawson
      */
     public static class FormattedNumberSorter implements Comparator<String> {
         @Override
         public int compare(String s0, String s1) {
-            //lets find the weight class integer for each name
+            // lets find the weight class integer for each name
             DecimalFormat format = new DecimalFormat();
             int l0 = 0;
             try {
                 l0 = format.parse(s0).intValue();
             } catch (ParseException e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
             int l1 = 0;
             try {
                 l1 = format.parse(s1).intValue();
             } catch (ParseException e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
             return ((Comparable<Integer>) l0).compareTo(l1);
         }
@@ -467,6 +481,7 @@ public class ChooseRefitDialog extends JDialog {
 
     /**
      * A comparator for refit classes
+     * 
      * @author Jay Lawson
      */
     public static class ClassSorter implements Comparator<String> {

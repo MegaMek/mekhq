@@ -28,7 +28,7 @@ public class MovedEquipmentStep extends UnscrambleStep {
     @Override
     public void visit(final EquipmentProposal proposal, final EquipmentPart part) {
         for (final Entry<Integer, Mounted> equipment : proposal.getEquipment()) {
-            final Mounted m = equipment.getValue();
+            final Mounted<?> m = equipment.getValue();
             if (m.isDestroyed()) {
                 continue;
             }
@@ -43,7 +43,7 @@ public class MovedEquipmentStep extends UnscrambleStep {
     @Override
     public void visit(final EquipmentProposal proposal, final MissingEquipmentPart part) {
         for (final Entry<Integer, Mounted> equipment : proposal.getEquipment()) {
-            final Mounted m = equipment.getValue();
+            final Mounted<?> m = equipment.getValue();
             if (m.isDestroyed()) {
                 continue;
             }

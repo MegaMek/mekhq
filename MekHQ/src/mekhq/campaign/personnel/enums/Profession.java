@@ -18,17 +18,17 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.ranks.Rank;
-import mekhq.campaign.personnel.ranks.RankSystem;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
+
 public enum Profession {
-    //region Enum Declarations
-    MECHWARRIOR("Profession.MECHWARRIOR.text", "Profession.MECHWARRIOR.toolTipText"),
+    // region Enum Declarations
+    MEKWARRIOR("Profession.MEKWARRIOR.text", "Profession.MEKWARRIOR.toolTipText"),
     AEROSPACE("Profession.AEROSPACE.text", "Profession.AEROSPACE.toolTipText"),
     VEHICLE("Profession.VEHICLE.text", "Profession.VEHICLE.toolTipText"),
     NAVAL("Profession.NAVAL.text", "Profession.NAVAL.toolTipText"),
@@ -37,31 +37,31 @@ public enum Profession {
     MEDICAL("Profession.MEDICAL.text", "Profession.MEDICAL.toolTipText"),
     ADMINISTRATOR("Profession.ADMINISTRATOR.text", "Profession.ADMINISTRATOR.toolTipText"),
     CIVILIAN("Profession.CIVILIAN.text", "Profession.CIVILIAN.toolTipText");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     Profession(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    public boolean isMechWarrior() {
-        return this == MECHWARRIOR;
+    // region Boolean Comparison Methods
+    public boolean isMekWarrior() {
+        return this == MEKWARRIOR;
     }
 
     public boolean isAerospace() {
@@ -95,14 +95,16 @@ public enum Profession {
     public boolean isCivilian() {
         return this == CIVILIAN;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     /**
-     * This takes this, the initial profession, converts it into a base profession, and then calls
-     * getProfessionFromBase to determine the profession to use for the provided rank.
+     * This takes this, the initial profession, converts it into a base profession,
+     * and then calls
+     * getProfessionFromBase to determine the profession to use for the provided
+     * rank.
      *
      * @param rankSystem the rank system to determine the profession within
-     * @param rank the rank to determine the profession for
+     * @param rank       the rank to determine the profession for
      * @return the determined profession
      */
     public Profession getProfession(final RankSystem rankSystem, final Rank rank) {
@@ -110,11 +112,12 @@ public enum Profession {
     }
 
     /**
-     * This takes this, the base profession, and uses it to determine the profession to use for the
+     * This takes this, the base profession, and uses it to determine the profession
+     * to use for the
      * provided rank in the provided rank system
      *
      * @param rankSystem the rank system to determine the profession within
-     * @param rank the rank to determine the profession for
+     * @param rank       the rank to determine the profession for
      * @return the determined profession
      */
     public Profession getProfessionFromBase(final RankSystem rankSystem, final Rank rank) {
@@ -134,12 +137,14 @@ public enum Profession {
     }
 
     /**
-     * This is used to get the base profession for the rank column following any required redirects
+     * This is used to get the base profession for the rank column following any
+     * required redirects
      * based on this, the initial profession.
      *
      * @param rankSystem the rank system to get the base profession for
-     * @return the final base profession for this rank system based on this being the initial base
-     * profession
+     * @return the final base profession for this rank system based on this being
+     *         the initial base
+     *         profession
      */
     public Profession getBaseProfession(final RankSystem rankSystem) {
         Profession baseProfession = this;
@@ -150,7 +155,8 @@ public enum Profession {
     }
 
     /**
-     * This is used to determine if a profession is empty, which means the first rank is an
+     * This is used to determine if a profession is empty, which means the first
+     * rank is an
      * alternative system while every other rank tier is empty.
      *
      * @param rankSystem the rank system to determine if this profession is empty in
@@ -158,16 +164,20 @@ public enum Profession {
      */
     public boolean isEmptyProfession(final RankSystem rankSystem) {
         // MekWarrior profession cannot be empty
-        // TODO : I should be allowed to be empty, and have my default replaced by another column,
-        // TODO : albeit with the validator properly run before to ensure the rank system is valid.
-        // TODO : The default return for getAlternativeProfession would not need to change in this case
-        if (isMechWarrior()) {
+        // TODO : I should be allowed to be empty, and have my default replaced by
+        // another column,
+        // TODO : albeit with the validator properly run before to ensure the rank
+        // system is valid.
+        // TODO : The default return for getAlternativeProfession would not need to
+        // change in this case
+        if (isMekWarrior()) {
             return false;
         }
 
         final Rank rank = rankSystem.getRanks().get(0);
         if (!rank.indicatesAlternativeSystem(this)) {
-            // Return false if the first rank doesn't indicate an alternative rank system, as the
+            // Return false if the first rank doesn't indicate an alternative rank system,
+            // as the
             // rank system is not empty.
             return false;
         } else if (rankSystem.getRanks().size() == 1) {
@@ -184,7 +194,9 @@ public enum Profession {
 
     /**
      * Determines the alternative profession to use based on the initial rank value
-     * @param rankSystem the rank system to use to determine the alternative profession
+     *
+     * @param rankSystem the rank system to use to determine the alternative
+     *                   profession
      * @return the alternative profession determined
      */
     public Profession getAlternateProfession(final RankSystem rankSystem) {
@@ -193,6 +205,7 @@ public enum Profession {
 
     /**
      * Determines the alternative profession to use based on the provided rank
+     *
      * @param rank the rank to determine the alternative profession for
      * @return the alternative profession determined
      */
@@ -202,13 +215,15 @@ public enum Profession {
 
     /**
      * Determines the alternative profession to use based on the name of a rank
-     * @param name the name of the rank to use in determining the alternative profession
+     *
+     * @param name the name of the rank to use in determining the alternative
+     *             profession
      * @return the alternative profession determined
      */
     public Profession getAlternateProfession(final String name) {
         switch (name.toUpperCase(Locale.ENGLISH)) {
             case "--MW":
-                return MECHWARRIOR;
+                return MEKWARRIOR;
             case "--ASF":
                 return AEROSPACE;
             case "--VEE":
@@ -226,9 +241,9 @@ public enum Profession {
             case "--CIVILIAN":
                 return CIVILIAN;
             default:
-                LogManager.getLogger().debug("Cannot get alternate profession for unknown alternative "
-                        + name + " returning MECHWARRIOR.");
-                return MECHWARRIOR;
+                MMLogger.create(Profession.class).debug("Cannot get alternate profession for unknown alternative "
+                        + name + " returning MEKWARRIOR.");
+                return MEKWARRIOR;
         }
     }
 
@@ -255,9 +270,9 @@ public enum Profession {
             case VESSEL_GUNNER:
             case VESSEL_NAVIGATOR:
                 return NAVAL;
-            case MECH_TECH:
+            case MEK_TECH:
             case MECHANIC:
-            case AERO_TECH:
+            case AERO_TEK:
             case BA_TECH:
             case ASTECH:
                 return TECH;
@@ -272,11 +287,11 @@ public enum Profession {
             case DEPENDENT:
             case NONE:
                 return CIVILIAN;
-            case MECHWARRIOR:
+            case MEKWARRIOR:
             case LAM_PILOT:
-            case PROTOMECH_PILOT:
+            case PROTOMEK_PILOT:
             default:
-                return MECHWARRIOR;
+                return MEKWARRIOR;
         }
     }
 
