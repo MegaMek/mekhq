@@ -714,9 +714,16 @@ public class RetirementDefectionTracker {
      * @return the base target number
      */
     private int getBaseTargetNumber(Campaign campaign, Person person) {
-        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
-                && (campaign.getCampaignOptions().isUseHideLoyalty())) {
-            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() + person.getLoyalty();
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
+            int loyaltyScore = person.getLoyalty();
+
+            if (person.isCommander()) {
+                loyaltyScore += 2;
+            }
+
+            int loyaltyModifier = person.getLoyaltyModifier(loyaltyScore);
+
+            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() + loyaltyModifier;
         } else {
             return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
         }
@@ -899,7 +906,7 @@ public class RetirementDefectionTracker {
 
     /**
      * Clears out an individual entirely from this tracker.
-     * 
+     *
      * @param person The person to remove
      */
     public void removePerson(Person person) {
