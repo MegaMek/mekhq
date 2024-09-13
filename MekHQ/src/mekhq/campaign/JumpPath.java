@@ -20,27 +20,32 @@
  */
 package mekhq.campaign;
 
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.universe.PlanetarySystem;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.logging.MMLogger;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
  * This is an array list of planets for a jump path, from which we can derive
- * various statistics. We can also add in details about the jump path here, like if
- * the user would like to use recharge stations when available. For XML serialization,
+ * various statistics. We can also add in details about the jump path here, like
+ * if
+ * the user would like to use recharge stations when available. For XML
+ * serialization,
  * this object will need to spit out a list of planet names and then reconstruct
  * the planets from that.
  *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class JumpPath {
+    private static final MMLogger logger = MMLogger.create(JumpPath.class);
+
     private List<PlanetarySystem> path;
 
     public JumpPath() {
@@ -165,12 +170,12 @@ public class JumpPath {
                     if (null != p) {
                         retVal.addSystem(p);
                     } else {
-                        LogManager.getLogger().error("Couldn't find planet named " + wn2.getTextContent());
+                        logger.error("Couldn't find planet named " + wn2.getTextContent());
                     }
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         return retVal;

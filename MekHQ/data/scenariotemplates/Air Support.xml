@@ -2,9 +2,10 @@
 <ScenarioTemplate>
     <name>Air Support</name>
     <shortBriefing>Provide air support.</shortBriefing>
-    <detailedBriefing>Provide air support for allied ground units. Keep at least half of the allied units alive.</detailedBriefing>
+    <detailedBriefing>Provide air support for allied ground units. Keep at least half of the allied
+        units alive.</detailedBriefing>
     <mapParameters>
-        <allowedTerrainTypes/>
+        <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
         <baseHeight>40</baseHeight>
         <baseWidth>40</baseWidth>
@@ -126,7 +127,7 @@
             <associatedForceNames>
                 <associatedForceName>Allies</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -141,7 +142,7 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails />
             <description>Preserve 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
@@ -153,7 +154,7 @@
             <associatedForceNames>
                 <associatedForceName>Primary Opfor</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -168,7 +169,7 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails />
             <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>

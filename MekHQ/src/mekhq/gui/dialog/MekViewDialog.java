@@ -1,28 +1,55 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.dialog;
+
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.WindowConstants;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MechView;
+import megamek.common.MekView;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ResourceBundle;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @since July 15, 2009, 9:30 PM
  */
 public class MekViewDialog extends JDialog {
-    private MechView mview;
+    private static final MMLogger logger = MMLogger.create(MekViewDialog.class);
+
+    private MekView mview;
     private JButton btnOkay;
     private JScrollPane jScrollPane2;
     private JTextPane txtMek;
 
     /** Creates new form MekViewDialog */
-    public MekViewDialog(JFrame parent, boolean modal, MechView mv) {
+    public MekViewDialog(JFrame parent, boolean modal, MekView mv) {
         super(parent, modal);
         this.mview = mv;
         initComponents();
@@ -46,7 +73,7 @@ public class MekViewDialog extends JDialog {
         txtMek.setEditable(false);
         txtMek.setFont(Font.decode(resourceMap.getString("txtMek.font")));
         txtMek.setName("txtMek");
-        txtMek.setText(mview.getMechReadout());
+        txtMek.setText(mview.getMekReadout());
         jScrollPane2.setViewportView(txtMek);
 
         btnOkay.setText(resourceMap.getString("btnOkay.text"));
@@ -66,7 +93,7 @@ public class MekViewDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

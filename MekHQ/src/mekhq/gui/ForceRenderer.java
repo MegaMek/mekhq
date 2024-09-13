@@ -18,30 +18,34 @@
  */
 package mekhq.gui;
 
+import java.awt.Component;
+
+import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
+
 import megamek.client.ui.Messages;
 import megamek.common.Entity;
 import megamek.common.GunEmplacement;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import java.awt.*;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
-    //region Constructors
+    private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
+
+    // region Constructors
     public ForceRenderer() {
 
     }
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
-                                                  boolean expanded, boolean leaf, int row,
-                                                  boolean hasFocus) {
+            boolean expanded, boolean leaf, int row,
+            boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
         setOpaque(false);
 
@@ -59,12 +63,14 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 name += " (" + u.getEntity().getCrew().getGunnery() + '/'
                         + u.getEntity().getCrew().getPiloting() + ')';
                 if (person.needsFixing() || (u.getEntity().getCrew().getHits() > 0)) {
-                    name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + name + "</font>";
+                    name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + name
+                            + "</font>";
                 }
             }
             String uname = "<i>" + u.getName() + "</i>";
             if (u.isDamaged()) {
-                uname = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + uname + "</font>";
+                uname = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + uname
+                        + "</font>";
             }
 
             Entity entity = u.getEntity();
@@ -135,14 +141,15 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             }
         } else if (value instanceof Force) {
             Force force = (Force) value;
-            getAccessibleContext().setAccessibleName((force.isDeployed() ? "Deployed Force: " : "Force: ") + force.getFullName());
+            getAccessibleContext()
+                    .setAccessibleName((force.isDeployed() ? "Deployed Force: " : "Force: ") + force.getFullName());
             if (!sel && force.isDeployed()) {
                 setForeground(MekHQ.getMHQOptions().getDeployedForeground());
                 setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
         } else {
-            LogManager.getLogger().error("Attempted to render node with unknown node class of "
+            logger.error("Attempted to render node with unknown node class of "
                     + ((value != null) ? value.getClass() : "null"));
         }
 

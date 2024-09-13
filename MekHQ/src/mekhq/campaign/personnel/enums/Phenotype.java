@@ -18,8 +18,8 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,35 +27,43 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public enum Phenotype {
-    //region Enum Declarations
+    // region Enum Declarations
     // External Phenotypes
-    MECHWARRIOR("Phenotype.MECHWARRIOR.text", "Trueborn.text", "Phenotype.MECHWARRIOR.text", "Phenotype.MECHWARRIOR.toolTipText"),
-    ELEMENTAL("Phenotype.ELEMENTAL.text", "Trueborn.text", "Phenotype.ELEMENTAL.text", "Phenotype.ELEMENTAL.toolTipText"),
-    AEROSPACE("Phenotype.AEROSPACE.text", "Trueborn.text", "Phenotype.AEROSPACE.groupingNameText", "Phenotype.AEROSPACE.toolTipText"),
-    VEHICLE("Phenotype.VEHICLE.text", "Trueborn.text", "Phenotype.VEHICLE.groupingNameText", "Phenotype.VEHICLE.toolTipText"),
-    PROTOMECH("Phenotype.PROTOMECH.text", "Trueborn.text", "Phenotype.PROTOMECH.groupingNameText", "Phenotype.PROTOMECH.toolTipText"),
+    MEKWARRIOR("Phenotype.MEKWARRIOR.text", "Trueborn.text", "Phenotype.MEKWARRIOR.text",
+            "Phenotype.MEKWARRIOR.toolTipText"),
+    ELEMENTAL("Phenotype.ELEMENTAL.text", "Trueborn.text", "Phenotype.ELEMENTAL.text",
+            "Phenotype.ELEMENTAL.toolTipText"),
+    AEROSPACE("Phenotype.AEROSPACE.text", "Trueborn.text", "Phenotype.AEROSPACE.groupingNameText",
+            "Phenotype.AEROSPACE.toolTipText"),
+    VEHICLE("Phenotype.VEHICLE.text", "Trueborn.text", "Phenotype.VEHICLE.groupingNameText",
+            "Phenotype.VEHICLE.toolTipText"),
+    PROTOMEK("Phenotype.PROTOMEK.text", "Trueborn.text", "Phenotype.PROTOMEK.groupingNameText",
+            "Phenotype.PROTOMEK.toolTipText"),
     NAVAL("Phenotype.NAVAL.text", "Trueborn.text", "Phenotype.NAVAL.groupingNameText", "Phenotype.NAVAL.toolTipText"),
-    // Internal Phenotypes
-    NONE("Phenotype.NONE.text", "Freeborn.text", "Phenotype.NONE.text",  "Phenotype.NONE.toolTipText" , false),
-    GENERAL("Phenotype.GENERAL.text", "Trueborn.text","Phenotype.GENERAL.text", "Phenotype.GENERAL.toolTipText", false);
-    //endregion Enum Declarations
 
-    //region Variable Declarations
+    // Internal Phenotypes
+    NONE("Phenotype.NONE.text", "Freeborn.text", "Phenotype.NONE.text", "Phenotype.NONE.toolTipText", false),
+    GENERAL("Phenotype.GENERAL.text", "Trueborn.text", "Phenotype.GENERAL.text", "Phenotype.GENERAL.toolTipText",
+            false);
+
+    // endregion Enum Declarations
+
+    // region Variable Declarations
     private final String name;
     private final String shortName;
     private final String groupingName;
     private final String toolTipText;
     private final boolean external;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     Phenotype(final String name, final String shortName, final String groupingName,
-              final String toolTipText) {
+            final String toolTipText) {
         this(name, shortName, groupingName, toolTipText, true);
     }
 
     Phenotype(final String name, final String shortName, final String groupingName,
-              final String toolTipText, final boolean external) {
+            final String toolTipText, final boolean external) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
@@ -64,9 +72,9 @@ public enum Phenotype {
         this.toolTipText = resources.getString(toolTipText);
         this.external = external;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getName() {
         return name;
     }
@@ -86,11 +94,11 @@ public enum Phenotype {
     public boolean isExternal() {
         return external;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    public boolean isMechWarrior() {
-        return this == MECHWARRIOR;
+    // region Boolean Comparison Methods
+    public boolean isMekWarrior() {
+        return this == MEKWARRIOR;
     }
 
     public boolean isElemental() {
@@ -105,8 +113,8 @@ public enum Phenotype {
         return this == VEHICLE;
     }
 
-    public boolean isProtoMech() {
-        return this == PROTOMECH;
+    public boolean isProtoMek() {
+        return this == PROTOMEK;
     }
 
     public boolean isNaval() {
@@ -120,7 +128,7 @@ public enum Phenotype {
     public boolean isGeneral() {
         return this == GENERAL;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     public static List<Phenotype> getExternalPhenotypes() {
         return Arrays.stream(values())
@@ -128,7 +136,7 @@ public enum Phenotype {
                 .collect(Collectors.toList());
     }
 
-    //region File I/O
+    // region File I/O
     public static Phenotype parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -141,7 +149,7 @@ public enum Phenotype {
                 case 0:
                     return NONE;
                 case 1:
-                    return MECHWARRIOR;
+                    return MEKWARRIOR;
                 case 2:
                     return ELEMENTAL;
                 case 3:
@@ -155,10 +163,11 @@ public enum Phenotype {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a Phenotype. Returning NONE.");
+        String message = String.format("Unable to parse %s into a Phenotype. Returning NONE.", text);
+        MMLogger.create(Phenotype.class).error(message);
         return NONE;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

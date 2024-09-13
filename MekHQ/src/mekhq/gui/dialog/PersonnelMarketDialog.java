@@ -18,11 +18,43 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import megamek.client.ui.models.XTableColumnModel;
-import megamek.client.ui.preferences.*;
-import megamek.client.ui.swing.MechViewPanel;
+import megamek.client.ui.preferences.JComboBoxPreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.MekViewPanel;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.*;
+import megamek.common.Aero;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.Mek;
+import megamek.common.Tank;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -38,27 +70,15 @@ import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.view.PersonViewPanel;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.List;
-import java.util.*;
 
 /**
- * @author  Jay Lawson (jaylawson39 at yahoo.com)
- * (code borrowed heavily from MegaMekLab UnitSelectorDialog
+ * @author Jay Lawson (jaylawson39 at yahoo.com)
+ *         (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
 public class PersonnelMarketDialog extends JDialog {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(PersonnelMarketDialog.class);
+
+    // region Variable Declarations
     private PersonnelTableModel personnelModel;
     private Campaign campaign;
     private CampaignGUI hqView;
@@ -88,12 +108,12 @@ public class PersonnelMarketDialog extends JDialog {
             PersonnelTableModelColumn.GENDER,
             PersonnelTableModelColumn.SKILL_LEVEL,
             PersonnelTableModelColumn.PERSONNEL_ROLE,
-            PersonnelTableModelColumn.UNIT_ASSIGNMENT
-    );
+            PersonnelTableModelColumn.UNIT_ASSIGNMENT);
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelMarketDialog",
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.PersonnelMarketDialog",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
     public PersonnelMarketDialog(final JFrame frame, final CampaignGUI view, final Campaign campaign) {
         super(frame, true);
@@ -191,7 +211,7 @@ public class PersonnelMarketDialog extends JDialog {
             comboRecruitRole.setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                              boolean isSelected, boolean cellHasFocus) {
+                        boolean isSelected, boolean cellHasFocus) {
                     return super.getListCellRendererComponent(list,
                             (value instanceof PersonnelRole) ? ((PersonnelRole) value).getName(isClan) : value,
                             index, isSelected, cellHasFocus);
@@ -263,7 +283,7 @@ public class PersonnelMarketDialog extends JDialog {
         panelMain.add(panelFilterBtns, BorderLayout.PAGE_START);
         panelMain.add(scrollTablePersonnel, BorderLayout.CENTER);
 
-        splitMain = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,panelMain, scrollPersonnelView);
+        splitMain = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelMain, scrollPersonnelView);
         splitMain.setOneTouchExpandable(true);
         splitMain.setResizeWeight(0.0);
         getContentPane().add(splitMain, BorderLayout.CENTER);
@@ -328,7 +348,7 @@ public class PersonnelMarketDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -339,11 +359,13 @@ public class PersonnelMarketDialog extends JDialog {
     private void hirePerson(ActionEvent evt) {
         if (null != selectedPerson) {
             if (campaign.getFunds().isLessThan((campaign.getCampaignOptions().isPayForRecruitment()
-                            ? selectedPerson.getSalary(campaign).multipliedBy(2)
-                            : Money.zero()).plus(unitCost))) {
-                 campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>Insufficient funds. Transaction cancelled</b>.</font>");
+                    ? selectedPerson.getSalary(campaign).multipliedBy(2)
+                    : Money.zero()).plus(unitCost))) {
+                campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                        + "'><b>Insufficient funds. Transaction cancelled</b>.</font>");
             } else {
-                /* Adding person to campaign changes pid; grab the old one to
+                /*
+                 * Adding person to campaign changes pid; grab the old one to
                  * use as a key to any attached entity
                  */
                 UUID pid = selectedPerson.getId();
@@ -422,7 +444,7 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {
-        LogManager.getLogger().info("btnClose");
+        logger.info("btnClose");
         closeOrCancelActionPerformed();
     }
 
@@ -445,7 +467,8 @@ public class PersonnelMarketDialog extends JDialog {
         sorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
-                return nGroup.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()), hqView.getCampaign().getLocalDate());
+                return nGroup.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()),
+                        hqView.getCampaign().getLocalDate());
             }
         });
     }
@@ -459,12 +482,12 @@ public class PersonnelMarketDialog extends JDialog {
             return;
         }
         selectedPerson = personnelModel.getPerson(tablePersonnel.convertRowIndexToModel(view));
-        Entity en =  personnelMarket.getAttachedEntity(selectedPerson);
+        Entity en = personnelMarket.getAttachedEntity(selectedPerson);
         if (null == en) {
             unitCost = Money.zero();
         } else {
             if (!campaign.getCampaignOptions().isUseShareSystem()
-                    && ((en instanceof Mech) || (en instanceof Tank) || (en instanceof Aero))) {
+                    && ((en instanceof Mek) || (en instanceof Tank) || (en instanceof Aero))) {
                 unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
             } else {
                 unitCost = Money.zero();
@@ -473,53 +496,53 @@ public class PersonnelMarketDialog extends JDialog {
         refreshPersonView();
     }
 
-     void refreshPersonView() {
-         lblUnitCost.setText("");
+    void refreshPersonView() {
+        lblUnitCost.setText("");
 
-         int row = tablePersonnel.getSelectedRow();
+        int row = tablePersonnel.getSelectedRow();
 
-         if (row < 0) {
-             scrollPersonnelView.setViewportView(null);
-             return;
-         }
+        if (row < 0) {
+            scrollPersonnelView.setViewportView(null);
+            return;
+        }
 
-         Entity en = personnelMarket.getAttachedEntity(selectedPerson);
-         String unitText = "";
-         if (unitCost.isPositive()) {
-             unitText = "Unit cost: " + unitCost.toAmountAndSymbolString();
-         }
+        Entity en = personnelMarket.getAttachedEntity(selectedPerson);
+        String unitText = "";
+        if (unitCost.isPositive()) {
+            unitText = "Unit cost: " + unitCost.toAmountAndSymbolString();
+        }
 
-         if (null != en) {
-             if (StringUtility.isNullOrBlank(unitText)) {
-                 unitText = "Unit: ";
-             } else {
-                 unitText += " - ";
-             }
+        if (null != en) {
+            if (StringUtility.isNullOrBlank(unitText)) {
+                unitText = "Unit: ";
+            } else {
+                unitText += " - ";
+            }
 
-             unitText += en.getDisplayName();
-         }
+            unitText += en.getDisplayName();
+        }
 
-         lblUnitCost.setText(unitText);
+        lblUnitCost.setText(unitText);
 
-         if (null != en) {
-             JTabbedPane tabUnit = new JTabbedPane();
-             String name = "Commander";
-             if (Compute.getFullCrewSize(en) == 1) {
-                 name = "Pilot";
-             }
-             tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, hqView));
-             MechViewPanel mvp = new MechViewPanel(200, 400, true);
-             tabUnit.setMinimumSize(new Dimension(200, 400));
-             tabUnit.setPreferredSize(new Dimension(200, 400));
-             mvp.setMech(en, true);
-             tabUnit.add("Unit", mvp);
-             scrollPersonnelView.setViewportView(tabUnit);
-         } else {
-             scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView));
-         }
-         // This odd code is to make sure that the scrollbar stays at the top
-         // I can't just call it here, because it ends up getting reset somewhere later
-         SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
+        if (null != en) {
+            JTabbedPane tabUnit = new JTabbedPane();
+            String name = "Commander";
+            if (Compute.getFullCrewSize(en) == 1) {
+                name = "Pilot";
+            }
+            tabUnit.add(name, new PersonViewPanel(selectedPerson, campaign, hqView));
+            MekViewPanel mvp = new MekViewPanel(200, 400, true);
+            tabUnit.setMinimumSize(new Dimension(200, 400));
+            tabUnit.setPreferredSize(new Dimension(200, 400));
+            mvp.setMek(en, true);
+            tabUnit.add("Unit", mvp);
+            scrollPersonnelView.setViewportView(tabUnit);
+        } else {
+            scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, hqView));
+        }
+        // This odd code is to make sure that the scrollbar stays at the top
+        // I can't just call it here, because it ends up getting reset somewhere later
+        SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
     @Override

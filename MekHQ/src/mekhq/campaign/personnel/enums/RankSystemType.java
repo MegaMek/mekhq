@@ -18,40 +18,40 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import mekhq.MHQConstants;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+
 public enum RankSystemType {
-    //region Enum Declarations
+    // region Enum Declarations
     DEFAULT("RankSystemType.DEFAULT.text", "RankSystemType.DEFAULT.toolTipText"),
     USER_DATA("RankSystemType.USER_DATA.text", "RankSystemType.USER_DATA.toolTipText"),
     CAMPAIGN("RankSystemType.CAMPAIGN.text", "RankSystemType.CAMPAIGN.toolTipText");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     RankSystemType(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isDefault() {
         return this == DEFAULT;
     }
@@ -63,7 +63,7 @@ public enum RankSystemType {
     public boolean isCampaign() {
         return this == CAMPAIGN;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     public String getFilePath() {
         switch (this) {
@@ -73,7 +73,8 @@ public enum RankSystemType {
                 return MHQConstants.USER_RANKS_FILE_PATH;
             case CAMPAIGN:
             default:
-                LogManager.getLogger().error("Attempted to load an illegal file path. Returning a blank String, which will cause the load to fail.");
+                MMLogger.create(RankSystemType.class).error(
+                        "Attempted to load an illegal file path. Returning a blank String, which will cause the load to fail.");
                 return "";
         }
     }

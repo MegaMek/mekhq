@@ -18,6 +18,8 @@
  */
 package mekhq.campaign.personnel.generator;
 
+import java.util.Objects;
+
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
@@ -25,8 +27,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-
-import java.util.Objects;
 
 /**
  * Represents a class which can generate new {@link Skill} objects
@@ -41,6 +41,7 @@ public abstract class AbstractSkillGenerator {
 
     /**
      * Gets the {@link RandomSkillPreferences}.
+     *
      * @return The {@link RandomSkillPreferences} to use.
      */
     public RandomSkillPreferences getSkillPreferences() {
@@ -49,6 +50,7 @@ public abstract class AbstractSkillGenerator {
 
     /**
      * Sets the {@link RandomSkillPreferences}.
+     *
      * @param skillPreferences A {@link RandomSkillPreferences} to use.
      */
     public void setSkillPreferences(RandomSkillPreferences skillPreferences) {
@@ -57,29 +59,35 @@ public abstract class AbstractSkillGenerator {
 
     /**
      * Generates skills for a {@link Person} given their experience level.
+     *
      * @param campaign The {@link Campaign} the person is a part of
-     * @param person The {@link Person} to add skills.
-     * @param expLvl The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
+     * @param person   The {@link Person} to add skills.
+     * @param expLvl   The experience level of the person (e.g.
+     *                 {@link SkillType#EXP_GREEN}).
      */
     public abstract void generateSkills(final Campaign campaign, final Person person, final int expLvl);
 
     /**
-     * Generates the default skills for a {@link Person} based on their primary role.
-     * @param person The {@link Person} to add default skills.
-     * @param primaryRole The primary role of the person
-     * @param expLvl The experience level of the person (e.g. {@link SkillType#EXP_GREEN}).
-     * @param bonus The bonus to use for the default skills.
+     * Generates the default skills for a {@link Person} based on their primary
+     * role.
+     *
+     * @param person       The {@link Person} to add default skills.
+     * @param primaryRole  The primary role of the person
+     * @param expLvl       The experience level of the person (e.g.
+     *                     {@link SkillType#EXP_GREEN}).
+     * @param bonus        The bonus to use for the default skills.
      * @param rollModifier A roll modifier to apply to any randomizations.
      */
-    protected void generateDefaultSkills(Person person, PersonnelRole primaryRole, int expLvl, int bonus, int rollModifier) {
+    protected void generateDefaultSkills(Person person, PersonnelRole primaryRole, int expLvl, int bonus,
+            int rollModifier) {
         switch (primaryRole) {
-            case MECHWARRIOR:
-                addSkill(person, SkillType.S_PILOT_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+            case MEKWARRIOR:
+                addSkill(person, SkillType.S_PILOT_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_GUN_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case LAM_PILOT:
-                addSkill(person, SkillType.S_PILOT_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_GUN_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_PILOT_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_GUN_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 addSkill(person, SkillType.S_PILOT_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 addSkill(person, SkillType.S_GUN_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
@@ -109,17 +117,17 @@ public abstract class AbstractSkillGenerator {
                 addSkill(person, SkillType.S_PILOT_JET, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 addSkill(person, SkillType.S_GUN_JET, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
-            case PROTOMECH_PILOT:
+            case PROTOMEK_PILOT:
                 addSkill(person, SkillType.S_GUN_PROTO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case BATTLE_ARMOUR:
                 addSkill(person, SkillType.S_GUN_BA, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
-                addSkill(person, SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                addSkill(person, SkillType.S_ANTI_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 addSkill(person, SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case SOLDIER:
                 if (Utilities.rollProbability(rskillPrefs.getAntiMekProb())) {
-                    addSkill(person, SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+                    addSkill(person, SkillType.S_ANTI_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 }
                 addSkill(person, SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
@@ -135,13 +143,13 @@ public abstract class AbstractSkillGenerator {
             case VESSEL_NAVIGATOR:
                 addSkill(person, SkillType.S_NAV, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
-            case MECH_TECH:
-                addSkill(person, SkillType.S_TECH_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
+            case MEK_TECH:
+                addSkill(person, SkillType.S_TECH_MEK, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case MECHANIC:
                 addSkill(person, SkillType.S_TECH_MECHANIC, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
-            case AERO_TECH:
+            case AERO_TEK:
                 addSkill(person, SkillType.S_TECH_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus, rollModifier);
                 break;
             case BA_TECH:
@@ -182,11 +190,13 @@ public abstract class AbstractSkillGenerator {
         person.addSkill(skillName, new Skill(skillName, level, bonus));
     }
 
-    protected static void addSkill(Person person, String skillName, int experienceLevel, boolean randomizeLevel, int bonus) {
+    protected static void addSkill(Person person, String skillName, int experienceLevel, boolean randomizeLevel,
+            int bonus) {
         addSkill(person, skillName, experienceLevel, randomizeLevel, bonus, 0);
     }
 
-    protected static void addSkill(Person person, String skillName, int experienceLevel, boolean randomizeLevel, int bonus, int rollMod) {
+    protected static void addSkill(Person person, String skillName, int experienceLevel, boolean randomizeLevel,
+            int bonus, int rollMod) {
         if (randomizeLevel) {
             person.addSkill(skillName, Skill.randomizeLevel(skillName, experienceLevel, bonus, rollMod));
         } else {
@@ -196,6 +206,7 @@ public abstract class AbstractSkillGenerator {
 
     /**
      * Gets the clan phenotype bonus for a {@link Person}, if applicable.
+     *
      * @param person A {@link Person} to calculate a phenotype bonus.
      * @return The bonus to a {@link Skill} due to clan phenotypes matching
      *         the primary role.
@@ -206,9 +217,9 @@ public abstract class AbstractSkillGenerator {
         }
 
         switch (person.getPrimaryRole()) {
-            case MECHWARRIOR:
+            case MEKWARRIOR:
             case LAM_PILOT:
-                if (person.getPhenotype().isMechWarrior()) {
+                if (person.getPhenotype().isMekWarrior()) {
                     return 1;
                 }
                 break;
@@ -227,8 +238,8 @@ public abstract class AbstractSkillGenerator {
                     return 1;
                 }
                 break;
-            case PROTOMECH_PILOT:
-                if (person.getPhenotype().isProtoMech()) {
+            case PROTOMEK_PILOT:
+                if (person.getPhenotype().isProtoMek()) {
                     return 1;
                 }
             case BATTLE_ARMOUR:

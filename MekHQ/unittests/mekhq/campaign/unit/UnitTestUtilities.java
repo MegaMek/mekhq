@@ -59,7 +59,7 @@ public final class UnitTestUtilities {
     public static Entity parseBase64BlkFile(String base64) {
         try {
             InputStream in = new ByteArrayInputStream(TestUtilities.Decode(base64));
-            IMechLoader loader;
+            IMekLoader loader;
 
             BuildingBlock bb = new BuildingBlock(in);
             if (bb.exists("UnitType")) {
@@ -71,10 +71,10 @@ public final class UnitTestUtilities {
                     loader = new BLKInfantryFile(bb);
                 } else if (sType.equals("BattleArmor")) {
                     loader = new BLKBattleArmorFile(bb);
-                } else if (sType.equals("ProtoMech")) {
-                    loader = new BLKProtoFile(bb);
-                } else if (sType.equals("Mech")) {
-                    loader = new BLKMechFile(bb);
+                } else if (sType.equals("ProtoMek")) {
+                    loader = new BLKProtoMekFile(bb);
+                } else if (sType.equals("Mek")) {
+                    loader = new BLKMekFile(bb);
                 } else if (sType.equals("VTOL")) {
                     loader = new BLKVTOLFile(bb);
                 } else if (sType.equals("GunEmplacement")) {
@@ -107,7 +107,7 @@ public final class UnitTestUtilities {
                     throw new EntityLoadingException("Unknown UnitType: " + sType);
                 }
             } else {
-                loader = new BLKMechFile(bb);
+                loader = new BLKMekFile(bb);
             }
 
             return loader.getEntity();
@@ -119,7 +119,7 @@ public final class UnitTestUtilities {
     }
 
     public static Entity getLocustLCT1V() {
-        // megamek/megamek/data/mechfiles/mechs/3039u/Locust LCT-1V.mtf
+        // megamek/megamek/data/mekfiles/meks/3039u/Locust LCT-1V.mtf
         return ParseBase64MtfFile(
              "VmVyc2lvbjoxLjAKTG9jdXN0CkxDVC0xVgoKQ29uZmlnOkJpcGVkClRlY2hCYXNlO"
             + "klubmVyIFNwaGVyZQpFcmE6MjQ5OQpTb3VyY2U6VFJPIDMwMzkgLSBBZ2Ugb2YgV"
@@ -155,7 +155,7 @@ public final class UnitTestUtilities {
     }
 
     public static Entity getLocustLCT1E() {
-        // megamek/megamek/data/mechfiles/mechs/3039u/Locust LCT-1E.mtf
+        // megamek/megamek/data/mekfiles/meks/3039u/Locust LCT-1E.mtf
         return ParseBase64MtfFile(
             "VmVyc2lvbjoxLjANCkxvY3VzdA0KTENULTFFDQoNCkNvbmZpZzpCaXBlZA0KVGVjaEJhc2U6SW5u"
             + "ZXIgU3BoZXJlDQpFcmE6MjgxMQ0KU291cmNlOlRSTyAzMDM5IC0gU3VjY2Vzc2lvbiBXYXJzDQpS"
@@ -225,7 +225,7 @@ public final class UnitTestUtilities {
     }
 
     public static Entity getWaspLAMMk1() {
-        // megamek/megamek/data/mechfiles/mechs/LAMS/Wasp LAM Mk I WSP-100.mtf
+        // megamek/megamek/data/mekfiles/meks/LAMS/Wasp LAM Mk I WSP-100.mtf
         return ParseBase64MtfFile(
             "VmVyc2lvbjoxLjAKV2FzcCBMQU0gTWsgSQpXU1AtMTAwCgpDb25maWc6TEFNClRlY2"
             + "hCYXNlOklubmVyIFNwaGVyZQpFcmE6MjY5MApTb3VyY2U6VFJPMzA4NQpSdWxlcy"
@@ -262,7 +262,7 @@ public final class UnitTestUtilities {
     }
 
     public static Entity getArionStandard() {
-        // megamek/megamek/data/mechfiles/mechs/QuadVees/Arion (Standard).mtf
+        // megamek/megamek/data/mekfiles/meks/QuadVees/Arion (Standard).mtf
         return ParseBase64MtfFile(
             "VmVyc2lvbjoxLjAKQXJpb24KKFN0YW5kYXJkKQoKQ29uZmlnOlF1YWRWZWUKVGVjaE"
             + "Jhc2U6Q2xhbgpFcmE6MzEzNgpTb3VyY2U6VFJPIDMxNDUgVGhlIENsYW5zIC0gTG"
@@ -298,7 +298,7 @@ public final class UnitTestUtilities {
     }
 
     public static Entity getJavelinJVN10N() {
-        // megamek/megamek/data/mechfiles/mechs/3039u/Javelin JVN-10N.mtf
+        // megamek/megamek/data/mekfiles/meks/3039u/Javelin JVN-10N.mtf
         return ParseBase64MtfFile(
             "VmVyc2lvbjoxLjANCkphdmVsaW4NCkpWTi0xME4NCg0KQ29uZmlnOkJpcGVkDQpUZWNoQmFzZTpJ"
             + "bm5lciBTcGhlcmUNCkVyYToyNzUxDQpTb3VyY2U6VFJPIDMwMzkgLSBTdGFyIExlYWd1ZQ0KUnVs"
@@ -367,7 +367,7 @@ public final class UnitTestUtilities {
     }
 
     public static Entity getJavelinJVN10A() {
-        // megamek/megamek/data/mechfiles/mechs/RS Succession Wars/Javelin JVN-10A.mtf
+        // megamek/megamek/data/mekfiles/meks/RS Succession Wars/Javelin JVN-10A.mtf
         return ParseBase64MtfFile(
             "VmVyc2lvbjoxLjANCkphdmVsaW4NCkpWTi0xMEENCg0KQ29uZmlnOkJpcGVkDQpUZWNoQmFzZTpJ"
             + "bm5lciBTcGhlcmUNCkVyYToyNzUyDQpTb3VyY2U6UlM6U3VjY2Vzc2lvbiBXYXJzIC0gU3VjY2Vz"

@@ -18,8 +18,29 @@
  */
 package mekhq.gui.model;
 
+import java.awt.Component;
+import java.awt.Image;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.*;
+import megamek.common.EntityWeightClass;
+import megamek.common.Jumpship;
+import megamek.common.SmallCraft;
+import megamek.common.Tank;
+import megamek.common.TargetRoll;
+import megamek.common.UnitType;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -29,17 +50,10 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.*;
 
 public class RetirementTableModel extends AbstractTableModel {
+    private static final MMLogger logger = MMLogger.create(RetirementTableModel.class);
+
     public final static int COL_PERSON = 0;
     public final static int COL_ASSIGN = 1;
     public final static int COL_FORCE = 2;
@@ -53,9 +67,9 @@ public class RetirementTableModel extends AbstractTableModel {
     public final static int N_COL = 10;
 
     private final static String[] colNames = {
-        "Person", "Assignment", "Force", "Target Number",
-        "Shares", "Retention Bonus", "Pay Bonus", "Custom Modifier",
-        "Payout", "Unit"
+            "Person", "Assignment", "Force", "Target Number",
+            "Shares", "Retention Bonus", "Pay Bonus", "Custom Modifier",
+            "Payout", "Unit"
     };
 
     private final Campaign campaign;
@@ -93,7 +107,8 @@ public class RetirementTableModel extends AbstractTableModel {
             data.add(id);
             payBonus.put(id,
                     ((campaign.getCampaignOptions().isPayBonusDefault())
-                    && (targets.get(id).getValue() >= campaign.getCampaignOptions().getPayBonusDefaultThreshold())));
+                            && (targets.get(id).getValue() >= campaign.getCampaignOptions()
+                                    .getPayBonusDefaultThreshold())));
             miscMods.put(id, 0);
         }
         fireTableDataChanged();
@@ -145,7 +160,7 @@ public class RetirementTableModel extends AbstractTableModel {
         try {
             retVal = getValueAt(0, col).getClass();
         } catch (NullPointerException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
         return retVal;
     }
@@ -176,7 +191,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         if (u.isNavigator(p)) {
                             name = name + " [Navigator]";
                         } else if (u.isDriver(p)) {
-                            name =  name + " [Pilot]";
+                            name = name + " [Pilot]";
                         } else if (u.isGunner(p)) {
                             name = name + " [Gunner]";
                         } else {
@@ -185,7 +200,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     }
                     return name;
                 }
-                //check for tech
+                // check for tech
                 if (!p.getTechUnits().isEmpty()) {
                     if (p.getTechUnits().size() == 1) {
                         u = p.getTechUnits().get(0);
@@ -237,7 +252,8 @@ public class RetirementTableModel extends AbstractTableModel {
                     return altPayout.get(p.getId()).toAmountAndSymbolString();
                 }
                 Money payout = campaign.getRetirementDefectionTracker().getPayout(p.getId()).getPayoutAmount();
-                /* If no unit is required as part of the payout, the unit is part or all of the
+                /*
+                 * If no unit is required as part of the payout, the unit is part or all of the
                  * final payout. If using the share system and tracking the original unit,
                  * the payout is also reduced by the value of the unit.
                  */
@@ -246,25 +262,28 @@ public class RetirementTableModel extends AbstractTableModel {
                         (campaign.getCampaignOptions().isUseShareSystem() &&
                                 campaign.getCampaignOptions().isTrackOriginalUnit()
                                 && Objects.equals(p.getOriginalUnitId(), unitAssignments.get(p.getId())) &&
-                                        null != campaign.getUnit(unitAssignments.get(p.getId())))) {
+                                null != campaign.getUnit(unitAssignments.get(p.getId())))) {
                     payout = payout.minus(campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost());
                 }
 
-                // if the person is under contract, we don't check whether they need a unit or are owed a shortfall
-                if (ChronoUnit.MONTHS.between(p.getRecruitment(), campaign.getLocalDate())
-                        >= campaign.getCampaignOptions().getServiceContractDuration()) {
+                // if the person is under contract, we don't check whether they need a unit or
+                // are owed a shortfall
+                if (ChronoUnit.MONTHS.between(p.getRecruitment(), campaign.getLocalDate()) >= campaign
+                        .getCampaignOptions().getServiceContractDuration()) {
                     // if the person requires a unit, check to ensure there isn't a shortfall
                     if (null != unitAssignments.get(p.getId())) {
-                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
-                                RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId())))));
+                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(
+                                campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
+                                RetirementDefectionDialog
+                                        .weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId())))));
                     }
 
                     // if the person requires a unit, but doesn't have one...
-                    if ((unitAssignments.get(p.getId()) == null) && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
+                    if ((unitAssignments.get(p.getId()) == null)
+                            && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
                         payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(
                                 campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
-                                0)
-                        );
+                                0));
                     }
                 }
 
@@ -279,7 +298,8 @@ public class RetirementTableModel extends AbstractTableModel {
                 }
                 if (null != unitAssignments.get(p.getId())) {
                     return campaign.getUnit(unitAssignments.get(p.getId())).getName();
-                } else if (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() < EntityWeightClass.WEIGHT_LIGHT) {
+                } else if (campaign.getRetirementDefectionTracker().getPayout(p.getId())
+                        .getWeightClass() < EntityWeightClass.WEIGHT_LIGHT) {
                     return "";
                 } else {
                     return "Class " + campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass();
@@ -350,7 +370,7 @@ public class RetirementTableModel extends AbstractTableModel {
     public class TextRenderer extends MekHqTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+                boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
                     hasFocus, row, column);
             int actualCol = table.convertColumnIndexToModel(column);
@@ -367,7 +387,7 @@ public class RetirementTableModel extends AbstractTableModel {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+                boolean hasFocus, int row, int column) {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
             Person p = getPerson(actualRow);
@@ -403,7 +423,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 if (null != force) {
                     StringBuilder desc = new StringBuilder("<html><b>" + force.getName() + "</b>");
                     Force parent = force.getParentForce();
-                    //cut off after three lines and don't include the top level
+                    // cut off after three lines and don't include the top level
                     int lines = 1;
                     while ((parent != null) && (null != parent.getParentForce()) && (lines < 4)) {
                         desc.append("<br>").append(parent.getName());

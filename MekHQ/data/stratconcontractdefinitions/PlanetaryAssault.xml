@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <contractTypeName>Planetary Assault</contractTypeName>
-    <alliedFacilityCount>0</alliedFacilityCount>
-    <briefing>Destroy or capture designated facilities.</briefing>
-    <hostileFacilityCount>0</hostileFacilityCount>
+	<contractTypeName>Planetary Assault</contractTypeName>
+	<alliedFacilityCount>0</alliedFacilityCount>
+	<briefing>Destroy or capture designated facilities.</briefing>
+	<hostileFacilityCount>0</hostileFacilityCount>
 	<scenarioOdds>
 		<scenarioOdds>20</scenarioOdds>
 		<scenarioOdds>40</scenarioOdds>
@@ -16,10 +16,10 @@
 		<deploymentTimes>2</deploymentTimes>
 		<deploymentTimes>3</deploymentTimes>
 	</deploymentTimes>
-    <objectiveParameters>
-        <objectiveParameter>
-		<objectiveType>FacilityDestruction</objectiveType>
-		<objectiveCount>-1</objectiveCount>
-        </objectiveParameter>
-    </objectiveParameters>
+	<objectiveParameters>
+		<objectiveParameter>
+			<objectiveType>FacilityDestruction</objectiveType>
+			<objectiveCount>-1</objectiveCount>
+		</objectiveParameter>
+	</objectiveParameters>
 </ScenarioTemplate>

@@ -20,22 +20,29 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.CriticalSlot;
+import megamek.common.IArmorState;
+import megamek.common.Mounted;
+import megamek.common.Tank;
+import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Turret extends TankLocation {
+    private static final MMLogger logger = MMLogger.create(Turret.class);
+
     protected double weight;
 
     public Turret() {
@@ -69,7 +76,7 @@ public class Turret extends TankLocation {
         super.setUnit(u);
         if (null != unit) {
             weight = 0;
-            for (Mounted m : unit.getEntity().getWeaponList()) {
+            for (Mounted<?> m : unit.getEntity().getWeaponList()) {
                 WeaponType wt = (WeaponType) m.getType();
                 if (m.getLocation() == this.loc) {
                     weight += wt.getTonnage(unit.getEntity()) / 10.0;
@@ -111,7 +118,7 @@ public class Turret extends TankLocation {
                     damage = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -170,11 +177,11 @@ public class Turret extends TankLocation {
             return null;
         }
         if (isSalvaging()) {
-            //check for armor
+            // check for armor
             if (unit.getEntity().getArmorForReal(loc, false) > 0) {
                 return "must salvage armor in this location first";
             }
-            //you can only salvage a location that has nothing left on it
+            // you can only salvage a location that has nothing left on it
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
                 // ignore empty & non-hittable slots
@@ -182,7 +189,8 @@ public class Turret extends TankLocation {
                     continue;
                 }
                 if (slot.isRepairable()) {
-                    return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+                    return "Repairable parts in " + unit.getEntity().getLocationName(loc)
+                            + " must be salvaged or scrapped first.";
                 }
             }
         }
@@ -191,11 +199,11 @@ public class Turret extends TankLocation {
 
     @Override
     public String checkScrappable() {
-        //check for armor
+        // check for armor
         if (unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED) {
             return "You must scrap armor in the turret first";
         }
-        //you can only scrap a location that has nothing left on it
+        // you can only scrap a location that has nothing left on it
         for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
             CriticalSlot slot = unit.getEntity().getCritical(loc, i);
             // ignore empty & non-hittable slots

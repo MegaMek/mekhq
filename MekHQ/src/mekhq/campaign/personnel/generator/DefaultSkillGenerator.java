@@ -79,7 +79,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         // roll artillery skill
         if (campaign.getCampaignOptions().isUseArtillery()
-                && (primaryRole.isMechWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier())
+                && (primaryRole.isMekWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier())
                 && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
             generateArtillerySkill(person, bonus);
         }

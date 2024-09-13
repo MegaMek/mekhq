@@ -11,7 +11,7 @@
     <selfPreservationIndex>10</selfPreservationIndex>
     <herdMentalityIndex>8</herdMentalityIndex>
     <braveryIndex>2</braveryIndex>
-    <strategicTargets/>
+    <strategicTargets />
   </behavior>
   <behavior>
     <name>BERSERK</name>
@@ -24,7 +24,7 @@
     <selfPreservationIndex>2</selfPreservationIndex>
     <herdMentalityIndex>5</herdMentalityIndex>
     <braveryIndex>9</braveryIndex>
-    <strategicTargets/>
+    <strategicTargets />
   </behavior>
   <behavior>
     <name>ESCAPE</name>
@@ -37,7 +37,7 @@
     <selfPreservationIndex>10</selfPreservationIndex>
     <herdMentalityIndex>5</herdMentalityIndex>
     <braveryIndex>2</braveryIndex>
-    <strategicTargets/>
+    <strategicTargets />
   </behavior>
   <behavior>
     <name>DEFAULT</name>
@@ -50,6 +50,6 @@
     <selfPreservationIndex>5</selfPreservationIndex>
     <herdMentalityIndex>5</herdMentalityIndex>
     <braveryIndex>5</braveryIndex>
-    <strategicTargets/>
+    <strategicTargets />
   </behavior>
 </princessBehaviors>

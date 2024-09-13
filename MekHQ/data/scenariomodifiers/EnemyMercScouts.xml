@@ -32,9 +32,9 @@
 		<forceAlignment>2</forceAlignment>
 		<forceName>Enemy Merc Scouts</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>MercHeat.mul</fixedMul>	
+		<fixedMul>MercHeat.mul</fixedMul>
 		<generationOrder>1</generationOrder>
-		<maxWeightClass>4</maxWeightClass>			
+		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>

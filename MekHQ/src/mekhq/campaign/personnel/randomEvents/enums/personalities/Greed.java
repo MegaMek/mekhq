@@ -18,12 +18,12 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
 
+import mekhq.MekHQ;
+
 public enum Greed {
-    //region Enum Declarations
+    // region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
     ASTUTE("Greed.ASTUTE.text", "Greed.ASTUTE.description", true, false),
     ADEPT("Greed.ADEPT.text", "Greed.ADEPT.description", true, false),
@@ -55,16 +55,16 @@ public enum Greed {
     THIEF("Greed.THIEF.text", "Greed.THIEF.description", false, true),
     UNPRINCIPLED("Greed.UNPRINCIPLED.text", "Greed.UNPRINCIPLED.description", false, false),
     VORACIOUS("Greed.VORACIOUS.text", "Greed.VORACIOUS.description", true, false);
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String description;
     private final boolean isPositive;
     private final boolean isMajor;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     Greed(final String name, final String description, boolean isPositive, boolean isMajor) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
                 MekHQ.getMHQOptions().getLocale());
@@ -73,198 +73,171 @@ public enum Greed {
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
-    @SuppressWarnings(value = "unused")
+    // region Getters
+
     public String getDescription() {
         return description;
     }
 
     /**
-     * @return {@code true} if the personality trait is considered positive, {@code false} otherwise.
+     * @return {@code true} if the personality trait is considered positive,
+     *         {@code false} otherwise.
      */
-    @SuppressWarnings(value = "unused")
+
     public boolean isTraitPositive() {
         return isPositive;
     }
 
     /**
-     * @return {@code true} if the personality trait is considered a major trait, {@code false} otherwise.
+     * @return {@code true} if the personality trait is considered a major trait,
+     *         {@code false} otherwise.
      */
-    @SuppressWarnings(value = "unused")
+
     public boolean isTraitMajor() {
         return isMajor;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    @SuppressWarnings(value = "unused")
+    // region Boolean Comparison Methods
+
     public boolean isNone() {
         return this == NONE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAstute() {
         return this == ASTUTE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAdept() {
         return this == ADEPT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAvaricious() {
         return this == AVARICIOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCorrupt() {
         return this == CORRUPT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDynamic() {
         return this == DYNAMIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isEager() {
         return this == EAGER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isEnterprising() {
         return this == ENTERPRISING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isExploitative() {
         return this == EXPLOITATIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFraudulent() {
         return this == FRAUDULENT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isGenerous() {
         return this == GENEROUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isGreedy() {
         return this == GREEDY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHoarding() {
         return this == HOARDING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isInsatiable() {
         return this == INSATIABLE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isInsightful() {
         return this == INSIGHTFUL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isIntuitive() {
         return this == INTUITIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isJudicious() {
         return this == JUDICIOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLustful() {
         return this == LUSTFUL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isMercenary() {
         return this == MERCENARY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isMeticulous() {
         return this == METICULOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isNefarious() {
         return this == NEFARIOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isOverreaching() {
         return this == OVERREACHING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isProfitable() {
         return this == PROFITABLE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSavvy() {
         return this == SAVVY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSelfServing() {
         return this == SELF_SERVING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isShameless() {
         return this == SHAMELESS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isShrewd() {
         return this == SHREWD;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTactical() {
         return this == TACTICAL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isThief() {
         return this == THIEF;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUnprincipled() {
         return this == UNPRINCIPLED;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isVoracious() {
         return this == VORACIOUS;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
      * Parses a given string and returns the corresponding Greed enum.
      * Accepts either the ENUM ordinal value, or its name
      *
      * @param greed the string to be parsed
      * @return the Greed enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid Greed
+     * @throws IllegalStateException if the given string does not match any valid
+     *                               Greed
      */
-    @SuppressWarnings(value = "unused")
+
     public static Greed parseFromString(final String greed) {
         return switch (greed) {
             case "0", "None" -> NONE;
@@ -301,8 +274,9 @@ public enum Greed {
             case "29", "Nefarious" -> NEFARIOUS;
             case "30", "Thief" -> THIEF;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Greed.java/parseFromString: "
-                            + greed);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Greed.java/parseFromString: "
+                                + greed);
         };
     }
 
@@ -311,9 +285,10 @@ public enum Greed {
      *
      * @param greed the integer value representing the Greed level
      * @return the corresponding Greed enum value
-     * @throws IllegalStateException if the integer value does not correspond to any valid Greed enum value
+     * @throws IllegalStateException if the integer value does not correspond to any
+     *                               valid Greed enum value
      */
-    @SuppressWarnings(value = "unused")
+
     public static Greed parseFromInt(final int greed) {
         return switch (greed) {
             case 0 -> NONE;
@@ -350,8 +325,9 @@ public enum Greed {
             case 29 -> NEFARIOUS;
             case 30 -> THIEF;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Greed.java/parseFromInt: "
-                            + greed);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Greed.java/parseFromInt: "
+                                + greed);
         };
     }
 

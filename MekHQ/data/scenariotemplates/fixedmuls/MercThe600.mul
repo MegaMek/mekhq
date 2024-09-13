@@ -1,69 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Beast Infantry (Horse)" model="(Auto-Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="c15e6526-e540-4fca-a506-64e918fb7d75">
-			<pilot size="1" name="Earl Cardigan" nick="" gender="MALE" gunnery="3" piloting="4" externalId="ac66a1fb-c76d-4db2-bb26-88e34e28d982" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="1"/>
-		</entity>
+	<entity chassis="Beast Infantry (Horse)" model="(Auto-Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="c15e6526-e540-4fca-a506-64e918fb7d75">
+		<pilot size="1" name="Earl Cardigan" nick="" gender="MALE" gunnery="3" piloting="4"
+			externalId="ac66a1fb-c76d-4db2-bb26-88e34e28d982" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="1" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Horse)" model="(Auto-Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="6e2ee935-4b21-42f2-b37f-7dbc09fdc013">
-			<pilot size="1" name="Louis Nolan" nick="" gender="MALE" gunnery="4" piloting="4" externalId="1313ac7d-6959-4570-91e3-bdfd02913034" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="2"/>
-		</entity>
+	<entity chassis="Beast Infantry (Horse)" model="(Auto-Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="6e2ee935-4b21-42f2-b37f-7dbc09fdc013">
+		<pilot size="1" name="Louis Nolan" nick="" gender="MALE" gunnery="4" piloting="4"
+			externalId="1313ac7d-6959-4570-91e3-bdfd02913034" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="2" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Horse)" model="(Auto-Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="86898925-d7eb-4c01-9557-91ca00c46da7">
-			<pilot size="1" name="Pablo Walseth" nick="" gender="MALE" gunnery="3" piloting="3" externalId="15aeb1e2-774d-462c-824c-ee0f83c3d096" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="3"/>
-		</entity>
+	<entity chassis="Beast Infantry (Horse)" model="(Auto-Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="86898925-d7eb-4c01-9557-91ca00c46da7">
+		<pilot size="1" name="Pablo Walseth" nick="" gender="MALE" gunnery="3" piloting="3"
+			externalId="15aeb1e2-774d-462c-824c-ee0f83c3d096" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="3" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Horse)" model="(Auto-Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="2af74c35-e09f-4917-bbde-e0ea23733924">
-			<pilot size="1" name="Stefan Eckholdt" nick="" gender="MALE" gunnery="4" piloting="4" externalId="def6db2f-3ce4-4dbb-a2ba-fffee46042e0" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="4"/>
-		</entity>
+	<entity chassis="Beast Infantry (Horse)" model="(Auto-Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="2af74c35-e09f-4917-bbde-e0ea23733924">
+		<pilot size="1" name="Stefan Eckholdt" nick="" gender="MALE" gunnery="4" piloting="4"
+			externalId="def6db2f-3ce4-4dbb-a2ba-fffee46042e0" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="4" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Horse)" model="(Laser Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="4a19ee97-9424-4da3-9322-468beea91f43">
-			<pilot size="1" name="Godfrey Morgan" nick="" gender="FEMALE" gunnery="3" piloting="3" externalId="768d5a21-11cd-4210-9c2c-dccba236fb7f" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="5"/>
-		</entity>
+	<entity chassis="Beast Infantry (Horse)" model="(Laser Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="4a19ee97-9424-4da3-9322-468beea91f43">
+		<pilot size="1" name="Godfrey Morgan" nick="" gender="FEMALE" gunnery="3" piloting="3"
+			externalId="768d5a21-11cd-4210-9c2c-dccba236fb7f" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="5" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Horse)" model="(Laser Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="978ca8cf-0f1d-45d3-9284-a4207bb43678">
-			<pilot size="1" name="Cynthia Huffman" nick="" gender="FEMALE" gunnery="4" piloting="5" externalId="3fb7cb42-1ef9-46b0-87a3-fc0b3baf4dbf" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="6"/>
-		</entity>
+	<entity chassis="Beast Infantry (Horse)" model="(Laser Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="978ca8cf-0f1d-45d3-9284-a4207bb43678">
+		<pilot size="1" name="Cynthia Huffman" nick="" gender="FEMALE" gunnery="4" piloting="5"
+			externalId="3fb7cb42-1ef9-46b0-87a3-fc0b3baf4dbf" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="6" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Horse)" model="(Laser Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="094bf338-7d0d-4a96-aa44-1c0d83348aa4">
-			<pilot size="1" name="Chad Naarden" nick="" gender="MALE" gunnery="3" piloting="4" externalId="061264b5-5956-4f11-9dfe-4e3ab48d46bb" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="7"/>
-		</entity>
+	<entity chassis="Beast Infantry (Horse)" model="(Laser Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="094bf338-7d0d-4a96-aa44-1c0d83348aa4">
+		<pilot size="1" name="Chad Naarden" nick="" gender="MALE" gunnery="3" piloting="4"
+			externalId="061264b5-5956-4f11-9dfe-4e3ab48d46bb" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="7" />
+	</entity>
 
-		<entity chassis="Beast Infantry (Horse)" model="(Laser Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="b405887c-01af-443c-8724-109ddb036d95">
-			<pilot size="1" name="Michael Joly" nick="" gender="MALE" gunnery="3" piloting="6" externalId="ab1ab9e1-5ae2-43d8-8164-ff46374a4957" ejected="false"/>
-			<location index="1"> Field Guns
-				<armor points="0" type="Internal"/>
-			</location>
-			<Game id="8"/>
-		</entity>
+	<entity chassis="Beast Infantry (Horse)" model="(Laser Rifle)" type="Leg" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="b405887c-01af-443c-8724-109ddb036d95">
+		<pilot size="1" name="Michael Joly" nick="" gender="MALE" gunnery="3" piloting="6"
+			externalId="ab1ab9e1-5ae2-43d8-8164-ff46374a4957" ejected="false" />
+		<location index="1"> Field Guns <armor points="0" type="Internal" />
+		</location>
+		<Game id="8" />
+	</entity>
 
 </unit>
