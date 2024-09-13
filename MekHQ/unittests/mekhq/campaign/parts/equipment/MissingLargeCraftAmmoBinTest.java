@@ -46,7 +46,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.*;
@@ -93,7 +92,8 @@ public class MissingLargeCraftAmmoBinTest {
     public void missingAmmoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
-        MissingLargeCraftAmmoBin missingAmmoBin = new MissingLargeCraftAmmoBin(0, isSRM2InfernoAmmo, 42, 25.0, mockCampaign);
+        MissingLargeCraftAmmoBin missingAmmoBin = new MissingLargeCraftAmmoBin(0, isSRM2InfernoAmmo, 42, 25.0,
+                mockCampaign);
         missingAmmoBin.setId(25);
 
         // Write the AmmoBin XML
@@ -202,7 +202,8 @@ public class MissingLargeCraftAmmoBinTest {
         // Create a missing ammo bin on a unit
         int equipmentNum = 18;
         int bayNum = 31;
-        MissingLargeCraftAmmoBin missingAmmoBin = new MissingLargeCraftAmmoBin(0, ammoType, equipmentNum, 25.0, mockCampaign);
+        MissingLargeCraftAmmoBin missingAmmoBin = new MissingLargeCraftAmmoBin(0, ammoType, equipmentNum, 25.0,
+                mockCampaign);
         Unit unit = mock(Unit.class);
         ArgumentCaptor<Part> replacementCaptor = ArgumentCaptor.forClass(Part.class);
         doAnswer(ans -> {

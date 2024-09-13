@@ -18,11 +18,27 @@
  */
 package mekhq.gui.panes;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.baseComponents.SpinnerCellEditor;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
@@ -30,20 +46,17 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.baseComponents.*;
+import mekhq.gui.baseComponents.AbstractMHQScrollPane;
+import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
+import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.dialog.CustomRankSystemCreationDialog;
 import mekhq.gui.model.RankTableModel;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import java.awt.*;
-import java.io.File;
-import java.util.List;
-import java.util.*;
 
 public class RankSystemsPane extends AbstractMHQScrollPane {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(RankSystemsPane.class);
+
+    // region Variable Declarations
     private final Campaign campaign;
     private RankSystem selectedRankSystem;
     private boolean changed;
@@ -57,18 +70,18 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     // Ranks Table Panel
     private JTable ranksTable;
     private RankTableModel ranksTableModel;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public RankSystemsPane(final JFrame frame, final Campaign campaign) {
         super(frame, "RankSystemsPane");
         this.campaign = campaign;
         setChanged(false);
         initialize();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public Campaign getCampaign() {
         return campaign;
     }
@@ -89,7 +102,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         this.changed = changed;
     }
 
-    //region Rank System Panel
+    // region Rank System Panel
     public SortedComboBoxModel<RankSystem> getRankSystemModel() {
         return rankSystemModel;
     }
@@ -121,9 +134,9 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     public void setComboRankSystemType(final MMComboBox<RankSystemType> comboRankSystemType) {
         this.comboRankSystemType = comboRankSystemType;
     }
-    //endregion Rank System Panel
+    // endregion Rank System Panel
 
-    //region Ranks Table Panel
+    // region Ranks Table Panel
     public JTable getRanksTable() {
         return ranksTable;
     }
@@ -139,20 +152,22 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     public void setRanksTableModel(final RankTableModel ranksTableModel) {
         this.ranksTableModel = ranksTableModel;
     }
-    //endregion Ranks Table Panel
-    //endregion Getters/Setters
+    // endregion Ranks Table Panel
+    // endregion Getters/Setters
 
-    //region Initialization
+    // region Initialization
     /**
      * No Preferences are required here, so we don't call setPreferences.
-     * SelectedRankSystem will be non-null for the initialization based on how the logic is set up,
+     * SelectedRankSystem will be non-null for the initialization based on how the
+     * logic is set up,
      * so we don't need to check to ensure that is the case
      */
     @Override
     protected void initialize() {
         // First, we have to initialize the selected rank system.
         setSelectedRankSystem(getCampaign().getRankSystem().getType().isCampaign()
-                ? new RankSystem(getCampaign().getRankSystem()) : getCampaign().getRankSystem());
+                ? new RankSystem(getCampaign().getRankSystem())
+                : getCampaign().getRankSystem());
 
         // Then, we can start creating the actual panel
         final AbstractMHQScrollablePanel rankSystemsPanel = new DefaultMHQScrollablePanel(getFrame(),
@@ -199,7 +214,8 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
                 (systemA, systemB) -> comparator.compare(systemA.toString(), systemB.toString())));
         for (final RankSystem rankSystem : Ranks.getRankSystems().values()) {
             getRankSystemModel().addElement(rankSystem.getType().isDefault()
-                    ? rankSystem : new RankSystem(rankSystem));
+                    ? rankSystem
+                    : new RankSystem(rankSystem));
         }
 
         if (getSelectedRankSystem().getType().isCampaign()) {
@@ -219,8 +235,8 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         getComboRankSystems().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final int index, final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof RankSystem) {
                     list.setToolTipText(((RankSystem) value).getDescription());
@@ -241,8 +257,8 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         getComboRankSystemType().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final int index, final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof RankSystemType) {
                     list.setToolTipText(((RankSystemType) value).getToolTipText());
@@ -252,7 +268,8 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         });
 
         final JButton btnCreateCustomRankSystem = new MMButton("btnCreateCustomRankSystem",
-                resources.getString("btnCreateCustomRankSystem.text"), resources.getString("btnCreateCustomRankSystem.toolTipText"),
+                resources.getString("btnCreateCustomRankSystem.text"),
+                resources.getString("btnCreateCustomRankSystem.toolTipText"),
                 evt -> createCustomRankSystem());
 
         // Programmatically Assign Accessibility Labels
@@ -274,8 +291,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
                                 .addComponent(lblRankSystem)
                                 .addComponent(getComboRankSystems())
                                 .addComponent(getComboRankSystemType())
-                                .addComponent(btnCreateCustomRankSystem, GroupLayout.Alignment.LEADING))
-        );
+                                .addComponent(btnCreateCustomRankSystem, GroupLayout.Alignment.LEADING)));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -283,8 +299,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
                                 .addComponent(lblRankSystem)
                                 .addComponent(getComboRankSystems())
                                 .addComponent(getComboRankSystemType())
-                                .addComponent(btnCreateCustomRankSystem))
-        );
+                                .addComponent(btnCreateCustomRankSystem)));
 
         return panel;
     }
@@ -329,56 +344,60 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         // Create the Buttons
         panel.add(new MMButton("btnExportCurrentRankSystem", resources.getString("btnExportCurrentRankSystem.text"),
                 resources.getString("btnExportCurrentRankSystem.toolTipText"), evt -> {
-            if (getSelectedRankSystem() != null) {
-                updateRankSystem();
-                getSelectedRankSystem().writeToFile(FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null));
-            }
-        }));
+                    if (getSelectedRankSystem() != null) {
+                        updateRankSystem();
+                        getSelectedRankSystem()
+                                .writeToFile(FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null));
+                    }
+                }));
 
         panel.add(new MMButton("btnExportUserDataRankSystems", resources.getString("btnExportUserDataRankSystems.text"),
-                resources.getString("btnExportUserDataRankSystems.toolTipText"), evt -> exportUserDataRankSystems(true)));
+                resources.getString("btnExportUserDataRankSystems.toolTipText"),
+                evt -> exportUserDataRankSystems(true)));
 
         panel.add(new MMButton("btnExportRankSystems", resources.getString("btnExportRankSystems.text"),
                 resources.getString("btnExportRankSystems.toolTipText"), evt -> {
-            updateRankSystem();
-            final List<RankSystem> rankSystems = new ArrayList<>();
-            for (int i = 0; i < getRankSystemModel().getSize(); i++) {
-                rankSystems.add(getRankSystemModel().getElementAt(i));
-            }
-            Ranks.exportRankSystemsToFile(FileDialogs.saveRankSystems(getFrame()).orElse(null), rankSystems);
-        }));
+                    updateRankSystem();
+                    final List<RankSystem> rankSystems = new ArrayList<>();
+                    for (int i = 0; i < getRankSystemModel().getSize(); i++) {
+                        rankSystems.add(getRankSystemModel().getElementAt(i));
+                    }
+                    Ranks.exportRankSystemsToFile(FileDialogs.saveRankSystems(getFrame()).orElse(null), rankSystems);
+                }));
 
-        panel.add(new MMButton("btnImportIndividualRankSystem", resources.getString("btnImportIndividualRankSystem.text"),
-                resources.getString("btnImportIndividualRankSystem.toolTipText"), evt -> {
-            final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
-                    FileDialogs.openIndividualRankSystem(getFrame()).orElse(null));
-            // Validate on load, to ensure we don't have any display issues
-            if (new RankValidator().validate(getRankSystemModel(), rankSystem, true)) {
-                getRankSystemModel().addElement(rankSystem);
-            }
-        }));
+        panel.add(
+                new MMButton("btnImportIndividualRankSystem", resources.getString("btnImportIndividualRankSystem.text"),
+                        resources.getString("btnImportIndividualRankSystem.toolTipText"), evt -> {
+                            final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
+                                    FileDialogs.openIndividualRankSystem(getFrame()).orElse(null));
+                            // Validate on load, to ensure we don't have any display issues
+                            if (new RankValidator().validate(getRankSystemModel(), rankSystem, true)) {
+                                getRankSystemModel().addElement(rankSystem);
+                            }
+                        }));
 
         panel.add(new MMButton("btnImportRankSystems", resources.getString("btnImportRankSystems.text"),
                 resources.getString("btnImportRankSystems.toolTipText"), evt -> {
-            final List<RankSystem> rankSystems = Ranks.loadRankSystemsFromFile(
-                    FileDialogs.openRankSystems(getFrame()).orElse(null), RankSystemType.CAMPAIGN);
-            final RankValidator rankValidator = new RankValidator();
-            for (final RankSystem rankSystem : rankSystems) {
-                if (rankValidator.validate(getRankSystemModel(), rankSystem, true)) {
-                    getRankSystemModel().addElement(rankSystem);
-                }
-            }
-        }));
+                    final List<RankSystem> rankSystems = Ranks.loadRankSystemsFromFile(
+                            FileDialogs.openRankSystems(getFrame()).orElse(null), RankSystemType.CAMPAIGN);
+                    final RankValidator rankValidator = new RankValidator();
+                    for (final RankSystem rankSystem : rankSystems) {
+                        if (rankValidator.validate(getRankSystemModel(), rankSystem, true)) {
+                            getRankSystemModel().addElement(rankSystem);
+                        }
+                    }
+                }));
 
-        panel.add(new MMButton("btnRefreshRankSystemsFromFile", resources.getString("btnRefreshRankSystemsFromFile.text"),
-                resources.getString("btnRefreshRankSystemsFromFile.toolTipText"),
-                evt -> refreshRankSystems()));
+        panel.add(
+                new MMButton("btnRefreshRankSystemsFromFile", resources.getString("btnRefreshRankSystemsFromFile.text"),
+                        resources.getString("btnRefreshRankSystemsFromFile.toolTipText"),
+                        evt -> refreshRankSystems()));
 
         return panel;
     }
-    //endregion Initialization
+    // endregion Initialization
 
-    //region Button Actions
+    // region Button Actions
     private void comboRankSystemChanged() {
         updateRankSystem();
 
@@ -386,10 +405,11 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
             getRankSystemTypeModel().addElement(RankSystemType.DEFAULT);
         }
 
-        // Then update the selected rank system, with null protection (although it shouldn't be null)
+        // Then update the selected rank system, with null protection (although it
+        // shouldn't be null)
         setSelectedRankSystem(getRankSystemModel().getSelectedItem());
         if (getSelectedRankSystem() == null) {
-            LogManager.getLogger().error("The selected rank system is null. Not changing the ranks, just returning.");
+            logger.error("The selected rank system is null. Not changing the ranks, just returning.");
             getComboRankSystemType().setEnabled(false);
             return;
         }
@@ -425,7 +445,8 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     }
 
     private void createCustomRankSystem() {
-        // We need to get the current Rank Systems from the rank system combo box for to ensure
+        // We need to get the current Rank Systems from the rank system combo box for to
+        // ensure
         // the data's uniqueness
         final List<RankSystem> rankSystems = new ArrayList<>();
         for (int i = 0; i < getRankSystemModel().getSize(); i++) {
@@ -470,7 +491,8 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         setSelectedRankSystem(null);
         Ranks.reinitializeRankSystems(getCampaign());
 
-        // Then collect all of the campaign-type rank systems into a set, so we don't just throw
+        // Then collect all of the campaign-type rank systems into a set, so we don't
+        // just throw
         // them away
         final Set<RankSystem> campaignRankSystems = new HashSet<>();
         for (int i = 0; i < getRankSystemModel().getSize(); i++) {
@@ -486,10 +508,12 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
             getRankSystemModel().addElement(new RankSystem(rankSystem));
         }
 
-        // Revalidate all of the Campaign Rank Systems before adding, as we need to ensure no duplicate keys
+        // Revalidate all of the Campaign Rank Systems before adding, as we need to
+        // ensure no duplicate keys
         final RankValidator rankValidator = new RankValidator();
         for (final RankSystem rankSystem : campaignRankSystems) {
-            // Validating against the core ranks is fine here, as we know all of the rank systems
+            // Validating against the core ranks is fine here, as we know all of the rank
+            // systems
             // we want to check against have been loaded there
             if (rankValidator.validate(rankSystem, true)) {
                 getRankSystemModel().addElement(rankSystem);
@@ -499,7 +523,7 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         // Set the selected item
         getComboRankSystems().setSelectedItem(getCampaign().getRankSystem());
     }
-    //endregion Button Actions
+    // endregion Button Actions
 
     public void applyToCampaign() {
         if (isChanged()) {

@@ -1,17 +1,41 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.personnel.backgrounds;
+
+import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.*;
-
-import java.util.ResourceBundle;
-import java.util.function.Supplier;
+import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.EndWordCorporate;
+import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.EndWordMercenary;
+import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.MiddleWordCorporate;
+import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.MiddleWordMercenary;
+import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.PreFabHumorous;
 
 public class BackgroundsController {
-    final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
+    static final ResourceBundle resources = ResourceBundle
+            .getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
 
     public static void generateBackground(Campaign campaign, Person person) {
         if (campaign.getCampaignOptions().isUseToughness()) {
@@ -23,7 +47,8 @@ public class BackgroundsController {
      * Generates a random mercenary company name.
      *
      * @return A string containing the generated name.
-     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     * @throws IllegalStateException if an unexpected value is encountered during
+     *                               the generation process.
      */
     public static String randomMercenaryCompanyNameGenerator(@Nullable Person commander) {
         return getPrefix(commander) + ' ' + getNameBody();
@@ -33,7 +58,8 @@ public class BackgroundsController {
      * Returns the body of the generated name.
      *
      * @return the name body as a String.
-     * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
+     * @throws IllegalStateException if an unexpected value is encountered in the
+     *                               switch statement.
      */
     private static String getNameBody() {
         String name = "";
@@ -59,8 +85,7 @@ public class BackgroundsController {
             case 3 -> PreFabHumorous.getRandomWord();
             default -> throw new IllegalStateException(
                     "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/randomMercenaryCompanyNameGenerator 1 of 2: "
-                    + roll
-            );
+                            + roll);
         };
     }
 
@@ -69,7 +94,8 @@ public class BackgroundsController {
      *
      * @param commander The person object representing the commander. Can be null.
      * @return The prefix for generating a random mercenary company name.
-     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     * @throws IllegalStateException if an unexpected value is encountered during
+     *                               the generation process.
      */
     private static String getPrefix(Person commander) {
         int roll = Compute.randomInt(4);
@@ -91,17 +117,20 @@ public class BackgroundsController {
      * Retrieves the name of the commander.
      *
      * @param commander The person object representing the commander. Can be null.
-     * @return The name of the commander. If the commander is null, a random callsign from a weighted list will be returned.
+     * @return The name of the commander. If the commander is null, a random
+     *         callsign from a weighted list will be returned.
      */
     private static String getCommanderName(@Nullable Person commander) {
-        try { // this allows us to use getCampaign() in tests without needing to also mock RandomCallsignGenerator
+        try { // this allows us to use getCampaign() in tests without needing to also mock
+              // RandomCallsignGenerator
             if (commander == null) {
                 return RandomCallsignGenerator.getWeightedCallsigns().randomItem();
             } else {
                 String name = commander.getCallsign().isBlank() ? commander.getSurname() : commander.getCallsign();
                 return name.isBlank() ? commander.getFirstName() : name;
             }
-        } catch (NullPointerException ignored) {}
+        } catch (NullPointerException ignored) {
+        }
 
         return "";
     }
@@ -109,7 +138,7 @@ public class BackgroundsController {
     /**
      * Retrieves a new word based on the given name and end word supplier.
      *
-     * @param name The name to check if it contains the generated word.
+     * @param name            The name to check if it contains the generated word.
      * @param endWordSupplier The supplier to provide a new word.
      * @return The new word that unique to the given name.
      */
@@ -126,9 +155,10 @@ public class BackgroundsController {
     /**
      * Checks if the start of the suggested addition is present in the current name.
      *
-     * @param currentName         the current name to check against
-     * @param suggestedAddition   the suggested addition to the name
-     * @return true if the start of the suggested addition is not present in the current name, otherwise false
+     * @param currentName       the current name to check against
+     * @param suggestedAddition the suggested addition to the name
+     * @return true if the start of the suggested addition is not present in the
+     *         current name, otherwise false
      */
     private static boolean checkIfNameContains(String currentName, String suggestedAddition) {
         int checkLength = suggestedAddition.length() - 2;
@@ -139,7 +169,8 @@ public class BackgroundsController {
     }
 
     /**
-     * Generates a numerical name using a random number and a suffix based on the number's modulo.
+     * Generates a numerical name using a random number and a suffix based on the
+     * number's modulo.
      */
     private static String getNumericalNameStart() {
         int number = Compute.randomInt(30) + 1;

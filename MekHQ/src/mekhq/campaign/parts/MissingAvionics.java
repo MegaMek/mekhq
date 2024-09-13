@@ -31,8 +31,8 @@ import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
+import megamek.common.LandAirMek;
+import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
@@ -75,16 +75,16 @@ public class MissingAvionics extends MissingPart {
 
     @Override
     public @Nullable String checkFixable() {
-        if ((unit != null) && (unit.getEntity() instanceof LandAirMech)) {
+        if ((unit != null) && (unit.getEntity() instanceof LandAirMek)) {
             // Avionics are installed in the Head and both Torsos,
             // make sure they're not missing.
             StringJoiner missingLocs = new StringJoiner(", ");
             for (Part part : unit.getParts()) {
                 if (part instanceof MissingMekLocation) {
                     switch (part.getLocation()) {
-                        case Mech.LOC_HEAD:
-                        case Mech.LOC_LT:
-                        case Mech.LOC_RT:
+                        case Mek.LOC_HEAD:
+                        case Mek.LOC_LT:
+                        case Mek.LOC_RT:
                             missingLocs.add(unit.getEntity().getLocationName(part.getLocation()));
                             break;
                         default:
@@ -126,8 +126,8 @@ public class MissingAvionics extends MissingPart {
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Aero) {
             ((Aero) unit.getEntity()).setAvionicsHits(3);
-        } else if (null != unit && unit.getEntity() instanceof LandAirMech) {
-            unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS, 3);
+        } else if (null != unit && unit.getEntity() instanceof LandAirMek) {
+            unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_AVIONICS, 3);
         }
     }
 

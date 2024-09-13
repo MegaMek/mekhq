@@ -49,8 +49,8 @@
         <facultySkill>9</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>MechWarrior Apprenticeship</qualification>
-        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualification>MekWarrior Apprenticeship</qualification>
+        <curriculum>Gunnery/Mek, Piloting/Mek</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Mechanized Apprenticeship</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
@@ -62,15 +62,15 @@
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
         <qualificationStartYear>2455</qualificationStartYear>
         <qualification>Infantry Apprenticeship</qualification>
-        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <curriculum>Small Arms, Anti-Mek</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>MechTech Apprenticeship</qualification>
-        <curriculum>Astech, Tech/Mech</curriculum>
+        <qualification>MekTech Apprenticeship</qualification>
+        <curriculum>Astech, Tech/Mek</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Mechanic Apprenticeship</qualification>
         <curriculum>Astech, Tech/Mechanic</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>AeroTech Apprenticeship</qualification>
+        <qualification>AeroTek Apprenticeship</qualification>
         <curriculum>Astech, Tech/Aero</curriculum>
         <qualificationStartYear>2314</qualificationStartYear>
         <qualification>Battle Armor Technician Apprenticeship</qualification>
@@ -127,8 +127,8 @@
         <durationDays>150</durationDays>
         <facultySkill>9</facultySkill>
         <ageMin>16</ageMin>
-        <qualification>Basic MechWarrior Training</qualification>
-        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualification>Basic MekWarrior Training</qualification>
+        <curriculum>Gunnery/Mek, Piloting/Mek</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Basic Aerospace Training</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>

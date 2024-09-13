@@ -1,24 +1,26 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>The forces at this facility must be engaged for the specified duration.</additionalBriefingText>
-	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PreForceGeneration</eventTiming>
-	<linkedModifiers>
-		<entry>
-            		<key>FacilityHostileDestroy.xml</key>
-            		<value>If destroyed, this facility will be considered to have been sufficiently distracted.</value>
-		</entry>
-		<entry>
-            		<key>FacilityHostileCapture.xml</key>
-            		<value>If captured, this facility will be considered to have been sufficiently distracted.</value>
-		</entry>
-	</linkedModifiers>
-	<modifierName>Engage</modifierName>
-	<objectives>
+    <additionalBriefingText>The forces at this facility must be engaged for the specified duration.</additionalBriefingText>
+    <benefitsPlayer>false</benefitsPlayer>
+    <eventTiming>PreForceGeneration</eventTiming>
+    <linkedModifiers>
+        <entry>
+            <key>FacilityHostileDestroy.xml</key>
+            <value>If destroyed, this facility will be considered to have been sufficiently
+                distracted.</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileCapture.xml</key>
+            <value>If captured, this facility will be considered to have been sufficiently
+                distracted.</value>
+        </entry>
+    </linkedModifiers>
+    <modifierName>Engage</modifierName>
+    <objectives>
         <objective>
             <associatedForceNames>
                 <associatedForceName>Base Turrets</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -33,14 +35,15 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
-            <description>Engage any hostile units with weapons fire or physical attacks for the specified number of turns.</description>
+            <additionalDetails />
+            <description>Engage any hostile units with weapons fire or physical attacks for the
+                specified number of turns.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Custom</objectiveCriterion>
             <percentage>1</percentage>
             <timeLimitAtMost>false</timeLimitAtMost>
             <timeLimitScaleFactor>1</timeLimitScaleFactor>
             <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
-	</objective>
-	</objectives>
+        </objective>
+    </objectives>
 </AtBScenarioModifier>

@@ -16,7 +16,7 @@
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>true</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
-		<deploymentZones/>
+		<deploymentZones />
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>3</fixedUnitCount>
 		<forceAlignment>0</forceAlignment>
@@ -33,32 +33,32 @@
 	</forceDefinition>
 
 	<objectives>
-        <objective>
-            <associatedForceNames>
-                <associatedForceName>Allied Trainees</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs/>
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <description>Preserve 100% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>100</percentage>
-            <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </objective>
-        </objectives>
+		<objective>
+			<associatedForceNames>
+				<associatedForceName>Allied Trainees</associatedForceName>
+			</associatedForceNames>
+			<associatedUnitIDs />
+			<successEffects>
+				<successEffect>
+					<effectType>ScenarioVictory</effectType>
+					<effectScaling>Fixed</effectScaling>
+					<howMuch>1</howMuch>
+				</successEffect>
+			</successEffects>
+			<failureEffects>
+				<failureEffect>
+					<effectType>ScenarioDefeat</effectType>
+					<effectScaling>Fixed</effectScaling>
+					<howMuch>1</howMuch>
+				</failureEffect>
+			</failureEffects>
+			<description>Preserve 100% of the following force(s) and unit(s):</description>
+			<destinationEdge>NONE</destinationEdge>
+			<objectiveCriterion>Preserve</objectiveCriterion>
+			<percentage>100</percentage>
+			<timeLimit>0</timeLimit>
+			<timeLimitAtMost>true</timeLimitAtMost>
+			<timeLimitType>None</timeLimitType>
+		</objective>
+	</objectives>
 </AtBScenarioModifier>

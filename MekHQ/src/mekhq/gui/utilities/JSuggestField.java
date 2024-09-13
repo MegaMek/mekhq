@@ -1,12 +1,39 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.utilities;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.IllegalComponentStateException;
+import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.*;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
+
+import javax.swing.JDialog;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 /**
  * Provides a text-field that makes suggestions using a provided data-vector.
@@ -48,7 +75,7 @@ public class JSuggestField extends JTextField {
     /**
      * The last chosen variable which exists. Needed if user
      * continued to type but didn't press the enter key
-     * */
+     */
     private String lastChosenExistingVariable;
 
     /** Listeners, fire event when a selection as occurred */
@@ -58,7 +85,7 @@ public class JSuggestField extends JTextField {
      * Create a new JSuggestField.
      *
      * @param owner
-     *            Frame containing this JSuggestField
+     *              Frame containing this JSuggestField
      */
     public JSuggestField(Window owner) {
         super();
@@ -139,7 +166,7 @@ public class JSuggestField extends JTextField {
                     setText("");
                 }
 
-                //showSuggest();
+                // showSuggest();
             }
         });
         d = new JDialog(owner);
@@ -227,9 +254,9 @@ public class JSuggestField extends JTextField {
      * Create a new JSuggestField.
      *
      * @param owner
-     *            Frame containing this JSuggestField
+     *              Frame containing this JSuggestField
      * @param data
-     *            Available suggestions
+     *              Available suggestions
      */
     public JSuggestField(Window owner, Vector<String> data) {
         this(owner);
@@ -240,7 +267,7 @@ public class JSuggestField extends JTextField {
      * Sets new data used to suggest similar words.
      *
      * @param data
-     *            Vector containing available words
+     *             Vector containing available words
      * @return success, true unless the data-vector was null
      */
     public boolean setSuggestData(Vector<String> data) {
@@ -267,7 +294,7 @@ public class JSuggestField extends JTextField {
      * Set preferred size for the drop-down that will appear.
      *
      * @param size
-     *            Preferred size of the drop-down list
+     *             Preferred size of the drop-down list
      */
     public void setPreferredSuggestSize(Dimension size) {
         d.setPreferredSize(size);
@@ -277,7 +304,7 @@ public class JSuggestField extends JTextField {
      * Set minimum size for the drop-down that will appear.
      *
      * @param size
-     *            Minimum size of the drop-down list
+     *             Minimum size of the drop-down list
      */
     public void setMinimumSuggestSize(Dimension size) {
         d.setMinimumSize(size);
@@ -287,7 +314,7 @@ public class JSuggestField extends JTextField {
      * Set maximum size for the drop-down that will appear.
      *
      * @param size
-     *            Maximum size of the drop-down list
+     *             Maximum size of the drop-down list
      */
     public void setMaximumSuggestSize(Dimension size) {
         d.setMaximumSize(size);
@@ -308,7 +335,7 @@ public class JSuggestField extends JTextField {
             matcher.stop = true;
         }
         matcher = new InterruptibleMatcher();
-        //matcher.start();
+        // matcher.start();
         SwingUtilities.invokeLater(matcher);
         lastWord = getText();
         relocate();
@@ -390,6 +417,7 @@ public class JSuggestField extends JTextField {
 
     /**
      * Adds a listener that notifies when a selection has occurred
+     * 
      * @param listener ActionListener to use
      */
     public void addSelectionListener(ActionListener listener) {
@@ -400,6 +428,7 @@ public class JSuggestField extends JTextField {
 
     /**
      * Removes the Listener
+     * 
      * @param listener ActionListener to remove
      */
     public void removeSelectionListener(ActionListener listener) {
@@ -417,14 +446,13 @@ public class JSuggestField extends JTextField {
         }
     }
 
-
     /**
      * Returns the selected value in the drop down list
      *
-     * @return selected value from the user or null if the entered value does not exist
+     * @return selected value from the user or null if the entered value does not
+     *         exist
      */
     public String getLastChosenExistingVariable() {
         return lastChosenExistingVariable;
     }
 }
-

@@ -21,11 +21,11 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.annotations.Nullable;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.Arrays;
 import java.util.Locale;
+
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 
 public enum WorkTime {
     NORMAL(0, "Normal", 0, false, 0, 1.0),
@@ -59,12 +59,12 @@ public enum WorkTime {
 
     /** Default (Strategic Operations) work time modifiers */
     public static final WorkTime[] DEFAULT_TIMES = {
-        NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, RUSH_2, RUSH_4, RUSH_8
+            NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, RUSH_2, RUSH_4, RUSH_8
     };
 
     /** StratOps times in increasing order **/
     public static final WorkTime[] STRAT_OPTS_INCREASING_TIMES = {
-        RUSH_8, RUSH_4, RUSH_2, NORMAL, EXTRA_2, EXTRA_3, EXTRA_4
+            RUSH_8, RUSH_4, RUSH_2, NORMAL, EXTRA_2, EXTRA_3, EXTRA_4
     };
 
     /**
@@ -89,7 +89,8 @@ public enum WorkTime {
     public final int id;
     // User-displayable. TODO: Localize
     public final String name;
-    // Base modificator to target number. Positive = more difficult. Use getMod(true) to get the value
+    // Base modificator to target number. Positive = more difficult. Use
+    // getMod(true) to get the value
     private final int mod;
     // Does this count as a rushed job?
     public final boolean isRushed;
@@ -142,7 +143,7 @@ public enum WorkTime {
         }
     }
 
-    //region File I/O
+    // region File I/O
     public static WorkTime parseFromString(final String text) {
         try {
             return valueOf(text);
@@ -156,8 +157,8 @@ public enum WorkTime {
             return workTime;
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a WorkTime. Returning NORMAL.");
+        MMLogger.create(WorkTime.class).error("Unable to parse " + text + " into a WorkTime. Returning NORMAL.");
         return NORMAL;
     }
-    //endregion File I/O
+    // endregion File I/O
 }

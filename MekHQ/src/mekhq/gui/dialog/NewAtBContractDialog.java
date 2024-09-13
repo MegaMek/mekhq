@@ -20,10 +20,22 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.util.HashSet;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.swing.*;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -39,19 +51,13 @@ import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.HashSet;
-import java.util.ResourceBundle;
-import java.util.Set;
 
 /**
  * @author Neoancient
  */
 public class NewAtBContractDialog extends NewContractDialog {
+    private static final MMLogger logger = MMLogger.create(NewAtBContractDialog.class);
+
     protected FactionComboBox cbEmployer;
     protected FactionComboBox cbEnemy;
     protected JCheckBox chkShowAllFactions;
@@ -82,7 +88,7 @@ public class NewAtBContractDialog extends NewContractDialog {
             setName("NewAtBContractDialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -122,7 +128,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
     @Override
     protected void initDescPanel(ResourceBundle resourceMap, JPanel descPanel) {
-        AtBContract contract = (AtBContract)(this.contract);
+        AtBContract contract = (AtBContract) (this.contract);
 
         GridBagConstraints gbc;
         txtName = new JTextField();
@@ -142,7 +148,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         txtDesc = new MarkdownEditorPanel();
         JLabel lblPlanetName = new JLabel();
         // TODO : Switch me to use IUnitRating
-        String[] ratingNames = {"F", "D", "C", "B", "A"};
+        String[] ratingNames = { "F", "D", "C", "B", "A" };
 
         final DefaultComboBoxModel<SkillLevel> allySkillModel = new DefaultComboBoxModel<>();
         allySkillModel.addAll(SkillLevel.getGeneratableValues());
@@ -279,8 +285,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         comboContractType.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final int index, final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AtBContractType) {
                     list.setToolTipText(((AtBContractType) value).getToolTipText());
@@ -430,8 +436,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (getCurrentEmployerCode() == null) {
             return;
         }
-        cbEnemy.addFactionEntries(RandomFactionGenerator.getInstance().
-                getEnemyList(getCurrentEmployerCode()), campaign.getGameYear());
+        cbEnemy.addFactionEntries(RandomFactionGenerator.getInstance().getEnemyList(getCurrentEmployerCode()),
+                campaign.getGameYear());
         cbEnemy.setSelectedItemByKey(((AtBContract) contract).getEnemyCode());
     }
 
@@ -465,23 +471,23 @@ public class NewAtBContractDialog extends NewContractDialog {
     private void updatePlanets() {
         if (chkShowAllPlanets.isSelected() ||
                 getCurrentEmployerCode() == null ||
-                getCurrentEnemyCode()== null) {
+                getCurrentEnemyCode() == null) {
             return;
         }
         AtBContract contract = (AtBContract) this.contract;
         HashSet<String> systems = new HashSet<>();
         if (!contract.getContractType().isGarrisonType()
                 || Factions.getInstance().getFaction(getCurrentEnemyCode()).isRebelOrPirate()) {
-            for (PlanetarySystem p : RandomFactionGenerator.getInstance().
-                    getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
+            for (PlanetarySystem p : RandomFactionGenerator.getInstance().getMissionTargetList(getCurrentEmployerCode(),
+                    getCurrentEnemyCode())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }
 
         if ((contract.getContractType().isGarrisonType() || contract.getContractType().isReliefDuty())
                 && !contract.getEnemy().isRebel()) {
-            for (PlanetarySystem p : RandomFactionGenerator.getInstance().
-                    getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
+            for (PlanetarySystem p : RandomFactionGenerator.getInstance().getMissionTargetList(getCurrentEnemyCode(),
+                    getCurrentEmployerCode())) {
                 systems.add(p.getName(campaign.getLocalDate()));
             }
         }
@@ -510,7 +516,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         contract.setName(txtName.getText());
         if (chkShowAllPlanets.isSelected()) {
-            //contract.setPlanetName(suggestPlanet.getText());
+            // contract.setPlanetName(suggestPlanet.getText());
         } else {
             contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
                     campaign.getLocalDate())).getId());
@@ -535,7 +541,8 @@ public class NewAtBContractDialog extends NewContractDialog {
                 contract.getTotalAdvanceAmount(), "Advance funds for " + contract.getName());
         campaign.addMission(contract);
 
-        // note that the contract must be initialized after the mission is added to the campaign
+        // note that the contract must be initialized after the mission is added to the
+        // campaign
         // to ensure presence of mission ID
         if (campaign.getCampaignOptions().isUseStratCon()) {
             StratconContractInitializer.initializeCampaignState(contract, campaign,
@@ -558,16 +565,16 @@ public class NewAtBContractDialog extends NewContractDialog {
             contract.setStartDate(null);
             needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
-            LogManager.getLogger().info("Setting employer code to " + getCurrentEmployerCode());
+            logger.info("Setting employer code to " + getCurrentEmployerCode());
             long time = System.currentTimeMillis();
             contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
-            LogManager.getLogger().info("to set employer code: " + (System.currentTimeMillis() - time));
+            logger.info("to set employer code: " + (System.currentTimeMillis() - time));
             time = System.currentTimeMillis();
             updateEnemies();
-            LogManager.getLogger().info("to update enemies: " + (System.currentTimeMillis() - time));
+            logger.info("to update enemies: " + (System.currentTimeMillis() - time));
             time = System.currentTimeMillis();
             updatePlanets();
-            LogManager.getLogger().info("to update planets: " + (System.currentTimeMillis() - time));
+            logger.info("to update planets: " + (System.currentTimeMillis() - time));
             needUpdatePayment = true;
         } else if (source.equals(cbEnemy)) {
             contract.setEnemyCode(getCurrentEnemyCode());
@@ -595,5 +602,5 @@ public class NewAtBContractDialog extends NewContractDialog {
         super.doUpdateContract(source);
 
         addAllListeners();
-   }
+    }
 }

@@ -21,26 +21,28 @@
  */
 package mekhq.campaign.universe;
 
-import megamek.common.annotations.Nullable;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
+import java.awt.Color;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.Map.Entry;
+
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Faction {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Faction.class);
+
+    // region Variable Declarations
     public static final String DEFAULT_CODE = "???";
 
     private String shortName;
@@ -61,9 +63,9 @@ public class Faction {
     private Set<Tag> tags;
     private int start; // Start year (inclusive)
     private int end; // End year (inclusive)
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public Faction() {
         this(DEFAULT_CODE, "Unknown");
     }
@@ -83,14 +85,14 @@ public class Faction {
         start = 0;
         end = 9999;
     }
-    //endregion Constructors
+    // endregion Constructors
 
     public String getShortName() {
         return shortName;
     }
 
     public String getFullName(int year) {
-        Entry<Integer,String> change = nameChanges.floorEntry(year);
+        Entry<Integer, String> change = nameChanges.floorEntry(year);
         if (null == change) {
             return fullName;
         } else {
@@ -128,37 +130,37 @@ public class Faction {
             return 0;
         } else {
             if (year < 2570) {
-                //Era: Age of War
+                // Era: Age of War
                 return eraMods[0];
             } else if (year < 2598) {
-                //Era: RW
+                // Era: RW
                 return eraMods[1];
             } else if (year < 2785) {
-                //Era: Star League
+                // Era: Star League
                 return eraMods[2];
             } else if (year < 2828) {
-                //Era: 1st SW
+                // Era: 1st SW
                 return eraMods[3];
             } else if (year < 2864) {
-                //Era: 2nd SW
+                // Era: 2nd SW
                 return eraMods[4];
             } else if (year < 3028) {
-                //Era: 3rd SW
+                // Era: 3rd SW
                 return eraMods[5];
             } else if (year < 3050) {
-                //Era: 4th SW
+                // Era: 4th SW
                 return eraMods[6];
             } else if (year < 3067) {
-                //Era: Clan Invasion
+                // Era: Clan Invasion
                 return eraMods[7];
             } else if (year < 3086) {
-                //Era: Jihad
+                // Era: Jihad
                 return eraMods[8];
             } else if (year < 3151) {
-                //Era: Dark Age
+                // Era: Dark Age
                 return eraMods[9];
             } else {
-                //Era: ilClan
+                // Era: ilClan
                 return eraMods[10];
             }
         }
@@ -224,7 +226,7 @@ public class Faction {
         this.layeredForceIconLogoFilename = layeredForceIconLogoFilename;
     }
 
-    //region Checks
+    // region Checks
     public boolean isPlayable() {
         return is(Tag.PLAYABLE);
     }
@@ -281,7 +283,7 @@ public class Faction {
         return "IND".equals(getShortName());
     }
 
-    //region Power Checks
+    // region Power Checks
     public boolean isSuperPower() {
         return is(Tag.SUPER);
     }
@@ -305,8 +307,8 @@ public class Faction {
     public boolean isSmall() {
         return is(Tag.SMALL);
     }
-    //endregion Power Checks
-    //endregion Checks
+    // endregion Power Checks
+    // endregion Checks
 
     public static Faction getFactionFromXML(Node wn) throws DOMException {
         Faction retVal = new Faction();
@@ -368,12 +370,8 @@ public class Faction {
                     retVal.end = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
-        }
-
-        if ((retVal.eraMods != null) && (retVal.eraMods.length < 9)) {
-            LogManager.getLogger().warn("{} faction did not have a long enough eraMods vector", retVal.fullName);
         }
 
         return retVal;
@@ -417,20 +415,30 @@ public class Faction {
         MERC,
         /** Major trading company */
         TRADER,
-        /** Super Power: the Terran Hegemony, the First Star League, and the Federated Commonwealth. (CamOps p12) */
+        /**
+         * Super Power: the Terran Hegemony, the First Star League, and the Federated
+         * Commonwealth. (CamOps p12)
+         */
         SUPER,
         /**
-         * Major Power: e.g. Inner Sphere Great Houses, Republic of the Sphere, Terran Alliance,
+         * Major Power: e.g. Inner Sphere Great Houses, Republic of the Sphere, Terran
+         * Alliance,
          * Second Star League, Inner Sphere Clans. (CamOps p12)
          */
         MAJOR,
-        /** Faction is limited to a single star system, or potentially just a part of a planet (CamOps p12) */
+        /**
+         * Faction is limited to a single star system, or potentially just a part of a
+         * planet (CamOps p12)
+         */
         MINOR,
         /** Independent world or Small State (CamOps p12) */
         SMALL,
         /** Faction is rebelling against the superior ("parent") faction */
         REBEL,
-        /** Faction isn't overtly acting on the political/military scale; think ComStar before clan invasion */
+        /**
+         * Faction isn't overtly acting on the political/military scale; think ComStar
+         * before clan invasion
+         */
         INACTIVE,
         /** Faction represents empty space */
         ABANDONED,

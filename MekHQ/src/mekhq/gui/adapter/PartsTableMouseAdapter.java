@@ -1,4 +1,32 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.adapter;
+
+import java.awt.event.ActionEvent;
+import java.util.Optional;
+
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 
 import megamek.common.TargetRoll;
 import mekhq.MekHQ;
@@ -15,10 +43,6 @@ import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.service.enums.MRMSMode;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.Optional;
 
 public class PartsTableMouseAdapter extends JPopupMenuAdapter {
 
@@ -108,12 +132,12 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             int q = -1;
             boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
             Object[] possibilities = {
-                Part.getQualityName(Part.QUALITY_A, reverse),
-                Part.getQualityName(Part.QUALITY_B, reverse),
-                Part.getQualityName(Part.QUALITY_C, reverse),
-                Part.getQualityName(Part.QUALITY_D, reverse),
-                Part.getQualityName(Part.QUALITY_E, reverse),
-                Part.getQualityName(Part.QUALITY_F, reverse)
+                    Part.getQualityName(Part.QUALITY_A, reverse),
+                    Part.getQualityName(Part.QUALITY_B, reverse),
+                    Part.getQualityName(Part.QUALITY_C, reverse),
+                    Part.getQualityName(Part.QUALITY_D, reverse),
+                    Part.getQualityName(Part.QUALITY_E, reverse),
+                    Part.getQualityName(Part.QUALITY_F, reverse)
             };
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(), "Choose the new quality level",
                     "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
@@ -181,7 +205,8 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                     return;
                 }
                 int q = pvcd.getValue();
-                gui.getCampaign().getShoppingList().addShoppingItem(selectedPart.getAcquisitionWork(), q, gui.getCampaign());
+                gui.getCampaign().getShoppingList().addShoppingItem(selectedPart.getAcquisitionWork(), q,
+                        gui.getCampaign());
             }
         }
     }
@@ -313,7 +338,8 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menu);
         }
 
-        // also add the ability to order one or many parts, if we have at least one part selected
+        // also add the ability to order one or many parts, if we have at least one part
+        // selected
         if (rows.length > 0) {
             menu = new JMenu("Buy");
             menuItem = new JMenuItem("Buy Single Part of This Type");
@@ -322,7 +348,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             menu.add(menuItem);
 
             if (oneSelected) {
-                menuItem = new JMenuItem ("Buy # Parts of This Type...");
+                menuItem = new JMenuItem("Buy # Parts of This Type...");
                 menuItem.setActionCommand("BUY_N");
                 menuItem.addActionListener(this);
                 menu.add(menuItem);

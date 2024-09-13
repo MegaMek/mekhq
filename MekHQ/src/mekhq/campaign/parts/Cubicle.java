@@ -18,25 +18,29 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.BayType;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * A transport bay cubicle for a Mech, ProtoMech, vehicle, fighter, or small craft.
+ * A transport bay cubicle for a Mek, ProtoMek, vehicle, fighter, or small
+ * craft.
  *
  * @author Neoancient
  */
 public class Cubicle extends Part {
+    private static final MMLogger logger = MMLogger.create(Cubicle.class);
+
     private BayType bayType;
 
     public Cubicle() {
@@ -120,7 +124,8 @@ public class Cubicle extends Part {
 
     @Override
     public boolean needsFixing() {
-        // Per replacement repair tables in SO, cubicles are replaced rather than repaired.
+        // Per replacement repair tables in SO, cubicles are replaced rather than
+        // repaired.
         return false;
     }
 
@@ -161,8 +166,8 @@ public class Cubicle extends Part {
             if (wn2.getNodeName().equalsIgnoreCase("bayType")) {
                 bayType = BayType.parse(wn2.getTextContent());
                 if (null == bayType) {
-                    LogManager.getLogger().error("Could not parse bay type " + wn2.getTextContent());
-                    bayType = BayType.MECH;
+                    logger.error("Could not parse bay type " + wn2.getTextContent());
+                    bayType = BayType.MEK;
                 }
                 name = bayType.getDisplayName() + " Cubicle";
             }

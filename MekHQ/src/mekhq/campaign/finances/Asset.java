@@ -21,28 +21,34 @@
  */
 package mekhq.campaign.finances;
 
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.ResourceBundle;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.ResourceBundle;
 
 /**
- * An Asset is a non-core (i.e. not part of the core company) investment that a user can use to
- * generate income on a schedule. It can also be used increase loan collateral and thus get bigger
+ * An Asset is a non-core (i.e. not part of the core company) investment that a
+ * user can use to
+ * generate income on a schedule. It can also be used increase loan collateral
+ * and thus get bigger
  * loans.
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  * @author Justin "Windchild" Bowen (modern version)
  */
 public class Asset {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Asset.class);
+
+    // region Variable Declarations
     private String name;
     private Money value;
     private FinancialTerm financialTerm;
@@ -50,18 +56,18 @@ public class Asset {
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public Asset() {
         setName("New Asset");
         setValue(Money.zero());
         setFinancialTerm(FinancialTerm.ANNUALLY);
         setIncome(Money.zero());
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public String getName() {
         return name;
     }
@@ -93,10 +99,10 @@ public class Asset {
     public void setIncome(final Money income) {
         this.income = income;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     public void processNewDay(final Campaign campaign, final LocalDate yesterday,
-                              final LocalDate today, final Finances finances) {
+            final LocalDate today, final Finances finances) {
         if (getFinancialTerm().endsToday(yesterday, today)) {
             finances.credit(TransactionType.MISCELLANEOUS, today, getIncome(),
                     String.format(resources.getString("AssetPayment.finances"), getName()));
@@ -105,7 +111,7 @@ public class Asset {
         }
     }
 
-    //region File I/O
+    // region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "asset");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
@@ -129,14 +135,12 @@ public class Asset {
                     asset.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("income")) {
                     asset.setIncome(Money.fromXmlString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) { // Legacy - 0.49.3 Removal
-                    asset.setFinancialTerm(FinancialTerm.parseFromString(wn2.getTextContent().trim()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
         return asset;
     }
-    //endregion File I/O
+    // endregion File I/O
 }

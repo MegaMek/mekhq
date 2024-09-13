@@ -18,27 +18,32 @@
  */
 package mekhq.campaign.personnel;
 
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.w3c.dom.Node;
+
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.enums.InjuryHiding;
 import mekhq.campaign.personnel.enums.InjuryLevel;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Injury class based on Jayof9s' (jayof9s@gmail.com) Advanced Medical documents
@@ -48,6 +53,8 @@ import java.util.UUID;
 @XmlRootElement(name = "injury")
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class Injury {
+    private static final MMLogger logger = MMLogger.create(Injury.class);
+
     public static final int VERSION = 1;
 
     // Marshaller / unmarshaller instances
@@ -58,25 +65,26 @@ public class Injury {
             JAXBContext context = JAXBContext.newInstance(Injury.class, BodyLocation.class, InjuryType.class);
             marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            //marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            // marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             unmarshaller = context.createUnmarshaller();
             // For debugging only!
-            // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
+            // unmarshaller.setEventHandler(new
+            // javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
     /**
-     *  Load from campaign file XML
-     *  <p>
-     *  Also used by the personnel exporter
+     * Load from campaign file XML
+     * <p>
+     * Also used by the personnel exporter
      */
     public static Injury generateInstanceFromXML(Node wn) {
         try {
             return unmarshaller.unmarshal(wn, Injury.class).getValue();
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
         return null;
     }
@@ -113,19 +121,23 @@ public class Injury {
         this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, start, false, false, false);
     }
 
-    // Normal constructor for a new injury that has not been treated by a doctor & does not have extended time
+    // Normal constructor for a new injury that has not been treated by a doctor &
+    // does not have extended time
     public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start, boolean perm) {
         this(time, text, loc, type, num, start, perm, false, false);
     }
 
-    // Constructor if this injury has been treated by a doctor, but without extended time
-    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start, boolean perm, boolean workedOn) {
+    // Constructor if this injury has been treated by a doctor, but without extended
+    // time
+    public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start, boolean perm,
+            boolean workedOn) {
         this(time, text, loc, type, num, start, perm, workedOn, false);
     }
 
-    // Constructor for when this injury has extended time, full options including worked on by a doctor
+    // Constructor for when this injury has extended time, full options including
+    // worked on by a doctor
     public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, LocalDate start,
-                  boolean perm, boolean workedOn, boolean extended) {
+            boolean perm, boolean workedOn, boolean extended) {
         setTime(time);
         setOriginalTime(time);
         setFluff(text);
@@ -265,12 +277,14 @@ public class Injury {
 
     // End Details Methods
 
-    // Returns the full long name of this injury including location and type as applicable
+    // Returns the full long name of this injury including location and type as
+    // applicable
     public String getName() {
         return type.getName(location, hits);
     }
 
-    // Return the location name for the injury by passing location to the static overload
+    // Return the location name for the injury by passing location to the static
+    // overload
     public String getLocationName() {
         return Utilities.capitalize(location.locationName());
     }
@@ -289,7 +303,7 @@ public class Injury {
         try {
             marshaller.marshal(this, pw);
         } catch (JAXBException ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -309,15 +323,23 @@ public class Injury {
         // Fix hand/foot locations
         if (fluff.endsWith(" hand")) {
             switch (location) {
-                case LEFT_ARM: location = BodyLocation.LEFT_HAND; break;
-                case RIGHT_ARM: location = BodyLocation.RIGHT_HAND; break;
+                case LEFT_ARM:
+                    location = BodyLocation.LEFT_HAND;
+                    break;
+                case RIGHT_ARM:
+                    location = BodyLocation.RIGHT_HAND;
+                    break;
                 default: // do nothing
             }
         }
         if (fluff.endsWith(" foot")) {
             switch (location) {
-                case LEFT_LEG: location = BodyLocation.LEFT_FOOT; break;
-                case RIGHT_LEG: location = BodyLocation.RIGHT_FOOT; break;
+                case LEFT_LEG:
+                    location = BodyLocation.LEFT_FOOT;
+                    break;
+                case RIGHT_LEG:
+                    location = BodyLocation.RIGHT_FOOT;
+                    break;
                 default: // do nothing
             }
         }

@@ -20,30 +20,41 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.*;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.common.Compute;
+import megamek.common.Dropship;
+import megamek.common.Entity;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class DropshipDockingCollar extends Part {
+    private static final MMLogger logger = MMLogger.create(DropshipDockingCollar.class);
+
     static final TechAdvancement TA_BOOM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
-            .setProductionFactions(F_TH).setTechRating(RATING_C)
+            .setAdvancement(2458, 2470, 2500)
+            .setPrototypeFactions(F_TH)
+            .setProductionFactions(F_TH)
+            .setTechRating(RATING_C)
             .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
     static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TECH_BASE_ALL)
-            .setAdvancement(2304, 2350, 2364, 2520).setPrototypeFactions(F_TA)
-            .setProductionFactions(F_TH).setTechRating(RATING_B)
+            .setAdvancement(2304, 2350, 2364, 2520)
+            .setPrototypeFactions(F_TA)
+            .setProductionFactions(F_TH)
+            .setTechRating(RATING_B)
             .setAvailability(RATING_C, RATING_X, RATING_X, RATING_X)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
 
@@ -79,17 +90,17 @@ public class DropshipDockingCollar extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
         if (null != unit && unit.getEntity() instanceof Dropship) {
-             if (((Dropship) unit.getEntity()).isDockCollarDamaged()) {
-                 hits = 1;
-             } else {
-                 hits = 0;
-             }
+            if (((Dropship) unit.getEntity()).isDockCollarDamaged()) {
+                hits = 1;
+            } else {
+                hits = 0;
+            }
 
-             if (checkForDestruction
-                     && hits > priorHits
-                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-                 remove(false);
-             }
+            if (checkForDestruction
+                    && hits > priorHits
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                remove(false);
+            }
         }
     }
 
@@ -164,7 +175,7 @@ public class DropshipDockingCollar extends Part {
         if (collarType == Dropship.COLLAR_STANDARD) {
             return Money.of(10000);
         } else {
-            return Money.of(1010000) ;
+            return Money.of(1010000);
         }
     }
 
@@ -198,7 +209,7 @@ public class DropshipDockingCollar extends Part {
                     collarType = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
     }

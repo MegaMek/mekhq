@@ -2,7 +2,8 @@
 <ScenarioTemplate>
     <name>Special Scenario: Ace Duel</name>
     <shortBriefing></shortBriefing>
-    <detailedBriefing>One of your non-officer MechWarriors has been challenged to a duel by an ace from the opposing force. Destroy the enemy 'Mech or force it to withdraw.</detailedBriefing>
+    <detailedBriefing>One of your non-officer MekWarriors has been challenged to a duel by an ace
+        from the opposing force. Destroy the enemy 'Mek or force it to withdraw.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -45,7 +46,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -64,7 +65,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -74,7 +75,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
@@ -83,5 +84,5 @@
             </value>
         </entry>
     </scenarioForces>
-    <scenarioObjectives/>
+    <scenarioObjectives />
 </ScenarioTemplate>

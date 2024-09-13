@@ -18,13 +18,13 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum AgeGroup {
-    //region Enum Declarations
+    // region Enum Declarations
     ELDER("AgeGroup.ELDER.text", "AgeGroup.ELDER.toolTipText", 65),
     ADULT("AgeGroup.ADULT.text", "AgeGroup.ADULT.toolTipText", 20),
     TEENAGER("AgeGroup.TEENAGER.text", "AgeGroup.TEENAGER.toolTipText", 13),
@@ -32,15 +32,15 @@ public enum AgeGroup {
     CHILD("AgeGroup.CHILD.text", "AgeGroup.CHILD.toolTipText", 3),
     TODDLER("AgeGroup.TODDLER.text", "AgeGroup.TODDLER.toolTipText", 1),
     BABY("AgeGroup.BABY.text", "AgeGroup.BABY.toolTipText", -1);
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
     private final int groupLowerBound; // the lower bound of the age range for this age group, inclusive
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     AgeGroup(final String name, final String toolTipText, final int groupLowerBound) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
@@ -48,9 +48,9 @@ public enum AgeGroup {
         this.toolTipText = resources.getString(toolTipText);
         this.groupLowerBound = groupLowerBound;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
@@ -58,9 +58,9 @@ public enum AgeGroup {
     public int getGroupLowerBound() {
         return groupLowerBound;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isElder() {
         return this == ELDER;
     }
@@ -88,7 +88,7 @@ public enum AgeGroup {
     public boolean isBaby() {
         return this == BABY;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     public static AgeGroup determineAgeGroup(final int age) {
         for (final AgeGroup ageGroup : AgeGroup.values()) {
@@ -97,7 +97,7 @@ public enum AgeGroup {
             }
         }
 
-        LogManager.getLogger().error("Illegal age of " + age + " entered for a person. Returning Adult");
+        MMLogger.create(AgeGroup.class).error("Illegal age of " + age + " entered for a person. Returning Adult");
 
         // This is a default return, which will only happen on error cases
         return ADULT;
