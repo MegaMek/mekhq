@@ -21,9 +21,34 @@
  */
 package mekhq.campaign.againstTheBot;
 
-import megamek.common.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.function.Function;
+
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.Compute;
+import megamek.common.EntityWeightClass;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
+import megamek.common.TargetRoll;
+import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
@@ -32,29 +57,21 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.function.Function;
 
 /**
  * @author Neoancient
  *
- * Class that handles configuration options for Against the Bot campaigns
- * more extensive than what is handled by CampaignOptions. Most of the options
- * fall into one of two categories: they allow users to customize the various
- * tables in the rules, or they avoid hard-coding universe details.
+ *         Class that handles configuration options for Against the Bot
+ *         campaigns
+ *         more extensive than what is handled by CampaignOptions. Most of the
+ *         options
+ *         fall into one of two categories: they allow users to customize the
+ *         various
+ *         tables in the rules, or they avoid hard-coding universe details.
  */
 public class AtBConfiguration {
+    private static final MMLogger logger = MMLogger.create(AtBConfiguration.class);
+
     /* Used to indicate size of lance or equivalent in OpFor forces */
     public static final String ORG_IS = "IS";
     public static final String ORG_CLAN = "CLAN";
@@ -83,7 +100,8 @@ public class AtBConfiguration {
     private WeightedTable<String> dsTable;
     private WeightedTable<String> jsTable;
 
-    private final transient ResourceBundle defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults",
+    private final transient ResourceBundle defaultProperties = ResourceBundle.getBundle(
+            "mekhq.resources.AtBConfigDefaults",
             MekHQ.getMHQOptions().getLocale());
 
     private AtBConfiguration() {
@@ -98,14 +116,16 @@ public class AtBConfiguration {
      */
     private WeightedTable<String> getDefaultForceTable(String key, int index) {
         if (index < 0) {
-            LogManager.getLogger().error("Default force tables don't support negative weights, limiting to 0");
+            logger.error("Default force tables don't support negative weights, limiting to 0");
             index = 0;
         }
         String property = defaultProperties.getString(key);
         String[] fields = property.split("\\|");
         if (index >= fields.length) {
             // Deal with too short field lengths
-            LogManager.getLogger().error(String.format("Default force tables have %d weight entries; limiting the original value of %d.", fields.length, index));
+            logger.error(
+                    String.format("Default force tables have %d weight entries; limiting the original value of %d.",
+                            fields.length, index));
             index = fields.length - 1;
         }
         return parseDefaultWeightedTable(fields[index]);
@@ -115,7 +135,7 @@ public class AtBConfiguration {
         return parseDefaultWeightedTable(entry, Function.identity());
     }
 
-    private <T>WeightedTable<T> parseDefaultWeightedTable(String entry, Function<String,T> fromString) {
+    private <T> WeightedTable<T> parseDefaultWeightedTable(String entry, Function<String, T> fromString) {
         WeightedTable<T> retVal = new WeightedTable<>();
         String[] entries = entry.split(",");
         for (String e : entries) {
@@ -123,7 +143,7 @@ public class AtBConfiguration {
                 String[] fields = e.split(":");
                 retVal.add(Integer.parseInt(fields[0]), fromString.apply(fields[1]));
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
         return retVal;
@@ -133,7 +153,7 @@ public class AtBConfiguration {
      * Used if the config file is missing.
      */
     private void setAllValuesToDefaults() {
-        for (Enumeration<String> e = defaultProperties.getKeys(); e.hasMoreElements(); ) {
+        for (Enumeration<String> e = defaultProperties.getKeys(); e.hasMoreElements();) {
             String key = e.nextElement();
             String property = defaultProperties.getString(key);
             switch (key) {
@@ -221,7 +241,9 @@ public class AtBConfiguration {
             int weightClassIndex = weightClassIndex(weightClass);
             WeightedTable<String> table;
             if ((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
-                LogManager.getLogger().error(String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass));
+                logger.error(String.format(
+                        "Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values",
+                        org, weightClass));
                 weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
             }
             table = botForceTable.get(weightClassIndex);
@@ -230,7 +252,7 @@ public class AtBConfiguration {
             }
             return table.select(rollMod);
         } else {
-            LogManager.getLogger().error(String.format("Bot force tables for organization \"%s\" not found, ignoring", org));
+            logger.error(String.format("Bot force tables for organization \"%s\" not found, ignoring", org));
             return null;
         }
     }
@@ -250,9 +272,11 @@ public class AtBConfiguration {
      * Translates character code in the indicated position to the appropriate weight
      * class constant.
      *
-     * @param s        A String of single-character codes that indicate the weight classes of the units in a lance (e.g. "LMMH")
-     * @param i        The index of the code to be translated
-     * @return        The value used by UnitTableData to find the correct RAT for the weight class
+     * @param s A String of single-character codes that indicate the weight classes
+     *          of the units in a lance (e.g. "LMMH")
+     * @param i The index of the code to be translated
+     * @return The value used by UnitTableData to find the correct RAT for the
+     *         weight class
      */
     public static int decodeWeightStr(String s, int i) {
         switch (s.charAt(i)) {
@@ -284,7 +308,7 @@ public class AtBConfiguration {
     }
 
     public boolean isHiringHall(String planet, LocalDate date) {
-        return hiringHalls.stream().anyMatch( rec -> rec.getValue().equals(planet)
+        return hiringHalls.stream().anyMatch(rec -> rec.getValue().equals(planet)
                 && rec.fitsDate(date));
     }
 
@@ -325,7 +349,8 @@ public class AtBConfiguration {
 
         TargetRoll target = new TargetRoll(baseShipSearchTarget, "Base");
         Person adminLog = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_LOGISTICS, SkillType.S_ADMIN);
-        int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
+        int adminLogExp = (adminLog == null) ? SkillType.EXP_ULTRA_GREEN
+                : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 
         target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
         target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(),
@@ -333,7 +358,7 @@ public class AtBConfiguration {
         return target;
     }
 
-    public @Nullable MechSummary findShip(int unitType) {
+    public @Nullable MekSummary findShip(int unitType) {
         WeightedTable<String> table = null;
         if (unitType == UnitType.JUMPSHIP) {
             table = jsTable;
@@ -349,13 +374,13 @@ public class AtBConfiguration {
         if (shipName == null) {
             return null;
         }
-        return MechSummaryCache.getInstance().getMech(shipName);
+        return MekSummaryCache.getInstance().getMek(shipName);
     }
 
     public static AtBConfiguration loadFromXml() {
         AtBConfiguration retVal = new AtBConfiguration();
 
-        LogManager.getLogger().info("Starting load of AtB configuration data from XML...");
+        logger.info("Starting load of AtB configuration data from XML...");
 
         Document xmlDoc;
         try (InputStream is = new FileInputStream("data/universe/atbconfig.xml")) { // TODO : Remove inline file path
@@ -363,11 +388,11 @@ public class AtBConfiguration {
 
             xmlDoc = db.parse(is);
         } catch (FileNotFoundException ex) {
-            LogManager.getLogger().info("File data/universe/atbconfig.xml not found. Loading defaults.");
+            logger.info("File data/universe/atbconfig.xml not found. Loading defaults.");
             retVal.setAllValuesToDefaults();
             return retVal;
         } catch (Exception ex) {
-            LogManager.getLogger().error("Error parsing file data/universe/atbconfig.xml. Loading defaults.", ex);
+            logger.error("Error parsing file data/universe/atbconfig.xml. Loading defaults.", ex);
             retVal.setAllValuesToDefaults();
             return retVal;
         }
@@ -443,7 +468,7 @@ public class AtBConfiguration {
                     }
                     retVal.set(weightClass, loadWeightedTableFromXml(wn));
                 } catch (Exception ex) {
-                    LogManager.getLogger().error("Could not parse weight class attribute for enemy forces table", ex);
+                    logger.error("Could not parse weight class attribute for enemy forces table", ex);
                 }
             }
         }
@@ -521,7 +546,7 @@ public class AtBConfiguration {
         return loadWeightedTableFromXml(node, Function.identity());
     }
 
-    private <T>WeightedTable<T> loadWeightedTableFromXml(Node node, Function<String,T> fromString) {
+    private <T> WeightedTable<T> loadWeightedTableFromXml(Node node, Function<String, T> fromString) {
         WeightedTable<T> retVal = new WeightedTable<>();
         NodeList nl = node.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
@@ -603,13 +628,15 @@ public class AtBConfiguration {
 
         /**
          * Select random entry proportionally to the weight values
-         * @param rollMod - a modifier to the die roll, expressed as a fraction of the total weight
+         *
+         * @param rollMod - a modifier to the die roll, expressed as a fraction of the
+         *                total weight
          * @return
          */
         public @Nullable T select(float rollMod) {
             int total = weights.stream().mapToInt(Integer::intValue).sum();
             if (total > 0) {
-                int roll = Math.min(Compute.randomInt(total) + (int)(total * rollMod + 0.5f),
+                int roll = Math.min(Compute.randomInt(total) + (int) (total * rollMod + 0.5f),
                         total - 1);
                 for (int i = 0; i < weights.size(); i++) {
                     if (roll < weights.get(i)) {

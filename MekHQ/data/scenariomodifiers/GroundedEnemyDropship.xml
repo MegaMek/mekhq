@@ -1,5 +1,6 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An enemy dropship has been grounded in this area, but its weapons are still active so pay attention.</additionalBriefingText>
+	<additionalBriefingText>An enemy dropship has been grounded in this area, but its weapons are
+		still active so pay attention.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -16,8 +17,8 @@
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
-		<deploymentZones/>
-			<destinationZone>5</destinationZone>
+		<deploymentZones />
+		<destinationZone>5</destinationZone>
 		<fixedUnitCount>1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>

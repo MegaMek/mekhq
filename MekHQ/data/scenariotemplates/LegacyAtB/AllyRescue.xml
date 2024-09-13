@@ -2,11 +2,13 @@
 <ScenarioTemplate>
     <name>Big Battle: Ally Rescue</name>
     <shortBriefing></shortBriefing>
-    <detailedBriefing>Allied forces have come under attack by overwhelming numbers of enemy units. Protect them while destroying or routing the enemy. This mission requires the deployment of two lances.</detailedBriefing>
+    <detailedBriefing>Allied forces have come under attack by overwhelming numbers of enemy units.
+        Protect them while destroying or routing the enemy. This mission requires the deployment of
+        two lances.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
-        <allowedTerrainTypes/>
+        <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
@@ -47,7 +49,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -78,7 +80,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -97,7 +99,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>12</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -107,7 +109,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
@@ -127,7 +129,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -137,7 +139,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>SameEdge</syncDeploymentType>
@@ -146,5 +148,5 @@
             </value>
         </entry>
     </scenarioForces>
-    <scenarioObjectives/>
+    <scenarioObjectives />
 </ScenarioTemplate>

@@ -22,7 +22,6 @@ import megamek.Version;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -30,6 +29,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -226,9 +226,7 @@ public class AtBDynamicScenario extends AtBScenario {
         if ((x >= 0) && (x < getBotForces().size())) {
             BotForce botToRemove = getBotForces().get(x);
 
-            if (botForceTemplates.containsKey(botToRemove)) {
-                botForceTemplates.remove(botToRemove);
-            }
+            botForceTemplates.remove(botToRemove);
         }
 
         super.removeBotForce(x);
@@ -335,10 +333,10 @@ public class AtBDynamicScenario extends AtBScenario {
      * and that AtBDynamicScenarioFactory.finalizeScenario() has been called on this scenario to
      * generate opposing forces and their bots, apply any present scenario modifiers,
      * set up deployment turns, calculate which units belong to which objectives, and many other things.
-     *
+     * <p>
      * Further "post-force-generation" modifiers can be applied to this scenario, but calling
      * finalizeScenario() on it again will lead to "unsupported" behavior.
-     *
+     * <p>
      * Can be called as a short hand way of telling "is this scenario ready to play".
      */
     public boolean isFinalized() {
@@ -396,7 +394,7 @@ public class AtBDynamicScenario extends AtBScenario {
 
         if ((commander != null) &&
                 commander.hasSkill(skillType)) {
-            skillValue = commander.getSkill(skillType).getLevel();
+            skillValue = commander.getSkill(skillType).getTotalSkillLevel();
         }
 
         return skillValue;

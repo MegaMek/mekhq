@@ -33,13 +33,13 @@ public class AtBStaticWeightGenerator {
      */
     public static int getRandomWeight(final Campaign campaign, final int unitType,
                                       final Faction faction) {
-        return getRandomWeight(unitType, faction, campaign.getCampaignOptions().isRegionalMechVariations());
+        return getRandomWeight(unitType, faction, campaign.getCampaignOptions().isRegionalMekVariations());
     }
 
     /**
      * @param unitType the unit type to determine the format of weight to generate
      * @param faction the faction to generate the weight for
-     * @param regionVariations whether to generate 'Mech weights based on hardcoded regional variations
+     * @param regionVariations whether to generate 'Mek weights based on hardcoded regional variations
      * @return the generated weight
      */
     private static int getRandomWeight(final int unitType, final Faction faction,
@@ -47,16 +47,16 @@ public class AtBStaticWeightGenerator {
         if (unitType == UnitType.AEROSPACEFIGHTER) {
             return getRandomAerospaceWeight();
         } else if ((unitType == UnitType.MEK) && regionVariations) {
-            return getRegionalMechWeight(faction);
+            return getRegionalMekWeight(faction);
         } else {
-            return getRandomMechWeight();
+            return getRandomMekWeight();
         }
     }
 
     /**
-     * @return the generated weight for a BattleMech
+     * @return the generated weight for a BattleMek
      */
-    private static int getRandomMechWeight() {
+    private static int getRandomMekWeight() {
         final int roll = Compute.randomInt(10);
         if (roll < 3) {
             return EntityWeightClass.WEIGHT_LIGHT;
@@ -70,10 +70,10 @@ public class AtBStaticWeightGenerator {
     }
 
     /**
-     * @param faction the faction to determine the regional BattleMech weight for
-     * @return the generated weight for a BattleMech
+     * @param faction the faction to determine the regional BattleMek weight for
+     * @return the generated weight for a BattleMek
      */
-    private static int getRegionalMechWeight(final Faction faction) {
+    private static int getRegionalMekWeight(final Faction faction) {
         final int roll = Compute.randomInt(100);
         switch (faction.getShortName()) {
             case "DC":

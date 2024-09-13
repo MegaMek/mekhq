@@ -18,26 +18,31 @@
  */
 package mekhq.campaign.icons;
 
-import megamek.common.annotations.Nullable;
-import megamek.utilities.xml.MMXMLUtility;
-import org.apache.logging.log4j.LogManager;
+import java.awt.Image;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.awt.*;
-import java.io.PrintWriter;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import megamek.utilities.xml.MMXMLUtility;
 
 /**
- * Unit Icon is an implementation of StandardForceIcon that permits a null filename, thereby
+ * Unit Icon is an implementation of StandardForceIcon that permits a null
+ * filename, thereby
  * allowing it to purposefully return a null image when a unit icon is absent.
+ * 
  * @see StandardForceIcon
  */
 public class UnitIcon extends StandardForceIcon {
-    //region Variable Declarations
-    public static final String XML_TAG = "unitIcon";
-    //endregion Variable Declarations
+    private static final MMLogger logger = MMLogger.create(UnitIcon.class);
 
-    //region Constructors
+    // region Variable Declarations
+    public static final String XML_TAG = "unitIcon";
+    // endregion Variable Declarations
+
+    // region Constructors
     public UnitIcon() {
         this(ROOT_CATEGORY, DEFAULT_FORCE_ICON_FILENAME);
     }
@@ -45,9 +50,9 @@ public class UnitIcon extends StandardForceIcon {
     public UnitIcon(final @Nullable String category, final @Nullable String filename) {
         super(category, filename);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     @Override
     public @Nullable String getFilename() {
         return super.getFilename();
@@ -58,15 +63,15 @@ public class UnitIcon extends StandardForceIcon {
         // We allow filename to be null here to indicate no icons
         this.filename = filename;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region Boolean Methods
+    // region Boolean Methods
     @Override
     public boolean hasDefaultFilename() {
         return DEFAULT_ICON_FILENAME.equals(getFilename())
                 || ((getFilename() != null) && getFilename().isBlank());
     }
-    //endregion Boolean Methods
+    // endregion Boolean Methods
 
     @Override
     public @Nullable Image getImage(final int width, final int height) {
@@ -77,7 +82,7 @@ public class UnitIcon extends StandardForceIcon {
         return (image == null) ? null : super.getImage(image, width, height);
     }
 
-    //region File I/O
+    // region File I/O
     @Override
     public void writeToXML(final PrintWriter pw, final int indent) {
         writeToXML(pw, indent, XML_TAG);
@@ -99,7 +104,7 @@ public class UnitIcon extends StandardForceIcon {
         try {
             icon.parseNodes(wn.getChildNodes());
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return new UnitIcon();
         }
         return icon;
@@ -113,7 +118,7 @@ public class UnitIcon extends StandardForceIcon {
             setFilename(null);
         }
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public UnitIcon clone() {

@@ -1,4 +1,35 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.personnel;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
@@ -8,18 +39,6 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.time.LocalDate;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
 public class PersonTest {
     private Person mockPerson;
@@ -36,21 +55,27 @@ public class PersonTest {
         Campaign mockCampaign = Mockito.mock(Campaign.class);
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
-        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
-        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
-        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
+                LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
+                LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2",
+                LocalDate.parse("3000-01-01"));
 
-        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"), LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"),
+                LocalDate.parse("3000-01-02"));
 
         assertTrue(mockPerson.getAwardController().hasAwards());
         assertEquals(2, mockPerson.getAwardController().getAwards().size());
 
-        mockPerson.getAwardController().removeAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"), LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().removeAward("TestSet", "Test Award 2", LocalDate.parse("3000-01-01"),
+                LocalDate.parse("3000-01-02"));
 
         assertTrue(mockPerson.getAwardController().hasAwards());
         assertEquals(1, mockPerson.getAwardController().getAwards().size());
 
-        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"), LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"),
+                LocalDate.parse("3000-01-02"));
 
         assertFalse(mockPerson.getAwardController().hasAwards());
         assertEquals(0, mockPerson.getAwardController().getAwards().size());
@@ -68,17 +93,22 @@ public class PersonTest {
         Campaign mockCampaign = Mockito.mock(Campaign.class);
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
 
-        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-01"));
-        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1", LocalDate.parse("3000-01-02"));
-        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2", LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
+                LocalDate.parse("3000-01-01"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 1",
+                LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().addAndLogAward(mockCampaign, "TestSet", "Test Award 2",
+                LocalDate.parse("3000-01-01"));
 
-        assertEquals( 2, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
+        assertEquals(2, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 
-        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"), LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-01"),
+                LocalDate.parse("3000-01-02"));
 
         assertEquals(1, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
 
-        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"), LocalDate.parse("3000-01-02"));
+        mockPerson.getAwardController().removeAward("TestSet", "Test Award 1", LocalDate.parse("3000-01-02"),
+                LocalDate.parse("3000-01-02"));
 
         assertEquals(0, mockPerson.getAwardController().getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
     }
@@ -105,11 +135,11 @@ public class PersonTest {
         assertEquals(is1Id, mockPerson.getOriginalUnitId());
 
         int[] is2Techs = new int[] {
-            TechConstants.T_IS_TW_NON_BOX,
-            TechConstants.T_IS_TW_ALL,
-            TechConstants.T_IS_ADVANCED,
-            TechConstants.T_IS_EXPERIMENTAL,
-            TechConstants.T_IS_UNOFFICIAL,
+                TechConstants.T_IS_TW_NON_BOX,
+                TechConstants.T_IS_TW_ALL,
+                TechConstants.T_IS_ADVANCED,
+                TechConstants.T_IS_EXPERIMENTAL,
+                TechConstants.T_IS_UNOFFICIAL,
         };
         for (int is2TechLevel : is2Techs) {
             UUID is2Id = UUID.randomUUID();
@@ -131,10 +161,10 @@ public class PersonTest {
         }
 
         int[] clanTechs = new int[] {
-            TechConstants.T_CLAN_TW,
-            TechConstants.T_CLAN_ADVANCED,
-            TechConstants.T_CLAN_EXPERIMENTAL,
-            TechConstants.T_CLAN_UNOFFICIAL,
+                TechConstants.T_CLAN_TW,
+                TechConstants.T_CLAN_ADVANCED,
+                TechConstants.T_CLAN_EXPERIMENTAL,
+                TechConstants.T_CLAN_UNOFFICIAL,
         };
         for (int clanTech : clanTechs) {
             UUID clanId = UUID.randomUUID();
@@ -345,6 +375,6 @@ public class PersonTest {
     }
 
     private void initAwards() {
-        AwardsFactory.getInstance().loadAwardsFromStream(PersonnelTestUtilities.getTestAwardSet(),"TestSet");
+        AwardsFactory.getInstance().loadAwardsFromStream(PersonnelTestUtilities.getTestAwardSet(), "TestSet");
     }
 }

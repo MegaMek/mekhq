@@ -20,24 +20,25 @@
  */
 package mekhq.campaign.mission;
 
-import megamek.Version;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Systems;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * Missions are primarily holder objects for a set of scenarios.
@@ -47,7 +48,9 @@ import java.util.stream.Collectors;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Mission {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Mission.class);
+
+    // region Variable Declarations
     private String name;
     protected String systemId;
     private MissionStatus status;
@@ -56,9 +59,9 @@ public class Mission {
     private List<Scenario> scenarios;
     private int id = -1;
     private String legacyPlanetName;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public Mission() {
         this(null);
     }
@@ -71,7 +74,7 @@ public class Mission {
         this.status = MissionStatus.ACTIVE;
         scenarios = new ArrayList<>();
     }
-    //endregion Constructors
+    // endregion Constructors
 
     public String getName() {
         return name;
@@ -103,8 +106,9 @@ public class Mission {
 
     /**
      * Convenience property to return the name of the current planet.
-     * Sometimes, the "current planet" doesn't match up with an existing planet in our planet database,
-     * in which case we return whatever was stored.
+     * Sometimes, the "current planet" doesn't match up with an existing planet in
+     * our planet database, in which case we return whatever was stored.
+     *
      * @return
      */
     public String getSystemName(LocalDate when) {
@@ -143,7 +147,7 @@ public class Mission {
         return getStatus().isActive();
     }
 
-    //region Scenarios
+    // region Scenarios
     public List<Scenario> getScenarios() {
         return scenarios;
     }
@@ -153,7 +157,8 @@ public class Mission {
     }
 
     public List<Scenario> getCurrentScenarios() {
-        return getScenarios().stream().filter(scenario -> scenario.getStatus().isCurrent()).collect(Collectors.toList());
+        return getScenarios().stream().filter(scenario -> scenario.getStatus().isCurrent())
+                .collect(Collectors.toList());
     }
 
     public List<AtBScenario> getCurrentAtBScenarios() {
@@ -164,7 +169,8 @@ public class Mission {
     }
 
     public List<Scenario> getCompletedScenarios() {
-        return getScenarios().stream().filter(scenario -> !scenario.getStatus().isCurrent()).collect(Collectors.toList());
+        return getScenarios().stream().filter(scenario -> !scenario.getStatus().isCurrent())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -184,10 +190,10 @@ public class Mission {
 
     public boolean hasPendingScenarios() {
         // scenarios that are pending, but have not been revealed don't count
-        return getScenarios().stream().anyMatch(scenario ->
-            (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
+        return getScenarios().stream()
+                .anyMatch(scenario -> (scenario.getStatus().isCurrent() && !scenario.isCloaked()));
     }
-    //endregion Scenarios
+    // endregion Scenarios
 
     public int getId() {
         return id;
@@ -197,7 +203,7 @@ public class Mission {
         this.id = i;
     }
 
-    //region File I/O
+    // region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
         indent = writeToXMLBegin(pw, indent);
         writeToXMLEnd(pw, indent);
@@ -282,7 +288,7 @@ public class Mission {
                         if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            LogManager.getLogger().error("Unknown node type not loaded in Scenario nodes: " + wn3.getNodeName());
+                            logger.error("Unknown node type not loaded in Scenario nodes: " + wn3.getNodeName());
 
                             continue;
                         }
@@ -295,12 +301,12 @@ public class Mission {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         return retVal;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

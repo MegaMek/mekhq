@@ -1,13 +1,34 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.model;
+
+import java.awt.Component;
+import java.util.ArrayList;
+
+import javax.swing.AbstractListModel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * A table model for displaying personnel in the infirmary
@@ -21,11 +42,11 @@ public class PatientTableModel extends AbstractListModel<Person> {
         campaign = c;
     }
 
-    //fill table with values
+    // fill table with values
     public void setData(ArrayList<Person> data) {
         patients = data;
         this.fireContentsChanged(this, 0, patients.size());
-        //fireTableDataChanged();
+        // fireTableDataChanged();
     }
 
     @Override

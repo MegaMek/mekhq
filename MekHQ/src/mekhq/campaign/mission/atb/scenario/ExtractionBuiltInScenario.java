@@ -18,24 +18,31 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
+import java.util.ArrayList;
+import java.util.UUID;
+
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 @AtBScenarioEnabled
 public class ExtractionBuiltInScenario extends AtBScenario {
+    private static final MMLogger logger = MMLogger.create(ExtractionBuiltInScenario.class);
+
     private static final String CIVILIAN_FORCE_ID = "Civilians";
 
     @Override
@@ -55,7 +62,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+            ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int otherStart;
         int otherHome;
@@ -121,7 +128,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 addBotForce(bf, campaign);
             }
         } catch (PrincessException ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 

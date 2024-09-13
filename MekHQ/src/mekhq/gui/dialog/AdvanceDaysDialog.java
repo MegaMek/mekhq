@@ -18,19 +18,8 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.baseComponents.MMButton;
-import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.event.Subscribe;
-import mekhq.MekHQ;
-import mekhq.campaign.event.ReportEvent;
-import mekhq.gui.CampaignGUI;
-import mekhq.gui.DailyReportLogPanel;
-import mekhq.gui.baseComponents.AbstractMHQDialog;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -40,8 +29,29 @@ import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+
+import megamek.client.ui.baseComponents.MMButton;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.event.Subscribe;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.event.ReportEvent;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.DailyReportLogPanel;
+import mekhq.gui.baseComponents.AbstractMHQDialog;
+
 public class AdvanceDaysDialog extends AbstractMHQDialog {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(AdvanceDaysDialog.class);
+
+    // region Variable Declarations
     private final CampaignGUI gui;
     private boolean running;
 
@@ -54,17 +64,17 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
     private JButton btnNewYear;
     private JButton btnNewQuinquennial;
     private DailyReportLogPanel dailyLogPanel;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public AdvanceDaysDialog(final JFrame frame, final CampaignGUI gui) {
         super(frame, "AdvanceDaysDialog", "AdvanceDaysDialog.title");
         this.gui = gui;
         initialize();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public CampaignGUI getGUI() {
         return gui;
     }
@@ -148,9 +158,9 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
     public void setDailyLogPanel(final DailyReportLogPanel dailyLogPanel) {
         this.dailyLogPanel = dailyLogPanel;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region Initialization
+    // region Initialization
     @Override
     protected Container createCenterPane() {
         // Create Panel Components
@@ -171,14 +181,12 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(advanceDaysDurationPanel)
-                        .addComponent(getDailyLogPanel())
-        );
+                        .addComponent(getDailyLogPanel()));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(advanceDaysDurationPanel)
-                        .addComponent(getDailyLogPanel())
-        );
+                        .addComponent(getDailyLogPanel()));
 
         return panel;
     }
@@ -187,7 +195,8 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         final JPanel panel = new JPanel(new GridLayout(0, 3));
         panel.setName("advanceDaysDurationPanel");
 
-        // Maxing out at 100 years for dev testing reasons, which is cancellable by pressing escape
+        // Maxing out at 100 years for dev testing reasons, which is cancellable by
+        // pressing escape
         setSpnDays(new JSpinner(new SpinnerNumberModel(7, 1, 36525, 1)));
         getSpnDays().setToolTipText(resources.getString("spnDays.toolTipText"));
         getSpnDays().setName("spnDays");
@@ -235,7 +244,8 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent evt) {
-                // We need to unregister here as unregistering in the actionPerformed method will
+                // We need to unregister here as unregistering in the actionPerformed method
+                // will
                 // lead to incorrect behaviour if the user tries to advance days again without
                 // exiting this dialog
                 MekHQ.unregisterHandler(this);
@@ -249,7 +259,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         super.setCustomPreferences(preferences);
         preferences.manage(new JIntNumberSpinnerPreference(getSpnDays()));
     }
-    //endregion Initialization
+    // endregion Initialization
 
     public void startAdvancement(final ActionEvent evt) {
         MekHQ.registerHandler(this);
@@ -261,28 +271,34 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         } else if (getBtnNewDay().equals(evt.getSource())) {
             days = 1;
         } else if (getBtnNewWeek().equals(evt.getSource())) {
-            // The number of days until the next monday is eight days (a week and a day) minus
-            // the current day of the week. The additional one is added to ensure we get the next
+            // The number of days until the next monday is eight days (a week and a day)
+            // minus
+            // the current day of the week. The additional one is added to ensure we get the
+            // next
             // Monday instead of the Sunday
             days = 8 - today.getDayOfWeek().getValue();
         } else if (getBtnNewMonth().equals(evt.getSource())) {
-            // The number of days until the next month is the length of the month plus one minus
-            // the current day, with the one added because otherwise we get the last day of the same
+            // The number of days until the next month is the length of the month plus one
+            // minus
+            // the current day, with the one added because otherwise we get the last day of
+            // the same
             // month
             days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
         } else if (getBtnNewQuarter().equals(evt.getSource())) {
             days = Math.toIntExact(ChronoUnit.DAYS.between(today,
                     today.with(IsoFields.DAY_OF_QUARTER, 1).plusMonths(3)));
         } else if (getBtnNewYear().equals(evt.getSource())) {
-            // The number of days until the next year is the length of the year plus one minus
-            // the current day, with the one added because otherwise we get the last day of the same
+            // The number of days until the next year is the length of the year plus one
+            // minus
+            // the current day, with the one added because otherwise we get the last day of
+            // the same
             // year
             days = today.lengthOfYear() + 1 - today.getDayOfYear();
         } else if (getBtnNewQuinquennial().equals(evt.getSource())) {
             days = Math.toIntExact(ChronoUnit.DAYS.between(today,
                     LocalDate.ofYearDay(today.getYear() + 5 - (today.getYear() % 5), 1)));
         } else {
-            LogManager.getLogger().error("Unknown source to start advancing days. Advancing to tomorrow.");
+            logger.error("Unknown source to start advancing days. Advancing to tomorrow.");
             days = 1;
         }
 
@@ -305,7 +321,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
                 }
                 reports.addAll(getGUI().getCampaign().fetchAndClearNewReports());
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
                 break;
             }
         }

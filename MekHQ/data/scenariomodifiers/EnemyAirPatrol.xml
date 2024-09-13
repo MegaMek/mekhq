@@ -31,8 +31,8 @@
 		<generationOrder>5</generationOrder>
 		<maxWeightClass>1</maxWeightClass>
 		<objectiveLinkedForces>
-                    <objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
-                </objectiveLinkedForces>
+			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+		</objectiveLinkedForces>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>None</syncDeploymentType>

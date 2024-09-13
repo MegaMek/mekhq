@@ -77,14 +77,14 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
         if (addToCampaign) {
             // This is used for the buy command in MekHQ, named buttonSelect because of how it is used elsewhere
-            buttonSelect = new JButton(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
+            buttonSelect = new JButton(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
             buttonSelect.setName("buttonBuy");
             buttonSelect.addActionListener(this);
             panelButtons.add(buttonSelect, new GridBagConstraints());
 
             if (campaign.isGM()) {
                 // This is used as a GM add, the name is because of how it is used in MegaMek and MegaMekLab
-                buttonSelectClose = new JButton(Messages.getString("MechSelectorDialog.AddGM"));
+                buttonSelectClose = new JButton(Messages.getString("MekSelectorDialog.AddGM"));
                 buttonSelectClose.setName("buttonAddGM");
                 buttonSelectClose.addActionListener(this);
                 panelButtons.add(buttonSelectClose, new GridBagConstraints());
@@ -95,7 +95,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             buttonClose.setName("buttonClose");
             buttonClose.addActionListener(this);
         } else {
-            buttonSelectClose = new JButton(Messages.getString("MechSelectorDialog.Add"));
+            buttonSelectClose = new JButton(Messages.getString("MekSelectorDialog.Add"));
             buttonSelectClose.setName("buttonAdd");
             //the actual work will be done by whatever called this
             buttonSelectClose.addActionListener(evt -> setVisible(false));
@@ -112,7 +112,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         panelButtons.add(buttonClose, new GridBagConstraints());
 
         // This displays the BV of the selected unit
-        buttonShowBV = new JButton(Messages.getString("MechSelectorDialog.BV"));
+        buttonShowBV = new JButton(Messages.getString("MekSelectorDialog.BV"));
         buttonShowBV.setName("buttonShowBV");
         buttonShowBV.addActionListener(this);
         panelButtons.add(buttonShowBV, new GridBagConstraints());
@@ -151,7 +151,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             selectedUnit = null;
             if (addToCampaign) {
                 buttonSelect.setEnabled(false);
-                buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy", TARGET_UNKNOWN));
+                buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy", TARGET_UNKNOWN));
                 buttonSelect.setToolTipText(null);
             }
         } else {
@@ -159,7 +159,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
             if (addToCampaign) {
                 buttonSelect.setEnabled(true);
                 final TargetRoll target = campaign.getTargetForAcquisition(selectedUnit);
-                buttonSelect.setText(Messages.getString("MechSelectorDialog.Buy",
+                buttonSelect.setText(Messages.getString("MekSelectorDialog.Buy",
                         target.getValueAsString()));
                 buttonSelect.setToolTipText(target.getDesc());
             }
@@ -182,7 +182,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
     @Override
     protected void filterUnits() {
-        RowFilter<MechTableModel, Integer> unitTypeFilter;
+        RowFilter<MekTableModel, Integer> unitTypeFilter;
 
         List<Integer> techLevels = new ArrayList<>();
         for (Integer selectedIdx : listTechLevel.getSelectedIndices()) {
@@ -193,18 +193,18 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
         final int nClass = comboWeight.getSelectedIndex();
         final int nUnit = comboUnitType.getSelectedIndex() - 1;
-        final boolean checkSupportVee = Messages.getString("MechSelectorDialog.SupportVee")
+        final boolean checkSupportVee = Messages.getString("MekSelectorDialog.SupportVee")
                 .equals(comboUnitType.getSelectedItem());
         // If the current expression doesn't parse, don't update.
         try {
             unitTypeFilter = new RowFilter<>() {
                 @Override
-                public boolean include(Entry<? extends MechTableModel, ? extends Integer> entry) {
-                    MechTableModel mechModel = entry.getModel();
-                    MechSummary mech = mechModel.getMechSummary(entry.getIdentifier());
-                    ITechnology tech = UnitTechProgression.getProgression(mech, campaign.getTechFaction(), true);
+                public boolean include(Entry<? extends MekTableModel, ? extends Integer> entry) {
+                    MekTableModel mekModel = entry.getModel();
+                    MekSummary mek = mekModel.getMekSummary(entry.getIdentifier());
+                    ITechnology tech = UnitTechProgression.getProgression(mek, campaign.getTechFaction(), true);
                     boolean techLevelMatch = false;
-                    int type = enableYearLimits ? mech.getType(allowedYear) : mech.getType();
+                    int type = enableYearLimits ? mek.getType(allowedYear) : mek.getType();
                     for (int tl : nTypes) {
                         if (type == tl) {
                             techLevelMatch = true;
@@ -214,27 +214,27 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
 
                     if (
                             /* year limits */
-                            (!enableYearLimits || (mech.getYear() <= allowedYear))
+                            (!enableYearLimits || (mek.getYear() <= allowedYear))
                             /* Clan/IS limits */
-                            && (campaign.getCampaignOptions().isAllowClanPurchases() || !TechConstants.isClan(mech.getType()))
-                            && (campaign.getCampaignOptions().isAllowISPurchases() || TechConstants.isClan(mech.getType()))
+                            && (campaign.getCampaignOptions().isAllowClanPurchases() || !TechConstants.isClan(mek.getType()))
+                            && (campaign.getCampaignOptions().isAllowISPurchases() || TechConstants.isClan(mek.getType()))
                             /* Canon */
-                            && (!canonOnly || mech.isCanon())
+                            && (!canonOnly || mek.isCanon())
                             /* Weight */
-                            && ((nClass == mech.getWeightClass()) || (nClass == EntityWeightClass.SIZE))
+                            && ((nClass == mek.getWeightClass()) || (nClass == EntityWeightClass.SIZE))
                             /* Technology Level */
                             && ((null != tech) && campaign.isLegal(tech))
                             && (techLevelMatch)
                             /* Support Vehicles */
                             && ((nUnit == -1)
-                                    || (!checkSupportVee && mech.getUnitType().equals(UnitType.getTypeName(nUnit)))
-                                    || (checkSupportVee && mech.isSupport()))
+                                    || (!checkSupportVee && mek.getUnitType().equals(UnitType.getTypeName(nUnit)))
+                                    || (checkSupportVee && mek.isSupport()))
                             /* Advanced Search */
-                            && ((searchFilter == null) || MechSearchFilter.isMatch(mech, searchFilter))
+                            && ((searchFilter == null) || MekSearchFilter.isMatch(mek, searchFilter))
                     ) {
                         if (!textFilter.getText().isBlank()) {
                             String text = textFilter.getText();
-                            return mech.getName().toLowerCase().contains(text.toLowerCase());
+                            return mek.getName().toLowerCase().contains(text.toLowerCase());
                         }
                         return true;
                     }

@@ -18,31 +18,44 @@
  */
 package mekhq.campaign.universe;
 
-import megamek.client.ratgenerator.FactionRecord;
-import megamek.client.ratgenerator.RATGenerator;
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import megamek.client.ratgenerator.FactionRecord;
+import megamek.client.ratgenerator.RATGenerator;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
 
 public class Factions {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(Factions.class);
+
+    // region Variable Declarations
     private static Factions instance;
 
     private Map<String, Faction> factions = new HashMap<>();
 
     private RATGenerator ratGenerator;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     private Factions() {
         this(RATGenerator.getInstance());
     }
@@ -50,7 +63,7 @@ public class Factions {
     private Factions(final RATGenerator ratGenerator) {
         this.ratGenerator = Objects.requireNonNull(ratGenerator);
     }
-    //endregion Constructors
+    // endregion Constructors
 
     public static Factions getInstance() {
         if (instance == null) {
@@ -126,7 +139,8 @@ public class Factions {
             }
 
             if (fRec == null) {
-                LogManager.getLogger().error("Could not locate faction record for " + faction);
+                String message = String.format("Could not locate faction record for %s", faction);
+                logger.error(message);
             }
         }
 
@@ -143,11 +157,11 @@ public class Factions {
      */
     public static Factions loadDefault()
             throws DOMException, SAXException, IOException, ParserConfigurationException {
-        LogManager.getLogger().info("Starting load of faction data from XML...");
+        logger.info("Starting load of faction data from XML...");
 
         Factions factions = load("data/universe/factions.xml");
 
-        LogManager.getLogger().info("Loaded a total of " + factions.factions.size() + " factions");
+        logger.info("Loaded a total of %d factions", factions.factions.size());
 
         return factions;
     }
@@ -180,7 +194,7 @@ public class Factions {
         NodeList nl = factionEle.getChildNodes();
 
         // Get rid of empty text nodes and adjacent text nodes...
-        // Stupid weird parsing of XML.  At least this cleans it up.
+        // Stupid weird parsing of XML. At least this cleans it up.
         factionEle.normalize();
 
         // Okay, lets iterate through the children, eh?
@@ -201,9 +215,12 @@ public class Factions {
                     if (!retVal.factions.containsKey(faction.getShortName())) {
                         retVal.factions.put(faction.getShortName(), faction);
                     } else {
-                        LogManager.getLogger().error(
-                                String.format("Faction code \"%s\" already used for faction %s, can't re-use it for %s",
-                                        faction.getShortName(), retVal.factions.get(faction.getShortName()).getFullName(0), faction.getFullName(0)));
+                        String message = String.format(
+                                "Faction code \"%s\" already used for faction %s, can't re-use it for %s",
+                                faction.getShortName(),
+                                retVal.factions.get(faction.getShortName()).getFullName(0),
+                                faction.getFullName(0));
+                        logger.error(message);
                     }
                 }
             }

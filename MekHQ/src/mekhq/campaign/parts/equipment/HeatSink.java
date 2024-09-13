@@ -45,15 +45,16 @@ public class HeatSink extends EquipmentPart {
     }
 
     /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
+     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer
+     * detail, boolean ignoreAmmo)
      *
      */
     @Override
     public Money getStickerPrice() {
         if (type.hasFlag(MiscType.F_DOUBLE_HEAT_SINK) || type.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
-            return Money.of(isOmniPodded()? 7500 : 6000);
+            return Money.of(isOmniPodded() ? 7500 : 6000);
         } else {
-            return Money.of(isOmniPodded()? 2500 : 2000);
+            return Money.of(isOmniPodded() ? 2500 : 2000);
         }
     }
 
@@ -66,13 +67,14 @@ public class HeatSink extends EquipmentPart {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
             int priorHits = hits;
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            Mounted<?> mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted) {
                 if (mounted.isMissing()) {
                     remove(false);
                     return;
                 }
-                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
+                hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum,
+                        mounted.getLocation());
             }
             if (checkForDestruction
                     && hits > priorHits

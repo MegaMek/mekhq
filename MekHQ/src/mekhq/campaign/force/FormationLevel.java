@@ -18,15 +18,16 @@
  */
 package mekhq.campaign.force;
 
+import java.util.ResourceBundle;
+
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 
-import java.util.ResourceBundle;
-
 public enum FormationLevel {
-    //region Enum Declarations
-    REMOVE_OVERRIDE("FormationLevel.REMOVE_OVERRIDE.text", "FormationLevel.REMOVE_OVERRIDE.description", -1, true, true, true),
+    // region Enum Declarations
+    REMOVE_OVERRIDE("FormationLevel.REMOVE_OVERRIDE.text", "FormationLevel.REMOVE_OVERRIDE.description", -1, true, true,
+            true),
     NONE("FormationLevel.NONE.text", "FormationLevel.NONE.description", -1, true, true, true),
     INVALID("FormationLevel.INVALID.text", "FormationLevel.INVALID.description", -1, true, true, true),
 
@@ -42,29 +43,31 @@ public enum FormationLevel {
 
     // Clan
     STAR_OR_NOVA("FormationLevel.STAR_OR_NOVA.text", "FormationLevel.STAR_OR_NOVA.description", 0, false, true, false),
-    BINARY_OR_TRINARY("FormationLevel.BINARY_OR_TRINARY.text", "FormationLevel.BINARY_OR_TRINARY.description", 1, false, true, false),
+    BINARY_OR_TRINARY("FormationLevel.BINARY_OR_TRINARY.text", "FormationLevel.BINARY_OR_TRINARY.description", 1, false,
+            true, false),
     CLUSTER("FormationLevel.CLUSTER.text", "FormationLevel.CLUSTER.description", 2, false, true, false),
     GALAXY("FormationLevel.GALAXY.text", "FormationLevel.GALAXY.description", 3, false, true, false),
     TOUMAN("FormationLevel.TOUMAN.text", "FormationLevel.TOUMAN.description", 4, false, true, false),
 
     // ComStar
-    LEVEL_II_OR_CHOIR("FormationLevel.LEVEL_II_OR_CHOIR.text", "FormationLevel.LEVEL_II_OR_CHOIR.description", 0, false, false, true),
+    LEVEL_II_OR_CHOIR("FormationLevel.LEVEL_II_OR_CHOIR.text", "FormationLevel.LEVEL_II_OR_CHOIR.description", 0, false,
+            false, true),
     LEVEL_III("FormationLevel.LEVEL_III.text", "FormationLevel.LEVEL_III.description", 1, false, false, true),
     LEVEL_IV("FormationLevel.LEVEL_IV.text", "FormationLevel.LEVEL_IV.description", 2, false, false, true),
     LEVEL_V("FormationLevel.LEVEL_V.text", "FormationLevel.LEVEL_V.description", 3, false, false, true),
     LEVEL_VI("FormationLevel.LEVEL_VI.text", "FormationLevel.LEVEL_VI.description", 4, false, false, true);
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String description;
     private final int depth;
     private final boolean isInnerSphere;
     private final boolean isClan;
     private final boolean isComStar;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     FormationLevel(final String name, final String description, int depth, boolean isIS, boolean isClan, boolean isCS) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.FormationLevel",
                 MekHQ.getMHQOptions().getLocale());
@@ -76,167 +79,140 @@ public enum FormationLevel {
         this.isClan = isClan;
         this.isComStar = isCS;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
-    @SuppressWarnings(value = "unused")
+    // region Getters
     public String getDescription() {
         return description;
     }
 
-    @SuppressWarnings(value = "unused")
     public int getDepth() {
         return depth;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isInnerSphere() {
         return isInnerSphere;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isClan() {
         return isClan;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isComStar() {
         return isComStar;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    @SuppressWarnings(value = "unused")
+    // region Boolean Comparison Methods
     public boolean isRemoveOverride() {
         return this == REMOVE_OVERRIDE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isNone() {
         return this == NONE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isInvalid() {
         return this == INVALID;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLance() {
         return this == LANCE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCompany() {
         return this == COMPANY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBattalion() {
         return this == BATTALION;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isRegiment() {
         return this == REGIMENT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBrigade() {
         return this == BRIGADE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDivision() {
         return this == DIVISION;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCorps() {
         return this == CORPS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isArmy() {
         return this == ARMY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isStarOrNova() {
         return this == STAR_OR_NOVA;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBinaryOrTrinary() {
         return this == BINARY_OR_TRINARY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCluster() {
         return this == CLUSTER;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isGalaxy() {
         return this == GALAXY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTouman() {
         return this == TOUMAN;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLevelTwoOrChoir() {
         return this == LEVEL_II_OR_CHOIR;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLevelThree() {
         return this == LEVEL_III;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLevelFour() {
         return this == LEVEL_IV;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLevelFive() {
         return this == LEVEL_V;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLevelSix() {
         return this == LEVEL_VI;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isLanceEquivalent() {
         return this == LANCE || this == STAR_OR_NOVA || this == LEVEL_II_OR_CHOIR;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCompanyEquivalent() {
         return this == COMPANY || this == BINARY_OR_TRINARY || this == LEVEL_III;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBattalionEquivalent() {
         return this == BATTALION || this == CLUSTER || this == LEVEL_IV;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
 
     /**
-     * Parses a string representation of a formation level and returns the corresponding FormationLevel enum value.
+     * Parses a string representation of a formation level and returns the
+     * corresponding FormationLevel enum value.
      *
      * @param formationLevel the string representation of the formation level
-     * @return the FormationLevel enum value corresponding to the given formation level string
+     * @return the FormationLevel enum value corresponding to the given formation
+     *         level string
      * @throws IllegalStateException if the formation level string is not recognized
      */
-    @SuppressWarnings(value = "unused")
+
     public static FormationLevel parseFromString(final String formationLevel) {
         return switch (formationLevel) {
             case "0", "Remove Override" -> REMOVE_OVERRIDE;
@@ -268,19 +244,23 @@ public enum FormationLevel {
             case "20", "Level VI" -> LEVEL_VI;
 
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromString: "
-                            + formationLevel);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromString: "
+                                + formationLevel);
         };
     }
 
     /**
-     * Parses an integer value representing a formation level and returns the corresponding FormationLevel enum value.
+     * Parses an integer value representing a formation level and returns the
+     * corresponding FormationLevel enum value.
      *
      * @param formationLevel The integer value representing the formation level.
-     * @return The FormationLevel enum value corresponding to the given integer value.
-     * @throws IllegalStateException if the given formation level has no corresponding FormationLevel enum value.
+     * @return The FormationLevel enum value corresponding to the given integer
+     *         value.
+     * @throws IllegalStateException if the given formation level has no
+     *                               corresponding FormationLevel enum value.
      */
-    @SuppressWarnings(value = "unused")
+
     public static FormationLevel parseFromInt(final int formationLevel) {
         return switch (formationLevel) {
             case 0 -> REMOVE_OVERRIDE;
@@ -312,8 +292,9 @@ public enum FormationLevel {
             case 20 -> LEVEL_VI;
 
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromInt: "
-                            + formationLevel);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/force/FormationLevel.java/parseFromInt: "
+                                + formationLevel);
         };
     }
 
@@ -323,7 +304,7 @@ public enum FormationLevel {
      * @return The integer representation of the FormationLevel enum value.
      * @throws IllegalStateException If the given FormationLevel is unexpected.
      */
-    @SuppressWarnings(value = "unused")
+
     public int parseToInt() {
         return switch (this) {
             case REMOVE_OVERRIDE -> 0;
@@ -360,7 +341,7 @@ public enum FormationLevel {
      * Parses the formation level based on a given depth and campaign faction.
      *
      * @param campaign The current campaign
-     * @param depth The depth of the formation
+     * @param depth    The depth of the formation
      * @return The corresponding formation level
      */
     public static FormationLevel parseFromDepth(Campaign campaign, int depth) {

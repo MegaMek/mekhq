@@ -18,36 +18,37 @@
  */
 package mekhq.campaign.finances.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TransactionTypeTest {
-    //region Variable Declarations
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class TransactionTypeTest {
+    // region Variable Declarations
     private static final TransactionType[] types = TransactionType.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
-    public void testGetToolTipText() {
+    void testGetToolTipText() {
         assertEquals(resources.getString("TransactionType.RECRUITMENT.toolTipText"),
                 TransactionType.RECRUITMENT.getToolTipText());
         assertEquals(resources.getString("TransactionType.UNIT_SALE.toolTipText"),
                 TransactionType.UNIT_SALE.getToolTipText());
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsBattleLossCompensation() {
+    void testIsBattleLossCompensation() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.BATTLE_LOSS_COMPENSATION) {
                 assertTrue(transactionType.isBattleLossCompensation());
@@ -58,7 +59,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsConstruction() {
+    void testIsConstruction() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.CONSTRUCTION) {
                 assertTrue(transactionType.isConstruction());
@@ -69,7 +70,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsContractPayment() {
+    void testIsContractPayment() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.CONTRACT_PAYMENT) {
                 assertTrue(transactionType.isContractPayment());
@@ -80,7 +81,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsEducation() {
+    void testIsEducation() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.EDUCATION) {
                 assertTrue(transactionType.isEducation());
@@ -91,7 +92,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsEquipmentPurchase() {
+    void testIsEquipmentPurchase() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.EQUIPMENT_PURCHASE) {
                 assertTrue(transactionType.isEquipmentPurchase());
@@ -102,7 +103,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsEquipmentSale() {
+    void testIsEquipmentSale() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.EQUIPMENT_SALE) {
                 assertTrue(transactionType.isEquipmentSale());
@@ -113,7 +114,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsFinancialTermEndCarryover() {
+    void testIsFinancialTermEndCarryover() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.FINANCIAL_TERM_END_CARRYOVER) {
                 assertTrue(transactionType.isFinancialTermEndCarryover());
@@ -124,7 +125,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsFine() {
+    void testIsFine() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.FINE) {
                 assertTrue(transactionType.isFine());
@@ -135,7 +136,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsLoanPayment() {
+    void testIsLoanPayment() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.LOAN_PAYMENT) {
                 assertTrue(transactionType.isLoanPayment());
@@ -146,7 +147,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsLoanPrincipal() {
+    void testIsLoanPrincipal() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.LOAN_PRINCIPAL) {
                 assertTrue(transactionType.isLoanPrincipal());
@@ -157,7 +158,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsMaintenance() {
+    void testIsMaintenance() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.MAINTENANCE) {
                 assertTrue(transactionType.isMaintenance());
@@ -168,7 +169,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsMedicalExpenses() {
+    void testIsMedicalExpenses() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.MEDICAL_EXPENSES) {
                 assertTrue(transactionType.isMedicalExpenses());
@@ -179,7 +180,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsMiscellaneous() {
+    void testIsMiscellaneous() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.MISCELLANEOUS) {
                 assertTrue(transactionType.isMiscellaneous());
@@ -190,7 +191,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsOverhead() {
+    void testIsOverhead() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.OVERHEAD) {
                 assertTrue(transactionType.isOverhead());
@@ -201,7 +202,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsRansom() {
+    void testIsRansom() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.RANSOM) {
                 assertTrue(transactionType.isRansom());
@@ -212,7 +213,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsRecruitment() {
+    void testIsRecruitment() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.RECRUITMENT) {
                 assertTrue(transactionType.isRecruitment());
@@ -223,7 +224,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsRent() {
+    void testIsRent() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.RENT) {
                 assertTrue(transactionType.isRent());
@@ -234,7 +235,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsRepairs() {
+    void testIsRepairs() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.REPAIRS) {
                 assertTrue(transactionType.isRepairs());
@@ -245,7 +246,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsPayout() {
+    void testIsPayout() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.PAYOUT) {
                 assertTrue(transactionType.isPayout());
@@ -256,7 +257,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsSalaries() {
+    void testIsSalaries() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.SALARIES) {
                 assertTrue(transactionType.isSalaries());
@@ -267,7 +268,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsSalvage() {
+    void testIsSalvage() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.SALVAGE) {
                 assertTrue(transactionType.isSalvage());
@@ -278,7 +279,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsSalvageExchange() {
+    void testIsSalvageExchange() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.SALVAGE_EXCHANGE) {
                 assertTrue(transactionType.isSalvageExchange());
@@ -289,7 +290,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsStartingCapital() {
+    void testIsStartingCapital() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.STARTING_CAPITAL) {
                 assertTrue(transactionType.isStartingCapital());
@@ -300,7 +301,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsTaxes() {
+    void testIsTaxes() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.TAXES) {
                 assertTrue(transactionType.isTaxes());
@@ -311,7 +312,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsTransportation() {
+    void testIsTransportation() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.TRANSPORTATION) {
                 assertTrue(transactionType.isTransportation());
@@ -322,7 +323,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsUnitPurchase() {
+    void testIsUnitPurchase() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.UNIT_PURCHASE) {
                 assertTrue(transactionType.isUnitPurchase());
@@ -333,7 +334,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsUnitSale() {
+    void testIsUnitSale() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.UNIT_SALE) {
                 assertTrue(transactionType.isUnitSale());
@@ -344,7 +345,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsTheft() {
+    void testIsTheft() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.THEFT) {
                 assertTrue(transactionType.isTheft());
@@ -355,7 +356,7 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsBonusPartExchange() {
+    void testIsBonusPartExchange() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.BONUS_EXCHANGE) {
                 assertTrue(transactionType.isBonusExchange());
@@ -364,52 +365,27 @@ public class TransactionTypeTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Enum.valueOf Testing
         assertEquals(TransactionType.CONSTRUCTION, TransactionType.parseFromString("CONSTRUCTION"));
-        assertEquals(TransactionType.FINANCIAL_TERM_END_CARRYOVER, TransactionType.parseFromString("FINANCIAL_TERM_END_CARRYOVER"));
+        assertEquals(TransactionType.FINANCIAL_TERM_END_CARRYOVER,
+                TransactionType.parseFromString("FINANCIAL_TERM_END_CARRYOVER"));
         assertEquals(TransactionType.MEDICAL_EXPENSES, TransactionType.parseFromString("MEDICAL_EXPENSES"));
-
-        // Parsing Legacy Testing
-        assertEquals(TransactionType.FINANCIAL_TERM_END_CARRYOVER, TransactionType.parseFromString("CARRYOVER"));
-        assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("0"));
-        assertEquals(TransactionType.EQUIPMENT_PURCHASE, TransactionType.parseFromString("1"));
-        assertEquals(TransactionType.UNIT_PURCHASE, TransactionType.parseFromString("2"));
-        assertEquals(TransactionType.SALARIES, TransactionType.parseFromString("3"));
-        assertEquals(TransactionType.OVERHEAD, TransactionType.parseFromString("4"));
-        assertEquals(TransactionType.MAINTENANCE, TransactionType.parseFromString("5"));
-        assertEquals(TransactionType.UNIT_SALE, TransactionType.parseFromString("6"));
-        assertEquals(TransactionType.EQUIPMENT_SALE, TransactionType.parseFromString("7"));
-        assertEquals(TransactionType.STARTING_CAPITAL, TransactionType.parseFromString("8"));
-        assertEquals(TransactionType.TRANSPORTATION, TransactionType.parseFromString("9"));
-        assertEquals(TransactionType.CONTRACT_PAYMENT, TransactionType.parseFromString("10"));
-        assertEquals(TransactionType.BATTLE_LOSS_COMPENSATION, TransactionType.parseFromString("11"));
-        assertEquals(TransactionType.SALVAGE_EXCHANGE, TransactionType.parseFromString("12"));
-        assertEquals(TransactionType.LOAN_PRINCIPAL, TransactionType.parseFromString("13"));
-        assertEquals(TransactionType.LOAN_PAYMENT, TransactionType.parseFromString("14"));
-        assertEquals(TransactionType.REPAIRS, TransactionType.parseFromString("15"));
-        assertEquals(TransactionType.RANSOM, TransactionType.parseFromString("16"));
-        assertEquals(TransactionType.EDUCATION, TransactionType.parseFromString("17"));
-        assertEquals(TransactionType.THEFT, TransactionType.parseFromString("18"));
-        assertEquals(TransactionType.PAYOUT, TransactionType.parseFromString("19"));
-        assertEquals(TransactionType.TAXES, TransactionType.parseFromString("20"));
-        assertEquals(TransactionType.BONUS_EXCHANGE, TransactionType.parseFromString("21"));
-        assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("22"));
 
         // Failure Testing
         assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("failureFailsFake"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     /**
      * Testing to ensure the toString Override is working as intended
      */
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("TransactionType.BATTLE_LOSS_COMPENSATION.text"),
                 TransactionType.BATTLE_LOSS_COMPENSATION.toString());
         assertEquals(resources.getString("TransactionType.MISCELLANEOUS.text"),

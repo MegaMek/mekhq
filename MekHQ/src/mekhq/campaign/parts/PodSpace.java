@@ -23,6 +23,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
@@ -322,8 +323,8 @@ public class PodSpace implements IPartWork {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        if (unit.getEntity() instanceof Mech) {
-            return skillType.equals(SkillType.S_TECH_MECH);
+        if (unit.getEntity() instanceof Mek) {
+            return skillType.equals(SkillType.S_TECH_MEK);
         } else if (unit.getEntity() instanceof Aero) {
             return skillType.equals(SkillType.S_TECH_AERO);
         } else if (unit.getEntity() instanceof Tank) {
@@ -497,5 +498,30 @@ public class PodSpace implements IPartWork {
     @Override
     public PartRepairType getRepairPartType() {
         return PartRepairType.POD_SPACE;
+    }
+
+
+    /**
+     * Sticker price is the value of the part according to the rulebooks
+     * @return the part's sticker price
+     */
+    @Override
+    public Money getStickerPrice(){
+        return Money.of(0.0);
+    }
+
+    /**
+     * This is the value of the part that may be affected by characteristics and campaign options
+     * (Note: Pod Space, an abstraction, does not have value or price.
+     * @return the part's actual value
+     */
+    @Override
+    public Money getActualValue() {
+        return Money.of(0.0);
+    }
+
+    @Override
+    public boolean isPriceAdjustedForAmount(){
+        return false;
     }
 }

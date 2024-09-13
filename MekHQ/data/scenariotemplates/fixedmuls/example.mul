@@ -1,109 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.4-SNAPSHOT" >
+<unit version="0.49.4-SNAPSHOT">
 
-		<entity chassis="Burke Defense Tank" model="(HPPC)" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="2292722c-d57f-4a56-aa45-11297998812d" c3UUID="75e1bfe9-40e3-4a04-a5f3-1c04c404bb58">
-			<pilot size="5" name="Marjani Afiba" nick="" gender="FEMALE" gunnery="4" piloting="4" externalId="18d8f9fe-170d-443c-bb84-c127216e7260" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Streak SRM 4 Ammo" shots="25"/>
-				<slot index="2" type="IS Streak SRM 4 Ammo" shots="25"/>
-			</location>
+	<entity chassis="Burke Defense Tank" model="(HPPC)" type="Tracked" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
+		externalId="2292722c-d57f-4a56-aa45-11297998812d" c3UUID="75e1bfe9-40e3-4a04-a5f3-1c04c404bb58">
+		<pilot size="5" name="Marjani Afiba" nick="" gender="FEMALE" gunnery="4" piloting="4"
+			externalId="18d8f9fe-170d-443c-bb84-c127216e7260" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1" type="IS Streak SRM 4 Ammo"
+				shots="25" />
+				<slot index="2" type="IS Streak SRM 4 Ammo" shots="25" />
+		</location>
 			<c3iset>
-			<c3i_link link="75e1bfe9-40e3-4a04-a5f3-1c04c404bb58"/>
-			</c3iset>
-			<Game id="1"/>
-		</entity>
+			<c3i_link link="75e1bfe9-40e3-4a04-a5f3-1c04c404bb58" />
+		</c3iset>
+			<Game id="1" />
+	</entity>
 
-		<entity chassis="Burke Defense Tank" model="(HPPC)" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="f0e0e915-2b33-4ef6-a2fd-945680ff2c69" c3UUID="4dd2ef01-d254-4353-b3c6-747bdaadc545">
-			<pilot size="5" name="Hanoona Fawzi" nick="" gender="FEMALE" gunnery="4" piloting="6" externalId="79c78d96-c934-4f6e-828d-de520ba02eb4" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Streak SRM 4 Ammo" shots="25"/>
-				<slot index="2" type="IS Streak SRM 4 Ammo" shots="25"/>
-			</location>
+	<entity chassis="Burke Defense Tank" model="(HPPC)" type="Tracked" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
+		externalId="f0e0e915-2b33-4ef6-a2fd-945680ff2c69" c3UUID="4dd2ef01-d254-4353-b3c6-747bdaadc545">
+		<pilot size="5" name="Hanoona Fawzi" nick="" gender="FEMALE" gunnery="4" piloting="6"
+			externalId="79c78d96-c934-4f6e-828d-de520ba02eb4" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1" type="IS Streak SRM 4 Ammo"
+				shots="25" />
+				<slot index="2" type="IS Streak SRM 4 Ammo" shots="25" />
+		</location>
 			<c3iset>
-			<c3i_link link="4dd2ef01-d254-4353-b3c6-747bdaadc545"/>
-			</c3iset>
-			<Game id="2"/>
-		</entity>
+			<c3i_link link="4dd2ef01-d254-4353-b3c6-747bdaadc545" />
+		</c3iset>
+			<Game id="2" />
+	</entity>
 
-		<entity chassis="Burke Defense Tank" model="(HPPC)" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="3bf56969-4818-4db0-b28b-45e4a7d5f4b2" c3UUID="bf24cb08-a355-4882-aef7-9ae63f137201">
-			<pilot size="5" name="Siddheshwari Rajaram" nick="" gender="FEMALE" gunnery="4" piloting="5" externalId="e1111a7a-060f-4e24-84cd-1326ae0723b1" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Streak SRM 4 Ammo" shots="25"/>
-				<slot index="2" type="IS Streak SRM 4 Ammo" shots="25"/>
-			</location>
+	<entity chassis="Burke Defense Tank" model="(HPPC)" type="Tracked" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
+		externalId="3bf56969-4818-4db0-b28b-45e4a7d5f4b2" c3UUID="bf24cb08-a355-4882-aef7-9ae63f137201">
+		<pilot size="5" name="Siddheshwari Rajaram" nick="" gender="FEMALE" gunnery="4" piloting="5"
+			externalId="e1111a7a-060f-4e24-84cd-1326ae0723b1" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1" type="IS Streak SRM 4 Ammo"
+				shots="25" />
+				<slot index="2" type="IS Streak SRM 4 Ammo" shots="25" />
+		</location>
 			<c3iset>
-			<c3i_link link="bf24cb08-a355-4882-aef7-9ae63f137201"/>
-			</c3iset>
-			<Game id="3"/>
-		</entity>
+			<c3i_link link="bf24cb08-a355-4882-aef7-9ae63f137201" />
+		</c3iset>
+			<Game id="3" />
+	</entity>
 
-		<entity chassis="Burke Defense Tank" model="(HPPC)" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="78b72e41-f5bd-4c94-b9be-24c69dec4888" c3UUID="3e754235-9c41-47a8-97d9-c78cebd74c53">
-			<pilot size="5" name="Volker Mauelshagen" nick="" gender="MALE" gunnery="4" piloting="5" externalId="2a2c7f34-953a-4da5-8797-47fb3f24a7be" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Streak SRM 4 Ammo" shots="25"/>
-				<slot index="2" type="IS Streak SRM 4 Ammo" shots="25"/>
-			</location>
+	<entity chassis="Burke Defense Tank" model="(HPPC)" type="Tracked" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
+		externalId="78b72e41-f5bd-4c94-b9be-24c69dec4888" c3UUID="3e754235-9c41-47a8-97d9-c78cebd74c53">
+		<pilot size="5" name="Volker Mauelshagen" nick="" gender="MALE" gunnery="4" piloting="5"
+			externalId="2a2c7f34-953a-4da5-8797-47fb3f24a7be" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1" type="IS Streak SRM 4 Ammo"
+				shots="25" />
+				<slot index="2" type="IS Streak SRM 4 Ammo" shots="25" />
+		</location>
 			<c3iset>
-			<c3i_link link="3e754235-9c41-47a8-97d9-c78cebd74c53"/>
-			</c3iset>
-			<Game id="4"/>
-		</entity>
+			<c3i_link link="3e754235-9c41-47a8-97d9-c78cebd74c53" />
+		</c3iset>
+			<Game id="4" />
+	</entity>
 
-		<entity chassis="Centipede Scout Car" model="(Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="babe1895-0584-4f54-bbab-dbf5c9ae0a0e">
-			<pilot size="2" name="Pacu Muto" nick="" gender="MALE" gunnery="4" piloting="4" externalId="b301b07d-401b-4de2-83e0-7425049287ce" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Vehicle Flamer Ammo" shots="20"/>
-			</location>
-			<Game id="5"/>
-		</entity>
+	<entity chassis="Centipede Scout Car" model="(Standard)" type="Hover" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
+		externalId="babe1895-0584-4f54-bbab-dbf5c9ae0a0e">
+		<pilot size="2" name="Pacu Muto" nick="" gender="MALE" gunnery="4" piloting="4"
+			externalId="b301b07d-401b-4de2-83e0-7425049287ce" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1"
+				type="IS Vehicle Flamer Ammo" shots="20" />
+		</location>
+			<Game id="5" />
+	</entity>
 
-		<entity chassis="Centipede Scout Car" model="(Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="a14c0f59-f668-4260-8b63-6c95586139bf">
-			<pilot size="2" name="Doris Bravence" nick="" gender="FEMALE" gunnery="4" piloting="4" externalId="9b38634b-8241-4044-8a17-31de0d24a184" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Vehicle Flamer Ammo" shots="20"/>
-			</location>
-			<Game id="6"/>
-		</entity>
+	<entity chassis="Centipede Scout Car" model="(Standard)" type="Hover" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
+		externalId="a14c0f59-f668-4260-8b63-6c95586139bf">
+		<pilot size="2" name="Doris Bravence" nick="" gender="FEMALE" gunnery="4" piloting="4"
+			externalId="9b38634b-8241-4044-8a17-31de0d24a184" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1"
+				type="IS Vehicle Flamer Ammo" shots="20" />
+		</location>
+			<Game id="6" />
+	</entity>
 
-		<entity chassis="Centipede Scout Car" model="(Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="4156e3d5-42e8-495f-8898-b4e602298467">
-			<pilot size="2" name="Keri Warren" nick="" gender="FEMALE" gunnery="4" piloting="6" externalId="e009dc8f-d3c2-48d1-91be-1e9468d03708" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Vehicle Flamer Ammo" shots="20"/>
-			</location>
-			<Game id="7"/>
-		</entity>
+	<entity chassis="Centipede Scout Car" model="(Standard)" type="Hover" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
+		externalId="4156e3d5-42e8-495f-8898-b4e602298467">
+		<pilot size="2" name="Keri Warren" nick="" gender="FEMALE" gunnery="4" piloting="6"
+			externalId="e009dc8f-d3c2-48d1-91be-1e9468d03708" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1"
+				type="IS Vehicle Flamer Ammo" shots="20" />
+		</location>
+			<Game id="7" />
+	</entity>
 
-		<entity chassis="Centipede Scout Car" model="(Standard)" type="Hover" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="bf0ece17-8bdd-41de-a433-437c584336e5">
-			<pilot size="2" name="Sefia Kufuo" nick="" gender="FEMALE" gunnery="4" piloting="4" externalId="dffc2fe6-7ebe-438a-8dd9-514a4ae44b11" ejected="false"/>
-      <motive damage="0" penalty="0"/>
-      Tanks have special needs, so don't delete any ammo slots.
-      The first slot in a location is at index="1".
-			<location index="0"> Body
-				<slot index="1" type="IS Vehicle Flamer Ammo" shots="20"/>
-			</location>
-			<Game id="8"/>
-		</entity>
+	<entity chassis="Centipede Scout Car" model="(Standard)" type="Hover" commander="false"
+		offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
+		externalId="bf0ece17-8bdd-41de-a433-437c584336e5">
+		<pilot size="2" name="Sefia Kufuo" nick="" gender="FEMALE" gunnery="4" piloting="4"
+			externalId="dffc2fe6-7ebe-438a-8dd9-514a4ae44b11" ejected="false" />
+      <motive damage="0"
+			penalty="0" /> Tanks have special needs, so don't delete any ammo slots. The first slot in a
+		location is at index="1". <location index="0"> Body <slot index="1"
+				type="IS Vehicle Flamer Ammo" shots="20" />
+		</location>
+			<Game id="8" />
+	</entity>
 
 </unit>

@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Goliath" model="GOL-1H" type="Quad" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="174ac0e3-7bd9-4201-a602-846a396ec48c">
-			<pilot size="1" name="Ionel Stanisic" nick="" gender="MALE" gunnery="3" piloting="3" externalId="f28c45ea-baaf-40cd-9662-5531d1590793" ejected="false" advantages="tm_forest_ranger::tm_mountaineer::sniper" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="1"> Center Torso
-				<slot index="11" type="IS Ammo LRM-10" shots="12"/>
-				<slot index="12" type="IS Ammo LRM-10" shots="12"/>
-			</location>
-			<location index="3"> Left Torso
-				<slot index="4" type="IS Ammo MG - Full" shots="200"/>
-			</location>
-			<Game id="9"/>
-		</entity>
+	<entity chassis="Goliath" model="GOL-1H" type="Quad" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="174ac0e3-7bd9-4201-a602-846a396ec48c">
+		<pilot size="1" name="Ionel Stanisic" nick="" gender="MALE" gunnery="3" piloting="3"
+			externalId="f28c45ea-baaf-40cd-9662-5531d1590793" ejected="false"
+			advantages="tm_forest_ranger::tm_mountaineer::sniper"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="1"> Center
+		Torso <slot index="11" type="IS Ammo LRM-10" shots="12" />
+				<slot index="12" type="IS Ammo LRM-10"
+				shots="12" />
+		</location>
+			<location index="3"> Left Torso <slot index="4"
+				type="IS Ammo MG - Full" shots="200" />
+		</location>
+			<Game id="9" />
+	</entity>
 
 </unit>

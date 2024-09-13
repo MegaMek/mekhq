@@ -20,46 +20,48 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
+import java.io.PrintWriter;
+import java.text.ParseException;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.common.Entity;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
 
 /**
  * A StoryTrigger that adds a Unit to the Campaign.
  */
 public class AddUnitStoryTrigger extends StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(AddUnitStoryTrigger.class);
 
     String entityName;
 
     @Override
     protected void execute() {
-        MechSummary ms = MechSummaryCache.getInstance().getMech(entityName);
+        MekSummary ms = MekSummaryCache.getInstance().getMek(entityName);
         if (ms == null) {
-            LogManager.getLogger().error("Cannot find entry for {}", entityName);
+            logger.error("Cannot find entry for {}", entityName);
             return;
         }
 
-        MechFileParser mechFileParser;
+        MekFileParser mekFileParser;
         try {
-            mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
+            mekFileParser = new MekFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
-            LogManager.getLogger().error("Unable to load unit: {}", ms.getEntryName(), ex);
+            logger.error("Unable to load unit: {}", ms.getEntryName(), ex);
             return;
         }
 
-        Entity en = mechFileParser.getEntity();
+        Entity en = mekFileParser.getEntity();
 
         int quality = 3;
 
@@ -90,7 +92,7 @@ public class AddUnitStoryTrigger extends StoryTrigger {
                 }
 
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }
