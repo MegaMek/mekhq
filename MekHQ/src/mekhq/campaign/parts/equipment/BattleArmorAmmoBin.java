@@ -20,23 +20,34 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import megamek.common.*;
+import megamek.common.AmmoType;
+import megamek.common.BattleArmor;
+import megamek.common.CriticalSlot;
+import megamek.common.EquipmentType;
+import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.PartInventory;
-import org.apache.logging.log4j.LogManager;
 
 /**
- * Battle Armor ammo bins need to look for shots for all the remaining troopers in the
+ * Battle Armor ammo bins need to look for shots for all the remaining troopers
+ * in the
  * squad.
- * TODO: Think about how to handle the case of understrength squads. Right now they
- * pay for more ammo than they need, but this is easier than trying to track ammo per suit
- * and adjust for different ammo types when suits are added and removed from squads.
+ * TODO: Think about how to handle the case of understrength squads. Right now
+ * they
+ * pay for more ammo than they need, but this is easier than trying to track
+ * ammo per suit
+ * and adjust for different ammo types when suits are added and removed from
+ * squads.
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class BattleArmorAmmoBin extends AmmoBin {
+    private static final MMLogger logger = MMLogger.create(BattleArmorAmmoBin.class);
+
     public BattleArmorAmmoBin() {
         this(0, null, -1, 0, false, null);
     }
@@ -48,7 +59,8 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
     @Override
     public BattleArmorAmmoBin clone() {
-        BattleArmorAmmoBin clone = new BattleArmorAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, isOneShot(),
+        BattleArmorAmmoBin clone = new BattleArmorAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded,
+                isOneShot(),
                 campaign);
         clone.copyBaseData(this);
         clone.shotsNeeded = this.shotsNeeded;
@@ -57,10 +69,13 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
     public int getNumTroopers() {
         if (null != unit && unit.getEntity() instanceof BattleArmor) {
-            //we are going to base this on the full squad size, even though this makes understrength
-            //squads overpay for their ammo - that way suits can be moved around without having to adjust
-            //ammo - Tech: "oh you finally got here. Check in the back corner, we stockpiled some ammo for
-            //you."
+            // we are going to base this on the full squad size, even though this makes
+            // understrength
+            // squads overpay for their ammo - that way suits can be moved around without
+            // having to adjust
+            // ammo - Tech: "oh you finally got here. Check in the back corner, we
+            // stockpiled some ammo for
+            // you."
             return ((BattleArmor) unit.getEntity()).getSquadSize();
         }
         return 0;
@@ -74,7 +89,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
     @Override
     protected int getCurrentShots() {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             // Replace with actual entity values if entity not null because
             // the previous number will not be correct for ammo swaps
@@ -86,7 +101,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if ((mounted != null) && !ammoTypeChanged()) {
             // Same ammo type, just a reload
             shotsNeeded = (getFullShots() - mounted.getBaseShotsLeft()) * getNumTroopers();
@@ -108,7 +123,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
     @Override
     public void updateConditionFromPart() {
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             mounted.setHit(false);
             mounted.setDestroyed(false);
@@ -145,7 +160,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
         int shots = 0;
 
         AmmoType curType = getType();
-        Mounted mounted = getMounted();
+        Mounted<?> mounted = getMounted();
         if (mounted != null) {
             shots = mounted.getBaseShotsLeft() * getNumTroopers();
             mounted.setShotsLeft(0);
@@ -167,7 +182,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
     @Override
     public void remove(boolean salvage) {
-        //shouldn't be here
+        // shouldn't be here
     }
 
     @Override
@@ -192,8 +207,8 @@ public class BattleArmorAmmoBin extends AmmoBin {
     protected int calculateShots() {
         int shots = (int) Math.floor(1000 / getType().getKgPerShot());
         if (shots <= 0) {
-            //FIXME: no idea what to do here, these really should be fixed on the MM side
-            //because presumably this is happening because KgperShot is -1 or 0
+            // FIXME: no idea what to do here, these really should be fixed on the MM side
+            // because presumably this is happening because KgperShot is -1 or 0
             shots = 20;
         }
 
@@ -231,29 +246,33 @@ public class BattleArmorAmmoBin extends AmmoBin {
             type = EquipmentType.get(typeName);
         }
 
-
-        //FIXME, this is a crappy hack, but we want something along these lines
-        //to make sure that BA ammo gets removed from all parts - It might be better to run
-        //a check on the XML loading after restore - we also will need to to the same for proto
-        //ammo but we can only do this if we have all the correct ammo rack sizes for the
-        //generics (e.g. LRM1, LRM2, LRM3, etc)
-        /*if (typeName.contains("BA-")) {
-            String newTypeName = "IS" + typeName.split("BA-")[1];
-            EquipmentType newType = EquipmentType.get(newTypeName);
-            if (null != newType) {
-                typeName = newTypeName;
-                type = newType;
-            }
-        }*/
+        // FIXME, this is a crappy hack, but we want something along these lines
+        // to make sure that BA ammo gets removed from all parts - It might be better to
+        // run
+        // a check on the XML loading after restore - we also will need to to the same
+        // for proto
+        // ammo but we can only do this if we have all the correct ammo rack sizes for
+        // the
+        // generics (e.g. LRM1, LRM2, LRM3, etc)
+        /*
+         * if (typeName.contains("BA-")) {
+         * String newTypeName = "IS" + typeName.split("BA-")[1];
+         * EquipmentType newType = EquipmentType.get(newTypeName);
+         * if (null != newType) {
+         * typeName = newTypeName;
+         * type = newType;
+         * }
+         * }
+         */
 
         if (type == null) {
-            LogManager.getLogger().error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
+            logger.error("Mounted.restore: could not restore equipment type \"" + typeName + "\"");
             return;
         }
         try {
             equipTonnage = type.getTonnage(null);
         } catch (NullPointerException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 }

@@ -323,8 +323,8 @@ public class PodSpace implements IPartWork {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        if (unit.getEntity() instanceof Mech) {
-            return skillType.equals(SkillType.S_TECH_MECH);
+        if (unit.getEntity() instanceof Mek) {
+            return skillType.equals(SkillType.S_TECH_MEK);
         } else if (unit.getEntity() instanceof Aero) {
             return skillType.equals(SkillType.S_TECH_AERO);
         } else if (unit.getEntity() instanceof Tank) {

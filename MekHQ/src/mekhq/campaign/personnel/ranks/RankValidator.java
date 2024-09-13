@@ -18,37 +18,44 @@
  */
 package mekhq.campaign.personnel.ranks;
 
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.Profession;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.DefaultComboBoxModel;
+
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.Profession;
+
 public class RankValidator {
-    //region Constructors
+    private static final MMLogger logger = MMLogger.create(RankValidator.class);
+
+    // region Constructors
     public RankValidator() {
 
     }
-    //endregion Constructors
+    // endregion Constructors
 
     public boolean validate(final @Nullable RankSystem rankSystem, final boolean checkCode) {
         return validate(null, rankSystem, checkCode);
     }
 
     /**
-     * @param rankSystemsModel the combo box model to use in checking the rank system code, or null
-     * @param rankSystem the rank system to check, which may be null to indicate an invalid system
-     * @param checkCode the code to check
+     * @param rankSystemsModel the combo box model to use in checking the rank
+     *                         system code, or null
+     * @param rankSystem       the rank system to check, which may be null to
+     *                         indicate an invalid system
+     * @param checkCode        the code to check
      * @return whether the rank system is valid
      */
     public boolean validate(final @Nullable DefaultComboBoxModel<RankSystem> rankSystemsModel,
-                            final @Nullable RankSystem rankSystem, final boolean checkCode) {
-        // Null is never a valid rank system, but this catches some default returns whose errors are
-        // caught during the loading process. This MUST be the first check and CANNOT be removed.
+            final @Nullable RankSystem rankSystem, final boolean checkCode) {
+        // Null is never a valid rank system, but this catches some default returns
+        // whose errors are
+        // caught during the loading process. This MUST be the first check and CANNOT be
+        // removed.
         if (rankSystem == null) {
             return false;
         }
@@ -69,11 +76,11 @@ public class RankValidator {
 
             if (duplicateKey) {
                 if (rankSystem.getType().isUserData()) {
-                    LogManager.getLogger().error("Duplicate Rank System Code: " + rankSystem.getCode()
+                    logger.error("Duplicate Rank System Code: " + rankSystem.getCode()
                             + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
                             + " is duplicated by userData Rank System " + rankSystem);
                 } else {
-                    LogManager.getLogger().error("Duplicate Rank System Code: " + rankSystem.getCode()
+                    logger.error("Duplicate Rank System Code: " + rankSystem.getCode()
                             + ". Current " + Ranks.getRankSystems().get(rankSystem.getCode())
                             + " is duplicated by " + rankSystem);
                 }
@@ -87,22 +94,24 @@ public class RankValidator {
         }
 
         // Now for the more computationally intensive processing, the rank validation
-        // First, let's check the size, as we currently require a size equal to the total number of
+        // First, let's check the size, as we currently require a size equal to the
+        // total number of
         // rank tiers
         if (rankSystem.getRanks().size() != Rank.RC_NUM) {
-            LogManager.getLogger().error(String.format("Illegal number of ranks of %d when %d is required",
+            logger.error(String.format("Illegal number of ranks of %d when %d is required",
                     rankSystem.getRanks().size(), Rank.RC_NUM));
             return false;
         }
 
         // Index 0 needs to be checked individually for empty ranks, as that is a no-go.
-        // Additionally, we need to setup the default professions for later redirect testing
+        // Additionally, we need to setup the default professions for later redirect
+        // testing
         final Rank initialRank = rankSystem.getRank(0);
         final Profession[] professions = Profession.values();
         final Set<Profession> defaultProfessions = new HashSet<>(); // Professions with legal level 1 names
         for (final Profession profession : professions) {
             if (initialRank.isEmpty(profession)) {
-                LogManager.getLogger().error("Illegal Rank index 0 empty profession of " + profession + " for " + rankSystem);
+                logger.error("Illegal Rank index 0 empty profession of " + profession + " for " + rankSystem);
                 return false;
             } else if (!initialRank.indicatesAlternativeSystem(profession)) {
                 defaultProfessions.add(profession);
@@ -111,20 +120,23 @@ public class RankValidator {
 
         // We do require a single default profession
         if (defaultProfessions.isEmpty()) {
-            LogManager.getLogger().error("You cannot have Rank Index 0 all indicate alternative professions for " + rankSystem);
+            logger.error("You cannot have Rank Index 0 all indicate alternative professions for " + rankSystem);
         }
 
         // Now, we need to check each profession
         for (final Profession profession : professions) {
-            // Default professions do not indicate an alternative and cannot be empty, so we can skip
+            // Default professions do not indicate an alternative and cannot be empty, so we
+            // can skip
             // some processing for them
             if (!defaultProfessions.contains(profession)) {
-                // Check the initial rank to ensure it doesn't include an infinite loop for this profession
+                // Check the initial rank to ensure it doesn't include an infinite loop for this
+                // profession
                 if (!validateRankAlternatives(initialRank, profession, professions.length, 0)) {
                     return false;
                 }
 
-                // Empty professions at this point can be skipped, as they are valid if their initial
+                // Empty professions at this point can be skipped, as they are valid if their
+                // initial
                 // rank isn't an infinite loop
                 if (profession.isEmptyProfession(rankSystem)) {
                     continue;
@@ -146,19 +158,20 @@ public class RankValidator {
 
     /**
      * Validates that the rank alternatives aren't an infinite loop or empty
-     * @param rank the rank to check for issues
-     * @param profession the current profession
+     * 
+     * @param rank          the rank to check for issues
+     * @param profession    the current profession
      * @param maxRecursions the maximum level of recursion
-     * @param recursion the current recursion level
+     * @param recursion     the current recursion level
      * @return if the alternatives are valid
      */
     private boolean validateRankAlternatives(final Rank rank, final Profession profession,
-                                             final int maxRecursions, final int recursion) {
+            final int maxRecursions, final int recursion) {
         if (recursion > maxRecursions) {
-            LogManager.getLogger().error("Hit max recursions, rank system contains an infinite loop");
+            logger.error("Hit max recursions, rank system contains an infinite loop");
             return false;
         } else if (rank.isEmpty(profession)) {
-            LogManager.getLogger().error("Cannot have an empty value as an alternative");
+            logger.error("Cannot have an empty value as an alternative");
             return false;
         } else if (rank.indicatesAlternativeSystem(profession)) {
             return validateRankAlternatives(rank, profession.getAlternateProfession(rank),
@@ -169,13 +182,15 @@ public class RankValidator {
     }
 
     /**
-     * Check assigned rank systems for the campaign, updating if needed, and then do the same for
+     * Check assigned rank systems for the campaign, updating if needed, and then do
+     * the same for
      * all personnel
      *
      * @param campaign the campaign to check the rank systems for
      */
     public void checkAssignedRankSystems(final Campaign campaign) {
-        // First, we need to ensure the campaign's rank system was refreshed. This can be done by
+        // First, we need to ensure the campaign's rank system was refreshed. This can
+        // be done by
         // checking if the system is a campaign custom
         if (!campaign.getRankSystem().getType().isCampaign()) {
             // This ensures it properly changes, with fallback properly handled
@@ -189,7 +204,8 @@ public class RankValidator {
     }
 
     /**
-     * Checks the rank of a person to ensure it is valid, and decreases the rank down to the highest
+     * Checks the rank of a person to ensure it is valid, and decreases the rank
+     * down to the highest
      * one that is valid for the rank system.
      *
      * @param person the person whose rank needs to be checked

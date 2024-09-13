@@ -20,21 +20,23 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryTrigger;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+import java.text.ParseException;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * A StoryTrigger to change the value of a stored string variable in StoryArc.
  */
 public class ChangeStringVariableStoryTrigger extends StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(ChangeStringVariableStoryTrigger.class);
 
     String key;
     String value;
@@ -66,7 +68,7 @@ public class ChangeStringVariableStoryTrigger extends StoryTrigger {
                     value = wn2.getTextContent().trim();
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

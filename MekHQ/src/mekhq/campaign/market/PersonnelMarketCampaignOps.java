@@ -50,12 +50,12 @@ public class PersonnelMarketCampaignOps implements PersonnelMarketMethod {
         } else if (roll == 3) { // ASF or Proto Pilot
             if (c.getFaction().isClan() && c.getLocalDate().isAfter(LocalDate.of(3059, 1, 1))
                     && Compute.d6(2) < 6) {
-                p = c.newPerson(PersonnelRole.PROTOMECH_PILOT);
+                p = c.newPerson(PersonnelRole.PROTOMEK_PILOT);
             } else {
                 p = c.newPerson(PersonnelRole.AEROSPACE_PILOT);
             }
         } else if (roll == 4 || roll == 10) { // MW
-            p = c.newPerson(PersonnelRole.MECHWARRIOR);
+            p = c.newPerson(PersonnelRole.MEKWARRIOR);
         } else if (roll == 5 || roll == 9) { // Vehicle Crews
             p = c.newPerson((Compute.d6() < 3) ? PersonnelRole.GROUND_VEHICLE_DRIVER : PersonnelRole.VEHICLE_GUNNER);
         } else if (roll == 6 || roll == 8) { // Infantry

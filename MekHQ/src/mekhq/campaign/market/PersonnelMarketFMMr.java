@@ -50,7 +50,7 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
         int q = 0;
         long mft = PersonnelMarket.getUnitMainForceType(c);
         int mftMod = 0;
-        if (mft == Entity.ETYPE_MECH || mft == Entity.ETYPE_TANK || mft == Entity.ETYPE_INFANTRY || mft == Entity.ETYPE_BATTLEARMOR) {
+        if (mft == Entity.ETYPE_MEK || mft == Entity.ETYPE_TANK || mft == Entity.ETYPE_INFANTRY || mft == Entity.ETYPE_BATTLEARMOR) {
             mftMod = 1;
         }
         for (PersonnelRole role : PersonnelRole.getMilitaryRoles()) {

@@ -18,19 +18,30 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.common.*;
+import megamek.common.Board;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.MekSummary;
+import megamek.common.UnitType;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @AtBScenarioEnabled
 public class StarLeagueCache1BuiltInScenario extends AtBScenario {
@@ -84,7 +95,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+            ArrayList<Entity> enemyEntities) {
         setStartingPos(Board.START_CENTER);
         int enemyStart = Board.START_N;
 
@@ -106,11 +117,11 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
 
         List<Entity> otherForce = new ArrayList<>();
-        MechSummary ms = null;
+        MekSummary ms = null;
 
         if (roll == 1) {
-            RandomUnitGenerator.getInstance().setChosenRAT("CivilianUnits_PrimMech");
-            ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
+            RandomUnitGenerator.getInstance().setChosenRAT("CivilianUnits_PrimMek");
+            ArrayList<MekSummary> msl = RandomUnitGenerator.getInstance().generate(1);
             if (!msl.isEmpty()) {
                 ms = msl.get(0);
             }
@@ -126,7 +137,8 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
                         SkillLevel.GREEN, campaign, ms);
         otherForce.add(en);
 
-        // TODO: During SW offer a choice between an employer exchange or a contract breach
+        // TODO: During SW offer a choice between an employer exchange or a contract
+        // breach
         Loot loot = new Loot();
         loot.setName(defaultResourceBundle.getString("battleDetails.starLeagueCache.Mek"));
         loot.addUnit(en);
@@ -139,9 +151,11 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
 
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 100);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 1,
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
+                1,
                 1, true);
-        ScenarioObjective keepTechAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(TECH_FORCE_ID, 1, 1, true);
+        ScenarioObjective keepTechAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(TECH_FORCE_ID, 1, 1,
+                true);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);

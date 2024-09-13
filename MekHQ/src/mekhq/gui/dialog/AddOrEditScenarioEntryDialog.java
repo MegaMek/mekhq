@@ -18,25 +18,37 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import mekhq.MekHQ;
-import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.log.ServiceLogEntry;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.ServiceLogEntry;
+
 /**
  * Dialog used to add or edit scenario entries.
  */
 public class AddOrEditScenarioEntryDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(AddOrEditScenarioEntryDialog.class);
+
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
@@ -105,7 +117,7 @@ public class AddOrEditScenarioEntryDialog extends JDialog {
         }
         getContentPane().setLayout(new BorderLayout());
         panMain.setLayout(new GridBagLayout());
-        panBtn.setLayout(new GridLayout(0,2));
+        panBtn.setLayout(new GridLayout(0, 2));
 
         btnDate = new JButton();
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(newDate));
@@ -158,7 +170,7 @@ public class AddOrEditScenarioEntryDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

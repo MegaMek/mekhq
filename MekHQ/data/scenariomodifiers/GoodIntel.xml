@@ -1,5 +1,6 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Recon over-estimated enemy strength. A group of enemy units are not present.</additionalBriefingText>
+	<additionalBriefingText>Recon over-estimated enemy strength. A group of enemy units are not
+		present.</additionalBriefingText>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<eventRecipient>Opposing</eventRecipient>
