@@ -4191,14 +4191,14 @@ public class ForceIconMigrator {
         }
     }
 
-    private static StandardForceIcon migrateStandardMech(final StandardForceIcon icon) {
+    private static StandardForceIcon migrateStandardMek(final StandardForceIcon icon) {
         final LayeredForceIcon layered = new LayeredForceIcon();
         switch (icon.getFilename()) {
             case "amech.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Assault.png"));
@@ -4207,7 +4207,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Assault.png"));
@@ -4220,7 +4220,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Heavy.png"));
@@ -4229,7 +4229,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Heavy.png"));
@@ -4242,7 +4242,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Heavy.png"));
@@ -4256,7 +4256,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Heavy.png"));
@@ -4275,7 +4275,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Heavy.png"));
@@ -4288,7 +4288,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Headquarters.png"));
@@ -4301,7 +4301,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Headquarters.png"));
@@ -4314,7 +4314,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Headquarters.png"));
@@ -4328,7 +4328,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Headquarters.png"));
@@ -4347,7 +4347,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Industrial.png"));
@@ -4356,7 +4356,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Aerospace (Right).png"));
@@ -4365,7 +4365,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Light.png"));
@@ -4374,7 +4374,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Light.png"));
@@ -4387,7 +4387,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Light.png"));
@@ -4400,7 +4400,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Light.png"));
@@ -4414,7 +4414,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Light.png"));
@@ -4433,7 +4433,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Light.png"));
@@ -4446,13 +4446,13 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Center).png"));
+                                "BattleMek (Center).png"));
                 return layered;
             case "mechcompany.png":
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Center).png"));
+                                "BattleMek (Center).png"));
                 layered.getPieces().put(LayeredForceIconLayer.FORMATION, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.FORMATION)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.FORMATION,
@@ -4462,7 +4462,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Medium.png"));
@@ -4471,7 +4471,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Medium.png"));
@@ -4484,7 +4484,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Medium.png"));
@@ -4503,7 +4503,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Medium.png"));
@@ -4516,7 +4516,7 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Bottom).png"));
+                                "BattleMek (Bottom).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
                                 "Battle Armor (Extended).png"));
@@ -4529,10 +4529,10 @@ public class ForceIconMigrator {
                 layered.getPieces().put(LayeredForceIconLayer.TYPE, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "BattleMech (Left).png"));
+                                "BattleMek (Left).png"));
                 layered.getPieces().get(LayeredForceIconLayer.TYPE)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.TYPE, "StratOps/",
-                                "ProtoMech.png"));
+                                "ProtoMek.png"));
                 return layered;
             default:
                 return icon;
