@@ -1654,11 +1654,9 @@ public class AtBDynamicScenarioFactory {
             // If unit has an infantry bay
             if (bay instanceof TroopSpace) {
 
-                boolean isLargeBay = bay.getUnused() >= 6.0;
-
-                boolean keepLoading = true;
-                while (keepLoading) {
-                    double bayCapacity = bay.getUnused();
+                double bayCapacity = bay.getUnused();
+                int remainingCount = (int) Math.max(1, Math.floor(bayCapacity / IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT));
+                while (remainingCount > 0) {
 
                     // Set base random generation parameters
                     UnitGeneratorParameters newParams = params.clone();
@@ -1715,9 +1713,12 @@ public class AtBDynamicScenarioFactory {
                     }
 
                     transportedUnits.add(transportedUnit);
+                    remainingCount--;
                     bayCapacity -= transportedUnit.getWeight();
+                    if (bayCapacity < IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT) {
+                        remainingCount = 0;
+                    }
 
-                    keepLoading = isLargeBay && bayCapacity >= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT;
                 }
 
             }
