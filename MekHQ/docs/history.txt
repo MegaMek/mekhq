@@ -24,6 +24,7 @@ MEKHQ VERSION HISTORY:
 + FIX #4790: Fix Mission XP Reward Setting
 + FIX #4803, #4802: Corrected Experience Rating Calculation in Reputation
 + PR #4830: Corrected terminology in Academy XMLs
++ PR #4831: Fix typos in identifiers for MEKWARRIOR and AtBUnitRatingMod
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
