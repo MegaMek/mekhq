@@ -18,13 +18,13 @@
  */
 package mekhq.campaign.personnel.enums;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 
 public enum Phenotype {
     // region Enum Declarations
@@ -40,12 +40,6 @@ public enum Phenotype {
     PROTOMEK("Phenotype.PROTOMEK.text", "Trueborn.text", "Phenotype.PROTOMEK.groupingNameText",
             "Phenotype.PROTOMEK.toolTipText"),
     NAVAL("Phenotype.NAVAL.text", "Trueborn.text", "Phenotype.NAVAL.groupingNameText", "Phenotype.NAVAL.toolTipText"),
-
-    // Remove Milestone past 0.49.19
-    MECHWARRIOR("Phenotype.MEKWARRIOR.text", "Trueborn.text", "Phenotype.MEKWARRIOR.text",
-            "Phenotype.MEKWARRIOR.toolTipText"),
-    PROTOMECH("Phenotype.PROTOMEK.text", "Trueborn.text", "Phenotype.PROTOMEK.groupingNameText",
-            "Phenotype.PROTOMEK.toolTipText"),
 
     // Internal Phenotypes
     NONE("Phenotype.NONE.text", "Freeborn.text", "Phenotype.NONE.text", "Phenotype.NONE.toolTipText", false),
