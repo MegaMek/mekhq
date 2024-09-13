@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MegaMek.
+ * This file is part of MekHQ.
  *
  * MegaMek is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,10 @@
  */
 package mekhq.campaign.mission;
 
-
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-
 import java.util.List;
 import java.util.Map;
+
+import jakarta.xml.bind.annotation.XmlElementWrapper;
 
 public class TerrainConditionsOdds {
     public String type;

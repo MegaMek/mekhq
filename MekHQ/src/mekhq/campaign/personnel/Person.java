@@ -91,6 +91,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -1194,7 +1195,7 @@ public class Person {
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
             campaign.addReport(String.format(resources.getString("loyaltyChangeGroup.text"),
                     "<span color=" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                    "</span>"));
+                    ReportingUtilities.CLOSING_SPAN_TAG));
         }
     }
 
@@ -1303,7 +1304,7 @@ public class Person {
         }
 
         String report = String.format(resources.getString("loyaltyChangeReport.text"), getHyperlinkedFullTitle(),
-                "<span color=" + color + "'>", changeString, "</span>");
+                "<span color=" + color + "'>", changeString, ReportingUtilities.CLOSING_SPAN_TAG);
 
         campaign.addReport(report);
     }

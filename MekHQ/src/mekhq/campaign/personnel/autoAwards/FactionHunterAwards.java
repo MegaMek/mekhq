@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MegaMek.
+ * This file is part of MekHQ.
  *
  * MegaMek is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ public class FactionHunterAwards {
     /**
      * This function loops through Faction Hunter Awards, checking whether the
      * person is eligible to receive each type of award
-     * 
+     *
      * @param campaign the campaign to be processed
      * @param mission  the mission just completed
      * @param person   the person to check award eligibility for

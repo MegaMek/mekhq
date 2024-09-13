@@ -18,6 +18,26 @@
  */
 package mekhq.gui.stratcon;
 
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.UUID;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+
 import megamek.common.Minefield;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -32,13 +52,7 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.*;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * UI for managing force/unit assignments for individual StratCon scenarios.
@@ -67,7 +81,8 @@ public class StratconScenarioWizard extends JDialog {
     /**
      * Selects a scenario on a particular track in a particular campaign.
      */
-    public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState, StratconCampaignState campaignState) {
+    public void setCurrentScenario(StratconScenario scenario, StratconTrackState trackState,
+            StratconCampaignState campaignState) {
         currentScenario = scenario;
         currentCampaignState = campaignState;
         currentTrackState = trackState;
@@ -102,13 +117,13 @@ public class StratconScenarioWizard extends JDialog {
                 setAssignForcesUI(gbc, true);
                 gbc.gridy++;
 
-                List<Unit> eligibleLeadershipUnits =
-                        StratconRulesManager.getEligibleLeadershipUnits(campaign,
+                List<Unit> eligibleLeadershipUnits = StratconRulesManager.getEligibleLeadershipUnits(campaign,
                         currentScenario.getPrimaryForceIDs());
 
                 eligibleLeadershipUnits.sort(Comparator.comparing(Unit::getName));
 
-                int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER, campaign);
+                int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER,
+                        campaign);
 
                 if (!eligibleLeadershipUnits.isEmpty() && (leadershipSkill > 0)) {
                     setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
@@ -130,14 +145,16 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Worker function that sets up the instructions for the currently selected scenario.
+     * Worker function that sets up the instructions for the currently selected
+     * scenario.
      */
     private void setInstructions(GridBagConstraints gbc) {
         JLabel lblInfo = new JLabel();
         StringBuilder labelBuilder = new StringBuilder();
         labelBuilder.append("<html>");
 
-        if (currentTrackState.isGmRevealed() || currentTrackState.getRevealedCoords().contains(currentScenario.getCoords()) ||
+        if (currentTrackState.isGmRevealed()
+                || currentTrackState.getRevealedCoords().contains(currentScenario.getCoords()) ||
                 (currentScenario.getDeploymentDate() != null)) {
             labelBuilder.append(currentScenario.getInfo());
         }
@@ -161,12 +178,13 @@ public class StratconScenarioWizard extends JDialog {
      */
     private void setAssignForcesUI(GridBagConstraints gbc, boolean reinforcements) {
         // generate a lance selector with the following parameters:
-        // all forces assigned to the current track that aren't already assigned elsewhere
+        // all forces assigned to the current track that aren't already assigned
+        // elsewhere
         // max number of items that can be selected = current scenario required lances
 
-        List<ScenarioForceTemplate> eligibleForceTemplates = reinforcements ?
-                currentScenario.getScenarioTemplate().getAllPlayerReinforcementForces() :
-                    currentScenario.getScenarioTemplate().getAllPrimaryPlayerForces();
+        List<ScenarioForceTemplate> eligibleForceTemplates = reinforcements
+                ? currentScenario.getScenarioTemplate().getAllPlayerReinforcementForces()
+                : currentScenario.getScenarioTemplate().getAllPrimaryPlayerForces();
 
         for (ScenarioForceTemplate forceTemplate : eligibleForceTemplates) {
             JPanel forcePanel = new JPanel();
@@ -175,9 +193,9 @@ public class StratconScenarioWizard extends JDialog {
             localGbc.gridx = 0;
             localGbc.gridy = 0;
 
-            String labelText = reinforcements ?
-                    resourceMap.getString("selectReinforcementsForTemplate.Text") :
-                    String.format(resourceMap.getString("selectForceForTemplate.Text"), currentScenario.getRequiredPlayerLances());
+            String labelText = reinforcements ? resourceMap.getString("selectReinforcementsForTemplate.Text")
+                    : String.format(resourceMap.getString("selectForceForTemplate.Text"),
+                            currentScenario.getRequiredPlayerLances());
 
             JLabel assignForceListInstructions = new JLabel(labelText);
             forcePanel.add(assignForceListInstructions, localGbc);
@@ -186,8 +204,8 @@ public class StratconScenarioWizard extends JDialog {
             JLabel selectedForceInfo = new JLabel();
             JList<Force> availableForceList = addAvailableForceList(forcePanel, localGbc, forceTemplate);
 
-            availableForceList.addListSelectionListener(e ->
-                    availableForceSelectorChanged(e, selectedForceInfo, reinforcements));
+            availableForceList
+                    .addListSelectionListener(e -> availableForceSelectorChanged(e, selectedForceInfo, reinforcements));
 
             availableForceLists.put(forceTemplate.getForceName(), availableForceList);
 
@@ -200,11 +218,13 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Set up the UI for "defensive elements", such as infantry, gun emplacements, minefields, etc.
+     * Set up the UI for "defensive elements", such as infantry, gun emplacements,
+     * minefields, etc.
      */
     private void setDefensiveUI(GridBagConstraints gbc) {
         gbc.anchor = GridBagConstraints.WEST;
-        JLabel lblDefensivePostureInstructions = new JLabel(resourceMap.getString("lblDefensivePostureInstructions.Text"));
+        JLabel lblDefensivePostureInstructions = new JLabel(
+                resourceMap.getString("lblDefensivePostureInstructions.Text"));
         getContentPane().add(lblDefensivePostureInstructions, gbc);
 
         gbc.gridy++;
@@ -212,17 +232,18 @@ public class StratconScenarioWizard extends JDialog {
         List<Unit> eligibleInfantryUnits = StratconRulesManager.getEligibleDefensiveUnits(campaign);
         eligibleInfantryUnits.sort(Comparator.comparing(Unit::getName));
 
-        availableInfantryUnits =
-                addIndividualUnitSelector(eligibleInfantryUnits, gbc, currentScenario.getNumDefensivePoints());
+        availableInfantryUnits = addIndividualUnitSelector(eligibleInfantryUnits, gbc,
+                currentScenario.getNumDefensivePoints());
 
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.WEST;
 
-        JLabel lblDefensiveMinefieldCount = new JLabel(String.format(resourceMap.getString("lblDefensiveMinefieldCount.text"),
-                currentScenario.getNumDefensivePoints()));
+        JLabel lblDefensiveMinefieldCount = new JLabel(
+                String.format(resourceMap.getString("lblDefensiveMinefieldCount.text"),
+                        currentScenario.getNumDefensivePoints()));
 
-        availableInfantryUnits.addListSelectionListener(e ->
-                availableInfantrySelectorChanged(lblDefensiveMinefieldCount));
+        availableInfantryUnits
+                .addListSelectionListener(e -> availableInfantrySelectorChanged(lblDefensiveMinefieldCount));
 
         getContentPane().add(lblDefensiveMinefieldCount, gbc);
     }
@@ -234,9 +255,10 @@ public class StratconScenarioWizard extends JDialog {
 
         if (maxSelectionSize <= 0) {
             // either the full text or empty string
-            String leadershipUsedText = currentScenario.getLeadershipPointsUsed() > 0 ?
-                    String.format(resourceMap.getString("lblLeaderUnitsUsed.Text"),
-                            currentScenario.getLeadershipPointsUsed()) : "";
+            String leadershipUsedText = currentScenario.getLeadershipPointsUsed() > 0
+                    ? String.format(resourceMap.getString("lblLeaderUnitsUsed.Text"),
+                            currentScenario.getLeadershipPointsUsed())
+                    : "";
             String leadershipUnavailable = resourceMap.getString("lblLeadershipReinforcementsUnavailable.Text");
 
             JLabel lblLeadershipInstructions = new JLabel(
@@ -246,7 +268,6 @@ public class StratconScenarioWizard extends JDialog {
             gbc.gridy++;
             return;
         }
-
 
         JLabel lblLeadershipInstructions = new JLabel(resourceMap.getString("lblLeadershipInstructions.Text"));
         getContentPane().add(lblLeadershipInstructions, gbc);
@@ -259,7 +280,8 @@ public class StratconScenarioWizard extends JDialog {
     /**
      * Add an "available force list" to the given control
      */
-    private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc, ScenarioForceTemplate forceTemplate) {
+    private JList<Force> addAvailableForceList(JPanel parent, GridBagConstraints gbc,
+            ScenarioForceTemplate forceTemplate) {
         JScrollPane forceListContainer = new JScrollPane();
 
         ScenarioWizardLanceModel lanceModel;
@@ -281,10 +303,13 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Adds an individual unit selector, given a list of individual units, a global grid bag constraint set
+     * Adds an individual unit selector, given a list of individual units, a global
+     * grid bag constraint set
      * and a maximum selection size.
-     * @param units The list of units to use as data source.
-     * @param gbc Gridbag constraints to indicate where the control will go
+     * 
+     * @param units            The list of units to use as data source.
+     * @param gbc              Gridbag constraints to indicate where the control
+     *                         will go
      * @param maxSelectionSize Maximum number of units that can be selected
      */
     private JList<Unit> addIndividualUnitSelector(List<Unit> units, GridBagConstraints gbc, int maxSelectionSize) {
@@ -315,8 +340,8 @@ public class StratconScenarioWizard extends JDialog {
         JList<Unit> availableUnits = new JList<>();
         availableUnits.setModel(availableModel);
         availableUnits.setCellRenderer(new ScenarioWizardUnitRenderer());
-        availableUnits.addListSelectionListener(e ->
-                availableUnitSelectorChanged(e, unitSelectionLabel, unitStatusLabel, maxSelectionSize));
+        availableUnits.addListSelectionListener(
+                e -> availableUnitSelectorChanged(e, unitSelectionLabel, unitStatusLabel, maxSelectionSize));
 
         JScrollPane infantryContainer = new JScrollPane();
         infantryContainer.setViewportView(availableUnits);
@@ -334,7 +359,8 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Worker function that builds an "html-enabled" string indicating the brief status of a force
+     * Worker function that builds an "html-enabled" string indicating the brief
+     * status of a force
      */
     private String buildForceStatus(Force f, boolean showForceCost) {
         StringBuilder sb = new StringBuilder();
@@ -355,7 +381,8 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Worker function that builds an "html-enabled" string indicating the brief status of an individual unit
+     * Worker function that builds an "html-enabled" string indicating the brief
+     * status of an individual unit
      */
     private String buildUnitStatus(Unit u) {
         StringBuilder sb = new StringBuilder();
@@ -368,10 +395,10 @@ public class StratconScenarioWizard extends JDialog {
 
         if (injuryCount > 0) {
             sb.append(String.format(
-                    ", <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>%d/%d injured crew</span>",
+                    ", <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                            + "'>%d/%d injured crew</span>",
                     injuryCount,
-                    u.getCrew().size())
-            );
+                    u.getCrew().size()));
         }
 
         sb.append("<br/>");
@@ -379,7 +406,8 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Worker function that builds an indicator of what it will take to deploy a particular force
+     * Worker function that builds an indicator of what it will take to deploy a
+     * particular force
      * to the current scenario as reinforcements.
      */
     private String buildForceCost(int forceID) {
@@ -387,28 +415,30 @@ public class StratconScenarioWizard extends JDialog {
         costBuilder.append("(");
 
         switch (StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign, currentCampaignState)) {
-        case SupportPoint:
-            costBuilder.append(resourceMap.getString("supportPoint.text"));
-            if (currentCampaignState.getSupportPoints() <= 0) {
-                costBuilder.append(", ");
+            case SupportPoint:
+                costBuilder.append(resourceMap.getString("supportPoint.text"));
+                if (currentCampaignState.getSupportPoints() <= 0) {
+                    costBuilder.append(", ");
 
-                if (currentCampaignState.getVictoryPoints() <= 1) {
-                    costBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>")
-                            .append(resourceMap.getString("reinforcementRoll.Text")).append("</span>");
-                } else {
-                    costBuilder.append(resourceMap.getString("supportPointConvert.text"));
+                    if (currentCampaignState.getVictoryPoints() <= 1) {
+                        costBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                                .append("'>")
+                                .append(resourceMap.getString("reinforcementRoll.Text"))
+                                .append(ReportingUtilities.CLOSING_SPAN_TAG);
+                    } else {
+                        costBuilder.append(resourceMap.getString("supportPointConvert.text"));
+                    }
                 }
-            }
-            break;
-        case ChainedScenario:
-            costBuilder.append(resourceMap.getString("fromChainedScenario.text"));
-            break;
-        case FightLance:
-            costBuilder.append(resourceMap.getString("lanceInFightRole.text"));
-            break;
-        default:
-            costBuilder.append("Error: Invalid Reinforcement Type");
-            break;
+                break;
+            case ChainedScenario:
+                costBuilder.append(resourceMap.getString("fromChainedScenario.text"));
+                break;
+            case FightLance:
+                costBuilder.append(resourceMap.getString("lanceInFightRole.text"));
+                break;
+            default:
+                costBuilder.append("Error: Invalid Reinforcement Type");
+                break;
         }
 
         costBuilder.append(")");
@@ -443,12 +473,13 @@ public class StratconScenarioWizard extends JDialog {
             for (Force force : availableForceLists.get(templateID).getSelectedValuesList()) {
                 // if we are assigning reinforcements, pay the price if appropriate
                 if (currentScenario.getCurrentState() == ScenarioState.PRIMARY_FORCES_COMMITTED) {
-                    ReinforcementEligibilityType reinforcementType =
-                            StratconRulesManager.getReinforcementType(force.getId(), currentTrackState,
-                                    campaign, currentCampaignState);
+                    ReinforcementEligibilityType reinforcementType = StratconRulesManager.getReinforcementType(
+                            force.getId(), currentTrackState,
+                            campaign, currentCampaignState);
 
                     // if we failed to deploy as reinforcements, move on to the next force
-                    if (!StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState, currentScenario, campaign)) {
+                    if (!StratconRulesManager.processReinforcementDeployment(reinforcementType, currentCampaignState,
+                            currentScenario, campaign)) {
                         currentScenario.addFailedReinforcements(force.getId());
                         continue;
                     }
@@ -478,20 +509,24 @@ public class StratconScenarioWizard extends JDialog {
                     forceID, campaign, currentTrackState, false);
         }
 
-        // scenarios that haven't had primary forces committed yet get those committed now
-        // and the scenario gets published to the campaign and may be played immediately from the briefing room
+        // scenarios that haven't had primary forces committed yet get those committed
+        // now
+        // and the scenario gets published to the campaign and may be played immediately
+        // from the briefing room
         // that being said, give the player a chance to commit reinforcements too
         if (currentScenario.getCurrentState() == ScenarioState.UNRESOLVED) {
-            // if we've already generated forces and applied modifiers, no need to do it twice
+            // if we've already generated forces and applied modifiers, no need to do it
+            // twice
             if (!currentScenario.getBackingScenario().isFinalized()) {
-                AtBDynamicScenarioFactory.finalizeScenario(currentScenario.getBackingScenario(), currentCampaignState.getContract(), campaign);
+                AtBDynamicScenarioFactory.finalizeScenario(currentScenario.getBackingScenario(),
+                        currentCampaignState.getContract(), campaign);
                 StratconRulesManager.setScenarioParametersFromBiome(currentTrackState, currentScenario);
             }
 
             StratconRulesManager.commitPrimaryForces(campaign, currentScenario, currentTrackState);
             setCurrentScenario(currentScenario, currentTrackState, currentCampaignState);
             currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
-        // if we've just committed reinforcements then simply close it down
+            // if we've just committed reinforcements then simply close it down
         } else {
             currentScenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, getNumMinefields());
             setVisible(false);
@@ -501,7 +536,9 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Event handler for when the user makes a selection on the available force selector.
+     * Event handler for when the user makes a selection on the available force
+     * selector.
+     * 
      * @param e The event fired.
      */
     private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel, boolean reinforcements) {
@@ -532,19 +569,23 @@ public class StratconScenarioWizard extends JDialog {
      * Event handler for when an available unit selector's selection changes.
      * Updates the "# units selected" label and the unit status label.
      * Also checks maximum selection size and disables commit button (TBD).
+     * 
      * @param e
-     * @param selectionCountLabel Which label to update with how many items are selected
-     * @param unitStatusLabel Which label to update with detailed unit info
-     * @param maxSelectionSize How many items can be selected at most
+     * @param selectionCountLabel Which label to update with how many items are
+     *                            selected
+     * @param unitStatusLabel     Which label to update with detailed unit info
+     * @param maxSelectionSize    How many items can be selected at most
      */
-    private void availableUnitSelectorChanged(ListSelectionEvent e, JLabel selectionCountLabel, JLabel unitStatusLabel, int maxSelectionSize) {
+    private void availableUnitSelectorChanged(ListSelectionEvent e, JLabel selectionCountLabel, JLabel unitStatusLabel,
+            int maxSelectionSize) {
         if (!(e.getSource() instanceof JList<?>)) {
             return;
         }
 
         JList<Unit> changedList = (JList<Unit>) e.getSource();
         selectionCountLabel.setText(String.format("%d selected", changedList.getSelectedIndices().length));
-        // if we've selected too many units here, change the label and disable the commit button
+        // if we've selected too many units here, change the label and disable the
+        // commit button
         if (changedList.getSelectedIndices().length > maxSelectionSize) {
             selectionCountLabel.setForeground(Color.RED);
             btnCommit.setEnabled(false);
@@ -584,6 +625,7 @@ public class StratconScenarioWizard extends JDialog {
 
     /**
      * Worker function that de-selects duplicate units.
+     * 
      * @param listToProcess
      * @param selectedUnits
      */
@@ -609,9 +651,11 @@ public class StratconScenarioWizard extends JDialog {
     }
 
     /**
-     * Worker function that calculates how many minefields should be available for the current scenario.
+     * Worker function that calculates how many minefields should be available for
+     * the current scenario.
      */
     private int getNumMinefields() {
-        return Math.max(0, currentScenario.getNumDefensivePoints() - availableInfantryUnits.getSelectedIndices().length);
+        return Math.max(0,
+                currentScenario.getNumDefensivePoints() - availableInfantryUnits.getSelectedIndices().length);
     }
 }

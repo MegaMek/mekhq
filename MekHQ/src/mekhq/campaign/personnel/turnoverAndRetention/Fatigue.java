@@ -30,6 +30,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * The Fatigue class contains static methods for calculating and processing
@@ -86,28 +87,28 @@ public class Fatigue {
                 campaign.addReport(String.format(resources.getString("fatigueTired.text"),
                         person.getHyperlinkedFullTitle(),
                         "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                        "</span>"));
+                        ReportingUtilities.CLOSING_SPAN_TAG));
 
                 person.setIsRecoveringFromFatigue(true);
             } else if ((effectiveFatigue >= 9) && (effectiveFatigue < 12)) {
                 campaign.addReport(String.format(resources.getString("fatigueFatigued.text"),
                         person.getHyperlinkedFullTitle(),
                         "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                        "</span>"));
+                        ReportingUtilities.CLOSING_SPAN_TAG));
 
                 person.setIsRecoveringFromFatigue(true);
             } else if ((effectiveFatigue >= 12) && (effectiveFatigue < 16)) {
                 campaign.addReport(String.format(resources.getString("fatigueExhausted.text"),
                         person.getHyperlinkedFullTitle(),
                         "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                        "</span>"));
+                        ReportingUtilities.CLOSING_SPAN_TAG));
 
                 person.setIsRecoveringFromFatigue(true);
             } else if (effectiveFatigue >= 17) {
                 campaign.addReport(String.format(resources.getString("fatigueCritical.text"),
                         person.getHyperlinkedFullTitle(),
                         "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                        "</span>"));
+                        ReportingUtilities.CLOSING_SPAN_TAG));
 
                 person.setIsRecoveringFromFatigue(true);
             }
@@ -172,7 +173,7 @@ public class Fatigue {
                         campaign.addReport(String.format(resources.getString("fatigueRecovered.text"),
                                 person.getHyperlinkedFullTitle(),
                                 "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                                "</span>"));
+                                ReportingUtilities.CLOSING_SPAN_TAG));
 
                         person.setIsRecoveringFromFatigue(false);
 

@@ -61,6 +61,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * Parts do the lions share of the work of repairing, salvaging, reloading,
@@ -490,7 +491,7 @@ public abstract class Part implements IPartWork, ITechnology {
             if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
                 toReturn += ", <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
                         + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                        + "</span>";
+                        + ReportingUtilities.CLOSING_SPAN_TAG;
             }
 
             toReturn += ", TN: " + bonus;

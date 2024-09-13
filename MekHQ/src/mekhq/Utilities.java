@@ -108,10 +108,10 @@ public class Utilities {
 
         final Vector<AmmoType> munitions = AmmoType.getMunitionsFor(currentAmmoType.getAmmoType());
         if (munitions == null) {
-            logger
-                    .error(String.format(
-                            "Cannot getMunitions for %s because of a null munitions list for ammo type %d",
-                            entity.getDisplayName(), currentAmmoType.getAmmoType()));
+            String message = String.format(
+                    "Cannot getMunitions for %s because of a null munitions list for ammo type %d",
+                    entity.getDisplayName(), currentAmmoType.getAmmoType());
+            logger.error(message);
             return Collections.emptyList();
         }
 
@@ -131,10 +131,9 @@ public class Utilities {
                 lvl = 0;
             }
 
-            if (techLvl < Utilities.getSimpleTechLevel(lvl)) {
-                continue;
-            } else if (TechConstants.isClan(currentAmmoType.getTechLevel(entity.getTechLevelYear())) != TechConstants
-                    .isClan(lvl)) {
+            if ((techLvl < Utilities.getSimpleTechLevel(lvl)) ||
+                    (TechConstants.isClan(currentAmmoType.getTechLevel(entity.getTechLevelYear())) != TechConstants
+                            .isClan(lvl))) {
                 continue;
             }
 
@@ -223,6 +222,7 @@ public class Utilities {
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
         CampaignOptions options = campaign.getCampaignOptions();
         ArrayList<String> variants = new ArrayList<>();
+
         for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
             // If this isn't the same chassis, is our current unit, we continue
             if (!en.getChassis().equalsIgnoreCase(summary.getChassis())
@@ -233,8 +233,8 @@ public class Utilities {
 
             // Weight of the two units must match or we continue, but BA weight gets checked
             // differently
-            if (en instanceof BattleArmor) {
-                if (((BattleArmor) en).getTroopers() != (int) summary.getTWweight()) {
+            if (en instanceof BattleArmor battleArmor) {
+                if (battleArmor.getTroopers() != (int) summary.getTWweight()) {
                     continue;
                 }
             } else {
@@ -252,13 +252,12 @@ public class Utilities {
             ITechnology techProg = UnitTechProgression.getProgression(summary, campaign.getTechFaction(), true);
             if (techProg == null) {
                 // This should never happen unless there was an exception thrown when
-                // calculating the progression.
-                // In such a case we will log it and take the least restrictive action, which is
-                // to let it through.
-                logger.warn(
-                        String.format(
-                                "Could not determine tech progression for %s, including among available refits.",
-                                summary.getName()));
+                // calculating the progression. In such a case we will log it and take the least
+                // restrictive action, which is to let it through.
+                String message = String.format(
+                        "Could not determine tech progression for %s, including among available refits.",
+                        summary.getName());
+                logger.warn(message);
             } else if (!campaign.isLegal(techProg)) {
                 continue;
             }

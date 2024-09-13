@@ -51,6 +51,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -349,7 +350,7 @@ public class Finances {
 
                     campaign.addReport(String.format(loyaltyChangeResources.getString("loyaltyChangeGroup.text"),
                             "<span color=" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                            "</span>"));
+                            ReportingUtilities.CLOSING_SPAN_TAG));
                 }
             }
 

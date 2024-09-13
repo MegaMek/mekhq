@@ -41,15 +41,21 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * The EducationController class is responsible for managing the education
- * process.
- * It provides methods to begin the education process, calculate education
- * level, and enroll a person into an academy.
+ * process. It provides methods to begin the education process, calculate
+ * education level, and enroll a person into an academy.
  */
 public class EducationController {
     private static final MMLogger logger = MMLogger.create(EducationController.class);
+
+    private static final String BUNDLE_NAME = BUNDLE_NAME;
+
+    private EducationController() {
+        // Just here to remove warning.
+    }
 
     /**
      * Checks eligibility for enrollment in an academy.
@@ -63,8 +69,7 @@ public class EducationController {
      */
     public static boolean makeEnrollmentCheck(Campaign campaign, Person person, String academySet,
             String academyNameInSet) {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
-                MekHQ.getMHQOptions().getLocale());
+        ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
         Academy academy = findAcademyInSet(academySet, academyNameInSet);
 
@@ -83,8 +88,8 @@ public class EducationController {
             campaign.addReport(String.format(resources.getString("secondApplication.text"),
                     person.getHyperlinkedFullTitle()),
                     academyNameInSet,
-                    "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                    "</span>");
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                    ReportingUtilities.CLOSING_SPAN_TAG);
             return false;
         }
 
@@ -108,8 +113,8 @@ public class EducationController {
             person.addEduFailedApplications(academy);
             campaign.addReport(String.format(resources.getString("applicationFailure.text"),
                     person.getHyperlinkedFullTitle(),
-                    "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                    "</span>",
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                    ReportingUtilities.CLOSING_SPAN_TAG,
                     academyNameInSet));
 
             ServiceLogger.eduFailedApplication(person, campaign.getLocalDate(), academyNameInSet);
@@ -153,8 +158,7 @@ public class EducationController {
     public static void performEducationPreEnrollmentActions(Campaign campaign, Person person, String academySet,
             String academyNameInSet, int courseIndex,
             String campus, String faction, boolean isReEnrollment) {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
-                MekHQ.getMHQOptions().getLocale());
+        ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
 
         Academy academy = findAcademyInSet(academySet, academyNameInSet);
 
@@ -167,10 +171,10 @@ public class EducationController {
 
         if (tuition > 0) {
             if (campaign.getFinances().getBalance().isLessThan(Money.of(tuition))) {
-                String reportMessage = "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                        + String.format(resources.getString("insufficientFunds.text"), person.getFullTitle())
-                        + "</span>";
-
+                String insufficientFundsMessage = String.format(resources.getString("insufficientFunds.text"),
+                        person.getFullTitle());
+                String reportMessage = ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(), insufficientFundsMessage);
                 campaign.addReport(reportMessage);
                 return;
             } else {
@@ -222,7 +226,7 @@ public class EducationController {
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
 
         if (academy.isHomeSchool()) {
-            // if the student is being homeschooled, we skip the journey to the 'academy'
+            // if the student is being home schooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
@@ -265,8 +269,8 @@ public class EducationController {
                     + campaign.getSystemById(campus).getName(campaign.getLocalDate()) + ')');
         }
 
-        // we have this all the way at the bottom as a bit of insurance.
-        // when troubleshooting, if the log isn't getting entered, we know something
+        // we have this all the way at the bottom as a bit of insurance. when
+        // troubleshooting, if the log isn't getting entered, we know something
         // went wrong when enrolling.
         ServiceLogger.eduEnrolled(person, campaign.getLocalDate(), person.getEduAcademyName(),
                 academy.getQualifications().get(person.getEduCourseIndex()));
@@ -281,7 +285,7 @@ public class EducationController {
      */
     public static void reEnrollPerson(Campaign campaign, Person person, Academy academy) {
         if (academy.isHomeSchool()) {
-            // if the student is being homeschooled, we skip the journey to the 'academy'
+            // if the student is being home schooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
         } else {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
@@ -301,8 +305,8 @@ public class EducationController {
         // reset days of travel
         person.setEduDaysOfTravel(0);
 
-        // we have this all the way at the bottom as a bit of insurance.
-        // when troubleshooting, if the log isn't getting entered, we know something
+        // we have this all the way at the bottom as a bit of insurance. when
+        // troubleshooting, if the log isn't getting entered, we know something
         // went wrong when enrolling.
         ServiceLogger.eduReEnrolled(person, campaign.getLocalDate(), person.getEduAcademyName(),
                 academy.getQualifications().get(person.getEduCourseIndex()));
@@ -317,7 +321,7 @@ public class EducationController {
      * @return The generated name.
      */
     public static String generateName(Academy academy, String campus) {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
+        ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME,
                 MekHQ.getMHQOptions().getLocale());
 
         if (academy.isPrepSchool()) {
@@ -438,8 +442,7 @@ public class EducationController {
      * @return true if the new day was successfully processed, false otherwise
      */
     public static boolean processNewDay(Campaign campaign, Person person, boolean ageBypass) {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
-                MekHQ.getMHQOptions().getLocale());
+        ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME, MekHQ.getMHQOptions().getLocale());
         Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
         EducationStage educationStage = person.getEduEducationStage();
@@ -581,7 +584,7 @@ public class EducationController {
      * @param resources the resource bundle containing localized strings
      */
     private static void beginJourneyHome(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        // if the student is being homeschooled, they skip the journey home.
+        // if the student is being home schooled, they skip the journey home.
         if (academy.isHomeSchool()) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
 
@@ -742,8 +745,9 @@ public class EducationController {
                         processTrainingInjury(campaign, academy, person, resources);
                     } else {
                         String resultString = String.format(resources.getString("eventTrainingAccidentKilled.text"),
-                                "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                                "</span>");
+                                ReportingUtilities.spanOpeningWithCustomColor(
+                                        MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                                ReportingUtilities.CLOSING_SPAN_TAG);
 
                         String reportMessage = String.format(resources.getString("eventTrainingAccident.text"),
                                 person.getHyperlinkedFullTitle(),
@@ -773,8 +777,8 @@ public class EducationController {
         int roll = Compute.d6(3);
 
         String resultString = String.format(resources.getString("eventTrainingAccidentWounded.text"),
-                "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                "</span>",
+                ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                ReportingUtilities.CLOSING_SPAN_TAG,
                 roll);
 
         String reportMessage = String.format(resources.getString("eventTrainingAccident.text"),
@@ -842,8 +846,9 @@ public class EducationController {
                 } else {
                     String reportMessage = String.format(resources.getString("dropOutRejected.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities
+                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 }
@@ -853,8 +858,9 @@ public class EducationController {
                 // might as well scare the player
                 String reportMessage = String.format(resources.getString("dropOutRejected.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                        "</span>");
+                        ReportingUtilities
+                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
                 return true;
@@ -871,7 +877,7 @@ public class EducationController {
      * @param academy  the academy where the person was studying
      */
     public static void processForcedDropOut(Campaign campaign, Person person, Academy academy) {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
+        ResourceBundle resources = ResourceBundle.getBundle(BUNDLE_NAME,
                 MekHQ.getMHQOptions().getLocale());
 
         reportDropOut(campaign, person, academy, resources);
@@ -898,7 +904,7 @@ public class EducationController {
         String reportText = academy.isHomeSchool() ? "dropOutHomeSchooled.text" : "dropOut.text";
 
         String coloredOpen = String.format("<span color='%s'>", negativeHexColor);
-        String coloredClose = "</span>";
+        String coloredClose = ReportingUtilities.CLOSING_SPAN_TAG;
 
         String report = String.format(resources.getString(reportText), personTitle, coloredOpen, coloredClose);
 
@@ -919,8 +925,8 @@ public class EducationController {
         if (academy.isFactionConflict(campaign, person)) {
             String reportMessage = String.format(resources.getString("eventWarExpelled.text"),
                     person.getHyperlinkedFullTitle(),
-                    "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                    "</span>");
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                    ReportingUtilities.CLOSING_SPAN_TAG);
 
             campaign.addReport(reportMessage);
 
@@ -944,8 +950,8 @@ public class EducationController {
         if (campaign.getLocalDate().getYear() >= academy.getClosureYear()) {
             String reportMessage = String.format(resources.getString("eventClosure.text"),
                     person.getHyperlinkedFullTitle(),
-                    "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                    "</span>");
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                    ReportingUtilities.CLOSING_SPAN_TAG);
 
             campaign.addReport(reportMessage);
             person.setEduEducationStage(EducationStage.DROPPING_OUT);
@@ -971,10 +977,11 @@ public class EducationController {
                 if (Compute.d6(2) >= 5) {
                     String reportMessage = String.format(resources.getString("eventDestruction.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                            "</span>",
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities
+                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG,
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
 
@@ -982,10 +989,12 @@ public class EducationController {
                 } else {
                     String reportMessage = String.format(resources.getString("eventDestructionKilled.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                            "</span>",
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities
+                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG,
+                            ReportingUtilities
+                                    .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
 
@@ -994,10 +1003,11 @@ public class EducationController {
             } else {
                 String reportMessage = String.format(resources.getString("eventDestruction.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                        "</span>",
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                        "</span>");
+                        ReportingUtilities
+                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG,
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
 
@@ -1043,15 +1053,17 @@ public class EducationController {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedFailedHomeSchooled.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                        "</span>");
+                        ReportingUtilities
+                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             } else {
                 String reportMessage = String.format(resources.getString("graduatedFailed.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>",
-                        "</span>");
+                        ReportingUtilities
+                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             }
@@ -1073,8 +1085,8 @@ public class EducationController {
 
             String reportMessage = String.format(resources.getString("graduatedClassNeeded.text"),
                     person.getHyperlinkedFullTitle(),
-                    "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                    "</span>",
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                    ReportingUtilities.CLOSING_SPAN_TAG,
                     roll);
 
             campaign.addReport(reportMessage);
@@ -1089,18 +1101,18 @@ public class EducationController {
                 if (academy.isHomeSchool()) {
                     String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 } else {
                     String reportMessage = String.format(resources.getString("graduatedTop.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>",
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG,
                             ' ' + resources.getString(graduationEventPicker()),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 }
@@ -1108,18 +1120,18 @@ public class EducationController {
                 if (academy.isHomeSchool()) {
                     String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 } else {
                     String reportMessage = String.format(resources.getString("graduatedTop.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>",
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG,
                             "",
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 }
@@ -1145,18 +1157,18 @@ public class EducationController {
                 if (academy.isHomeSchool()) {
                     String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 } else {
                     String reportMessage = String.format(resources.getString("graduatedHonors.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>",
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG,
                             ' ' + resources.getString(graduationEventPicker()),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 }
@@ -1164,18 +1176,18 @@ public class EducationController {
                 if (academy.isHomeSchool()) {
                     String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 } else {
                     String reportMessage = String.format(resources.getString("graduatedHonors.text"),
                             person.getHyperlinkedFullTitle(),
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>",
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG,
                             "",
-                            "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                            "</span>");
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            ReportingUtilities.CLOSING_SPAN_TAG);
 
                     campaign.addReport(reportMessage);
                 }
@@ -1199,15 +1211,15 @@ public class EducationController {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                        "</span>");
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             } else {
                 String reportMessage = String.format(resources.getString("graduated.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                        "</span>",
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG,
                         ' ' + resources.getString(graduationEventPicker()));
 
                 campaign.addReport(reportMessage);
@@ -1216,15 +1228,15 @@ public class EducationController {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                        "</span>");
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             } else {
                 String reportMessage = String.format(resources.getString("graduated.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                        "</span>",
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG,
                         "");
 
                 campaign.addReport(reportMessage);
@@ -1304,9 +1316,9 @@ public class EducationController {
             String graduationText, String qualification, ResourceBundle resources) {
         campaign.addReport(String.format(resources.getString("graduatedPostGradReport.text"),
                 personName,
-                "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
+                ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                 graduationText,
-                "</span>",
+                ReportingUtilities.CLOSING_SPAN_TAG,
                 qualification));
     }
 
@@ -1336,15 +1348,17 @@ public class EducationController {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedBarelyHomeSchooled.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                        "</span>");
+                        ReportingUtilities
+                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             } else {
                 String reportMessage = String.format(resources.getString("graduatedBarely.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>",
-                        "</span>");
+                        ReportingUtilities
+                                .spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorWarningHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             }
@@ -1352,15 +1366,15 @@ public class EducationController {
             if (academy.isHomeSchool()) {
                 String reportMessage = String.format(resources.getString("graduatedHomeSchooled.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                        "</span>");
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             } else {
                 String reportMessage = String.format(resources.getString("graduatedChild.text"),
                         person.getHyperlinkedFullTitle(),
-                        "<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>",
-                        "</span>");
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        ReportingUtilities.CLOSING_SPAN_TAG);
 
                 campaign.addReport(reportMessage);
             }
