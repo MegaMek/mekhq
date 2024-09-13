@@ -1049,7 +1049,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         lblCompanyNameGenerated.setName("lblCompanyNameGenerated");
         addComponent(panel, lblCompanyNameGenerated, gridBagConstraints, 0, 1);
 
-        JTextArea txtCompanyNamesGenerated = new JTextArea(gui.getCampaign().getName());
+        txtCompanyNamesGenerated = new JTextArea(gui.getCampaign().getName());
         txtCompanyNamesGenerated.setName("txtCompanyNamesGenerated");
         addComponent(panel, txtCompanyNamesGenerated, gridBagConstraints, 1, 1);
         lblCompanyNameGenerated.setLabelFor(txtCompanyNamesGenerated);

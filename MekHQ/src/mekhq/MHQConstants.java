@@ -20,6 +20,7 @@ package mekhq;
 
 import megamek.SuiteConstants;
 
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 
@@ -281,6 +282,19 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STORY_ARC_FILE = "storyArc.xml";
     public static final String STORY_ARC_CAMPAIGN_FILE = "initCampaign.cpnx.gz";
     // endregion StoryArcs
+
+    // region Backgrounds
+    public static final String NAME_MIDDLE_WORD_CORPORATE = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/middleWordCorporate.csv").toString();
+    public static final String NAME_MIDDLE_WORD_CORPORATE_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordCorporate.csv").toString();
+    public static final String NAME_END_WORD_CORPORATE = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/endWordCorporate.csv").toString();
+    public static final String NAME_END_WORD_CORPORATE_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordCorporate.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MERCENARY = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/middleWordMercenary.csv").toString();
+    public static final String NAME_MIDDLE_WORD_MERCENARY_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/middleWordMercenary.csv").toString();
+    public static final String NAME_END_WORD_MERCENARY = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
+    public static final String NAME_END_WORD_MERCENARY_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/endWordMercenary.csv").toString();
+    public static final String NAME_PRE_FAB = Paths.get("data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
+    public static final String NAME_PRE_FAB_USER = Paths.get("userdata/data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
+    // endregion Backgrounds
 
     // endregion File Paths
 }
