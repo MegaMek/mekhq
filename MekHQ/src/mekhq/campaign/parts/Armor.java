@@ -531,6 +531,11 @@ public class Armor extends Part implements IAcquisitionWork {
         return target;
     }
 
+    @Override
+    public int getSellableQuantity() {
+        return amount;
+    }
+
     public double getArmorPointsPerTon() {
         return ArmorType.of(type, clan).getPointsPerTon();
     }

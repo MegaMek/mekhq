@@ -19,7 +19,8 @@
 
 package mekhq.campaign.parts;
 
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import megamek.common.AmmoType;
 import mekhq.campaign.finances.Money;
@@ -28,7 +29,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartInUse {
     private String description;
-    private String name;
     private IAcquisitionWork partToBuy;
     private int useCount;
     private int storeCount;
@@ -36,6 +36,7 @@ public class PartInUse {
     private int transferCount;
     private int plannedCount;
     private Money cost = Money.zero();
+    private List<Part> spares = new ArrayList<>();
 
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails(false);
@@ -54,15 +55,12 @@ public class PartInUse {
             appendDetails(sb, part);
         }
         part.setUnit(u);
-        this.name = part.getName();
         this.description = sb.toString();
         this.partToBuy = part.getAcquisitionWork();
         this.tonnagePerItem = part.getTonnage();
-        // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo
-        // inside
+        // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
         // We redo the description based on that
         if (partToBuy instanceof AmmoStorage) {
-            this.name = ((AmmoStorage) partToBuy).getName();
             sb.setLength(0);
             sb.append(((AmmoStorage) partToBuy).getName());
             appendDetails(sb, (Part) ((AmmoStorage) partToBuy).getAcquisitionWork());
@@ -83,22 +81,32 @@ public class PartInUse {
         }
     }
 
-    public PartInUse(String description, IAcquisitionWork partToBuy, Money cost) {
-        this.description = Objects.requireNonNull(description);
-        this.partToBuy = Objects.requireNonNull(partToBuy);
-        this.cost = cost;
-    }
-
-    public PartInUse(String description, IAcquisitionWork partToBuy) {
-        this(description, partToBuy, partToBuy.getBuyCost());
-    }
-
     public String getDescription() {
         return description;
     }
 
-    public String getName() {
-        return name;
+    /**
+     * Returns a list of "spares" for this part in the warehouse that can be sold
+     *
+     * @return a list of spare Part references in the Warehouse sorted by quality in ascending order
+     */
+    public List<Part> getSpares() {
+        return spares.stream()
+            .sorted(Comparator.comparingInt(Part::getQuality))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns an Optional containing the lowest quality spare part in the warehouse, if one exists.
+     *
+     * @return The lowest quality spare part, if available
+     */
+    public Optional<Part> getSpare() {
+        return getSpares().stream().findFirst();
+    }
+
+    public void addSpare(Part part) {
+        spares.add(part);
     }
 
     public IAcquisitionWork getPartToBuy() {

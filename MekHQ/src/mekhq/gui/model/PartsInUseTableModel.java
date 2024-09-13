@@ -57,17 +57,14 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_TONNAGE = 3;
     public final static int COL_IN_TRANSFER = 4;
     public final static int COL_COST = 5;
-    public final static int COL_BUTTON_BUY = 6;
-    public final static int COL_BUTTON_BUY_BULK = 7;
-    // public final static int COL_BUTTON_SELL = 8;
-    // public final static int COL_BUTTON_SELL_BULK = 9;
-    // public final static int COL_BUTTON_GMADD = 10;
-    // public final static int COL_BUTTON_GMADD_BULK = 11;
-    public final static int COL_BUTTON_GMADD = 8;
-    public final static int COL_BUTTON_GMADD_BULK = 9;
+    public final static int COL_BUTTON_BUY  = 6;
+    public final static int COL_BUTTON_BUY_BULK  = 7;
+    public final static int COL_BUTTON_SELL = 8;
+    public final static int COL_BUTTON_SELL_BULK = 9;
+    public final static int COL_BUTTON_GMADD  = 10;
+    public final static int COL_BUTTON_GMADD_BULK  = 11;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
-            "mekhq.resources.PartsInUseTableModel",
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
             MekHQ.getMHQOptions().getLocale());
 
     public PartsInUseTableModel() {
@@ -131,10 +128,10 @@ public class PartsInUseTableModel extends DataTableModel {
                 return resourceMap.getString("buy.text");
             case COL_BUTTON_BUY_BULK:
                 return resourceMap.getString("buyInBulk.text");
-            // case COL_BUTTON_SELL:
-            // return resourceMap.getString("sell.text");
-            // case COL_BUTTON_SELL_BULK:
-            // return resourceMap.getString("sellInBulk.text");
+            case COL_BUTTON_SELL:
+                return resourceMap.getString("sell.text");
+            case COL_BUTTON_SELL_BULK:
+                return resourceMap.getString("sellInBulk.text");
             case COL_BUTTON_GMADD:
                 return resourceMap.getString("add.text");
             case COL_BUTTON_GMADD_BULK:
@@ -154,8 +151,8 @@ public class PartsInUseTableModel extends DataTableModel {
         switch (col) {
             case COL_BUTTON_BUY:
             case COL_BUTTON_BUY_BULK:
-                // case COL_BUTTON_SELL:
-                // case COL_BUTTON_SELL_BULK:
+            case COL_BUTTON_SELL:
+            case COL_BUTTON_SELL_BULK:
             case COL_BUTTON_GMADD:
             case COL_BUTTON_GMADD_BULK:
                 return true;
@@ -212,12 +209,12 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_COST:
                 return 20;
             case COL_BUTTON_BUY:
-                // case COL_BUTTON_SELL:
+            case COL_BUTTON_SELL:
                 return 50;
             case COL_BUTTON_GMADD:
                 return 70;
             case COL_BUTTON_BUY_BULK:
-                // case COL_BUTTON_SELL_BULK:
+            case COL_BUTTON_SELL_BULK:
                 return 80;
             default:
                 return 100;
@@ -228,8 +225,8 @@ public class PartsInUseTableModel extends DataTableModel {
         switch (col) {
             case COL_BUTTON_BUY:
             case COL_BUTTON_BUY_BULK:
-                // case COL_BUTTON_SELL:
-                // case COL_BUTTON_SELL_BULK:
+            case COL_BUTTON_SELL:
+            case COL_BUTTON_SELL_BULK:
             case COL_BUTTON_GMADD:
             case COL_BUTTON_GMADD_BULK:
                 return true;
@@ -242,8 +239,8 @@ public class PartsInUseTableModel extends DataTableModel {
         switch (col) {
             case COL_BUTTON_BUY:
             case COL_BUTTON_BUY_BULK:
-                // case COL_BUTTON_SELL:
-                // case COL_BUTTON_SELL_BULK:
+            case COL_BUTTON_SELL:
+            case COL_BUTTON_SELL_BULK:
             case COL_BUTTON_GMADD:
             case COL_BUTTON_GMADD_BULK:
                 // Calculate from button width, respecting style
