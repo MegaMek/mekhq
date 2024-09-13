@@ -29,6 +29,6 @@ Explanation of fields:
 
 [list of weight class abbreviations]: Normally L, M, H, or A, but UL and SH are acceptable for ultra-light and superheavy as well. C is understood as Colossal and is treated as a synonym of SH.
 
-[list of equipment ratings]: Usually one of the follwing: A, B, C, D, F. Clan ratings can be used instead, some of which have multiple possible values: Keshik/K, FL, SL/2L, Solahma/Sol, PG/PGC. It is also possible to give an A* value, but most RATs do not use this.
+[list of equipment ratings]: Usually one of the following: A, B, C, D, F. Clan ratings can be used instead, some of which have multiple possible values: Keshik/K, FL, SL/2L, Solahma/Sol, PG/PGC. It is also possible to give an A* value, but most RATs do not use this.
 
 When multiple values are provided as a list, they must be separated by commas with no space between. Any list value can be omitted, in which case it will match any value. When more than one RAT can match the search criteria, only the first will be returned.

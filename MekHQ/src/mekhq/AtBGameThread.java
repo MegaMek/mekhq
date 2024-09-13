@@ -34,8 +34,6 @@ import java.util.UUID;
 
 import javax.swing.JOptionPane;
 
-import org.apache.logging.log4j.LogManager;
-
 import io.sentry.Sentry;
 import megamek.client.AbstractClient;
 import megamek.client.Client;
@@ -50,6 +48,7 @@ import megamek.common.MapSettings;
 import megamek.common.Minefield;
 import megamek.common.UnitType;
 import megamek.common.planetaryconditions.PlanetaryConditions;
+import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
@@ -67,6 +66,7 @@ import mekhq.campaign.unit.Unit;
  * @author Neoancient
  */
 public class AtBGameThread extends GameThread {
+    private static final MMLogger logger = MMLogger.create(AtBGameThread.class);
 
     private final AtBScenario scenario;
 
@@ -110,7 +110,7 @@ public class AtBGameThread extends GameThread {
         try {
             client.connect();
         } catch (Exception ex) {
-            LogManager.getLogger().error("MegaMek client failed to connect to server", ex);
+            logger.error("MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -123,12 +123,12 @@ public class AtBGameThread extends GameThread {
             for (int i = 0; (i < MekHQ.getMHQOptions().getStartGameClientRetryCount())
                     && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
-                LogManager.getLogger()
+                logger
                         .warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
-                LogManager.getLogger().info("Thread in lounge");
+                logger.info("Thread in lounge");
 
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
                 client.getLocalPlayer().setColour(app.getCampaign().getColour());
@@ -166,7 +166,7 @@ public class AtBGameThread extends GameThread {
                     } catch (FileNotFoundException ex) {
                         Sentry.captureException(ex);
                         // TODO: Remove inline file path
-                        LogManager.getLogger().error(
+                        logger.error(
                                 String.format("Could not load map file data/mapgen/%s.xml", scenario.getMap()),
                                 ex);
                     }
@@ -375,7 +375,7 @@ public class AtBGameThread extends GameThread {
                         botClient.connect();
                     } catch (Exception e) {
                         Sentry.captureException(e);
-                        LogManager.getLogger().error(String.format("Could not connect with Bot name %s", bf.getName()),
+                        logger.error(String.format("Could not connect with Bot name %s", bf.getName()),
                                 e);
                     }
 
@@ -461,7 +461,7 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception ex) {
             Sentry.captureException(ex);
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         } finally {
             swingGui.setDisconnectQuietly(true);
             client.die();
@@ -493,7 +493,7 @@ public class AtBGameThread extends GameThread {
             }
 
             if (botClient.getLocalPlayer() == null) {
-                LogManager.getLogger().error(
+                logger.error(
                         String.format("Could not configure bot %s", botClient.getName()));
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
@@ -518,7 +518,7 @@ public class AtBGameThread extends GameThread {
             }
         } catch (Exception ex) {
             Sentry.captureException(ex);
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 

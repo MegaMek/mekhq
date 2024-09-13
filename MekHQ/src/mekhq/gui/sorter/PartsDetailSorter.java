@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.sorter;
 
 import java.util.Comparator;
@@ -5,7 +23,7 @@ import java.util.Comparator;
 /**
  *
  * @author Dylan Myers
- * Comparator for comparing details in the warehouse and parts store
+ *         Comparator for comparing details in the warehouse and parts store
  */
 public class PartsDetailSorter implements Comparator<String> {
 
@@ -13,20 +31,22 @@ public class PartsDetailSorter implements Comparator<String> {
     public int compare(String s0, String s1) {
         double l0 = -1;
         double l1 = -1;
-        String[] ss0 = s0.replace("<html>", "").replace("</html>", "").replace("<nobr>", "").replace("</nobr>", "").split(" ");
-        String[] ss1 = s1.replace("<html>", "").replace("</html>", "").replace("<nobr>", "").replace("</nobr>", "").split(" ");
+        String[] ss0 = s0.replace("<html>", "").replace("</html>", "").replace("<nobr>", "").replace("</nobr>", "")
+                .split(" ");
+        String[] ss1 = s1.replace("<html>", "").replace("</html>", "").replace("<nobr>", "").replace("</nobr>", "")
+                .split(" ");
         if (!ss0[0].isEmpty()) {
             try {
                 l0 = Double.parseDouble(ss0[0]);
             } catch (NumberFormatException e) {
-                //do nothing
+                // do nothing
             }
         }
         if (!ss1[0].isEmpty()) {
             try {
                 l1 = Double.parseDouble(ss1[0]);
             } catch (NumberFormatException e) {
-                //do nothing
+                // do nothing
             }
         }
         s0 = "";

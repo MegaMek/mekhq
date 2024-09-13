@@ -1,10 +1,36 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui;
 
-import mekhq.IconPackage;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
-import java.awt.*;
+
+import mekhq.IconPackage;
 
 /**
  * A specialized JPanel wrapper for repair tasks. This is different from
@@ -60,7 +86,7 @@ public class RepairTaskInfo extends JPanel {
 
     public void highlightBorder() {
         this.setBorder(new LineBorder(
-            UIManager.getColor("Tree.selectionBorderColor"), 4, true));
+                UIManager.getColor("Tree.selectionBorderColor"), 4, true));
     }
 
     public void unhighlightBorder() {

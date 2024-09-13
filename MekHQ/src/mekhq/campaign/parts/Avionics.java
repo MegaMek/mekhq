@@ -34,7 +34,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IAero;
 import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
+import megamek.common.LandAirMek;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
@@ -63,7 +63,7 @@ public class Avionics extends Part {
     public void updateConditionFromEntity(boolean checkForDestruction) {
         int priorHits = hits;
         if (null != unit
-                && (unit.getEntity().getEntityType() & (Entity.ETYPE_AEROSPACEFIGHTER | Entity.ETYPE_LAND_AIR_MECH)) != 0) {
+                && (unit.getEntity().getEntityType() & (Entity.ETYPE_AEROSPACEFIGHTER | Entity.ETYPE_LAND_AIR_MEK)) != 0) {
             hits = ((IAero) unit.getEntity()).getAvionicsHits();
             if (checkForDestruction
                     && hits > priorHits
@@ -136,11 +136,11 @@ public class Avionics extends Part {
         }
         if (unit.getEntity() instanceof Aero) {
             ((Aero) unit.getEntity()).setAvionicsHits(hits);
-        } else if (unit.getEntity() instanceof LandAirMech) {
+        } else if (unit.getEntity() instanceof LandAirMek) {
             if (hits == 0) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS);
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_AVIONICS);
             } else {
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS, hits);
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_AVIONICS, hits);
             }
         }
     }
@@ -151,8 +151,8 @@ public class Avionics extends Part {
         if (null != unit) {
             if (unit.getEntity() instanceof Aero) {
                 ((Aero) unit.getEntity()).setAvionicsHits(0);
-            } else if (unit.getEntity() instanceof LandAirMech) {
-                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS);
+            } else if (unit.getEntity() instanceof LandAirMek) {
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_AVIONICS);
             }
         }
     }
@@ -162,8 +162,8 @@ public class Avionics extends Part {
         if (null != unit) {
             if (unit.getEntity() instanceof Aero) {
                 ((Aero) unit.getEntity()).setAvionicsHits(3);
-            } else if (unit.getEntity() instanceof LandAirMech) {
-                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS, 3);
+            } else if (unit.getEntity() instanceof LandAirMek) {
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_AVIONICS, 3);
             }
             Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
             if (!salvage) {
@@ -231,8 +231,8 @@ public class Avionics extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        if (unit != null && unit.getEntity() instanceof LandAirMech) {
-            return skillType.equals(SkillType.S_TECH_MECH);
+        if (unit != null && unit.getEntity() instanceof LandAirMek) {
+            return skillType.equals(SkillType.S_TECH_MEK);
         }
         return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
     }

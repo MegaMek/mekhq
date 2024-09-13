@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <StratconBiomeManifest>
     <biomes>
-	<biomeCategory>Terran</biomeCategory>
+        <biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>0</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>267</allowedTemperatureUpperBound>
         <allowedTerrainTypes>SnowField</allowedTerrainTypes>
         <allowedTerrainTypes>Glacier</allowedTerrainTypes>
         <allowedTerrainTypes>ArcticDesert</allowedTerrainTypes>
-	<allowedTerrainTypes>ColdHills</allowedTerrainTypes>
-	<allowedTerrainTypes>ColdMountain</allowedTerrainTypes>
-	<allowedTerrainTypes>FrozenSea</allowedTerrainTypes>
+        <allowedTerrainTypes>ColdHills</allowedTerrainTypes>
+        <allowedTerrainTypes>ColdMountain</allowedTerrainTypes>
+        <allowedTerrainTypes>FrozenSea</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>Terran</biomeCategory>
+        <biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>268</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>277</allowedTemperatureUpperBound>
         <allowedTerrainTypes>Tundra</allowedTerrainTypes>
@@ -20,135 +20,135 @@
         <allowedTerrainTypes>ColdForest</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
         <allowedTerrainTypes>ArcticDesert</allowedTerrainTypes>
-	<allowedTerrainTypes>ColdHills</allowedTerrainTypes>
-	<allowedTerrainTypes>ColdMountain</allowedTerrainTypes>
-	<allowedTerrainTypes>ColdSea</allowedTerrainTypes>
-	<allowedTerrainTypes>ColdUrban</allowedTerrainTypes>
+        <allowedTerrainTypes>ColdHills</allowedTerrainTypes>
+        <allowedTerrainTypes>ColdMountain</allowedTerrainTypes>
+        <allowedTerrainTypes>ColdSea</allowedTerrainTypes>
+        <allowedTerrainTypes>ColdUrban</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>Terran</biomeCategory>
+        <biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>278</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>287</allowedTemperatureUpperBound>
-	<allowedTerrainTypes>Badlands</allowedTerrainTypes>
+        <allowedTerrainTypes>Badlands</allowedTerrainTypes>
         <allowedTerrainTypes>Plains</allowedTerrainTypes>
         <allowedTerrainTypes>Forest</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
-        <allowedTerrainTypes>Desert</allowedTerrainTypes>				
-	<allowedTerrainTypes>Hills</allowedTerrainTypes>
-	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
-	<allowedTerrainTypes>Sea</allowedTerrainTypes>
-	<allowedTerrainTypes>Urban</allowedTerrainTypes>
+        <allowedTerrainTypes>Desert</allowedTerrainTypes>
+        <allowedTerrainTypes>Hills</allowedTerrainTypes>
+        <allowedTerrainTypes>Mountain</allowedTerrainTypes>
+        <allowedTerrainTypes>Sea</allowedTerrainTypes>
+        <allowedTerrainTypes>Urban</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>Terran</biomeCategory>
+        <biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>288</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>297</allowedTemperatureUpperBound>
-	<allowedTerrainTypes>Badlands</allowedTerrainTypes>
+        <allowedTerrainTypes>Badlands</allowedTerrainTypes>
         <allowedTerrainTypes>Plains</allowedTerrainTypes>
         <allowedTerrainTypes>Forest</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
-	<allowedTerrainTypes>Hills</allowedTerrainTypes>
-	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
-	<allowedTerrainTypes>Sea</allowedTerrainTypes>
-	<allowedTerrainTypes>Urban</allowedTerrainTypes>
+        <allowedTerrainTypes>Hills</allowedTerrainTypes>
+        <allowedTerrainTypes>Mountain</allowedTerrainTypes>
+        <allowedTerrainTypes>Sea</allowedTerrainTypes>
+        <allowedTerrainTypes>Urban</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>Terran</biomeCategory>
+        <biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>298</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>307</allowedTemperatureUpperBound>
-	<allowedTerrainTypes>Badlands</allowedTerrainTypes>
+        <allowedTerrainTypes>Badlands</allowedTerrainTypes>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
         <allowedTerrainTypes>Forest</allowedTerrainTypes>
         <allowedTerrainTypes>HotForest</allowedTerrainTypes>
         <allowedTerrainTypes>Jungle</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
-	<allowedTerrainTypes>Hills</allowedTerrainTypes>
-	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
-	<allowedTerrainTypes>HotHillsDry</allowedTerrainTypes>
-	<allowedTerrainTypes>HotHillsWet</allowedTerrainTypes>
-	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
-	<allowedTerrainTypes>Sea</allowedTerrainTypes>
-	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
-	<allowedTerrainTypes>Urban</allowedTerrainTypes>
-	<allowedTerrainTypes>HotUrban</allowedTerrainTypes>
+        <allowedTerrainTypes>Hills</allowedTerrainTypes>
+        <allowedTerrainTypes>Mountain</allowedTerrainTypes>
+        <allowedTerrainTypes>HotHillsDry</allowedTerrainTypes>
+        <allowedTerrainTypes>HotHillsWet</allowedTerrainTypes>
+        <allowedTerrainTypes>Mountain</allowedTerrainTypes>
+        <allowedTerrainTypes>Sea</allowedTerrainTypes>
+        <allowedTerrainTypes>HotSea</allowedTerrainTypes>
+        <allowedTerrainTypes>Urban</allowedTerrainTypes>
+        <allowedTerrainTypes>HotUrban</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>Terran</biomeCategory>
+        <biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>308</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>317</allowedTemperatureUpperBound>
-	<allowedTerrainTypes>Badlands</allowedTerrainTypes>
+        <allowedTerrainTypes>Badlands</allowedTerrainTypes>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
         <allowedTerrainTypes>HotForest</allowedTerrainTypes>
         <allowedTerrainTypes>Jungle</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
-	<allowedTerrainTypes>Hills</allowedTerrainTypes>
-	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
-	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
-	<allowedTerrainTypes>HotUrban</allowedTerrainTypes>
-	<allowedTerrainTypes>HotHillsDry</allowedTerrainTypes>
-	<allowedTerrainTypes>HotHillsWet</allowedTerrainTypes>
-	<allowedTerrainTypes>HotMountainDry</allowedTerrainTypes>
-	<allowedTerrainTypes>HotMountainWet</allowedTerrainTypes>
+        <allowedTerrainTypes>Hills</allowedTerrainTypes>
+        <allowedTerrainTypes>Mountain</allowedTerrainTypes>
+        <allowedTerrainTypes>HotSea</allowedTerrainTypes>
+        <allowedTerrainTypes>HotUrban</allowedTerrainTypes>
+        <allowedTerrainTypes>HotHillsDry</allowedTerrainTypes>
+        <allowedTerrainTypes>HotHillsWet</allowedTerrainTypes>
+        <allowedTerrainTypes>HotMountainDry</allowedTerrainTypes>
+        <allowedTerrainTypes>HotMountainWet</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>Terran</biomeCategory>
+        <biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>318</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>90000</allowedTemperatureUpperBound>
-	<allowedTerrainTypes>Badlands</allowedTerrainTypes>
+        <allowedTerrainTypes>Badlands</allowedTerrainTypes>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
         <allowedTerrainTypes>Jungle</allowedTerrainTypes>
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
-	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
-	<allowedTerrainTypes>HotHillsDry</allowedTerrainTypes>
-	<allowedTerrainTypes>HotHillsWet</allowedTerrainTypes>
-	<allowedTerrainTypes>HotMountainDry</allowedTerrainTypes>
-	<allowedTerrainTypes>HotMountainWet</allowedTerrainTypes>
+        <allowedTerrainTypes>HotSea</allowedTerrainTypes>
+        <allowedTerrainTypes>HotHillsDry</allowedTerrainTypes>
+        <allowedTerrainTypes>HotHillsWet</allowedTerrainTypes>
+        <allowedTerrainTypes>HotMountainDry</allowedTerrainTypes>
+        <allowedTerrainTypes>HotMountainWet</allowedTerrainTypes>
     </biomes>
     <!-- Generic facility biomes for defaults -->
     <biomes>
-	<biomeCategory>TerranFacility</biomeCategory>
+        <biomeCategory>TerranFacility</biomeCategory>
         <allowedTemperatureLowerBound>0</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>267</allowedTemperatureUpperBound>
         <allowedTerrainTypes>FrozenFacility</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>TerranFacility</biomeCategory>
+        <biomeCategory>TerranFacility</biomeCategory>
         <allowedTemperatureLowerBound>268</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>277</allowedTemperatureUpperBound>
         <allowedTerrainTypes>ColdFacility</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>TerranFacility</biomeCategory>
+        <biomeCategory>TerranFacility</biomeCategory>
         <allowedTemperatureLowerBound>278</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>297</allowedTemperatureUpperBound>
         <allowedTerrainTypes>TemperateFacility</allowedTerrainTypes>
     </biomes>
     <biomes>
-	<biomeCategory>TerranFacility</biomeCategory>
+        <biomeCategory>TerranFacility</biomeCategory>
         <allowedTemperatureLowerBound>298</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>90000</allowedTemperatureUpperBound>
         <allowedTerrainTypes>HotFacility</allowedTerrainTypes>
     </biomes>
     <!-- Theoretically: Lunar/Facility, Martian/Facility, Purple/Facility -->
     <biomeMapTypes>
-	<entry>
+        <entry>
             <key>ArcticDesert</key>
             <value>
                 <mapTypes>ArcticDesert</mapTypes>
                 <mapTypes>ArcticDesert-Rough</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Badlands</key>
             <value>
                 <mapTypes>Dust-bowl</mapTypes>
                 <mapTypes>Light-craters</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>ColdFacility</key>
             <value>
                 <mapTypes>ColdSeaCoastalFort</mapTypes>
@@ -157,20 +157,20 @@
                 <mapTypes>BaseCold</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>ColdForest</key>
             <value>
                 <mapTypes>ColdForest</mapTypes>
-		<mapTypes>Some-trees-snow</mapTypes>
+                <mapTypes>Some-trees-snow</mapTypes>
                 <mapTypes>Wooded-lake-snow</mapTypes>
                 <mapTypes>Woods-deep-snow</mapTypes>
                 <mapTypes>Wooded-valley-snow</mapTypes>
                 <mapTypes>Woods-river-snow</mapTypes>
                 <mapTypes>Wooded-tundra</mapTypes>
-                <mapTypes>RuralHomesteadsCold</mapTypes>				
+                <mapTypes>RuralHomesteadsCold</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>ColdHills</key>
             <value>
                 <mapTypes>ColdHills</mapTypes>
@@ -182,7 +182,7 @@
                 <mapTypes>Wooded-hills-snow</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>ColdMountain</key>
             <value>
                 <mapTypes>ColdMountain</mapTypes>
@@ -200,7 +200,7 @@
                 <mapTypes>Heavy-craters-snow</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>ColdSea</key>
             <value>
                 <mapTypes>ColdSeaCoastalFort</mapTypes>
@@ -210,24 +210,24 @@
                 <mapTypes>ColdSeaFjordsSteep</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>ColdUrban</key>
             <value>
                 <mapTypes>ColdSeaCoastalFort</mapTypes>
                 <mapTypes>CityCold</mapTypes>
                 <mapTypes>TownCold</mapTypes>
-                <mapTypes>RuralHomesteadsCold</mapTypes>				
+                <mapTypes>RuralHomesteadsCold</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Desert</key>
             <value>
                 <mapTypes>Desert</mapTypes>
                 <mapTypes>TownHotDesert</mapTypes>
-                <mapTypes>RuralHomesteadsHotDesert</mapTypes>				
+                <mapTypes>RuralHomesteadsHotDesert</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Forest</key>
             <value>
                 <mapTypes>Some-trees</mapTypes>
@@ -241,20 +241,20 @@
                 <mapTypes>Town-wooded</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>FrozenFacility</key>
             <value>
                 <mapTypes>BaseCold</mapTypes>
                 <mapTypes>IceOutpost</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>FrozenSea</key>
             <value>
                 <mapTypes>FrozenSea</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Glacier</key>
             <value>
                 <mapTypes>Icefield</mapTypes>
@@ -264,13 +264,13 @@
                 <mapTypes>IceHills</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>HotHillsDry</key>
             <value>
                 <mapTypes>HillsHotDesert</mapTypes>
             </value>
-	</entry>
-	<entry>
+        </entry>
+        <entry>
             <key>Hills</key>
             <value>
                 <mapTypes>Hills</mapTypes>
@@ -284,7 +284,7 @@
                 <mapTypes>Wooded-hills</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>HotFacility</key>
             <value>
                 <mapTypes>BaseHotDesert</mapTypes>
@@ -293,63 +293,63 @@
                 <mapTypes>CityHotJungle</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>HotForest</key>
             <value>
                 <mapTypes>ForestHot</mapTypes>
-                <mapTypes>RuralHomesteadsHotJungle</mapTypes>				
+                <mapTypes>RuralHomesteadsHotJungle</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>HotHillsDry</key>
             <value>
                 <mapTypes>HillsHotDesert</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>HotHillsWet</key>
             <value>
                 <mapTypes>HillsHotJungle</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>HotMountainsDry</key>
             <value>
                 <mapTypes>MountainHotDesert</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>HotMountainsWet</key>
             <value>
                 <mapTypes>MountainHotJungle</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>HotSea</key>
             <value>
                 <mapTypes>SeaHotDesert</mapTypes>
                 <mapTypes>SeaHotJungle</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>HotUrban</key>
             <value>
                 <mapTypes>CityHotDesert</mapTypes>
                 <mapTypes>CityHotJungle</mapTypes>
                 <mapTypes>TownHotJungle</mapTypes>
                 <mapTypes>TownHotJungle</mapTypes>
-                <mapTypes>RuralHomesteadsHotDesert</mapTypes>				
+                <mapTypes>RuralHomesteadsHotDesert</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Jungle</key>
             <value>
                 <mapTypes>Jungle</mapTypes>
-        		<mapTypes>TownHotJungle</mapTypes>
-                <mapTypes>RuralHomesteadsHotJungle</mapTypes>		
+                <mapTypes>TownHotJungle</mapTypes>
+                <mapTypes>RuralHomesteadsHotJungle</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Mountain</key>
             <value>
                 <mapTypes>Mountain-lake</mapTypes>
@@ -365,7 +365,7 @@
                 <mapTypes>Heavy-craters</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Plains</key>
             <value>
                 <mapTypes>PlainsLake</mapTypes>
@@ -375,16 +375,16 @@
                 <mapTypes>Town-ruin</mapTypes>
                 <mapTypes>Town-farming</mapTypes>
                 <mapTypes>Dust-bowl</mapTypes>
-		<mapTypes>River-huge</mapTypes>
+                <mapTypes>River-huge</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Savannah</key>
             <value>
                 <mapTypes>Savannah</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Sea</key>
             <value>
                 <mapTypes>Sea-CoastalFort</mapTypes>
@@ -396,7 +396,7 @@
                 <mapTypes>Seaport</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>SnowField</key>
             <value>
                 <mapTypes>Snowfield</mapTypes>
@@ -406,7 +406,7 @@
                 <mapTypes>SnowHill</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Steppe</key>
             <value>
                 <mapTypes>SteppeGrass</mapTypes>
@@ -415,7 +415,7 @@
                 <mapTypes>Town-farming</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Swamp</key>
             <value>
                 <mapTypes>Muddy-swamp</mapTypes>
@@ -427,7 +427,7 @@
                 <mapTypes>River-wetlands</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Tundra</key>
             <value>
                 <mapTypes>TundraRiverGrass</mapTypes>
@@ -438,7 +438,7 @@
                 <mapTypes>Wooded-tundra</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>TemperateFacility</key>
             <value>
                 <mapTypes>City-dense</mapTypes>
@@ -448,11 +448,11 @@
                 <mapTypes>Town-generic</mapTypes>
                 <mapTypes>Town-ruin</mapTypes>
                 <mapTypes>PlainsOutpost</mapTypes>
-		<mapTypes>PlainsTown</mapTypes>
+                <mapTypes>PlainsTown</mapTypes>
                 <mapTypes>Town-wooded</mapTypes>
             </value>
         </entry>
-	<entry>
+        <entry>
             <key>Urban</key>
             <value>
                 <mapTypes>City-dense</mapTypes>
@@ -461,258 +461,258 @@
                 <mapTypes>Fortress-City</mapTypes>
                 <mapTypes>Town-generic</mapTypes>
                 <mapTypes>Town-ruin</mapTypes>
-		<mapTypes>Seaport</mapTypes>
+                <mapTypes>Seaport</mapTypes>
             </value>
         </entry>
     </biomeMapTypes>
-	<biomeImages>
-		<entry>
-			<key>ArcticDesert</key>
-			<value>data/images/stratcon/Stratcon_Arctic_Desert.png</value>
-		</entry>
-		<entry>
-			<key>Badlands</key>
-			<value>data/images/stratcon/Stratcon_Mars.png</value>
-		</entry>
-		<entry>
-			<key>ColdForest</key>
-			<value>data/images/stratcon/Stratcon_Cold_Forest.png</value>
-		</entry>
-		<entry>
-			<key>ColdHills</key>
-			<value>data/images/stratcon/Stratcon_Cold_Hills.png</value>
-		</entry>
-		<entry>
-			<key>ColdSea</key>
-			<value>data/images/stratcon/Stratcon_Cold_Sea.png</value>
-		</entry>
-		<entry>
-			<key>ColdUrban</key>
-			<value>data/images/stratcon/Stratcon_Urban_Cold.png</value>
-		</entry>
-		<entry>
-			<key>Desert</key>
-			<value>data/images/stratcon/Stratcon_Desert.png</value>
-		</entry>
-		<entry>
-			<key>FogOfWar</key>
-			<value>data/images/stratcon/Stratcon_Fog_of_War.png</value>
-		</entry>
-		<entry>
-			<key>ForceHostile</key>
-			<value>data/images/stratcon/SelectedHex/Stratcon_Force_Presence_Hostile_Red.png</value>
-		</entry>
-		<entry>
-			<key>ForceFriendly</key>
-			<value>data/images/stratcon/SelectedHex/Stratcon_Force_Presence_Friendly_Green.png</value>
-		</entry>
-		<entry>
-			<key>Forest</key>
-			<value>data/images/stratcon/Stratcon_Forest.png</value>
-		</entry>
-		<entry>
-			<key>FrozenSea</key>
-			<value>data/images/stratcon/Stratcon_Frozen_Sea.png</value>
-		</entry>
-		<entry>
-			<key>Factory</key>
-			<value>data/images/stratcon/Stratcon_Factory.png</value>
-		</entry>
-		<entry>
-			<key>Glacier</key>
-			<value>data/images/stratcon/Stratcon_Glacier.png</value>
-		</entry>
-		<entry>
-			<key>GrayLunar</key>
-			<value>data/images/stratcon/Stratcon_Gray_Luna.png</value>
-		</entry>
-		<entry>
-			<key>HexSelected</key>
-			<value>data/images/stratcon/SelectedHex/Stratcon_Selected_Hex_White.png</value>
-		</entry>
-		<entry>
-			<key>Hills</key>
-			<value>data/images/stratcon/Stratcon_Hills.png</value>
-		</entry>
-		<entry>
-			<key>HotForest</key>
-			<value>data/images/stratcon/Stratcon_Jungle.png</value>
-		</entry>
-		<entry>
-			<key>HotHillsDry</key>
-			<value>data/images/stratcon/Stratcon_Hot_Hills_Dry.png</value>
-		</entry>
-		<entry>
-			<key>HotHillsWet</key>
-			<value>data/images/stratcon/Stratcon_Hot_Hills_Wet.png</value>
-		</entry>
-		<entry>
-			<key>HotSea</key>
-			<value>data/images/stratcon/Stratcon_Hot_Sea.png</value>
-		</entry>
-		<entry>
-			<key>HotUrban</key>
-			<value>data/images/stratcon/Stratcon_Urban_Hot.png</value>
-		</entry>
-		<entry>
-			<key>Jungle</key>
-			<value>data/images/stratcon/Stratcon_Jungle.png</value>
-		</entry>
-		<entry>
-			<key>Mountain</key>
-			<value>data/images/stratcon/Stratcon_Mountains.png</value>
-		</entry>
-		<entry>
-			<key>HotMountainWet</key>
-			<value>data/images/stratcon/Stratcon_Mountains.png</value>
-		</entry>
-		<entry>
-			<key>HotMountainDry</key>
-			<value>data/images/stratcon/Stratcon_Hot_Mountain.png</value>
-		</entry>
-		<entry>
-			<key>ColdMountain</key>
-			<value>data/images/stratcon/Stratcon_Cold_Mountain.png</value>
-		</entry>
-		<entry>
-			<key>Mars</key>
-			<value>data/images/stratcon/Stratcon_Mars.png</value>
-		</entry>
-		<entry>
-			<key>Plains</key>
-			<value>data/images/stratcon/Stratcon_Plains.png</value>
-		</entry>
-		<entry>
-			<key>Savannah</key>
-			<value>data/images/stratcon/Stratcon_Savannah.png</value>
-		</entry>
-		<entry>
-			<key>Sea</key>
-			<value>data/images/stratcon/Stratcon_Sea.png</value>
-		</entry>
-		<entry>
-			<key>SnowField</key>
-			<value>data/images/stratcon/Stratcon_Snowfield.png</value>
-		</entry>
-		<entry>
-			<key>Steppe</key>
-			<value>data/images/stratcon/Stratcon_Steppe.png</value>
-		</entry>
-		<entry>
-			<key>Swamp</key>
-			<value>data/images/stratcon/Stratcon_Swamp.png</value>
-		</entry>
-		<entry>
-			<key>Tundra</key>
-			<value>data/images/stratcon/Stratcon_Tundra.png</value>
-		</entry>
-		<entry>
-			<key>Urban</key>
-			<value>data/images/stratcon/Stratcon_Urban_Temperate.png</value>
-		</entry>
-		<entry>
-			<key>Volcano</key>
-			<value>data/images/stratcon/Stratcon_Volcanic.png</value>
-		</entry>
-	</biomeImages>
+    <biomeImages>
+        <entry>
+            <key>ArcticDesert</key>
+            <value>data/images/stratcon/Stratcon_Arctic_Desert.png</value>
+        </entry>
+        <entry>
+            <key>Badlands</key>
+            <value>data/images/stratcon/Stratcon_Mars.png</value>
+        </entry>
+        <entry>
+            <key>ColdForest</key>
+            <value>data/images/stratcon/Stratcon_Cold_Forest.png</value>
+        </entry>
+        <entry>
+            <key>ColdHills</key>
+            <value>data/images/stratcon/Stratcon_Cold_Hills.png</value>
+        </entry>
+        <entry>
+            <key>ColdSea</key>
+            <value>data/images/stratcon/Stratcon_Cold_Sea.png</value>
+        </entry>
+        <entry>
+            <key>ColdUrban</key>
+            <value>data/images/stratcon/Stratcon_Urban_Cold.png</value>
+        </entry>
+        <entry>
+            <key>Desert</key>
+            <value>data/images/stratcon/Stratcon_Desert.png</value>
+        </entry>
+        <entry>
+            <key>FogOfWar</key>
+            <value>data/images/stratcon/Stratcon_Fog_of_War.png</value>
+        </entry>
+        <entry>
+            <key>ForceHostile</key>
+            <value>data/images/stratcon/SelectedHex/Stratcon_Force_Presence_Hostile_Red.png</value>
+        </entry>
+        <entry>
+            <key>ForceFriendly</key>
+            <value>data/images/stratcon/SelectedHex/Stratcon_Force_Presence_Friendly_Green.png</value>
+        </entry>
+        <entry>
+            <key>Forest</key>
+            <value>data/images/stratcon/Stratcon_Forest.png</value>
+        </entry>
+        <entry>
+            <key>FrozenSea</key>
+            <value>data/images/stratcon/Stratcon_Frozen_Sea.png</value>
+        </entry>
+        <entry>
+            <key>Factory</key>
+            <value>data/images/stratcon/Stratcon_Factory.png</value>
+        </entry>
+        <entry>
+            <key>Glacier</key>
+            <value>data/images/stratcon/Stratcon_Glacier.png</value>
+        </entry>
+        <entry>
+            <key>GrayLunar</key>
+            <value>data/images/stratcon/Stratcon_Gray_Luna.png</value>
+        </entry>
+        <entry>
+            <key>HexSelected</key>
+            <value>data/images/stratcon/SelectedHex/Stratcon_Selected_Hex_White.png</value>
+        </entry>
+        <entry>
+            <key>Hills</key>
+            <value>data/images/stratcon/Stratcon_Hills.png</value>
+        </entry>
+        <entry>
+            <key>HotForest</key>
+            <value>data/images/stratcon/Stratcon_Jungle.png</value>
+        </entry>
+        <entry>
+            <key>HotHillsDry</key>
+            <value>data/images/stratcon/Stratcon_Hot_Hills_Dry.png</value>
+        </entry>
+        <entry>
+            <key>HotHillsWet</key>
+            <value>data/images/stratcon/Stratcon_Hot_Hills_Wet.png</value>
+        </entry>
+        <entry>
+            <key>HotSea</key>
+            <value>data/images/stratcon/Stratcon_Hot_Sea.png</value>
+        </entry>
+        <entry>
+            <key>HotUrban</key>
+            <value>data/images/stratcon/Stratcon_Urban_Hot.png</value>
+        </entry>
+        <entry>
+            <key>Jungle</key>
+            <value>data/images/stratcon/Stratcon_Jungle.png</value>
+        </entry>
+        <entry>
+            <key>Mountain</key>
+            <value>data/images/stratcon/Stratcon_Mountains.png</value>
+        </entry>
+        <entry>
+            <key>HotMountainWet</key>
+            <value>data/images/stratcon/Stratcon_Mountains.png</value>
+        </entry>
+        <entry>
+            <key>HotMountainDry</key>
+            <value>data/images/stratcon/Stratcon_Hot_Mountain.png</value>
+        </entry>
+        <entry>
+            <key>ColdMountain</key>
+            <value>data/images/stratcon/Stratcon_Cold_Mountain.png</value>
+        </entry>
+        <entry>
+            <key>Mars</key>
+            <value>data/images/stratcon/Stratcon_Mars.png</value>
+        </entry>
+        <entry>
+            <key>Plains</key>
+            <value>data/images/stratcon/Stratcon_Plains.png</value>
+        </entry>
+        <entry>
+            <key>Savannah</key>
+            <value>data/images/stratcon/Stratcon_Savannah.png</value>
+        </entry>
+        <entry>
+            <key>Sea</key>
+            <value>data/images/stratcon/Stratcon_Sea.png</value>
+        </entry>
+        <entry>
+            <key>SnowField</key>
+            <value>data/images/stratcon/Stratcon_Snowfield.png</value>
+        </entry>
+        <entry>
+            <key>Steppe</key>
+            <value>data/images/stratcon/Stratcon_Steppe.png</value>
+        </entry>
+        <entry>
+            <key>Swamp</key>
+            <value>data/images/stratcon/Stratcon_Swamp.png</value>
+        </entry>
+        <entry>
+            <key>Tundra</key>
+            <value>data/images/stratcon/Stratcon_Tundra.png</value>
+        </entry>
+        <entry>
+            <key>Urban</key>
+            <value>data/images/stratcon/Stratcon_Urban_Temperate.png</value>
+        </entry>
+        <entry>
+            <key>Volcano</key>
+            <value>data/images/stratcon/Stratcon_Volcanic.png</value>
+        </entry>
+    </biomeImages>
 
-	<facilityImages>
-		<entry>
-			<key>FacilityAlliedAirBase</key>
-			<value>data/images/stratcon/Bases/Stratcon_Airbase_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedArtilleryBase</key>
-			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedDefault</key>
-			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedMekBase</key>
-			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedTankBase</key>
-			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedSupplyDepot</key>
-			<value>data/images/stratcon/Bases/Stratcon_Factory_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedDataCenter</key>
-			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedIndustrialFacility</key>
-			<value>data/images/stratcon/Bases/Stratcon_Factory_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedCommandCenter</key>
-			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedEarlyWarningSystem</key>
-			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedOrbitalDefense</key>
-			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
-		</entry>
-		<entry>
-			<key>FacilityAlliedBaseOfOperations</key>
-			<value>data/images/stratcon/Bases/Stratcon_Fortress_Real_Allied.png</value>
-		</entry>
-		<!-- Hostile facility images start here -->
-		<entry>
-			<key>FacilityHostileAirBase</key>
-			<value>data/images/stratcon/Bases/Stratcon_Airbase_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileArtilleryBase</key>
-			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileDefault</key>
-			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileMekBase</key>
-			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileTankBase</key>
-			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileSupplyDepot</key>
-			<value>data/images/stratcon/Bases/Stratcon_Factory_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileDataCenter</key>
-			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileIndustrialFacility</key>
-			<value>data/images/stratcon/Bases/Stratcon_Factory_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileCommandCenter</key>
-			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileEarlyWarningSystem</key>
-			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileOrbitalDefense</key>
-			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
-		</entry>
-		<entry>
-			<key>FacilityHostileBaseOfOperations</key>
-			<value>data/images/stratcon/Bases/Stratcon_Fortress_Real_Hostile.png</value>
-		</entry>
-	</facilityImages>
+    <facilityImages>
+        <entry>
+            <key>FacilityAlliedAirBase</key>
+            <value>data/images/stratcon/Bases/Stratcon_Airbase_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedArtilleryBase</key>
+            <value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedDefault</key>
+            <value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedMekBase</key>
+            <value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedTankBase</key>
+            <value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedSupplyDepot</key>
+            <value>data/images/stratcon/Bases/Stratcon_Factory_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedDataCenter</key>
+            <value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedIndustrialFacility</key>
+            <value>data/images/stratcon/Bases/Stratcon_Factory_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedCommandCenter</key>
+            <value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedEarlyWarningSystem</key>
+            <value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedOrbitalDefense</key>
+            <value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
+        </entry>
+        <entry>
+            <key>FacilityAlliedBaseOfOperations</key>
+            <value>data/images/stratcon/Bases/Stratcon_Fortress_Real_Allied.png</value>
+        </entry>
+        <!-- Hostile facility images start here -->
+        <entry>
+            <key>FacilityHostileAirBase</key>
+            <value>data/images/stratcon/Bases/Stratcon_Airbase_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileArtilleryBase</key>
+            <value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileDefault</key>
+            <value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileMekBase</key>
+            <value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileTankBase</key>
+            <value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileSupplyDepot</key>
+            <value>data/images/stratcon/Bases/Stratcon_Factory_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileDataCenter</key>
+            <value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileIndustrialFacility</key>
+            <value>data/images/stratcon/Bases/Stratcon_Factory_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileCommandCenter</key>
+            <value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileEarlyWarningSystem</key>
+            <value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileOrbitalDefense</key>
+            <value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
+        </entry>
+        <entry>
+            <key>FacilityHostileBaseOfOperations</key>
+            <value>data/images/stratcon/Bases/Stratcon_Fortress_Real_Hostile.png</value>
+        </entry>
+    </facilityImages>
 </StratconBiomeManifest>

@@ -18,20 +18,6 @@
  */
 package mekhq.campaign.personnel;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
-import megamek.client.ui.swing.CommonSettingsDialog;
-import megamek.common.annotations.Nullable;
-import megamek.common.preference.PreferenceManager;
-import mekhq.MHQConstants;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.AwardSet;
-import mekhq.io.migration.PersonMigrator;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,12 +28,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import megamek.client.ui.swing.CommonSettingsDialog;
+import megamek.common.annotations.Nullable;
+import megamek.common.preference.PreferenceManager;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
+import mekhq.campaign.AwardSet;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * This class is responsible to control the awards. It loads one instance of each awards, then it creates a copy of it
+ * This class is responsible to control the awards. It loads one instance of
+ * each awards, then it creates a copy of it
  * once it needs to be awarded to someone.
+ *
  * @author Miguel Azevedo
  */
 public class AwardsFactory {
+    private static final MMLogger logger = MMLogger.create(AwardsFactory.class);
+
     private static AwardsFactory instance = null;
 
     /**
@@ -79,6 +83,7 @@ public class AwardsFactory {
 
     /**
      * Gets a list of all awards that belong to a given Set
+     *
      * @param setName is the name of the set
      * @return list with the awards belonging to that set
      */
@@ -87,9 +92,11 @@ public class AwardsFactory {
     }
 
     /**
-     * By searching the "blueprints" (i.e. awards instances that serve as data model), it generates
+     * By searching the "blueprints" (i.e. awards instances that serve as data
+     * model), it generates
      * a copy of that award in order for it to be given to someone.
-     * @param setName the name of the set
+     *
+     * @param setName   the name of the set
      * @param awardName the name of the award
      * @return the copied award, or null if one cannot be copied
      */
@@ -104,8 +111,10 @@ public class AwardsFactory {
 
     /**
      * Generates a new award from an XML entry (when loading game, for example)
-     * @param node xml node
-     * @param defaultSetMigration whether or not to check if the default set needs to be migrated
+     *
+     * @param node                xml node
+     * @param defaultSetMigration whether or not to check if the default set needs
+     *                            to be migrated
      * @return an award
      */
     public @Nullable Award generateNewFromXML(final Node node, final boolean defaultSetMigration) {
@@ -128,16 +137,11 @@ public class AwardsFactory {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         if (defaultSetMigration && "Default Set".equalsIgnoreCase(set)) {
             name = (name == null) ? "" : name;
-            final String newName = PersonMigrator.awardDefaultSetMigrator(name);
-            if (newName != null) {
-                set = "standard";
-                name = newName;
-            }
         }
 
         final Award award = generateNew(set, name);
@@ -155,7 +159,7 @@ public class AwardsFactory {
             try (InputStream inputStream = new FileInputStream(file)) {
                 loadAwardsFromStream(inputStream, new File(file).getName());
             } catch (IOException e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -167,7 +171,8 @@ public class AwardsFactory {
             JAXBContext jaxbContext = JAXBContext.newInstance(AwardSet.class, Award.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-            awardSet = unmarshaller.unmarshal(MHQXMLUtility.createSafeXmlSource(inputStream), AwardSet.class).getValue();
+            awardSet = unmarshaller.unmarshal(MHQXMLUtility.createSafeXmlSource(inputStream), AwardSet.class)
+                    .getValue();
 
             Map<String, Award> tempAwardMap = new HashMap<>();
             String currentSetName = fileName.replaceFirst("[.][^.]+$", "");
@@ -180,8 +185,7 @@ public class AwardsFactory {
             }
             awardsMap.put(currentSetName, tempAwardMap);
         } catch (JAXBException e) {
-            LogManager.getLogger().error("Error loading XML for awards", e);
+            logger.error("Error loading XML for awards", e);
         }
     }
 }
-

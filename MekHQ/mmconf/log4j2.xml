@@ -9,27 +9,27 @@
             <PatternLayout pattern="${layout}" />
         </Console>
         <File name="MegaMekLog" fileName="logs/megamek.log" append="false">
-            <PatternLayout pattern="${layout}"/>
+            <PatternLayout pattern="${layout}" />
         </File>
         <File name="MegaMekLabLog" fileName="logs/megameklab.log" append="false">
-            <PatternLayout pattern="${layout}"/>
+            <PatternLayout pattern="${layout}" />
         </File>
         <File name="MekHQLog" fileName="logs/mekhq.log" append="false">
-            <PatternLayout pattern="${layout}"/>
+            <PatternLayout pattern="${layout}" />
         </File>
     </Appenders>
 
     <Loggers>
-        <Logger name="megamek.client.bot" level="error" additivity="false" >
+        <Logger name="megamek.client.bot" level="error" additivity="false">
             <AppenderRef ref="MegaMekLog" />
         </Logger>
-        <Logger name="megamek" level="info" additivity="false" >
+        <Logger name="megamek" level="info" additivity="false">
             <AppenderRef ref="MegaMekLog" />
         </Logger>
-        <Logger name="megameklab" level="info" additivity="false" >
+        <Logger name="megameklab" level="info" additivity="false">
             <AppenderRef ref="MegaMekLabLog" />
         </Logger>
-        <Logger name="mekhq" level="info" additivity="false" >
+        <Logger name="mekhq" level="info" additivity="false">
             <AppenderRef ref="MekHQLog" />
         </Logger>
 

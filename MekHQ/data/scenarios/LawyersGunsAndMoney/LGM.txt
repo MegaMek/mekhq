@@ -159,8 +159,6 @@ Note: A 'Mek is considered "lost" if it's destroyed per the standard BMR Rules.
 
 4.  What're We Fightin' For?
 
-
-
 VICTORY CONDITIONS
 The Lone Star forces must break through the Renegade lines
 while preventing the Renegades' escape. The Renegades must buy time for
@@ -190,7 +188,7 @@ Objective by moving less than 4 'Meks off the
 Renegade.s home edge.
 Pyrrhic Victory . . . . . . . .Achieve only the Primary or Secondary
 Objective.
-Marginal Defeat . . . . . . . .Achieved neither the Primary or Secondary
+Marginal Defeat . . . . . . . .Achieved neither the Primary nor Secondary
 Objectives.
 Total Defeat . . . . . . . . . . .All 8 Lone Star 'Meks were lost.
 Redfield.s Renegades:
@@ -202,6 +200,6 @@ Objective by moving less than 4 'Meks off the
 Lone Star.s home edge
 Pyrrhic Victory . . . . . . . .Achieve only the Primary or Secondary
 Objective.
-Marginal Defeat . . . . . . . .Achieved neither the Primary or Secondary
+Marginal Defeat . . . . . . . .Achieved neither the Primary nor Secondary
 Objectives.
 Total Defeat . . . . . . . . . . .All 8 Renegade 'Meks were lost.

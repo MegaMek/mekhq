@@ -20,25 +20,28 @@
  */
 package mekhq.campaign;
 
-import megamek.Version;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
+import java.io.PrintWriter;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.PrintWriter;
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson
  */
 public class RandomSkillPreferences {
+    private static final MMLogger logger = MMLogger.create(CampaignOptions.class);
+
     private int overallRecruitBonus;
     private int[] recruitBonuses;
     private boolean randomizeSkill;
     private boolean useClanBonuses;
     private int antiMekProb;
-    private int[] specialAbilBonus;
+    private int[] specialAbilityBonus;
     private int combatSmallArmsBonus;
     private int supportSmallArmsBonus;
     private int[] tacticsMod;
@@ -55,7 +58,7 @@ public class RandomSkillPreferences {
         antiMekProb = 10;
         combatSmallArmsBonus = -3;
         supportSmallArmsBonus = -10;
-        specialAbilBonus = new int[] { -10, -10, -2, 0, 1 };
+        specialAbilityBonus = new int[] { -10, -10, -2, 0, 1 };
         tacticsMod = new int[] { -10, -10, -7, -4, -1 };
         artilleryProb = 10;
         artilleryBonus = -2;
@@ -83,13 +86,13 @@ public class RandomSkillPreferences {
         recruitBonuses[index] = bonus;
     }
 
-    public int getSpecialAbilBonus(int type) {
-        return (type < specialAbilBonus.length) ? specialAbilBonus[type] : 0;
+    public int getSpecialAbilityBonus(int type) {
+        return (type < specialAbilityBonus.length) ? specialAbilityBonus[type] : 0;
     }
 
-    public void setSpecialAbilBonus(int type, int bonus) {
-        if (type < specialAbilBonus.length) {
-            specialAbilBonus[type] = bonus;
+    public void setSpecialAbilityBonus(int type, int bonus) {
+        if (type < specialAbilityBonus.length) {
+            specialAbilityBonus[type] = bonus;
         }
     }
 
@@ -179,7 +182,7 @@ public class RandomSkillPreferences {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "randomSkillPreferences");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overallRecruitBonus", overallRecruitBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitBonuses", recruitBonuses);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialAbilBonus", specialAbilBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specialAbilityBonus", specialAbilityBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tacticsMod", tacticsMod);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeSkill", randomizeSkill);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanBonuses", useClanBonuses);
@@ -194,7 +197,7 @@ public class RandomSkillPreferences {
     }
 
     public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn, Version version) {
-        LogManager.getLogger().debug("Loading Random Skill Preferences from XML...");
+        logger.debug("Loading Random Skill Preferences from XML...");
 
         wn.normalize();
         RandomSkillPreferences retVal = new RandomSkillPreferences();
@@ -209,7 +212,8 @@ public class RandomSkillPreferences {
                 continue;
             }
 
-            LogManager.getLogger().debug(wn2.getNodeName() + ": " + wn2.getTextContent());
+            logger.debug("%s: %s", wn2.getNodeName(), wn2.getTextContent());
+
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("overallRecruitBonus")) {
                     retVal.overallRecruitBonus = Integer.parseInt(wn2.getTextContent().trim());
@@ -233,32 +237,26 @@ public class RandomSkillPreferences {
                     retVal.secondSkillBonus = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitBonuses")) {
                     String[] values = wn2.getTextContent().split(",");
-                    if (version.isLowerThan("0.49.0")) {
-                        for (int i = 0; i < values.length; i++) {
-                            retVal.recruitBonuses[PersonnelRole.parseFromString(String.valueOf(i)).ordinal()] = Integer.parseInt(values[i]);
-                        }
-                    } else {
-                        for (int i = 0; i < values.length; i++) {
-                            retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
-                        }
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
                         retVal.tacticsMod[i] = Integer.parseInt(values[i]);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("specialAbilBonus")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("specialAbilityBonus")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.specialAbilBonus[i] = Integer.parseInt(values[i]);
+                        retVal.specialAbilityBonus[i] = Integer.parseInt(values[i]);
                     }
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                logger.debug(ex, "Unknown Exception - generateRandomSkillPreferencesFromXML");
             }
         }
 
-        LogManager.getLogger().debug("Load Random Skill Preferences Complete!");
+        logger.debug("Load Random Skill Preferences Complete!");
 
         return retVal;
     }

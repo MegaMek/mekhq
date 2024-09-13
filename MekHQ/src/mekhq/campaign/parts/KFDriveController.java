@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.StringJoiner;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.StringJoiner;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author MKerensky
  */
 public class KFDriveController extends Part {
+    private static final MMLogger logger = MMLogger.create(KFDriveController.class);
+
     public static final TechAdvancement TA_DRIVE_CONTROLLER = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
@@ -101,10 +104,10 @@ public class KFDriveController extends Part {
     public int getBaseTime() {
         int time;
         if (isSalvaging()) {
-            //10x the repair time
+            // 10x the repair time
             time = 3000;
         } else {
-            //BattleSpace, p28
+            // BattleSpace, p28
             time = 300;
         }
         return time;
@@ -112,14 +115,14 @@ public class KFDriveController extends Part {
 
     @Override
     public int getDifficulty() {
-        //Battlespace, p28 - just as difficult to repair as replace
+        // Battlespace, p28 - just as difficult to repair as replace
         return 5;
     }
 
     @Override
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
-                ((Jumpship) unit.getEntity()).setKFDriveControllerHit(needsFixing());
+            ((Jumpship) unit.getEntity()).setKFDriveControllerHit(needsFixing());
         }
     }
 
@@ -129,7 +132,8 @@ public class KFDriveController extends Part {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
             Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFDriveControllerHit(false);
-            // Also repair your KF Drive integrity - +1 point if you have other components to fix
+            // Also repair your KF Drive integrity - +1 point if you have other components
+            // to fix
             // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
                 js.setKFIntegrity(Math.min((js.getKFIntegrity() + 1), js.getOKFIntegrity()));
@@ -146,8 +150,8 @@ public class KFDriveController extends Part {
                 Jumpship js = ((Jumpship) unit.getEntity());
                 js.setKFIntegrity(Math.max(0, js.getKFIntegrity() - 1));
                 js.setKFDriveControllerHit(true);
-                //You can transport a drive controller
-                //See SO p130 for reference
+                // You can transport a drive controller
+                // See SO p130 for reference
                 Part spare = campaign.getWarehouse().checkForExistingSparePart(this);
                 if (!salvage) {
                     campaign.getWarehouse().removePart(this);
@@ -155,7 +159,7 @@ public class KFDriveController extends Part {
                     spare.incrementQuantity();
                     campaign.getWarehouse().removePart(this);
                 } else {
-                    //Start a new collection
+                    // Start a new collection
                     campaign.getQuartermaster().addPart(this, 0);
                 }
                 campaign.getWarehouse().removePart(this);
@@ -234,7 +238,7 @@ public class KFDriveController extends Part {
                     docks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }

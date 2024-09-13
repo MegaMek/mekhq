@@ -481,7 +481,7 @@
 		<personnelMarketDylansWeight>0.3</personnelMarketDylansWeight>
 		<usePersonnelHireHiringHallOnly>false</usePersonnelHireHiringHallOnly>
 		<unitMarketMethod>ATB_MONTHLY</unitMarketMethod>
-		<unitMarketRegionalMechVariations>true</unitMarketRegionalMechVariations>
+		<unitMarketRegionalMekVariations>true</unitMarketRegionalMekVariations>
 		<unitMarketSpecialUnitChance>30</unitMarketSpecialUnitChance>
 		<unitMarketRarityModifier>0</unitMarketRarityModifier>
 		<instantUnitMarketDelivery>true</instantUnitMarketDelivery>
@@ -504,13 +504,13 @@
 		<clanVehicles>true</clanVehicles>
 		<doubleVehicles>false</doubleVehicles>
 		<adjustPlayerVehicles>false</adjustPlayerVehicles>
-		<opForLanceTypeMechs>5</opForLanceTypeMechs>
+		<opForLanceTypeMeks>5</opForLanceTypeMeks>
 		<opForLanceTypeMixed>2</opForLanceTypeMixed>
 		<opForLanceTypeVehicles>1</opForLanceTypeVehicles>
 		<opForUsesVTOLs>false</opForUsesVTOLs>
 		<useDropShips>false</useDropShips>
 		<mercSizeLimited>false</mercSizeLimited>
-		<regionalMechVariations>false</regionalMechVariations>
+		<regionalMekVariations>false</regionalMekVariations>
 		<attachedPlayerCamouflage>true</attachedPlayerCamouflage>
 		<playerControlsAttachedUnits>true</playerControlsAttachedUnits>
 		<atbBattleChance>0,0,0,0</atbBattleChance>
@@ -560,7 +560,7 @@
 	</randomSkillPreferences>
 	<skillTypes>
 		<skillType>
-			<name>Piloting/Mech</name>
+			<name>Piloting/Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -570,7 +570,7 @@
 			<costs>20,10,20,30,40,50,60,70,80,90,100</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/Mech</name>
+			<name>Gunnery/Mek</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -700,7 +700,7 @@
 			<costs>20,10,20,30,40,50,60,70,80,90,100</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/ProtoMech</name>
+			<name>Gunnery/ProtoMek</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -720,7 +720,7 @@
 			<costs>20,10,20,30,40,50,60,70,80,90,100</costs>
 		</skillType>
 		<skillType>
-			<name>Anti-Mech</name>
+			<name>Anti-Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -730,7 +730,7 @@
 			<costs>20,10,20,30,40,50,60,70,80,90,100</costs>
 		</skillType>
 		<skillType>
-			<name>Tech/Mech</name>
+			<name>Tech/Mek</name>
 			<target>10</target>
 			<countUp>false</countUp>
 			<greenLvl>1</greenLvl>

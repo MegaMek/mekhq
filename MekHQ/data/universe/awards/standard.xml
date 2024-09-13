@@ -122,7 +122,8 @@
     </award>
     <award>
         <name>Medal of Honor</name>
-        <description>Distinguished oneself conspicuously by gallantry and intrepidity at the risk of life above and beyond the call of duty.</description>
+        <description>Distinguished oneself conspicuously by gallantry and intrepidity at the risk of
+            life above and beyond the call of duty.</description>
         <group>Personal Awards</group>
         <medal>MedalOfHonorM.png</medal>
         <ribbon>1-01-1-MedalOfHonor.png</ribbon>
@@ -489,7 +490,8 @@
         <xp>1</xp>
         <item>Theatre of War</item>
         <size>3028, 3030</size>
-        <range>Lyran Commonwealth(1),Federated Suns(1),Draconis Combine(2),Free Worlds League(2),Capellan Confederation(2)</range>
+        <range>Lyran Commonwealth(1),Federated Suns(1),Draconis Combine(2),Free Worlds
+            League(2),Capellan Confederation(2)</range>
     </award>
     <award>
         <name>Andurien Wars Campaign</name>
@@ -500,7 +502,8 @@
         <xp>1</xp>
         <item>Theatre Of War</item>
         <size>3030, 3040</size>
-        <range>Duchy of Andurien(1),Magistracy of Canopus(1),Capellan Confederation(2),Free Worlds League(2)</range>
+        <range>Duchy of Andurien(1),Magistracy of Canopus(1),Capellan Confederation(2),Free Worlds
+            League(2)</range>
     </award>
     <award>
         <name>Ronin Wars Campaign</name>

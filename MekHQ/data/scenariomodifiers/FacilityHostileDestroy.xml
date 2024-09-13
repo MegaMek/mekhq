@@ -1,31 +1,31 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Destroy or cripple all of the designated turrets.</additionalBriefingText>
-	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PreForceGeneration</eventTiming>
-	<linkedModifiers>
-		<entry>
-            		<key>FacilityHostileCapture.xml</key>
-            		<value>Capturing this facility will allow it to be destroyed as well.</value>
-		</entry>
-	</linkedModifiers>
-	<modifierName>Destroy</modifierName>
-	<objectives>
+    <additionalBriefingText>Destroy or cripple all of the designated turrets.</additionalBriefingText>
+    <benefitsPlayer>false</benefitsPlayer>
+    <eventTiming>PreForceGeneration</eventTiming>
+    <linkedModifiers>
+        <entry>
+            <key>FacilityHostileCapture.xml</key>
+            <value>Capturing this facility will allow it to be destroyed as well.</value>
+        </entry>
+    </linkedModifiers>
+    <modifierName>Destroy</modifierName>
+    <objectives>
         <objective>
             <associatedForceNames>
                 <associatedForceName>Base Turrets</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>2</howMuch>
                 </successEffect>
-		<successEffect>
-			<effectType>FacilityRemoved</effectType>
-			<effectScaling>Fixed</effectScaling>
-			<howMuch>1</howMuch>
-		</successEffect>
+                <successEffect>
+                    <effectType>FacilityRemoved</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
             </successEffects>
             <failureEffects>
                 <failureEffect>
@@ -34,8 +34,9 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
-            <description>Destroy or force the withdrawal of all of the following force(s) and unit(s) to render the facility inoperative:</description>
+            <additionalDetails />
+            <description>Destroy or force the withdrawal of all of the following force(s) and
+                unit(s) to render the facility inoperative:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>100</percentage>
@@ -43,5 +44,5 @@
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </objective>
-        </objectives>
+    </objectives>
 </AtBScenarioModifier>

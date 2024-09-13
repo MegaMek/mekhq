@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Crusader" model="CRD-3L" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="7ffbf883-252e-471b-b54a-f8edd8b1e8a1">
-			<pilot size="1" name="Munemi Sato" nick="" gender="FEMALE" gunnery="2" piloting="3" externalId="89585d17-bfe5-41a8-b950-e610812218eb" ejected="false" advantages="jumping_jack::cluster_master::weapon_specialist LRM 10" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="1"> Center Torso
-				<slot index="11" type="IS Ammo SRM-4" shots="25"/>
-				<slot index="12" type="IS Ammo MG - Full" shots="200"/>
-			</location>
-			<location index="2"> Right Torso
-				<slot index="3" type="IS Ammo LRM-10" shots="12"/>
-			</location>
-			<location index="3"> Left Torso
-				<slot index="3" type="IS Ammo LRM-10" shots="12"/>
-			</location>
-			<Game id="2"/>
-		</entity>
+	<entity chassis="Crusader" model="CRD-3L" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="7ffbf883-252e-471b-b54a-f8edd8b1e8a1">
+		<pilot size="1" name="Munemi Sato" nick="" gender="FEMALE" gunnery="2" piloting="3"
+			externalId="89585d17-bfe5-41a8-b950-e610812218eb" ejected="false"
+			advantages="jumping_jack::cluster_master::weapon_specialist LRM 10"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="1"> Center
+		Torso <slot index="11" type="IS Ammo SRM-4" shots="25" />
+				<slot index="12"
+				type="IS Ammo MG - Full" shots="200" />
+		</location>
+			<location index="2"> Right Torso <slot
+				index="3" type="IS Ammo LRM-10" shots="12" />
+		</location>
+			<location index="3"> Left Torso <slot
+				index="3" type="IS Ammo LRM-10" shots="12" />
+		</location>
+			<Game id="2" />
+	</entity>
 
 </unit>

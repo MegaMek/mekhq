@@ -18,30 +18,41 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.*;
 
 public class NewPlanetaryEventDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(NewPlanetaryEventDialog.class);
+
     private static final String FIELD_MESSAGE = "message";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_SHORTNAME = "shortName";
@@ -87,16 +98,17 @@ public class NewPlanetaryEventDialog extends JDialog {
     private JLabel socioindustrialCombined;
     private JLabel hpgCombined;
 
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewPlanetaryEventDialog",
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.NewPlanetaryEventDialog",
             MekHQ.getMHQOptions().getLocale());
 
     public NewPlanetaryEventDialog(final JFrame frame, final Campaign campaign,
-                                   final Planet planet) {
+            final Planet planet) {
         this(frame, true, campaign, planet);
     }
 
     public NewPlanetaryEventDialog(final JFrame frame, final boolean modal,
-                                   final Campaign campaign, final Planet planet) {
+            final Campaign campaign, final Planet planet) {
         super(frame, modal);
         this.planet = new Planet(Objects.requireNonNull(planet).getId());
         this.planet.copyDataFrom(planet);
@@ -197,8 +209,8 @@ public class NewPlanetaryEventDialog extends JDialog {
         JPanel data = new JPanel(new GridBagLayout());
         data.setName("data");
         data.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder(resourceMap.getString("eventData.text")),
-            BorderFactory.createEmptyBorder(1, 5, 1, 5)));
+                BorderFactory.createTitledBorder(resourceMap.getString("eventData.text")),
+                BorderFactory.createEmptyBorder(1, 5, 1, 5)));
         content.add(data, gbc);
 
         prepareDataPane(data, campaign);
@@ -413,10 +425,12 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(new JLabel(resourceMap.getString("hpg.text")), gbc);
 
         gbc.gridx = 1;
-        hpgField = new JComboBox<>(new HPGChoice[]{
+        hpgField = new JComboBox<>(new HPGChoice[] {
                 new HPGChoice(null, resourceMap.getString("hpg.undefined.text")),
-                new HPGChoice(EquipmentType.RATING_A, resourceMap.getString("hpg.a.text")), new HPGChoice(EquipmentType.RATING_B, resourceMap.getString("hpg.b.text")),
-                new HPGChoice(EquipmentType.RATING_C, resourceMap.getString("hpg.c.text")), new HPGChoice(EquipmentType.RATING_D, resourceMap.getString("hpg.d.text")),
+                new HPGChoice(EquipmentType.RATING_A, resourceMap.getString("hpg.a.text")),
+                new HPGChoice(EquipmentType.RATING_B, resourceMap.getString("hpg.b.text")),
+                new HPGChoice(EquipmentType.RATING_C, resourceMap.getString("hpg.c.text")),
+                new HPGChoice(EquipmentType.RATING_D, resourceMap.getString("hpg.d.text")),
                 new HPGChoice(EquipmentType.RATING_X, resourceMap.getString("hpg.none.text"))
         });
         hpgField.addActionListener(changeValueAction);
@@ -441,7 +455,7 @@ public class NewPlanetaryEventDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -466,7 +480,8 @@ public class NewPlanetaryEventDialog extends JDialog {
         factionsButton.setText(Faction.getFactionNames(factionSet, date.getYear()));
         try {
             socioindustrialField.setText(((null != event) && (null != event.socioIndustrial))
-                ? SOCIO_INDUSTRIAL_ADAPTER.marshal(event.socioIndustrial) : null);
+                    ? SOCIO_INDUSTRIAL_ADAPTER.marshal(event.socioIndustrial)
+                    : null);
         } catch (Exception ex) {
             socioindustrialField.setText(null);
         }
@@ -479,11 +494,12 @@ public class NewPlanetaryEventDialog extends JDialog {
         hpgKeep.setSelected((null == event) || (null == event.hpg));
 
         nameCombined.setText(ObjectUtility.nonNull(planet.getName(date), resourceMap.getString("undefined.text")));
-        shortNameCombined.setText(ObjectUtility.nonNull(planet.getShortName(date), resourceMap.getString("undefined.text")));
+        shortNameCombined
+                .setText(ObjectUtility.nonNull(planet.getShortName(date), resourceMap.getString("undefined.text")));
         factionCombined.setText(planet.getFactionDesc(date));
         String socioIndustrialText = "";
         try {
-            socioIndustrialText= SOCIO_INDUSTRIAL_ADAPTER.marshal(planet.getSocioIndustrial(date));
+            socioIndustrialText = SOCIO_INDUSTRIAL_ADAPTER.marshal(planet.getSocioIndustrial(date));
         } catch (Exception ignored) {
 
         }
