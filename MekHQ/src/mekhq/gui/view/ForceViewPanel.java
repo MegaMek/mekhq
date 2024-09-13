@@ -507,8 +507,8 @@ public class ForceViewPanel extends JScrollablePanel {
         if (!unit.getEntity().getTransportBays().isEmpty()) {
             int veeTotal = (int) (unit.getCurrentLightVehicleCapacity() + unit.getCurrentHeavyVehicleCapacity() + unit.getCurrentSuperHeavyVehicleCapacity());
             int aeroTotal = (int) (unit.getCurrentASFCapacity() + unit.getCurrentSmallCraftCapacity());
-            if (unit.getCurrentMechCapacity() > 0) {
-                toReturn += "<br><i>" + "Mech Bays: " + (int) unit.getCurrentMechCapacity() + " free.</i>";
+            if (unit.getCurrentMekCapacity() > 0) {
+                toReturn += "<br><i>" + "Mek Bays: " + (int) unit.getCurrentMekCapacity() + " free.</i>";
             }
             if (veeTotal > 0) {
                 toReturn += "<br><i>" + "Vehicle Bays: " + veeTotal + " free.</i>";
@@ -516,8 +516,8 @@ public class ForceViewPanel extends JScrollablePanel {
             if (aeroTotal > 0) {
                 toReturn += "<br><i>" + "ASF/SC Bays: " + aeroTotal + " free.</i>";
             }
-            if (unit.getCurrentProtomechCapacity() > 0) {
-                toReturn += "<br><i>" + "ProtoMech Bays: " + (int) unit.getCurrentProtomechCapacity() + " free.</i>";
+            if (unit.getCurrentProtoMekCapacity() > 0) {
+                toReturn += "<br><i>" + "ProtoMek Bays: " + (int) unit.getCurrentProtoMekCapacity() + " free.</i>";
             }
             if (unit.getCurrentBattleArmorCapacity() > 0) {
                 toReturn += "<br><i>" + "Battle Armor Bays: " + (int) unit.getCurrentBattleArmorCapacity() + " free.</i>";

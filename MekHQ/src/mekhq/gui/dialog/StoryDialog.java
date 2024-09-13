@@ -19,7 +19,6 @@
 package mekhq.gui.dialog;
 
 import mekhq.campaign.storyarc.Personality;
-import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.storypoint.DialogStoryPoint;
 
 import javax.swing.*;
@@ -27,10 +26,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 /**
- * This is the base class for dialogs related to the Story Arc, to help create a similar look and feel.
- * Inheriting classes must call initialize() in their constructors and override getMainPanel()
+ * This is the base class for dialogs related to the Story Arc, to help create a
+ * similar look and feel.
+ * Inheriting classes must call initialize() in their constructors and override
+ * getMainPanel()
  */
 public abstract class StoryDialog extends JDialog implements ActionListener {
 
@@ -45,7 +45,7 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
         this.storyPoint = sEvent;
     }
 
-    //region initialization
+    // region initialization
     protected void initialize() {
         setLayout(new BorderLayout());
         add(getButtonPanel(), BorderLayout.SOUTH);
@@ -68,7 +68,7 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
     }
 
     protected abstract Container getMainPanel();
-    //endregion initialization
+    // endregion initialization
 
     protected DialogStoryPoint getStoryPoint() {
         return storyPoint;
@@ -80,7 +80,7 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
         imgWidth = 0;
         Image img = getStoryPoint().getImage();
 
-        //check for personality as this will override image
+        // check for personality as this will override image
         Personality p = getStoryPoint().getPersonality();
         if (null != p) {
             img = p.getImage();
@@ -92,32 +92,32 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
             JLabel imgLbl = new JLabel();
             imgLbl.setIcon(icon);
             imagePanel.add(imgLbl, BorderLayout.CENTER);
-            if(null != p) {
-                //add a caption
+            if (null != p) {
+                // add a caption
                 imagePanel.add(new JLabel(p.getTitle(), SwingConstants.CENTER), BorderLayout.PAGE_END);
             }
         }
 
-        //we can grab and put here in an image panel
+        // we can grab and put here in an image panel
         return imagePanel;
     }
 
     protected void setDialogSize() {
 
-        int width = 400+imgWidth;
+        int width = 400 + imgWidth;
         int height = 400;
         setMinimumSize(new Dimension(width, height));
         setPreferredSize(new Dimension(width, height));
         setMaximumSize(new Dimension(width, height));
     }
 
-    //region Listeners
+    // region Listeners
     @Override
     public void actionPerformed(ActionEvent e) {
         if (doneButton.equals(e.getSource())) {
             this.setVisible(false);
         }
     }
-    //endregion Listeners
+    // endregion Listeners
 
 }

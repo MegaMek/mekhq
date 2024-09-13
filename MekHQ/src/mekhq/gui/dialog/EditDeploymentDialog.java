@@ -19,7 +19,6 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.GBC;
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.client.ui.swing.util.UIUtil.TipButton;
 import megamek.common.IStartingPositions;
 import megamek.common.Player;
@@ -87,16 +86,16 @@ public class EditDeploymentDialog extends JDialog {
         panStartButtons.add(butStartPos[9]);
         updateStartGrid();
 
-        SpinnerNumberModel mStartingAnyNWx = new SpinnerNumberModel(player.getStartingAnyNWx()+1, 0,
+        SpinnerNumberModel mStartingAnyNWx = new SpinnerNumberModel(player.getStartingAnyNWx() + 1, 0,
                 null, 1);
         spinStartingAnyNWx = new JSpinner(mStartingAnyNWx);
-        SpinnerNumberModel mStartingAnyNWy = new SpinnerNumberModel(player.getStartingAnyNWy()+1, 0,
+        SpinnerNumberModel mStartingAnyNWy = new SpinnerNumberModel(player.getStartingAnyNWy() + 1, 0,
                 null, 1);
         spinStartingAnyNWy = new JSpinner(mStartingAnyNWy);
-        SpinnerNumberModel mStartingAnySEx = new SpinnerNumberModel(player.getStartingAnySEx()+1, 0,
+        SpinnerNumberModel mStartingAnySEx = new SpinnerNumberModel(player.getStartingAnySEx() + 1, 0,
                 null, 1);
         spinStartingAnySEx = new JSpinner(mStartingAnySEx);
-        SpinnerNumberModel mStartingAnySEy = new SpinnerNumberModel(player.getStartingAnySEy()+1, 0,
+        SpinnerNumberModel mStartingAnySEy = new SpinnerNumberModel(player.getStartingAnySEy() + 1, 0,
                 null, 1);
         spinStartingAnySEy = new JSpinner(mStartingAnySEy);
 
@@ -151,7 +150,7 @@ public class EditDeploymentDialog extends JDialog {
 
         for (int i = 0; i < 11; i++) {
             butText[i].append("<HTML><P ALIGN=CENTER>");
-            //butTT[i].append(Messages.getString("PlayerSettingsDialog.invalidStartPosTT"));
+            // butTT[i].append(Messages.getString("PlayerSettingsDialog.invalidStartPosTT"));
             butText[i].append(IStartingPositions.START_LOCATION_NAMES[i]).append("</FONT><BR>");
         }
 
@@ -183,10 +182,14 @@ public class EditDeploymentDialog extends JDialog {
         player.setStartingPos(currentStartPos);
         player.setStartWidth(parseField(txtWidth));
         player.setStartOffset(parseField(txtOffset));
-        player.setStartingAnyNWx(Math.min((Integer) spinStartingAnyNWx.getValue(), (Integer) spinStartingAnySEx.getValue()) - 1);
-        player.setStartingAnyNWy(Math.min((Integer) spinStartingAnyNWy.getValue(), (Integer) spinStartingAnySEy.getValue()) - 1);
-        player.setStartingAnySEx(Math.max((Integer) spinStartingAnyNWx.getValue(), (Integer) spinStartingAnySEx.getValue()) - 1);
-        player.setStartingAnySEy(Math.max((Integer) spinStartingAnyNWy.getValue(), (Integer) spinStartingAnySEy.getValue()) - 1);
+        player.setStartingAnyNWx(
+                Math.min((Integer) spinStartingAnyNWx.getValue(), (Integer) spinStartingAnySEx.getValue()) - 1);
+        player.setStartingAnyNWy(
+                Math.min((Integer) spinStartingAnyNWy.getValue(), (Integer) spinStartingAnySEy.getValue()) - 1);
+        player.setStartingAnySEx(
+                Math.max((Integer) spinStartingAnyNWx.getValue(), (Integer) spinStartingAnySEx.getValue()) - 1);
+        player.setStartingAnySEy(
+                Math.max((Integer) spinStartingAnyNWy.getValue(), (Integer) spinStartingAnySEy.getValue()) - 1);
         this.setVisible(false);
     }
 

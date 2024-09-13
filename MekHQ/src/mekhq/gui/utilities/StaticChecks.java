@@ -85,7 +85,7 @@ public class StaticChecks {
         int numberHVee = 0;
         int numberInfantry = 0;
         int numberLVee = 0;
-        int numberMech = 0;
+        int numberMek = 0;
         int numberProto = 0;
         int numberSC = 0;
         int numberSHVee = 0;
@@ -110,7 +110,7 @@ public class StaticChecks {
                 numberInfantry += (int) Math.ceil(unit.getEntity().getWeight());
             } else if (unit.getEntity().getUnitType() == UnitType.MEK) {
                 // Includes LAMs and Quadvees
-                numberMech++;
+                numberMek++;
             } else if (unit.getEntity().getUnitType() == UnitType.PROTOMEK) {
                 numberProto++;
             } else if (unit.getEntity().getUnitType() == UnitType.TANK
@@ -155,13 +155,13 @@ public class StaticChecks {
             loadOK = false;
         }
 
-        if (numberMech > ship.getCurrentMechCapacity()) {
-            reason.add("    Selection of Units includes too many Mechs. \n");
+        if (numberMek > ship.getCurrentMekCapacity()) {
+            reason.add("    Selection of Units includes too many Meks. \n");
             loadOK = false;
         }
 
-        if (numberProto > ship.getCurrentProtomechCapacity()) {
-            reason.add("    Selection of Units includes too many ProtoMechs. \n");
+        if (numberProto > ship.getCurrentProtoMekCapacity()) {
+            reason.add("    Selection of Units includes too many ProtoMeks. \n");
             loadOK = false;
         }
 

@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.Mech;
+import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
@@ -40,7 +40,7 @@ public class MissingMekLifeSupport extends MissingPart {
 
     public MissingMekLifeSupport(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Mech Life Support System";
+        this.name = "Mek Life Support System";
     }
 
     @Override
@@ -75,7 +75,7 @@ public class MissingMekLifeSupport extends MissingPart {
             return null;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0) {
+            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0) {
                 if (unit.isLocationBreached(i)) {
                     return unit.getEntity().getLocationName(i) + " is breached.";
                 } else if (unit.isLocationDestroyed(i)) {
@@ -94,7 +94,7 @@ public class MissingMekLifeSupport extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT);
         }
     }
 
@@ -109,7 +109,7 @@ public class MissingMekLifeSupport extends MissingPart {
         if (null != unit) {
             Entity entity = unit.getEntity();
             for (int i = 0; i < entity.locations(); i++) {
-                if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0) {
+                if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_LIFE_SUPPORT, i) > 0) {
                     return i;
                 }
             }
@@ -124,15 +124,15 @@ public class MissingMekLifeSupport extends MissingPart {
 
     @Override
     public boolean isInLocation(String loc) {
-         if (null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mech)) {
+         if (null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mek)) {
              return false;
          }
-         if (((Mech) unit.getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
-             if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_LT
-                     || unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_RT) {
+         if (((Mek) unit.getEntity()).getCockpitType() == Mek.COCKPIT_TORSO_MOUNTED) {
+             if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_LT
+                     || unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_RT) {
                  return true;
              }
-         } else if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
+         } else if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_HEAD) {
              return true;
          }
          return false;

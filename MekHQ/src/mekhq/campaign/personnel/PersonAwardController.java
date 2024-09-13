@@ -18,24 +18,27 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.log.AwardLogger;
-import mekhq.campaign.log.PersonalLogger;
-import org.apache.logging.log4j.LogManager;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.log.AwardLogger;
+import mekhq.campaign.log.PersonalLogger;
+
 /**
  * This class is responsible for the awards given to a person.
+ * 
  * @author Miguel Azevedo
  */
 public class PersonAwardController {
+    private static final MMLogger logger = MMLogger.create(PersonAwardController.class);
+
     private List<Award> awards;
     private Person person;
 
@@ -61,7 +64,7 @@ public class PersonAwardController {
     }
 
     /**
-     * @param set String with the name of the set which the award belongs
+     * @param set  String with the name of the set which the award belongs
      * @param name String with the name of the award
      * @return true if person has an award of that name and set
      */
@@ -77,21 +80,24 @@ public class PersonAwardController {
     }
 
     /**
-     * @return true if this person has one or more awards that are represented with a ribbon icon.
+     * @return true if this person has one or more awards that are represented with
+     *         a ribbon icon.
      */
     public boolean hasAwardsWithRibbons() {
         return awards.stream().anyMatch(a -> a.getNumberOfRibbonFiles() > 0);
     }
 
     /**
-     * @return true if this person has one or more awards that are represented with a medal icon.
+     * @return true if this person has one or more awards that are represented with
+     *         a medal icon.
      */
     public boolean hasAwardsWithMedals() {
         return awards.stream().anyMatch(a -> a.getNumberOfMedalFiles() > 0);
     }
 
     /**
-     * @return true if this person has one or more awards that are represented by a misc icon.
+     * @return true if this person has one or more awards that are represented by a
+     *         misc icon.
      */
     public boolean hasAwardsWithMiscs() {
         return awards.stream().anyMatch(a -> a.getNumberOfMiscFiles() > 0);
@@ -99,24 +105,25 @@ public class PersonAwardController {
 
     /**
      * Adds and logs an award to this person based on
-     * @param setName is the name of the set of the award
+     * 
+     * @param setName   is the name of the set of the award
      * @param awardName is the name of the award
-     * @param date is the date it was awarded
+     * @param date      is the date it was awarded
      */
     public void addAndLogAward(final Campaign campaign, final String setName,
-                               final String awardName, final LocalDate date) {
+            final String awardName, final LocalDate date) {
         final Award award;
         if (hasAward(setName, awardName)) {
             award = getAward(setName, awardName);
 
             if (!award.canBeAwarded(person)) {
-                LogManager.getLogger().info("Award not stackable, returning.");
+                logger.info("Award not stackable, returning.");
                 return;
             }
         } else {
             award = AwardsFactory.getInstance().generateNew(setName, awardName);
             if (award == null) {
-                LogManager.getLogger().error("Cannot award a null award, returning.");
+                logger.error("Cannot award a null award, returning.");
                 return;
             }
 
@@ -148,6 +155,7 @@ public class PersonAwardController {
 
     /**
      * Gives the award to this person
+     * 
      * @param award is the award being loaded from XML
      */
     public void addAwardFromXml(final @Nullable Award award) {
@@ -167,9 +175,11 @@ public class PersonAwardController {
 
     /**
      * Removes an award given to this person based on:
-     * @param setName is the name of the set of the award
-     * @param awardName is the name of the award
-     * @param awardedDate is the date it was awarded, or null if it is to be bulk removed
+     * 
+     * @param setName     is the name of the set of the award
+     * @param awardName   is the name of the award
+     * @param awardedDate is the date it was awarded, or null if it is to be bulk
+     *                    removed
      * @param currentDate is the current date
      */
     public void removeAward(String setName, String awardName, LocalDate awardedDate, LocalDate currentDate) {
@@ -189,9 +199,11 @@ public class PersonAwardController {
 
     /**
      * Removes an award given to this person (without logging the removal) based on:
-     * @param setName is the name of the set of the award
-     * @param awardName is the name of the award
-     * @param awardedDate is the date it was awarded, or null if it is to be bulk removed
+     * 
+     * @param setName     is the name of the set of the award
+     * @param awardName   is the name of the award
+     * @param awardedDate is the date it was awarded, or null if it is to be bulk
+     *                    removed
      */
     public void removeAwardSilent(String setName, String awardName, LocalDate awardedDate) {
         for (Award award : awards) {
@@ -210,6 +222,7 @@ public class PersonAwardController {
 
     /**
      * Adds an entry log for a given award.
+     * 
      * @param award that was given.
      */
     public void logAward(Award award, LocalDate date) {
@@ -218,7 +231,7 @@ public class PersonAwardController {
     }
 
     /**
-     * @param set String with the name of the set which the award belongs
+     * @param set  String with the name of the set which the award belongs
      * @param name String with the name of the award
      * @return the award
      */
@@ -232,8 +245,10 @@ public class PersonAwardController {
     }
 
     /**
-     * Finds an award with a given name, without taking into account the set name. This is used for backward compatibility
+     * Finds an award with a given name, without taking into account the set name.
+     * This is used for backward compatibility
      * and should be avoided.
+     * 
      * @param name String with the name of the award
      * @return the award
      */

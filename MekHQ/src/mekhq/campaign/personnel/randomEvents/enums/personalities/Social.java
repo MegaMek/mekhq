@@ -18,12 +18,12 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
 
+import mekhq.MekHQ;
+
 public enum Social {
-    //region Enum Declarations
+    // region Enum Declarations
     NONE("Personality.NONE.text", "Personality.NONE.description", false, false),
     ALTRUISTIC("Social.ALTRUISTIC.text", "Social.ALTRUISTIC.description", true, true),
     APATHETIC("Social.APATHETIC.text", "Social.APATHETIC.description", false, false),
@@ -55,16 +55,16 @@ public enum Social {
     SUPPORTIVE("Social.SUPPORTIVE.text", "Social.SUPPORTIVE.description", true, false),
     TACTFUL("Social.TACTFUL.text", "Social.TACTFUL.description", true, false),
     UNTRUSTWORTHY("Social.UNTRUSTWORTHY.text", "Social.UNTRUSTWORTHY.description", false, false);
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String description;
     private final boolean isPositive;
     private final boolean isMajor;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     Social(final String name, final String description, boolean isPositive, boolean isMajor) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
                 MekHQ.getMHQOptions().getLocale());
@@ -73,198 +73,171 @@ public enum Social {
         this.isPositive = isPositive;
         this.isMajor = isMajor;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
-    @SuppressWarnings(value = "unused")
+    // region Getters
+
     public String getDescription() {
         return description;
     }
 
     /**
-     * @return {@code true} if the personality trait is considered positive, {@code false} otherwise.
+     * @return {@code true} if the personality trait is considered positive,
+     *         {@code false} otherwise.
      */
-    @SuppressWarnings(value = "unused")
+
     public boolean isTraitPositive() {
         return isPositive;
     }
 
     /**
-     * @return {@code true} if the personality trait is considered a major trait, {@code false} otherwise.
+     * @return {@code true} if the personality trait is considered a major trait,
+     *         {@code false} otherwise.
      */
-    @SuppressWarnings(value = "unused")
+
     public boolean isTraitMajor() {
         return isMajor;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    @SuppressWarnings(value = "unused")
+    // region Boolean Comparison Methods
+
     public boolean isNone() {
         return this == NONE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAltruistic() {
         return this == ALTRUISTIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isApathetic() {
         return this == APATHETIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isAuthentic() {
         return this == AUTHENTIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isBlunt() {
         return this == BLUNT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCallous() {
         return this == CALLOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCompassionate() {
         return this == COMPASSIONATE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCondescending() {
         return this == CONDESCENDING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isConsiderate() {
         return this == CONSIDERATE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDisingenuous() {
         return this == DISINGENUOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDismissive() {
         return this == DISMISSIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isEncouraging() {
         return this == ENCOURAGING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isErratic() {
         return this == ERRATIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isEmpathetic() {
         return this == EMPATHETIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isFriendly() {
         return this == FRIENDLY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isGregarious() {
         return this == GREGARIOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isInspiring() {
         return this == INSPIRING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isIndifferent() {
         return this == INDIFFERENT;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isIntroverted() {
         return this == INTROVERTED;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isIrritable() {
         return this == IRRITABLE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isNarcissistic() {
         return this == NARCISSISTIC;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isNeglectful() {
         return this == NEGLECTFUL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPompous() {
         return this == POMPOUS;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPetty() {
         return this == PETTY;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPersuasive() {
         return this == PERSUASIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isReceptive() {
         return this == RECEPTIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isScheming() {
         return this == SCHEMING;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSincere() {
         return this == SINCERE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isSupportive() {
         return this == SUPPORTIVE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isTactful() {
         return this == TACTFUL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUntrustworthy() {
         return this == UNTRUSTWORTHY;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
      * Parses a given string and returns the corresponding Social enum.
      * Accepts either the ENUM ordinal value or its name
      *
      * @param social the string to be parsed
      * @return the Social enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid Social
+     * @throws IllegalStateException if the given string does not match any valid
+     *                               Social
      */
-    @SuppressWarnings(value = "unused")
+
     public static Social parseFromString(final String social) {
         return switch (social) {
             case "0", "None" -> NONE;
@@ -301,8 +274,9 @@ public enum Social {
             case "29", "Pompous" -> POMPOUS;
             case "30", "Scheming" -> SCHEMING;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromString: "
-                            + social);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromString: "
+                                + social);
         };
     }
 
@@ -311,9 +285,10 @@ public enum Social {
      *
      * @param social the integer value representing the Social level
      * @return the corresponding Social enum value
-     * @throws IllegalStateException if the integer value does not correspond to any valid Social enum value
+     * @throws IllegalStateException if the integer value does not correspond to any
+     *                               valid Social enum value
      */
-    @SuppressWarnings(value = "unused")
+
     public static Social parseFromInt(final int social) {
         return switch (social) {
             case 0 -> NONE;
@@ -350,8 +325,9 @@ public enum Social {
             case 29 -> POMPOUS;
             case 30 -> SCHEMING;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromInt: "
-                            + social);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Social.java/parseFromInt: "
+                                + social);
         };
     }
 

@@ -26,8 +26,8 @@ import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
+import megamek.common.LandAirMek;
+import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
@@ -71,7 +71,7 @@ public class MissingLandingGear extends MissingPart {
 
     @Override
     public @Nullable String checkFixable() {
-        if ((unit != null) && (unit.getEntity() instanceof LandAirMech)) {
+        if ((unit != null) && (unit.getEntity() instanceof LandAirMek)) {
             // Landing Gear is installed in the CT and both Side Torsos,
             // make sure they're not missing.
             StringJoiner missingLocs = new StringJoiner(", ");
@@ -79,8 +79,8 @@ public class MissingLandingGear extends MissingPart {
                 if (part instanceof MissingMekLocation) {
                     // The CT cannot be scrapped, so that check is elided.
                     switch (part.getLocation()) {
-                        case Mech.LOC_LT:
-                        case Mech.LOC_RT:
+                        case Mek.LOC_LT:
+                        case Mek.LOC_RT:
                             missingLocs.add(unit.getEntity().getLocationName(part.getLocation()));
                             break;
                         default:
@@ -121,8 +121,8 @@ public class MissingLandingGear extends MissingPart {
     public void updateConditionFromPart() {
         if (null != unit && unit.getEntity() instanceof Aero) {
             ((Aero) unit.getEntity()).setGearHit(true);
-        } else if (null != unit && unit.getEntity() instanceof LandAirMech) {
-            unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, 3);
+        } else if (null != unit && unit.getEntity() instanceof LandAirMek) {
+            unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMek.LAM_LANDING_GEAR, 3);
         }
     }
 

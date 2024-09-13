@@ -18,12 +18,12 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import mekhq.MekHQ;
-
 import java.util.ResourceBundle;
 
+import mekhq.MekHQ;
+
 public enum Intelligence {
-    //region Enum Declarations
+    // region Enum Declarations
     BRAIN_DEAD("Intelligence.BRAIN_DEAD.text", "Intelligence.BRAIN_DEAD.description"),
     UNINTELLIGENT("Intelligence.UNINTELLIGENT.text", "Intelligence.UNINTELLIGENT.description"),
     FOOLISH("Intelligence.FOOLISH.text", "Intelligence.FOOLISH.description"),
@@ -49,142 +49,142 @@ public enum Intelligence {
     BRILLIANT("Intelligence.BRILLIANT.text", "Intelligence.BRILLIANT.description"),
     EXCEPTIONAL("Intelligence.EXCEPTIONAL.text", "Intelligence.EXCEPTIONAL.description"),
     GENIUS("Intelligence.GENIUS.text", "Intelligence.GENIUS.description");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String description;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     Intelligence(final String name, final String description) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personalities",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.description = resources.getString(description);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
-    @SuppressWarnings(value = "unused")
+    // region Getters
+
     public String getDescription() {
         return description;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    @SuppressWarnings(value = "unused")
+    // region Boolean Comparison Methods
+
     public boolean isBrainDead() {
         return this == BRAIN_DEAD;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isUnintelligent() {
         return this == UNINTELLIGENT;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isFeebleMinded() {
         return this == FOOLISH;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isSimple() {
         return this == SIMPLE;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isSlow() {
         return this == SLOW;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isUninspired() {
         return this == UNINSPIRED;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isDull() {
         return this == DULL;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isDimwitted() {
         return this == DIMWITTED;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isObtuse() {
         return this == OBTUSE;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isBelowAverage() {
         return this == BELOW_AVERAGE;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isUnderPerforming() {
         return this == UNDER_PERFORMING;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isLimitedInsight() {
         return this == LIMITED_INSIGHT;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isAverage() {
         return this == AVERAGE;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isAboveAverage() {
         return this == ABOVE_AVERAGE;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isSTUDIOUS() {
         return this == STUDIOUS;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isDiscerning() {
         return this == DISCERNING;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isSharp() {
         return this == SHARP;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isQuickWitted() {
         return this == QUICK_WITTED;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isPerceptive() {
         return this == PERCEPTIVE;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isBright() {
         return this == BRIGHT;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isClever() {
         return this == CLEVER;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isIntellectual() {
         return this == INTELLECTUAL;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isBrilliant() {
         return this == BRILLIANT;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isExceptional() {
         return this == EXCEPTIONAL;
     }
-    @SuppressWarnings(value = "unused")
+
     public boolean isGenius() {
         return this == GENIUS;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
      * Parses a given string and returns the corresponding Quirk enum.
      * Accepts either the ENUM ordinal value, or its name
      *
      * @param quirk the string to be parsed
      * @return the Greed enum that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid Quirk
+     * @throws IllegalStateException if the given string does not match any valid
+     *                               Quirk
      */
-    @SuppressWarnings(value = "unused")
     public static Intelligence parseFromString(final String quirk) {
         return switch (quirk) {
             case "0", "Brain Dead" -> BRAIN_DEAD;
@@ -213,8 +213,9 @@ public enum Intelligence {
             case "23", "Exceptional" -> EXCEPTIONAL;
             case "24", "Genius" -> GENIUS;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/PersonalityQuirk.java/parseFromString: "
-                            + quirk);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/PersonalityQuirk.java/parseFromString: "
+                                + quirk);
         };
     }
 
@@ -224,7 +225,7 @@ public enum Intelligence {
      * @param intelligence the Intelligence enum value to be parsed
      * @return the integer value representing the parsed Intelligence
      */
-    @SuppressWarnings(value = "unused")
+
     public static int parseToInt(final Intelligence intelligence) {
         return switch (intelligence) {
             case BRAIN_DEAD -> 0;
@@ -261,7 +262,8 @@ public enum Intelligence {
     }
 
     /**
-     * Evaluates 'intelligence score', an int representation of how intelligent a character is.
+     * Evaluates 'intelligence score', an int representation of how intelligent a
+     * character is.
      *
      * @return The calculated intelligence score.
      */

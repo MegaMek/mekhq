@@ -18,21 +18,34 @@
  */
 package mekhq.campaign.mod.am;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
+import megamek.logging.MMLogger;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.log.MedicalLogEntry;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.personnel.*;
-import mekhq.campaign.personnel.enums.*;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.*;
+import mekhq.campaign.personnel.BodyLocation;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
+import mekhq.campaign.personnel.Modifier;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.InjuryLevel;
+import mekhq.campaign.personnel.enums.ModifierValue;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 
 /** Advanced Medical sub-system injury types */
 public final class InjuryTypes {
+    private static final MMLogger logger = MMLogger.create(InjuryType.class);
+
     // Predefined types
     public static final InjuryType CUT = new InjuryTypes.Cut();
     public static final InjuryType BRUISE = new InjuryTypes.Bruise();
@@ -54,7 +67,10 @@ public final class InjuryTypes {
 
     private static boolean registered = false;
 
-    /** Register all injury types defined here. Don't use them until you called this once! */
+    /**
+     * Register all injury types defined here. Don't use them until you called this
+     * once!
+     */
     public static synchronized void registerAll() {
         if (!registered) {
             InjuryType.register(0, "am:cut", CUT);
@@ -139,7 +155,7 @@ public final class InjuryTypes {
                             p.addInjury(severedSpine);
 
                             MedicalLogEntry entry = MedicalLogger.severedSpine(p, c.getLocalDate());
-                            LogManager.getLogger().info(entry.toString());
+                            logger.info(entry.toString());
                         }
                     }));
         }
@@ -147,8 +163,8 @@ public final class InjuryTypes {
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             return Arrays.asList(
-                new Modifier(ModifierValue.GUNNERY, 3, null, InjuryType.MODTAG_INJURY),
-                new Modifier(ModifierValue.PILOTING, 3, null, InjuryType.MODTAG_INJURY));
+                    new Modifier(ModifierValue.GUNNERY, 3, null, InjuryType.MODTAG_INJURY),
+                    new Modifier(ModifierValue.PILOTING, 3, null, InjuryType.MODTAG_INJURY));
         }
     }
 
@@ -172,26 +188,27 @@ public final class InjuryTypes {
                                 rnd -> {
                                     p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
                                     MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
-                                    LogManager.getLogger().info(entry.toString());
+                                    logger.info(entry.toString());
                                 }));
             } else {
                 // We have a chance!
                 return Arrays.asList(
-                    newResetRecoveryTimeAction(i),
-                    new GameEffect(deathChance + "% chance of death",
-                        rnd -> {
-                            if (rnd.applyAsInt(6) + hits >= 5) {
-                                p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
-                                MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
-                                LogManager.getLogger().info(entry.toString());
-                        }
-                    }));
+                        newResetRecoveryTimeAction(i),
+                        new GameEffect(deathChance + "% chance of death",
+                                rnd -> {
+                                    if (rnd.applyAsInt(6) + hits >= 5) {
+                                        p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
+                                        MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
+                                        logger.info(entry.toString());
+                                    }
+                                }));
             }
         }
 
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
-            return Collections.singletonList(new Modifier(ModifierValue.PILOTING, Integer.MAX_VALUE, null, InjuryType.MODTAG_INJURY));
+            return Collections.singletonList(
+                    new Modifier(ModifierValue.PILOTING, Integer.MAX_VALUE, null, InjuryType.MODTAG_INJURY));
         }
     }
 
@@ -227,19 +244,18 @@ public final class InjuryTypes {
                 secondEffectFluff = worseningChance + "% chance of " + secondEffectFluff;
             }
             return Arrays.asList(
-                newResetRecoveryTimeAction(i),
-                new GameEffect(
-                    secondEffectFluff,
-                    rnd -> {
-                        if (rnd.applyAsInt(6) + hits >= 5) {
-                            Injury cte = CTE.newInjury(c, p, BodyLocation.HEAD, 1);
-                            p.addInjury(cte);
-                            p.removeInjury(i);
-                            MedicalLogEntry entry = MedicalLogger.developedEncephalopathy(p, c.getLocalDate());
-                            LogManager.getLogger().info(entry.toString());
-                        }
-                    })
-                );
+                    newResetRecoveryTimeAction(i),
+                    new GameEffect(
+                            secondEffectFluff,
+                            rnd -> {
+                                if (rnd.applyAsInt(6) + hits >= 5) {
+                                    Injury cte = CTE.newInjury(c, p, BodyLocation.HEAD, 1);
+                                    p.addInjury(cte);
+                                    p.removeInjury(i);
+                                    MedicalLogEntry entry = MedicalLogger.developedEncephalopathy(p, c.getLocalDate());
+                                    logger.info(entry.toString());
+                                }
+                            }));
         }
 
         @Override
@@ -281,10 +297,18 @@ public final class InjuryTypes {
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();
             switch (loc) {
-                case LEFT_ARM: case LEFT_HAND: case RIGHT_ARM: case RIGHT_HAND:
-                    return Collections.singletonList(new Modifier(ModifierValue.GUNNERY, 3, null, InjuryType.MODTAG_INJURY));
-                case LEFT_LEG: case LEFT_FOOT: case RIGHT_LEG: case RIGHT_FOOT:
-                    return Collections.singletonList(new Modifier(ModifierValue.PILOTING, 3, null, InjuryType.MODTAG_INJURY));
+                case LEFT_ARM:
+                case LEFT_HAND:
+                case RIGHT_ARM:
+                case RIGHT_HAND:
+                    return Collections
+                            .singletonList(new Modifier(ModifierValue.GUNNERY, 3, null, InjuryType.MODTAG_INJURY));
+                case LEFT_LEG:
+                case LEFT_FOOT:
+                case RIGHT_LEG:
+                case RIGHT_FOOT:
+                    return Collections
+                            .singletonList(new Modifier(ModifierValue.PILOTING, 3, null, InjuryType.MODTAG_INJURY));
                 default:
                     return Collections.emptyList();
             }
@@ -353,29 +377,29 @@ public final class InjuryTypes {
                                 rnd -> {
                                     p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
                                     MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getLocalDate());
-                                    LogManager.getLogger().info(entry.toString());
-                                })
-                );
+                                    logger.info(entry.toString());
+                                }));
             } else {
                 // We have a chance!
                 return Arrays.asList(
-                    newResetRecoveryTimeAction(i),
-                    new GameEffect(
-                        secondEffectFluff,
-                        rnd -> {
-                            if (rnd.applyAsInt(6) + hits >= 5) {
-                                if (i.getHits() < 3) {
-                                    i.setHits(i.getHits() + 1);
-                                    MedicalLogEntry entry = MedicalLogger.internalBleedingWorsened(p, c.getLocalDate());
-                                    LogManager.getLogger().info(entry.toString());
-                                } else {
-                                    p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
-                                    MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getLocalDate());
-                                    LogManager.getLogger().info(entry.toString());
-                                }
-                            }
-                        })
-                    );
+                        newResetRecoveryTimeAction(i),
+                        new GameEffect(
+                                secondEffectFluff,
+                                rnd -> {
+                                    if (rnd.applyAsInt(6) + hits >= 5) {
+                                        if (i.getHits() < 3) {
+                                            i.setHits(i.getHits() + 1);
+                                            MedicalLogEntry entry = MedicalLogger.internalBleedingWorsened(p,
+                                                    c.getLocalDate());
+                                            logger.info(entry.toString());
+                                        } else {
+                                            p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
+                                            MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p,
+                                                    c.getLocalDate());
+                                            logger.info(entry.toString());
+                                        }
+                                    }
+                                }));
             }
         }
     }
@@ -426,10 +450,16 @@ public final class InjuryTypes {
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();
             switch (loc) {
-                case LEFT_ARM: case LEFT_HAND: case RIGHT_ARM: case RIGHT_HAND:
+                case LEFT_ARM:
+                case LEFT_HAND:
+                case RIGHT_ARM:
+                case RIGHT_HAND:
                     return Collections.singletonList(new Modifier(ModifierValue.GUNNERY, inj.isPermanent() ? 1 : 2,
                             null, InjuryType.MODTAG_INJURY));
-                case LEFT_LEG: case LEFT_FOOT: case RIGHT_LEG: case RIGHT_FOOT:
+                case LEFT_LEG:
+                case LEFT_FOOT:
+                case RIGHT_LEG:
+                case RIGHT_FOOT:
                     return Collections.singletonList(new Modifier(ModifierValue.PILOTING, inj.isPermanent() ? 1 : 2,
                             null, InjuryType.MODTAG_INJURY));
                 default:
@@ -456,7 +486,7 @@ public final class InjuryTypes {
                             Injury bleeding = INTERNAL_BLEEDING.newInjury(c, p, BodyLocation.ABDOMEN, 1);
                             p.addInjury(bleeding);
                             MedicalLogEntry entry = MedicalLogger.brokenRibPuncture(p, c.getLocalDate());
-                            LogManager.getLogger().info(entry.toString());
+                            logger.info(entry.toString());
                         }
                     }));
         }
@@ -480,12 +510,12 @@ public final class InjuryTypes {
                         if (rib < 1) {
                             p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
                             MedicalLogEntry entry = MedicalLogger.brokenRibPunctureDead(p, c.getLocalDate());
-                            LogManager.getLogger().info(entry.toString());
+                            logger.info(entry.toString());
                         } else if (rib < 10) {
                             Injury puncturedLung = PUNCTURED_LUNG.newInjury(c, p, BodyLocation.CHEST, 1);
                             p.addInjury(puncturedLung);
                             MedicalLogEntry entry = MedicalLogger.brokenRibPuncture(p, c.getLocalDate());
-                            LogManager.getLogger().info(entry.toString());
+                            logger.info(entry.toString());
                         }
                     }));
         }
@@ -517,30 +547,32 @@ public final class InjuryTypes {
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             String secondEffectFluff = (i.getHits() == 1)
-                ? "concussion worsening" : "development of a cerebral contusion";
+                    ? "concussion worsening"
+                    : "development of a cerebral contusion";
             if (hits < 5) {
                 int worseningChance = Math.max((int) Math.round((1 + hits) * 100.0 / 6.0), 100);
                 secondEffectFluff = worseningChance + "% chance of " + secondEffectFluff;
             }
             return Arrays.asList(newResetRecoveryTimeAction(i),
-                new GameEffect(
-                    secondEffectFluff,
-                    rnd -> {
-                        if (rnd.applyAsInt(6) + hits >= 5) {
-                            if (i.getHits() == 1) {
-                                i.setHits(2);
-                                MedicalLogEntry entry = MedicalLogger.concussionWorsened(p, c.getLocalDate());
-                                LogManager.getLogger().info(entry.toString());
-                            } else {
-                                Injury cerebralContusion = CEREBRAL_CONTUSION.newInjury(c, p, BodyLocation.HEAD, 1);
-                                p.addInjury(cerebralContusion);
-                                p.removeInjury(i);
-                                MedicalLogEntry entry = MedicalLogger.developedCerebralContusion(p, c.getLocalDate());
-                                LogManager.getLogger().info(entry.toString());
-                            }
-                        }
-                    })
-                );
+                    new GameEffect(
+                            secondEffectFluff,
+                            rnd -> {
+                                if (rnd.applyAsInt(6) + hits >= 5) {
+                                    if (i.getHits() == 1) {
+                                        i.setHits(2);
+                                        MedicalLogEntry entry = MedicalLogger.concussionWorsened(p, c.getLocalDate());
+                                        logger.info(entry.toString());
+                                    } else {
+                                        Injury cerebralContusion = CEREBRAL_CONTUSION.newInjury(c, p, BodyLocation.HEAD,
+                                                1);
+                                        p.addInjury(cerebralContusion);
+                                        p.removeInjury(i);
+                                        MedicalLogEntry entry = MedicalLogger.developedCerebralContusion(p,
+                                                c.getLocalDate());
+                                        logger.info(entry.toString());
+                                    }
+                                }
+                            }));
         }
 
         @Override
@@ -579,12 +611,14 @@ public final class InjuryTypes {
                 case LEFT_HAND:
                 case RIGHT_ARM:
                 case RIGHT_HAND:
-                    return Collections.singletonList(new Modifier(ModifierValue.GUNNERY, 1, null, InjuryType.MODTAG_INJURY));
+                    return Collections
+                            .singletonList(new Modifier(ModifierValue.GUNNERY, 1, null, InjuryType.MODTAG_INJURY));
                 case LEFT_LEG:
                 case LEFT_FOOT:
                 case RIGHT_LEG:
                 case RIGHT_FOOT:
-                    return Collections.singletonList(new Modifier(ModifierValue.PILOTING, 1, null, InjuryType.MODTAG_INJURY));
+                    return Collections
+                            .singletonList(new Modifier(ModifierValue.PILOTING, 1, null, InjuryType.MODTAG_INJURY));
                 default:
                     return Collections.emptyList();
             }

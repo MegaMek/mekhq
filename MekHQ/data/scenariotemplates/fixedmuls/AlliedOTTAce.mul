@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Ostscout" model="OTT-7J" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="a0d75d31-7607-450c-bf89-a0c28e0d6aa0">
-			<pilot size="1" name="Lisa Kathirithamby" nick="" gender="FEMALE" gunnery="3" piloting="3" externalId="fcbd3a9d-2f19-4951-80ee-004b397f1f89" ejected="false" advantages="jumping_jack::melee_master" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-			<Game id="7"/>
-		</entity>
+	<entity chassis="Ostscout" model="OTT-7J" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="a0d75d31-7607-450c-bf89-a0c28e0d6aa0">
+		<pilot size="1" name="Lisa Kathirithamby" nick="" gender="FEMALE" gunnery="3" piloting="3"
+			externalId="fcbd3a9d-2f19-4951-80ee-004b397f1f89" ejected="false"
+			advantages="jumping_jack::melee_master"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" />
+		<Game id="7" />
+	</entity>
 
 </unit>

@@ -20,8 +20,30 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.AssetChangedEvent;
@@ -29,21 +51,13 @@ import mekhq.campaign.event.AssetNewEvent;
 import mekhq.campaign.event.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.gui.model.DataTableModel;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
  */
 public class ManageAssetsDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(ManageAssetsDialog.class);
+
     private JFrame frame;
     private Campaign campaign;
     private AssetTableModel assetModel;
@@ -78,7 +92,7 @@ public class ManageAssetsDialog extends JDialog {
         setTitle(resourceMap.getString("dialogTitle.text"));
         getContentPane().setLayout(new BorderLayout());
 
-        JPanel panBtns = new JPanel(new GridLayout(1,0));
+        JPanel panBtns = new JPanel(new GridLayout(1, 0));
         btnAdd.setText(resourceMap.getString("btnAddAsset.text"));
         btnAdd.addActionListener(evt -> addAsset());
         panBtns.add(btnAdd);
@@ -94,7 +108,7 @@ public class ManageAssetsDialog extends JDialog {
 
         assetTable = new JTable(assetModel);
         TableColumn column;
-        for (int i = 0; i <AssetTableModel.N_COL; i++) {
+        for (int i = 0; i < AssetTableModel.N_COL; i++) {
             column = assetTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(assetModel.getColumnWidth(i));
             column.setCellRenderer(assetModel.getRenderer());
@@ -122,7 +136,7 @@ public class ManageAssetsDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -151,7 +165,8 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     private void editAsset() {
-        // TODO: fix this to use a cloned asset and the user has to confirm edits with OK
+        // TODO: fix this to use a cloned asset and the user has to confirm edits with
+        // OK
         Asset a = assetModel.getAssetAt(assetTable.getSelectedRow());
         if (null != a) {
             EditAssetDialog ead = new EditAssetDialog(frame, a);
@@ -175,7 +190,7 @@ public class ManageAssetsDialog extends JDialog {
         if (selectedRow != -1) {
             if (assetTable.getRowCount() > 0) {
                 if (assetTable.getRowCount() == selectedRow) {
-                    assetTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
+                    assetTable.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
                 } else {
                     assetTable.setRowSelectionInterval(selectedRow, selectedRow);
                 }
@@ -184,14 +199,15 @@ public class ManageAssetsDialog extends JDialog {
     }
 
     /**
-     * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
+     * A table model for displaying parts - similar to the one in CampaignGUI, but
+     * not exactly
      */
     public static class AssetTableModel extends DataTableModel {
-        public final static int COL_NAME    =    0;
-        public final static int COL_VALUE    =   1;
-        public final static int COL_SCHEDULE =   2;
-        public final static int COL_INCOME   =   3;
-        public final static int N_COL          = 4;
+        public final static int COL_NAME = 0;
+        public final static int COL_VALUE = 1;
+        public final static int COL_SCHEDULE = 2;
+        public final static int COL_INCOME = 3;
+        public final static int N_COL = 4;
 
         public AssetTableModel(List<Asset> assets) {
             data = assets;
@@ -272,8 +288,8 @@ public class ManageAssetsDialog extends JDialog {
         public class Renderer extends DefaultTableCellRenderer {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
+                    boolean isSelected, boolean hasFocus,
+                    int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setOpaque(true);
                 int actualCol = table.convertColumnIndexToModel(column);

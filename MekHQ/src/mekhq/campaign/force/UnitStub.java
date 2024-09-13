@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.force;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.codeUtilities.StringUtility;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
 
 public class UnitStub {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(UnitStub.class);
+
+    // region Variable Declarations
     private String desc;
     private AbstractIcon portrait;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public UnitStub() {
         portrait = new Portrait();
         desc = "";
@@ -50,9 +53,9 @@ public class UnitStub {
         Person commander = u.getCommander();
         portrait = (commander == null) ? new Portrait() : commander.getPortrait();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public AbstractIcon getPortrait() {
         return portrait;
     }
@@ -68,7 +71,7 @@ public class UnitStub {
     public void setDesc(final String desc) {
         this.desc = desc;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
     private String getUnitDescription(Unit u) {
         String name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No Crew</font>";
@@ -109,14 +112,10 @@ public class UnitStub {
                     retVal.setDesc(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase(Portrait.XML_TAG)) {
                     retVal.setPortrait(Portrait.parseFromXML(wn2));
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) { // Legacy - 0.49.3 removal
-                    retVal.getPortrait().setCategory(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFileName")) { // Legacy - 0.49.3 removal
-                    retVal.getPortrait().setFilename(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
         return retVal;
     }

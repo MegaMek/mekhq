@@ -18,13 +18,13 @@
  */
 package mekhq.campaign.mission.enums;
 
-import mekhq.MekHQ;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.ResourceBundle;
 
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+
 public enum AtBMoraleLevel {
-    //region Enum Declarations
+    // region Enum Declarations
     BROKEN("AtBMoraleLevel.BROKEN.text", "AtBMoraleLevel.BROKEN.toolTipText"),
     VERY_LOW("AtBMoraleLevel.VERY_LOW.text", "AtBMoraleLevel.VERY_LOW.toolTipText"),
     LOW("AtBMoraleLevel.LOW.text", "AtBMoraleLevel.LOW.toolTipText"),
@@ -32,29 +32,29 @@ public enum AtBMoraleLevel {
     HIGH("AtBMoraleLevel.HIGH.text", "AtBMoraleLevel.HIGH.toolTipText"),
     VERY_HIGH("AtBMoraleLevel.VERY_HIGH.text", "AtBMoraleLevel.VERY_HIGH.toolTipText"),
     UNBREAKABLE("AtBMoraleLevel.UNBREAKABLE.text", "AtBMoraleLevel.UNBREAKABLE.toolTipText");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     AtBMoraleLevel(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isRout() {
         return this == BROKEN;
     }
@@ -82,9 +82,9 @@ public enum AtBMoraleLevel {
     public boolean isUnbreakable() {
         return this == UNBREAKABLE;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
      * @param text containing the AtBMoraleLevel
      * @return the saved AtBMoraleLevel
@@ -119,10 +119,11 @@ public enum AtBMoraleLevel {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into an AtBMoraleLevel. Returning NORMAL.");
+        MMLogger.create(AtBMoraleLevel.class)
+                .error("Unable to parse " + text + " into an AtBMoraleLevel. Returning NORMAL.");
         return NORMAL;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {
