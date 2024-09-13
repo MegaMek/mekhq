@@ -47,9 +47,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 
@@ -367,12 +367,8 @@ public class HireBulkPersonnelDialog extends JDialog {
                 person.limitSkills(age - 13);
             }
 
-            // set education based on age
-            if (age < 16) {
-                person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
-            } else {
-                person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
-            }
+            // re-calculate initial education, as this might have changed since the person was first generated
+            EducationController.setInitialEducation(campaign, person);
 
             if (!campaign.recruitPerson(person, isGmHire)) {
                 number = 0;
