@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.enums.MissionStatus;
-import mekhq.campaign.storyarc.StoryTrigger;
-import mekhq.campaign.storyarc.StoryPoint;
-import mekhq.campaign.storyarc.storypoint.MissionStoryPoint;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.enums.MissionStatus;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.storyarc.storypoint.MissionStoryPoint;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * A trigger that completes a mission. It can optionally include information on the final victory
+ * A trigger that completes a mission. It can optionally include information on
+ * the final victory
  * status of the mission.
  */
 public class CompleteMissionStoryTrigger extends StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(CompleteMissionStoryTrigger.class);
 
     UUID missionStoryPointId;
     MissionStatus missionStatus;
@@ -79,7 +82,7 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
                     missionStatus = MissionStatus.parseFromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                 LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

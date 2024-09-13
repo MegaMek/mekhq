@@ -2,9 +2,10 @@
 <ScenarioTemplate>
     <name>Engage - Heavy</name>
     <shortBriefing>Engage enemy force.</shortBriefing>
-    <detailedBriefing>Engage enemy force with weapons fire or physical attacks for the specified duration.</detailedBriefing>
+    <detailedBriefing>Engage enemy force with weapons fire or physical attacks for the specified
+        duration.</detailedBriefing>
     <mapParameters>
-        <allowedTerrainTypes/>
+        <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
@@ -66,7 +67,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -89,7 +90,7 @@
             <associatedForceNames>
                 <associatedForceName>Primary Opfor</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -104,7 +105,7 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails />
             <description>Engage the following enemy unit(s) and force(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Custom</objectiveCriterion>

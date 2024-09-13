@@ -18,27 +18,31 @@
  */
 package mekhq.campaign.stratcon;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import org.apache.logging.log4j.LogManager;
-
-import javax.xml.transform.Source;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import javax.xml.transform.Source;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import megamek.logging.MMLogger;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
  * This represents a facility in the StratCon context
+ * 
  * @author NickAragua
  */
 @XmlRootElement(name = "StratconFacility")
 public class StratconFacility implements Cloneable {
+    private static final MMLogger logger = MMLogger.create(StratconFacility.class);
+
     public enum FacilityType {
         MekBase,
         TankBase,
@@ -66,15 +70,16 @@ public class StratconFacility implements Cloneable {
     private int scenarioOddsModifier;
     private int weeklySPModifier;
     private boolean preventAerospace;
-    //TODO: post-MVP
-    //private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
+    // TODO: post-MVP
+    // private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
     private boolean isStrategicObjective;
     private List<StratconBiome> biomes = new ArrayList<>();
-    
+
     private transient TreeMap<Integer, StratconBiome> biomeTempMap = new TreeMap<>();
 
     /**
-     * A temporary variable used to track situations where changing the ownership of this facility
+     * A temporary variable used to track situations where changing the ownership of
+     * this facility
      * hinges upon multiple objectives
      */
     private transient int ownershipChangeScore;
@@ -100,7 +105,8 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * Copies data from the source facility to here. Does cosmetic data. Reconstructs file-driven transient data.
+     * Copies data from the source facility to here. Does cosmetic data.
+     * Reconstructs file-driven transient data.
      */
     public void copyRulesDataFrom(StratconFacility facility) {
         setCapturedDefinition(facility.getCapturedDefinition());
@@ -157,7 +163,8 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios in the same track as this facility.
+     * This is a list of scenario modifier IDs that affect scenarios in the same
+     * track as this facility.
      */
     public List<String> getSharedModifiers() {
         return sharedModifiers;
@@ -168,7 +175,8 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios involving this facility directly.
+     * This is a list of scenario modifier IDs that affect scenarios involving this
+     * facility directly.
      */
     public List<String> getLocalModifiers() {
         return localModifiers;
@@ -255,21 +263,24 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
-     * Returns the biome temperature map (note: temperature mapping is in kelvins but stored in celsius)
+     * Returns the biome temperature map (note: temperature mapping is in kelvins
+     * but stored in celsius)
      */
     public TreeMap<Integer, StratconBiome> getBiomeTempMap() {
         return biomeTempMap;
     }
-    
+
     /**
-     * Attempt to deserialize an instance of a StratconFacility from the passed-in file name
+     * Attempt to deserialize an instance of a StratconFacility from the passed-in
+     * file name
+     * 
      * @return Possibly an instance of a StratconFacility
      */
     public static StratconFacility deserialize(String fileName) {
         StratconFacility resultingFacility = null;
         File inputFile = new File(fileName);
         if (!inputFile.exists()) {
-            LogManager.getLogger().warn(String.format("Specified file %s does not exist", fileName));
+            logger.warn(String.format("Specified file %s does not exist", fileName));
             return null;
         }
 
@@ -282,14 +293,14 @@ public class StratconFacility implements Cloneable {
                 resultingFacility = facilityElement.getValue();
             }
         } catch (Exception e) {
-            LogManager.getLogger().error(String.format("Error Deserializing Facility %s", fileName), e);
+            logger.error(String.format("Error Deserializing Facility %s", fileName), e);
         }
-       
+
         ReconstructTransientData(resultingFacility);
 
         return resultingFacility;
     }
-    
+
     private static void ReconstructTransientData(StratconFacility facility) {
         for (StratconBiome biome : facility.getBiomes()) {
             facility.getBiomeTempMap().put(biome.allowedTemperatureLowerBound, biome);

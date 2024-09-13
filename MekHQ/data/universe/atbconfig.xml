@@ -8,7 +8,8 @@ details used by the Against the Bot campaign system.
 Note that this feature is in development, and more options will be appearing.
 
 Several options make use of a <weightedTable> node, which is used to represent a table
-of options chosen by a dice roll. Each entry in the table has the form <entry weight="#">option</entry>.
+of options chosen by a dice roll. Each entry in the table has the form <entry
+weight="#">option</entry>.
 The value of the weight attribute indicates how likely that option is to be chosen:
 a value of 2 is twice as likely to be chosen as a value of 1, but half as likely as a value
 of 4. An entry of the form <entry>option</entry> has a weight of 1.
@@ -17,8 +18,8 @@ of 4. An entry of the form <entry>option</entry> has a weight of 1.
 
 <atbPrefs>
 
-	<scenarioGeneration>
-		<!-- Tables for generating the enemy force. <botForce> determines how many lances
+    <scenarioGeneration>
+        <!-- Tables for generating the enemy force. <botForce> determines how many lances
 		or lance-equivalents are in the enemy force and the weight class of each.
 		The org attribute indicates which type of organization the opposing force uses:
 		CLAN is used for any Clan faction, CS for ComStar and WoB, and IS for all others.
@@ -26,127 +27,127 @@ of 4. An entry of the form <entry>option</entry> has a weight of 1.
 		There should be a <weightedTable> node for each of the four weight classes: L, M, H, A.
 		These correspond to the weight class of the player's lance. See above for the <weightTable>
 		format. -->
-		<botForce org="IS,CLAN,CS">
-			<weightedTable weightClass="L">
-				<entry weight="9">M</entry>
-				<entry weight="7">LL</entry>
-				<entry weight="4">H</entry>
-			</weightedTable>
-			<weightedTable weightClass="M">
-				<entry weight="5">LL</entry>
-				<entry weight="5">H</entry>
-				<entry weight="10">ML</entry>
-			</weightedTable>
-			<weightedTable weightClass="H">
-				<entry weight="3">LLL</entry>
-				<entry weight="4">MM</entry>
-				<entry weight="2">A</entry>
-				<entry weight="3">HL</entry>
-				<entry weight="4">MLL</entry>
-				<entry weight="4">HM</entry>
-			</weightedTable>
-			<weightedTable weightClass="A">
-				<entry weight="4">MML</entry>
-				<entry weight="3">HLL</entry>
-				<entry weight="2">HH</entry>
-				<entry weight="2">AL</entry>
-				<entry weight="4">MMM</entry>
-				<entry weight="3">HML</entry>
-				<entry weight="2">AM</entry>
-			</weightedTable>
-		</botForce>
-		
-		<!-- <botLance> determines the weight classes of the individual units that
+        <botForce org="IS,CLAN,CS">
+            <weightedTable weightClass="L">
+                <entry weight="9">M</entry>
+                <entry weight="7">LL</entry>
+                <entry weight="4">H</entry>
+            </weightedTable>
+            <weightedTable weightClass="M">
+                <entry weight="5">LL</entry>
+                <entry weight="5">H</entry>
+                <entry weight="10">ML</entry>
+            </weightedTable>
+            <weightedTable weightClass="H">
+                <entry weight="3">LLL</entry>
+                <entry weight="4">MM</entry>
+                <entry weight="2">A</entry>
+                <entry weight="3">HL</entry>
+                <entry weight="4">MLL</entry>
+                <entry weight="4">HM</entry>
+            </weightedTable>
+            <weightedTable weightClass="A">
+                <entry weight="4">MML</entry>
+                <entry weight="3">HLL</entry>
+                <entry weight="2">HH</entry>
+                <entry weight="2">AL</entry>
+                <entry weight="4">MMM</entry>
+                <entry weight="3">HML</entry>
+                <entry weight="2">AM</entry>
+            </weightedTable>
+        </botForce>
+
+        <!-- <botLance> determines the weight classes of the individual units that
 		make up each enemy Lance (or Star or Level II). The format is the same as for
 		<botForce>, but the weightClass attribute indicates the weight class of the enemy
 		lance selected by <botForce> above. -->
-		
-		<botLance org="IS">
-			<weightedTable weightClass="L">
-				<entry weight="3">LLLL</entry>
-				<entry weight="2">LLLM</entry>
-				<entry weight="1">LLMM</entry>
-			</weightedTable>
-			<weightedTable weightClass="M">
-				<entry weight="1">LLMM</entry>
-				<entry weight="2">LMMM</entry>
-				<entry weight="2">MMMM</entry>
-				<entry weight="1">MMMH</entry>
-			</weightedTable>
-			<weightedTable weightClass="H">
-				<entry weight="1">MMHH</entry>
-				<entry weight="2">MHHH</entry>
-				<entry weight="2">HHHH</entry>
-				<entry weight="1">HHHA</entry>
-			</weightedTable>
-			<weightedTable weightClass="A">
-				<entry weight="2">HHAA</entry>
-				<entry weight="3">HAAA</entry>
-				<entry weight="1">AAAA</entry>
-			</weightedTable>
-		</botLance>
-		
-		<botLance org="CLAN">
-			<weightedTable weightClass="L">
-				<entry>LLLLL</entry>
-				<entry>LLLLM</entry>
-				<entry>LLLMM</entry>
-			</weightedTable>
-			<weightedTable weightClass="M">
-				<entry weight="1">LLMMM</entry>
-				<entry weight="1">LMMMM</entry>
-				<entry weight="2">MMMMM</entry>
-				<entry weight="1">MMMMH</entry>
-				<entry weight="1">MMMHH</entry>
-			</weightedTable>
-			<weightedTable weightClass="H">
-				<entry weight="1">MMHHH</entry>
-				<entry weight="2">MHHHH</entry>
-				<entry weight="2">HHHHH</entry>
-				<entry weight="1">HHHHA</entry>
-			</weightedTable>
-			<weightedTable weightClass="A">
-				<entry weight="1">MHHAA</entry>
-				<entry weight="2">HHHAA</entry>
-				<entry weight="2">HHAAA</entry>
-				<entry weight="1">AAAAA</entry>
-			</weightedTable>
-		</botLance>
-		
-		<botLance org="CS">
-			<weightedTable weightClass="L">
-				<entry weight="1">LLLLLL</entry>
-				<entry weight="2">LLLLLM</entry>
-				<entry weight="2">LLLLMM</entry>
-				<entry weight="1">LLLMMM</entry>
-			</weightedTable>
-			<weightedTable weightClass="M">
-				<entry weight="1">LLLMMM</entry>
-				<entry weight="1">LLMMMM</entry>
-				<entry weight="1">LMMMMM</entry>
-				<entry weight="1">MMMMMM</entry>
-				<entry weight="1">MMMMMH</entry>
-				<entry weight="1">MMMMHH</entry>
-			</weightedTable>
-			<weightedTable weightClass="H">
-				<entry>MMMHHH</entry>
-				<entry>MMHHHH</entry>
-				<entry>MHHHHH</entry>
-				<entry>HHHHHH</entry>
-				<entry>HHHHHA</entry>
-				<entry>HHHHAA</entry>
-			</weightedTable>
-			<weightedTable weightClass="A">
-				<entry weight="2">HHHAAA</entry>
-				<entry weight="1">HHAAAA</entry>
-				<entry weight="2">HAAAAA</entry>
-				<entry weight="1">AAAAAA</entry>
-			</weightedTable>
-		</botLance>
-	</scenarioGeneration>
-	
-	<contractGeneration>
-		<!-- Units stationed on worlds with hiring halls receive +1
+
+        <botLance org="IS">
+            <weightedTable weightClass="L">
+                <entry weight="3">LLLL</entry>
+                <entry weight="2">LLLM</entry>
+                <entry weight="1">LLMM</entry>
+            </weightedTable>
+            <weightedTable weightClass="M">
+                <entry weight="1">LLMM</entry>
+                <entry weight="2">LMMM</entry>
+                <entry weight="2">MMMM</entry>
+                <entry weight="1">MMMH</entry>
+            </weightedTable>
+            <weightedTable weightClass="H">
+                <entry weight="1">MMHH</entry>
+                <entry weight="2">MHHH</entry>
+                <entry weight="2">HHHH</entry>
+                <entry weight="1">HHHA</entry>
+            </weightedTable>
+            <weightedTable weightClass="A">
+                <entry weight="2">HHAA</entry>
+                <entry weight="3">HAAA</entry>
+                <entry weight="1">AAAA</entry>
+            </weightedTable>
+        </botLance>
+
+        <botLance org="CLAN">
+            <weightedTable weightClass="L">
+                <entry>LLLLL</entry>
+                <entry>LLLLM</entry>
+                <entry>LLLMM</entry>
+            </weightedTable>
+            <weightedTable weightClass="M">
+                <entry weight="1">LLMMM</entry>
+                <entry weight="1">LMMMM</entry>
+                <entry weight="2">MMMMM</entry>
+                <entry weight="1">MMMMH</entry>
+                <entry weight="1">MMMHH</entry>
+            </weightedTable>
+            <weightedTable weightClass="H">
+                <entry weight="1">MMHHH</entry>
+                <entry weight="2">MHHHH</entry>
+                <entry weight="2">HHHHH</entry>
+                <entry weight="1">HHHHA</entry>
+            </weightedTable>
+            <weightedTable weightClass="A">
+                <entry weight="1">MHHAA</entry>
+                <entry weight="2">HHHAA</entry>
+                <entry weight="2">HHAAA</entry>
+                <entry weight="1">AAAAA</entry>
+            </weightedTable>
+        </botLance>
+
+        <botLance org="CS">
+            <weightedTable weightClass="L">
+                <entry weight="1">LLLLLL</entry>
+                <entry weight="2">LLLLLM</entry>
+                <entry weight="2">LLLLMM</entry>
+                <entry weight="1">LLLMMM</entry>
+            </weightedTable>
+            <weightedTable weightClass="M">
+                <entry weight="1">LLLMMM</entry>
+                <entry weight="1">LLMMMM</entry>
+                <entry weight="1">LMMMMM</entry>
+                <entry weight="1">MMMMMM</entry>
+                <entry weight="1">MMMMMH</entry>
+                <entry weight="1">MMMMHH</entry>
+            </weightedTable>
+            <weightedTable weightClass="H">
+                <entry>MMMHHH</entry>
+                <entry>MMHHHH</entry>
+                <entry>MHHHHH</entry>
+                <entry>HHHHHH</entry>
+                <entry>HHHHHA</entry>
+                <entry>HHHHAA</entry>
+            </weightedTable>
+            <weightedTable weightClass="A">
+                <entry weight="2">HHHAAA</entry>
+                <entry weight="1">HHAAAA</entry>
+                <entry weight="2">HAAAAA</entry>
+                <entry weight="1">AAAAAA</entry>
+            </weightedTable>
+        </botLance>
+    </scenarioGeneration>
+
+    <contractGeneration>
+        <!-- Units stationed on worlds with hiring halls receive +1
 			to the monthly roll for number of contracts. This list
 			comes from information in the FM:Mercs(R), its supplementals,
 			and FM 3085. Dates are mostly approximate due to lack of precise detail
@@ -154,52 +155,52 @@ of 4. An entry of the form <entry>option</entry> has a weight of 1.
 			*Note that start and end dates are optional, but must
 			follow yyyy-MM-dd format. Planet names much match the
 			name in planets.xml exactly.-->
-		<hiringHalls>
-			<hall start="3031-01-01" end="3067-10-15">Outreach</hall>
-			<hall start="2700-01-01">Solaris</hall>
-			<hall start="3057-01-01">Arc-Royal</hall>
-			<hall start="3058-01-01" end="3081-03-15">Fletcher</hall>
-			<hall start="2650-01-01">Galatea</hall>
-			<hall start="3000-01-01">Westerhand</hall>
-			<hall start="3057-01-01" end="3081-03-15">Northwind</hall>
-			<hall start="3020-01-01">Herotitus</hall>
-		</hiringHalls>
-		
-	</contractGeneration>
-	
-	<!-- Values used for searching for an available ship to purchase. -->
-	<shipSearch>
-		<!-- The total cost of the search process -->
-		<shipSearchCost>100000</shipSearchCost>
-		
-		<!-- The number of weeks required to complete the ship search. -->
-		<shipSearchLengthWeeks>4</shipSearchLengthWeeks>
-		
-		<!-- The target number to for the dice roll to determine whether the ship search
+        <hiringHalls>
+            <hall start="3031-01-01" end="3067-10-15">Outreach</hall>
+            <hall start="2700-01-01">Solaris</hall>
+            <hall start="3057-01-01">Arc-Royal</hall>
+            <hall start="3058-01-01" end="3081-03-15">Fletcher</hall>
+            <hall start="2650-01-01">Galatea</hall>
+            <hall start="3000-01-01">Westerhand</hall>
+            <hall start="3057-01-01" end="3081-03-15">Northwind</hall>
+            <hall start="3020-01-01">Herotitus</hall>
+        </hiringHalls>
+
+    </contractGeneration>
+
+    <!-- Values used for searching for an available ship to purchase. -->
+    <shipSearch>
+        <!-- The total cost of the search process -->
+        <shipSearchCost>100000</shipSearchCost>
+
+        <!-- The number of weeks required to complete the ship search. -->
+        <shipSearchLengthWeeks>4</shipSearchLengthWeeks>
+
+        <!-- The target number to for the dice roll to determine whether the ship search
 		was successful. Acceptable values for unitType are Dropship, Jumpship, and Warship.
 		If the target number is missing or commented out, that type of ship is not available
 		in a search. -->
-		<target unitType="Dropship">10</target>
-		<target unitType="Jumpship">12</target>
-		<!-- <target unitType="Warship">14</target> -->
-		
-		<!-- If the unit generation method selected in Campaign Options does not produce
+        <target unitType="Dropship">10</target>
+        <target unitType="Jumpship">12</target>
+        <!-- <target unitType="Warship">14</target> -->
+
+        <!-- If the unit generation method selected in Campaign Options does not produce
 		a result, the following tables are used. -->
-		<weightedTable unitType="Dropship">
-			<entry weight="1">Buccaneer (Standard)</entry>
-			<entry weight="6">Mule (Standard)</entry>
-			<entry weight="1">Seeker (2815)</entry>
-			<entry weight="4">Gazelle (2531)</entry>
-			<entry weight="1">Excalibur (2786)</entry>
-			<entry weight="2">Leopard (2537)</entry>
-			<entry weight="4">Union (2708)</entry>
-			<entry weight="1">Overlord (2762)</entry>
-		</weightedTable>
-		
-		<weightedTable unitType="Jumpship">
-			<entry weight="1">Scout JumpShip (Standard)</entry>
-			<entry weight="2">Merchant Jumpship (Standard)</entry>
-			<entry weight="3">Invader Jumpship (Standard)</entry>			
-		</weightedTable>
-	</shipSearch>
+        <weightedTable unitType="Dropship">
+            <entry weight="1">Buccaneer (Standard)</entry>
+            <entry weight="6">Mule (Standard)</entry>
+            <entry weight="1">Seeker (2815)</entry>
+            <entry weight="4">Gazelle (2531)</entry>
+            <entry weight="1">Excalibur (2786)</entry>
+            <entry weight="2">Leopard (2537)</entry>
+            <entry weight="4">Union (2708)</entry>
+            <entry weight="1">Overlord (2762)</entry>
+        </weightedTable>
+
+        <weightedTable unitType="Jumpship">
+            <entry weight="1">Scout JumpShip (Standard)</entry>
+            <entry weight="2">Merchant Jumpship (Standard)</entry>
+            <entry weight="3">Invader Jumpship (Standard)</entry>
+        </weightedTable>
+    </shipSearch>
 </atbPrefs>

@@ -1,14 +1,42 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.personnel.randomEvents;
+
+import static mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
-
-import java.util.*;
-
-import static mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence.*;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Aggression;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Ambition;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Greed;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.PersonalityQuirk;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.Social;
 
 public class PersonalityController {
     public static void generatePersonality(Person person) {
@@ -40,21 +68,26 @@ public class PersonalityController {
         // finally, write the description
         writeDescription(person);
 
-        // check at least one characteristic has been generated, if not, then repeat the process
+        // check at least one characteristic has been generated, if not, then repeat the
+        // process
         // while this might create a couple of loops,
-        // probability says we can only expect 1 additional loop, 2 in exceptional circumstances
+        // probability says we can only expect 1 additional loop, 2 in exceptional
+        // circumstances
         if (Objects.equals(person.getPersonalityDescription(), "")) {
             generatePersonality(person);
         }
     }
 
     /**
-     * Sets the personality traits of a person based on the given table roll and trait roll.
+     * Sets the personality traits of a person based on the given table roll and
+     * trait roll.
      *
-     * @param person the person whose personality traits will be set
-     * @param tableRoll the table roll used to determine which personality trait to set
+     * @param person    the person whose personality traits will be set
+     * @param tableRoll the table roll used to determine which personality trait to
+     *                  set
      * @param traitRoll the roll used to generate the value of the personality trait
-     * @throws IllegalStateException if an unexpected value is rolled for tableRoll parameter
+     * @throws IllegalStateException if an unexpected value is rolled for tableRoll
+     *                               parameter
      */
     private static void setPersonalityTrait(Person person, int tableRoll, int traitRoll) {
         // We want major traits to have a low chance of occurring.
@@ -68,15 +101,17 @@ public class PersonalityController {
             case 1 -> person.setAmbition(Ambition.parseFromInt(traitRoll));
             case 2 -> person.setGreed(Greed.parseFromInt(traitRoll));
             case 3 -> person.setSocial(Social.parseFromInt(traitRoll));
-            default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/setPersonalityTrait: "
-                    + tableRoll);
+            default -> throw new IllegalStateException(
+                    "Unexpected value in mekhq/campaign/personnel/randomEvents/personality/PersonalityController.java/setPersonalityTrait: "
+                            + tableRoll);
         }
     }
 
     /**
-     * Sets the personality description of a person based on their personality traits.
+     * Sets the personality description of a person based on their personality
+     * traits.
      *
-     * @param person         the person whose personality description will be set
+     * @param person the person whose personality description will be set
      */
     public static void writeDescription(Person person) {
         List<String> traitDescriptions = getTraitDescriptions(person);
@@ -95,7 +130,8 @@ public class PersonalityController {
 
             // Define "forward" and "plural" based on the index value.
             // If the index is an even number, use first name; otherwise use pronoun.
-            // The alternation between first name and pronoun adds variety to the descriptions.
+            // The alternation between first name and pronoun adds variety to the
+            // descriptions.
             // The "plural" string is only used when the first name is used.
             String forward = ((index % 2) == 0) ? firstName : pronoun;
             String plural = ((index % 2) == 0) ? "s" : "";
@@ -221,8 +257,9 @@ public class PersonalityController {
         } else if (roll < 8346) {
             return GENIUS;
         } else {
-            throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/randomEvents/PersonalityController.java/generateIntelligence: "
-                    + roll);
+            throw new IllegalStateException(
+                    "Unexpected value in mekhq/campaign/personnel/randomEvents/PersonalityController.java/generateIntelligence: "
+                            + roll);
         }
     }
 }

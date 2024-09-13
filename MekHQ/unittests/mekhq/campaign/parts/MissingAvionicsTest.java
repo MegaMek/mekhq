@@ -18,8 +18,8 @@
  */
 package mekhq.campaign.parts;
 
-import megamek.common.LandAirMech;
-import megamek.common.Mech;
+import megamek.common.LandAirMek;
+import megamek.common.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ public class MissingAvionicsTest {
     public void missingLAMAvionicsRepairableOnlyWithBothTorsosAndHead() {
         Campaign mockCampaign = mock(Campaign.class);
         Unit unit = mock(Unit.class);
-        LandAirMech entity = mock(LandAirMech.class);
+        LandAirMek entity = mock(LandAirMek.class);
         when(unit.getEntity()).thenReturn(entity);
         when(entity.getWeight()).thenReturn(30.0);
         doCallRealMethod().when(entity).getLocationName(any());
@@ -49,13 +49,13 @@ public class MissingAvionicsTest {
         missing.setUnit(unit);
 
         final MissingMekLocation rightTorso = mock(MissingMekLocation.class);
-        when(rightTorso.getLocation()).thenReturn(Mech.LOC_RT);
+        when(rightTorso.getLocation()).thenReturn(Mek.LOC_RT);
 
         final MissingMekLocation leftTorso = mock(MissingMekLocation.class);
-        when(leftTorso.getLocation()).thenReturn(Mech.LOC_LT);
+        when(leftTorso.getLocation()).thenReturn(Mek.LOC_LT);
 
         final MissingMekLocation head = mock(MissingMekLocation.class);
-        when(head.getLocation()).thenReturn(Mech.LOC_HEAD);
+        when(head.getLocation()).thenReturn(Mek.LOC_HEAD);
 
         // No missing parts
         when(unit.getParts()).thenReturn(new ArrayList<>());
@@ -89,7 +89,7 @@ public class MissingAvionicsTest {
 
         // Missing an arm
         final MissingMekLocation arm = mock(MissingMekLocation.class);
-        when(arm.getLocation()).thenReturn(Mech.LOC_RARM);
+        when(arm.getLocation()).thenReturn(Mek.LOC_RARM);
         when(unit.getParts()).thenReturn(List.of(arm));
 
         // We CAN repair the avionics with just a missing arm

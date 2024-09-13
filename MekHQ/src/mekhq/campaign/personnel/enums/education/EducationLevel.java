@@ -18,75 +18,72 @@
  */
 package mekhq.campaign.personnel.enums.education;
 
+import java.util.ResourceBundle;
+
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import mekhq.MekHQ;
 
-import java.util.ResourceBundle;
-
 public enum EducationLevel {
-    //region Enum Declarations
+    // region Enum Declarations
     EARLY_CHILDHOOD("EducationLevel.EARLY_CHILDHOOD.text", "EducationLevel.EARLY_CHILDHOOD.toolTipText"),
     HIGH_SCHOOL("EducationLevel.HIGH_SCHOOL.text", "EducationLevel.HIGH_SCHOOL.toolTipText"),
     COLLEGE("EducationLevel.COLLEGE.text", "EducationLevel.COLLEGE.toolTipText"),
     POST_GRADUATE("EducationLevel.POST_GRADUATE.text", "EducationLevel.POST_GRADUATE.toolTipText"),
     DOCTORATE("EducationLevel.DOCTORATE.text", "EducationLevel.DOCTORATE.toolTipText");
-    //endregion Enum Declarations
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     EducationLevel(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
-    @SuppressWarnings(value = "unused")
+    // region Boolean Comparison Methods
+
     public boolean isEarlyChildhood() {
         return this == EARLY_CHILDHOOD;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isHighSchool() {
         return this == HIGH_SCHOOL;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isCollege() {
         return this == COLLEGE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isPostGraduate() {
         return this == POST_GRADUATE;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isDoctorate() {
         return this == DOCTORATE;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     /**
      * Parses a given string and returns the corresponding AcademyType.
      * Accepts either the ENUM ordinal value or its name
      *
      * @param educationLevel the string to be parsed
      * @return the AcademyType object that corresponds to the given string
-     * @throws IllegalStateException if the given string does not match any valid AcademyType
+     * @throws IllegalStateException if the given string does not match any valid
+     *                               AcademyType
      */
     public static EducationLevel parseFromString(final String educationLevel) {
         return switch (educationLevel) {
@@ -96,7 +93,9 @@ public enum EducationLevel {
             case "Post-Graduate" -> POST_GRADUATE;
             case "Doctorate" -> DOCTORATE;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromString: " + educationLevel);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromString: "
+                                + educationLevel);
         };
     }
 
@@ -105,7 +104,8 @@ public enum EducationLevel {
      *
      * @param educationLevel the integer value representing the education level
      * @return the corresponding EducationLevel enum value
-     * @throws IllegalStateException if the integer value does not correspond to any valid EducationLevel enum value
+     * @throws IllegalStateException if the integer value does not correspond to any
+     *                               valid EducationLevel enum value
      */
     public static EducationLevel parseFromInt(final int educationLevel) {
         return switch (educationLevel) {
@@ -115,7 +115,9 @@ public enum EducationLevel {
             case 3 -> POST_GRADUATE;
             case 4 -> DOCTORATE;
             default ->
-                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromInt: " + educationLevel);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromInt: "
+                                + educationLevel);
         };
     }
 
@@ -135,9 +137,9 @@ public enum EducationLevel {
             case DOCTORATE -> 4;
         };
     }
-    //endregion File I/O
+    // endregion File I/O
 
-    //region adaptors
+    // region adaptors
     public static class Adapter extends XmlAdapter<String, EducationLevel> {
         @Override
         public EducationLevel unmarshal(String educationLevel) {
@@ -145,11 +147,11 @@ public enum EducationLevel {
         }
 
         @Override
-        public String marshal(EducationLevel educationLevel){
+        public String marshal(EducationLevel educationLevel) {
             return educationLevel.toString();
         }
     }
-    //endregion adaptors
+    // endregion adaptors
 
     @Override
     public String toString() {

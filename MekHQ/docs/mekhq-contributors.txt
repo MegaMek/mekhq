@@ -56,9 +56,9 @@ Data
 
 	Against the Bot Guide
 		CampaignAnon
-		
+
 	Tutorial Guide
-		boomboomf22 
+		boomboomf22
 
 	News
 		Jason Schmetzer
@@ -66,7 +66,7 @@ Data
 
 	Icons for MarkdownEditorPanel
 		Bold, italic, ordered list, unordered list, horizontal rule, and question mark icons provided
-		by Google in Google Material Design Icons and distributed under the Creative Commons ShareAlike 4.0 
+		by Google in Google Material Design Icons and distributed under the Creative Commons ShareAlike 4.0
 		International License (https://creativecommons.org/licenses/by-sa/4.0/).
 
 		Header icons provided by Font Awesome by Dave Gandy - http://fontawesome.io

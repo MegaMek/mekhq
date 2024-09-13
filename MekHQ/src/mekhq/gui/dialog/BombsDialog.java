@@ -20,6 +20,18 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.BombChoicePanel;
@@ -27,16 +39,11 @@ import megamek.common.AmmoType;
 import megamek.common.BombType;
 import megamek.common.EquipmentType;
 import megamek.common.IBomber;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.equipment.EquipmentPart;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
@@ -44,6 +51,8 @@ import java.awt.event.ActionListener;
  * @since 4/7/2012
  */
 public class BombsDialog extends JDialog implements ActionListener {
+    private static final MMLogger logger = MMLogger.create(BombsDialog.class);
+
     private BombChoicePanel bombPanel;
     private IBomber bomber;
     private Campaign campaign;
@@ -70,13 +79,15 @@ public class BombsDialog extends JDialog implements ActionListener {
     }
 
     private void initGUI() {
-        //Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory
-        //and for ease of access later
+        // Using bombCatalog to store the part ID's of the bombs so don't have to keep
+        // full spare list in memory
+        // and for ease of access later
         campaign.getWarehouse().forEachSparePart(spare -> {
             if ((spare instanceof AmmoStorage)
                     && (((EquipmentPart) spare).getType() instanceof BombType)
                     && spare.isPresent()) {
-                int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage) spare).getType().getInternalName()));
+                int bombType = (BombType
+                        .getBombTypeFromInternalName(((AmmoStorage) spare).getType().getInternalName()));
                 bombCatalog[bombType] = spare.getId();
                 availBombs[bombType] = ((AmmoStorage) spare).getShots();
             }
@@ -86,11 +97,12 @@ public class BombsDialog extends JDialog implements ActionListener {
             typeMax[type] = availBombs[type] + bombChoices[type];
         }
 
-        // BombChoicePanel takes care of managing internal and external stores, so we don't need to here.
+        // BombChoicePanel takes care of managing internal and external stores, so we
+        // don't need to here.
         bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"),
                 true, typeMax);
 
-        //Set up the display of this dialog.
+        // Set up the display of this dialog.
         JScrollPane scroller = new JScrollPane(bombPanel);
         scroller.setPreferredSize(new Dimension(300, 200));
         setLayout(new BorderLayout());
@@ -121,18 +133,19 @@ public class BombsDialog extends JDialog implements ActionListener {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
-            // internal and external choices are applied by bombPanel; here we only care about the totals.
+            // internal and external choices are applied by bombPanel; here we only care
+            // about the totals.
             bombPanel.applyChoice();
             int[] newLoadout = bombPanel.getChoice();
 
-            //Get difference between starting bomb load and new bomb load
+            // Get difference between starting bomb load and new bomb load
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if (bombChoices[type] != newLoadout[type]) {
                     newLoadout[type] = bombChoices[type] - newLoadout[type];
@@ -143,17 +156,19 @@ public class BombsDialog extends JDialog implements ActionListener {
 
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if (newLoadout[type] != 0) {
-                    //IF there are bombs of this TYPE in the warehouse
+                    // IF there are bombs of this TYPE in the warehouse
                     if (bombCatalog[type] > 0) {
                         AmmoStorage storedBombs = (AmmoStorage) campaign.getWarehouse().getPart(bombCatalog[type]);
                         storedBombs.changeShots(newLoadout[type]);
                         if (storedBombs.getShots() == 0) {
                             campaign.getWarehouse().removePart(storedBombs);
                         }
-                    //No bombs of this type in warehouse, add bombs
-                    //In this case newLoadout should always be greater than 0, but check to be sure
+                        // No bombs of this type in warehouse, add bombs
+                        // In this case newLoadout should always be greater than 0, but check to be sure
                     } else if (bombCatalog[type] == 0 && newLoadout[type] > 0) {
-                        AmmoStorage excessBombs = new AmmoStorage(0, (AmmoType) EquipmentType.get(BombType.getBombInternalName(type)), newLoadout[type], campaign);
+                        AmmoStorage excessBombs = new AmmoStorage(0,
+                                (AmmoType) EquipmentType.get(BombType.getBombInternalName(type)), newLoadout[type],
+                                campaign);
                         campaign.getQuartermaster().addPart(excessBombs, 0);
                     }
                 }

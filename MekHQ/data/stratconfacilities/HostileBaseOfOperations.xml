@@ -1,12 +1,13 @@
 <StratconFacility>
-	<capturedDefinition>AlliedBaseOfOperations.xml</capturedDefinition>
-	<displayableName>Base of Operations</displayableName>
-        <facilityType>BaseOfOperations</facilityType>
-        <owner>Opposing</owner>
-	<localModifiers>Veterans.xml</localModifiers>
-	<localModifiers>GoodEquipment.xml</localModifiers>
-	<localModifiers>EnemyTurrets.xml</localModifiers>
-        <sharedModifiers>EnemyCommanderMech.xml</sharedModifiers>
-	<userDescription>This base is defended by well-equipped veteran troops, turrets and a commander in a mech.</userDescription>		
-        <visible>false</visible>
+    <capturedDefinition>AlliedBaseOfOperations.xml</capturedDefinition>
+    <displayableName>Base of Operations</displayableName>
+    <facilityType>BaseOfOperations</facilityType>
+    <owner>Opposing</owner>
+    <localModifiers>Veterans.xml</localModifiers>
+    <localModifiers>GoodEquipment.xml</localModifiers>
+    <localModifiers>EnemyTurrets.xml</localModifiers>
+    <sharedModifiers>EnemyCommanderMek.xml</sharedModifiers>
+    <userDescription>This base is defended by well-equipped veteran troops, turrets and a commander
+        in a Mek.</userDescription>
+    <visible>false</visible>
 </StratconFacility>

@@ -18,10 +18,25 @@
  */
 package mekhq.gui.panels;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTabbedPane;
+
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.preferences.JTabbedPanePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.icons.ForcePieceIcon;
 import mekhq.campaign.icons.LayeredForceIcon;
@@ -29,44 +44,39 @@ import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.enums.LayeredForceIconLayer;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
-import org.apache.logging.log4j.LogManager;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
- * This panel is used to create, display, and export a LayeredForceIcon based on a tabbed pane
- * containing a ForcePieceIconChooser for every potential LayeredForceIconLayer layer.
+ * This panel is used to create, display, and export a LayeredForceIcon based on
+ * a tabbed pane
+ * containing a ForcePieceIconChooser for every potential LayeredForceIconLayer
+ * layer.
  */
 public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(LayeredForceIconCreationPanel.class);
+
+    // region Variable Declarations
     private LayeredForceIcon forceIcon;
     private final boolean includeRefreshButton;
 
     private JTabbedPane tabbedPane;
     private Map<LayeredForceIconLayer, ForcePieceIconChooser> choosers;
     private JLabel lblIcon;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public LayeredForceIconCreationPanel(final JFrame frame,
-                                         final @Nullable StandardForceIcon forceIcon,
-                                         final boolean includeRefreshButton) {
+            final @Nullable StandardForceIcon forceIcon,
+            final boolean includeRefreshButton) {
         super(frame, "LayeredForceIconCreationPanel", new GridBagLayout());
         setForceIcon((forceIcon instanceof LayeredForceIcon)
-                ? ((LayeredForceIcon) forceIcon).clone() : new LayeredForceIcon());
+                ? ((LayeredForceIcon) forceIcon).clone()
+                : new LayeredForceIcon());
         this.includeRefreshButton = includeRefreshButton;
         initialize();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public LayeredForceIcon getForceIcon() {
         return forceIcon;
     }
@@ -102,9 +112,9 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
     public void setLblIcon(final JLabel lblIcon) {
         this.lblIcon = lblIcon;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region Initialization
+    // region Initialization
     @Override
     protected void initialize() {
         final GridBagConstraints gbc = new GridBagConstraints();
@@ -162,7 +172,9 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         try {
             setPreferences();
         } catch (Exception ex) {
-            LogManager.getLogger().error("Error setting the Layered Force Icon Creation Panel's preferences. Keeping the created panel, but this is likely to cause some oddities.", ex);
+            logger.error(
+                    "Error setting the Layered Force Icon Creation Panel's preferences. Keeping the created panel, but this is likely to cause some oddities.",
+                    ex);
         }
     }
 
@@ -171,9 +183,9 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
         super.setCustomPreferences(preferences);
         preferences.manage(new JTabbedPanePreference(getTabbedPane()));
     }
-    //endregion Initialization
+    // endregion Initialization
 
-    //region Button Actions
+    // region Button Actions
     /**
      * Creates a new LayeredForceIcon to use as both the current and original icon
      */
@@ -213,13 +225,15 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
             final BufferedImage image = (BufferedImage) getForceIcon().getImage();
             ImageIO.write(image, "png", file);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
     /**
-     * @param performDirectoryRefresh whether to perform the actual refresh of the Force Icons
-     *                                directory or just handle the changes required for an already
+     * @param performDirectoryRefresh whether to perform the actual refresh of the
+     *                                Force Icons
+     *                                directory or just handle the changes required
+     *                                for an already
      *                                refreshed directory.
      */
     public void refreshDirectory(final boolean performDirectoryRefresh) {
@@ -233,11 +247,13 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
             chooser.refreshTree();
         }
     }
-    //endregion Button Actions
+    // endregion Button Actions
 
     /**
-     * Creates a force icon based on the individual selections for each piece chooser, and then
+     * Creates a force icon based on the individual selections for each piece
+     * chooser, and then
      * sets the force icon stored in this panel to that new icon.
+     * 
      * @return the newly created force icon
      */
     public LayeredForceIcon createForceIcon() {

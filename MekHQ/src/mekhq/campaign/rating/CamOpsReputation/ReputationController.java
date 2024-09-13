@@ -1,18 +1,22 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.rating.CamOpsReputation;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getAtBModifier;
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getReputationModifier;
@@ -24,6 +28,25 @@ import static mekhq.campaign.rating.CamOpsReputation.FinancialRating.calculateFi
 import static mekhq.campaign.rating.CamOpsReputation.OtherModifiers.calculateOtherModifiers;
 import static mekhq.campaign.rating.CamOpsReputation.SupportRating.calculateSupportRating;
 import static mekhq.campaign.rating.CamOpsReputation.TransportationRating.calculateTransportationRating;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
 
 public class ReputationController {
     // utilities
@@ -46,34 +69,34 @@ public class ReputationController {
     private int combatRecordRating = 0;
 
     // transportation rating
-    private Map<String, Integer> transportationCapacities =  new HashMap<>();
-    private Map<String, Integer> transportationRequirements =  new HashMap<>();
-    private Map<String, Integer> transportationValues =  new HashMap<>();
+    private Map<String, Integer> transportationCapacities = new HashMap<>();
+    private Map<String, Integer> transportationRequirements = new HashMap<>();
+    private Map<String, Integer> transportationValues = new HashMap<>();
     private int transportationRating = 0;
 
     // support rating
-    private Map<String, Integer> administrationRequirements =  new HashMap<>();
-    private Map<String, Integer> crewRequirements =  new HashMap<>();
-    private Map<String, List<Integer>> technicianRequirements =  new HashMap<>();
+    private Map<String, Integer> administrationRequirements = new HashMap<>();
+    private Map<String, Integer> crewRequirements = new HashMap<>();
+    private Map<String, List<Integer>> technicianRequirements = new HashMap<>();
     private int supportRating = 0;
 
     // financial rating
-    private Map<String, Integer> financialRatingMap =  new HashMap<>();
+    private Map<String, Integer> financialRatingMap = new HashMap<>();
     private int financialRating = 0;
 
     // crime rating
     private LocalDate dateOfLastCrime = null;
-    private Map<String, Integer> crimeRatingMap =  new HashMap<>();
+    private Map<String, Integer> crimeRatingMap = new HashMap<>();
     private int crimeRating = 0;
 
     // other modifiers
-    private Map<String, Integer> otherModifiersMap =  new HashMap<>();
+    private Map<String, Integer> otherModifiersMap = new HashMap<>();
     private int otherModifiers = 0;
 
     // total
     private int reputationRating = 0;
 
-    //region Getters and Setters
+    // region Getters and Setters
     public SkillLevel getAverageSkillLevel() {
         return this.averageSkillLevel;
     }
@@ -85,12 +108,13 @@ public class ReputationController {
     public int getReputationRating() {
         return this.reputationRating;
     }
-    //endregion Getters and Setters
+    // endregion Getters and Setters
 
     /**
      * Initializes the ReputationController class with default values.
      */
-    public ReputationController() {}
+    public ReputationController() {
+    }
 
     /**
      * Performs and stores all reputation calculations.
@@ -189,8 +213,10 @@ public class ReputationController {
         description.append(String.format(resources.getString("negotiation.text"), commanderMap.get("negotiation")));
         description.append(String.format(resources.getString("traits.text"), commanderMap.get("traits")));
 
-        if (campaign.getCampaignOptions().isUseRandomPersonalities() && (campaign.getCampaignOptions().isUseRandomPersonalityReputation())) {
-            description.append(String.format(resources.getString("personality.text"), commanderMap.get("personality"))).append("<br><br>");
+        if (campaign.getCampaignOptions().isUseRandomPersonalities()
+                && (campaign.getCampaignOptions().isUseRandomPersonalityReputation())) {
+            description.append(String.format(resources.getString("personality.text"), commanderMap.get("personality")))
+                    .append("<br><br>");
         } else {
             description.append("<br><br>");
         }
@@ -204,7 +230,8 @@ public class ReputationController {
         description.append(getMissionString("contractsBreached", resources.getString("contractsBreached.text"), -25));
 
         if (campaign.getRetainerStartDate() != null) {
-            description.append(getMissionString("retainerDuration", resources.getString("retainerDuration.text"), 5)).append("<br><br>");
+            description.append(getMissionString("retainerDuration", resources.getString("retainerDuration.text"), 5))
+                    .append("<br><br>");
         } else {
             description.append("<br><br>");
         }
@@ -217,15 +244,24 @@ public class ReputationController {
         }
 
         description.append(getDropShipString());
-        description.append(getTransportString("smallCraftCount", "smallCraftBays", "smallCraft", resources.getString("smallCraft.text"), true));
-        description.append(getTransportString("asfCount", "asfBays", "asf", resources.getString("fighters.text"), false));
-        description.append(getTransportString("mechCount", "mechBays", "mech", resources.getString("battleMechs.text"), false));
-        description.append(getTransportString("superHeavyVehicleCount", "superHeavyVehicleBays", "superHeavyVehicle", resources.getString("vehicleSuperHeavy.text"), true));
-        description.append(getTransportString("heavyVehicleCount", "heavyVehicleBays", "heavyVehicle", resources.getString("vehicleHeavy.text"), true));
-        description.append(getTransportString("lightVehicleCount", "lightVehicleBays", "lightVehicle", resources.getString("vehicleLight.text"), false));
-        description.append(getTransportString("protoMechCount", "protoMechBays", "protoMech", resources.getString("protoMechs.text"), false));
-        description.append(getTransportString("battleArmorCount", "battleArmorBays", "battleArmor", resources.getString("battleArmor.text"), false));
-        description.append(getTransportString("infantryCount", "infantryBays", "infantry", resources.getString("infantry.text"), false));
+        description.append(getTransportString("smallCraftCount", "smallCraftBays", "smallCraft",
+                resources.getString("smallCraft.text"), true));
+        description
+                .append(getTransportString("asfCount", "asfBays", "asf", resources.getString("fighters.text"), false));
+        description.append(
+                getTransportString("mekCount", "mekBays", "mek", resources.getString("battleMeks.text"), false));
+        description.append(getTransportString("superHeavyVehicleCount", "superHeavyVehicleBays", "superHeavyVehicle",
+                resources.getString("vehicleSuperHeavy.text"), true));
+        description.append(getTransportString("heavyVehicleCount", "heavyVehicleBays", "heavyVehicle",
+                resources.getString("vehicleHeavy.text"), true));
+        description.append(getTransportString("lightVehicleCount", "lightVehicleBays", "lightVehicle",
+                resources.getString("vehicleLight.text"), false));
+        description.append(getTransportString("protoMekCount", "protoMekBays", "protoMek",
+                resources.getString("protoMeks.text"), false));
+        description.append(getTransportString("battleArmorCount", "battleArmorBays", "battleArmor",
+                resources.getString("battleArmor.text"), false));
+        description.append(getTransportString("infantryCount", "infantryBays", "infantry",
+                resources.getString("infantry.text"), false));
         description.append(resources.getString("asterisk.text"));
 
         // SUPPORT RATING
@@ -240,9 +276,10 @@ public class ReputationController {
                 administrationRequirements.get("administratorCount"),
                 administrationRequirements.get("total")));
 
-        description.append(String.format(resources.getString("technicianRequirements.text"), technicianRequirements.get("rating").get(0)));
+        description.append(String.format(resources.getString("technicianRequirements.text"),
+                technicianRequirements.get("rating").get(0)));
 
-        description.append(getTechnicianString("mech"));
+        description.append(getTechnicianString("mek"));
         description.append(getTechnicianString("vehicle"));
         description.append(getTechnicianString("aero"));
         description.append(getTechnicianString("battleArmor"));
@@ -300,10 +337,13 @@ public class ReputationController {
 
     /**
      * Appends the technician requirement information for the given type.
-     * If the technician requirement exceeds 0, it generates an HTML formatted string
-     * with the technician label and the current count and maximum count of technicians.
+     * If the technician requirement exceeds 0, it generates an HTML formatted
+     * string
+     * with the technician label and the current count and maximum count of
+     * technicians.
      *
-     * @param type the type of technician requirement (mech, vehicle, aero, battleArmor)
+     * @param type the type of technician requirement (mek, vehicle, aero,
+     *             battleArmor)
      * @return the generated technician requirement string in HTML format,
      *         or an empty string if either technicianRequirement value is 0.
      */
@@ -312,12 +352,13 @@ public class ReputationController {
 
         if ((technicianRequirement.get(0) > 0) || (technicianRequirement.get(1) > 0)) {
             String label = switch (type) {
-                case "mech" -> resources.getString("battleMechsAndProtoMechs.text");
+                case "mek" -> resources.getString("battleMeksAndProtoMeks.text");
                 case "vehicle" -> resources.getString("vehicles.text");
                 case "aero" -> resources.getString("fightersAndSmallCraft.text");
                 case "battleArmor" -> resources.getString("battleArmor.text");
-                default -> throw new IllegalStateException("Unexpected value in mekhq/campaign/rating/CamOpsReputation/ReputationController.java/getTechnicianString: "
-                        + type);
+                default -> throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/rating/CamOpsReputation/ReputationController.java/getTechnicianString: "
+                                + type);
             };
 
             return String.format(resources.getString("technicianString.text"),
@@ -336,7 +377,10 @@ public class ReputationController {
      * @param label      the label to be displayed in the mission string
      * @param multiplier the multiplier to apply to the count
      * @return the generated mission string, formatted as
-     * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>count (count * multiplier)<br>", or null if the count is <= 0
+     *         "<br>
+     *         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>count (count *
+     *         multiplier)<br>
+     *         ", or null if the count is <= 0
      */
     private String getMissionString(String key, String label, int multiplier) {
         int count = combatRecordMap.get(key);
@@ -356,7 +400,10 @@ public class ReputationController {
      * Generates DropShip string information for the unit report
      *
      * @return the generated string in HTML format, formatted as
-     * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DropShips: </b>unitCount / bayCapacity Docking Collars (modifier)<br>"
+     *         "<br>
+     *         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DropShips: </b>unitCount / bayCapacity
+     *         Docking Collars (modifier)<br>
+     *         "
      */
     private String getDropShipString() {
         int unitCount = transportationRequirements.get("dropShipCount");
@@ -376,18 +423,26 @@ public class ReputationController {
     }
 
     /**
-     * Generates a transport string with the given unitKey, bayKey, valueKey, label, and displayAsterisk.
+     * Generates a transport string with the given unitKey, bayKey, valueKey, label,
+     * and displayAsterisk.
      *
-     * @param unitKey         the key to access the unit count in the transportationRequirements map
-     * @param bayKey          the key to access the bay capacity in the transportationCapacities map
-     * @param valueKey        the key to access the rating in the transportationValues map
+     * @param unitKey         the key to access the unit count in the
+     *                        transportationRequirements map
+     * @param bayKey          the key to access the bay capacity in the
+     *                        transportationCapacities map
+     * @param valueKey        the key to access the rating in the
+     *                        transportationValues map
      * @param label           the label to be displayed in the transport string
      * @param displayAsterisk whether to display an asterisk in the transport string
      * @return the generated transport string in HTML format, formatted as
-     * "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>unitCount / bayCount Bays* modifier<br>", or an empty string if unitCount and bayCount
-     *  are both 0
+     *         "<br>
+     *         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: </b>unitCount / bayCount Bays*
+     *         modifier<br>
+     *         ", or an empty string if unitCount and bayCount
+     *         are both 0
      */
-    private String getTransportString(String unitKey, String bayKey, String valueKey, String label, boolean displayAsterisk) {
+    private String getTransportString(String unitKey, String bayKey, String valueKey, String label,
+            boolean displayAsterisk) {
         int unitCount = transportationRequirements.get(unitKey);
         int bayCount = transportationCapacities.get(bayKey);
         int rating = transportationValues.get(valueKey);
@@ -416,8 +471,8 @@ public class ReputationController {
     /**
      * Writes the reputation ratings and values to an XML file.
      *
-     * @param pw      the PrintWriter object used to write to XML
-     * @param indent  the number of spaces to indent the XML tags
+     * @param pw     the PrintWriter object used to write to XML
+     * @param indent the number of spaces to indent the XML tags
      */
     public void writeReputationToXML(final PrintWriter pw, int indent) {
         // average experience rating
@@ -499,11 +554,13 @@ public class ReputationController {
     /**
      * Writes a map to XML format.
      *
-     * @param pw      the PrintWriter object used to write to XML
-     * @param indent  the number of spaces to indent the XML tags
-     * @param map     the map to write to XML, where the keys are strings, and the values can be any type
-     * @param <T>     the type of the values in the map
-     * @return the updated value of the indent parameter after writing the map to XML
+     * @param pw     the PrintWriter object used to write to XML
+     * @param indent the number of spaces to indent the XML tags
+     * @param map    the map to write to XML, where the keys are strings, and the
+     *               values can be any type
+     * @param <T>    the type of the values in the map
+     * @return the updated value of the indent parameter after writing the map to
+     *         XML
      */
     private <T> void writeMapToXML(final PrintWriter pw, final int indent, final Map<String, T> map) {
         for (String key : map.keySet()) {
@@ -574,11 +631,14 @@ public class ReputationController {
     }
 
     /**
-     * Parses the sub-nodes of a given node and populates either a map or a technicianRequirements list based on the boolean flag.
+     * Parses the sub-nodes of a given node and populates either a map or a
+     * technicianRequirements list based on the boolean flag.
      *
-     * @param workingNode The node whose sub-nodes need to be parsed.
-     * @param map The map to populate with the sub-node data (null if technicianRequirements).
-     * @param isTechnicianRequirements Flag indicating whether to populate a technicianRequirements list.
+     * @param workingNode              The node whose sub-nodes need to be parsed.
+     * @param map                      The map to populate with the sub-node data
+     *                                 (null if technicianRequirements).
+     * @param isTechnicianRequirements Flag indicating whether to populate a
+     *                                 technicianRequirements list.
      */
     private void parseSubNode(Node workingNode, @Nullable Map<String, Integer> map, boolean isTechnicianRequirements) {
         NodeList subNodeList = workingNode.getChildNodes();
@@ -589,7 +649,8 @@ public class ReputationController {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 if (isTechnicianRequirements) {
                     try {
-                        String[] numbers = node.getTextContent().substring(1, node.getTextContent().length() - 1).split(",\\s*");
+                        String[] numbers = node.getTextContent().substring(1, node.getTextContent().length() - 1)
+                                .split(",\\s*");
                         List<Integer> list = Arrays.stream(numbers).map(Integer::parseInt).collect(Collectors.toList());
                         technicianRequirements.put(node.getNodeName(), list);
                     } catch (NumberFormatException ex) {

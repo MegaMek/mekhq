@@ -1,43 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Shadow Hawk" model="SHD-2H" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="1a337f13-bc4d-41ae-b5d1-2fe86444a7c1">
-			<pilot size="1" name="Inghean Trewen" nick="" gender="FEMALE" gunnery="4" piloting="2" externalId="ba62ac5f-3b0c-4344-954a-c929a9f757ec" ejected="false" advantages="melee_master" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="1"> Center Torso
-				<slot index="12" type="IS Ammo SRM-2" shots="50"/>
-			</location>
-			<location index="2"> Right Torso
-				<slot index="4" type="IS Ammo LRM-5" shots="24"/>
-			</location>
-			<location index="3"> Left Torso
-				<slot index="6" type="IS Ammo AC/5" shots="20"/>
-			</location>
-			<Game id="24"/>
-		</entity>
+	<entity chassis="Shadow Hawk" model="SHD-2H" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="1a337f13-bc4d-41ae-b5d1-2fe86444a7c1">
+		<pilot size="1" name="Inghean Trewen" nick="" gender="FEMALE" gunnery="4" piloting="2"
+			externalId="ba62ac5f-3b0c-4344-954a-c929a9f757ec" ejected="false" advantages="melee_master"
+			edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="1"> Center
+		Torso <slot index="12" type="IS Ammo SRM-2" shots="50" />
+		</location>
+			<location index="2">
+		Right Torso <slot index="4" type="IS Ammo LRM-5" shots="24" />
+		</location>
+			<location index="3">
+		Left Torso <slot index="6" type="IS Ammo AC/5" shots="20" />
+		</location>
+			<Game id="24" />
+	</entity>
 
-		<entity chassis="Wolverine" model="WVR-6M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="d1a73b39-da09-458e-9bd8-d0f6d02e316e">
-			<pilot size="1" name="Francisco Romero" nick="" gender="MALE" gunnery="3" piloting="4" externalId="5af580b0-b634-4e52-b5cd-7c7ece425963" ejected="false" advantages="some_like_it_hot::small_pilot" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="2"> Right Torso
-				<slot index="4" type="IS Ammo SRM-6" shots="15"/>
-			</location>
-			<Game id="25"/>
-		</entity>
+	<entity chassis="Wolverine" model="WVR-6M" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="d1a73b39-da09-458e-9bd8-d0f6d02e316e">
+		<pilot size="1" name="Francisco Romero" nick="" gender="MALE" gunnery="3" piloting="4"
+			externalId="5af580b0-b634-4e52-b5cd-7c7ece425963" ejected="false"
+			advantages="some_like_it_hot::small_pilot"
+			edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="2"> Right
+		Torso <slot index="4" type="IS Ammo SRM-6" shots="15" />
+		</location>
+			<Game id="25" />
+	</entity>
 
-		<entity chassis="Griffin" model="GRF-1S" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="361dd771-0582-4dfc-8994-fa3f37b575dc">
-			<pilot size="1" name="Imogen Westmacott" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="2aacf2f9-0a94-4c10-8381-b89273a98264" ejected="false" advantages="hopping_jack" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="2"> Right Torso
-				<slot index="3" type="IS Ammo LRM-5" shots="4"/>
-			</location>
-			<Game id="26"/>
-		</entity>
+	<entity chassis="Griffin" model="GRF-1S" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="361dd771-0582-4dfc-8994-fa3f37b575dc">
+		<pilot size="1" name="Imogen Westmacott" nick="" gender="FEMALE" gunnery="3" piloting="4"
+			externalId="2aacf2f9-0a94-4c10-8381-b89273a98264" ejected="false" advantages="hopping_jack"
+			edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="2"> Right
+		Torso <slot index="3" type="IS Ammo LRM-5" shots="4" />
+		</location>
+			<Game id="26" />
+	</entity>
 
-		<entity chassis="Phoenix Hawk" model="PXH-1D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="3fa94c40-4d80-4e42-823f-773ea54798ff">
-			<pilot size="1" name="David Wrenn" nick="" gender="MALE" gunnery="3" piloting="4" externalId="bf246dfd-a1e3-4139-a34b-925a2d106ddd" ejected="false" advantages="tm_forest_ranger::human_tro Mek" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-			<Game id="27"/>
-		</entity>
+	<entity chassis="Phoenix Hawk" model="PXH-1D" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="3fa94c40-4d80-4e42-823f-773ea54798ff">
+		<pilot size="1" name="David Wrenn" nick="" gender="MALE" gunnery="3" piloting="4"
+			externalId="bf246dfd-a1e3-4139-a34b-925a2d106ddd" ejected="false"
+			advantages="tm_forest_ranger::human_tro Mek"
+			edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" />
+		<Game id="27" />
+	</entity>
 
 </unit>

@@ -57,7 +57,7 @@ hostileFacilityCount - Decimal. Exactly like alliedFacilityCount, except for hos
 
 scenarioOdds - a list of base odds that a scenario will occur a) for a require lance on monday, b) when a lance is deployed to a hex on a track that does not have an allied facility. Picked randomly from the list for each track.
 
-deploymentTimes - a list of deployment times, in days, for when a force gets assigned to a scenario. Once assigned, a force (and any reinforcements, and, theoretically, in the future, any salvage) will not return for the specified number of days. Picked randomly from the list for each track. 
+deploymentTimes - a list of deployment times, in days, for when a force gets assigned to a scenario. Once assigned, a force (and any reinforcements, and, theoretically, in the future, any salvage) will not return for the specified number of days. Picked randomly from the list for each track.
 
 globalScenarioModifiers/globalScenarioModifier - a list of all scenario modifier file names to apply to any scenario in this contract. Use sparingly.
 
@@ -71,7 +71,7 @@ objectivescenarioModifiers/objectiveScenarioModifier - a list of scenario modifi
 
 
 objectiveType - the class of objective. There are four types:
-AnyScenarioVictory - victory in any scenario. 
+AnyScenarioVictory - victory in any scenario.
 SpecificScenarioVictory - victory in specific pre-seeded scenarios, from the list in objectiveScenarios.
 FacilityDestruction - drops some hostile facilities on the map, which the player must seize control over/destroy.
 AlliedFacilityControl - drops some allied facilities on the map, which the player must retain control over (it is possible to retake if they were captured).

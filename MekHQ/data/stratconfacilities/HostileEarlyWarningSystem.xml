@@ -1,10 +1,10 @@
 <StratconFacility>
-	<capturedDefinition>AlliedEarlyWarningSystem.xml</capturedDefinition>
-	<displayableName>Early Warning Center</displayableName>
-        <facilityType>EarlyWarningSystem</facilityType>
-        <owner>Opposing</owner>
-	<localModifiers>ReinforcementDelayReductionHostile.xml</localModifiers>
-        <sharedModifiers>ReinforcementDelayReductionHostile.xml</sharedModifiers>
-	<userDescription>Reduces hostile reinforcement arrival time for scenarios on this track.</userDescription>	
-        <visible>true</visible>
+    <capturedDefinition>AlliedEarlyWarningSystem.xml</capturedDefinition>
+    <displayableName>Early Warning Center</displayableName>
+    <facilityType>EarlyWarningSystem</facilityType>
+    <owner>Opposing</owner>
+    <localModifiers>ReinforcementDelayReductionHostile.xml</localModifiers>
+    <sharedModifiers>ReinforcementDelayReductionHostile.xml</sharedModifiers>
+    <userDescription>Reduces hostile reinforcement arrival time for scenarios on this track.</userDescription>
+    <visible>true</visible>
 </StratconFacility>

@@ -6,7 +6,7 @@
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
-        <allowedTerrainTypes/>
+        <allowedTerrainTypes />
         <allowRotation>true</allowRotation>
         <baseHeight>17</baseHeight>
         <baseWidth>50</baseWidth>
@@ -20,7 +20,7 @@
             <associatedForceNames>
                 <associatedForceName>Primary Opfor</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -35,7 +35,7 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails />
             <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
@@ -47,7 +47,7 @@
             <associatedForceNames>
                 <associatedForceName>Allied DropShip</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -106,7 +106,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -125,7 +125,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -135,7 +135,7 @@
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
@@ -155,7 +155,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
+                <deploymentZones />
                 <destinationZone>6</destinationZone>
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
@@ -165,7 +165,7 @@
                 <generationOrder>4</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>SameEdge</syncDeploymentType>

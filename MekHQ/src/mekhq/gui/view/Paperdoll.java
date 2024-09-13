@@ -18,18 +18,6 @@
  */
 package mekhq.gui.view;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.personnel.BodyLocation;
-import mekhq.gui.utilities.MultiplyComposite;
-import org.apache.logging.log4j.LogManager;
-
-import javax.xml.transform.Source;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,15 +26,42 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.IntStream;
+
+import javax.xml.transform.Source;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlValue;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.BodyLocation;
+import mekhq.gui.utilities.MultiplyComposite;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * A component allowing to display a "paper doll" image, with overlays
  * for body locations.
  */
 public class Paperdoll extends Component {
+    private static final MMLogger logger = MMLogger.create(Paperdoll.class);
+
     public static final int DEFAULT_WIDTH = 256;
     public static final int DEFAULT_HEIGHT = 768;
 
@@ -72,7 +87,7 @@ public class Paperdoll extends Component {
         try {
             loadShapeData(is);
         } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
 
         highlightColor = null;
@@ -104,7 +119,7 @@ public class Paperdoll extends Component {
             try {
                 mt.waitForAll();
             } catch (InterruptedException e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         } else {
             base = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_ARGB);
@@ -179,31 +194,32 @@ public class Paperdoll extends Component {
         // Check for image overlays first, and record what we have drawn
         Set<BodyLocation> drawnOverlays = EnumSet.noneOf(BodyLocation.class);
         locTags.entrySet().stream().filter(Objects::nonNull)
-            .filter(entry -> ((null != entry.getValue()) && locOverlays.containsKey(entry.getKey())
-                && locOverlays.get(entry.getKey()).containsKey(entry.getValue())))
-            .forEach(entry -> {
-                final Image image = locOverlays.get(entry.getKey()).get(entry.getValue());
-                g2.drawImage(image, 0, 0, scaledWidth, scaledHeight, this);
-                drawnOverlays.add(entry.getKey());
-            });
+                .filter(entry -> ((null != entry.getValue()) && locOverlays.containsKey(entry.getKey())
+                        && locOverlays.get(entry.getKey()).containsKey(entry.getValue())))
+                .forEach(entry -> {
+                    final Image image = locOverlays.get(entry.getKey()).get(entry.getValue());
+                    g2.drawImage(image, 0, 0, scaledWidth, scaledHeight, this);
+                    drawnOverlays.add(entry.getKey());
+                });
         g2.scale(scale, scale);
         locColors.entrySet().stream().filter(Objects::nonNull)
-            .filter(entry -> ((null != entry.getValue()) && locShapes.containsKey(entry.getKey())
-                && !drawnOverlays.contains(entry.getKey())))
-            .forEach(entry -> {
-                final Path2D overlay = locShapes.get(entry.getKey());
-                g2.setPaint(entry.getValue());
-                g2.setComposite(MultiplyComposite.INSTANCE);
+                .filter(entry -> ((null != entry.getValue()) && locShapes.containsKey(entry.getKey())
+                        && !drawnOverlays.contains(entry.getKey())))
+                .forEach(entry -> {
+                    final Path2D overlay = locShapes.get(entry.getKey());
+                    g2.setPaint(entry.getValue());
+                    g2.setComposite(MultiplyComposite.INSTANCE);
 
-                // The try catch is required because of a Java bug: https://bugs.openjdk.java.net/browse/JDK-6689349
-                // It falls back to just overwriting everything below, instead of nicely merging
-                try {
-                    g2.fill(overlay);
-                } catch (InternalError ignored) {
-                    g2.setComposite(AlphaComposite.SrcOver);
-                    g2.fill(overlay);
-                }
-            });
+                    // The try catch is required because of a Java bug:
+                    // https://bugs.openjdk.java.net/browse/JDK-6689349
+                    // It falls back to just overwriting everything below, instead of nicely merging
+                    try {
+                        g2.fill(overlay);
+                    } catch (InternalError ignored) {
+                        g2.setComposite(AlphaComposite.SrcOver);
+                        g2.fill(overlay);
+                    }
+                });
         g2.setComposite(AlphaComposite.SrcOver); // Revert to default composite
 
         if ((null != highlightColor) && (null != hoverLoc) && locShapes.containsKey(hoverLoc)) {
@@ -217,8 +233,8 @@ public class Paperdoll extends Component {
         final double scaledX = x / scale;
         final double scaledY = y / scale;
         return locShapes.entrySet().stream()
-            .filter(entry -> entry.getValue().contains(scaledX, scaledY)).findAny()
-            .map(Map.Entry::getKey).orElse(BodyLocation.GENERIC);
+                .filter(entry -> entry.getValue().contains(scaledX, scaledY)).findAny()
+                .map(Map.Entry::getKey).orElse(BodyLocation.GENERIC);
     }
 
     @Override
@@ -261,24 +277,24 @@ public class Paperdoll extends Component {
     }
 
     // XML serialization classes
-    @XmlRootElement(name="overlays")
+    @XmlRootElement(name = "overlays")
     @XmlAccessorType(XmlAccessType.FIELD)
     private static class OverlayLocDataList {
         public String base;
-        @XmlElement(name="loc")
+        @XmlElement(name = "loc")
         public List<OverlayLocData> locs;
     }
 
-    @XmlRootElement(name="loc")
+    @XmlRootElement(name = "loc")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class OverlayLocData {
-        @XmlAttribute(name="type")
+        @XmlAttribute(name = "type")
         public BodyLocation loc;
-        @XmlElement(name="p")
-        @XmlElementWrapper(name="path")
+        @XmlElement(name = "p")
+        @XmlElementWrapper(name = "path")
         @XmlJavaTypeAdapter(XMLPoint2DAdapter.class)
         public List<Point2D> path;
-        @XmlElement(name="image")
+        @XmlElement(name = "image")
         public List<OverlayLocImage> overlayImages;
 
         public Path2D genPath() {
@@ -286,7 +302,7 @@ public class Paperdoll extends Component {
             if ((null != path) && !path.isEmpty()) {
                 result.moveTo(path.get(0).getX(), path.get(0).getY());
                 IntStream.range(1, path.size()).mapToObj(i -> path.get(i))
-                    .forEachOrdered(p -> result.lineTo(p.getX(), p.getY()));
+                        .forEachOrdered(p -> result.lineTo(p.getX(), p.getY()));
                 result.closePath();
             }
             return result;

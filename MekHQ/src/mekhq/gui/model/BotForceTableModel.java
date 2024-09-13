@@ -21,31 +21,32 @@
  */
 package mekhq.gui.model;
 
+import java.awt.Component;
+import java.util.List;
+
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.BotForce;
 
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
-import java.util.List;
-
 public class BotForceTableModel extends AbstractTableModel {
 
-    //region Variable Declarations
+    // region Variable Declarations
     protected String[] columnNames;
     protected List<BotForce> data;
     private Campaign campaign;
 
-    public final static int COL_NAME         = 0;
-    public final static int COL_IFF          = 1;
-    public final static int COL_FIXED        = 2;
-    public final static int COL_RANDOM       = 3;
-    public final static int COL_DEPLOYMENT   = 4;
-    public final static int N_COL            = 5;
-    //endregion Variable Declarations
+    public static final int COL_NAME = 0;
+    public static final int COL_IFF = 1;
+    public static final int COL_FIXED = 2;
+    public static final int COL_RANDOM = 3;
+    public static final int COL_DEPLOYMENT = 4;
+    public static final int N_COL = 5;
+    // endregion Variable Declarations
 
     public BotForceTableModel(List<BotForce> entries, Campaign c) {
         data = entries;
@@ -97,8 +98,8 @@ public class BotForceTableModel extends AbstractTableModel {
             case COL_FIXED:
                 return botForce.getFixedEntityList().size() + " Units, BV: " + botForce.getFixedBV();
             case COL_RANDOM:
-                return ((null == botForce.getBotForceRandomizer()) ? "" : botForce.getBotForceRandomizer().
-                        getShortDescription());
+                return ((null == botForce.getBotForceRandomizer()) ? ""
+                        : botForce.getBotForceRandomizer().getShortDescription());
             case COL_DEPLOYMENT:
                 return Utilities.getDeploymentString(botForce);
             default:
@@ -157,14 +158,14 @@ public class BotForceTableModel extends AbstractTableModel {
 
         switch (col) {
             case COL_RANDOM:
-                return ((null == botForce.getBotForceRandomizer()) ? "" : botForce.getBotForceRandomizer().
-                        getDescription(campaign));
+                return ((null == botForce.getBotForceRandomizer()) ? ""
+                        : botForce.getBotForceRandomizer().getDescription(campaign));
             default:
                 return null;
         }
     }
 
-    //fill table with values
+    // fill table with values
     public void setData(List<BotForce> botForce) {
         data = botForce;
         fireTableDataChanged();
@@ -177,8 +178,8 @@ public class BotForceTableModel extends AbstractTableModel {
     public class Renderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus,
-                                                       int row, int column) {
+                boolean isSelected, boolean hasFocus,
+                int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             setOpaque(true);
             int actualCol = table.convertColumnIndexToModel(column);

@@ -18,36 +18,37 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import mekhq.MekHQ;
-import org.junit.jupiter.api.Test;
-
-import java.util.ResourceBundle;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PrisonerStatusTest {
-    //region Variable Declarations
+import java.util.ResourceBundle;
+
+import org.junit.jupiter.api.Test;
+
+import mekhq.MekHQ;
+
+class PrisonerStatusTest {
+    // region Variable Declarations
     private static final PrisonerStatus[] statuses = PrisonerStatus.values();
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
             MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Getters
+    // region Getters
     @Test
-    public void testGetTitleExtension() {
+    void testGetTitleExtension() {
         assertEquals(resources.getString("PrisonerStatus.FREE.titleExtension"),
                 PrisonerStatus.FREE.getTitleExtension());
         assertEquals(resources.getString("PrisonerStatus.PRISONER_DEFECTOR.titleExtension"),
                 PrisonerStatus.PRISONER_DEFECTOR.getTitleExtension());
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     @Test
-    public void testIsFree() {
+    void testIsFree() {
         for (final PrisonerStatus prisonerStatus : statuses) {
             if (prisonerStatus == PrisonerStatus.FREE) {
                 assertTrue(prisonerStatus.isFree());
@@ -58,7 +59,7 @@ public class PrisonerStatusTest {
     }
 
     @Test
-    public void testIsPrisoner() {
+    void testIsPrisoner() {
         for (final PrisonerStatus prisonerStatus : statuses) {
             if (prisonerStatus == PrisonerStatus.PRISONER) {
                 assertTrue(prisonerStatus.isPrisoner());
@@ -69,7 +70,7 @@ public class PrisonerStatusTest {
     }
 
     @Test
-    public void testIsPrisonerDefector() {
+    void testIsPrisonerDefector() {
         for (final PrisonerStatus prisonerStatus : statuses) {
             if (prisonerStatus == PrisonerStatus.PRISONER_DEFECTOR) {
                 assertTrue(prisonerStatus.isPrisonerDefector());
@@ -80,7 +81,7 @@ public class PrisonerStatusTest {
     }
 
     @Test
-    public void testIsBondsman() {
+    void testIsBondsman() {
         for (final PrisonerStatus prisonerStatus : statuses) {
             if (prisonerStatus == PrisonerStatus.BONDSMAN) {
                 assertTrue(prisonerStatus.isBondsman());
@@ -91,7 +92,7 @@ public class PrisonerStatusTest {
     }
 
     @Test
-    public void testIsCurrentPrisoner() {
+    void testIsCurrentPrisoner() {
         for (final PrisonerStatus prisonerStatus : statuses) {
             if ((prisonerStatus == PrisonerStatus.PRISONER)
                     || (prisonerStatus == PrisonerStatus.PRISONER_DEFECTOR)) {
@@ -101,28 +102,23 @@ public class PrisonerStatusTest {
             }
         }
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
-    //region File I/O
+    // region File I/O
     @Test
-    public void testParseFromString() {
+    void testParseFromString() {
         // Normal Parsing
         assertEquals(PrisonerStatus.FREE, PrisonerStatus.parseFromString("FREE"));
         assertEquals(PrisonerStatus.BONDSMAN, PrisonerStatus.parseFromString("BONDSMAN"));
-
-        // Legacy Parsing
-        assertEquals(PrisonerStatus.FREE, PrisonerStatus.parseFromString("0"));
-        assertEquals(PrisonerStatus.PRISONER, PrisonerStatus.parseFromString("1"));
-        assertEquals(PrisonerStatus.BONDSMAN, PrisonerStatus.parseFromString("2"));
 
         // Error Case
         assertEquals(PrisonerStatus.FREE, PrisonerStatus.parseFromString("3"));
         assertEquals(PrisonerStatus.FREE, PrisonerStatus.parseFromString("blah"));
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Test
-    public void testToStringOverride() {
+    void testToStringOverride() {
         assertEquals(resources.getString("PrisonerStatus.FREE.text"), PrisonerStatus.FREE.toString());
         assertEquals(resources.getString("PrisonerStatus.BONDSMAN.text"), PrisonerStatus.BONDSMAN.toString());
     }

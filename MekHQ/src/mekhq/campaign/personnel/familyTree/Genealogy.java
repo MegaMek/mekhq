@@ -18,33 +18,43 @@
  */
 package mekhq.campaign.personnel.familyTree;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
- * The Genealogy class is used to track immediate familial relationships, spouses, and former spouses.
+ * The Genealogy class is used to track immediate familial relationships,
+ * spouses, and former spouses.
  * It is also used to determine familial relationships between people
  */
 public class Genealogy {
-    //region Variables
+    private static final MMLogger logger = MMLogger.create(Genealogy.class);
+
+    // region Variables
     private final Person origin;
     private Person spouse;
     private final List<FormerSpouse> formerSpouses = new ArrayList<>();
     private final Map<FamilialRelationshipType, List<Person>> family = new HashMap<>();
-    //endregion Variables
+    // endregion Variables
 
-    //region Constructors
+    // region Constructors
     /**
      * @param origin the origin person
      */
@@ -52,9 +62,9 @@ public class Genealogy {
         this.origin = origin;
         setSpouse(null);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     /**
      * @return the origin person
      */
@@ -77,7 +87,8 @@ public class Genealogy {
     }
 
     /**
-     * @return a list of FormerSpouse objects for all the former spouses of the current person
+     * @return a list of FormerSpouse objects for all the former spouses of the
+     *         current person
      */
     public List<FormerSpouse> getFormerSpouses() {
         return formerSpouses;
@@ -91,8 +102,10 @@ public class Genealogy {
     }
 
     /**
-     * @param formerSpouse the former spouse object to remove from the current person's list. Do
-     *                     note that this may remove multiple identical former spouses, as we do
+     * @param formerSpouse the former spouse object to remove from the current
+     *                     person's list. Do
+     *                     note that this may remove multiple identical former
+     *                     spouses, as we do
      *                     not require uniqueness for former spouses.
      */
     public void removeFormerSpouse(final FormerSpouse formerSpouse) {
@@ -100,7 +113,8 @@ public class Genealogy {
     }
 
     /**
-     * @param formerSpouse the former spouse to remove from the current person's list
+     * @param formerSpouse the former spouse to remove from the current person's
+     *                     list
      */
     public void removeFormerSpouse(final Person formerSpouse) {
         getFormerSpouses().removeIf(ex -> ex.getFormerSpouse().equals(formerSpouse));
@@ -115,11 +129,12 @@ public class Genealogy {
 
     /**
      * This is used to add a new family member
+     *
      * @param relationshipType the relationship type between the two people
-     * @param person the person to add
+     * @param person           the person to add
      */
     public void addFamilyMember(final FamilialRelationshipType relationshipType,
-                                final @Nullable Person person) {
+            final @Nullable Person person) {
         if (person != null) {
             getFamily().putIfAbsent(relationshipType, new ArrayList<>());
             getFamily().get(relationshipType).add(person);
@@ -128,10 +143,10 @@ public class Genealogy {
 
     /**
      * @param relationshipType the FamilialRelationshipType of the person to remove
-     * @param person the person to remove
+     * @param person           the person to remove
      */
     public void removeFamilyMember(final @Nullable FamilialRelationshipType relationshipType,
-                                   final Person person) {
+            final Person person) {
         if (relationshipType == null) {
             for (final FamilialRelationshipType type : FamilialRelationshipType.values()) {
                 final List<Person> familyMembers = getFamily().getOrDefault(type, new ArrayList<>());
@@ -144,7 +159,7 @@ public class Genealogy {
                 }
             }
         } else if (getFamily().get(relationshipType) == null) {
-            LogManager.getLogger().error("Could not remove family member of unknown relationship "
+            logger.error("Could not remove family member of unknown relationship "
                     + relationshipType.name() + " between person " + person.getFullTitle()
                     + "and unknown potential relation " + person.getFullTitle() + ' ' + person.getId() + '.');
         } else {
@@ -155,9 +170,9 @@ public class Genealogy {
             }
         }
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region Boolean Checks
+    // region Boolean Checks
     /**
      * @return whether the Genealogy object is empty or not
      */
@@ -167,7 +182,7 @@ public class Genealogy {
 
     /**
      * @return whether the family side of the Genealogy object is empty or not
-     * (i.e. spouse and formerSpouses are not included, just family)
+     *         (i.e. spouse and formerSpouses are not included, just family)
      */
     public boolean familyIsEmpty() {
         return getFamily().isEmpty();
@@ -202,8 +217,9 @@ public class Genealogy {
     }
 
     /**
-     * @return {@code true} if the person at least one living parent, otherwise {@code false}.
-     * Will also return false if the person has no parents
+     * @return {@code true} if the person at least one living parent, otherwise
+     *         {@code false}.
+     *         Will also return false if the person has no parents
      */
     public boolean hasLivingParents() {
         if (hasParents()) {
@@ -215,9 +231,11 @@ public class Genealogy {
     }
 
     /**
-     * This is used to determine if two people have mutual ancestors based on their genealogies
+     * This is used to determine if two people have mutual ancestors based on their
+     * genealogies
+     *
      * @param person the person to check if they are related or not
-     * @param depth the depth to check mutual ancestry up to
+     * @param depth  the depth to check mutual ancestry up to
      * @return true if they have mutual ancestors, otherwise false
      */
     public boolean checkMutualAncestors(final Person person, final int depth) {
@@ -236,7 +254,8 @@ public class Genealogy {
     /**
      * @param depth the depth of ancestors to get
      * @return a set of all unique ancestors of a person back depth generations
-     * @note this is a recursive search to ensure it goes to a specified depth of relation
+     * @note this is a recursive search to ensure it goes to a specified depth of
+     *       relation
      */
     private Set<Person> getAncestors(int depth) {
         // Create the return value
@@ -259,9 +278,9 @@ public class Genealogy {
         // Finally, return the ancestors
         return ancestors;
     }
-    //endregion Boolean Checks
+    // endregion Boolean Checks
 
-    //region Basic Family Getters
+    // region Basic Family Getters
     /**
      * @return a list of the current person's grandparent(s)
      */
@@ -308,6 +327,7 @@ public class Genealogy {
 
     /**
      * Siblings are defined as sharing either parent. Inlaws are not counted.
+     *
      * @return the siblings of the current person
      */
     public List<Person> getSiblings() {
@@ -370,10 +390,11 @@ public class Genealogy {
                 .distinct()
                 .collect(Collectors.toList());
     }
-    //endregion Basic Family Getters
+    // endregion Basic Family Getters
 
     /**
-     * This is used to remove all external Genealogy links to a person, as part of clearing out any
+     * This is used to remove all external Genealogy links to a person, as part of
+     * clearing out any
      * data related to a person during their removal.
      */
     public void clearGenealogyLinks() {
@@ -384,8 +405,8 @@ public class Genealogy {
 
         // Clear Former Spouses
         if (!getFormerSpouses().isEmpty()) {
-            getFormerSpouses().forEach(formerSpouse ->
-                    formerSpouse.getFormerSpouse().getGenealogy().removeFormerSpouse(getOrigin()));
+            getFormerSpouses().forEach(
+                    formerSpouse -> formerSpouse.getFormerSpouse().getGenealogy().removeFormerSpouse(getOrigin()));
         }
 
         // Clear Family
@@ -396,10 +417,11 @@ public class Genealogy {
         }
     }
 
-    //region File I/O
+    // region File I/O
     /**
-     * @param pw the PrintWriter to write to
-     * @param indent the indent for the base line (i.e. the line containing genealogy)
+     * @param pw     the PrintWriter to write to
+     * @param indent the indent for the base line (i.e. the line containing
+     *               genealogy)
      */
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "genealogy");
@@ -449,7 +471,7 @@ public class Genealogy {
                         if (wn.hasChildNodes()) {
                             loadFormerSpouses(wn.getChildNodes());
                         } else {
-                            LogManager.getLogger().error("Cannot parse a former spouses node without child nodes for "
+                            logger.error("Cannot parse a former spouses node without child nodes for "
                                     + getOrigin().getId());
                         }
                         break;
@@ -457,7 +479,7 @@ public class Genealogy {
                         if (wn.hasChildNodes()) {
                             loadFamily(wn.getChildNodes());
                         } else {
-                            LogManager.getLogger().error("Cannot parse a family node without child nodes for "
+                            logger.error("Cannot parse a family node without child nodes for "
                                     + getOrigin().getId());
                         }
                         break;
@@ -465,7 +487,7 @@ public class Genealogy {
                         break;
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("Failed to parse a node with name "
+                logger.error("Failed to parse a node with name "
                         + wn.getNodeName() + " containing " + wn.getTextContent() + " for "
                         + getOrigin().getId(), ex);
             }
@@ -475,6 +497,7 @@ public class Genealogy {
     /**
      * This loads the FormerSpouses from their saved nodes
      * Note: This must be public for migration reasons
+     *
      * @param nl the NodeList containing the saved former spouses
      */
     public void loadFormerSpouses(final NodeList nl) {
@@ -485,13 +508,14 @@ public class Genealogy {
                     getFormerSpouses().add(FormerSpouse.generateInstanceFromXML(wn));
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
     }
 
     /**
      * This loads the familial relationships from their saved nodes
+     *
      * @param nl the NodeList containing the saved Genealogy familial relationships
      */
     private void loadFamily(final NodeList nl) {
@@ -522,5 +546,5 @@ public class Genealogy {
             getFamily().put(type, people);
         }
     }
-    //endregion File I/O
+    // endregion File I/O
 }
