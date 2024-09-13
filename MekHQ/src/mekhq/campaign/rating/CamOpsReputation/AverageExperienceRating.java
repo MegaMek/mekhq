@@ -159,7 +159,7 @@ public class AverageExperienceRating {
             } else if (entity instanceof ProtoMek) {
                 // ProtoMek entities only use gunnery for calculation
                 if (person.hasSkill(SkillType.S_GUN_PROTO)) {
-                    totalExperience += person.getSkill(SkillType.S_GUN_PROTO).getTotalSkillLevel();
+                    totalExperience += person.getSkill(SkillType.S_GUN_PROTO).getFinalSkillValue();
                 }
 
                 personnelCount++;
@@ -167,7 +167,10 @@ public class AverageExperienceRating {
                 // For regular entities, another method calculates the average experience
                 if (unit.isGunner(person) || unit.isDriver(person)) {
                     totalExperience += calculateRegularExperience(person, entity, unit);
-                    personnelCount++;
+
+                    if (totalExperience > 0) {
+                        personnelCount++;
+                    }
                 }
             }
         }
@@ -223,36 +226,23 @@ public class AverageExperienceRating {
      * @return The average experience of the crew.
      */
     private static double calculateRegularExperience(Person person, Entity entity, Unit unit) {
-        /*
-         * skillData[0] represents sumOfSkillLevels
-         * skillData[1] represents skillCount
-         */
-        int[] skillData = new int[2];
+        String skillType;
 
-        Consumer<String> skillHandler = skillName -> {
-            if (person.hasSkill(skillName)) {
-                skillData[0] += person.getSkill(skillName).getTotalSkillLevel();
-                skillData[1]++;
-            }
-        };
+        int skillValue = 0;
+        int skillCount = 0;
 
         if (unit.isDriver(person)) {
-            skillHandler.accept(SkillType.getDrivingSkillFor(entity));
+            skillType = SkillType.getDrivingSkillFor(entity);
+            skillValue += person.getSkill(skillType).getFinalSkillValue();
+            skillCount++;
         }
 
         if (unit.isGunner(person)) {
-            skillHandler.accept(SkillType.getGunnerySkillFor(entity));
+            skillType = SkillType.getGunnerySkillFor(entity);
+            skillValue += person.getSkill(skillType).getFinalSkillValue();
+            skillCount++;
         }
 
-        if (skillData[1] != 0) {
-            if (person.getPrimaryRole().isVehicleCrew() &&
-                    (person.getSecondaryRole().isCivilian() || person.getSecondaryRole().isVehicleCrew())) {
-                if (person.hasSkill(SkillType.S_TECH_MECHANIC)) {
-                    return person.getSkill(SkillType.S_TECH_MECHANIC).getTotalSkillLevel();
-                }
-            }
-        }
-
-        return (skillData[0] > 0) ? (double) skillData[0] / skillData[1] : 0.0;
+        return (double) skillValue / skillCount;
     }
 }
