@@ -1721,7 +1721,7 @@ public class ResolveScenarioTracker {
         }
 
         if (campaign.getCampaignOptions().isUseAtB() && isAtBContract) {
-            final int unitRatingMod = campaign.getUnitRatingMod();
+            final int unitRatingMod = campaign.getAtBUnitRatingMod();
             for (Unit unit : getUnits()) {
                 unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
             }

@@ -48,6 +48,7 @@ import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
@@ -352,7 +353,7 @@ public class AtBConfiguration {
                 : adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
 
         target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
-        target.addModifier(IUnitRating.DRAGOON_C - campaign.getUnitRatingMod(),
+        target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(),
                 "Unit Rating");
         return target;
     }
@@ -627,7 +628,7 @@ public class AtBConfiguration {
 
         /**
          * Select random entry proportionally to the weight values
-         * 
+         *
          * @param rollMod - a modifier to the die roll, expressed as a fraction of the
          *                total weight
          * @return

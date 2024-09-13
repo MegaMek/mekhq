@@ -633,7 +633,7 @@ public class Contract extends Mission {
             // contract base * transport period * reputation * employer modifier
             transitAmount = accountant.getContractBase()
                     .multipliedBy(((getJumpPath(c).getJumps()) * 2.0) / 4.0)
-                    .multipliedBy(c.getUnitRatingMod() * 0.2 + 0.5)
+                    .multipliedBy(c.getAtBUnitRatingMod() * 0.2 + 0.5)
                     .multipliedBy(1.2);
         } else {
             transitAmount = Money.zero();

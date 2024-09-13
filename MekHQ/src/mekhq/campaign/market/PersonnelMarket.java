@@ -467,7 +467,7 @@ public class PersonnelMarket {
             }
         }
         target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
-        target.addModifier(IUnitRating.DRAGOON_C - campaign.getUnitRatingMod(), "Unit Rating");
+        target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }
 }

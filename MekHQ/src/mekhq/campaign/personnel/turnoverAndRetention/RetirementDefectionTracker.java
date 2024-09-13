@@ -731,11 +731,11 @@ public class RetirementDefectionTracker {
     private static int getUnitRatingModifier(Campaign campaign) {
         int unitRating = 0;
 
-        if (campaign.getUnitRatingMod() < 1) {
+        if (campaign.getAtBUnitRatingMod() < 1) {
             unitRating = 2;
-        } else if (campaign.getUnitRatingMod() == 1) {
+        } else if (campaign.getAtBUnitRatingMod() == 1) {
             unitRating = 1;
-        } else if (campaign.getUnitRatingMod() > 3) {
+        } else if (campaign.getAtBUnitRatingMod() > 3) {
             unitRating = -1;
         }
         return unitRating;

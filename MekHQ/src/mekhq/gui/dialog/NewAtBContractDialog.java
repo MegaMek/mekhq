@@ -99,7 +99,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         contract = new AtBContract("New Contract");
         contract.calculateContract(campaign);
         ((AtBContract) contract).initContractDetails(campaign);
-        dragoonRating = campaign.getUnitRatingMod();
+        dragoonRating = campaign.getAtBUnitRatingMod();
         super.initComponents();
 
         updateEnemies();

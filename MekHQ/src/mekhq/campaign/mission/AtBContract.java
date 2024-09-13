@@ -235,7 +235,7 @@ public class AtBContract extends Contract {
     }
 
     public void calculatePaymentMultiplier(Campaign campaign) {
-        int unitRatingMod = campaign.getUnitRatingMod();
+        int unitRatingMod = campaign.getAtBUnitRatingMod();
         double multiplier = 1.0;
         // IntOps reputation factor then Dragoons rating
         if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {

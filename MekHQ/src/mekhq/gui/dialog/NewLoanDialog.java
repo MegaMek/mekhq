@@ -106,7 +106,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         this.campaign = campaign;
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
 
-        rating = campaign.getUnitRatingMod();
+        rating = campaign.getAtBUnitRatingMod();
         loan = Loan.getBaseLoan(rating, this.campaign.getLocalDate());
         maxCollateralValue = this.campaign.getFinances().getMaxCollateral(this.campaign);
         initComponents();
