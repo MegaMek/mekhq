@@ -32,7 +32,7 @@ import megamek.client.generator.ReconfigurationParameters;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
-import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
+import megamek.client.generator.skillGenerators.StratConSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
@@ -2040,7 +2040,7 @@ public class AtBDynamicScenarioFactory {
         innerMap.put(Crew.MAP_GIVEN_NAME, crewNameArray[0]);
         innerMap.put(Crew.MAP_SURNAME, crewNameArray[1]);
 
-        final AbstractSkillGenerator skillGenerator = new TaharqaSkillGenerator();
+        final AbstractSkillGenerator skillGenerator = new StratConSkillGenerator();
         skillGenerator.setLevel(skill);
         if (faction.isClan()) {
             skillGenerator.setType(SkillGeneratorType.CLAN);
