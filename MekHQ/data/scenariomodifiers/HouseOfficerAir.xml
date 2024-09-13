@@ -1,39 +1,40 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Your force will be deployed under the command of a house officer. Keep them alive. Additionally, allied command will dictate retreat conditions.</additionalBriefingText>
-	<benefitsPlayer>true</benefitsPlayer>
-	<eventTiming>PreForceGeneration</eventTiming>
-	<forceDefinition>
-		<actualDeploymentZone>-1</actualDeploymentZone>
-		<allowAeroBombs>true</allowAeroBombs>
-		<allowedUnitType>9</allowedUnitType>
-		<arrivalTurn>0</arrivalTurn>
-		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>true</contributesToBV>
-		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>true</contributesToUnitCount>
-		<deployOffboard>false</deployOffboard>
-		<deploymentZones/>
-		<destinationZone>5</destinationZone>
-		<fixedUnitCount>1</fixedUnitCount>
-		<forceAlignment>1</forceAlignment>
-		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>House Officer</forceName>
-		<generationMethod>3</generationMethod>
-		<generationOrder>3</generationOrder>
-		<maxWeightClass>4</maxWeightClass>
-		<retreatThreshold>50</retreatThreshold>
-		<startingAltitude>5</startingAltitude>
-		<syncDeploymentType>SameEdge</syncDeploymentType>
-		<syncedForceName>Player</syncedForceName>
-		<useArtillery>false</useArtillery>
-	</forceDefinition>
+    <additionalBriefingText>Your force will be deployed under the command of a house officer. Keep
+        them alive. Additionally, allied command will dictate retreat conditions.</additionalBriefingText>
+    <benefitsPlayer>true</benefitsPlayer>
+    <eventTiming>PreForceGeneration</eventTiming>
+    <forceDefinition>
+        <actualDeploymentZone>-1</actualDeploymentZone>
+        <allowAeroBombs>true</allowAeroBombs>
+        <allowedUnitType>9</allowedUnitType>
+        <arrivalTurn>0</arrivalTurn>
+        <canReinforceLinked>false</canReinforceLinked>
+        <contributesToBV>true</contributesToBV>
+        <contributesToMapSize>true</contributesToMapSize>
+        <contributesToUnitCount>true</contributesToUnitCount>
+        <deployOffboard>false</deployOffboard>
+        <deploymentZones />
+        <destinationZone>5</destinationZone>
+        <fixedUnitCount>1</fixedUnitCount>
+        <forceAlignment>1</forceAlignment>
+        <forceMultiplier>1.0</forceMultiplier>
+        <forceName>House Officer</forceName>
+        <generationMethod>3</generationMethod>
+        <generationOrder>3</generationOrder>
+        <maxWeightClass>4</maxWeightClass>
+        <retreatThreshold>50</retreatThreshold>
+        <startingAltitude>5</startingAltitude>
+        <syncDeploymentType>SameEdge</syncDeploymentType>
+        <syncedForceName>Player</syncedForceName>
+        <useArtillery>false</useArtillery>
+    </forceDefinition>
 
-	<objectives>
+    <objectives>
         <objective>
             <associatedForceNames>
                 <associatedForceName>House Officer</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -56,13 +57,13 @@
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </objective>
-	<objective>
+        <objective>
             <associatedForceNames>
                 <associatedForceName>House Officer</associatedForceName>
                 <associatedForceName>Player</associatedForceName>
                 <associatedForceName>Allied Force</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -77,7 +78,7 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails />
             <description>Preserve 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
@@ -86,5 +87,5 @@
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </objective>
-        </objectives>
+    </objectives>
 </AtBScenarioModifier>

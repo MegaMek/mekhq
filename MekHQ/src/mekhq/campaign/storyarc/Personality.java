@@ -20,28 +20,35 @@
  */
 package mekhq.campaign.storyarc;
 
-import megamek.common.icons.Portrait;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.awt.*;
+import java.awt.Image;
 import java.io.PrintWriter;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.icons.Portrait;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * The personality class holds information about a personality that may interact with the players during the
- * story arc. This personality may be drawn from the campaign's own personnel, but does not necessarily need to
+ * The personality class holds information about a personality that may interact
+ * with the players during the
+ * story arc. This personality may be drawn from the campaign's own personnel,
+ * but does not necessarily need to
  * do so. So it could be an employer, a liaison, a rival, etc.
- * <p>The Personality class mainly contains a Portrait and a title that is used when displaying story related dialogs
- * associated with the Personality</p>
+ * <p>
+ * The Personality class mainly contains a Portrait and a title that is used
+ * when displaying story related dialogs
+ * associated with the Personality
+ * </p>
  */
 public class Personality {
+    private static final MMLogger logger = MMLogger.create(Personality.class);
 
-    //region Variable Declarations
+    // region Variable Declarations
     /** A name for this personality **/
     private String name;
 
@@ -53,19 +60,20 @@ public class Personality {
     private String title;
 
     /**
-     * optionally a personality can be connected to a Person in the campaign. The personCampaignId identifies
+     * optionally a personality can be connected to a Person in the campaign. The
+     * personCampaignId identifies
      * this person
      */
     private UUID personCampaignId;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public Personality() {
         portrait = new StoryPortrait();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getter/Setters
+    // region Getter/Setters
     public void setTitle(String t) {
         this.title = t;
     }
@@ -97,7 +105,7 @@ public class Personality {
     public Image getImage() {
         return portrait.getBaseImage();
     }
-    //endregion Getter/Setters
+    // endregion Getter/Setters
 
     public void updatePersonalityFromCampaign(Campaign c) {
         if (null == personCampaignId) {
@@ -112,7 +120,7 @@ public class Personality {
         setTitle(p.getFullTitle());
     }
 
-    //region File I/O
+    // region File I/O
     public void writeToXml(PrintWriter pw1, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "personality", "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "id", id);
@@ -145,12 +153,12 @@ public class Personality {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error(ex);
+            logger.error(ex);
         }
 
         return retVal;
     }
 
-    //endregion File I/O
+    // endregion File I/O
 
 }

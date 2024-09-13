@@ -18,13 +18,13 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
-import megamek.common.MechSummary;
+import megamek.common.MekSummary;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.companyGeneration.AtBRandomMechParameters;
+import mekhq.campaign.universe.companyGeneration.AtBRandomMekParameters;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
 import mekhq.campaign.universe.enums.CompanyGenerationMethod;
@@ -44,17 +44,17 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
      * Set based on greater than instead of the greater than or equal to of AtB
      * @param faction the faction to use in generating the commanding officer's rank
      * @param tracker the commanding officer's tracker
-     * @param numMechWarriors the number of MekWarriors in their force, used to determine their rank
+     * @param numMekWarriors the number of MekWarriors in their force, used to determine their rank
      */
     @Override
     protected void generateCommandingOfficerRank(final Faction faction,
                                                  final CompanyGenerationPersonTracker tracker,
-                                                 final int numMechWarriors) {
-        if (numMechWarriors > 36) {
+                                                 final int numMekWarriors) {
+        if (numMekWarriors > 36) {
             tracker.getPerson().setRank(Rank.RWO_MAX + (faction.isComStarOrWoB() ? 7 : 8));
-        } else if (numMechWarriors > 12) {
+        } else if (numMekWarriors > 12) {
             tracker.getPerson().setRank(Rank.RWO_MAX + (faction.isComStarOrWoB() ? 7 : 5));
-        } else if (numMechWarriors > 4) {
+        } else if (numMekWarriors > 4) {
             tracker.getPerson().setRank(Rank.RWO_MAX + 4);
         } else {
             tracker.getPerson().setRank(Rank.RWO_MAX + 3);
@@ -68,12 +68,12 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
      *
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
-     * @param faction the faction to generate the mech from
-     * @return the MechSummary generated from the provided parameters, or null if generation fails
+     * @param faction the faction to generate the mek from
+     * @return the MekSummary generated from the provided parameters, or null if generation fails
      */
     @Override
-    protected @Nullable MechSummary generateMechSummary(final Campaign campaign,
-                                                        final AtBRandomMechParameters parameters,
+    protected @Nullable MekSummary generateMekSummary(final Campaign campaign,
+                                                        final AtBRandomMekParameters parameters,
                                                         final Faction faction) {
         if (parameters.isStarLeague()) {
             if (faction.isClan()) {
@@ -81,11 +81,11 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
                 // the Front Line tables
                 parameters.setQuality((parameters.getQuality() == IUnitRating.DRAGOON_ASTAR)
                         ? IUnitRating.DRAGOON_ASTAR : IUnitRating.DRAGOON_B);
-                return generateMechSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
+                return generateMekSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
-                // Roll on the Star League Royal table if you get a SL mech with A* Rating
+                // Roll on the Star League Royal table if you get a SL mek with A* Rating
                 final String factionCode = (parameters.getQuality() == IUnitRating.DRAGOON_ASTAR) ? "SL.R" : "SL";
-                return generateMechSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
+                return generateMekSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }
         } else {
             // Clan Pilots Generate from 2nd Line (or lesser) Tables (core AtB is just 2nd Line,
@@ -93,7 +93,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
             if (faction.isClan() && (parameters.getQuality() > IUnitRating.DRAGOON_C)) {
                 parameters.setQuality(IUnitRating.DRAGOON_C);
             }
-            return generateMechSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
+            return generateMekSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
         }
     }
     //endregion Units

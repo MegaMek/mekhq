@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.Mech;
+import megamek.common.Mek;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
@@ -75,7 +75,7 @@ public class MissingMekSensor extends MissingPart {
             return null;
         }
         for (int i = 0; i < unit.getEntity().locations(); i++) {
-            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
+            if (unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS, i) > 0) {
                 if (unit.isLocationBreached(i)) {
                     return unit.getEntity().getLocationName(i) + " is breached.";
                 } else if (unit.isLocationDestroyed(i)) {
@@ -94,7 +94,7 @@ public class MissingMekSensor extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (unit != null) {
-            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS);
         }
     }
 
@@ -108,7 +108,7 @@ public class MissingMekSensor extends MissingPart {
         if (unit != null) {
             Entity entity = unit.getEntity();
             for (int i = 0; i < entity.locations(); i++) {
-                if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
+                if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mek.SYSTEM_SENSORS, i) > 0) {
                     return i;
                 }
             }
@@ -123,12 +123,12 @@ public class MissingMekSensor extends MissingPart {
 
     @Override
     public boolean isInLocation(String loc) {
-         if ((unit == null) || (unit.getEntity() == null) || !(unit.getEntity() instanceof Mech)) {
+         if ((unit == null) || (unit.getEntity() == null) || !(unit.getEntity() instanceof Mek)) {
              return false;
-         } else if (unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_HEAD) {
+         } else if (unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_HEAD) {
              return true;
-         } else if (((Mech) unit.getEntity()).getCockpitType() == Mech.COCKPIT_TORSO_MOUNTED) {
-             return unit.getEntity().getLocationFromAbbr(loc) == Mech.LOC_CT;
+         } else if (((Mek) unit.getEntity()).getCockpitType() == Mek.COCKPIT_TORSO_MOUNTED) {
+             return unit.getEntity().getLocationFromAbbr(loc) == Mek.LOC_CT;
          }
          return false;
     }

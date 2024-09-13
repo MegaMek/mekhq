@@ -19,8 +19,6 @@
 package mekhq.campaign.universe;
 
 import mekhq.campaign.universe.FactionBorderTracker.RegionHex;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
@@ -41,7 +39,8 @@ public class FactionBorderTrackerTest {
     private Faction factionUs = createFaction("us", false, false);
     private Faction factionThem = createFaction("them", false, false);
 
-    // Builds a sample universe with a faction "us" with one planet at (0, 0) and faction
+    // Builds a sample universe with a faction "us" with one planet at (0, 0) and
+    // faction
     // "them" with planets on a 4x3 grid with 2 ly distance between adjacent planets
     private FactionBorderTracker buildTestTracker() {
         List<PlanetarySystem> systems = new ArrayList<>();

@@ -45,31 +45,31 @@ public class HangarReport extends AbstractReport {
     public JTree getHangarTree() {
         //region Variable Declarations
         //region BattleMeks
-        int countMechs = 0;
+        int countMeks = 0;
 
-        int countBattleMechs = 0;
-        int superHeavyMech = 0;
-        int assaultMech = 0;
-        int heavyMech = 0;
-        int mediumMech = 0;
-        int lightMech = 0;
-        int ultralightMech = 0;
+        int countBattleMeks = 0;
+        int superHeavyMek = 0;
+        int assaultMek = 0;
+        int heavyMek = 0;
+        int mediumMek = 0;
+        int lightMek = 0;
+        int ultralightMek = 0;
 
-        int countOmniMechs = 0;
-        int superHeavyOmniMech = 0;
-        int assaultOmniMech = 0;
-        int heavyOmniMech = 0;
-        int mediumOmniMech = 0;
-        int lightOmniMech = 0;
-        int ultralightOmniMech = 0;
+        int countOmniMeks = 0;
+        int superHeavyOmniMek = 0;
+        int assaultOmniMek = 0;
+        int heavyOmniMek = 0;
+        int mediumOmniMek = 0;
+        int lightOmniMek = 0;
+        int ultralightOmniMek = 0;
 
-        int countIndustrialMechs = 0;
-        int superHeavyIndustrialMech = 0;
-        int assaultIndustrialMech = 0;
-        int heavyIndustrialMech = 0;
-        int mediumIndustrialMech = 0;
-        int lightIndustrialMech = 0;
-        int ultralightIndustrialMech = 0;
+        int countIndustrialMeks = 0;
+        int superHeavyIndustrialMek = 0;
+        int assaultIndustrialMek = 0;
+        int heavyIndustrialMek = 0;
+        int mediumIndustrialMek = 0;
+        int lightIndustrialMek = 0;
+        int ultralightIndustrialMek = 0;
         //endregion BattleMeks
 
         //region ASF
@@ -348,13 +348,13 @@ public class HangarReport extends AbstractReport {
         // Conventional Fighter
         int countConv = 0;
 
-        //region ProtoMechs
+        //region ProtoMeks
         int countProtos = 0;
         int countAssaultProtos = 0;
         int countHeavyProtos = 0;
         int countMediumProtos = 0;
         int countLightProtos = 0;
-        //endregion ProtoMechs
+        //endregion ProtoMeks
 
         // Turrets
         int countGE = 0;
@@ -384,55 +384,55 @@ public class HangarReport extends AbstractReport {
         DefaultMutableTreeNode top = new DefaultMutableTreeNode(resources.getString("HangarReport.Origin"));
         JTree overviewHangarTree = new JTree(top);
 
-        // Mech Nodes
-        final DefaultMutableTreeNode mechs = new DefaultMutableTreeNode();
+        // Mek Nodes
+        final DefaultMutableTreeNode meks = new DefaultMutableTreeNode();
 
-        DefaultMutableTreeNode battleMechs = new DefaultMutableTreeNode();
-        mechs.add(battleMechs);
-        DefaultMutableTreeNode superHeavyMechs = new DefaultMutableTreeNode();
-        battleMechs.add(superHeavyMechs);
-        DefaultMutableTreeNode assaultMechs = new DefaultMutableTreeNode();
-        battleMechs.add(assaultMechs);
-        DefaultMutableTreeNode heavyMechs = new DefaultMutableTreeNode();
-        battleMechs.add(heavyMechs);
-        DefaultMutableTreeNode mediumMechs = new DefaultMutableTreeNode();
-        battleMechs.add(mediumMechs);
-        DefaultMutableTreeNode lightMechs = new DefaultMutableTreeNode();
-        battleMechs.add(lightMechs);
-        DefaultMutableTreeNode ultralightMechs = new DefaultMutableTreeNode();
-        battleMechs.add(ultralightMechs);
+        DefaultMutableTreeNode battleMeks = new DefaultMutableTreeNode();
+        meks.add(battleMeks);
+        DefaultMutableTreeNode superHeavyMeks = new DefaultMutableTreeNode();
+        battleMeks.add(superHeavyMeks);
+        DefaultMutableTreeNode assaultMeks = new DefaultMutableTreeNode();
+        battleMeks.add(assaultMeks);
+        DefaultMutableTreeNode heavyMeks = new DefaultMutableTreeNode();
+        battleMeks.add(heavyMeks);
+        DefaultMutableTreeNode mediumMeks = new DefaultMutableTreeNode();
+        battleMeks.add(mediumMeks);
+        DefaultMutableTreeNode lightMeks = new DefaultMutableTreeNode();
+        battleMeks.add(lightMeks);
+        DefaultMutableTreeNode ultralightMeks = new DefaultMutableTreeNode();
+        battleMeks.add(ultralightMeks);
 
         DefaultMutableTreeNode omnis = new DefaultMutableTreeNode();
-        mechs.add(omnis);
-        DefaultMutableTreeNode superHeavyOmniMechs = new DefaultMutableTreeNode();
-        omnis.add(superHeavyOmniMechs);
-        DefaultMutableTreeNode assaultOmniMechs = new DefaultMutableTreeNode();
-        omnis.add(assaultOmniMechs);
-        DefaultMutableTreeNode heavyOmniMechs = new DefaultMutableTreeNode();
-        omnis.add(heavyOmniMechs);
-        DefaultMutableTreeNode mediumOmniMechs = new DefaultMutableTreeNode();
-        omnis.add(mediumOmniMechs);
-        DefaultMutableTreeNode lightOmniMechs = new DefaultMutableTreeNode();
-        omnis.add(lightOmniMechs);
-        DefaultMutableTreeNode ultralightOmniMechs = new DefaultMutableTreeNode();
-        omnis.add(ultralightOmniMechs);
+        meks.add(omnis);
+        DefaultMutableTreeNode superHeavyOmniMeks = new DefaultMutableTreeNode();
+        omnis.add(superHeavyOmniMeks);
+        DefaultMutableTreeNode assaultOmniMeks = new DefaultMutableTreeNode();
+        omnis.add(assaultOmniMeks);
+        DefaultMutableTreeNode heavyOmniMeks = new DefaultMutableTreeNode();
+        omnis.add(heavyOmniMeks);
+        DefaultMutableTreeNode mediumOmniMeks = new DefaultMutableTreeNode();
+        omnis.add(mediumOmniMeks);
+        DefaultMutableTreeNode lightOmniMeks = new DefaultMutableTreeNode();
+        omnis.add(lightOmniMeks);
+        DefaultMutableTreeNode ultralightOmniMeks = new DefaultMutableTreeNode();
+        omnis.add(ultralightOmniMeks);
 
-        DefaultMutableTreeNode industrialMechs = new DefaultMutableTreeNode();
-        mechs.add(industrialMechs);
-        DefaultMutableTreeNode superHeavyIndustrialMechs = new DefaultMutableTreeNode();
-        industrialMechs.add(superHeavyIndustrialMechs);
-        DefaultMutableTreeNode assaultIndustrialMechs = new DefaultMutableTreeNode();
-        industrialMechs.add(assaultIndustrialMechs);
-        DefaultMutableTreeNode heavyIndustrialMechs = new DefaultMutableTreeNode();
-        industrialMechs.add(heavyIndustrialMechs);
-        DefaultMutableTreeNode mediumIndustrialMechs = new DefaultMutableTreeNode();
-        industrialMechs.add(mediumIndustrialMechs);
-        DefaultMutableTreeNode lightIndustrialMechs = new DefaultMutableTreeNode();
-        industrialMechs.add(lightIndustrialMechs);
-        DefaultMutableTreeNode ultralightIndustrialMechs = new DefaultMutableTreeNode();
-        industrialMechs.add(ultralightIndustrialMechs);
+        DefaultMutableTreeNode industrialMeks = new DefaultMutableTreeNode();
+        meks.add(industrialMeks);
+        DefaultMutableTreeNode superHeavyIndustrialMeks = new DefaultMutableTreeNode();
+        industrialMeks.add(superHeavyIndustrialMeks);
+        DefaultMutableTreeNode assaultIndustrialMeks = new DefaultMutableTreeNode();
+        industrialMeks.add(assaultIndustrialMeks);
+        DefaultMutableTreeNode heavyIndustrialMeks = new DefaultMutableTreeNode();
+        industrialMeks.add(heavyIndustrialMeks);
+        DefaultMutableTreeNode mediumIndustrialMeks = new DefaultMutableTreeNode();
+        industrialMeks.add(mediumIndustrialMeks);
+        DefaultMutableTreeNode lightIndustrialMeks = new DefaultMutableTreeNode();
+        industrialMeks.add(lightIndustrialMeks);
+        DefaultMutableTreeNode ultralightIndustrialMeks = new DefaultMutableTreeNode();
+        industrialMeks.add(ultralightIndustrialMeks);
 
-        top.add(mechs);
+        top.add(meks);
 
         // ASF Nodes
         final DefaultMutableTreeNode ASF = new DefaultMutableTreeNode();
@@ -934,7 +934,7 @@ public class HangarReport extends AbstractReport {
 
         top.add(conv);
 
-        // ProtoMechs
+        // ProtoMeks
         final DefaultMutableTreeNode protos = new DefaultMutableTreeNode();
         DefaultMutableTreeNode pAssault = new DefaultMutableTreeNode();
         protos.add(pAssault);
@@ -993,90 +993,90 @@ public class HangarReport extends AbstractReport {
             Entity e = u.getEntity();
 
             // Determine what type of unit, and add it to the proper subtree
-            if (e instanceof Mech) {
-                countMechs++;
-                if (((Mech) e).isIndustrial()) {
-                    countIndustrialMechs++;
+            if (e instanceof Mek) {
+                countMeks++;
+                if (((Mek) e).isIndustrial()) {
+                    countIndustrialMeks++;
                     switch (e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_SUPER_HEAVY:
-                            superHeavyIndustrialMech++;
-                            superHeavyIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            superHeavyIndustrialMek++;
+                            superHeavyIndustrialMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ASSAULT:
-                            assaultIndustrialMech++;
-                            assaultIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            assaultIndustrialMek++;
+                            assaultIndustrialMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_HEAVY:
-                            heavyIndustrialMech++;
-                            heavyIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            heavyIndustrialMek++;
+                            heavyIndustrialMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_MEDIUM:
-                            mediumIndustrialMech++;
-                            mediumIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            mediumIndustrialMek++;
+                            mediumIndustrialMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_LIGHT:
-                            lightIndustrialMech++;
-                            lightIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            lightIndustrialMek++;
+                            lightIndustrialMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
-                            ultralightIndustrialMech++;
-                            ultralightIndustrialMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            ultralightIndustrialMek++;
+                            ultralightIndustrialMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                     }
                 } else if (e.isOmni()) {
-                    countOmniMechs++;
+                    countOmniMeks++;
                     switch (e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_SUPER_HEAVY:
-                            superHeavyOmniMech++;
-                            superHeavyOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            superHeavyOmniMek++;
+                            superHeavyOmniMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ASSAULT:
-                            assaultOmniMech++;
-                            assaultOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            assaultOmniMek++;
+                            assaultOmniMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_HEAVY:
-                            heavyOmniMech++;
-                            heavyOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            heavyOmniMek++;
+                            heavyOmniMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_MEDIUM:
-                            mediumOmniMech++;
-                            mediumOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            mediumOmniMek++;
+                            mediumOmniMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_LIGHT:
-                            lightOmniMech++;
-                            lightOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            lightOmniMek++;
+                            lightOmniMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
-                            ultralightOmniMech++;
-                            ultralightOmniMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            ultralightOmniMek++;
+                            ultralightOmniMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                     }
                 } else {
-                    countBattleMechs++;
+                    countBattleMeks++;
                     switch (e.getWeightClass()) {
                         case EntityWeightClass.WEIGHT_SUPER_HEAVY:
-                            superHeavyMech++;
-                            superHeavyMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            superHeavyMek++;
+                            superHeavyMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ASSAULT:
-                            assaultMech++;
-                            assaultMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            assaultMek++;
+                            assaultMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_HEAVY:
-                            heavyMech++;
-                            heavyMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            heavyMek++;
+                            heavyMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_MEDIUM:
-                            mediumMech++;
-                            mediumMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            mediumMek++;
+                            mediumMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_LIGHT:
-                            lightMech++;
-                            lightMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            lightMek++;
+                            lightMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                         case EntityWeightClass.WEIGHT_ULTRA_LIGHT:
-                            ultralightMech++;
-                            ultralightMechs.add(new DefaultMutableTreeNode(createNodeName(u)));
+                            ultralightMek++;
+                            ultralightMeks.add(new DefaultMutableTreeNode(createNodeName(u)));
                             break;
                     }
                 }
@@ -1586,7 +1586,7 @@ public class HangarReport extends AbstractReport {
                             break;
                     }
                 }
-            } else if (e instanceof Protomech) {
+            } else if (e instanceof ProtoMek) {
                 countProtos++;
                 switch (e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_ASSAULT:
@@ -1998,32 +1998,32 @@ public class HangarReport extends AbstractReport {
         //endregion UnitList Processing
 
         //region Tree Description Assignment
-        // Mech Nodes
-        mechs.setUserObject(resources.getString("HangarReport.Mechs") + " " + countMechs);
+        // Mek Nodes
+        meks.setUserObject(resources.getString("HangarReport.Meks") + " " + countMeks);
 
-        battleMechs.setUserObject(resources.getString("HangarReport.BattleMechs") + " " + countBattleMechs);
-        superHeavyMechs.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + superHeavyMech);
-        assaultMechs.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultMech);
-        heavyMechs.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyMech);
-        mediumMechs.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumMech);
-        lightMechs.setUserObject(resources.getString("HangarReport.Light") + " " + lightMech);
-        ultralightMechs.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightMech);
+        battleMeks.setUserObject(resources.getString("HangarReport.BattleMeks") + " " + countBattleMeks);
+        superHeavyMeks.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + superHeavyMek);
+        assaultMeks.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultMek);
+        heavyMeks.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyMek);
+        mediumMeks.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumMek);
+        lightMeks.setUserObject(resources.getString("HangarReport.Light") + " " + lightMek);
+        ultralightMeks.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightMek);
 
-        omnis.setUserObject(resources.getString("HangarReport.OmniMechs") + " " + countOmniMechs);
-        superHeavyOmniMechs.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + superHeavyOmniMech);
-        assaultOmniMechs.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultOmniMech);
-        heavyOmniMechs.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyOmniMech);
-        mediumOmniMechs.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumOmniMech);
-        lightOmniMechs.setUserObject(resources.getString("HangarReport.Light") + " " + lightOmniMech);
-        ultralightOmniMechs.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightOmniMech);
+        omnis.setUserObject(resources.getString("HangarReport.OmniMeks") + " " + countOmniMeks);
+        superHeavyOmniMeks.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + superHeavyOmniMek);
+        assaultOmniMeks.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultOmniMek);
+        heavyOmniMeks.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyOmniMek);
+        mediumOmniMeks.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumOmniMek);
+        lightOmniMeks.setUserObject(resources.getString("HangarReport.Light") + " " + lightOmniMek);
+        ultralightOmniMeks.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightOmniMek);
 
-        industrialMechs.setUserObject(resources.getString("HangarReport.IndustrialMechs") + " " + countIndustrialMechs);
-        superHeavyIndustrialMechs.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + superHeavyIndustrialMech);
-        assaultIndustrialMechs.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultIndustrialMech);
-        heavyIndustrialMechs.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyIndustrialMech);
-        mediumIndustrialMechs.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumIndustrialMech);
-        lightIndustrialMechs.setUserObject(resources.getString("HangarReport.Light") + " " + lightIndustrialMech);
-        ultralightIndustrialMechs.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightIndustrialMech);
+        industrialMeks.setUserObject(resources.getString("HangarReport.IndustrialMeks") + " " + countIndustrialMeks);
+        superHeavyIndustrialMeks.setUserObject(resources.getString("HangarReport.SuperHeavy") + " " + superHeavyIndustrialMek);
+        assaultIndustrialMeks.setUserObject(resources.getString("HangarReport.Assault") + " " + assaultIndustrialMek);
+        heavyIndustrialMeks.setUserObject(resources.getString("HangarReport.Heavy") + " " + heavyIndustrialMek);
+        mediumIndustrialMeks.setUserObject(resources.getString("HangarReport.Medium") + " " + mediumIndustrialMek);
+        lightIndustrialMeks.setUserObject(resources.getString("HangarReport.Light") + " " + lightIndustrialMek);
+        ultralightIndustrialMeks.setUserObject(resources.getString("HangarReport.Ultralight") + " " + ultralightIndustrialMek);
 
         // ASF Nodes
         ASF.setUserObject(resources.getString("HangarReport.AerospaceFighters") + " " + countASF);
@@ -2304,8 +2304,8 @@ public class HangarReport extends AbstractReport {
         // Conventional Fighters
         conv.setUserObject(resources.getString("HangarReport.ConventionalFighters") + " " + countConv);
 
-        // ProtoMechs
-        protos.setUserObject(resources.getString("HangarReport.ProtoMechs") + " " + countProtos);
+        // ProtoMeks
+        protos.setUserObject(resources.getString("HangarReport.ProtoMeks") + " " + countProtos);
         pAssault.setUserObject(resources.getString("HangarReport.Assault") + " " + countAssaultProtos);
         pHeavy.setUserObject(resources.getString("HangarReport.Heavy") + " " + countHeavyProtos);
         pMedium.setUserObject(resources.getString("HangarReport.Medium") + " " + countMediumProtos);

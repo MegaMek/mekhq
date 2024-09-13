@@ -2,9 +2,10 @@
 <ScenarioTemplate>
     <name>Diversion - Heavy</name>
     <shortBriefing>Hostile force </shortBriefing>
-    <detailedBriefing>A hostile force is attempting to delay your force from its objective. Destroy or bypass them quickly.</detailedBriefing>
+    <detailedBriefing>A hostile force is attempting to delay your force from its objective. Destroy
+        or bypass them quickly.</detailedBriefing>
     <mapParameters>
-        <allowedTerrainTypes/>
+        <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
@@ -59,7 +60,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -82,7 +83,7 @@
             <associatedForceNames>
                 <associatedForceName>Primary Opfor</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -97,7 +98,7 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails />
             <description>Destroy or rout 50% of the following enemy force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
@@ -110,7 +111,7 @@
             <associatedForceNames>
                 <associatedForceName>Player</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -128,7 +129,8 @@
             <additionalDetails>
                 <additionalDetail>Crippled units do not count towards this objective.</additionalDetail>
             </additionalDetails>
-            <description>Move at least 50% of the following force(s) and unit(s) to the destination edge and leave the battlefield:</description>
+            <description>Move at least 50% of the following force(s) and unit(s) to the destination
+                edge and leave the battlefield:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ReachMapEdge</objectiveCriterion>
             <percentage>50</percentage>

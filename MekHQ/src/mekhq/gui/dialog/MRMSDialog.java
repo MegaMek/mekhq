@@ -18,9 +18,31 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -38,28 +60,19 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.service.mrms.MRMSConfiguredOptions;
 import mekhq.service.enums.MRMSMode;
+import mekhq.service.mrms.MRMSConfiguredOptions;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.service.mrms.MRMSService;
 import mekhq.service.mrms.MRMSService.MRMSPartSet;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.*;
 
 /**
  * @author Kipsta
  */
 public class MRMSDialog extends JDialog {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(MRMSDialog.class);
+
+    // region Variable Declarations
     private final JFrame frame;
     private CampaignGUI campaignGUI;
     private CampaignOptions campaignOptions;
@@ -100,16 +113,16 @@ public class MRMSDialog extends JDialog {
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle(
             "mekhq.resources.MRMS", MekHQ.getMHQOptions().getLocale());
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public MRMSDialog(final JFrame frame, final boolean modal, final CampaignGUI campaignGUI,
-                      final MRMSMode mode) {
+            final MRMSMode mode) {
         this(frame, modal, campaignGUI, null, mode);
     }
 
     public MRMSDialog(final JFrame frame, final boolean modal, final CampaignGUI campaignGUI,
-                      final Unit selectedUnit, final MRMSMode mode) {
+            final Unit selectedUnit, final MRMSMode mode) {
         super(frame, modal);
         this.frame = frame;
         this.campaignGUI = campaignGUI;
@@ -148,12 +161,12 @@ public class MRMSDialog extends JDialog {
         setLocationRelativeTo(frame);
         setUserPreferences();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Initialization
-    //endregion Initialization
+    // region Initialization
+    // endregion Initialization
 
-    //region Getters and Setters
+    // region Getters and Setters
     public MRMSMode getMode() {
         return mode;
     }
@@ -161,7 +174,7 @@ public class MRMSDialog extends JDialog {
     public Map<PartRepairType, MRMSOptionControl> getMRMSOptionControls() {
         return mrmsOptionControls;
     }
-    //endregion Getters and Setters
+    // endregion Getters and Setters
 
     private void filterUnits(MRMSConfiguredOptions configuredOptions) {
         // Store selections so after the table is refreshed we can re-select them
@@ -548,7 +561,7 @@ public class MRMSDialog extends JDialog {
 
         mrmsOptionControls.put(PartRepairType.WEAPON,
                 createMRMSOptionControls(PartRepairType.WEAPON,
-                   "mrmsItemWeapons.text", "mrmsItemWeapons.toolTipText",
+                        "mrmsItemWeapons.text", "mrmsItemWeapons.toolTipText",
                         "mrmsItemWeapons", pnlItems, gridRowIdx++));
         mrmsOptionControls.put(PartRepairType.GENERAL_LOCATION,
                 createMRMSOptionControls(PartRepairType.GENERAL_LOCATION,
@@ -583,8 +596,8 @@ public class MRMSDialog extends JDialog {
     }
 
     private MRMSOptionControl createMRMSOptionControls(PartRepairType type, String text, String tooltipText,
-                                                       String activeBoxName, JPanel pnlItems,
-                                                       int rowIdx) {
+            String activeBoxName, JPanel pnlItems,
+            int rowIdx) {
         MRMSOption mrmsOption = campaignOptions.getMRMSOptions().stream()
                 .filter(option -> option.getType() == type)
                 .findFirst()
@@ -622,7 +635,7 @@ public class MRMSDialog extends JDialog {
     }
 
     private JSpinner createMRMSSkillBTHSpinner(int selectedValue, boolean enabled,
-                                               JPanel pnlItems, int rowIdx, int columnIdx) {
+            JPanel pnlItems, int rowIdx, int columnIdx) {
         JSpinner skillBTHSpn = new JSpinner(new SpinnerNumberModel(selectedValue, 1, 12, 1));
         ((DefaultEditor) skillBTHSpn.getEditor()).getTextField().setEditable(false);
         skillBTHSpn.setEnabled(enabled);
@@ -640,7 +653,7 @@ public class MRMSDialog extends JDialog {
     }
 
     private JComboBox<String> createMRMSSkillCBox(int selectedValue, boolean enabled,
-                                                  JPanel pnlItems, int rowIdx, int columnIdx) {
+            JPanel pnlItems, int rowIdx, int columnIdx) {
         DefaultComboBoxModel<String> skillModel = new DefaultComboBoxModel<>();
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ULTRA_GREEN));
         skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_GREEN));
@@ -663,8 +676,8 @@ public class MRMSDialog extends JDialog {
     }
 
     private JCheckBox createMRMSOptionItemBox(String text, String toolTipText, String name,
-                                              boolean selected, JPanel pnlItems, int rowIdx,
-                                              int columnIdx) {
+            boolean selected, JPanel pnlItems, int rowIdx,
+            int columnIdx) {
         JCheckBox optionItemBox = new JCheckBox();
         optionItemBox.setText(resources.getString(text));
         optionItemBox.setToolTipText(resources.getString(toolTipText));
@@ -722,7 +735,6 @@ public class MRMSDialog extends JDialog {
         gridBagConstraints.gridx = btnIdx++;
         pnlButtons.add(btnSelectAssigned, gridBagConstraints);
 
-
         btnSelectUnassigned = new JButton(resources.getString("btnSelectUnassigned.text"));
         btnSelectUnassigned.setToolTipText(resources.getString("btnSelectUnassigned.toolTipText"));
         btnSelectUnassigned.setName("btnSelectUnassigned");
@@ -731,16 +743,20 @@ public class MRMSDialog extends JDialog {
         pnlButtons.add(btnSelectUnassigned, gridBagConstraints);
 
         JButton btnHideUnits = new JButton(resources.getString(pnlUnits.isVisible()
-                ? "btnHideUnits.Hide.text" : "btnHideUnits.Show.text"));
+                ? "btnHideUnits.Hide.text"
+                : "btnHideUnits.Show.text"));
         btnHideUnits.setToolTipText(resources.getString(pnlUnits.isVisible()
-                ? "btnHideUnits.Hide.toolTipText" : "btnHideUnits.Show.toolTipText"));
+                ? "btnHideUnits.Hide.toolTipText"
+                : "btnHideUnits.Show.toolTipText"));
         btnHideUnits.setName("btnHideUnits");
         btnHideUnits.addActionListener(evt -> {
             pnlUnits.setVisible(!pnlUnits.isVisible());
             btnHideUnits.setText(resources.getString(pnlUnits.isVisible()
-                    ? "btnHideUnits.Hide.text" : "btnHideUnits.Show.text"));
+                    ? "btnHideUnits.Hide.text"
+                    : "btnHideUnits.Show.text"));
             btnHideUnits.setToolTipText(resources.getString(pnlUnits.isVisible()
-                    ? "btnHideUnits.Hide.toolTipText" : "btnHideUnits.Show.toolTipText"));
+                    ? "btnHideUnits.Hide.toolTipText"
+                    : "btnHideUnits.Show.toolTipText"));
             this.pack();
         });
         gridBagConstraints.gridx = btnIdx++;
@@ -810,16 +826,20 @@ public class MRMSDialog extends JDialog {
         pnlButtons.add(btnSelectAllParts, gridBagConstraints);
 
         JButton btnHideParts = new JButton(resources.getString(pnlParts.isVisible()
-                ? "btnHideParts.Hide.text" : "btnHideParts.Show.text"));
+                ? "btnHideParts.Hide.text"
+                : "btnHideParts.Show.text"));
         btnHideParts.setToolTipText(resources.getString(pnlParts.isVisible()
-                ? "btnHideParts.Hide.toolTipText" : "btnHideParts.Show.toolTipText"));
+                ? "btnHideParts.Hide.toolTipText"
+                : "btnHideParts.Show.toolTipText"));
         btnHideParts.setName("btnHideParts");
         btnHideParts.addActionListener(evt -> {
             pnlParts.setVisible(!pnlParts.isVisible());
             btnHideParts.setText(resources.getString(pnlParts.isVisible()
-                    ? "btnHideParts.Hide.text" : "btnHideParts.Show.text"));
+                    ? "btnHideParts.Hide.text"
+                    : "btnHideParts.Show.text"));
             btnHideParts.setToolTipText(resources.getString(pnlParts.isVisible()
-                    ? "btnHideParts.Hide.toolTipText" : "btnHideParts.Show.toolTipText"));
+                    ? "btnHideParts.Hide.toolTipText"
+                    : "btnHideParts.Show.toolTipText"));
             this.pack();
         });
         gridBagConstraints.gridx = btnIdx++;
@@ -973,7 +993,8 @@ public class MRMSDialog extends JDialog {
             if (partSet.isHasRepairs()) {
                 int count = partSet.countRepairs();
                 msg += MessageFormat.format(resources.getString((count == 1)
-                        ? "Completed.repairCount.text" : "Completed.repairCountPlural.text"), count);
+                        ? "Completed.repairCount.text"
+                        : "Completed.repairCountPlural.text"), count);
             }
 
             filterCompletePartsList(true);
@@ -993,7 +1014,7 @@ public class MRMSDialog extends JDialog {
         this.setVisible(false);
     }
 
-    //region Campaign Options
+    // region Campaign Options
     private void refreshOptions() {
         getUseRepairBox().setSelected(campaignOptions.isMRMSUseRepair());
         getUseSalvageBox().setSelected(campaignOptions.isMRMSUseSalvage());
@@ -1030,8 +1051,10 @@ public class MRMSDialog extends JDialog {
                 continue;
             }
             MRMSOption mrmsOption = new MRMSOption(partRepairType, mrmsOptionControl.getActiveBox().isSelected(),
-                    mrmsOptionControl.getMinSkillCBox().getSelectedIndex(), mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
-                    (Integer) mrmsOptionControl.getMinBTHSpn().getValue(), (Integer) mrmsOptionControl.getMaxBTHSpn().getValue());
+                    mrmsOptionControl.getMinSkillCBox().getSelectedIndex(),
+                    mrmsOptionControl.getMaxSkillCBox().getSelectedIndex(),
+                    (Integer) mrmsOptionControl.getMinBTHSpn().getValue(),
+                    (Integer) mrmsOptionControl.getMaxBTHSpn().getValue());
 
             campaignOptions.addMRMSOption(mrmsOption);
         }
@@ -1043,7 +1066,7 @@ public class MRMSDialog extends JDialog {
                 resources.getString("DefaultOptionsSaved.title"),
                 JOptionPane.INFORMATION_MESSAGE);
     }
-    //endregion Campaign Options
+    // endregion Campaign Options
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
@@ -1052,7 +1075,7 @@ public class MRMSDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 

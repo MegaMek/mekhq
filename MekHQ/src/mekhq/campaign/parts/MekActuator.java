@@ -74,7 +74,7 @@ public class MekActuator extends Part {
     public MekActuator(int tonnage, int type, int loc, Campaign c) {
         super(tonnage, c);
         this.type = type;
-        Mech m = new BipedMech();
+        Mek m = new BipedMek();
         this.name = m.getSystemName(type) + " Actuator";
         this.location = loc;
     }
@@ -90,24 +90,24 @@ public class MekActuator extends Part {
     public Money getStickerPrice() {
         double unitCost = 0;
         switch (getType()) {
-            case Mech.ACTUATOR_UPPER_ARM:
+            case Mek.ACTUATOR_UPPER_ARM:
                 unitCost = 100;
                 break;
-            case Mech.ACTUATOR_LOWER_ARM:
+            case Mek.ACTUATOR_LOWER_ARM:
                 unitCost = 50;
                 break;
-            case Mech.ACTUATOR_HAND:
-            case Mech.ACTUATOR_LOWER_LEG:
+            case Mek.ACTUATOR_HAND:
+            case Mek.ACTUATOR_LOWER_LEG:
                 unitCost = 80;
                 break;
-            case Mech.ACTUATOR_UPPER_LEG:
+            case Mek.ACTUATOR_UPPER_LEG:
                 unitCost = 150;
                 break;
-            case Mech.ACTUATOR_FOOT:
+            case Mek.ACTUATOR_FOOT:
                 unitCost = 120;
                 break;
-            case Mech.ACTUATOR_HIP:
-            case Mech.ACTUATOR_SHOULDER:
+            case Mek.ACTUATOR_HIP:
+            case Mek.ACTUATOR_SHOULDER:
                 unitCost = 0;
                 break;
         }
@@ -290,12 +290,12 @@ public class MekActuator extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECH);
+        return skillType.equals(SkillType.S_TECH_MEK);
     }
 
     @Override
     public boolean isOmniPoddable() {
-        return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
+        return type == Mek.ACTUATOR_LOWER_ARM || type == Mek.ACTUATOR_HAND;
     }
 
     @Override

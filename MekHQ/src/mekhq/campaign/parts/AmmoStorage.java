@@ -20,11 +20,18 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.Objects;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.AmmoType;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -33,20 +40,17 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.Objects;
 
 /**
  * This will be a special type of part that will only exist as spares
  * It will determine the amount of ammo of a particular type that
  * is available
+ * 
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
+    private static final MMLogger logger = MMLogger.create(AmmoStorage.class);
+
     protected int shots;
 
     public AmmoStorage() {
@@ -75,21 +79,21 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         if (getType().getKgPerShot() > 0) {
             return getType().getKgPerShot() * (shots / 1000.0);
         }
-         return ((double) shots / getType().getShots());
+        return ((double) shots / getType().getShots());
     }
 
     @Override
     public Money getStickerPrice() {
         // CAW: previously we went thru AmmoType::getCost, which
-        //      for AmmoType was the default implementation
-        //      that simply returned 'cost'. Avoid the hassle for
-        //      now and just return the raw cost as our sticker price.
+        // for AmmoType was the default implementation
+        // that simply returned 'cost'. Avoid the hassle for
+        // now and just return the raw cost as our sticker price.
         //
-        //      We should revisit this if you can ever have ammo that
-        //      should be sold for more based on the unit which carries
-        //      it, or which location the ammo is stored in, or if
-        //      the unit which carries the ammo does so in an armored
-        //      location... but I don't think that's likely.
+        // We should revisit this if you can ever have ammo that
+        // should be sold for more based on the unit which carries
+        // it, or which location the ammo is stored in, or if
+        // the unit which carries the ammo does so in an armored
+        // location... but I don't think that's likely.
         return Money.of(getType().getRawCost());
     }
 
@@ -121,17 +125,19 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     /**
      * Gets a value indicating whether or an {@code AmmoType} is
      * the same as this instance's ammo.
+     * 
      * @param otherAmmoType The other {@code AmmoType}.
      */
     public boolean isSameAmmoType(AmmoType otherAmmoType) {
         return getType().equalsAmmoTypeOnly(otherAmmoType)
-            && (getType().getMunitionType().equals(otherAmmoType.getMunitionType()))
-            && (getType().getRackSize() == otherAmmoType.getRackSize());
+                && (getType().getMunitionType().equals(otherAmmoType.getMunitionType()))
+                && (getType().getRackSize() == otherAmmoType.getRackSize());
     }
 
     /**
      * Gets a value indicating whether or not an {@code AmmoType}
      * is compatible with this instance's ammo.
+     * 
      * @param otherAmmoType The other {@code AmmoType}.
      */
     public boolean isCompatibleAmmo(AmmoType otherAmmoType) {
@@ -167,7 +173,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                     shots = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
 
@@ -181,12 +187,12 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public void fix() {
-        //nothing to fix
+        // nothing to fix
     }
 
     @Override
     public MissingEquipmentPart getMissingPart() {
-        //nothing to do here
+        // nothing to do here
         return null;
     }
 
@@ -197,18 +203,18 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public TargetRoll getAllMods(Person tech) {
-        //nothing to do here
+        // nothing to do here
         return null;
     }
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        //nothing to do here
+        // nothing to do here
     }
 
     @Override
     public void updateConditionFromPart() {
-        //nothing to do here
+        // nothing to do here
     }
 
     @Override
@@ -252,9 +258,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+                    + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                    + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
 
@@ -265,7 +273,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> part not found</b>.</font>";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                + "'><b> part not found</b>.</font>";
     }
 
     @Override
@@ -320,7 +329,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         } else if (campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
-        //availability mod
+        // availability mod
         int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");

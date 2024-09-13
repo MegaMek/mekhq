@@ -20,22 +20,24 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
+import java.awt.Image;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.UUID;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.Personality;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.StorySplash;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.awt.*;
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.UUID;
 
 public abstract class DialogStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(DialogStoryPoint.class);
 
     /** A StorySplash image to display in a dialog. It can return a null image */
     private StorySplash storySplash;
@@ -50,9 +52,8 @@ public abstract class DialogStoryPoint extends StoryPoint {
         storySplash = new StorySplash();
     }
 
-
     public Image getImage() {
-        if(storySplash.isDefault()) {
+        if (storySplash.isDefault()) {
             return null;
         }
         return storySplash.getImage();
@@ -60,7 +61,9 @@ public abstract class DialogStoryPoint extends StoryPoint {
 
     /**
      * Get the {@link Personality Personality} associated with this StoryPoint.
-     * @return A {@link Personality Personality} or null if no Personality is associated with the StoryPoint.
+     * 
+     * @return A {@link Personality Personality} or null if no Personality is
+     *         associated with the StoryPoint.
      */
     public Personality getPersonality() {
         if (null == personalityId) {
@@ -89,7 +92,7 @@ public abstract class DialogStoryPoint extends StoryPoint {
                     storySplash = StorySplash.parseFromXML(wn2);
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

@@ -18,19 +18,6 @@
  */
 package mekhq.campaign.universe;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import megamek.codeUtilities.StringUtility;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -38,13 +25,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import megamek.codeUtilities.StringUtility;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * Instead of making this a static like Planets, we are just going to reload a years
- * worth of news items at the start of every year, to cut down on memory usage. If this
+ * Instead of making this a static like Planets, we are just going to reload a
+ * years
+ * worth of news items at the start of every year, to cut down on memory usage.
+ * If this
  * slows things down too much on year turn over we can reconsider
+ * 
  * @author Jay Lawson
  */
 public class News {
+    private static final MMLogger logger = MMLogger.create(News.class);
+
     private final static Object LOADING_LOCK = new Object[0];
 
     // Marshaller / unmarshaller instances
@@ -58,13 +65,14 @@ public class News {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             unmarshaller = context.createUnmarshaller();
             // For debugging only!
-            //unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
+            // unmarshaller.setEventHandler(new
+            // javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
-    //we need two hashes - one to access by date and the other by an id
+    // we need two hashes - one to access by date and the other by an id
     private Map<LocalDate, List<NewsItem>> archive;
     private Map<Integer, NewsItem> news;
 
@@ -92,7 +100,7 @@ public class News {
             archive = new HashMap<>();
             news = new HashMap<>();
             int id = 0;
-            LogManager.getLogger().debug("Starting load of news data for " + year + " from XML...");
+            logger.debug("Starting load of news data for " + year + " from XML...");
 
             // Initialize variables.
             Document xmlDoc;
@@ -104,7 +112,7 @@ public class News {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
                 return;
             }
 
@@ -112,7 +120,7 @@ public class News {
             NodeList nl = newsEle.getChildNodes();
 
             // Get rid of empty text nodes and adjacent text nodes...
-            // Stupid weird parsing of XML.  At least this cleans it up.
+            // Stupid weird parsing of XML. At least this cleans it up.
             newsEle.normalize();
 
             // Okay, lets iterate through the children, eh?
@@ -137,17 +145,17 @@ public class News {
                         try {
                             newsItem = (NewsItem) unmarshaller.unmarshal(wn);
                         } catch (JAXBException e) {
-                            LogManager.getLogger().error("", e);
+                            logger.error("", e);
                             continue;
                         }
                         if (StringUtility.isNullOrBlank(newsItem.getHeadline())) {
-                            LogManager.getLogger().error("Null or empty headline for a news item");
+                            logger.error("Null or empty headline for a news item");
                             continue;
                         } else if (null == newsItem.getDate()) {
-                            LogManager.getLogger().error("The date is null for news Item " + newsItem.getHeadline());
+                            logger.error("The date is null for news Item " + newsItem.getHeadline());
                             continue;
                         } else if (StringUtility.isNullOrBlank(newsItem.getDescription())) {
-                            LogManager.getLogger().error("Null or empty headline for a news item");
+                            logger.error("Null or empty headline for a news item");
                             continue;
                         } else if (!newsItem.isInYear(year)) {
                             continue;
@@ -166,7 +174,7 @@ public class News {
                     }
                 }
             }
-            LogManager.getLogger().debug("Loaded " + archive.size() + " days of news items for " + year);
+            logger.debug("Loaded " + archive.size() + " days of news items for " + year);
         }
     }
 }

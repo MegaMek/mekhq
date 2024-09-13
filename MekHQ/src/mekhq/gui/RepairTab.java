@@ -18,12 +18,37 @@
  */
 package mekhq.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import javax.swing.text.DefaultCaret;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.MechView;
+import megamek.common.MekView;
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.parts.Part;
@@ -45,30 +70,16 @@ import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
+import mekhq.service.PartsAcquisitionService;
 import mekhq.service.enums.MRMSMode;
 import mekhq.service.mrms.MRMSService;
-import mekhq.service.PartsAcquisitionService;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import javax.swing.text.DefaultCaret;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
-import java.awt.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.List;
-import java.util.*;
 
 /**
  * Shows damaged units and controls for repair.
  */
 public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
+    private static final MMLogger logger = MMLogger.create(RepairTab.class);
+
     private JPanel panDoTask;
     private JPanel panDoTaskText;
     private JSplitPane splitServicedUnits;
@@ -102,13 +113,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private Person selectedTech = getSelectedTech();
     private boolean ignoreUnitTable = false; // Used to disable selection listener while data is updated.
 
-    //region Constructors
+    // region Constructors
     public RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
     }
-    //endregion Constructors
+    // endregion Constructors
 
     /*
      * (non-Javadoc)
@@ -137,7 +148,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         });
 
         JButton btnMRMSInstantAll = new JButton("Instant Mass Repair/Salvage All");
-        btnMRMSInstantAll.setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
+        btnMRMSInstantAll
+                .setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
         btnMRMSInstantAll.setName("btnMRMSInstantAll");
         btnMRMSInstantAll.addActionListener(evt -> {
             MRMSService.mrmsAllUnits(getCampaign());
@@ -442,7 +454,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             servicedUnitTable.setName("serviceUnitsTable");
             preferences.manage(new JTablePreference(servicedUnitTable));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -552,9 +564,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (selected > -1) {
             Unit unit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(selected));
             if (null != unit) {
-                MechView mv = new MechView(unit.getEntity(), true, true);
-                txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic()
-                        + "<br>" + mv.getMechReadoutLoadout() + "</div>");
+                MekView mv = new MekView(unit.getEntity(), true, true);
+                txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMekReadoutBasic()
+                        + "<br>" + mv.getMekReadoutLoadout() + "</div>");
                 SwingUtilities.invokeLater(() -> scrollServicedUnitView.getVerticalScrollBar().setValue(0));
                 if (!unit.equals(selectedUnit)) {
                     choiceLocation.setSelectedIndex(0);
@@ -732,6 +744,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     /**
      * Focuses on the unit with the given ID if it exists.
+     * 
      * @param id The unique identifier of the unit.
      * @return A value indicating whether or not the unit was focused.
      */
@@ -816,7 +829,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     public void refreshTechsList() {
         int selected = techTable.getSelectedRow();
-        // The next gets all techs who have more than 0 minutes free, and sorted by skill descending (elites at bottom)
+        // The next gets all techs who have more than 0 minutes free, and sorted by
+        // skill descending (elites at bottom)
         List<Person> techs = getCampaign().getTechs(true);
         techsModel.setData(techs);
         filterTechs();

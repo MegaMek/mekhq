@@ -5,13 +5,13 @@ BASICS AND SETUP
 ============
 **** Double check your Java version!  You need 11 or 17 to play MHQ!  Any version after version 50.00, you must have Java 17.  This is a common source of issues.  Check the discord for detailed Java install instructions and general questions about the suite.  https://discord.gg/megamek
 
-**** If you dont have them, buy at least Battlemech Manual, or Total Warfare and Campaign Operations.  PDF versions are available online if you dont have the physical books.
+**** If you don't have them, buy at least Battlemech Manual, or Total Warfare and Campaign Operations.  PDF versions are available online if you don't have the physical books.
 
 **** Before you start StratCon, you should read the Official AtB TT Rules xcel spreadsheet "Campaign System" Tab and CampaignAnon's Against the Bot Starter Guide pdf.  They are located in the docs folder.  StratCon is a an extra layer on top of the AtB rules, and by learning those you will be learning the foundations of StratCon.
 
-Summary:   StratCon is a system that simulates different theaters of operation on a planetary scale, broken down into "tracks" that each have a different size and, perhaps, biomes, temperatures and allied or enemy facilities. In practice, it generates more random and less predictable circumstances that lead to a more dynamic, (and replayable) experience.  
+Summary:   StratCon is a system that simulates different theaters of operation on a planetary scale, broken down into "tracks" that each have a different size and, perhaps, biomes, temperatures and allied or enemy facilities. In practice, it generates more random and less predictable circumstances that lead to a more dynamic, (and replayable) experience.
 
-Different contract types have different scenario types.  Different contract clauses have different command rights and will greatly influence how allies and enemies are generated.  Allies and Enemies can have different Skill and Equipement Quality levels.  Allied and Enemy Facilities can contribute certain positive and negative modifiers to each battle.  Random Positive and Negative modifiers can also be rolled for each battle.  Most difficulty settings, including BV percentage and number of Modifiers, are customizable on the AtB tab in Campaign Options.
+Different contract types have different scenario types.  Different contract clauses have different command rights and will greatly influence how allies and enemies are generated.  Allies and Enemies can have different Skill and Equipment Quality levels.  Allied and Enemy Facilities can contribute certain positive and negative modifiers to each battle.  Random Positive and Negative modifiers can also be rolled for each battle.  Most difficulty settings, including BV percentage and number of Modifiers, are customizable on the AtB tab in Campaign Options.
 
 Note:  These are the StratCon rules and they are often enforced by MHQ. However, there is a GM mode you can enable (top right of main screen) that allows you to cheat.  You are your own GM and you can and should make edits to things you dont like.  Particularly when you are learning.  Good luck!
 
@@ -37,7 +37,7 @@ Heroic: 	130%
 Legendary: 	140%
 
 Modifiers:
-The default ("classic") modifier # is 3.  That means you can randomly roll up to 3 modifiers per battle (in addition to any added by facilities).  Some of the modifiers are helpful to the player and some are adverse.  They introduce variability in the encounters, but some can be difficult if you happen to roll 3 adverse modifiers.  You can change the maximum number of modifiers to a number between 1-10 (in addition to facility modifiers).  Less modifiers will reduce variety but also should make it easier.  
+The default ("classic") modifier # is 3.  That means you can randomly roll up to 3 modifiers per battle (in addition to any added by facilities).  Some of the modifiers are helpful to the player and some are adverse.  They introduce variability in the encounters, but some can be difficult if you happen to roll 3 adverse modifiers.  You can change the maximum number of modifiers to a number between 1-10 (in addition to facility modifiers).  Less modifiers will reduce variety but also should make it easier.
 
 =====================
 QUICKSTART STEPS
@@ -49,7 +49,7 @@ Select a Date
 Generate a Company (Manage Campaign, Company Generator, Generate)
 Find a Contract and accept it. (Marketplace, Contract Market)
 Travel to Contract (Briefing Tab, Click on Contract Planet, It will jump to Star Map, hit Calculate Jump Path, Begin Transit).
-Advance days while you travel to contract. Should hire spare personell and buy spare parts.  
+Advance days while you travel to contract. Should hire spare personell and buy spare parts.
 When you land on planet, go to briefing tab, assign roles to your lances.
 Advance Days, Scout StratCon map on AtB Campaign State tab, complete Objectives, and fight.
 Try not to embarress yourself.
@@ -60,11 +60,11 @@ CONTRACT COMMAND RIGHTS & NOTES
 
 **NOTE:  Despite what is mentioned below, Relief Duty, Garrison and Cadre Duty contracts always need to go their entire duration.
 
-Integrated - you need to keep your VP count positive. Every time you win a scenario, that's +1 VP. Every time you lose a scenario, -1 VP. Your employer chooses and deploys your lance on missions. You cannot scout the map.  You must complete the entire duration of the contract. Allied officer(s) in a mech/ASF will accompany you in scenarios.  Try to keep them alive.
+Integrated - you need to keep your VP count positive. Every time you win a scenario, that's +1 VP. Every time you lose a scenario, -1 VP. Your employer chooses and deploys your lance on missions. You cannot scout the map.  You must complete the entire duration of the contract. Allied officer(s) in a mek/ASF will accompany you in scenarios.  Try to keep them alive.
 
-House - you need to keep your VP count positive. Every time you win a scenario which you didn't initiate, that's +1 VP. Every time you lose a scenario you didn't initiate, that's -1 VP. You choose which lance to deploy. You must complete the entire duration of the contract.  A House officer in a mech/ASF will accompany you in scenarios. Try to keep them alive.
+House - you need to keep your VP count positive. Every time you win a scenario which you didn't initiate, that's +1 VP. Every time you lose a scenario you didn't initiate, that's -1 VP. You choose which lance to deploy. You must complete the entire duration of the contract.  A House officer in a mek/ASF will accompany you in scenarios. Try to keep them alive.
 
-Liaison - you need to keep your VP count positive AND you're responsible for completing the given number of strategic objectives, VPs are only affected by scenarios in which a liaison participates. You choose which lance to deploy. You must scout the map to find objectives. Once all of your objectives are complete, you may end the contract early.  A Liason officer in a mech/ASF will accompany you in some scenarios. Try to keep them alive.
+Liaison - you need to keep your VP count positive AND you're responsible for completing the given number of strategic objectives, VPs are only affected by scenarios in which a liaison participates. You choose which lance to deploy. You must scout the map to find objectives. Once all of your objectives are complete, you may end the contract early.  A Liason officer in a mek/ASF will accompany you in some scenarios. Try to keep them alive.
 
 Independent - only responsible for completing strategic objectives. Where, when and who you deploy is up to you. Your final VP score doesn't matter.  You must scout the map to find objectives. Once all of your objectives are complete, you may end the contract early.
 
@@ -79,7 +79,7 @@ SCENARIOS IN STRATCON MODE
     The biome of a hex on a track determines the map generator preset used to generate maps for that hex
     For the first time, map themes are used to give a distinct visual look to many of the maps
     Expect to see jungles, deserts, frozen wastelands and many others
-    Facilities can now spawn with reinforced buildings that are tough to destroy, so you might need to bring the big guns.  
+    Facilities can now spawn with reinforced buildings that are tough to destroy, so you might need to bring the big guns.
 
 
 * StratCon will generate scenarios based on the Contract. If such a scenario happens, it will be displayed in the Briefing room AND the "AtB Campaign State" tab (as a red icon).
@@ -88,13 +88,13 @@ SCENARIOS IN STRATCON MODE
 
 * If a scenario appears only in the Briefing tab, then it's a legacy or special scenario (e.g. cache, big battle), and you can ignore it if you wish (you would need to GM-remove it).
 
-* Stratcon has "Tracks" that are basically map pages.  When you are small, you will have one track (Track 0).  As you grow, your contract may involve multiple tracks.  You switch tracks on the right side of the Stratcon map in the track dropdown.  
+* Stratcon has "Tracks" that are basically map pages.  When you are small, you will have one track (Track 0).  As you grow, your contract may involve multiple tracks.  You switch tracks on the right side of the Stratcon map in the track dropdown.
 
 * Some scenarios and objectives may be on Track 0 and some on Track 1, etc.  You need to make sure you check and scout all of the Tracks, as necessary.
 
 * You can also trigger scenario by scouting out the Track. See below.
 
-* StratCon scenarios can spawn Mechs, vehicles, VTOLs, conventional infantry, battle armor, conventional fighters (with bombs or missiles), AeroSpace Fighters (with even MORE bombs or missiles), Dropships (and hotdrops), on and off-board Artillery, and even wet navy units.  Be prepared.  
+* StratCon scenarios can spawn Meks, vehicles, VTOLs, conventional infantry, battle armor, conventional fighters (with bombs or missiles), AeroSpace Fighters (with even MORE bombs or missiles), Dropships (and hotdrops), on and off-board Artillery, and even wet navy units.  Be prepared.
 
 * If you have even just a couple of Aerospace units, the game will spawn Aerospace or DropShip scenarios.
 
@@ -104,9 +104,9 @@ SCENARIOS IN STRATCON MODE
 
 * "My non-combat lance got dragged into battle!!" - The game sometimes ignores the non-combat flag (even for DropShips). Just don't use non-combat flag with StratCon, as it'll cause issues.
 
-* "The Enemy has 80 units and I have 4!!" - Stratcon normally pulls a lance/star unit from your TO&E to form as the seed unit for a new scenario.  BUT if you have units in your Main TO&E tree that are freestanding it can pull those units as seed, or it will use your whole TO&E BV as a seed.  Common offenders are Dropships and Jumpships, etc.  Make sure everything under your TO&E is in a subforce.  It might be best just to remove Dropships and Jumpships completely.  
+* "The Enemy has 80 units and I have 4!!" - Stratcon normally pulls a lance/star unit from your TO&E to form as the seed unit for a new scenario.  BUT if you have units in your Main TO&E tree that are freestanding it can pull those units as seed, or it will use your whole TO&E BV as a seed.  Common offenders are Dropships and Jumpships, etc.  Make sure everything under your TO&E is in a subforce.  It might be best just to remove Dropships and Jumpships completely.
 
-* "The Enemy has 80 units and I have 4, again!!"  If you ever feel outnumbered or outmatched, assign your force to the scenario, right click on it in the briefing tab, edit, and regnerate bot forces.  It will tailor the new force to the BV of your assigned force.  You may still be outmatched (as sometimes that is intentional and it will require reinforcements) - but it should be better.  
+* "The Enemy has 80 units and I have 4, again!!"  If you ever feel outnumbered or outmatched, assign your force to the scenario, right click on it in the briefing tab, edit, and regnerate bot forces.  It will tailor the new force to the BV of your assigned force.  You may still be outmatched (as sometimes that is intentional and it will require reinforcements) - but it should be better.
 
 * Evacuate Scenario during a Garrison contract: If you lose the facility, it will be under enemy control.  You can try to attack and recapture it.  If you dont, you will fail the contract.  If there is a bug with this, you can right click on hex and GM add it again. If it's a contract objective, you have to restore it in the same hex.
 
@@ -124,13 +124,13 @@ YOUR MISSION AND GOALS IN STRATCON MODE
 
 Your Contract Score is no longer the sole metric of your success.
 
-* Under Integrated and House command, you need to keep your VP count positive. Every time you win a scenario which you didn't initiate, that's +1 VP. Every time you lose a scenario you didn't initiate, that's -1 VP. 
+* Under Integrated and House command, you need to keep your VP count positive. Every time you win a scenario which you didn't initiate, that's +1 VP. Every time you lose a scenario you didn't initiate, that's -1 VP.
 
 * Under Liaison command, you need to keep your VP count positive AND you're responsible for completing the given number of strategic objectives. On defensive contracts, this may include keeping allied facilities intact and under allied control. On offensive contracts, it's usually capturing/destroying facilities or winning specific scenarios. VPs are only affected by scenarios in which a liaison participates.
 
 * Under Independent command, you're only responsible for completing strategic objectives.
 
-* Stratcon contract VP's are only awarded for "required by employer" scenarios, and will show "deployment required by contract / -1 VP if lost/ignored; +1 VP if won" and are NOT necessarily Contract Objectives.  There is a screenshot sticky in the Stratcon channel for an example.  
+* Stratcon contract VP's are only awarded for "required by employer" scenarios, and will show "deployment required by contract / -1 VP if lost/ignored; +1 VP if won" and are NOT necessarily Contract Objectives.  There is a screenshot sticky in the Stratcon channel for an example.
 
 * The information about whether a scenario gives VP/SP is stated in red on the scenario description in the StratCon tab. "Scenario Victory Points" stated in the briefing tab are internal, meant for the game to find the effect (if any) of the battle.  So, VP discussed in a post-battle resolution screen and VP on the StratCon campaign tab are NOT the same.  The ones on the campaign tab are the only ones that count toward final contract score.
 
@@ -148,15 +148,15 @@ THE STRATCON HEX GRID
 * Unscouted hexes are shaded grey. Scouted hexes are light grey. If it is hard to tell, you can click on the hex and it will say recon complete/recon incomplete.(See below how to scout)
 
 * Allied facilities are displayed as cyan icons. Hostile facilities as red icons.  They provide the following Bonuses to Allies or Enemies.  Usually in the form of a modifier added to a battle.  They will apply this modifier to a battle approximately 60% of the time - EVEN IF YOU HAVE NOT FOUND THEM ON THE MAP YET.  You should scout and take out hostile bases quickly.
-	* Mech/Tank/Air/Arty base - Adds an allied or enemy reinforcement of the listed type to scenarios.  Enemy bases of this type should be taken out quickly.
+	* Mek/Tank/Air/Arty base - Adds an allied or enemy reinforcement of the listed type to scenarios.  Enemy bases of this type should be taken out quickly.
 	* Supply Depot - Allied = 1SP/week.  Hostile = 5% bonus to Opfor BV budget in scenarios.
-	* Data Center - Allied = Shows the entire Map.  Hostile = Increase scenario odds and adds a enemy mech scout force to scenarios.
+	* Data Center - Allied = Shows the entire Map.  Hostile = Increase scenario odds and adds a enemy mek scout force to scenarios.
 	* Industrial Center - Allied = none.  Hostile = Increases BV% and Equipement Quality of OpFor.
 	* Comms Center - adds a random positive modifier for the side that owns it.
 	* Early Warning Center - Reduces the number of turns for allied or enemy reinforcements to arrive during battle.
-	* Oribital Defense - Hostile = Prevents Aerospace and adds an enemy Officer mech to scenarios.
-	* Base of Operations - More and better defenders.  Allied = losing this means a contract loss.  Enemy = Adds enemy commander mech to scenarios.  Enemy loss reduces contract activity.    
- 
+	* Oribital Defense - Hostile = Prevents Aerospace and adds an enemy Officer mek to scenarios.
+	* Base of Operations - More and better defenders.  Allied = losing this means a contract loss.  Enemy = Adds enemy commander mek to scenarios.  Enemy loss reduces contract activity.
+
 * Your forces currently deployed to the track are cyan icons.
 
 * Pending scenarios against hostile forces are red icons.
@@ -186,10 +186,10 @@ DEPLOYMENT IN STRATCON MODE
 * First, as of 49.0, the "Deployment Requirements" in the Briefing tab are not implemented in StratCon. However, the Lance count is important, as you will get multiple scenarios, up to that lance count. Also the assigned Roles are very important in StratCon, as you will see below.
 
 * To deploy in StratCon mode, you must right-click on the relevant Track hex with nested red squares and Manage. Then you can choose which Lance(s) to send, and what reinforcement to send. You can multi-select, and use ctrl-click to unselect. (The "old" TO&E deployment tool still works, but is mostly kept for GM use; use the Campaign tab one instead.)
- 
+
 * Note that when a Lance is deployed, you can right-click on that hex and click on a Lance's checkbox to have it remain in that hex, so that you don't have to spend resources to deploy it there later. Now you have a solid reason for having spare Lances!
 
-* Note that when a Lance is deployed, or returning from a battle, you can't repair/resupply it.  It is out in the field.  So you may not see mechs in your repair bay to repair.  Or units might appear in your TOE, but since they are still returning from battle, they cant be deployed.
+* Note that when a Lance is deployed, or returning from a battle, you can't repair/resupply it.  It is out in the field.  So you may not see meks in your repair bay to repair.  Or units might appear in your TOE, but since they are still returning from battle, they cant be deployed.
 
 * If under Integrated command, you don't get to choose! The command will choose for you... Otherwise, a Lance is randomly auto-selected for the purpose of computing the OpFor BV, and then you can change it. The exception is when you are scouting or voluntarily creating a battle.
 
@@ -210,12 +210,12 @@ A NOTE ON OPFOR GENERATION
 The primary opposing forces are usually generated via the "scaled BV" method. This takes into account the difficulty rating and your current CamOps or FMM unit rating. The algorithm is roughly as follows:
 - Your unit rating determines the BV floor. This is a percentage from 50-100, inclusive.
 - Your difficulty determines the BV ceiling. This a percentage between 80-120, inclusive.
-Multiply the above percentages by the BV of your primary force (the lance that gets somewhat-randomly selected when the scenario is generated). The resulting BVs are the BV floor and BV ceiling, respectively. Note that, on non-Integrated command, the primary force is a randomly picked lance from your TO&E, and you then get to choose which lance is actually assigned to the fight. 
+Multiply the above percentages by the BV of your primary force (the lance that gets somewhat-randomly selected when the scenario is generated). The resulting BVs are the BV floor and BV ceiling, respectively. Note that, on non-Integrated command, the primary force is a randomly picked lance from your TO&E, and you then get to choose which lance is actually assigned to the fight.
 
 1. The scaled OpFor receives one lance off the appropriate RAT. If the BV is under the floor, repeat.
 2. If the BV is between the floor and ceiling, we roll a 1d100 and compare it to the ratio of current opposition BV / ceiling. If the roll is lower than the ratio, then we stop. Otherwise, go back to 1 and add another lance.
 
-The intention here is that, as the unit gets better, it will face tougher opposition, while giving a bit of a break to starting units. This mechanism may not produce very fair results for very low BV forces, so there is no expectation of a balanced scenario for four squads of foot rifle infantry. For very high BV forces, you are likely to see excessive numbers of hostile units.  If you play in very early timelines (where RATs are not fully developed), or limit yourself to certain units (like mostly tanks or mostly ASF) then you will likely find the difficulty varies wildly.  Adjust 
+The intention here is that, as the unit gets better, it will face tougher opposition, while giving a bit of a break to starting units. This mechanism may not produce very fair results for very low BV forces, so there is no expectation of a balanced scenario for four squads of foot rifle infantry. For very high BV forces, you are likely to see excessive numbers of hostile units.  If you play in very early timelines (where RATs are not fully developed), or limit yourself to certain units (like mostly tanks or mostly ASF) then you will likely find the difficulty varies wildly.  Adjust
 
 Modifiers can be randomly rolled or added to a scenario by a allied or enemy facility.  Some of the modifiers are helpful.  Some are very hard.  Example 8 Pirate Aircraft or Overwhelming Enemy Ground Reinforcements can be difficult.  Reinforce as necessary, or take a loss.  Pick your battles.  Or if you want to cheat just start the battle and remove that force in the MegaMek lobby.  You can and will see enemy ASF, Artillery, and Infantry.  You should probably invest in some of your own.
 
@@ -236,7 +236,7 @@ DESIGNING YOUR OWN MODIFIERS
 
 Look in the scenario Now, go to your data\scenariomodifiers directory and create (if it doesn't exist already) a file called usermodifiermanifest.xml. It should be formatted exactly like modifiermanifest.xml. Make sure not to overlap with the ID numbers or file names in ModifierManifest, as that "may cause unpredictable behavior". Now that you've got your scenario in the UserModifierManifest file, it'll be added to the pool of scenarios StratCon draws from when generating battles.
 
-A note on Modifier Difficulty:  The hardest Modifers are Pirates Present Air & Ground and the Overwhelming Reinforcements.  Each adds 8 or more enemy units.  Consider carefully before you add modifiers more difficult that these.  
+A note on Modifier Difficulty:  The hardest Modifers are Pirates Present Air & Ground and the Overwhelming Reinforcements.  Each adds 8 or more enemy units.  Consider carefully before you add modifiers more difficult that these.
 
 If you think some modifiers are difficult and dont like them, you can delete them from the modifiermanifest and they will not spawn anymore.  Some modifiers are required by some scenarios.  Deleting those may cause issues.  Make sure to save a backup copy of the scenariomanifest before you change it.
 
@@ -276,7 +276,7 @@ There is no direct sure-fire way to go about disabling turrets. You have two cho
 - Some of the new facilities are built on Reinforced buildings that take a lot of damage to destroy.  Make sure you pay attention to the map type and if there are heavy buildings you should bring some big guns.
 
 * Base/objective attacks and capture*
-That one's a bit tricky. 
+That one's a bit tricky.
 - To capture the base you need to leave 75% of the turrets intact with 75% of opfor destroyed.  As explained above, your best bet is to NOT shoot at the turrets (though crew/weapon-disabled turrets count as preserved), then rout the indicated % of forces. That's very hard if you have bot allies as they love to shoot and kick buildings; a trick is to give all allied bots all non-turret enemies as strategic targets and set their aggression level lower.
 - To destroy the base, you need to destroy or disable ALL Turrets. You don't actually need to rout the ground forces.
 - To recon the base, you need to scan all turrets. You might want to tweak allied bots as above. Jump jets are a must. Note that if you get a base Recon scenario, you're not bound to stick to recon and can still go for a capture or destroy. You might consider the scenario a failure, though, I guess.
@@ -291,5 +291,4 @@ MHQ considers all fled units as withdrawn, even if they fled when meant as part 
 LEGACY GLOSSARY & DETAILED DESCRIPTIONS
 ===========================================
 
-This document is the most recent and accurate, but you can see Legacy_Stratcon.pdf by the original designer of StratCon, for the legacy descriptions of some of the StratCon mechanics.  In the case of a conflict between that document and this one, this one controls.  
-
+This document is the most recent and accurate, but you can see Legacy_Stratcon.pdf by the original designer of StratCon, for the legacy descriptions of some of the StratCon mechanics.  In the case of a conflict between that document and this one, this one controls.

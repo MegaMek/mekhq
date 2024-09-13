@@ -25,7 +25,6 @@ import mekhq.gui.panels.StoryChoicePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -34,7 +33,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 /**
- * Creates a {@link StoryDialog StoryDialog} with an optional image, text, and choices from which the player can
+ * Creates a {@link StoryDialog StoryDialog} with an optional image, text, and
+ * choices from which the player can
  * choose a response.
  */
 public class StoryChoiceDialog extends StoryDialog implements KeyListener {
@@ -43,21 +43,20 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
     private JList<String> choiceList;
     private List<String> choices;
 
-    //region Constructors
+    // region Constructors
     public StoryChoiceDialog(final JFrame parent, ChoiceStoryPoint sEvent) {
         super(parent, sEvent);
         choices = new ArrayList<>();
         initialize();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Initialization
+    // region Initialization
     @Override
     protected void initialize() {
         super.initialize();
         choiceList.requestFocusInWindow();
     }
-
 
     @Override
     protected Container getMainPanel() {
@@ -78,7 +77,8 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
         JTextPane txtDesc = new JTextPane();
         txtDesc.setEditable(false);
         txtDesc.setContentType("text/html");
-        String text = StoryArc.replaceTokens(((ChoiceStoryPoint) getStoryPoint()).getQuestion(), getStoryPoint().getCampaign());
+        String text = StoryArc.replaceTokens(((ChoiceStoryPoint) getStoryPoint()).getQuestion(),
+                getStoryPoint().getCampaign());
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(text));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -105,7 +105,7 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
         choiceList.addKeyListener(this);
         gbc.gridy = 1;
         gbc.weighty = 1.0;
-        choicePanel.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
+        choicePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         choicePanel.add(choiceList);
         rightPanel.add(choicePanel, gbc);
 
@@ -117,13 +117,13 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         JScrollPane scrollPane = new JScrollPane(rightPanel);
-        scrollPane.setMinimumSize(new Dimension(200, 150 ));
-        scrollPane.setPreferredSize(new Dimension(200, 150 ));
+        scrollPane.setMinimumSize(new Dimension(200, 150));
+        scrollPane.setPreferredSize(new Dimension(200, 150));
         mainPanel.add(scrollPane, gbc);
 
         return mainPanel;
     }
-    //endregion Initialization
+    // endregion Initialization
 
     public String getChoice() {
         return choices.get(choiceList.getSelectedIndex());
@@ -138,11 +138,11 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
     public void keyPressed(KeyEvent e) {
         // FIXME: This is not working!
         /*
-        if (Character.isDigit(e.getKeyChar())) {
-            int selected = Integer.parseInt(String.valueOf(e.getKeyChar()));
-            choiceList.setSelectedIndex(selected--);
-        }
-        */
+         * if (Character.isDigit(e.getKeyChar())) {
+         * int selected = Integer.parseInt(String.valueOf(e.getKeyChar()));
+         * choiceList.setSelectedIndex(selected--);
+         * }
+         */
     }
 
     @Override
@@ -158,16 +158,18 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
 
         @Override
         public Component getListCellRendererComponent(final JList list,
-                                                      final String value, final int index,
-                                                      final boolean isSelected,
-                                                      final boolean cellHasFocus) {
+                final String value, final int index,
+                final boolean isSelected,
+                final boolean cellHasFocus) {
             final Color foreground = new Color((isSelected
-                    ? list.getSelectionForeground() : list.getForeground()).getRGB());
+                    ? list.getSelectionForeground()
+                    : list.getForeground()).getRGB());
             final Color background = new Color((isSelected
-                    ? list.getSelectionBackground() : list.getBackground()).getRGB());
-            //setOpaque(true);
-            //setForeground(foreground);
-            //setBackground(background);
+                    ? list.getSelectionBackground()
+                    : list.getBackground()).getRGB());
+            // setOpaque(true);
+            // setForeground(foreground);
+            // setBackground(background);
 
             updateChoice(value, isSelected, getStoryPoint().getCampaign(), foreground, background);
 
@@ -177,5 +179,3 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
         }
     }
 }
-
-

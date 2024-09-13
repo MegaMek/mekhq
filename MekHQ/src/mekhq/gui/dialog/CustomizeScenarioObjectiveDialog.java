@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
- * This file is part of MegaMek.
+ * This file is part of MekHQ.
  *
  * MegaMek is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,22 +18,29 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import javax.swing.*;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectConditionType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveAmountType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import java.util.ResourceBundle;
 
 public class CustomizeScenarioObjectiveDialog extends JDialog {
 
@@ -77,8 +84,8 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
     DefaultListModel<String> detailModel = new DefaultListModel<>();
 
-
-    public CustomizeScenarioObjectiveDialog(JFrame parent, boolean modal, ScenarioObjective objective, List<String> botForceNames) {
+    public CustomizeScenarioObjectiveDialog(JFrame parent, boolean modal, ScenarioObjective objective,
+            List<String> botForceNames) {
         super(parent, modal);
         this.objective = objective;
         this.botForceNames = botForceNames;
@@ -169,11 +176,11 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbc.weightx = 0.0;
         panMain.add(btnAddDetail, gbc);
 
-
         lstDetails = new JList<>(detailModel);
         JButton btnRemoveDetail = new JButton(resourceMap.getString("btnRemove.text"));
         btnRemoveDetail.addActionListener(e -> this.removeDetails());
-        lstDetails.addListSelectionListener(e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList().isEmpty()));
+        lstDetails.addListSelectionListener(
+                e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList().isEmpty()));
         lstDetails.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrDetails = new JScrollPane(lstDetails);
         scrDetails.setMinimumSize(new Dimension(200, 100));
@@ -272,7 +279,6 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         cboCountType = new MMComboBox<>("cboCountType", ObjectiveAmountType.values());
         cboCountType.addActionListener(etv -> switchNumberModel());
 
-
         cboDirection = new JComboBox<>();
         cboDirection.addItem("Force Destination Edge");
         for (int x = 1; x < OffBoardDirection.values().length; x++) {
@@ -346,7 +352,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         panObjectiveEffect = new JPanel(new GridBagLayout());
         panObjectiveEffect.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("panObjectiveEffect.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         GridBagConstraints gbcLeft = new GridBagConstraints();
         gbcLeft.gridx = 0;
@@ -402,9 +408,11 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         JLabel lblFailureEffects = new JLabel(resourceMap.getString("lblFailureEffects.text"));
 
         successEffects = new JList<>(successEffectsModel);
-        successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
+        successEffects.addListSelectionListener(
+                e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
         failureEffects = new JList<>(failureEffectsModel);
-        failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
+        failureEffects.addListSelectionListener(
+                e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
 
         btnRemoveSuccess = new JButton(resourceMap.getString("btnRemove.text"));
         btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffectConditionType.ObjectiveSuccess));
@@ -419,7 +427,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5,5,0,5);
+        gbc.insets = new Insets(5, 5, 0, 5);
         panBottom.add(lblSuccessEffects, gbc);
         gbc.gridx++;
         gbc.gridx++;
@@ -483,8 +491,8 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
     private void switchNumberModel() {
         int value = (int) spnAmount.getValue();
-        if(cboCountType.getSelectedItem() == ObjectiveAmountType.Percentage) {
-            if(value > 100) {
+        if (cboCountType.getSelectedItem() == ObjectiveAmountType.Percentage) {
+            if (value > 100) {
                 value = 100;
             }
             modelPercent.setValue(value);
@@ -541,7 +549,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
     private void removeForce() {
         for (String forceName : forceNames.getSelectedValuesList()) {
-           forceModel.removeElement(forceName);
+            forceModel.removeElement(forceName);
         }
         btnRemove.setEnabled(false);
         pack();
@@ -591,23 +599,22 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         }
 
         objective.clearForces();
-        for (int i = 0; i< forceModel.getSize(); i++) {
+        for (int i = 0; i < forceModel.getSize(); i++) {
             objective.addForce(forceModel.getElementAt(i));
         }
 
-
         objective.clearSuccessEffects();
-        for (int i = 0; i< successEffectsModel.getSize(); i++) {
+        for (int i = 0; i < successEffectsModel.getSize(); i++) {
             objective.addSuccessEffect(successEffectsModel.getElementAt(i));
         }
 
         objective.clearFailureEffects();
-        for (int i = 0; i< failureEffectsModel.getSize(); i++) {
+        for (int i = 0; i < failureEffectsModel.getSize(); i++) {
             objective.addFailureEffect(failureEffectsModel.getElementAt(i));
         }
 
         objective.clearDetails();
-        for (int i = 0; i< detailModel.getSize(); i++) {
+        for (int i = 0; i < detailModel.getSize(); i++) {
             objective.addDetail(detailModel.getElementAt(i));
         }
 
