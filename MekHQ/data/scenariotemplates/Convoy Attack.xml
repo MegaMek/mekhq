@@ -2,9 +2,10 @@
 <ScenarioTemplate>
     <name>Convoy Attack</name>
     <shortBriefing>Attack on an enemy supply convoy.</shortBriefing>
-    <detailedBriefing>Prevent 50% of the convoy units from crossing the far edge of the map. The convoy will surrender if 50% of the escorts are destroyed or routed.</detailedBriefing>
+    <detailedBriefing>Prevent 50% of the convoy units from crossing the far edge of the map. The
+        convoy will surrender if 50% of the escorts are destroyed or routed.</detailedBriefing>
     <mapParameters>
-        <allowedTerrainTypes/>
+        <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
@@ -26,7 +27,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -55,7 +56,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones/>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -100,7 +101,7 @@
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
-		<subjectToRandomRemoval>false</subjectToRandomRemoval>
+                <subjectToRandomRemoval>false</subjectToRandomRemoval>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
@@ -112,7 +113,7 @@
             <associatedForceNames>
                 <associatedForceName>Convoy</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -127,7 +128,7 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails/>
+            <additionalDetails />
             <description>Prevent the following force(s) and unit(s) from reaching the far map edge:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>PreventReachMapEdge</objectiveCriterion>
@@ -139,7 +140,7 @@
             <associatedForceNames>
                 <associatedForceName>Convoy</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>SupportPointUpdate</effectType>
@@ -147,9 +148,10 @@
                     <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
-            <failureEffects/>
-            <additionalDetails/>
-            <description>Capture intact units from the following force(s) for additional support points:</description>
+            <failureEffects />
+            <additionalDetails />
+            <description>Capture intact units from the following force(s) for additional support
+                points:</description>
             <destinationEdge>NONE</destinationEdge>
             <fixedAmount>1</fixedAmount>
             <objectiveCriterion>Capture</objectiveCriterion>
@@ -161,7 +163,7 @@
             <associatedForceNames>
                 <associatedForceName>Primary Opfor</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -169,9 +171,10 @@
                     <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
-            <failureEffects/>
-            <additionalDetails/>
-            <description>Destroy or rout 50% of the following force(s) and unit(s) to force convoy surrender:</description>
+            <failureEffects />
+            <additionalDetails />
+            <description>Destroy or rout 50% of the following force(s) and unit(s) to force convoy
+                surrender:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>

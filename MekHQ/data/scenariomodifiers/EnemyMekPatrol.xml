@@ -1,20 +1,21 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Additional allied 'Meks are approaching the area.</additionalBriefingText>
+	<additionalBriefingText>A detail of enemy scout meks has been spotted in the area.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
 	</allowedMapLocations>
-	<benefitsPlayer>true</benefitsPlayer>
+	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<forceDefinition>
 		<actualDeploymentZone>-1</actualDeploymentZone>
-		<allowAeroBombs>true</allowAeroBombs>
+		<allowAeroBombs>false</allowAeroBombs>
 		<allowedUnitType>0</allowedUnitType>
-		<arrivalTurn>-3</arrivalTurn>
-		<canReinforceLinked>true</canReinforceLinked>
+		<arrivalTurn>3</arrivalTurn>
+		<canReinforceLinked>false</canReinforceLinked>
 		<contributesToBV>false</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
+		<deployOffboard>false</deployOffboard>
 		<deploymentZones>
 			<deploymentZone>1</deploymentZone>
 			<deploymentZone>2</deploymentZone>
@@ -27,16 +28,18 @@
 			<deploymentZone>9</deploymentZone>
 		</deploymentZones>
 		<destinationZone>5</destinationZone>
-		<fixedUnitCount>-1</fixedUnitCount>
-		<forceAlignment>1</forceAlignment>
-		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Allied Mech Reinforcements</forceName>
+		<fixedUnitCount>2</fixedUnitCount>
+		<forceAlignment>2</forceAlignment>
+		<forceName>Opfor Recon Meks</forceName>
 		<generationMethod>3</generationMethod>
-		<generationOrder>3</generationOrder>
-		<maxWeightClass>4</maxWeightClass>
+		<generationOrder>6</generationOrder>
+		<maxWeightClass>1</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
-		<objectiveLinkedForces/>
+		<startingAltitude>0</startingAltitude>
+		<objectiveLinkedForces>
+			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+		</objectiveLinkedForces>
 		<syncDeploymentType>None</syncDeploymentType>
-		<syncedForceName />
+		<useArtillery>false</useArtillery>
 	</forceDefinition>
 </AtBScenarioModifier>

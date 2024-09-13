@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Marauder" model="MAD-3D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="c0c05d7d-3e98-499c-9e05-c1f5791c3a0c">
-			<pilot size="1" name="Maria Dunn" nick="" gender="FEMALE" gunnery="3" piloting="3" externalId="9ffa9841-7cab-4df4-b89d-2976ae2f4cdc" ejected="false" advantages="specialist Energy::some_like_it_hot" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-			<Game id="1"/>
-		</entity>
+	<entity chassis="Marauder" model="MAD-3D" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="c0c05d7d-3e98-499c-9e05-c1f5791c3a0c">
+		<pilot size="1" name="Maria Dunn" nick="" gender="FEMALE" gunnery="3" piloting="3"
+			externalId="9ffa9841-7cab-4df4-b89d-2976ae2f4cdc" ejected="false"
+			advantages="specialist Energy::some_like_it_hot"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" />
+		<Game id="1" />
+	</entity>
 
 </unit>

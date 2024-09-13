@@ -1,38 +1,42 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>This facility is defended by an additional force of enemy mechs.</additionalBriefingText>
+	<additionalBriefingText>Additional hostile meks are approaching the area.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
 	</allowedMapLocations>
 	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PreForceGeneration</eventTiming>
+	<eventTiming>PostForceGeneration</eventTiming>
 	<forceDefinition>
 		<actualDeploymentZone>-1</actualDeploymentZone>
-		<allowAeroBombs>false</allowAeroBombs>
+		<allowAeroBombs>true</allowAeroBombs>
 		<allowedUnitType>0</allowedUnitType>
-		<arrivalTurn>0</arrivalTurn>
-		<canReinforceLinked>false</canReinforceLinked>
+		<arrivalTurn>-3</arrivalTurn>
+		<canReinforceLinked>true</canReinforceLinked>
 		<contributesToBV>false</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
-		<deployOffboard>false</deployOffboard>
 		<deploymentZones>
-			<deploymentZone>10</deploymentZone>
+			<deploymentZone>1</deploymentZone>
+			<deploymentZone>2</deploymentZone>
+			<deploymentZone>3</deploymentZone>
+			<deploymentZone>4</deploymentZone>
+			<deploymentZone>5</deploymentZone>
+			<deploymentZone>6</deploymentZone>
+			<deploymentZone>7</deploymentZone>
+			<deploymentZone>8</deploymentZone>
+			<deploymentZone>9</deploymentZone>
 		</deploymentZones>
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Mech Garrison</forceName>
+		<forceName>Enemy Mek Reinforcements</forceName>
 		<generationMethod>3</generationMethod>
-		<generationOrder>5</generationOrder>
+		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
-		<retreatThreshold>75</retreatThreshold>
-		<startingAltitude>0</startingAltitude>
-		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
-		</objectiveLinkedForces>
+		<retreatThreshold>50</retreatThreshold>
+		<objectiveLinkedForces />
 		<syncDeploymentType>None</syncDeploymentType>
-		<useArtillery>false</useArtillery>
+		<syncedForceName />
 	</forceDefinition>
 </AtBScenarioModifier>

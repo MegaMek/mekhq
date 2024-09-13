@@ -1,5 +1,6 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>One of your employer's Aces is close and is moving to support.  Watch and learn.</additionalBriefingText>
+	<additionalBriefingText>This facility is guarded by a lance of allied meks who will fight
+		alongside us in its defense.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -9,28 +10,27 @@
 	<forceDefinition>
 		<actualDeploymentZone>-1</actualDeploymentZone>
 		<allowAeroBombs>false</allowAeroBombs>
-		<allowedUnitType>-2</allowedUnitType>
-		<arrivalTurn>2</arrivalTurn>
+		<allowedUnitType>0</allowedUnitType>
+		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
 		<contributesToBV>true</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>true</contributesToUnitCount>
+		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
-		<deploymentZones/>
+		<deploymentZones>
+			<deploymentZone>10</deploymentZone>
+		</deploymentZones>
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>1</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<fixedUnitCount>4</fixedUnitCount>
-		<forceName>Allied Mech Ace</forceName>
-		<generationMethod>5</generationMethod>
-			<fixedMul>AlliedGLTAce.mul</fixedMul>
+		<forceName>Allied Mek Garrison</forceName>
+		<generationMethod>3</generationMethod>
 		<generationOrder>1</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
-		<retreatThreshold>0</retreatThreshold>
+		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
-		<syncDeploymentType>SameEdge</syncDeploymentType>
-		<syncedForceName>Player</syncedForceName>
+		<syncDeploymentType>None</syncDeploymentType>
 		<useArtillery>false</useArtillery>
 	</forceDefinition>
 </AtBScenarioModifier>

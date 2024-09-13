@@ -3,7 +3,7 @@ chassis:Black Hawk
 clanname:Nova
 model:Phelan
 
-Config:Biped Omnimech
+Config:Biped OmniMek
 techbase:Clan
 era:2870
 rules level:2
@@ -167,4 +167,3 @@ systemmanufacturer:ARMOR:Forge Type HH30
 systemmanufacturer:JUMPJET:Clan Standard Type A2
 systemmanufacturer:COMMUNICATIONS:CH3B
 systemmanufacturer:TARGETING:Version Omega-V TTS
-

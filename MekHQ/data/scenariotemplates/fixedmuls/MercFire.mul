@@ -1,54 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Thunderbolt" model="TDR-5SE" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="a0dc0be7-a465-42e6-8122-6d6a059cee32">
-			<pilot size="1" name="Melancton Karyoti" nick="" gender="MALE" gunnery="3" piloting="4" externalId="3f5e1497-de08-4e32-aee2-15286e03ad5f" ejected="false" advantages="hopping_jack" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="1"> Center Torso
-				<slot index="11" type="IS Ammo LRM-10" shots="12"/>
-				<slot index="12" type="IS Ammo LRM-10" shots="12"/>
-			</location>
-			<Game id="15"/>
-		</entity>
+	<entity chassis="Thunderbolt" model="TDR-5SE" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="a0dc0be7-a465-42e6-8122-6d6a059cee32">
+		<pilot size="1" name="Melancton Karyoti" nick="" gender="MALE" gunnery="3" piloting="4"
+			externalId="3f5e1497-de08-4e32-aee2-15286e03ad5f" ejected="false" advantages="hopping_jack"
+			edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="1"> Center
+		Torso <slot index="11" type="IS Ammo LRM-10" shots="12" />
+				<slot index="12" type="IS Ammo LRM-10"
+				shots="12" />
+		</location>
+			<Game id="15" />
+	</entity>
 
-		<entity chassis="Crusader" model="CRD-3D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="8dbf9b85-b60c-4b2e-8af5-88319e8f54d8">
-			<pilot size="1" name="Gadi bin Saqr" nick="" gender="MALE" gunnery="3" piloting="4" externalId="482950d6-603e-415a-9f93-5c0560ddae32" ejected="false" advantages="cluster_master" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="1"> Center Torso
-				<slot index="11" type="IS Ammo SRM-4" shots="25"/>
-			</location>
-			<location index="2"> Right Torso
-				<slot index="3" type="IS Ammo LRM-15" shots="8"/>
-			</location>
-			<location index="3"> Left Torso
-				<slot index="3" type="IS Ammo LRM-15" shots="8"/>
-			</location>
-			<Game id="16"/>
-		</entity>
+	<entity chassis="Crusader" model="CRD-3D" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="8dbf9b85-b60c-4b2e-8af5-88319e8f54d8">
+		<pilot size="1" name="Gadi bin Saqr" nick="" gender="MALE" gunnery="3" piloting="4"
+			externalId="482950d6-603e-415a-9f93-5c0560ddae32" ejected="false" advantages="cluster_master"
+			edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="1"> Center
+		Torso <slot index="11" type="IS Ammo SRM-4" shots="25" />
+		</location>
+			<location index="2">
+		Right Torso <slot index="3" type="IS Ammo LRM-15" shots="8" />
+		</location>
+			<location index="3">
+		Left Torso <slot index="3" type="IS Ammo LRM-15" shots="8" />
+		</location>
+			<Game id="16" />
+	</entity>
 
-		<entity chassis="Archer" model="ARC-2R" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="8a866e19-37f8-4b18-afbb-ddc9535a8bd4">
-			<pilot size="1" name="Dave Chong" nick="" gender="MALE" gunnery="3" piloting="5" externalId="27ac6b7c-ce05-40e2-9c77-02cf7dd064d6" ejected="false" advantages="oblique_attacker::some_like_it_hot" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="2"> Right Torso
-				<slot index="6" type="IS Ammo LRM-20" shots="6"/>
-				<slot index="7" type="IS Ammo LRM-20" shots="6"/>
-			</location>
-			<location index="3"> Left Torso
-				<slot index="6" type="IS Ammo LRM-20" shots="6"/>
-				<slot index="7" type="IS Ammo LRM-20" shots="6"/>
-			</location>
-			<Game id="17"/>
-		</entity>
+	<entity chassis="Archer" model="ARC-2R" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="8a866e19-37f8-4b18-afbb-ddc9535a8bd4">
+		<pilot size="1" name="Dave Chong" nick="" gender="MALE" gunnery="3" piloting="5"
+			externalId="27ac6b7c-ce05-40e2-9c77-02cf7dd064d6" ejected="false"
+			advantages="oblique_attacker::some_like_it_hot"
+			edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="2"> Right
+		Torso <slot index="6" type="IS Ammo LRM-20" shots="6" />
+				<slot index="7" type="IS Ammo LRM-20"
+				shots="6" />
+		</location>
+			<location index="3"> Left Torso <slot index="6"
+				type="IS Ammo LRM-20" shots="6" />
+				<slot index="7" type="IS Ammo LRM-20" shots="6" />
+		</location>
+			<Game
+			id="17" />
+	</entity>
 
-		<entity chassis="Awesome" model="AWS-8T" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="2b65d707-518f-437b-9c5a-26b74aef30c1">
-			<pilot size="1" name="Zachary Feng" nick="" gender="MALE" gunnery="3" piloting="3" externalId="2119b536-f659-4933-92ca-149eb5cae37c" ejected="false" advantages="weapon_specialist Large Laser" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="1"> Center Torso
-				<slot index="11" type="IS Ammo LRM-15" shots="8"/>
-				<slot index="12" type="IS Ammo LRM-15" shots="8"/>
-			</location>
-			<Game id="18"/>
-		</entity>
+	<entity chassis="Awesome" model="AWS-8T" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="2b65d707-518f-437b-9c5a-26b74aef30c1">
+		<pilot size="1" name="Zachary Feng" nick="" gender="MALE" gunnery="3" piloting="3"
+			externalId="2119b536-f659-4933-92ca-149eb5cae37c" ejected="false"
+			advantages="weapon_specialist Large Laser"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="1"> Center
+		Torso <slot index="11" type="IS Ammo LRM-15" shots="8" />
+				<slot index="12" type="IS Ammo LRM-15"
+				shots="8" />
+		</location>
+			<Game id="18" />
+	</entity>
 
 </unit>

@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An enemy mech Commander has been spotted.  Destroy them.</additionalBriefingText>
+	<additionalBriefingText>An enemy mek Officer has been spotted. Destroy them.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -16,15 +16,15 @@
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
-        <deploymentZones/>
+		<deploymentZones />
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
-		<forceName>Enemy Mech Commander</forceName>
+		<forceName>Enemy Officer Mek</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>1</generationOrder>
-		<maxWeightClass>4</maxWeightClass>
-		<minWeightClass>2</minWeightClass>			
+		<maxWeightClass>3</maxWeightClass>
+		<minWeightClass>2</minWeightClass>
 		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>

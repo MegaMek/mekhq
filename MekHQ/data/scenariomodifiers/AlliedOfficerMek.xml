@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An allied mech Officer has been assigned to your force.  Impress them.</additionalBriefingText>
+	<additionalBriefingText>An allied mek Officer has been assigned to your force. Impress them.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -16,15 +16,15 @@
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
-        <deploymentZones/>
+		<deploymentZones />
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>1</fixedUnitCount>
 		<forceAlignment>1</forceAlignment>
-		<forceName>Allied Officer Mech</forceName>
+		<forceName>Allied Officer Mek</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>1</generationOrder>
 		<maxWeightClass>3</maxWeightClass>
-		<minWeightClass>2</minWeightClass>			
+		<minWeightClass>2</minWeightClass>
 		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>

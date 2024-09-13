@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An enemy mech Ace has been spotted.  Beware.</additionalBriefingText>
+	<additionalBriefingText>An enemy mek Ace has been spotted. Beware.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -16,15 +16,15 @@
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
-        <deploymentZones/>
+		<deploymentZones />
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>0</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
-		<forceName>Enemy Mech Ace</forceName>
+		<forceName>Enemy Mek Ace</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>aceFS9M.mul</fixedMul>		
+		<fixedMul>aceMAD3D.mul</fixedMul>
 		<generationOrder>1</generationOrder>
-		<maxWeightClass>4</maxWeightClass>		
+		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>

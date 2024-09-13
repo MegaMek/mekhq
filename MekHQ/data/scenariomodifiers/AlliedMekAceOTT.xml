@@ -1,5 +1,6 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>One of your employer's Aces is close and is moving to support.  Watch and learn.</additionalBriefingText>
+	<additionalBriefingText>One of your employer's Aces is close and is moving to support. Watch and
+		learn.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -16,15 +17,15 @@
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>true</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
-		<deploymentZones/>
+		<deploymentZones />
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>1</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
 		<fixedUnitCount>4</fixedUnitCount>
-		<forceName>Allied Mech Ace</forceName>
+		<forceName>Allied Mek Ace</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>AlliedTBTAce.mul</fixedMul>
+		<fixedMul>AlliedOTTAce.mul</fixedMul>
 		<generationOrder>1</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>

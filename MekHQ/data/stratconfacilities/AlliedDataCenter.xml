@@ -1,9 +1,9 @@
 <StratconFacility>
 	<capturedDefinition>HostileDataCenter.xml</capturedDefinition>
 	<displayableName>Data Center</displayableName>
-        <facilityType>DataCenter</facilityType>
-        <owner>Allied</owner>
+	<facilityType>DataCenter</facilityType>
+	<owner>Allied</owner>
 	<revealTrack>true</revealTrack>
 	<userDescription>This facility reveals all information about this track as long as it is active.</userDescription>
-        <visible>true</visible>
+	<visible>true</visible>
 </StratconFacility>

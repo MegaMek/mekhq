@@ -1,10 +1,10 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Additional hostile mechs are approaching the area.</additionalBriefingText>
+	<additionalBriefingText>Additional allied 'Meks are approaching the area.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
 	</allowedMapLocations>
-	<benefitsPlayer>false</benefitsPlayer>
+	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<forceDefinition>
 		<actualDeploymentZone>-1</actualDeploymentZone>
@@ -28,14 +28,14 @@
 		</deploymentZones>
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
-		<forceAlignment>2</forceAlignment>
+		<forceAlignment>1</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Enemy Mech Reinforcements</forceName>
+		<forceName>Allied Mek Reinforcements</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
-		<objectiveLinkedForces/>
+		<objectiveLinkedForces />
 		<syncDeploymentType>None</syncDeploymentType>
 		<syncedForceName />
 	</forceDefinition>

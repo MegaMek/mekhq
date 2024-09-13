@@ -1,40 +1,33 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>A detail of enemy scout mechs has been spotted in the area.</additionalBriefingText>
+	<additionalBriefingText>This facility is defended by an additional force of enemy meks.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
 	</allowedMapLocations>
 	<benefitsPlayer>false</benefitsPlayer>
-	<eventTiming>PostForceGeneration</eventTiming>
+	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>
 		<actualDeploymentZone>-1</actualDeploymentZone>
 		<allowAeroBombs>false</allowAeroBombs>
 		<allowedUnitType>0</allowedUnitType>
-		<arrivalTurn>3</arrivalTurn>
+		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
 		<contributesToBV>false</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones>
-			<deploymentZone>1</deploymentZone>
-			<deploymentZone>2</deploymentZone>
-			<deploymentZone>3</deploymentZone>
-			<deploymentZone>4</deploymentZone>
-			<deploymentZone>5</deploymentZone>
-			<deploymentZone>6</deploymentZone>
-			<deploymentZone>7</deploymentZone>
-			<deploymentZone>8</deploymentZone>
-			<deploymentZone>9</deploymentZone>
+			<deploymentZone>10</deploymentZone>
 		</deploymentZones>
 		<destinationZone>5</destinationZone>
-		<fixedUnitCount>2</fixedUnitCount>
+		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
-		<forceName>Opfor Recon Mechs</forceName>
+		<forceMultiplier>1.0</forceMultiplier>
+		<forceName>Opfor Mek Garrison</forceName>
 		<generationMethod>3</generationMethod>
-		<generationOrder>6</generationOrder>
-		<maxWeightClass>1</maxWeightClass>			
-		<retreatThreshold>50</retreatThreshold>
+		<generationOrder>5</generationOrder>
+		<maxWeightClass>4</maxWeightClass>
+		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>
 			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
