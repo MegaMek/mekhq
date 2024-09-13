@@ -19,19 +19,16 @@
 
 package mekhq.campaign.personnel.backgrounds;
 
-import java.util.ResourceBundle;
-import java.util.function.Supplier;
-
-import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.EndWordCorporate;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.EndWordMercenary;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.MiddleWordCorporate;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.MiddleWordMercenary;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.PreFabHumorous;
+
+import java.util.ResourceBundle;
+
+import static megamek.client.generator.RandomCallsignGenerator.getWeightedCallsigns;
+import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.*;
 
 public class BackgroundsController {
     static final ResourceBundle resources = ResourceBundle
