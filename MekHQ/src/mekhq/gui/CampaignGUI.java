@@ -2296,6 +2296,9 @@ public class CampaignGUI extends JPanel {
         getFrame().setTitle(getCampaign().getTitle());
     }
 
+    /**
+     * Refreshes the 'funds' display on the GUI.
+     */
     private void refreshFunds() {
         Money funds = getCampaign().getFunds();
         String inDebt = "";
@@ -2415,106 +2418,96 @@ public class CampaignGUI extends JPanel {
 
     // region Subscriptions
     @Subscribe
-    public void handleDayEnding(DayEndingEvent evt) {
-        // first check for overdue loan payments - don't allow advancement until
-        // these are addressed
-        if (getCampaign().checkOverDueLoans()) {
-            refreshFunds();
-            // FIXME : Localize
-            JOptionPane.showMessageDialog(null, "You must resolve overdue loans before advancing the day",
-                    "Overdue loans", JOptionPane.WARNING_MESSAGE);
-            evt.cancel();
+    public void handleDayEnding(DayEndingEvent dayEndingEvent) {
+        if (checkForOverdueLoans(dayEndingEvent)) {
             return;
         }
 
-        if (getCampaign().checkScenariosDue()) {
-            JOptionPane.showMessageDialog(null, getResourceMap().getString("dialogCheckDueScenarios.text"),
-                    getResourceMap().getString("dialogCheckDueScenarios.title"), JOptionPane.WARNING_MESSAGE);
-            evt.cancel();
+        if (checkForDueScenarios(dayEndingEvent)) {
             return;
         }
 
         if (new UnmaintainedUnitsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new PregnantCombatantNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new PrisonersNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new UntreatedPersonnelNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new EndContractNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new NoCommanderNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new InvalidFactionNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new UnableToAffordJumpNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new InsufficientAstechsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new InsufficientAstechTimeNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new InsufficientMedicsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (getCampaign().getLocalDate()
                 .equals(getCampaign().getLocalDate().with(TemporalAdjusters.lastDayOfMonth()))) {
             if (new UnableToAffordExpensesNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
+                dayEndingEvent.cancel();
                 return;
             }
         }
 
         if (new UnableToAffordLoanPaymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (getCampaign().getCampaignOptions().isUseAtB()) {
             if (new ShortDeploymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
+                dayEndingEvent.cancel();
                 return;
             }
 
             if (new UnresolvedStratConContactsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
+                dayEndingEvent.cancel();
                 return;
             }
 
             if (new OutstandingScenariosNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
+                dayEndingEvent.cancel();
                 return;
             }
         }
@@ -2529,7 +2522,7 @@ public class CampaignGUI extends JPanel {
                 case 0:
                     // the user launched the turnover dialog
                     if (!showRetirementDefectionDialog()) {
-                        evt.cancel();
+                        dayEndingEvent.cancel();
                         return;
                     }
                 case 1:
@@ -2537,13 +2530,59 @@ public class CampaignGUI extends JPanel {
                     break;
                 case 2:
                     // the user canceled
-                    evt.cancel();
+                    dayEndingEvent.cancel();
                     return;
                 default:
                     throw new IllegalStateException(
                             "Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " + turnoverPrompt);
             }
         }
+    }
+
+    /**
+     * Checks if there are any due Scenarios.
+     * If the checkScenariosDue method of the Campaign associated with the given DayEndingEvent returns true, a dialog
+     * shows up informing the user of the due scenarios, and the DayEndingEvent is canceled.
+     *
+     * @param dayEndingEvent the DayEndingEvent being checked.
+     * @return {@code true} if there are due scenarios and {@code false} otherwise.
+     */
+    private boolean checkForDueScenarios(DayEndingEvent dayEndingEvent) {
+        if (getCampaign().checkScenariosDue()) {
+            JOptionPane.showMessageDialog(null,
+                    getResourceMap().getString("dialogCheckDueScenarios.text"),
+                    getResourceMap().getString("dialogCheckDueScenarios.title"),
+                    JOptionPane.WARNING_MESSAGE);
+
+            dayEndingEvent.cancel();
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if there are any overdue loans
+     * If the checkOverDueLoans method of the Campaign associated with the given DayEndingEvent returns true,
+     * the funds get refreshed, a dialog shows up informing the user of the overdue loans, and the DayEndingEvent is canceled.
+     *
+     * @param dayEndingEvent the DayEndingEvent being checked.
+     * @return {@code true} if there are overdue loans and {@code false} otherwise.
+     */
+    private boolean checkForOverdueLoans(DayEndingEvent dayEndingEvent) {
+        if (getCampaign().checkOverDueLoans()) {
+            refreshFunds();
+
+            JOptionPane.showMessageDialog(null,
+                    getResourceMap().getString("dialogOverdueLoans.text"),
+                    getResourceMap().getString("dialogOverdueLoans.title"),
+                    JOptionPane.WARNING_MESSAGE);
+
+            dayEndingEvent.cancel();
+
+            return true;
+        }
+        return false;
     }
 
     @Subscribe
