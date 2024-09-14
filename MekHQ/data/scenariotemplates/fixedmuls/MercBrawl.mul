@@ -1,48 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<unit version="0.49.16-SNAPSHOT" >
+<unit version="0.49.16-SNAPSHOT">
 
-		<entity chassis="Orion" model="ON1-VA" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="7e5db2b4-9038-47e5-a0d9-f190a65422de">
-			<pilot size="1" name="Kayla Postogova" nick="" gender="FEMALE" gunnery="3" piloting="4" externalId="dff30365-62d6-4708-a505-1a32b2a78282" ejected="false" advantages="pain_resistance" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="2"> Right Torso
-				<slot index="8" type="IS Ammo AC/10" shots="10"/>
-				<slot index="9" type="IS Ammo AC/10" shots="10"/>
-			</location>
-			<location index="3"> Left Torso
-				<slot index="1" type="IS Ammo SRM-4" shots="25"/>
-				<slot index="2" type="IS Ammo SRM-4" shots="25"/>
-			</location>
-			<Game id="19"/>
-		</entity>
+	<entity chassis="Orion" model="ON1-VA" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="7e5db2b4-9038-47e5-a0d9-f190a65422de">
+		<pilot size="1" name="Kayla Postogova" nick="" gender="FEMALE" gunnery="3" piloting="4"
+			externalId="dff30365-62d6-4708-a505-1a32b2a78282" ejected="false" advantages="pain_resistance"
+			edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="2"> Right
+		Torso <slot index="8" type="IS Ammo AC/10" shots="10" />
+				<slot index="9" type="IS Ammo AC/10"
+				shots="10" />
+		</location>
+			<location index="3"> Left Torso <slot index="1"
+				type="IS Ammo SRM-4" shots="25" />
+				<slot index="2" type="IS Ammo SRM-4" shots="25" />
+		</location>
+			<Game
+			id="19" />
+	</entity>
 
-		<entity chassis="Flashman" model="FLS-7K" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="19007c8b-58a6-4c8a-8400-088f55a0d270">
-			<pilot size="1" name="Dustin Tengonciang" nick="" gender="MALE" gunnery="3" piloting="3" externalId="16dc68dd-a2bb-4212-8c20-57e1d22c694d" ejected="false" advantages="weapon_specialist Medium Laser" edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-			<Game id="20"/>
-		</entity>
+	<entity chassis="Flashman" model="FLS-7K" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="19007c8b-58a6-4c8a-8400-088f55a0d270">
+		<pilot size="1" name="Dustin Tengonciang" nick="" gender="MALE" gunnery="3" piloting="3"
+			externalId="16dc68dd-a2bb-4212-8c20-57e1d22c694d" ejected="false"
+			advantages="weapon_specialist Medium Laser"
+			edge="edge 1::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" />
+		<Game id="20" />
+	</entity>
 
-		<entity chassis="Guillotine" model="GLT-4L" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="f92cc973-aaf0-4708-b837-6593b4d18364">
-			<pilot size="1" name="Satornil Havrda" nick="" gender="MALE" gunnery="3" piloting="4" externalId="0e2e8cf1-4706-4f61-a032-fc2f19b90a58" ejected="false" advantages="jumping_jack" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="2"> Right Torso
-				<slot index="7" type="IS Ammo SRM-6" shots="15"/>
-			</location>
-			<Game id="21"/>
-		</entity>
+	<entity chassis="Guillotine" model="GLT-4L" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="f92cc973-aaf0-4708-b837-6593b4d18364">
+		<pilot size="1" name="Satornil Havrda" nick="" gender="MALE" gunnery="3" piloting="4"
+			externalId="0e2e8cf1-4706-4f61-a032-fc2f19b90a58" ejected="false" advantages="jumping_jack"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion::edge_when_masc_fails"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="2"> Right
+		Torso <slot index="7" type="IS Ammo SRM-6" shots="15" />
+		</location>
+			<Game id="21" />
+	</entity>
 
-		<entity chassis="Highlander" model="HGN-733C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" neverDeployed="true" externalId="ceaff9f9-3917-4838-b542-e296ed6d5da5">
-			<pilot size="1" name="Bryan Antimisiaris" nick="" gender="MALE" gunnery="3" piloting="3" externalId="6ace7fbf-3b54-42d1-929e-98d5b83219c0" ejected="false" advantages="melee_specialist" edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion" autoeject="true"/>
-      The first slot in a location is at index="1".
-			<location index="2"> Right Torso
-				<slot index="4" type="IS Ammo AC/20" shots="5"/>
-				<slot index="5" type="IS Ammo AC/20" shots="5"/>
-			</location>
-			<location index="3"> Left Torso
-				<slot index="7" type="IS Ammo SRM-6" shots="15"/>
-				<slot index="8" type="IS Ammo LRM-20" shots="6"/>
-				<slot index="9" type="IS Ammo LRM-20" shots="6"/>
-			</location>
-			<Game id="23"/>
-		</entity>
+	<entity chassis="Highlander" model="HGN-733C" type="Biped" commander="false" offboard="false"
+		hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
+		deploymentZoneOffset="0" neverDeployed="true" externalId="ceaff9f9-3917-4838-b542-e296ed6d5da5">
+		<pilot size="1" name="Bryan Antimisiaris" nick="" gender="MALE" gunnery="3" piloting="3"
+			externalId="6ace7fbf-3b54-42d1-929e-98d5b83219c0" ejected="false"
+			advantages="melee_specialist"
+			edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion"
+			autoeject="true" /> The first slot in a location is at index="1". <location index="2"> Right
+		Torso <slot index="4" type="IS Ammo AC/20" shots="5" />
+				<slot index="5" type="IS Ammo AC/20"
+				shots="5" />
+		</location>
+			<location index="3"> Left Torso <slot index="7"
+				type="IS Ammo SRM-6" shots="15" />
+				<slot index="8" type="IS Ammo LRM-20" shots="6" />
+				<slot
+				index="9" type="IS Ammo LRM-20" shots="6" />
+		</location>
+			<Game id="23" />
+	</entity>
 
 </unit>

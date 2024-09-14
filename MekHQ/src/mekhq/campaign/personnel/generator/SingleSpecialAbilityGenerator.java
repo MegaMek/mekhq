@@ -123,7 +123,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                 final String special;
                 switch (Compute.randomInt(3)) {
                     case 0:
-                        special = Crew.HUMANTRO_MECH;
+                        special = Crew.HUMANTRO_MEK;
                         break;
                     case 1:
                         special = Crew.HUMANTRO_AERO;

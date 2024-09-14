@@ -148,7 +148,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         }
 
         // Factory Market
-        if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
+        if (campaign.getAtBUnitRatingMod() >= IUnitRating.DRAGOON_B) {
             faction = ObjectUtility.getRandomItem(campaign.getCurrentSystem()
                     .getFactionSet(campaign.getLocalDate()));
 

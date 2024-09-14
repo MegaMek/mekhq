@@ -59,7 +59,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -161,7 +161,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -266,7 +266,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -371,7 +371,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -476,7 +476,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -586,7 +586,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -621,7 +621,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -726,7 +726,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -823,7 +823,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -928,7 +928,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -1028,7 +1028,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -1133,7 +1133,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -1238,7 +1238,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -1343,7 +1343,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn("MERC");
         when(campaign.getRetainerEmployerCode()).thenReturn(employer);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -1447,7 +1447,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -1552,7 +1552,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -1657,7 +1657,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 
@@ -1762,7 +1762,7 @@ public class ContractMarketAtBGenerationTests {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getFactionCode()).thenReturn(employer);
         when(campaign.getRetainerEmployerCode()).thenReturn(null);
-        when(campaign.getUnitRatingMod()).thenReturn(unitRating);
+        when(campaign.getAtBUnitRatingMod()).thenReturn(unitRating);
         when(campaign.getLocalDate()).thenReturn(LocalDate.ofYearDay(gameYear, 1));
         when(campaign.getGameYear()).thenReturn(gameYear);
 

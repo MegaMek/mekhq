@@ -18,20 +18,29 @@
  */
 package mekhq.campaign;
 
+import java.io.OutputStream;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+
+import org.w3c.dom.Node;
+
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-
-import java.io.OutputStream;
-import java.io.Writer;
-import java.util.*;
-import java.util.Map.Entry;
+import megamek.logging.MMLogger;
 
 /**
  * Class for holding extra data/properties with free-form strings as keys.
@@ -39,6 +48,7 @@ import java.util.Map.Entry;
  * Example usage:
  * <p>
  * - creating keys
+ * 
  * <pre>
  * ExtraData.Key&lt;Integer&gt; INTKEY = new ExtraData.IntKey("int_key");
  * ExtraData.Key&lt;Double&gt; DOUBLEKEY = new ExtraData.DoubleKey("double_key");
@@ -46,7 +56,9 @@ import java.util.Map.Entry;
  * ExtraData.Key&lt;Boolean&gt; BOOLEANKEY = new ExtraData.BooleanKey("realy?");
  * ExtraData.Key&lt;String&gt; PLAIN_OLD_BORING_KEY = new ExtraData.StringKey("stuff");
  * </pre>
+ * 
  * - setting and getting data
+ * 
  * <pre>
  * ed.set(INTKEY, 75);
  * ed.set(DOUBLEKEY, 12.5);
@@ -57,7 +69,9 @@ import java.util.Map.Entry;
  * // the next one guarantees to not return null, but -1 if the value is not set
  * int anotherIntVal = ed.get(INTKEY, -1);
  * </pre>
+ * 
  * - saving to XML and creating from XML
+ * 
  * <pre>
  * ed.writeToXML(System.out);
  * ExtraData newEd = ExtraData.createFromXml(xmlNode);
@@ -66,6 +80,8 @@ import java.util.Map.Entry;
 @XmlRootElement(name = "extraData")
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class ExtraData {
+    private static final MMLogger logger = MMLogger.create(ExtraData.class);
+
     private static final Marshaller marshaller;
     private static final Unmarshaller unmarshaller;
     static {
@@ -78,7 +94,7 @@ public class ExtraData {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             u = context.createUnmarshaller();
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
         marshaller = m;
         unmarshaller = u;
@@ -88,7 +104,9 @@ public class ExtraData {
     static {
         ADAPTERS.put(String.class, new StringAdapter<String>() {
             @Override
-            public String adapt(String str) { return str; }
+            public String adapt(String str) {
+                return str;
+            }
         });
         ADAPTERS.put(Integer.class, new StringAdapter<Integer>() {
             @Override
@@ -96,7 +114,7 @@ public class ExtraData {
                 try {
                     return Integer.valueOf(str);
                 } catch (Exception e) {
-                    LogManager.getLogger().error("", e);
+                    logger.error("", e);
                     return 0;
                 }
             }
@@ -107,7 +125,7 @@ public class ExtraData {
                 try {
                     return Double.valueOf(str);
                 } catch (Exception e) {
-                    LogManager.getLogger().error("", e);
+                    logger.error("", e);
                     return 0.0;
                 }
             }
@@ -118,7 +136,7 @@ public class ExtraData {
                 try {
                     return Boolean.valueOf(str);
                 } catch (Exception e) {
-                    LogManager.getLogger().error("", e);
+                    logger.error("", e);
                     return false;
                 }
             }
@@ -164,7 +182,8 @@ public class ExtraData {
     }
 
     /**
-     * @return the value associated with the given key, or <code>null</code> if there isn't one
+     * @return the value associated with the given key, or <code>null</code> if
+     *         there isn't one
      */
     public <T> T get(Key<T> key) {
         if (!values.containsKey(key.type)) {
@@ -174,7 +193,8 @@ public class ExtraData {
     }
 
     /**
-     * @return the value associated with the given key, or the default value if there isn't one
+     * @return the value associated with the given key, or the default value if
+     *         there isn't one
      */
     public <T> T get(Key<T> key, T defaultValue) {
         T result = get(key);
@@ -199,7 +219,7 @@ public class ExtraData {
         try {
             marshaller.marshal(this, writer);
         } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
@@ -207,7 +227,7 @@ public class ExtraData {
         try {
             marshaller.marshal(this, os);
         } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
     }
 
@@ -215,7 +235,7 @@ public class ExtraData {
         try {
             return (ExtraData) unmarshaller.unmarshal(wn);
         } catch (JAXBException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
             return null;
         }
     }
@@ -261,13 +281,14 @@ public class ExtraData {
 
     public static abstract class StringAdapter<T> {
         public abstract T adapt(String str);
+
         public String toString(T val) {
             return (null != val) ? val.toString() : null;
         }
     }
 
     private static class JAXBValueAdapter
-        extends XmlAdapter<XmlValueListArray, Map<Class<?>, Map<String, Object>>> {
+            extends XmlAdapter<XmlValueListArray, Map<Class<?>, Map<String, Object>>> {
         @Override
         public Map<Class<?>, Map<String, Object>> unmarshal(XmlValueListArray v) throws Exception {
             if ((null == v) || (null == v.list) || v.list.isEmpty()) {
@@ -281,7 +302,8 @@ public class ExtraData {
                 Class<?> type = null;
                 try {
                     type = Class.forName(list.type);
-                } catch (ClassNotFoundException ignored) {}
+                } catch (ClassNotFoundException ignored) {
+                }
                 if (null == type) {
                     continue;
                 }
@@ -336,7 +358,7 @@ public class ExtraData {
     private static class XmlValueList {
         @XmlAttribute
         public String type;
-        @XmlElement(name="entry")
+        @XmlElement(name = "entry")
         public List<XmlValueEntry> entries;
     }
 

@@ -20,23 +20,29 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.control.EditKillLogControl;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.Objects;
-import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
  */
 public class EditKillLogDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(EditKillLogDialog.class);
+
     private JFrame frame;
     private Campaign campaign;
     private Person person;
@@ -86,7 +92,7 @@ public class EditKillLogDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 }

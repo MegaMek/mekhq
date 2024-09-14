@@ -20,15 +20,15 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Loan;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.enums.FinancialTerm;
-import org.apache.logging.log4j.LogManager;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.ResourceBundle;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -37,16 +37,23 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.NumberFormat;
-import java.util.ResourceBundle;
+
+import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Loan;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.FinancialTerm;
 
 /**
  * @author Taharqa
  */
 public class NewLoanDialog extends JDialog implements ActionListener, ChangeListener {
+    private static final MMLogger logger = MMLogger.create(NewLoanDialog.class);
+
     private NumberFormatter numberFormatter;
     private JFrame frame;
     private Loan loan;
@@ -99,7 +106,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
         this.campaign = campaign;
         this.numberFormatter = new NumberFormatter(NumberFormat.getInstance());
 
-        rating = campaign.getUnitRatingMod();
+        rating = campaign.getAtBUnitRatingMod();
         loan = Loan.getBaseLoan(rating, this.campaign.getLocalDate());
         maxCollateralValue = this.campaign.getFinances().getMaxCollateral(this.campaign);
         initComponents();
@@ -385,7 +392,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -547,7 +554,7 @@ public class NewLoanDialog extends JDialog implements ActionListener, ChangeList
             lblTotalPayment.setText(loan.determineRemainingValue().toAmountAndSymbolString());
             lblCollateralAmount.setText(loan.determineCollateralAmount().toAmountAndSymbolString());
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 

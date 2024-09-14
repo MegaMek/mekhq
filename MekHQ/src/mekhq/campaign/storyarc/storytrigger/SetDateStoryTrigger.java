@@ -18,47 +18,55 @@
  */
 package mekhq.campaign.storyarc.storytrigger;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryPoint;
-import mekhq.campaign.storyarc.StoryTrigger;
-import mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
  * This StoryTrigger will set the date in a
- * {@link CheckDateReachedStoryPoint CheckDateReachedStoryPoint} identified by its id.
- * This can be used to assign dates to events where the date might not be known in advance. The date can be assigned
- * either by an actual date or by the number of days into the future from the point of this trigger.
+ * {@link CheckDateReachedStoryPoint CheckDateReachedStoryPoint} identified by
+ * its id.
+ * This can be used to assign dates to events where the date might not be known
+ * in advance. The date can be assigned
+ * either by an actual date or by the number of days into the future from the
+ * point of this trigger.
  */
 public class SetDateStoryTrigger extends StoryTrigger {
+    private static final MMLogger logger = MMLogger.create(SetDateStoryTrigger.class);
 
-   //region Variable Declarations
+    // region Variable Declarations
     /** The id of the CheckDateReachedStoryPoint that should be changed **/
     private UUID storyPointId;
 
-    /** the date to be changed to. This can be null if this trigger uses number of days instead **/
+    /**
+     * the date to be changed to. This can be null if this trigger uses number of
+     * days instead
+     **/
     private LocalDate date;
 
     /** The number of days from the present when this event should happen **/
     private int futureDays;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public SetDateStoryTrigger() {
         super();
         // set the default to be one day into the future in case it is missing
         futureDays = 1;
     }
-    //endregion Constructors
+    // endregion Constructors
 
     @Override
     protected void execute() {
@@ -99,7 +107,7 @@ public class SetDateStoryTrigger extends StoryTrigger {
                 }
 
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

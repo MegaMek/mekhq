@@ -18,7 +18,31 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Checkbox;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.UUID;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import megamek.client.ui.models.XTableColumnModel;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
@@ -27,18 +51,10 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.AutoAwardsTableModel;
 import mekhq.gui.sorter.PersonRankStringSorter;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.List;
-import java.util.*;
 
 public class AutoAwardsDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(AutoAwardsDialog.class);
+
     final Campaign campaign;
     final CampaignGUI gui;
 
@@ -65,9 +81,9 @@ public class AutoAwardsDialog extends JDialog {
         campaign = c;
         gui = campaign.getApp().getCampaigngui();
         allData = allAwardData;
-        LogManager.getLogger().info("attempting to extract a single page");
+        logger.info("attempting to extract a single page");
         data = allAwardData.get(ceremonyCount);
-        LogManager.getLogger().info("attempt successful");
+        logger.info("attempt successful");
         currentPageCount = ceremonyCount;
 
         setSize(new Dimension(800, 600));
@@ -89,7 +105,8 @@ public class AutoAwardsDialog extends JDialog {
         JPanel panMain = new JPanel(cardLayout);
         add(panMain, BorderLayout.CENTER);
 
-        // we work with a combination image & instructions panel, as that allows us to sit the image
+        // we work with a combination image & instructions panel, as that allows us to
+        // sit the image
         // right below the title, but above the instructions
         JPanel imageAndInstructionsPanel = new JPanel(new BorderLayout());
 
@@ -105,7 +122,7 @@ public class AutoAwardsDialog extends JDialog {
         txtInstructions.setText(resourceMap.getString("txtInstructions.text"));
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         imageAndInstructionsPanel.add(txtInstructions, BorderLayout.SOUTH);
         add(imageAndInstructionsPanel, BorderLayout.PAGE_START);
@@ -124,7 +141,7 @@ public class AutoAwardsDialog extends JDialog {
 
         upperPanel.add(cboPersonnelFilter);
         upperPanel.add(Box.createHorizontalGlue());
-        upperPanel.add(Box.createRigidArea(new Dimension(5,0)));
+        upperPanel.add(Box.createRigidArea(new Dimension(5, 0)));
 
         btnDeselectAll = new JButton(resourceMap.getString("btnDeselectAll.text"));
         btnDeselectAll.addMouseListener(toggleAllListener);
@@ -140,10 +157,10 @@ public class AutoAwardsDialog extends JDialog {
 
         AutoAwardsTableModel model = new AutoAwardsTableModel(campaign);
         // This is where we insert the external data
-        LogManager.getLogger().info("Trying to pass data to AutoAwardsTableModel.java");
-        LogManager.getLogger().info("Data being passed: {}", data);
+        logger.info("Trying to pass data to AutoAwardsTableModel.java");
+        logger.info("Data being passed: {}", data);
         model.setData(data);
-        LogManager.getLogger().info("Attempt successful");
+        logger.info("Attempt successful");
         personnelTable = new AutoAwardsTable(model);
         personnelSorter = new TableRowSorter<>(model);
         personnelSorter.setComparator(AutoAwardsTableModel.COL_PERSON, new PersonRankStringSorter(campaign));
@@ -249,8 +266,7 @@ public class AutoAwardsDialog extends JDialog {
                                 person.getAwardController().removeAwardSilent(
                                         awardPendingRemoval.getSet(),
                                         awardPendingRemoval.getName(),
-                                        null
-                                );
+                                        null);
                             }
                         }
 

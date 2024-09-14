@@ -24,7 +24,7 @@ import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
-import megamek.common.MechSummary;
+import megamek.common.MekSummary;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -59,7 +59,7 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
 
         for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
             enemyEntities = new ArrayList<>();
-            MechSummary ms = campaign.getUnitGenerator().generate("SL", UnitType.MEK, weight, 2750,
+            MekSummary ms = campaign.getUnitGenerator().generate("SL", UnitType.MEK, weight, 2750,
                     (Compute.d6() == 6) ? IUnitRating.DRAGOON_A : IUnitRating.DRAGOON_D);
 
             if (ms != null) {

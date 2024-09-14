@@ -21,9 +21,23 @@
  */
 package mekhq.campaign.universe;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.UUID;
+
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
@@ -34,9 +48,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
-
-import java.time.LocalDate;
-import java.util.*;
 
 /**
  * This is a PlanetarySystem object that will contain information
@@ -59,32 +70,33 @@ public class PlanetarySystem {
     public static final int SPECTRAL_L = 7;
     public static final int SPECTRAL_T = 8;
     public static final int SPECTRAL_Y = 9;
-    // Spectral class "D" (white dwarfs) are determined by their luminosity "VII" - the number is here for sorting
+    // Spectral class "D" (white dwarfs) are determined by their luminosity "VII" -
+    // the number is here for sorting
     public static final int SPECTRAL_D = 99;
     // "Q" - not a proper star (neutron stars QN, pulsars QP, black holes QB, ...)
     public static final int SPECTRAL_Q = 100;
     // TODO: Wolf-Rayet stars ("W"), carbon stars ("C"), S-type stars ("S"),
 
-    public static final String LUM_0           = "0";
-    public static final String LUM_IA          = "Ia";
-    public static final String LUM_IAB         = "Iab";
-    public static final String LUM_IB          = "Ib";
+    public static final String LUM_0 = "0";
+    public static final String LUM_IA = "Ia";
+    public static final String LUM_IAB = "Iab";
+    public static final String LUM_IB = "Ib";
     // Generic class, consisting of Ia, Iab and Ib
-    public static final String LUM_I           = "I";
-    public static final String LUM_II_EVOLVED  = "I/II";
-    public static final String LUM_II          = "II";
+    public static final String LUM_I = "I";
+    public static final String LUM_II_EVOLVED = "I/II";
+    public static final String LUM_II = "II";
     public static final String LUM_III_EVOLVED = "II/III";
-    public static final String LUM_III         = "III";
-    public static final String LUM_IV_EVOLVED  = "III/IV";
-    public static final String LUM_IV          = "IV";
-    public static final String LUM_V_EVOLVED   = "IV/V";
-    public static final String LUM_V           = "V";
+    public static final String LUM_III = "III";
+    public static final String LUM_IV_EVOLVED = "III/IV";
+    public static final String LUM_IV = "IV";
+    public static final String LUM_V_EVOLVED = "IV/V";
+    public static final String LUM_V = "V";
     // typically used as a prefix "sd", not as a suffix
-    public static final String LUM_VI          = "VI";
+    public static final String LUM_VI = "VI";
     // typically used as a prefix "esd", not as a suffix
-    public static final String LUM_VI_PLUS     = "VI+";
+    public static final String LUM_VI_PLUS = "VI+";
     // always used as class designation "D", never as a suffix
-    public static final String LUM_VII         = "VII";
+    public static final String LUM_VII = "VII";
 
     @XmlElement(name = "xcood")
     private Double x;
@@ -97,7 +109,7 @@ public class PlanetarySystem {
     private String id;
     private String name;
 
-    //Star data (to be factored out)
+    // Star data (to be factored out)
     private String spectralType;
     @XmlJavaTypeAdapter(value = SpectralClassAdapter.class)
     private Integer spectralClass;
@@ -159,15 +171,15 @@ public class PlanetarySystem {
     }
 
     public String getName(LocalDate when) {
-        if (primarySlot < 1) {
-            // if no primary slot, then just return the id
-            if (null != id) {
-                return id;
-            }
+        // if no primary slot, then just return the id
+        if (primarySlot < 1 && null != id) {
+            return id;
         }
+
         if (null != getPrimaryPlanet()) {
             return getPrimaryPlanet().getName(when);
         }
+
         return "Unknown";
     }
 
@@ -265,7 +277,8 @@ public class PlanetarySystem {
     }
 
     /**
-     * @return the distance to another system in light years (0 if both are in the same system)
+     * @return the distance to another system in light years (0 if both are in the
+     *         same system)
      */
     public double getDistanceTo(PlanetarySystem anotherSystem) {
         return Math.sqrt(Math.pow(x - anotherSystem.x, 2) + Math.pow(y - anotherSystem.y, 2));
@@ -297,7 +310,10 @@ public class PlanetarySystem {
         }
     }
 
-    /** Recharge time in hours (assuming the usage of the fastest charging method available) */
+    /**
+     * Recharge time in hours (assuming the usage of the fastest charging method
+     * available)
+     */
     public double getRechargeTime(LocalDate when) {
         if (isZenithCharge(when) || isNadirCharge(when)) {
             // The 176 value comes from pg. 87-88 and 138 of StratOps
@@ -307,7 +323,10 @@ public class PlanetarySystem {
         }
     }
 
-    /** Recharge time in hours using solar radiation alone (at jump point and 100% efficiency) */
+    /**
+     * Recharge time in hours using solar radiation alone (at jump point and 100%
+     * efficiency)
+     */
     public double getSolarRechargeTime() {
         if ((null == spectralClass) || (null == subtype)) {
             // 176 is the average recharge time across all spectral classes and subtypes
@@ -334,14 +353,16 @@ public class PlanetarySystem {
     }
 
     /**
-     * @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position
+     * @return the average travel time from low orbit to the jump point at 1g, in
+     *         Terran days for a given planetary position
      */
     public double getTimeToJumpPoint(double acceleration) {
         return getTimeToJumpPoint(acceleration, getPrimaryPlanetPosition());
     }
 
     /**
-     * @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position
+     * @return the average travel time from low orbit to the jump point at 1g, in
+     *         Terran days for a given planetary position
      */
     public double getTimeToJumpPoint(double acceleration, int sysPos) {
         return planets.get(sysPos).getTimeToJumpPoint(acceleration);
@@ -391,7 +412,8 @@ public class PlanetarySystem {
 
     /**
      * @return the planet object identified by the primary slot.
-     * If no primary slot is given, then this function will return the first planet
+     *         If no primary slot is given, then this function will return the first
+     *         planet
      */
     public Planet getPrimaryPlanet() {
         return planets.get(getPrimaryPlanetPosition());
@@ -423,7 +445,6 @@ public class PlanetarySystem {
         return planets.values();
     }
 
-
     public String getIcon() {
         return switch (getSpectralClass()) {
             case SPECTRAL_B -> "B_" + luminosity;
@@ -450,7 +471,7 @@ public class PlanetarySystem {
 
     @Override
     public int hashCode() {
-       return Objects.hash(id);
+        return Objects.hash(id);
     }
 
     public PlanetarySystemEvent getOrCreateEvent(LocalDate when) {
@@ -526,7 +547,8 @@ public class PlanetarySystem {
             id = name;
         }
 
-        // Spectral classification: use spectralType if available, else the separate values
+        // Spectral classification: use spectralType if available, else the separate
+        // values
         if (null != spectralType) {
             setSpectralType(spectralType);
         }
@@ -614,13 +636,12 @@ public class PlanetarySystem {
         }
     }
 
- // @FunctionalInterface in Java 8, or just use Function<PlanetaryEvent, T>
     private interface EventGetter<T> {
         T get(PlanetarySystemEvent e);
     }
 
     /** A class representing some event, possibly changing planetary information */
-    @XmlRootElement(name="event")
+    @XmlRootElement(name = "event")
     public static final class PlanetarySystemEvent {
         @XmlJavaTypeAdapter(value = DateAdapter.class)
         public LocalDate date;
@@ -649,7 +670,6 @@ public class PlanetarySystem {
         }
     }
 
-
     /**
      * Retrieves a list of filtered academies based on the given campaign.
      *
@@ -665,7 +685,10 @@ public class PlanetarySystem {
         return academyFactory.getAllSetNames().stream()
                 .filter(setName -> !excludedSets.contains(setName) // Excluding certain setNames
                         && (!setName.equalsIgnoreCase("Prestigious Academies")
-                        || campaign.getCampaignOptions().isEnablePrestigiousAcademies())) // Additional condition for "Prestigious Academies"
+                                || campaign.getCampaignOptions().isEnablePrestigiousAcademies())) // Additional
+                                                                                                  // condition for
+                                                                                                  // "Prestigious
+                                                                                                  // Academies"
                 .flatMap(setName -> getFilteredAcademiesForSet(currentDate, setName).stream())
                 .toList();
     }
@@ -691,7 +714,8 @@ public class PlanetarySystem {
     }
 
     /**
-     * Retrieves a string representation of the prestigious academies available in the system.
+     * Retrieves a string representation of the prestigious academies available in
+     * the system.
      *
      * @return A string representation of the prestigious academies in the system.
      */

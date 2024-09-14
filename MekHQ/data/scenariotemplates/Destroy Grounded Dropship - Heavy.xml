@@ -2,11 +2,12 @@
 <ScenarioTemplate>
     <name>Destroy Grounded Dropship - Heavy</name>
     <shortBriefing>Destroy grounded hostile dropship.</shortBriefing>
-    <detailedBriefing>Destroy or cripple a grounded enemy dropship. You have 30 turns to do so before it lifts off.</detailedBriefing>
+    <detailedBriefing>Destroy or cripple a grounded enemy dropship. You have 30 turns to do so
+        before it lifts off.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
-        <allowedTerrainTypes/>
+        <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
@@ -48,7 +49,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -79,7 +80,7 @@
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>3</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -110,10 +111,10 @@
                 <generationOrder>3</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces/>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-		<subjectToRandomRemoval>false</subjectToRandomRemoval>
+                <subjectToRandomRemoval>false</subjectToRandomRemoval>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
@@ -124,7 +125,7 @@
             <associatedForceNames>
                 <associatedForceName>Dropship</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -155,7 +156,7 @@
                 <associatedForceName>Primary Opfor</associatedForceName>
                 <associatedForceName>Dropship</associatedForceName>
             </associatedForceNames>
-            <associatedUnitIDs/>
+            <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
@@ -173,7 +174,8 @@
             <additionalDetails>
                 <additionalDetail></additionalDetail>
             </additionalDetails>
-            <description>Destroy, cripple or force to withdraw 50% of the following force(s) and unit(s):</description>
+            <description>Destroy, cripple or force to withdraw 50% of the following force(s) and
+                unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>
