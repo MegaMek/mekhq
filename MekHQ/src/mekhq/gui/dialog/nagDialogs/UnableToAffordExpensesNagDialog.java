@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,6 +27,10 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 
+/**
+ * This class represents a dialog that notifies the user when a campaign is unable to afford its monthly expenses.
+ * It extends the AbstractMHQNagDialog class.
+ */
 public class UnableToAffordExpensesNagDialog extends AbstractMHQNagDialog {
     /**
      * Determines whether the given campaign is unable to afford its monthly expenses.

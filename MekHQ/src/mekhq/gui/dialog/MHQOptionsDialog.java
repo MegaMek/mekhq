@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -47,6 +47,21 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+/**
+ * MHQOptionsDialog is a dialog that allows the user to configure various options in MegaMekHQ.
+ * It extends the AbstractMHQButtonDialog class and inherits its common dialog features.
+ * The dialog allows configuration of options related to display, colors, fonts, autosave,
+ * startup behavior, notifications, and various other miscellaneous options.
+ * <p>
+ * To create an instance of MHQOptionsDialog, invoke one of its constructors with a frame as a parameter.
+ * <p>
+ * Example Usage:
+ * JFrame frame = new JFrame("Main Frame");
+ * MHQOptionsDialog dialog = new MHQOptionsDialog(frame);
+ * dialog.setVisible(true);
+ * <p>
+ * This dialog uses the following Mnemonics: C, D, M, M, S, U, W, Y
+ */
 public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private static final MMLogger logger = MMLogger.create(MHQOptionsDialog.class);
 
