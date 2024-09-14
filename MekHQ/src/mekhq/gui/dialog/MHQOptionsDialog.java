@@ -18,19 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
-
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-
 import megamek.MMConstants;
 import megamek.client.ui.Messages;
 import megamek.client.ui.baseComponents.MMComboBox;
@@ -48,6 +35,17 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private static final MMLogger logger = MMLogger.create(MHQOptionsDialog.class);
@@ -162,6 +160,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private JCheckBox optionOutstandingScenariosNag;
         private JCheckBox optionInvalidFactionNag;
         private JCheckBox optionUnableToAffordExpensesNag;
+        private JCheckBox optionUnableToAffordLoanPaymentNag;
         private JCheckBox optionUnableToAffordJumpNag;
         // endregion Nag Tab
 
@@ -1008,6 +1007,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                 .setToolTipText(resources.getString("optionUnableToAffordExpensesNag.toolTipText"));
                 optionUnableToAffordExpensesNag.setName("optionUnableToAffordExpensesNag");
 
+                optionUnableToAffordLoanPaymentNag = new JCheckBox(
+                                resources.getString("optionUnableToAffordLoanPaymentNag.text"));
+                optionUnableToAffordLoanPaymentNag
+                                .setToolTipText(resources.getString("optionUnableToAffordLoanPaymentNag.toolTipText"));
+                optionUnableToAffordLoanPaymentNag.setName("optionUnableToAffordLoanPaymentNag");
+
                 optionUnableToAffordJumpNag = new JCheckBox(resources.getString("optionUnableToAffordJumpNag.text"));
                 optionUnableToAffordJumpNag
                                 .setToolTipText(resources.getString("optionUnableToAffordJumpNag.toolTipText"));
@@ -1037,6 +1042,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addComponent(optionOutstandingScenariosNag)
                                                 .addComponent(optionInvalidFactionNag)
                                                 .addComponent(optionUnableToAffordExpensesNag)
+                                                .addComponent(optionUnableToAffordLoanPaymentNag)
                                                 .addComponent(optionUnableToAffordJumpNag));
 
                 layout.setHorizontalGroup(
@@ -1055,6 +1061,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addComponent(optionOutstandingScenariosNag)
                                                 .addComponent(optionInvalidFactionNag)
                                                 .addComponent(optionUnableToAffordExpensesNag)
+                                                .addComponent(optionUnableToAffordLoanPaymentNag)
                                                 .addComponent(optionUnableToAffordJumpNag));
 
                 return panel;
@@ -1359,6 +1366,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                 optionInvalidFactionNag.isSelected());
                 MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES,
                                 optionUnableToAffordExpensesNag.isSelected());
+                MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT,
+                                optionUnableToAffordLoanPaymentNag.isSelected());
                 MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP,
                                 optionUnableToAffordJumpNag.isSelected());
 
@@ -1505,6 +1514,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                 MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INVALID_FACTION));
                 optionUnableToAffordExpensesNag.setSelected(
                                 MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES));
+                optionUnableToAffordLoanPaymentNag.setSelected(
+                                MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT));
                 optionUnableToAffordJumpNag.setSelected(
                                 MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP));
 
