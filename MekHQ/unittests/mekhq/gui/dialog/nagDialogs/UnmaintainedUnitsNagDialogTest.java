@@ -1,40 +1,69 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.dialog.nagDialogs;
 
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Systems;
-import org.apache.logging.log4j.LogManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static mekhq.gui.dialog.nagDialogs.UnmaintainedUnitsNagDialog.checkHanger;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * This class is a test class for the UnmaintainedUnitsNagDialog class.
+ * It tests the different combinations of unit states and verifies the behavior of the checkHanger() method.
+ */
 class UnmaintainedUnitsNagDialogTest {
     // Mock objects for the tests
-    private Campaign campaign;
-    private Hangar hangar;
-    private Unit mockUnit1, mockUnit2;
+    Campaign campaign;
+    Hangar hangar;
+    Unit mockUnit1, mockUnit2;
 
-    // System setup for all tests, runs once before all tests
+    /**
+     * Sets up the necessary dependencies and configurations before running the test methods.
+     * Runs once before all tests
+     */
     @BeforeAll
-    public static void setup() {
+    static void setup() {
         try {
             Systems.setInstance(Systems.loadDefault());
-        } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+        } catch (Exception exception) {
+            MMLogger.create(UnmaintainedUnitsNagDialogTest.class).error("", exception);
         }
     }
 
-    // Test setup for each test, runs before each test
+    /**
+     * Test setup for each test, runs before each test.
+     * Initializes the mock objects and sets up the necessary mock behaviors.
+     */
     @BeforeEach
-    public void init() {
+    void init() {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
         hangar = mock(Hangar.class);
@@ -45,128 +74,87 @@ class UnmaintainedUnitsNagDialogTest {
         when(campaign.getHangar()).thenReturn(hangar);
     }
 
+    /**
+     * Initializes the units by setting their maintenance status and salvage status.
+     *
+     * @param unit1Unmaintained A boolean indicating whether the first unit is unmaintained.
+     * @param unit1Salvage A boolean indicating whether the first unit is salvage.
+     * @param unit2Unmaintained A boolean indicating whether the second unit is unmaintained.
+     * @param unit2Salvage A boolean indicating whether the second unit is salvage.
+     */
+    private void initializeUnits(boolean unit1Unmaintained, boolean unit1Salvage, boolean unit2Unmaintained, boolean unit2Salvage) {
+        when(mockUnit1.isUnmaintained()).thenReturn(unit1Unmaintained);
+        when(mockUnit1.isSalvage()).thenReturn(unit1Salvage);
+
+        when(mockUnit2.isUnmaintained()).thenReturn(unit2Unmaintained);
+        when(mockUnit2.isSalvage()).thenReturn(unit2Salvage);
+
+        List<Unit> units = List.of(mockUnit1, mockUnit2);
+        when(hangar.getUnits()).thenReturn(units);
+    }
+
     // In the following tests,
     // Different combinations of unit states to set up desired behaviors in mock objects
     // Then the checkHanger() method of UnmaintainedUnitsNagDialog class is called,
     // and its response is checked against expected behavior
 
     @Test
-    public void unmaintainedUnitExists() {
-        when(mockUnit1.isUnmaintained()).thenReturn(false);
-        when(mockUnit1.isSalvage()).thenReturn(false);
-
-        when(mockUnit2.isUnmaintained()).thenReturn(true);
-        when(mockUnit2.isSalvage()).thenReturn(false);
-
-        List<Unit> units = List.of(mockUnit1, mockUnit2);
-        when(hangar.getUnits()).thenReturn(units);
-
-        UnmaintainedUnitsNagDialog nagDialog = new UnmaintainedUnitsNagDialog(null, campaign);
-        assertTrue(nagDialog.checkHanger());
+    void unmaintainedUnitExistsUnit1() {
+        initializeUnits(true, false, false, false);
+        assertTrue(checkHanger(campaign));
     }
 
     @Test
-    public void unmaintainedUnitExistsButSalvageUnit1() {
-        when(mockUnit1.isUnmaintained()).thenReturn(false);
-        when(mockUnit1.isSalvage()).thenReturn(true);
-
-        when(mockUnit2.isUnmaintained()).thenReturn(true);
-        when(mockUnit2.isSalvage()).thenReturn(false);
-
-        List<Unit> units = List.of(mockUnit1, mockUnit2);
-        when(hangar.getUnits()).thenReturn(units);
-
-        UnmaintainedUnitsNagDialog nagDialog = new UnmaintainedUnitsNagDialog(null, campaign);
-        assertTrue(nagDialog.checkHanger());
+    void unmaintainedUnitExistsUnit2() {
+        initializeUnits(false, false, true, false);
+        assertTrue(checkHanger(campaign));
     }
 
     @Test
-    public void unmaintainedUnitExistsButSalvageUnit2() {
-        when(mockUnit1.isUnmaintained()).thenReturn(false);
-        when(mockUnit1.isSalvage()).thenReturn(false);
-
-        when(mockUnit2.isUnmaintained()).thenReturn(true);
-        when(mockUnit2.isSalvage()).thenReturn(true);
-
-        List<Unit> units = List.of(mockUnit1, mockUnit2);
-        when(hangar.getUnits()).thenReturn(units);
-
-        UnmaintainedUnitsNagDialog nagDialog = new UnmaintainedUnitsNagDialog(null, campaign);
-        assertFalse(nagDialog.checkHanger());
+    void unmaintainedUnitExistsButSalvageUnit1() {
+        initializeUnits(true, true, true, false);
+        assertTrue(checkHanger(campaign));
     }
 
     @Test
-    public void unmaintainedUnitExistsButSalvageMixed() {
-        when(mockUnit1.isUnmaintained()).thenReturn(false);
-        when(mockUnit1.isSalvage()).thenReturn(true);
-
-        when(mockUnit2.isUnmaintained()).thenReturn(true);
-        when(mockUnit2.isSalvage()).thenReturn(false);
-
-        List<Unit> units = List.of(mockUnit1, mockUnit2);
-        when(hangar.getUnits()).thenReturn(units);
-
-        UnmaintainedUnitsNagDialog nagDialog = new UnmaintainedUnitsNagDialog(null, campaign);
-        assertTrue(nagDialog.checkHanger());
+    void unmaintainedUnitExistsButSalvageUnit2() {
+        initializeUnits(true, false, true, true);
+        assertTrue(checkHanger(campaign));
     }
 
     @Test
-    public void noUnmaintainedUnitExists() {
-        when(mockUnit1.isUnmaintained()).thenReturn(false);
-        when(mockUnit1.isSalvage()).thenReturn(false);
-
-        when(mockUnit2.isUnmaintained()).thenReturn(false);
-        when(mockUnit2.isSalvage()).thenReturn(false);
-
-        List<Unit> units = List.of(mockUnit1, mockUnit2);
-        when(hangar.getUnits()).thenReturn(units);
-
-        UnmaintainedUnitsNagDialog nagDialog = new UnmaintainedUnitsNagDialog(null, campaign);
-        assertFalse(nagDialog.checkHanger());
+    void unmaintainedUnitExistsButSalvageMixed() {
+        initializeUnits(false, true, true, false);
+        assertTrue(checkHanger(campaign));
     }
 
     @Test
-    public void noUnmaintainedUnitExistsButSalvageUnit1() {
-        when(mockUnit1.isUnmaintained()).thenReturn(false);
-        when(mockUnit1.isSalvage()).thenReturn(true);
-
-        when(mockUnit2.isUnmaintained()).thenReturn(false);
-        when(mockUnit2.isSalvage()).thenReturn(false);
-
-        List<Unit> units = List.of(mockUnit1, mockUnit2);
-        when(hangar.getUnits()).thenReturn(units);
-
-        UnmaintainedUnitsNagDialog nagDialog = new UnmaintainedUnitsNagDialog(null, campaign);
-        assertFalse(nagDialog.checkHanger());
+    void noUoUnmaintainedUnitExistsUnit1() {
+        initializeUnits(false, false, false, false);
+        assertFalse(checkHanger(campaign));
     }
 
     @Test
-    public void noUnmaintainedUnitExistsButSalvageUnit2() {
-        when(mockUnit1.isUnmaintained()).thenReturn(false);
-        when(mockUnit1.isSalvage()).thenReturn(false);
-
-        when(mockUnit2.isUnmaintained()).thenReturn(false);
-        when(mockUnit2.isSalvage()).thenReturn(true);
-
-        List<Unit> units = List.of(mockUnit1, mockUnit2);
-        when(hangar.getUnits()).thenReturn(units);
-
-        UnmaintainedUnitsNagDialog nagDialog = new UnmaintainedUnitsNagDialog(null, campaign);
-        assertFalse(nagDialog.checkHanger());
+    void noUnmaintainedUnitExistsUnit2() {
+        initializeUnits(false, false, false, false);
+        assertFalse(checkHanger(campaign));
     }
 
     @Test
-    public void noUnmaintainedUnitExistsButSalvageMixed() {
-        when(mockUnit1.isUnmaintained()).thenReturn(false);
-        when(mockUnit1.isSalvage()).thenReturn(true);
+    void noUnmaintainedUnitExistsButSalvageUnit1() {
+        initializeUnits(false, true, false, false);
+        assertFalse(checkHanger(campaign));
+    }
 
-        when(mockUnit2.isUnmaintained()).thenReturn(false);
-        when(mockUnit2.isSalvage()).thenReturn(false);
+    @Test
+    void noUnmaintainedUnitExistsButSalvageUnit2() {
+        initializeUnits(false, false, false, true);
+        assertFalse(checkHanger(campaign));
+    }
 
-        List<Unit> units = List.of(mockUnit1, mockUnit2);
-        when(hangar.getUnits()).thenReturn(units);
-
-        UnmaintainedUnitsNagDialog nagDialog = new UnmaintainedUnitsNagDialog(null, campaign);
-        assertFalse(nagDialog.checkHanger());
+    @Test
+    void noUnmaintainedUnitExistsButSalvageMixed() {
+        initializeUnits(false, true, false, false);
+        assertFalse(checkHanger(campaign));
     }
 }
