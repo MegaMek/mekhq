@@ -28,11 +28,20 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 import javax.swing.*;
 
 public class UnableToAffordExpensesNagDialog extends AbstractMHQNagDialog {
+    /**
+     * Determines whether the given campaign is unable to afford its monthly expenses.
+     *
+     * @param campaign the ongoing campaign
+     * @return {@code true} if the campaign's funds are less than the total deficit, {@code false} otherwise
+     */
     private static boolean isUnableToAffordExpenses (Campaign campaign) {
+        // calculate a financial report which includes the monthly expenses
         FinancialReport financialReport = FinancialReport.calculate(campaign);
 
-        Money deficit = financialReport.getTotalLiabilities().plus(financialReport.getMonthlyExpenses());
+        // get the total monthly expenses
+        Money deficit = financialReport.getMonthlyExpenses();
 
+        // check if the campaign's funds are less than the total deficit
         return campaign.getFunds().isLessThan(deficit);
     }
 
