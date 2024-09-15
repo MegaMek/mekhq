@@ -41,9 +41,9 @@ import static org.mockito.Mockito.when;
  */
 class UnmaintainedUnitsNagDialogTest {
     // Mock objects for the tests
-    Campaign campaign;
-    Hangar hangar;
-    Unit mockUnit1, mockUnit2;
+    private Campaign campaign;
+    private Hangar hangar;
+    private Unit mockUnit1, mockUnit2;
 
     /**
      * Sets up the necessary dependencies and configurations before running the test methods.

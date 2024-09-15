@@ -50,10 +50,10 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Constructs a new UnmaintainedUnitsNagDialog.
+     * Creates a new instance of the UnmaintainedUnitsNagDialog class.
      *
-     * @param frame    the parent JFrame for the dialog
-     * @param campaign the Campaign object associated with the dialog
+     * @param frame the parent JFrame for the dialog
+     * @param campaign the Campaign associated with the dialog
      */
     //region Constructors
     public UnmaintainedUnitsNagDialog(final JFrame frame, final Campaign campaign) {
