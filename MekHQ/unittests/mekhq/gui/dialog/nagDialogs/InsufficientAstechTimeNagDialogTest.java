@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 /**
  * This class contains test cases for the {@link InsufficientAstechTimeNagDialog} class.
  * It tests the different combinations of Astech requirements and verifies the behavior of the
- * {@code isContractEnded()} method.
+ * {@code getAstechTimeDeficit()} and {@code checkAstechTimeDeficit()} methods.
  */
 class InsufficientAstechTimeNagDialogTest {
     // Mock objects for the tests
