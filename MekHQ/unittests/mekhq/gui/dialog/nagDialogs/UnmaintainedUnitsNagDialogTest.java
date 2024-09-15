@@ -18,12 +18,9 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Systems;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,19 +41,6 @@ class UnmaintainedUnitsNagDialogTest {
     private Campaign campaign;
     private Hangar hangar;
     private Unit mockUnit1, mockUnit2;
-
-    /**
-     * Sets up the necessary dependencies and configurations before running the test methods.
-     * Runs once before all tests
-     */
-    @BeforeAll
-    static void setup() {
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (Exception exception) {
-            MMLogger.create(UnmaintainedUnitsNagDialogTest.class).error("", exception);
-        }
-    }
 
     /**
      * Test setup for each test, runs before each test.

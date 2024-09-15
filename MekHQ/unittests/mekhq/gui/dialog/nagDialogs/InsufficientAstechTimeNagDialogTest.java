@@ -18,12 +18,9 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Systems;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,19 +46,6 @@ class InsufficientAstechTimeNagDialogTest {
     private Unit unit1, unit2;
     private int possibleAstechMinutes;
     private int possibleAstechOvertimeMinutes;
-
-    /**
-     * Sets up the necessary dependencies and configurations before running the test methods.
-     * Runs once before all tests
-     */
-    @BeforeAll
-    static void setup() {
-        try {
-            Systems.setInstance(Systems.loadDefault());
-        } catch (Exception exception) {
-            MMLogger.create(InsufficientAstechTimeNagDialogTest.class).error("", exception);
-        }
-    }
 
     /**
      * Test setup for each test, runs before each test.
