@@ -36,8 +36,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * This class is a test class for the UnmaintainedUnitsNagDialog class.
- * It tests the different combinations of unit states and verifies the behavior of the checkHanger() method.
+ * This class is a test class for the {@link UnmaintainedUnitsNagDialog} class.
+ * It tests the different combinations of unit states and verifies the behavior of the {@code checkHanger()} method.
  */
 class UnmaintainedUnitsNagDialogTest {
     // Mock objects for the tests

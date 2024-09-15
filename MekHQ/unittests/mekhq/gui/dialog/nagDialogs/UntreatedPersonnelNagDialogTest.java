@@ -37,7 +37,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * This class contains test methods for the UntreatedPersonnelNagDialog class.
+ * This class contains test methods for the {@link UntreatedPersonnelNagDialog} class.
+ * It tests the different combinations of untreated personnel and verifies the behavior of the
+ * {@code isUntreatedInjury()} method.
  */
 class UntreatedPersonnelNagDialogTest {
     Campaign campaign;

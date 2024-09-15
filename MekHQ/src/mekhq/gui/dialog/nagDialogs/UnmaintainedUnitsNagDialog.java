@@ -28,6 +28,7 @@ import javax.swing.*;
 
 /**
  * A dialog that displays a nag message if there are unmaintained units in the campaign's hangar.
+ * It extends the {@link AbstractMHQNagDialog} class.
  */
 public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     static String DIALOG_NAME = "UnmaintainedUnitsNagDialog";
@@ -37,7 +38,7 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     /**
      * Checks if there are any unmaintained units in the given campaign's hangar.
      *
-     * @param campaign the campaign object containing the hangar to check
+     * @param campaign the {@link Campaign} containing the hangar to check
      * @return {@code true} if there are unmaintained units in the hangar, {@code false} otherwise
      */
     static boolean checkHanger(Campaign campaign) {
@@ -50,10 +51,10 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Creates a new instance of the UnmaintainedUnitsNagDialog class.
+     * Creates a new instance of the {@link UnmaintainedUnitsNagDialog} class.
      *
      * @param frame the parent JFrame for the dialog
-     * @param campaign the Campaign associated with the dialog
+     * @param campaign the {@link Campaign} associated with the dialog
      */
     //region Constructors
     public UnmaintainedUnitsNagDialog(final JFrame frame, final Campaign campaign) {

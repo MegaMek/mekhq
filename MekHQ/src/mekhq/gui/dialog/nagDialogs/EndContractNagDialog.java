@@ -29,7 +29,7 @@ import java.time.LocalDate;
 
 /**
  * This class represents a nag dialog displayed on the day a contract ends
- * It extends the AbstractMHQNagDialog class.
+ * It extends the {@link AbstractMHQNagDialog} class.
  */
 public class EndContractNagDialog extends AbstractMHQNagDialog {
     static String DIALOG_NAME = "EndContractNagDialog";
@@ -39,7 +39,7 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
     /**
      * Checks if a contract within a campaign has ended on the current date.
      *
-     * @param campaign the campaign containing the contracts to be checked
+     * @param campaign the {@link Campaign} containing the contracts to be checked
      * @return {@code true} if a contract within the campaign has ended on the current date,
      *         {@code false} otherwise
      */
@@ -60,10 +60,10 @@ public class EndContractNagDialog extends AbstractMHQNagDialog {
     }
 
     /**
-     * Creates a new instance of the EndContractNagDialog class.
+     * Creates a new instance of the {@link EndContractNagDialog} class.
      *
      * @param frame the parent JFrame for the dialog
-     * @param campaign the Campaign associated with the dialog
+     * @param campaign the {@link Campaign} associated with the dialog
      */
     public EndContractNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_CONTRACT_ENDED);
