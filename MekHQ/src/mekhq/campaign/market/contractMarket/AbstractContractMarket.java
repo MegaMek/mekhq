@@ -3,8 +3,10 @@ package mekhq.campaign.market.contractMarket;
 import megamek.Version;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -26,6 +28,7 @@ public abstract class AbstractContractMarket {
     public static final int CLAUSE_TRANSPORT = 3;
     public static final int CLAUSE_NUM = 4;
 
+    protected static final MMLogger logger = MMLogger.create(AtBConfiguration.class);
     protected List<Contract> contracts = new ArrayList<>();
     protected int lastId = 0;
     protected Map<Integer, Contract> contractIds = new HashMap<>();

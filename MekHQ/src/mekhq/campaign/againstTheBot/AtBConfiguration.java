@@ -521,7 +521,7 @@ public class AtBConfiguration {
                             try {
                                 level = HiringHallLevel.valueOf(wn2.getAttributes().getNamedItem("level").getTextContent().toUpperCase());
                             } catch (IllegalArgumentException e) {
-                                LogManager.getLogger().warn("Invalid value for Hiring Hall level, falling back to NONE: " + e);
+                                logger.warn("Invalid value for Hiring Hall level, falling back to NONE: " + e);
                             }
                         } else {
                             // Backwards compatibility--hiring halls in atbconfig.xml should default to GREAT

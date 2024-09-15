@@ -121,7 +121,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return campaign.getReputation().getReputationRating() / 10;
     }
 
-    private void determineMission(Campaign campaign, ) {
+    private void determineMission(Campaign campaign) {
         if (campaign.getFaction().isPirate()) {
 
         }

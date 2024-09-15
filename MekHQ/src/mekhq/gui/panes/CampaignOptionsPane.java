@@ -2950,7 +2950,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 //            if (contractMarketPanel.isEnabled() != enabled) {
 //                comboContractMarketMethod.setSelectedItem(enabled
 //                        ? ContractMarketMethod.ATB_MONTHLY
-                        : ContractMarketMethod.NONE);
+//                        : ContractMarketMethod.NONE);
 //                contractMarketPanel.setEnabled(enabled);
 //                comboContractMarketMethod.setEnabled(true);
 //            }
