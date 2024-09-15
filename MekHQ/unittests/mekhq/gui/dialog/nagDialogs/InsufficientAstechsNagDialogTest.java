@@ -62,10 +62,8 @@ class InsufficientAstechsNagDialogTest {
         campaign = mock(Campaign.class);
     }
 
-    // In the following tests,
-    // Different combinations of unit states to set up desired behaviors in mock objects
-    // Then the checkAstechsNeededCount() method of InsufficientAstechsNagDialog class is called,
-    // and its response is checked against expected behavior
+    // In the following tests the checkAstechsNeededCount() method is called, and its response is
+    // checked against expected behavior
 
     @Test
     void noAstechsNeeded() {

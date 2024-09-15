@@ -93,10 +93,8 @@ class UnmaintainedUnitsNagDialogTest {
         when(hangar.getUnits()).thenReturn(units);
     }
 
-    // In the following tests,
-    // Different combinations of unit states to set up desired behaviors in mock objects
-    // Then the checkHanger() method of UnmaintainedUnitsNagDialog class is called,
-    // and its response is checked against expected behavior
+    // In the following tests the checkHanger() method is called, and its response is checked
+    // against expected behavior
 
     @Test
     void unmaintainedUnitExistsUnit1() {

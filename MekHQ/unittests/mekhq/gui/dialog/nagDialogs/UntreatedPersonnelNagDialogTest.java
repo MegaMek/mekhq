@@ -71,6 +71,9 @@ class UntreatedPersonnelNagDialogTest {
         person.setHits(1);
     }
 
+    // In the following tests the isUntreatedInjury() method is called, and its response is checked
+    // against expected behavior
+
     @Test
     public void isUntreatedInjuryIncludesNonPrisonersTest() {
         person.setPrisonerStatus(campaign, PrisonerStatus.FREE, false);

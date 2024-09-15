@@ -117,10 +117,8 @@ class InsufficientAstechTimeNagDialogTest {
         when(campaign.getPossibleAstechPoolOvertime()).thenReturn(possibleAstechOvertimeMinutes);
     }
 
-    // In the following tests,
-    // Different combinations of Unit states to set up desired behaviors in mock objects
-    // Then the getAstechTimeDeficit() method of InsufficientAstechTimeNagDialog class is called,
-    // and its response is checked against expected behavior
+    // In the following tests the getAstechTimeDeficit() method is called, and its response is
+    // checked against expected behavior
 
     @Test
     void testAstechTimeDeficitCalculationNoOvertime() {
@@ -265,10 +263,8 @@ class InsufficientAstechTimeNagDialogTest {
         assertEquals(-6, getAstechTimeDeficit(campaign));
     }
 
-    // In the following tests,
-    // Different combinations of Unit states to set up desired behaviors in mock objects
-    // Then the checkAstechTimeDeficit() method of InsufficientAstechTimeNagDialog class is called,
-    // and its response is checked against expected behavior
+    // In the following tests the checkAstechTimeDeficit() method is called, and its response is
+    // checked against expected behavior
 
     @Test
     void testAstechTimeDeficitCheckNegativeDeficit() {

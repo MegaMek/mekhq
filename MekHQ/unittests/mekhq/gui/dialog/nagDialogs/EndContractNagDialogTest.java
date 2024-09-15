@@ -75,10 +75,8 @@ public class EndContractNagDialogTest {
         when(campaign.getLocalDate()).thenReturn(today);
     }
 
-    // In the following tests,
-    // Different combinations of contract end date states to set up desired behaviors in mock objects
-    // Then the isContractEnded() method of EndContractNagDialog class is called,
-    // and its response is checked against expected behavior
+    // In the following tests the isContractEnded() method is called, and its response is
+    // checked against expected behavior
 
     @Test
     void noActiveContracts() {
