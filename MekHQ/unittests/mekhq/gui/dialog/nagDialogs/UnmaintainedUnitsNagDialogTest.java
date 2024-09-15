@@ -129,14 +129,14 @@ class UnmaintainedUnitsNagDialogTest {
     }
 
     @Test
-    void noUoUnmaintainedUnitExistsUnit1() {
+    void noUnmaintainedUnitExistsNoSalvage() {
         initializeUnits(false, false, false, false);
         assertFalse(checkHanger(campaign));
     }
 
     @Test
-    void noUnmaintainedUnitExistsUnit2() {
-        initializeUnits(false, false, false, false);
+    void noUnmaintainedUnitExistsAllSalvage() {
+        initializeUnits(false, true, false, true);
         assertFalse(checkHanger(campaign));
     }
 
