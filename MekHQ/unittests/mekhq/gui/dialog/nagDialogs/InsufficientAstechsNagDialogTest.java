@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static mekhq.gui.dialog.nagDialogs.InsufficientAstechsNagDialog.checkAstechsNeededCount;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -32,13 +33,12 @@ import static org.mockito.Mockito.when;
 
 /**
  * This class contains test cases for the {@link InsufficientAstechsNagDialog} class.
- * It tests the different combinations of Astech requirements and verifies the behavior of the local
- * {@code checkNag()} method.
+ * It tests the different combinations of Astech requirements and verifies the behavior of the
+ * {@code isContractEnded()} method.
  */
 class InsufficientAstechsNagDialogTest {
     // Mock objects for the tests
     private Campaign campaign;
-    private InsufficientAstechsNagDialog dialog;
 
     /**
      * Sets up the necessary dependencies and configurations before running the test methods.
@@ -46,8 +46,6 @@ class InsufficientAstechsNagDialogTest {
      */
     @BeforeAll
     static void setup() {
-        System.setProperty("java.awt.headless", "true");
-
         try {
             Systems.setInstance(Systems.loadDefault());
         } catch (Exception exception) {
@@ -62,29 +60,28 @@ class InsufficientAstechsNagDialogTest {
     @BeforeEach
     void init() {
         campaign = mock(Campaign.class);
-        dialog = new InsufficientAstechsNagDialog(null, campaign);
     }
 
     // In the following tests,
     // Different combinations of unit states to set up desired behaviors in mock objects
-    // Then the checkNag() method of InsufficientAstechsNagDialog class is called,
+    // Then the checkAstechsNeededCount() method of InsufficientAstechsNagDialog class is called,
     // and its response is checked against expected behavior
 
     @Test
     void noAstechsNeeded() {
         when(campaign.getAstechNeed()).thenReturn(0);
-        assertFalse(dialog.checkNag());
+        assertFalse(checkAstechsNeededCount(campaign));
     }
 
     @Test
     void oneAstechNeeded() {
         when(campaign.getAstechNeed()).thenReturn(1);
-        assertTrue(dialog.checkNag());
+        assertTrue(checkAstechsNeededCount(campaign));
     }
 
     @Test
     void negativeAstechsNeeded() {
         when(campaign.getAstechNeed()).thenReturn(-1);
-        assertFalse(dialog.checkNag());
+        assertFalse(checkAstechsNeededCount(campaign));
     }
 }
