@@ -30,9 +30,9 @@ import javax.swing.*;
  * It extends the {@link AbstractMHQNagDialog} class.
  */
 public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
-    static String DIALOG_NAME = "InsufficientAstechsNagDialog";
-    static String DIALOG_TITLE = "InsufficientAstechsNagDialog.title";
-    static String DIALOG_BODY = "InsufficientAstechsNagDialog.text";
+    private static String DIALOG_NAME = "InsufficientAstechsNagDialog";
+    private static String DIALOG_TITLE = "InsufficientAstechsNagDialog.title";
+    private static String DIALOG_BODY = "InsufficientAstechsNagDialog.text";
 
     /**
      * Checks if the count of Astechs needed is greater than zero.
@@ -52,7 +52,7 @@ public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
      * @param campaign the {@link Campaign} associated with the dialog
      */
     public InsufficientAstechsNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, DIALOG_NAME, DIALOG_TITLE, "", campaign, MHQConstants.NAG_INSUFFICIENT_ASTECHS);
+        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_INSUFFICIENT_ASTECHS);
     }
     //endregion Constructors
 

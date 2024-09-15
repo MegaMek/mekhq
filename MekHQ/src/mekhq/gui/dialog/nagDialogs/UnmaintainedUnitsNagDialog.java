@@ -31,9 +31,9 @@ import javax.swing.*;
  * It extends the {@link AbstractMHQNagDialog} class.
  */
 public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
-    static String DIALOG_NAME = "UnmaintainedUnitsNagDialog";
-    static String DIALOG_TITLE = "UnmaintainedUnitsNagDialog.title";
-    static String DIALOG_BODY = "UnmaintainedUnitsNagDialog.text";
+    private static String DIALOG_NAME = "UnmaintainedUnitsNagDialog";
+    private static String DIALOG_TITLE = "UnmaintainedUnitsNagDialog.title";
+    private static String DIALOG_BODY = "UnmaintainedUnitsNagDialog.text";
 
     /**
      * Checks if there are any unmaintained units in the given campaign's hangar.

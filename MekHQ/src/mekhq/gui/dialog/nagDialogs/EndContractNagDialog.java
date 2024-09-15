@@ -32,9 +32,9 @@ import java.time.LocalDate;
  * It extends the {@link AbstractMHQNagDialog} class.
  */
 public class EndContractNagDialog extends AbstractMHQNagDialog {
-    static String DIALOG_NAME = "EndContractNagDialog";
-    static String DIALOG_TITLE = "EndContractNagDialog.title";
-    static String DIALOG_BODY = "EndContractNagDialog.text";
+    private static String DIALOG_NAME = "EndContractNagDialog";
+    private static String DIALOG_TITLE = "EndContractNagDialog.title";
+    private static String DIALOG_BODY = "EndContractNagDialog.text";
 
     /**
      * Checks if a contract within a campaign has ended on the current date.
