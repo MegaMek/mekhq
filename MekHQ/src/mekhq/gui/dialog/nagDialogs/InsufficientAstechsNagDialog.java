@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,33 +18,60 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 
+/**
+ * This class represents a nag dialog displayed when a campaign's Astech deficit is greater than 0.
+ * It extends the {@link AbstractMHQNagDialog} class.
+ */
 public class InsufficientAstechsNagDialog extends AbstractMHQNagDialog {
+    static String DIALOG_NAME = "InsufficientAstechsNagDialog";
+    static String DIALOG_TITLE = "InsufficientAstechsNagDialog.title";
+    static String DIALOG_BODY = "InsufficientAstechsNagDialog.text";
+
+    /**
+     * Checks if the count of Astechs needed is greater than zero.
+     * If so, it sets the description using the specified format and returns {@code true}.
+     * Otherwise, it returns {@code false}.
+     */
+    static boolean checkAstechsNeededCount(Campaign campaign) {
+        final int need = campaign.getAstechNeed();
+        return need > 0;
+    }
+
     //region Constructors
+    /**
+     * Creates a new instance of the {@link InsufficientAstechsNagDialog} class.
+     *
+     * @param frame the parent JFrame for the dialog
+     * @param campaign the {@link Campaign} associated with the dialog
+     */
     public InsufficientAstechsNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "InsufficientAstechsNagDialog", "InsufficientAstechsNagDialog.title",
-                "", campaign, MHQConstants.NAG_INSUFFICIENT_ASTECHS);
+        super(frame, DIALOG_NAME, DIALOG_TITLE, "", campaign, MHQConstants.NAG_INSUFFICIENT_ASTECHS);
     }
     //endregion Constructors
 
+    /**
+     * Checks if the count of Astechs needed is greater than zero.
+     * If the count is greater than zero and the Nag dialog for the current key is not ignored,
+     * it sets the description using the specified format and returns {@code true}.
+     * Otherwise, it returns {@code false}.
+     */
     @Override
     protected boolean checkNag() {
-        if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())) {
-            return false;
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
+                && checkAstechsNeededCount(getCampaign())) {
+            setDescription(String.format(
+                    resources.getString(DIALOG_BODY),
+                    getCampaign().getAstechNeed()));
+            return true;
         }
 
-        final int need = getCampaign().getAstechNeed();
-        if (need > 0) {
-            setDescription(String.format(resources.getString("InsufficientAstechsNagDialog.text"), need));
-            return true;
-        } else {
-            return false;
-        }
+        return false;
     }
 }
