@@ -18,8 +18,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * This class is a test class for the {@link UnableToAffordExpensesNagDialog} class.
- * It contains tests for various scenarios related to the {@code isUnableToAffordExpenses} and
- * {@code getMonthlyExpenses} methods
+ * It contains tests for various scenarios related to the {@code isUnableToAffordExpenses} method
  */
 class UnableToAffordExpensesNagDialogTest {
     // Mock objects for the tests

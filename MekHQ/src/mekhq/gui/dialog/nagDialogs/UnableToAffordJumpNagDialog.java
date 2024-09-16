@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,25 +21,77 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 
+/**
+ * This class represents a nag dialog displayed when the campaign can't afford its next jump
+ * It extends the {@link AbstractMHQNagDialog} class.
+ */
 public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
-    private static boolean isUnableToAffordNextJump (Campaign campaign) {
-        return campaign.getFunds().isLessThan(campaign.calculateCostPerJump(true, campaign.getCampaignOptions().isEquipmentContractBase()));
+    private static String DIALOG_NAME = "UnableToAffordJumpNagDialog";
+    private static String DIALOG_TITLE = "UnableToAffordJumpNagDialog.title";
+    private static String DIALOG_BODY = "UnableToAffordJumpNagDialog.text";
+
+    /**
+     * Checks if the campaign is unable to afford the cost of the next jump.
+     *
+     * @param campaign The campaign for which to check the affordability of the next jump.
+     * @return {@code true} if the campaign is unable to afford the cost of the next jump, {@code false} otherwise.
+     */
+    static boolean isUnableToAffordNextJump (Campaign campaign) {
+        Money currentFunds = campaign.getFunds();
+        Money nextJumpCost = getNextJumpCost(campaign);
+
+        return currentFunds.isLessThan(nextJumpCost);
+    }
+
+    /**
+     * Calculates the cost of the next jump for a given campaign.
+     * <p>
+     * This method determines the cost of the next jump by using the campaign's
+     * options and calculates the cost per jump based on whether the contract pays
+     * based on the value of the units in the campaign's TO&E.
+     *
+     * @param campaign the campaign for which to calculate the next jump cost
+     * @return the cost of the next jump for the campaign
+     */
+    static Money getNextJumpCost(Campaign campaign) {
+        boolean isContractPayBasedOnToeUnitsValue = campaign.getCampaignOptions().isEquipmentContractBase();
+
+        return campaign.calculateCostPerJump(true, isContractPayBasedOnToeUnitsValue);
     }
 
     //region Constructors
+    /**
+     * Creates a new instance of the {@link UnableToAffordJumpNagDialog} class.
+     *
+     * @param frame the parent JFrame for the dialog
+     * @param campaign the {@link Campaign} associated with the dialog
+     */
     public UnableToAffordJumpNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "UnableToAffordJumpNagDialog", "UnableToAffordJumpNagDialog.title",
-                "UnableToAffordJumpNagDialog.text", campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP);
+        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_JUMP);
     }
     //endregion Constructors
 
+    /**
+     * Checks if the campaign is able to afford its next jump.
+     * If the campaign is unable to afford its next jump and the Nag dialog for the current key is
+     * not ignored, it sets the description using the specified format and returns {@code true}.
+     * Otherwise, it returns {@code false}.
+     */
     @Override
     protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && isUnableToAffordNextJump(getCampaign());
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
+                && isUnableToAffordNextJump(getCampaign())) {
+            setDescription(String.format(
+                    resources.getString(DIALOG_BODY),
+                    getNextJumpCost(getCampaign()).toAmountAndSymbolString()));
+            return true;
+        }
+
+        return false;
     }
 }
