@@ -5,7 +5,6 @@ import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -27,7 +26,7 @@ public abstract class AbstractContractMarket {
     public static final int CLAUSE_TRANSPORT = 3;
     public static final int CLAUSE_NUM = 4;
 
-    protected static final MMLogger logger = MMLogger.create(AtBConfiguration.class);
+    protected static final MMLogger logger = MMLogger.create(AbstractContractMarket.class);
     protected List<Contract> contracts = new ArrayList<>();
     protected int lastId = 0;
     protected Map<Integer, Contract> contractIds = new HashMap<>();
@@ -268,7 +267,7 @@ public abstract class AbstractContractMarket {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         return retVal;
@@ -297,7 +296,7 @@ public abstract class AbstractContractMarket {
             }
         }
         if (market == null) {
-            LogManager.getLogger().warn("No Contract Market method found in XML...falling back to AtB_Monthly");
+            logger.warn("No Contract Market method found in XML...falling back to AtB_Monthly");
             market = new AtbMonthlyContractMarket();
         }
         return market;
