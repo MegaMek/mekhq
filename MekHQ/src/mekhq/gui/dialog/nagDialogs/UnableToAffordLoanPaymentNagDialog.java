@@ -29,18 +29,35 @@ import javax.swing.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * This class represents a nag dialog displayed when the campaign cannot afford its next loan payment
+ * It extends the {@link AbstractMHQNagDialog} class.
+ */
 public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
+    private static String DIALOG_NAME = "UnableToAffordLoanPaymentNagDialog";
+    private static String DIALOG_TITLE = "UnableToAffordLoanPaymentNagDialog.title";
+    private static String DIALOG_BODY = "UnableToAffordLoanPaymentNagDialog.text";
+
     /**
-     * Checks if a campaign is unable to afford any loan payment due the next day.
-     * It iterates over all loans of the campaign and sums up the loan payments with a due date of tomorrow.
-     * If the campaign's current funds are less than the total due payments,
-     * the function returns true, otherwise, false.
+     * Determines if the campaign is unable to afford its due loan payments.
      *
-     * @param campaign The ongoing campaign
-     * @return A boolean value indicating whether the campaign cannot afford its loan payments.
-     * Returns {@code true} if the current funds are less than payments due, {@code false} otherwise.
+     * @param campaign the campaign for which the loan payment affordability needs to be checked
+     * @return {@code true} if the campaign is unable to afford the loan payment, {@code false} otherwise
      */
-    private static boolean isUnableToAffordLoanPayment (Campaign campaign) {
+    static boolean isUnableToAffordLoanPayment(Campaign campaign) {
+        Money totalPaymentsDue = getTotalPaymentsDue(campaign);
+
+        // check if the campaign's funds are less than the total payments due tomorrow
+        return campaign.getFunds().isLessThan(totalPaymentsDue);
+    }
+
+    /**
+     * Calculates the total payments due tomorrow, across all current loans
+     *
+     * @param campaign the campaign for which to calculate the total payments due
+     * @return the total payments due as a {@link Money} object
+     */
+    static Money getTotalPaymentsDue(Campaign campaign) {
         // gets the list of the campaign's current loans
         List<Loan> loans = campaign.getFinances().getLoans();
 
@@ -57,21 +74,37 @@ public class UnableToAffordLoanPaymentNagDialog extends AbstractMHQNagDialog {
                 totalPaymentsDue = totalPaymentsDue.plus(loan.getPaymentAmount());
             }
         }
-
-        // check if the campaign's funds are less than the total payments due tomorrow
-        return campaign.getFunds().isLessThan(totalPaymentsDue);
+        return totalPaymentsDue;
     }
 
     //region Constructors
+    /**
+     * Creates a new instance of the {@link UnableToAffordLoanPaymentNagDialog} class.
+     *
+     * @param frame the parent JFrame for the dialog
+     * @param campaign the {@link Campaign} associated with the dialog
+     */
     public UnableToAffordLoanPaymentNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "UnableToAffordLoanPaymentNagDialog", "UnableToAffordLoanPaymentNagDialog.title",
-                "UnableToAffordLoanPaymentNagDialog.text", campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT);
+        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT);
     }
     //endregion Constructors
 
+    /**
+     * Checks if the campaign is able to afford its next loan payment.
+     * If the campaign is unable to afford its next loan payment and the Nag dialog for the current
+     * key is not ignored, it sets the description using the specified format and returns {@code true}.
+     * Otherwise, it returns {@code false}.
+     */
     @Override
     protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && isUnableToAffordLoanPayment(getCampaign());
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
+                && isUnableToAffordLoanPayment(getCampaign())) {
+            setDescription(String.format(
+                    resources.getString(DIALOG_BODY),
+                    getTotalPaymentsDue(getCampaign()).toAmountAndSymbolString()));
+            return true;
+        }
+
+        return false;
     }
 }
