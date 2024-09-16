@@ -47,6 +47,9 @@ class PregnantCombatantNagDialogTest {
         when(personPregnant.isPregnant()).thenReturn(true);
     }
 
+    // In the following tests the isPregnantCombatant() method is called, and its response is
+    // checked against expected behavior
+
     @Test
     void noActiveMission() {
         when(campaign.getActiveMissions(false)).thenReturn(new ArrayList<>());
