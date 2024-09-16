@@ -18,31 +18,71 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 import java.time.DayOfWeek;
 
+/**
+ * This class represents a nag dialog displayed when the campaign does not meet the deployment
+ * levels required by their active {@link AtBContract}
+ * It extends the {@link AbstractMHQNagDialog} class.
+ */
 public class ShortDeploymentNagDialog extends AbstractMHQNagDialog {
-    //region Constructors
-    public ShortDeploymentNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "ShortDeploymentNagDialog", "ShortDeploymentNagDialog.title",
-                "ShortDeploymentNagDialog.text", campaign, MHQConstants.NAG_SHORT_DEPLOYMENT);
-    }
-    //endregion Constructors
+    private static String DIALOG_NAME = "ShortDeploymentNagDialog";
+    private static String DIALOG_TITLE = "ShortDeploymentNagDialog.title";
+    private static String DIALOG_BODY = "ShortDeploymentNagDialog.text";
 
-    @Override
-    protected boolean checkNag() {
-        if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                || !getCampaign().getLocation().isOnPlanet()
-                || (getCampaign().getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY)) {
+    /**
+     * Checks if the deployment requirements are met for a given campaign.
+     *
+     * @param campaign the campaign to check the deployment requirements for
+     * @return {@code true} if the deployment requirements are met, {@code false} otherwise
+     */
+    static boolean checkDeploymentRequirementsMet(Campaign campaign) {
+        if (!campaign.getLocation().isOnPlanet()) {
             return false;
         }
 
-        return getCampaign().getActiveAtBContracts().stream()
-                .anyMatch(contract -> getCampaign().getDeploymentDeficit(contract) > 0);
+        // this prevents the nag from spamming daily
+        if (campaign.getLocalDate().getDayOfWeek() != DayOfWeek.SUNDAY) {
+            return false;
+        }
+
+        // There is no need to use a stream here, as the number of iterations doesn't warrant it.
+        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+            if (campaign.getDeploymentDeficit(contract) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //region Constructors
+    /**
+     * Creates a new instance of the {@link ShortDeploymentNagDialog} class.
+     *
+     * @param frame the parent JFrame for the dialog
+     * @param campaign the {@link Campaign} associated with the dialog
+     */
+    public ShortDeploymentNagDialog(final JFrame frame, final Campaign campaign) {
+        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_SHORT_DEPLOYMENT);
+    }
+    //endregion Constructors
+
+    /**
+     * Checks if there is a nag message to display.
+     *
+     * @return {@code true} if there is a nag message to display, {@code false} otherwise
+     */
+    @Override
+    protected boolean checkNag() {
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
+                && checkDeploymentRequirementsMet(getCampaign());
     }
 }
