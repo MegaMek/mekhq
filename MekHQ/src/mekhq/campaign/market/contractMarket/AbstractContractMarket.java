@@ -12,7 +12,6 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
