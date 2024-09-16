@@ -4,7 +4,6 @@ import megamek.Version;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
