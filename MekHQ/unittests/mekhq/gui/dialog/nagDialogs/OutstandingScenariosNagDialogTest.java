@@ -40,6 +40,14 @@ class OutstandingScenariosNagDialogTest {
         when(campaign.getLocalDate()).thenReturn(today);
     }
 
+    /**
+     * Initializes an {@link AtBContract} containing two instances of {@link AtBScenario}.
+     */
+    private void initializeContractWithTwoScenarios() {
+        when(campaign.getActiveAtBContracts(true)).thenReturn(List.of(contract));
+        when(contract.getCurrentAtBScenarios()).thenReturn(List.of(scenario1, scenario2));
+    }
+
     // In the following tests the checkForOutstandingScenarios() method is called, and its response
     // is checked against expected behavior
 
@@ -60,8 +68,7 @@ class OutstandingScenariosNagDialogTest {
 
     @Test
     void noOutstandingScenarios() {
-        when(campaign.getActiveAtBContracts(true)).thenReturn(List.of(contract));
-        when(contract.getCurrentAtBScenarios()).thenReturn(List.of(scenario1, scenario2));
+        initializeContractWithTwoScenarios();
 
         when(scenario1.getDate()).thenReturn(today.plusDays(1));
         when(scenario2.getDate()).thenReturn(today.plusDays(1));
@@ -71,8 +78,7 @@ class OutstandingScenariosNagDialogTest {
 
     @Test
     void oneOutstandingScenarioFirst() {
-        when(campaign.getActiveAtBContracts(true)).thenReturn(List.of(contract));
-        when(contract.getCurrentAtBScenarios()).thenReturn(List.of(scenario1, scenario2));
+        initializeContractWithTwoScenarios();
 
         when(scenario1.getDate()).thenReturn(today);
         when(scenario2.getDate()).thenReturn(today.plusDays(1));
@@ -82,8 +88,7 @@ class OutstandingScenariosNagDialogTest {
 
     @Test
     void oneOutstandingScenarioSecond() {
-        when(campaign.getActiveAtBContracts(true)).thenReturn(List.of(contract));
-        when(contract.getCurrentAtBScenarios()).thenReturn(List.of(scenario1, scenario2));
+        initializeContractWithTwoScenarios();
 
         when(scenario1.getDate()).thenReturn(today.plusDays(1));
         when(scenario2.getDate()).thenReturn(today);
@@ -93,8 +98,7 @@ class OutstandingScenariosNagDialogTest {
 
     @Test
     void twoOutstandingScenarios() {
-        when(campaign.getActiveAtBContracts(true)).thenReturn(List.of(contract));
-        when(contract.getCurrentAtBScenarios()).thenReturn(List.of(scenario1, scenario2));
+        initializeContractWithTwoScenarios();
 
         when(scenario1.getDate()).thenReturn(today);
         when(scenario2.getDate()).thenReturn(today);
