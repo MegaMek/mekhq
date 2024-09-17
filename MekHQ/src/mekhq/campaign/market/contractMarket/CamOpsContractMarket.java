@@ -9,14 +9,28 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class CamOpsContractMarket extends AbstractContractMarket {
     private static int BASE_NEGOTIATION_TARGET = 8;
     private static int EMPLOYER_NEGOTIATION_SKILL_LEVEL = 5;
+    private static String CONFIG_PATH = "data/camops/ContractData.xml";
+
+    private CamopsContractConfig config = new CamopsContractConfig();
 
     public CamOpsContractMarket() {
         super(ContractMarketMethod.CAM_OPS);
     }
+
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
         return null;
@@ -161,4 +175,84 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             }
         }
     }
+
+    private class CamopsContractConfig {
+        protected CamopsContractConfig() {
+            loadFromXML();
+        }
+
+        private void loadFromXML() {
+            logger.info("Starting load of CamOps contract market configuration data from XML...");
+
+            Document xmlDoc;
+            try (InputStream is = new FileInputStream(CamOpsContractMarket.CONFIG_PATH)) {
+                DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
+                xmlDoc = db.parse(is);
+            } catch (FileNotFoundException ex) {
+                logger.info("File " + CamOpsContractMarket.CONFIG_PATH + " not found. Loading defaults.");
+                setDefaults();
+                return;
+            } catch (Exception ex) {
+                logger.error("Error parsing file " + CamOpsContractMarket.CONFIG_PATH + ". Loading defaults.", ex);
+                setDefaults();
+                return;
+            }
+
+            Element rootElement = xmlDoc.getDocumentElement();
+            NodeList nl = rootElement.getChildNodes();
+            rootElement.normalize();
+
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node wn = nl.item(x);
+                switch (wn.getNodeName()) {
+                    case "hiringHallModifiers":
+                        loadHiringHallModifiersFromXML(wn);
+                        break;
+                    case "contractOfferNumbers":
+                        loadContractOfferNumbersFromXML(wn);
+                        break;
+                    case "employerTypes":
+                        loadEmployerTypesFromXML(wn);
+                        break;
+                    case "independentEmployerTypes":
+                        loadIndependentEmployerTypesFromXML(wn);
+                        break;
+                    case "supplementalContractTermsTable":
+                        loadSupplementalContractTermsFromXML(wn);
+                        break;
+                }
+            }
+        }
+
+        private void loadHiringHallModifiersFromXML(Node node) {
+            NodeList nodeList = node.getChildNodes();
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node child = nodeList.item(i);
+                String name = child.getNodeName();
+                switch (child.getNodeName()) {
+
+                }
+            }
+        }
+
+        private void loadContractOfferNumbersFromXML(Node node) {
+
+        }
+
+        private void loadEmployerTypesFromXML(Node node) {
+
+        }
+
+        private void loadIndependentEmployerTypesFromXML(Node node) {
+
+        }
+
+        private void loadSupplementalContractTermsFromXML(Node node) {
+
+        }
+
+        private void setDefaults() {
+
+        }
+     }
 }
