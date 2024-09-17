@@ -30,6 +30,7 @@ MEKHQ VERSION HISTORY:
 + PR #4843: Added Post-Name Change Compatibility Handlers, Added JavaDocs to Phenotype.java
 + PR #4846: Restored Missing Portrait Folders
 + PR #4847: Added Post-Name Change Compatibility Handlers to SkillType.java
++ FIX #4833: Added Post-Name Change Compatibility Handlers, Added JavaDocs to PersonnelRole.java
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
