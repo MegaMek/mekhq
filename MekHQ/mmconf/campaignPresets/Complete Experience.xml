@@ -218,7 +218,6 @@
 		<prisonerBabyStatus>true</prisonerBabyStatus>
 		<useAtBPrisonerDefection>true</useAtBPrisonerDefection>
 		<useAtBPrisonerRansom>true</useAtBPrisonerRansom>
-		<randomDependentMethod>AGAINST_THE_BOT</randomDependentMethod>
 		<useRandomDependentAddition>true</useRandomDependentAddition>
 		<useRandomDependentRemoval>true</useRandomDependentRemoval>
 		<usePersonnelRemoval>true</usePersonnelRemoval>

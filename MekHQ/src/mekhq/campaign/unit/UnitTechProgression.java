@@ -13,19 +13,15 @@
  */
 package mekhq.campaign.unit;
 
+import megamek.common.*;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.logging.MMLogger;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-
-import megamek.common.Entity;
-import megamek.common.ITechnology;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.loaders.EntityLoadingException;
-import megamek.logging.MMLogger;
 
 /**
  * Provides an ITechnology interface for every MekSummary, optionally customized
@@ -38,9 +34,8 @@ import megamek.logging.MMLogger;
  * or changing the option
  * to use faction-specific tech, but the data can be calculated for multiple
  * factions and used, for example,
- * for a tracked OpFor. The calculation is performed on a separate thread and
- * only blocks if the data is
- * needed before the task completes. There is also a non-blocking call.
+ * for a tracked OpFor. The calculation is performed on a separate thread and only blocks if the
+ * data is needed before the task completes. There is also a non-blocking call.
  *
  * @author Neoancient
  */
@@ -85,14 +80,13 @@ public class UnitTechProgression {
      * @param unit        The <code>Unit</code> for which to calculate the tech
      *                    progression.
      * @param techFaction The faction to use in calculating the progression.
-     * @param block       If the task has not completed this method will wait until
+     * @param block       If the task has not completed, this method will wait until
      *                    completion if block is true,
      *                    or return null if block is false. If the task has
      *                    completed, it will return the value
      *                    without waiting.
      * @return An ITechnology object for the unit and faction. If the task has not
-     *         completed and
-     *         block is false, or there was an exception processing the task, null
+     *         completed and the block is false, or there was an exception processing the task, null
      *         is returned.
      */
     public static ITechnology getProgression(final Unit unit,

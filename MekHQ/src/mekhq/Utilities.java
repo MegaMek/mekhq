@@ -19,7 +19,6 @@
  */
 package mekhq;
 
-import io.sentry.Sentry;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
@@ -45,7 +44,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
 import javax.swing.*;
@@ -1342,7 +1340,7 @@ public class Utilities {
 
         // I need to change the new entity to the one from the mtf file now, so that
         // equipment numbers will match
-        MechSummary summary = cacheInstance.getMech(newE.getFullChassis() + ' ' + newE.getModel());
+        MekSummary summary = cacheInstance.getMek(newE.getFullChassis() + ' ' + newE.getModel());
 
         if (null == summary) {
             // Attempt to deal with new naming convention directly

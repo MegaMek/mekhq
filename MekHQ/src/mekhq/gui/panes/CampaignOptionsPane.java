@@ -18,43 +18,6 @@
  */
 package mekhq.gui.panes;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.time.LocalDate;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
-import java.util.stream.IntStream;
-
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JSpinner.NumberEditor;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.baseComponents.JDisableablePanel;
@@ -111,6 +74,29 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.RandomOriginOptionsPanel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.IntStream;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
 
 /**
  * @author Justin 'Windchild' Bowen
@@ -5336,14 +5322,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(randomDependentPanel)
                         .addComponent(chkUseRandomDependentAddition)
                         .addComponent(chkUseRandomDependentRemoval)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(randomDependentPanel)
                         .addComponent(chkUseRandomDependentAddition)
                         .addComponent(chkUseRandomDependentRemoval)
         );
