@@ -25,6 +25,11 @@ MEKHQ VERSION HISTORY:
 + FIX #4803, #4802: Corrected Experience Rating Calculation in Reputation
 + PR #4830: Corrected terminology in Academy XMLs
 + PR #4831: Fix typos in identifiers for MEKWARRIOR and AtBUnitRatingMod
++ PR #4751: Fixed Typo in Mission.properties
++ FIX #4841: Added Post-Name Change Compatibility Handlers to Academy.java, Removed Redundant Setter Methods
++ PR #4843: Added Post-Name Change Compatibility Handlers, Added JavaDocs to Phenotype.java
++ PR #4846: Restored Missing Portrait Folders
++ PR #4847: Added Post-Name Change Compatibility Handlers to SkillType.java
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
