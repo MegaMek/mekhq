@@ -20,8 +20,25 @@
  */
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.UUID;
+
+import javax.swing.*;
+
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Asset;
@@ -30,19 +47,16 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import java.util.*;
 
 /**
  * A dialog to decide how you want to pay off collateral when you
  * default on a loan
+ *
  * @author Taharqa
  */
 public class PayCollateralDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(PayCollateralDialog.class);
+
     private JFrame frame;
     private Campaign campaign;
     private boolean cancelled;
@@ -58,7 +72,7 @@ public class PayCollateralDialog extends JDialog {
     private JButton btnCancel;
 
     public PayCollateralDialog(final JFrame frame, final boolean modal, final Campaign campaign,
-                               final Loan loan) {
+            final Loan loan) {
         super(frame, modal);
         this.frame = frame;
         this.campaign = campaign;
@@ -75,8 +89,8 @@ public class PayCollateralDialog extends JDialog {
                 MekHQ.getMHQOptions().getLocale());
 
         JTabbedPane panMain = new JTabbedPane();
-        JPanel panInfo = new JPanel(new GridLayout(1,0));
-        JPanel panBtn = new JPanel(new GridLayout(0,3));
+        JPanel panInfo = new JPanel(new GridLayout(1, 0));
+        JPanel panBtn = new JPanel(new GridLayout(0, 3));
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title"));
@@ -138,7 +152,7 @@ public class PayCollateralDialog extends JDialog {
                 quantity = ((AmmoStorage) p).getQuantity();
             }
             partSlider = new JSlider(JSlider.HORIZONTAL, 0, quantity, 0);
-            //TODO: deal with armors
+            // TODO: deal with armors
             partSlider.setMajorTickSpacing(1);
             if (quantity < 11) {
                 partSlider.setPaintLabels(true);
@@ -163,7 +177,7 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "
+            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails() + ", "
                     + p.getActualValue().toAmountAndSymbolString() + "</html>"), gridBagConstraints);
             i++;
         }
@@ -172,7 +186,7 @@ public class PayCollateralDialog extends JDialog {
         scrParts.setMinimumSize(new Dimension(400, 300));
         scrParts.setPreferredSize(new Dimension(400, 300));
 
-        //TODO: use cash reserves
+        // TODO: use cash reserves
 
         btnPay = new JButton(resourceMap.getString("btnPay.text"));
         btnPay.addActionListener(evt -> payCollateral());
@@ -236,7 +250,7 @@ public class PayCollateralDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -249,13 +263,13 @@ public class PayCollateralDialog extends JDialog {
     }
 
     public void payCollateral() {
-        //TODO: summary and are you sure dialog
+        // TODO: summary and are you sure dialog
         paid = true;
         setVisible(false);
     }
 
     public void dontPayCollateral() {
-        //TODO: are you sure dialog
+        // TODO: are you sure dialog
         paid = false;
         setVisible(false);
     }
@@ -271,7 +285,8 @@ public class PayCollateralDialog extends JDialog {
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
             if (quantity > 0) {
-                amount = amount.plus(campaign.getWarehouse().getPart(m.getValue()).getActualValue().multipliedBy(quantity));
+                amount = amount
+                        .plus(campaign.getWarehouse().getPart(m.getValue()).getActualValue().multipliedBy(quantity));
             }
         }
 
@@ -314,7 +329,7 @@ public class PayCollateralDialog extends JDialog {
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
             if (quantity > 0) {
-                int[] array = {m.getValue(), quantity};
+                int[] array = { m.getValue(), quantity };
                 parts.add(array);
             }
         }

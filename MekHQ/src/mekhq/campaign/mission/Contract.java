@@ -20,7 +20,16 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Accountant;
@@ -29,14 +38,6 @@ import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 /**
  * Contracts - we need to track static amounts here because changes in the
@@ -45,6 +46,8 @@ import java.time.temporal.ChronoUnit;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Contract extends Mission {
+    private static final MMLogger logger = MMLogger.create(Contract.class);
+
     public final static int OH_NONE = 0;
     public final static int OH_HALF = 1;
     public final static int OH_FULL = 2;
@@ -71,9 +74,12 @@ public class Contract extends Mission {
     private int advancePct;
     private int signBonus;
 
-    // this is a transient variable meant to keep track of a single jump path while the contract
-    // runs through initial calculations, as the same jump path is referenced multiple times
-    // and calculating it each time is expensive. No need to preserve it in save date.
+    // this is a transient variable meant to keep track of a single jump path while
+    // the contract
+    // runs through initial calculations, as the same jump path is referenced
+    // multiple times
+    // and calculating it each time is expensive. No need to preserve it in save
+    // date.
     private transient JumpPath cachedJumpPath;
 
     // need to keep track of total value salvaged for salvage rights
@@ -154,8 +160,10 @@ public class Contract extends Mission {
     }
 
     /**
-     * This sets the Start Date and End Date of the Contract based on the length of the contract and
+     * This sets the Start Date and End Date of the Contract based on the length of
+     * the contract and
      * the starting date provided
+     * 
      * @param startDate the date the contract starts at
      */
     public void setStartAndEndDate(LocalDate startDate) {
@@ -279,7 +287,9 @@ public class Contract extends Mission {
         return mrbcFee;
     }
 
-    public int getMrbcFeePercentage() {return MRBC_FEE_PERCENTAGE;}
+    public int getMrbcFeePercentage() {
+        return MRBC_FEE_PERCENTAGE;
+    }
 
     public void setMRBCFee(boolean b) {
         mrbcFee = b;
@@ -386,10 +396,12 @@ public class Contract extends Mission {
 
     /**
      * Gets the currently calculated jump path for this contract,
-     * only recalculating if it's not valid any longer or hasn't been calculated yet.
+     * only recalculating if it's not valid any longer or hasn't been calculated
+     * yet.
      */
     public @Nullable JumpPath getJumpPath(Campaign c) {
-        // if we don't have a cached jump path, or if the jump path's starting/ending point
+        // if we don't have a cached jump path, or if the jump path's starting/ending
+        // point
         // no longer match the campaign's current location or contract's destination
         if ((getCachedJumpPath() == null) || getCachedJumpPath().isEmpty()
                 || !getCachedJumpPath().getFirstSystem().equals(c.getCurrentSystem())
@@ -433,7 +445,8 @@ public class Contract extends Mission {
     private int getTravelDays(Campaign c) {
         if (null != this.getSystem()) {
             JumpPath jumpPath = getJumpPath(c);
-            double days = Math.round(jumpPath.getTotalTime(c.getLocalDate(), c.getLocation().getTransitTime()) * 100.0) / 100.0;
+            double days = Math.round(jumpPath.getTotalTime(c.getLocalDate(), c.getLocation().getTransitTime()) * 100.0)
+                    / 100.0;
             return (int) Math.round(days);
         }
         return 0;
@@ -441,7 +454,8 @@ public class Contract extends Mission {
 
     /**
      * @param c campaign loaded
-     * @return the approximate number of months for a 2-way trip + deployment, rounded up
+     * @return the approximate number of months for a 2-way trip + deployment,
+     *         rounded up
      */
     public int getLengthPlusTravel(Campaign c) {
         int travelMonths = (int) Math.ceil(2 * getTravelDays(c) / 30.0);
@@ -450,7 +464,8 @@ public class Contract extends Mission {
 
     /**
      * @param c campaign loaded
-     * @return the cumulative sum of estimated overhead expenses for the duration of travel + deployment
+     * @return the cumulative sum of estimated overhead expenses for the duration of
+     *         travel + deployment
      */
     public Money getTotalEstimatedOverheadExpenses(Campaign c) {
         return c.getAccountant().getOverheadExpenses().multipliedBy(getLengthPlusTravel(c));
@@ -458,7 +473,8 @@ public class Contract extends Mission {
 
     /**
      * @param c campaign loaded
-     * @return the cumulative sum of estimated maintenance expenses for the duration of travel + deployment
+     * @return the cumulative sum of estimated maintenance expenses for the duration
+     *         of travel + deployment
      */
     public Money getTotalEstimatedMaintenanceExpenses(Campaign c) {
         return c.getAccountant().getMaintenanceCosts().multipliedBy(getLengthPlusTravel(c));
@@ -479,15 +495,17 @@ public class Contract extends Mission {
 
     /**
      * @param c campaign loaded
-     * @return the cumulative sum of estimated payroll expenses for the duration of travel + deployment
+     * @return the cumulative sum of estimated payroll expenses for the duration of
+     *         travel + deployment
      */
     public Money getTotalEstimatedPayrollExpenses(Campaign c) {
-         return getEstimatedPayrollExpenses(c).multipliedBy(getLengthPlusTravel(c));
+        return getEstimatedPayrollExpenses(c).multipliedBy(getLengthPlusTravel(c));
     }
 
     /**
      * @param c campaign loaded
-     * @return the total (2-way) estimated transportation fee from the player's current location to this contract's planet
+     * @return the total (2-way) estimated transportation fee from the player's
+     *         current location to this contract's planet
      */
     public Money getTotalTransportationFees(Campaign c) {
         if ((null != getSystem()) && c.getCampaignOptions().isPayForTransport()) {
@@ -501,10 +519,14 @@ public class Contract extends Mission {
     }
 
     /**
-     * Get the estimated total profit for this contract. The total profit is the total contract
-     * payment including fees and bonuses, minus overhead, maintenance, payroll, spare parts,
-     * and other monthly expenses. The duration used for monthly expenses is the contract duration
-     * plus the travel time from the unit's current world to the contract world and back.
+     * Get the estimated total profit for this contract. The total profit is the
+     * total contract
+     * payment including fees and bonuses, minus overhead, maintenance, payroll,
+     * spare parts,
+     * and other monthly expenses. The duration used for monthly expenses is the
+     * contract duration
+     * plus the travel time from the unit's current world to the contract world and
+     * back.
      *
      * @param c The campaign with which this contract is associated.
      * @return The estimated profit in the current default currency.
@@ -516,7 +538,8 @@ public class Contract extends Mission {
     }
 
     /**
-     * Get the number of months left in this contract after the given date. Partial months are counted as
+     * Get the number of months left in this contract after the given date. Partial
+     * months are counted as
      * full months.
      *
      * @param date the date to use in the calculation
@@ -524,7 +547,8 @@ public class Contract extends Mission {
      */
     public int getMonthsLeft(LocalDate date) {
         int monthsLeft = Math.toIntExact(ChronoUnit.MONTHS.between(date, endDate));
-        // Ensure partial months are counted based on the current day of the month, as the above only
+        // Ensure partial months are counted based on the current day of the month, as
+        // the above only
         // counts full months
         if (date.getDayOfMonth() != endDate.getDayOfMonth()) {
             monthsLeft++;
@@ -540,14 +564,16 @@ public class Contract extends Mission {
     }
 
     /**
-     * Only do this at the time the contract is set up, otherwise amounts may change after
+     * Only do this at the time the contract is set up, otherwise amounts may change
+     * after
      * the ink is signed, which is a no-no.
+     * 
      * @param c current campaign
      */
     public void calculateContract(Campaign c) {
         Accountant accountant = c.getAccountant();
 
-        //calculate base amount
+        // calculate base amount
         baseAmount = accountant.getContractBase()
                 .multipliedBy(getLength())
                 .multipliedBy(paymentMultiplier);
@@ -587,8 +613,10 @@ public class Contract extends Mission {
         if (null != getSystem() && c.getCampaignOptions().isPayForTransport()) {
             JumpPath jumpPath = getJumpPath(c);
 
-            // FM:Mercs transport payments take into account owned transports and do not use CampaignOps DropShip costs.
-            // CampaignOps doesn't care about owned transports and does use its own DropShip costs.
+            // FM:Mercs transport payments take into account owned transports and do not use
+            // CampaignOps DropShip costs.
+            // CampaignOps doesn't care about owned transports and does use its own DropShip
+            // costs.
             boolean campaignOps = c.getCampaignOptions().isEquipmentContractBase();
             transportAmount = c.calculateCostPerJump(campaignOps, campaignOps)
                     .multipliedBy(jumpPath.getJumps())
@@ -605,7 +633,7 @@ public class Contract extends Mission {
             // contract base * transport period * reputation * employer modifier
             transitAmount = accountant.getContractBase()
                     .multipliedBy(((getJumpPath(c).getJumps()) * 2.0) / 4.0)
-                    .multipliedBy(c.getUnitRatingMod() * 0.2 + 0.5)
+                    .multipliedBy(c.getAtBUnitRatingMod() * 0.2 + 0.5)
                     .multipliedBy(1.2);
         } else {
             transitAmount = Money.zero();
@@ -654,7 +682,8 @@ public class Contract extends Mission {
 
     /**
      * Retrieves the percentage of shares for this contract.
-     * If the instance is of type AtBContract, it retrieves the dynamic Shares percentage.
+     * If the instance is of type AtBContract, it retrieves the dynamic Shares
+     * percentage.
      * Otherwise, it returns a default value of 30.
      *
      * @return the percentage of shares
@@ -760,7 +789,7 @@ public class Contract extends Mission {
                     salvagedByEmployer = Money.fromXmlString(wn2.getTextContent().trim());
                 }
             } catch (Exception ex) {
-                LogManager.getLogger().error("", ex);
+                logger.error("", ex);
             }
         }
     }

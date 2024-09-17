@@ -21,15 +21,16 @@
  */
 package mekhq.campaign;
 
-import megamek.Version;
-import megamek.logging.MMLogger;
-import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.UUID;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * A kill record
@@ -51,7 +52,8 @@ public class Kill {
     public Kill() {
     }
 
-    public Kill(UUID id, String kill, String killer, LocalDate d, int missionId, int scenarioId, int forceId, long unitType) {
+    public Kill(UUID id, String kill, String killer, LocalDate d, int missionId, int scenarioId, int forceId,
+            long unitType) {
         pilotId = id;
         this.killed = kill;
         this.killer = killer;
@@ -62,86 +64,71 @@ public class Kill {
         this.unitType = unitType;
     }
 
-    @SuppressWarnings(value = "unused")
     public UUID getPilotId() {
         return pilotId;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setPilotId(UUID id) {
         pilotId = id;
     }
 
-    @SuppressWarnings(value = "unused")
     public LocalDate getDate() {
         return date;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setDate(LocalDate d) {
         date = d;
     }
 
-    @SuppressWarnings(value = "unused")
     public String getWhatKilled() {
         return killed;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setWhatKilled(String s) {
         killed = s;
     }
 
-    @SuppressWarnings(value = "unused")
     public String getKilledByWhat() {
         return killer;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setKilledByWhat(String s) {
         killer = s;
     }
 
-    @SuppressWarnings(value = "unused")
     public int getMissionId() {
         return missionId;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setMissionId(int id) {
         missionId = id;
     }
 
-    @SuppressWarnings(value = "unused")
     public int getScenarioId() {
         return scenarioId;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setScenarioId(int id) {
         scenarioId = id;
     }
 
-    @SuppressWarnings(value = "unused")
     public int getForceId() {
         return forceId;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setForceId(final int id) {
         forceId = id;
     }
 
     /**
      * @return the long corresponding to the Entity type killed,
-     * or -1 if the kill does not have a unit type logged
+     *         or -1 if the kill does not have a unit type logged
      */
-    @SuppressWarnings(value = "unused")
+
     public long getUnitType() {
         return unitType;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setUnitType(final long type) {
         unitType = type;
     }
@@ -196,6 +183,7 @@ public class Kill {
 
     @Override
     public Kill clone() {
-        return new Kill(getPilotId(), getWhatKilled(), getKilledByWhat(), getDate(), getMissionId(), getScenarioId(), getForceId(), getUnitType());
+        return new Kill(getPilotId(), getWhatKilled(), getKilledByWhat(), getDate(), getMissionId(), getScenarioId(),
+                getForceId(), getUnitType());
     }
 }

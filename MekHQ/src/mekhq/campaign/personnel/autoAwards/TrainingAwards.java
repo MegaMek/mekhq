@@ -18,25 +18,36 @@
  */
 package mekhq.campaign.personnel.autoAwards;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.AcademyType;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.*;
 
 public class TrainingAwards {
+    private static final MMLogger logger = MMLogger.create(TrainingAwards.class);
+
     /**
-     * This function loops through Training Awards, checking whether the person is eligible to receive each type of award.
+     * This function loops through Training Awards, checking whether the person is
+     * eligible to receive each type of award.
      *
-     * @param campaign the campaign to be processed
-     * @param person the person to check award eligibility for
-     * @param academyAttributes the attributes of the person's academy (education level, type, name)
-     * @param awards the awards to be processed (should only include awards where item == Training)
-     * @return a mapping of award IDs to lists of eligible awards for the given person
+     * @param campaign          the campaign to be processed
+     * @param person            the person to check award eligibility for
+     * @param academyAttributes the attributes of the person's academy (education
+     *                          level, type, name)
+     * @param awards            the awards to be processed (should only include
+     *                          awards where item == Training)
+     * @return a mapping of award IDs to lists of eligible awards for the given
+     *         person
      */
-    public static Map<Integer, List<Object>> TrainingAwardsProcessor(Campaign campaign, UUID person, List<Object> academyAttributes, List<Award> awards) {
+    public static Map<Integer, List<Object>> TrainingAwardsProcessor(Campaign campaign, UUID person,
+            List<Object> academyAttributes, List<Award> awards) {
         Person student = campaign.getPerson(person);
         List<Award> eligibleAwards = new ArrayList<>();
 
@@ -44,11 +55,12 @@ public class TrainingAwards {
         AcademyType academyType;
         String academyName;
 
-        // We start by prepping the data we're going to be comparing against and ensuring it's all valid
+        // We start by prepping the data we're going to be comparing against and
+        // ensuring it's all valid
         try {
             academyEducationLevel = (int) academyAttributes.get(0);
         } catch (ClassCastException e) {
-            LogManager.getLogger().warn("{} has invalid academyEducationLevel value '{}'. Aborting.",
+            logger.warn("{} has invalid academyEducationLevel value '{}'. Aborting.",
                     student.getFullName(), academyAttributes.get(0).toString());
 
             return AutoAwardsController.prepareAwardData(person, eligibleAwards);
@@ -57,7 +69,7 @@ public class TrainingAwards {
         try {
             academyType = (AcademyType) academyAttributes.get(1);
         } catch (ClassCastException e) {
-            LogManager.getLogger().warn("{} has invalid academyType value '{}'. Aborting.",
+            logger.warn("{} has invalid academyType value '{}'. Aborting.",
                     student.getFullName(), academyAttributes.get(1).toString());
 
             return AutoAwardsController.prepareAwardData(person, eligibleAwards);
@@ -66,7 +78,7 @@ public class TrainingAwards {
         try {
             academyName = academyAttributes.get(2).toString();
         } catch (ClassCastException e) {
-            LogManager.getLogger().warn("{} has invalid academyName value '{}'. Aborting.",
+            logger.warn("{} has invalid academyName value '{}'. Aborting.",
                     student.getFullName(), academyAttributes.get(2).toString());
 
             return AutoAwardsController.prepareAwardData(person, eligibleAwards);
@@ -81,7 +93,7 @@ public class TrainingAwards {
             try {
                 requiredEducationLevel = award.getQty();
             } catch (Exception e) {
-                LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}",
+                logger.warn("Award {} from the {} set has an invalid qty value {}",
                         award.getName(), award.getSet(), award.getQty());
                 continue;
             }
@@ -89,7 +101,7 @@ public class TrainingAwards {
             try {
                 requiredType = AcademyType.parseFromString(award.getSize());
             } catch (Exception e) {
-                LogManager.getLogger().warn("Award {} from the {} set has an invalid size value {}",
+                logger.warn("Award {} from the {} set has an invalid size value {}",
                         award.getName(), award.getSet(), award.getSize());
                 continue;
             }
@@ -97,7 +109,7 @@ public class TrainingAwards {
             try {
                 requiredAcademyName = award.getRange();
             } catch (Exception e) {
-                LogManager.getLogger().warn("Award {} from the {} set has an invalid range value {}",
+                logger.warn("Award {} from the {} set has an invalid range value {}",
                         award.getName(), award.getSet(), award.getRange());
                 continue;
             }

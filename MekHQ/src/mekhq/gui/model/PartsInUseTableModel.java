@@ -1,15 +1,24 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.model;
 
-import mekhq.MekHQ;
-import mekhq.campaign.parts.PartInUse;
-import mekhq.gui.utilities.MekHqTableCellRenderer;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -18,6 +27,22 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Set;
+
+import javax.swing.AbstractCellEditor;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+
+import mekhq.MekHQ;
+import mekhq.campaign.parts.PartInUse;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class PartsInUseTableModel extends DataTableModel {
     private static final DecimalFormat FORMATTER = new DecimalFormat();
@@ -30,7 +55,7 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_IN_USE = 1;
     public final static int COL_STORED = 2;
     public final static int COL_TONNAGE = 3;
-    public final static int COL_IN_TRANSFER  = 4;
+    public final static int COL_IN_TRANSFER = 4;
     public final static int COL_COST = 5;
     public final static int COL_BUTTON_BUY  = 6;
     public final static int COL_BUTTON_BUY_BULK  = 7;
@@ -39,11 +64,10 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_BUTTON_GMADD  = 10;
     public final static int COL_BUTTON_GMADD_BULK  = 11;
 
-
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
             MekHQ.getMHQOptions().getLocale());
 
-    public PartsInUseTableModel () {
+    public PartsInUseTableModel() {
         data = new ArrayList<PartInUse>();
     }
 
@@ -90,11 +114,11 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_TONNAGE:
                 return (piu.getStoreTonnage() > 0) ? FORMATTER.format(piu.getStoreTonnage()) : EMPTY_CELL;
             case COL_IN_TRANSFER:
-                if ( piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0 ) {
+                if (piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0) {
                     return FORMATTER.format(piu.getTransferCount());
-                } else if ( piu.getPlannedCount() > 0 ) {
+                } else if (piu.getPlannedCount() > 0) {
                     return String.format("%s [+%s]",
-                        FORMATTER.format(piu.getTransferCount()), FORMATTER.format(piu.getPlannedCount()));
+                            FORMATTER.format(piu.getTransferCount()), FORMATTER.format(piu.getPlannedCount()));
                 } else {
                     return EMPTY_CELL;
                 }
@@ -156,7 +180,7 @@ public class PartsInUseTableModel extends DataTableModel {
 
     public boolean isBuyable(int row) {
         return (row >= 0) && (row < data.size())
-            && (null != ((PartInUse) data.get(row)).getPartToBuy());
+                && (null != ((PartInUse) data.get(row)).getPartToBuy());
     }
 
     public int getAlignment(int column) {
@@ -243,7 +267,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     public static class ButtonColumn extends AbstractCellEditor
-        implements TableCellRenderer, TableCellEditor, ActionListener, MouseListener {
+            implements TableCellRenderer, TableCellEditor, ActionListener, MouseListener {
 
         private JTable table;
         private Action action;
@@ -273,13 +297,11 @@ public class PartsInUseTableModel extends DataTableModel {
             table.addMouseListener(this);
         }
 
-        public Border getFocusBorder()
-        {
+        public Border getFocusBorder() {
             return focusBorder;
         }
 
-        public void setFocusBorder(Border focusBorder)
-        {
+        public void setFocusBorder(Border focusBorder) {
             this.focusBorder = focusBorder;
             editButton.setBorder(focusBorder);
         }
@@ -310,23 +332,33 @@ public class PartsInUseTableModel extends DataTableModel {
             isButtonColumnEditor = false;
         }
 
-        @Override public void mouseClicked(MouseEvent e) {}
-        @Override public void mouseEntered(MouseEvent e) {}
-        @Override public void mouseExited(MouseEvent e) {}
+        @Override
+        public void mouseClicked(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+        }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             int row = table.convertRowIndexToModel(table.getEditingRow());
             fireEditingStopped();
 
-            //  Invoke the Action
+            // Invoke the Action
             ActionEvent event = new ActionEvent(table, ActionEvent.ACTION_PERFORMED, "" + row);
             action.actionPerformed(event);
         }
 
         @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            boolean buyable = ((PartsInUseTableModel) table.getModel()).isBuyable(table.getRowSorter().convertRowIndexToModel(row));
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
+                int column) {
+            boolean buyable = ((PartsInUseTableModel) table.getModel())
+                    .isBuyable(table.getRowSorter().convertRowIndexToModel(row));
 
             if (value == null) {
                 editButton.setText(EMPTY_CELL);
@@ -345,12 +377,14 @@ public class PartsInUseTableModel extends DataTableModel {
         }
 
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            boolean buyable = ((PartsInUseTableModel) table.getModel()).isBuyable(table.getRowSorter().convertRowIndexToModel(row));
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+                int row, int column) {
+            boolean buyable = ((PartsInUseTableModel) table.getModel())
+                    .isBuyable(table.getRowSorter().convertRowIndexToModel(row));
 
             if (isSelected && enabled && buyable) {
                 renderButton.setForeground(table.getSelectionForeground());
-                 renderButton.setBackground(table.getSelectionBackground());
+                renderButton.setBackground(table.getSelectionBackground());
             } else {
                 renderButton.setForeground(table.getForeground());
                 renderButton.setBackground(UIManager.getColor("Button.background"));
@@ -362,8 +396,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 renderButton.setBorder(originalBorder);
             }
 
-            if (value == null)
-            {
+            if (value == null) {
                 renderButton.setText(EMPTY_CELL);
                 renderButton.setIcon(null);
             } else if (value instanceof Icon) {

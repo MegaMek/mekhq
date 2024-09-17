@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import megamek.common.AmmoType;
-import megamek.common.Mounted;
 import megamek.common.equipment.AmmoMounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -33,8 +32,10 @@ import mekhq.campaign.unit.Unit;
 /**
  * Checks for additional ammo bins and adds the appropriate part.
  *
- * Large craft can combine all the ammo of a single type into a single bin. Switching the munition type
- * of one or more tons of ammo can require the addition of an ammo bin and can change the ammo bin
+ * Large craft can combine all the ammo of a single type into a single bin.
+ * Switching the munition type
+ * of one or more tons of ammo can require the addition of an ammo bin and can
+ * change the ammo bin
  * capacity.
  */
 public class AdjustLargeCraftAmmoAction implements IUnitAction {

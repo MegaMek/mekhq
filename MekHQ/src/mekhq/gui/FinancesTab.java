@@ -406,9 +406,9 @@ public final class FinancesTab extends CampaignGuiTab {
                 .append(String.format(formatted, assets.toAmountAndSymbolString())).append("\n");
         sb.append("       Cash.............. ")
                 .append(String.format(formatted, r.getCash().toAmountAndSymbolString())).append("\n");
-        if (r.getMechValue().isPositive()) {
-            sb.append("       Mechs............. ")
-                    .append(String.format(formatted, r.getMechValue().toAmountAndSymbolString())).append("\n");
+        if (r.getMekValue().isPositive()) {
+            sb.append("       Meks............. ")
+                    .append(String.format(formatted, r.getMekValue().toAmountAndSymbolString())).append("\n");
         }
         if (r.getVeeValue().isPositive()) {
             sb.append("       Vehicles.......... ")
@@ -422,9 +422,9 @@ public final class FinancesTab extends CampaignGuiTab {
             sb.append("       Infantry.......... ")
                     .append(String.format(formatted, r.getInfantryValue().toAmountAndSymbolString())).append("\n");
         }
-        if (r.getProtomechValue().isPositive()) {
-            sb.append("       Protomechs........ ")
-                    .append(String.format(formatted, r.getProtomechValue().toAmountAndSymbolString())).append("\n");
+        if (r.getProtoMekValue().isPositive()) {
+            sb.append("       ProtoMeks........ ")
+                    .append(String.format(formatted, r.getProtoMekValue().toAmountAndSymbolString())).append("\n");
         }
         if (r.getSmallCraftValue().isPositive()) {
             sb.append("       Small Craft....... ")

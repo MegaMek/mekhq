@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.mission.atb;
 
-import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

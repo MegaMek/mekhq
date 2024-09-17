@@ -121,7 +121,7 @@ public class Academy implements Comparable<Academy> {
     private String set;
 
     /**
-     * This class provides a no-arg constructor, which is needed for unmarshalling of XML.
+     * This class provides a no-arg constructor, which is necessary for the unmarshalling of XML.
      */
     public Academy() {
     }
@@ -132,37 +132,51 @@ public class Academy implements Comparable<Academy> {
      * @param set                     the set name of the academy
      * @param name                    the name of the academy
      * @param type                    the type of academy (used by autoAwards)
-     * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
-     * @param isReeducationCamp       indicates if the academy is a reeducation camp (true) or not (false)
-     * @param isPrepSchool            indicates if the academy is focused on children (true) or not (false)
+     * @param isMilitary              indicates if the academy is a military academy
+     *                                (true) or not (false)
+     * @param isReeducationCamp       indicates if the academy is a reeducation camp
+     *                                (true) or not (false)
+     * @param isPrepSchool            indicates if the academy is focused on
+     *                                children (true) or not (false)
      * @param description             the description of the academy
-     * @param factionDiscount         the discount offered by the academy to faction members
-     * @param isFactionRestricted     indicates if the academy is restricted to faction members (true) or not (false)
-     * @param isLocal                 indicates if the academy is local (true) or not (false) (overrides locationSystems)
-     * @param isHomeSchool            indicates if the academy is a home school (true) or not (false)
-     * @param locationSystems         the list of location systems where the academy is present
+     * @param factionDiscount         the discount offered by the academy to faction
+     *                                members
+     * @param isFactionRestricted     indicates if the academy is restricted to
+     *                                faction members (true) or not (false)
+     * @param isLocal                 indicates if the academy is local (true) or
+     *                                not (false) (overrides locationSystems)
+     * @param isHomeSchool            indicates if the academy is a home school
+     *                                (true) or not (false)
+     * @param locationSystems         the list of location systems where the academy
+     *                                is present
      * @param constructionYear        the year when the academy was constructed
      * @param destructionYear         the year when the academy was destroyed
      * @param tuition                 the tuition fee for attending the academy
      * @param durationDays            the duration of the academy in days
      * @param facultySkill            the skill level of the academy's faculty
-     * @param educationLevelMin       the minimum education level required to attend the academy
-     * @param educationLevelMax       the maximum education level provided by the academy
-     * @param ageMin                  the minimum age requirement to attend the academy
+     * @param educationLevelMin       the minimum education level required to attend
+     *                                the academy
+     * @param educationLevelMax       the maximum education level provided by the
+     *                                academy
+     * @param ageMin                  the minimum age requirement to attend the
+     *                                academy
      * @param ageMax                  the maximum age accepted by the academy
-     * @param qualifications          the list of qualifications provided by the academy
+     * @param qualifications          the list of qualifications provided by the
+     *                                academy
      * @param curriculums             the list of curriculums offered by the academy
-     * @param qualificationStartYears the list of years when each qualification becomes available
+     * @param qualificationStartYears the list of years when each qualification
+     *                                becomes available
      * @param baseAcademicSkillLevel  the base skill level provided by the academy
-     * @param id                      the id number of the academy, used for sorting academies in mhq
+     * @param id                      the id number of the academy, used for sorting
+     *                                academies in mhq
      */
     public Academy(String set, String name, String type, Boolean isMilitary, Boolean isReeducationCamp,
-                   Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
-                   List<String> locationSystems, Boolean isLocal, Boolean isHomeSchool, Integer constructionYear,
-                   Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
-                   Integer facultySkill, EducationLevel educationLevelMin, EducationLevel educationLevelMax,
-                   Integer ageMin, Integer ageMax, List<String> qualifications, List<String> curriculums,
-                   List<Integer> qualificationStartYears, Integer baseAcademicSkillLevel, Integer id) {
+            Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
+            List<String> locationSystems, Boolean isLocal, Boolean isHomeSchool, Integer constructionYear,
+            Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
+            Integer facultySkill, EducationLevel educationLevelMin, EducationLevel educationLevelMax,
+            Integer ageMin, Integer ageMax, List<String> qualifications, List<String> curriculums,
+            List<Integer> qualificationStartYears, Integer baseAcademicSkillLevel, Integer id) {
         this.set = set;
         this.name = name;
         this.type = type;
@@ -197,7 +211,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The value of the "set" property.
      */
-    @SuppressWarnings(value = "unused")
     public String getSet() {
         return set;
     }
@@ -207,7 +220,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @param set the value to be assigned to the set variable
      */
-    @SuppressWarnings(value = "unused")
     public void setSet(String set) {
         this.set = set;
     }
@@ -217,18 +229,15 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the name of the academy
      */
-    @SuppressWarnings(value = "unused")
     public String getName() {
         return name;
     }
-
 
     /**
      * Sets the name of the academy.
      *
      * @param name the new name to be set
      */
-    @SuppressWarnings(value = "unused")
     public void setName(final String name) {
         this.name = name;
     }
@@ -238,7 +247,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The type of academy.
      */
-    @SuppressWarnings(value = "unused")
     public AcademyType getType() {
         return AcademyType.parseFromString(type);
     }
@@ -248,7 +256,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @param type the type to be set.
      */
-    @SuppressWarnings(value = "unused")
     public void setType(final String type) {
         this.type = type;
     }
@@ -256,9 +263,9 @@ public class Academy implements Comparable<Academy> {
     /**
      * Checks if the academy is a military academy.
      *
-     * @return {@code true} if the academy is a military academy, {@code false} otherwise.
+     * @return {@code true} if the academy is a military academy, {@code false}
+     *         otherwise.
      */
-    @SuppressWarnings(value = "unused")
     public Boolean isMilitary() {
         return isMilitary;
     }
@@ -268,7 +275,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @param isMilitary true if the academy is military, false otherwise.
      */
-    @SuppressWarnings(value = "unused")
     public void setIsMilitary(final boolean isMilitary) {
         this.isMilitary = isMilitary;
     }
@@ -278,77 +284,36 @@ public class Academy implements Comparable<Academy> {
      *
      * @return true, if the academy is a reeducation camp; otherwise, false.
      */
-    @SuppressWarnings(value = "unused")
     public boolean isReeducationCamp() {
         return isReeducationCamp;
     }
 
     /**
-     * Sets the value of the isReeducationCamp property.
-     *
-     * @param isReeducationCamp the new value for the isReeducationCamp property
-     */
-    @SuppressWarnings(value = "unused")
-    public void setIsReeducationCamp(final boolean isReeducationCamp) {
-        this.isReeducationCamp = isReeducationCamp;
-    }
-
-    /**
      * Checks if the academy is a Prep School.
      *
-     * @return {@code true} if the academy is a Prep School, {@code false} otherwise.
+     * @return {@code true} if the academy is a Prep School, {@code false}
+     *         otherwise.
      */
-    @SuppressWarnings(value = "unused")
     public Boolean isPrepSchool() {
         return isPrepSchool;
     }
 
     /**
-     * Sets the value indicating whether the academy is a prep school.
-     *
-     * @param isPrepSchool true if the academy is a prep school, false otherwise.
-     */
-    @SuppressWarnings(value = "unused")
-    public void setIsPrepSchool(final boolean isPrepSchool) {
-        this.isPrepSchool = isPrepSchool;
-    }
-
-    /**
      * Checks if the academy is a local academy.
      *
-     * @return {@code true} if the academy is a local academy, {@code false} otherwise.
+     * @return {@code true} if the academy is a local academy, {@code false}
+     *         otherwise.
      */
-    @SuppressWarnings(value = "unused")
     public Boolean isLocal() {
         return isLocal;
     }
 
     /**
-     * Sets the value indicating whether the academy is local.
-     *
-     * @param isLocal true if the academy is local, false otherwise.
+     * @return {@code true} if the academy is a home school, {@code false}
+     *         otherwise.
      */
-    @SuppressWarnings(value = "unused")
-    public void setIsLocal(final boolean isLocal) {
-        this.isLocal = isLocal;
-    }
-
-    /**
-     * @return {@code true} if the academy is a home school, {@code false} otherwise.
-     */
-    @SuppressWarnings(value = "unused")
     public Boolean isHomeSchool() {
         return isHomeSchool;
-    }
-
-    /**
-     * Sets the value indicating whether the academy is a home school.
-     *
-     * @param isHomeSchool true if the academy is a home school, false otherwise.
-     */
-    @SuppressWarnings(value = "unused")
-    public void setIsHomeSchool(final boolean isHomeSchool) {
-        this.isHomeSchool = isHomeSchool;
     }
 
     /**
@@ -356,7 +321,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The description of the academy.
      */
-    @SuppressWarnings(value = "unused")
     public String getDescription() {
         return description;
     }
@@ -366,7 +330,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @param description the new description for the academy
      */
-    @SuppressWarnings(value = "unused")
     public void setDescription(final String description) {
         this.description = description;
     }
@@ -376,7 +339,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The list of location systems as a List of String.
      */
-    @SuppressWarnings(value = "unused")
     public List<String> getLocationSystems() {
         return locationSystems;
     }
@@ -386,7 +348,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @param locationSystems the list of location systems to be set
      */
-    @SuppressWarnings(value = "unused")
     public void setLocationSystems(final List<String> locationSystems) {
         this.locationSystems = locationSystems;
     }
@@ -396,19 +357,8 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the academy's construction year as an Integer value.
      */
-    @SuppressWarnings(value = "unused")
     public Integer getConstructionYear() {
         return constructionYear;
-    }
-
-    /**
-     * Sets the construction year of the academy.
-     *
-     * @param constructionYear the construction year to be set
-     */
-    @SuppressWarnings(value = "unused")
-    public void setConstructionYear(final Integer constructionYear) {
-        this.constructionYear = constructionYear;
     }
 
     /**
@@ -416,19 +366,8 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The academy's destruction year, represented as an Integer.
      */
-    @SuppressWarnings(value = "unused")
     public Integer getDestructionYear() {
         return destructionYear;
-    }
-
-    /**
-     * Sets the destruction year of the academy.
-     *
-     * @param destructionYear the destruction year to be set
-     */
-    @SuppressWarnings(value = "unused")
-    public void setDestructionYear(final Integer destructionYear) {
-        this.destructionYear = destructionYear;
     }
 
     /**
@@ -436,19 +375,8 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The closure year as an Integer.
      */
-    @SuppressWarnings(value = "unused")
     public Integer getClosureYear() {
         return closureYear;
-    }
-
-    /**
-     * Sets the closure year of the academy.
-     *
-     * @param closureYear the closure year to be set
-     */
-    @SuppressWarnings(value = "unused")
-    public void setClosureYear(final Integer closureYear) {
-        this.closureYear = closureYear;
     }
 
     /**
@@ -456,19 +384,8 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the minimum age allowed as an Integer.
      */
-    @SuppressWarnings(value = "unused")
     public Integer getAgeMin() {
         return ageMin;
-    }
-
-    /**
-     * Sets the minimum age.
-     *
-     * @param ageMin the minimum age to set
-     */
-    @SuppressWarnings(value = "unused")
-    public void setAgeMin(final Integer ageMin) {
-        this.ageMin = ageMin;
     }
 
     /**
@@ -476,19 +393,8 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the maximum age allowed as an Integer.
      */
-    @SuppressWarnings(value = "unused")
     public Integer getAgeMax() {
         return ageMax;
-    }
-
-    /**
-     * Sets the maximum age.
-     *
-     * @param ageMax the maximum age to be set
-     */
-    @SuppressWarnings(value = "unused")
-    public void setAgeMax(final Integer ageMax) {
-        this.ageMax = ageMax;
     }
 
     /**
@@ -496,7 +402,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the academy's tuition value as an Integer.
      */
-    @SuppressWarnings(value = "unused")
     public Integer getTuition() {
         return tuition;
     }
@@ -506,7 +411,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @param tuition the new tuition value to be set
      */
-    @SuppressWarnings(value = "unused")
     public void setTuition(final Integer tuition) {
         this.tuition = tuition;
     }
@@ -516,19 +420,8 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The course duration in days as an Integer.
      */
-    @SuppressWarnings(value = "unused")
     public Integer getDurationDays() {
         return durationDays;
-    }
-
-    /**
-     * Sets the course duration in days.
-     *
-     * @param durationDays the duration in days to set
-     */
-    @SuppressWarnings(value = "unused")
-    public void setDurationDays(final Integer durationDays) {
-        this.durationDays = durationDays;
     }
 
     /**
@@ -536,7 +429,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The academy's discount value for the faction.
      */
-    @SuppressWarnings(value = "unused")
+
     public Integer getFactionDiscount() {
         return factionDiscount;
     }
@@ -546,29 +439,9 @@ public class Academy implements Comparable<Academy> {
      *
      * @param factionDiscount the faction discount to set
      */
-    @SuppressWarnings(value = "unused")
+
     public void setFactionDiscount(final Integer factionDiscount) {
         this.factionDiscount = factionDiscount;
-    }
-
-    /**
-     * Checks if the academy is faction restricted.
-     *
-     * @return true if the academy is faction restricted, otherwise false.
-     */
-    @SuppressWarnings(value = "unused")
-    public Boolean isFactionRestricted() {
-        return isFactionRestricted;
-    }
-
-    /**
-     * Sets whether the academy is faction restricted.
-     *
-     * @param isFactionRestricted true if the academy is faction restricted, false otherwise
-     */
-    @SuppressWarnings(value = "unused")
-    public void setIsFactionRestricted(final Boolean isFactionRestricted) {
-        this.isFactionRestricted = isFactionRestricted;
     }
 
     /**
@@ -576,19 +449,8 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The faculty skill level as an Integer.
      */
-    @SuppressWarnings(value = "unused")
     public Integer getFacultySkill() {
         return facultySkill;
-    }
-
-    /**
-     * Sets the skill level of the faculty.
-     *
-     * @param facultySkill the skill level of the faculty to be set
-     */
-    @SuppressWarnings(value = "unused")
-    public void setFacultySkill(final Integer facultySkill) {
-        this.facultySkill = facultySkill;
     }
 
     /**
@@ -596,7 +458,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The minimum academic tier value as an Integer.
      */
-    @SuppressWarnings(value = "unused")
     public EducationLevel getEducationLevelMin() {
         return educationLevelMin;
     }
@@ -606,19 +467,8 @@ public class Academy implements Comparable<Academy> {
      *
      * @param educationLevelMin the minimum education level required, as an Integer
      */
-    @SuppressWarnings(value = "unused")
     public void setEducationLevelMin(final EducationLevel educationLevelMin) {
         this.educationLevelMin = educationLevelMin;
-    }
-
-    /**
-     * Retrieves the maximum academic tier value.
-     *
-     * @return The maximum academic tier value as an Integer
-     */
-    @SuppressWarnings(value = "unused")
-    public EducationLevel getEducationLevelMax() {
-        return educationLevelMax;
     }
 
     /**
@@ -626,7 +476,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @param educationLevelMax the maximum education level to be set
      */
-    @SuppressWarnings(value = "unused")
     public void setEducationLevelMax(final EducationLevel educationLevelMax) {
         this.educationLevelMax = educationLevelMax;
     }
@@ -636,59 +485,26 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the list of qualification names.
      */
-    @SuppressWarnings(value = "unused")
     public List<String> getQualifications() {
         return qualifications;
     }
 
     /**
-     * Sets the qualifications for the academy.
-     *
-     * @param qualifications a list of strings representing the qualifications to set
-     */
-    @SuppressWarnings(value = "unused")
-    public void setQualifications(final List<String> qualifications) {
-        this.qualifications = qualifications;
-    }
-
-    /**
      * Retrieves the skills improved by this academy.
      *
      * @return The skills improved by this academy as a String.
      */
-    @SuppressWarnings(value = "unused")
     public List<String> getCurriculums() {
         return curriculums;
     }
 
     /**
-     * Sets the curriculums for the academy.
-     *
-     * @param curriculums The list of curriculums to be set.
-     */
-    @SuppressWarnings(value = "unused")
-    public void setCurriculums(final List<String> curriculums) {
-        this.curriculums = curriculums;
-    }
-
-    /**
      * Retrieves the skills improved by this academy.
      *
      * @return The skills improved by this academy as a String.
      */
-    @SuppressWarnings(value = "unused")
     public List<Integer> getQualificationStartYears() {
         return qualificationStartYears;
-    }
-
-    /**
-     * Sets the qualification start years.
-     *
-     * @param qualificationStartYears the list of qualification start years to be set
-     */
-    @SuppressWarnings(value = "unused")
-    public void setQualificationStartYears(List<Integer> qualificationStartYears) {
-        this.qualificationStartYears = qualificationStartYears;
     }
 
     /**
@@ -696,19 +512,8 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the base skill level granted by this academy as an Integer
      */
-    @SuppressWarnings(value = "unused")
     public Integer getBaseAcademicSkillLevel() {
         return baseAcademicSkillLevel;
-    }
-
-    /**
-     * Sets the base academic skill level.
-     *
-     * @param baseAcademicSkillLevel the new base academic skill level
-     */
-    @SuppressWarnings(value = "unused")
-    public void setBaseAcademicSkillLevel(final Integer baseAcademicSkillLevel) {
-        this.baseAcademicSkillLevel = baseAcademicSkillLevel;
     }
 
     /**
@@ -716,7 +521,6 @@ public class Academy implements Comparable<Academy> {
      *
      * @return the ID of the academy
      */
-    @SuppressWarnings(value = "unused")
     public Integer getId() {
         return id;
     }
@@ -726,13 +530,14 @@ public class Academy implements Comparable<Academy> {
      *
      * @param id The id to be set.
      */
-    @SuppressWarnings(value = "unused")
     public void setId(Integer id) {
         this.id = id;
     }
 
     /**
-     * Compares an academy with this one by priority: xp, edge and name. Used for sorting.
+     * Compares an academy with this one by priority: xp, edge and name. Used for
+     * sorting.
+     *
      * @param other academy to be compared
      * @return int used for sorting
      */
@@ -742,13 +547,15 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
-     * Retrieves the adjusted value of the academy's tuition based on the specified tier minimum and education level.
+     * Retrieves the adjusted value of the academy's tuition based on the specified
+     * tier minimum and education level.
      *
-     * @param person        the person for whom the tuition is being calculated
+     * @param person the person for whom the tuition is being calculated
      * @return the adjusted tuition value as an Integer
      */
     public int getTuitionAdjusted(Person person) {
-        double educationLevel = Math.max(1, getEducationLevel(person) - (EducationLevel.parseToInt(educationLevelMin) / 4));
+        double educationLevel = Math.max(1,
+                getEducationLevel(person) - (EducationLevel.parseToInt(educationLevelMin) / 4));
 
         return (int) (tuition * educationLevel);
     }
@@ -757,7 +564,7 @@ public class Academy implements Comparable<Academy> {
      * Calculates the adjusted faction discount for a given person in a campaign.
      *
      * @param campaign the campaign the person belongs to
-     * @param person the person receiving the discount
+     * @param person   the person receiving the discount
      * @return the faction discount as a double value, between 0.00 and 1.00
      */
     public Double getFactionDiscountAdjusted(Campaign campaign, Person person) {
@@ -765,7 +572,8 @@ public class Academy implements Comparable<Academy> {
             return 1.00;
         }
 
-        List<String> campuses = isLocal ? Collections.singletonList(campaign.getCurrentSystem().getId()) : locationSystems;
+        List<String> campuses = isLocal ? Collections.singletonList(campaign.getCurrentSystem().getId())
+                : locationSystems;
 
         Set<String> relevantFactions = new HashSet<>();
         relevantFactions.add(campaign.getFaction().getShortName());
@@ -785,12 +593,14 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
-     * Retrieves the first Faction not in conflict with person's Faction or the campaign Faction.
+     * Retrieves the first Faction not in conflict with person's Faction or the
+     * campaign Faction.
      *
      * @param campaign The campaign being played.
-     * @param person The person for whom to filter the faction.
+     * @param person   The person for whom to filter the faction.
      * @param factions The factions to check eligibility against.
-     * @return The filtered faction for the local campus, or null if no faction is found.
+     * @return The filtered faction for the local campus, or null if no faction is
+     *         found.
      */
     public String getFilteredFaction(Campaign campaign, Person person, List<String> factions) {
         if (factions.isEmpty()) {
@@ -822,30 +632,35 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
-     * Checks if a person is qualified to enroll based on their highest education level.
+     * Checks if a person is qualified to enroll based on their highest education
+     * level.
      *
      * @param person The person to check qualification for.
-     * @return True, if the person's highest education level is greater than or equal to the minimum education level required, false otherwise.
+     * @return True, if the person's highest education level is greater than or
+     *         equal to the minimum education level required, false otherwise.
      */
     public boolean isQualified(Person person) {
-        return EducationLevel.parseToInt(person.getEduHighestEducation()) >= EducationLevel.parseToInt(educationLevelMin);
+        return EducationLevel.parseToInt(person.getEduHighestEducation()) >= EducationLevel
+                .parseToInt(educationLevelMin);
     }
 
     /**
      * Checks if a person has a rejected application for a specific academy.
      *
-     * @param person  the person for whom to check the rejected applications
-     * @return true if the person has a rejected application for the given academy, false otherwise
+     * @param person the person for whom to check the rejected applications
+     * @return true if the person has a rejected application for the given academy,
+     *         false otherwise
      */
     public boolean hasRejectedApplication(Person person) {
         return person.getEduFailedApplications().contains(this);
     }
 
     /**
-     * Calculates the education level of a qualification based on the applicant's highest prior education level and
+     * Calculates the education level of a qualification based on the applicant's
+     * highest prior education level and
      * the range of education levels offered by the academy.
      *
-     * @param person  The person whose education level needs to be determined.
+     * @param person The person whose education level needs to be determined.
      * @return The education level of the qualification.
      */
     public int getEducationLevel(Person person) {
@@ -874,10 +689,11 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
-     * Checks if there is a conflict between the factions related to the academy and person or campaign.
+     * Checks if there is a conflict between the factions related to the academy and
+     * person or campaign.
      *
      * @param campaign The campaign to check faction conflict with.
-     * @param person The person to check the faction conflict with.
+     * @param person   The person to check the faction conflict with.
      * @return true if there is a faction conflict, false otherwise.
      */
     public Boolean isFactionConflict(Campaign campaign, Person person) {
@@ -916,12 +732,13 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
-     * Retrieves the tooltip for an academy, based on the number of persons in 'personnel'
+     * Retrieves the tooltip for an academy, based on the number of persons in
+     * 'personnel'
      *
-     * @param campaign     The campaign to retrieve the tooltip for.
-     * @param personnel    The list of personnel.
-     * @param courseIndex  The index of the course.
-     * @param destination  The campus.
+     * @param campaign    The campaign to retrieve the tooltip for.
+     * @param personnel   The list of personnel.
+     * @param courseIndex The index of the course.
+     * @param destination The campus.
      * @return The tooltip as a String.
      */
     public String getTooltip(Campaign campaign, List<Person> personnel, int courseIndex, PlanetarySystem destination) {
@@ -960,12 +777,14 @@ public class Academy implements Comparable<Academy> {
                     if (EducationLevel.parseToInt(person.getEduHighestEducation()) >= educationLevel) {
                         tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
                     } else {
-                        tooltip.append(educationLevel * campaign.getCampaignOptions().getCurriculumXpRate()).append(")<br>");
+                        tooltip.append(educationLevel * campaign.getCampaignOptions().getCurriculumXpRate())
+                                .append(")<br>");
                     }
                 } else {
                     String skillParsed = skillParser(skill);
 
-                    if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() >= educationLevel)) {
+                    if ((person.hasSkill(skillParsed))
+                            && (person.getSkill(skillParsed).getExperienceLevel() >= educationLevel)) {
                         tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
                     } else {
                         tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
@@ -983,19 +802,22 @@ public class Academy implements Comparable<Academy> {
         // with the skill content resolved, we can move onto the rest of the tooltip
         if (personnel.size() == 1) {
             tooltip.append("<b>").append(resources.getString("tuition.text")).append("</b> ")
-                    .append(getTuitionAdjusted(person) * getFactionDiscountAdjusted(campaign, person)).append(" CSB").append("<br>");
+                    .append(getTuitionAdjusted(person) * getFactionDiscountAdjusted(campaign, person)).append(" CSB")
+                    .append("<br>");
         }
 
         if (isPrepSchool) {
             tooltip.append("<b>").append(resources.getString("duration.text"))
-                    .append("</b> ").append(' ').append(String.format(resources.getString("durationAge.text"), ageMax)).append("<br>");
+                    .append("</b> ").append(' ').append(String.format(resources.getString("durationAge.text"), ageMax))
+                    .append("<br>");
         } else {
             tooltip.append("<b>").append(resources.getString("duration.text")).append("</b> ");
 
             tooltip.append(durationDays).append(' ').append(resources.getString("durationDays.text")).append("<br>");
         }
 
-        // we need to do a little extra work to get travel time, to cover academies with multiple campuses
+        // we need to do a little extra work to get travel time, to cover academies with
+        // multiple campuses
         if (!isHomeSchool) {
             int distance = campaign.getSimplifiedTravelTime(destination);
 
@@ -1006,7 +828,8 @@ public class Academy implements Comparable<Academy> {
             tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
         }
 
-        // with travel time out the way, all that's left is to add the last couple of entries
+        // with travel time out the way, all that's left is to add the last couple of
+        // entries
         if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
             tooltip.append("<b>").append(resources.getString("reeducation.text")).append("</b> ");
 
@@ -1024,7 +847,7 @@ public class Academy implements Comparable<Academy> {
         }
 
         tooltip.append("<b>").append(resources.getString("facultySkill.text")).append("</b> ")
-                .append(facultySkill).append ('+').append("<br>");
+                .append(facultySkill).append('+').append("<br>");
 
         if (personnel.size() == 1) {
             tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")
@@ -1043,8 +866,8 @@ public class Academy implements Comparable<Academy> {
      */
     public static String skillParser(String skill) {
         return switch (skill.toLowerCase().trim()) {
-            case "piloting/mech" -> SkillType.S_PILOT_MECH;
-            case "gunnery/mech" -> SkillType.S_GUN_MECH;
+            case "piloting/mek" -> SkillType.S_PILOT_MEK;
+            case "gunnery/mek" -> SkillType.S_GUN_MEK;
             case "piloting/aerospace" -> SkillType.S_PILOT_AERO;
             case "gunnery/aerospace" -> SkillType.S_GUN_AERO;
             case "piloting/ground vehicle" -> SkillType.S_PILOT_GVEE;
@@ -1056,14 +879,14 @@ public class Academy implements Comparable<Academy> {
             case "piloting/spacecraft" -> SkillType.S_PILOT_SPACE;
             case "gunnery/spacecraft" -> SkillType.S_GUN_SPACE;
             case "artillery" -> SkillType.S_ARTILLERY;
-            case "gunnery/battlesuit" -> SkillType.S_GUN_BA;
-            case "gunnery/protomech" -> SkillType.S_GUN_PROTO;
+            case "gunnery/battlearmor" -> SkillType.S_GUN_BA;
+            case "gunnery/protomek" -> SkillType.S_GUN_PROTO;
             case "small arms" -> SkillType.S_SMALL_ARMS;
-            case "anti-mech" -> SkillType.S_ANTI_MECH;
-            case "tech/mech" -> SkillType.S_TECH_MECH;
+            case "anti-mek" -> SkillType.S_ANTI_MEK;
+            case "tech/mek" -> SkillType.S_TECH_MEK;
             case "tech/mechanic" -> SkillType.S_TECH_MECHANIC;
             case "tech/aero" -> SkillType.S_TECH_AERO;
-            case "tech/ba" -> SkillType.S_TECH_BA;
+            case "tech/battlearmor" -> SkillType.S_TECH_BA;
             case "tech/vessel" -> SkillType.S_TECH_VESSEL;
             case "astech" -> SkillType.S_ASTECH;
             case "doctor" -> SkillType.S_DOCTOR;
@@ -1075,6 +898,16 @@ public class Academy implements Comparable<Academy> {
             case "negotiation" -> SkillType.S_NEG;
             case "leadership" -> SkillType.S_LEADER;
             case "scrounge" -> SkillType.S_SCROUNGE;
+
+            // <50.01 compatibility handlers
+            case "piloting/mech" -> SkillType.S_PILOT_MEK;
+            case "gunnery/mech" -> SkillType.S_GUN_MEK;
+            case "gunnery/battlesuit" -> SkillType.S_GUN_BA;
+            case "gunnery/protomech" -> SkillType.S_GUN_PROTO;
+            case "anti-mech" -> SkillType.S_ANTI_MEK;
+            case "tech/mech" -> SkillType.S_TECH_MEK;
+            case "tech/ba" -> SkillType.S_TECH_BA;
+
             default -> throw new IllegalStateException("Unexpected skill in skillParser(): " + skill);
         };
     }

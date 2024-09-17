@@ -1,15 +1,33 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.rating.CamOpsReputation;
-
-import megamek.logging.MMLogger;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.enums.AtBContractType;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBContractType;
 
 public class OtherModifiers {
     private static final MMLogger logger = MMLogger.create(OtherModifiers.class);
@@ -18,9 +36,12 @@ public class OtherModifiers {
      * Calculates the 'other modifiers' used by CamOps Reputation
      *
      * @param campaign The campaign for which to calculate the modifiers.
-     * @return A map representing the calculated modifiers. The map contains two entries:
-     *         - "inactiveYears": The number of inactive years calculated from the campaign options.
-     *         - "total": The total value calculated based on the number of inactive years.
+     * @return A map representing the calculated modifiers. The map contains two
+     *         entries:
+     *         - "inactiveYears": The number of inactive years calculated from the
+     *         campaign options.
+     *         - "total": The total value calculated based on the number of inactive
+     *         years.
      */
     protected static Map<String, Integer> calculateOtherModifiers(Campaign campaign) {
         // Calculate inactive years if campaign options allow
@@ -29,12 +50,12 @@ public class OtherModifiers {
 
         // Crime rating improvements are handled on New Day, so are not included here.
 
-        // Create a map for modifiers with "inactive years" and "total" calculated from inactive years
+        // Create a map for modifiers with "inactive years" and "total" calculated from
+        // inactive years
         Map<String, Integer> modifierMap = Map.of(
                 "inactiveYears", inactiveYears,
                 "customModifier", manualModifier,
-                "total", manualModifier - (inactiveYears * 5)
-        );
+                "total", manualModifier - (inactiveYears * 5));
 
         // Log the calculated modifiers
         logger.debug("Other Modifiers = {}",
@@ -47,7 +68,8 @@ public class OtherModifiers {
     }
 
     /**
-     * @return the number of years between the oldest mission date and the current date.
+     * @return the number of years between the oldest mission date and the current
+     *         date.
      *
      * @param campaign the current campaign
      */
@@ -57,15 +79,21 @@ public class OtherModifiers {
         // Build a list of completed contracts, excluding Garrison and Cadre contracts
         List<AtBContract> contracts = getSuitableContracts(campaign);
 
-        // Decide the oldest mission date based on the earliest completion date of the contracts
+        // Decide the oldest mission date based on the earliest completion date of the
+        // contracts
         // or the campaign start date if there are no completed contracts
         LocalDate oldestMissionDate = contracts.isEmpty() ? campaign.getCampaignStartDate()
                 : contracts.stream()
-                .map(AtBContract::getEndingDate)
-                .min(LocalDate::compareTo)
-                .orElse(today);
+                        .map(AtBContract::getEndingDate)
+                        .min(LocalDate::compareTo)
+                        .orElse(today);
 
-        // Calculate and return the number of years between the oldest mission date and today
+        if (oldestMissionDate == null) {
+            oldestMissionDate = today;
+        }
+
+        // Calculate and return the number of years between the oldest mission date and
+        // today
         return Math.max(0, (int) ChronoUnit.YEARS.between(today, oldestMissionDate));
     }
 
@@ -76,7 +104,8 @@ public class OtherModifiers {
      * @return A List of suitable AtBContracts.
      */
     private static List<AtBContract> getSuitableContracts(Campaign campaign) {
-        // Filter mission of type AtBContract and with completed status, check if it's suitable
+        // Filter mission of type AtBContract and with completed status, check if it's
+        // suitable
         return campaign.getMissions().stream()
                 .filter(c -> (c instanceof AtBContract) && (c.getStatus().isCompleted()))
                 .filter(c -> isSuitableContract((AtBContract) c))

@@ -18,19 +18,24 @@
  */
 package mekhq.campaign.log;
 
-import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
+import java.time.LocalDate;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.time.LocalDate;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * This class is responsible for instantiating the desired log entries from xml nodes.
+ * This class is responsible for instantiating the desired log entries from xml
+ * nodes.
+ * 
  * @author Miguel Azevedo
  */
 public class LogEntryFactory {
+    private static final MMLogger logger = MMLogger.create(LogEntryFactory.class);
+
     private static LogEntryFactory logEntryFactory = null;
 
     public LogEntryFactory() {
@@ -46,6 +51,7 @@ public class LogEntryFactory {
 
     /**
      * Creates a new log entry based on its type. Used for xml unmarshalling
+     * 
      * @param date date of the log
      * @param desc description of the log
      * @param type type of the log
@@ -71,6 +77,7 @@ public class LogEntryFactory {
 
     /**
      * Generates a log entry from a node
+     * 
      * @param wn xml node
      * @return log entry
      */
@@ -98,7 +105,7 @@ public class LogEntryFactory {
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return null;
         }
 

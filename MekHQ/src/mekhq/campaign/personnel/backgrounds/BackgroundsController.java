@@ -1,17 +1,38 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.personnel.backgrounds;
 
-import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.backgrounds.enums.mercenaryCompanyNameGenerator.*;
 
 import java.util.ResourceBundle;
-import java.util.function.Supplier;
+
+import static megamek.client.generator.RandomCallsignGenerator.getWeightedCallsigns;
+import static mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator.*;
 
 public class BackgroundsController {
-    final static ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
+    static final ResourceBundle resources = ResourceBundle
+            .getBundle("mekhq.resources.RandomMercenaryCompanyNameGenerator");
 
     public static void generateBackground(Campaign campaign, Person person) {
         if (campaign.getCampaignOptions().isUseToughness()) {
@@ -23,42 +44,48 @@ public class BackgroundsController {
      * Generates a random mercenary company name.
      *
      * @return A string containing the generated name.
-     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     * @throws IllegalStateException if an unexpected value is encountered during
+     *                               the generation process.
      */
     public static String randomMercenaryCompanyNameGenerator(@Nullable Person commander) {
-        return getPrefix(commander) + ' ' + getNameBody();
+        try { // this allows us to use getCampaign() in tests without needing to also mock RandomCallsignGenerator
+            String prefix = getPrefix(commander);
+            return getNameBody(prefix + ' ');
+        } catch (NullPointerException e) {
+            return "";
+        }
     }
 
     /**
      * Returns the body of the generated name.
      *
      * @return the name body as a String.
-     * @throws IllegalStateException if an unexpected value is encountered in the switch statement.
+     * @throws IllegalStateException if an unexpected value is encountered in the
+     *                               switch statement.
      */
-    private static String getNameBody() {
-        String name = "";
+    private static String getNameBody(String name) {
         int roll = Compute.randomInt(4);
 
         return switch (roll) {
             // Corporate
             case 0 -> {
-                name = MiddleWordCorporate.getRandomWord();
-                String newWordSuggestion = getNewWord(name, EndWordCorporate::getRandomWord);
+                name += getNewWord(name, getWeightedMiddleWordCorporate()) + ' ';
+                String newWordSuggestion = getNewWord(name, getWeightedEndWordCorporate());
 
-                yield name + ' ' + newWordSuggestion;
+                yield name + newWordSuggestion;
             }
             // Mercenary
-            case 1 -> getNewWord(name, EndWordMercenary::getRandomWord);
+            case 1 -> name + getNewWord(name, getWeightedEndWordMercenary());
             case 2 -> {
-                name = getNewWord(name, MiddleWordMercenary::getRandomWord) + ' ';
-                String newWordSuggestion = getNewWord(name, EndWordMercenary::getRandomWord);
+                name += getNewWord(name, getWeightedMiddleWordMercenary()) + ' ';
+                String newWordSuggestion = getNewWord(name, getWeightedEndWordMercenary());
 
                 yield name + newWordSuggestion;
             }
             // Pre-Fab
-            case 3 -> PreFabHumorous.getRandomWord();
+            case 3 -> name + getWeightedPreFab().randomItem();
             default -> throw new IllegalStateException(
-                    "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/randomMercenaryCompanyNameGenerator 1 of 2: "
+                    "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getNameBody: "
                     + roll
             );
         };
@@ -69,7 +96,8 @@ public class BackgroundsController {
      *
      * @param commander The person object representing the commander. Can be null.
      * @return The prefix for generating a random mercenary company name.
-     * @throws IllegalStateException if an unexpected value is encountered during the generation process.
+     * @throws IllegalStateException if an unexpected value is encountered during
+     *                               the generation process.
      */
     private static String getPrefix(Person commander) {
         int roll = Compute.randomInt(4);
@@ -82,7 +110,7 @@ public class BackgroundsController {
             // 'The'
             case 2, 3 -> resources.getString("definiteArticle.text");
             default -> throw new IllegalStateException(
-                    "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/randomMercenaryCompanyNameGenerator 2 of 2: "
+                    "Unexpected value in mekhq/campaign/personnel/backgrounds/BackgroundsController.java/getPrefix: "
                             + roll);
         };
     }
@@ -91,33 +119,30 @@ public class BackgroundsController {
      * Retrieves the name of the commander.
      *
      * @param commander The person object representing the commander. Can be null.
-     * @return The name of the commander. If the commander is null, a random callsign from a weighted list will be returned.
+     * @return The name of the commander. If the commander is null, a random
+     *         callsign from a weighted list will be returned.
      */
     private static String getCommanderName(@Nullable Person commander) {
-        try { // this allows us to use getCampaign() in tests without needing to also mock RandomCallsignGenerator
-            if (commander == null) {
-                return RandomCallsignGenerator.getWeightedCallsigns().randomItem();
-            } else {
-                String name = commander.getCallsign().isBlank() ? commander.getSurname() : commander.getCallsign();
-                return name.isBlank() ? commander.getFirstName() : name;
-            }
-        } catch (NullPointerException ignored) {}
-
-        return "";
+        if (commander == null) {
+            return getWeightedCallsigns().randomItem();
+        } else {
+            String name = commander.getCallsign().isBlank() ? commander.getSurname() : commander.getCallsign();
+            return name.isBlank() ? commander.getFirstName() : name;
+        }
     }
 
     /**
-     * Retrieves a new word based on the given name and end word supplier.
+     * Returns a random word from the given `wordMap` that is unique to the currently generated name.
      *
-     * @param name The name to check if it contains the generated word.
-     * @param endWordSupplier The supplier to provide a new word.
-     * @return The new word that unique to the given name.
+     * @param name the name string to check against the generated word
+     * @param wordMap the weighted map containing available words to choose from
+     * @return a new word that is unique within 'name'
      */
-    private static String getNewWord(String name, Supplier<String> endWordSupplier) {
+    private static String getNewWord(String name, WeightedIntMap<String> wordMap) {
         String newWord;
 
         do {
-            newWord = endWordSupplier.get();
+            newWord = wordMap.randomItem();
         } while (checkIfNameContains(name, newWord));
 
         return newWord;
@@ -126,9 +151,10 @@ public class BackgroundsController {
     /**
      * Checks if the start of the suggested addition is present in the current name.
      *
-     * @param currentName         the current name to check against
-     * @param suggestedAddition   the suggested addition to the name
-     * @return true if the start of the suggested addition is not present in the current name, otherwise false
+     * @param currentName       the current name to check against
+     * @param suggestedAddition the suggested addition to the name
+     * @return true if the start of the suggested addition is not present in the
+     *         current name, otherwise false
      */
     private static boolean checkIfNameContains(String currentName, String suggestedAddition) {
         int checkLength = suggestedAddition.length() - 2;
@@ -139,7 +165,8 @@ public class BackgroundsController {
     }
 
     /**
-     * Generates a numerical name using a random number and a suffix based on the number's modulo.
+     * Generates a numerical name using a random number and a suffix based on the
+     * number's modulo.
      */
     private static String getNumericalNameStart() {
         int number = Compute.randomInt(30) + 1;

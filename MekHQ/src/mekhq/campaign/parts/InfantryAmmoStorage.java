@@ -18,29 +18,32 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.Objects;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.Objects;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * Storage for infantry weapon ammo. The AmmoType is a placeholder and distinguishes between
+ * Storage for infantry weapon ammo. The AmmoType is a placeholder and
+ * distinguishes between
  * standard and inferno munitions, but does not distinguish the type of weapon.
  */
 public class InfantryAmmoStorage extends AmmoStorage {
+    private static final MMLogger logger = MMLogger.create(InfantryAmmoStorage.class);
+
     private InfantryWeapon weaponType;
 
-    @SuppressWarnings("unused")
     public InfantryAmmoStorage() {
         this(0, null, 0, null, null);
     }
@@ -61,7 +64,7 @@ public class InfantryAmmoStorage extends AmmoStorage {
                 this.name = weaponType.getShortName() + " Ammo";
             }
         } else {
-            LogManager.getLogger().error("InfantryAmmoStorage does not have a weapon type!");
+            logger.error("InfantryAmmoStorage does not have a weapon type!");
         }
     }
 
@@ -78,7 +81,6 @@ public class InfantryAmmoStorage extends AmmoStorage {
         storage.copyBaseData(this);
         return storage;
     }
-
 
     @Override
     public double getTonnage() {
@@ -102,9 +104,11 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     /**
-     * Gets a value indicating whether or not the {@code AmmoType} for the {@code InfantryWeapon}
+     * Gets a value indicating whether or not the {@code AmmoType} for the
+     * {@code InfantryWeapon}
      * is the same as this instance.
-     * @param ammoType The {@code AmmoType}.
+     *
+     * @param ammoType   The {@code AmmoType}.
      * @param weaponType The {@code InfantryWeapon} carrying the ammo.
      */
     public boolean isSameAmmoType(AmmoType ammoType, InfantryWeapon weaponType) {

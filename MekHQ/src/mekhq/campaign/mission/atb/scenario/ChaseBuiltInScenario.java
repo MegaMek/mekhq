@@ -18,18 +18,29 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
+import java.util.ArrayList;
+
 import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.PrincessException;
-import megamek.common.*;
+import megamek.common.Board;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.EntityWeightClass;
+import megamek.common.OffBoardDirection;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.CommonObjectiveFactory;
+import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import org.apache.logging.log4j.LogManager;
-
-import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class ChaseBuiltInScenario extends AtBScenario {
+    private static final MMLogger logger = MMLogger.create(ChaseBuiltInScenario.class);
+
     @Override
     public int getScenarioType() {
         return CHASE;
@@ -62,7 +73,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                       ArrayList<Entity> enemyEntities) {
+            ArrayList<Entity> enemyEntities) {
         boolean startNorth = Compute.d6() > 3;
 
         int destinationEdge = startNorth ? Board.START_S : Board.START_N;
@@ -98,7 +109,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
                 botForce.setDestinationEdge(destinationEdge);
             }
         } catch (PrincessException e) {
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         }
 
         addBotForce(botForce, campaign);
@@ -141,7 +152,8 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
         ScenarioObjective destroyHostiles = isAttacker()
                 ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 1, 50,
-                        OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos())))
+                        OffBoardDirection
+                                .translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos())))
                 : CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 1, 50,
                         OffBoardDirection.translateBoardStart(getEnemyHome()));
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,

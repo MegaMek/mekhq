@@ -1,9 +1,10 @@
 <StratconFacility>
-	<capturedDefinition>AlliedIndustrialFacility.xml</capturedDefinition>
-	<displayableName>Industrial Center</displayableName>
-        <facilityType>IndustrialFacility</facilityType>
-        <owner>Opposing</owner>
-        <sharedModifiers>ArmednArmored.xml</sharedModifiers>
-	<userDescription>Hostile forces on this track are larger and better equipped with factory-fresh units.</userDescription>	
-        <visible>false</visible>
+    <capturedDefinition>AlliedIndustrialFacility.xml</capturedDefinition>
+    <displayableName>Industrial Center</displayableName>
+    <facilityType>IndustrialFacility</facilityType>
+    <owner>Opposing</owner>
+    <sharedModifiers>ArmednArmored.xml</sharedModifiers>
+    <userDescription>Hostile forces on this track are larger and better equipped with factory-fresh
+        units.</userDescription>
+    <visible>false</visible>
 </StratconFacility>

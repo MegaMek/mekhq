@@ -20,7 +20,7 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
-import megamek.common.Mech;
+import megamek.common.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
@@ -58,9 +58,9 @@ public class MissingHeatSinkTest {
             part.setUnit(unit);
             return null;
         }).when(unit).addPart(any());
-        Mech mech = mock(Mech.class);
-        when(mech.getWeight()).thenReturn(65.0);
-        when(unit.getEntity()).thenReturn(mech);
+        Mek mek = mock(Mek.class);
+        when(mek.getWeight()).thenReturn(65.0);
+        when(unit.getEntity()).thenReturn(mek);
         EquipmentType heatSinkType = mock(EquipmentType.class);
 
         // Create a missing heat sink on a unit

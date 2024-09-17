@@ -20,32 +20,35 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
-import megamek.Version;
-import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.storyarc.StoryPoint;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.Version;
+import megamek.logging.MMLogger;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.utilities.MHQXMLUtility;
+
 /**
- * This StoryPoint checks the status of a Person in the campaign by their UUID and returns the raw status enum value
- * (e.g. ACTIVE, KIA) as the result. Can be used, for example, to check whether a person is active before assigning
+ * This StoryPoint checks the status of a Person in the campaign by their UUID
+ * and returns the raw status enum value
+ * (e.g. ACTIVE, KIA) as the result. Can be used, for example, to check whether
+ * a person is active before assigning
  * them a dialog.
  */
 public class CheckPersonStatusStoryPoint extends StoryPoint {
+    private static final MMLogger logger = MMLogger.create(CheckPersonStatusStoryPoint.class);
 
     private UUID personId;
 
     public CheckPersonStatusStoryPoint() {
         super();
     }
-
 
     @Override
     public String getTitle() {
@@ -87,7 +90,7 @@ public class CheckPersonStatusStoryPoint extends StoryPoint {
                     personId = UUID.fromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error(e);
+                logger.error(e);
             }
         }
     }

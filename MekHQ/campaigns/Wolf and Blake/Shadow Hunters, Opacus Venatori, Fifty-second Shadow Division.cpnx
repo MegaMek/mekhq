@@ -17,7 +17,7 @@
 		<astechPoolOvertime>0</astechPoolOvertime>
 		<medicPool>0</medicPool>
 		<camoCategory>Word of Blake/Shadow Divisions/</camoCategory>
-		<camoFileName>52nd  Shadow Division.jpg</camoFileName>
+		<camoFileName>52nd Shadow Division.jpg</camoFileName>
 		<iconCategory>-- General --</iconCategory>
 		<iconFileName>None</iconFileName>
 		<colorIndex>0</colorIndex>
@@ -203,7 +203,7 @@
 		<clanVehicles>false</clanVehicles>
 		<doubleVehicles>true</doubleVehicles>
 		<adjustPlayerVehicles>false</adjustPlayerVehicles>
-		<opforLanceTypeMechs>1</opforLanceTypeMechs>
+		<opforLanceTypeMeks>1</opforLanceTypeMeks>
 		<opforLanceTypeMixed>2</opforLanceTypeMixed>
 		<opforLanceTypeVehicles>3</opforLanceTypeVehicles>
 		<opforUsesVTOLs>true</opforUsesVTOLs>
@@ -221,7 +221,7 @@
 		<trackUnitFatigue>false</trackUnitFatigue>
 		<mercSizeLimited>false</mercSizeLimited>
 		<trackOriginalUnit>false</trackOriginalUnit>
-		<regionalMechVariations>false</regionalMechVariations>
+		<regionalMekVariations>false</regionalMekVariations>
 		<attachedPlayerCamouflage>true</attachedPlayerCamouflage>
 		<playerControlsAttachedUnits>false</playerControlsAttachedUnits>
 		<searchRadius>800</searchRadius>
@@ -341,22 +341,28 @@
 		<planetTechAcquisitionBonus>-1,0,1,2,4,8</planetTechAcquisitionBonus>
 		<planetIndustryAcquisitionBonus>0,0,0,0,0,0</planetIndustryAcquisitionBonus>
 		<planetOutputAcquisitionBonus>-1,0,1,2,4,8</planetOutputAcquisitionBonus>
-		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960 CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
+		<salaryTypeBase>0 CSB,1500 CSB,1500 CSB,900 CSB,900 CSB,900 CSB,900 CSB,960 CSB,750 CSB,960
+			CSB,900 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500
+			CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
 		<salaryXpMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXpMultiplier>
-		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
+		<usePortraitForType>
+			false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
 		<useAtBUnitMarket>false</useAtBUnitMarket>
 		<rats>Xotl,Total Warfare</rats>
 	</campaignOptions>
 	<units>
 		<unit id="c1b16001-6600-46c9-9c35-97c965a3a107" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Malak" model="C-MK-O (Mi)" type="Biped" commander="false" externalId="c1b16001-6600-46c9-9c35-97c965a3a107" quirks="imp_com::imp_sensors::bad_rep_is" c3UUID="15498450-6969-4f52-aba7-84c03ace7435" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
+			<entity chassis="Malak" model="C-MK-O (Mi)" type="Biped" commander="false"
+				externalId="c1b16001-6600-46c9-9c35-97c965a3a107" quirks="imp_com::imp_sensors::bad_rep_is"
+				c3UUID="15498450-6969-4f52-aba7-84c03ace7435" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Opacus.jpg">
 				<c3iset>
-					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
-					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513"/>
-					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9"/>
-					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22"/>
-					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7"/>
-					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282"/>
+					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435" />
+					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513" />
+					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9" />
+					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22" />
+					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7" />
+					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282" />
 				</c3iset>
 			</entity>
 			<driverId>95b2a383-8ffe-4184-9289-2e38a2fbacb3</driverId>
@@ -365,18 +371,19 @@
 			<daysSinceMaintenance>33</daysSinceMaintenance>
 		</unit>
 		<unit id="77047b79-b2a9-4a2c-a7df-34b44c8938a1" type="mekhq.campaign.unit.Unit">
-			<entity chassis="King Crab" model="KGC-008" type="Biped" commander="false" externalId="77047b79-b2a9-4a2c-a7df-34b44c8938a1" quirks="command_mech::no_twist" c3UUID="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
-      The first slot in a location is at index="1".
-				<location index="3"> Left Torso
-					<slot index="5" type="IS Ammo LAC/2" shots="45"/>
+			<entity chassis="King Crab" model="KGC-008" type="Biped" commander="false"
+				externalId="77047b79-b2a9-4a2c-a7df-34b44c8938a1" quirks="command_mech::no_twist"
+				c3UUID="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Venatori.jpg"> The first slot in a location is at index="1". <location
+					index="3"> Left Torso <slot index="5" type="IS Ammo LAC/2" shots="45" />
 				</location>
 				<c3iset>
-					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
-					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
-					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0"/>
-					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0"/>
-					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60"/>
-					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab"/>
+					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab" />
+					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1" />
+					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0" />
+					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0" />
+					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60" />
+					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab" />
 				</c3iset>
 			</entity>
 			<driverId>75057ad3-1c20-4258-8515-01c825f6502b</driverId>
@@ -386,14 +393,18 @@
 			<daysSinceMaintenance>18</daysSinceMaintenance>
 		</unit>
 		<unit id="d257aeeb-e278-4e31-9980-9f054c513e91" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Lightray" model="LGH-6W" type="Biped" commander="false" externalId="d257aeeb-e278-4e31-9980-9f054c513e91" quirks="hyper_actuator::bad_rep_is::exp_actuator" c3UUID="ef543e6e-43cf-4ac7-8dba-4ffb577499e1" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
+			<entity chassis="Lightray" model="LGH-6W" type="Biped" commander="false"
+				externalId="d257aeeb-e278-4e31-9980-9f054c513e91"
+				quirks="hyper_actuator::bad_rep_is::exp_actuator"
+				c3UUID="ef543e6e-43cf-4ac7-8dba-4ffb577499e1" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Venatori.jpg">
 				<c3iset>
-					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
-					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
-					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0"/>
-					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0"/>
-					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60"/>
-					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab"/>
+					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab" />
+					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1" />
+					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0" />
+					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0" />
+					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60" />
+					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab" />
 				</c3iset>
 			</entity>
 			<driverId>4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e</driverId>
@@ -403,14 +414,18 @@
 			<daysSinceMaintenance>18</daysSinceMaintenance>
 		</unit>
 		<unit id="f9936e32-1953-4888-beb3-ee243fad60c3" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Deva" model="C-DVA-O (Achilleus)" type="Biped" commander="false" externalId="f9936e32-1953-4888-beb3-ee243fad60c3" quirks="imp_com::imp_sensors::bad_rep_is::bad_rep_clan" c3UUID="6df625a9-5be3-48b5-bc5f-c632558e6513" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
+			<entity chassis="Deva" model="C-DVA-O (Achilleus)" type="Biped" commander="false"
+				externalId="f9936e32-1953-4888-beb3-ee243fad60c3"
+				quirks="imp_com::imp_sensors::bad_rep_is::bad_rep_clan"
+				c3UUID="6df625a9-5be3-48b5-bc5f-c632558e6513" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Opacus.jpg">
 				<c3iset>
-					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
-					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513"/>
-					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9"/>
-					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22"/>
-					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7"/>
-					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282"/>
+					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435" />
+					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513" />
+					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9" />
+					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22" />
+					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7" />
+					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282" />
 				</c3iset>
 			</entity>
 			<driverId>b17767cd-c109-471d-87d5-fddd084fdd9a</driverId>
@@ -419,18 +434,19 @@
 			<daysSinceMaintenance>33</daysSinceMaintenance>
 		</unit>
 		<unit id="3a0c56b6-a97e-4cbf-8c03-e2b99668e205" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Raijin II" model="RJN-200-A" type="Biped" commander="false" externalId="3a0c56b6-a97e-4cbf-8c03-e2b99668e205" quirks="ext_twist::bad_rep_is" c3UUID="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
-      The first slot in a location is at index="1".
-				<location index="3"> Left Torso
-					<slot index="8" type="IS Streak SRM 4 Ammo" shots="25"/>
+			<entity chassis="Raijin II" model="RJN-200-A" type="Biped" commander="false"
+				externalId="3a0c56b6-a97e-4cbf-8c03-e2b99668e205" quirks="ext_twist::bad_rep_is"
+				c3UUID="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Venatori.jpg"> The first slot in a location is at index="1". <location
+					index="3"> Left Torso <slot index="8" type="IS Streak SRM 4 Ammo" shots="25" />
 				</location>
 				<c3iset>
-					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
-					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
-					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0"/>
-					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0"/>
-					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60"/>
-					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab"/>
+					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab" />
+					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1" />
+					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0" />
+					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0" />
+					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60" />
+					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab" />
 				</c3iset>
 			</entity>
 			<driverId>34affb3a-6a1b-4788-81d9-b1e7efbb4def</driverId>
@@ -440,24 +456,30 @@
 			<daysSinceMaintenance>18</daysSinceMaintenance>
 		</unit>
 		<unit id="52249633-3534-4be5-a983-55e18d74655c" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Seraph" model="C-SRP-O (Havalah)" type="Biped" commander="false" externalId="52249633-3534-4be5-a983-55e18d74655c" quirks="imp_com::imp_sensors::low_profile::bad_rep_is::bad_rep_clan" c3UUID="a8cab9a9-4cda-4c97-aa92-6604591ef9d9" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="4" type="ISAMS Ammo" shots="12"/>
-					<slot index="5" type="IS Ultra AC/20 Ammo" shots="5"/>
-					<slot index="6" type="IS Ultra AC/20 Ammo" shots="5"/>
-					<slot index="7" type="IS Ultra AC/20 Ammo" shots="5"/>
-					<slot index="8" type="IS Ultra AC/20 Ammo" shots="5"/>
-					<slot index="9" type="IS Ultra AC/20 Ammo" shots="5"/>
-					<slot index="10" type="IS Ultra AC/20 Ammo" shots="5"/>
+			<entity chassis="Seraph" model="C-SRP-O (Havalah)" type="Biped" commander="false"
+				externalId="52249633-3534-4be5-a983-55e18d74655c"
+				quirks="imp_com::imp_sensors::low_profile::bad_rep_is::bad_rep_clan"
+				c3UUID="a8cab9a9-4cda-4c97-aa92-6604591ef9d9" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Opacus.jpg"> The first slot in a location is at index="1". <location index="2">
+				Right Torso <slot index="4" type="ISAMS Ammo" shots="12" />
+					<slot index="5"
+						type="IS Ultra AC/20 Ammo" shots="5" />
+					<slot index="6" type="IS Ultra AC/20 Ammo"
+						shots="5" />
+					<slot index="7" type="IS Ultra AC/20 Ammo" shots="5" />
+					<slot index="8"
+						type="IS Ultra AC/20 Ammo" shots="5" />
+					<slot index="9" type="IS Ultra AC/20 Ammo"
+						shots="5" />
+					<slot index="10" type="IS Ultra AC/20 Ammo" shots="5" />
 				</location>
 				<c3iset>
-					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
-					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513"/>
-					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9"/>
-					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22"/>
-					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7"/>
-					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282"/>
+					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435" />
+					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513" />
+					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9" />
+					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22" />
+					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7" />
+					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282" />
 				</c3iset>
 			</entity>
 			<driverId>4c9f3722-7bc1-4ef0-964c-b05c91f882ea</driverId>
@@ -466,14 +488,18 @@
 			<daysSinceMaintenance>33</daysSinceMaintenance>
 		</unit>
 		<unit id="f6790aa4-c393-4af6-bdeb-2185c4b5711f" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Gurkha" model="GUR-2G" type="Biped" commander="false" externalId="f6790aa4-c393-4af6-bdeb-2185c4b5711f" quirks="bad_rep_is::bad_rep_clan::exp_actuator" c3UUID="e2c1e75a-03c7-4892-9da3-6604eba213f0" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
+			<entity chassis="Gurkha" model="GUR-2G" type="Biped" commander="false"
+				externalId="f6790aa4-c393-4af6-bdeb-2185c4b5711f"
+				quirks="bad_rep_is::bad_rep_clan::exp_actuator"
+				c3UUID="e2c1e75a-03c7-4892-9da3-6604eba213f0" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Venatori.jpg">
 				<c3iset>
-					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
-					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
-					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0"/>
-					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0"/>
-					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60"/>
-					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab"/>
+					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab" />
+					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1" />
+					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0" />
+					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0" />
+					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60" />
+					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab" />
 				</c3iset>
 			</entity>
 			<driverId>8bbc8205-4809-4649-9ef9-779909f9b32d</driverId>
@@ -483,14 +509,18 @@
 			<daysSinceMaintenance>18</daysSinceMaintenance>
 		</unit>
 		<unit id="86e8442a-bc36-438a-87b3-df8a41e1a6e9" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Preta" model="C-PRT-O (Kendali)" type="Biped" commander="false" externalId="86e8442a-bc36-438a-87b3-df8a41e1a6e9" quirks="imp_com::imp_sensors::bad_rep_is::bad_rep_clan::exp_actuator" c3UUID="5fd55c97-5efc-43ae-a949-22321cf58c22" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
+			<entity chassis="Preta" model="C-PRT-O (Kendali)" type="Biped" commander="false"
+				externalId="86e8442a-bc36-438a-87b3-df8a41e1a6e9"
+				quirks="imp_com::imp_sensors::bad_rep_is::bad_rep_clan::exp_actuator"
+				c3UUID="5fd55c97-5efc-43ae-a949-22321cf58c22" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Opacus.jpg">
 				<c3iset>
-					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
-					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513"/>
-					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9"/>
-					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22"/>
-					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7"/>
-					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282"/>
+					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435" />
+					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513" />
+					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9" />
+					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22" />
+					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7" />
+					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282" />
 				</c3iset>
 			</entity>
 			<driverId>1133a093-b3cc-45f7-8ef0-83e6976fef41</driverId>
@@ -499,22 +529,24 @@
 			<daysSinceMaintenance>33</daysSinceMaintenance>
 		</unit>
 		<unit id="29c37941-0aa5-40e3-817b-6575944e8459" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Buccaneer" model="BCN-5W" type="Biped" commander="false" externalId="29c37941-0aa5-40e3-817b-6575944e8459" quirks="imp_target_short::bad_rep_is" c3UUID="a323a277-8f14-4152-aca9-0e169c814e60" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
-      The first slot in a location is at index="1".
-				<location index="2"> Right Torso
-					<slot index="12" type="IS Heavy Machine Gun Ammo - Half" shots="50"/>
+			<entity chassis="Buccaneer" model="BCN-5W" type="Biped" commander="false"
+				externalId="29c37941-0aa5-40e3-817b-6575944e8459" quirks="imp_target_short::bad_rep_is"
+				c3UUID="a323a277-8f14-4152-aca9-0e169c814e60" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Venatori.jpg"> The first slot in a location is at index="1". <location
+					index="2"> Right Torso <slot index="12" type="IS Heavy Machine Gun Ammo - Half" shots="50" />
 				</location>
-				<location index="4"> Right Arm
-					<slot index="6" type="ISPlasmaRifleAmmo" shots="10"/>
-					<slot index="7" type="ISPlasmaRifleAmmo" shots="10"/>
+				<location
+					index="4"> Right Arm <slot index="6" type="ISPlasmaRifleAmmo" shots="10" />
+					<slot index="7"
+						type="ISPlasmaRifleAmmo" shots="10" />
 				</location>
 				<c3iset>
-					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
-					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
-					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0"/>
-					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0"/>
-					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60"/>
-					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab"/>
+					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab" />
+					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1" />
+					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0" />
+					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0" />
+					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60" />
+					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab" />
 				</c3iset>
 			</entity>
 			<driverId>d636251e-4e78-441c-8f7c-ff151de2ab18</driverId>
@@ -524,14 +556,18 @@
 			<daysSinceMaintenance>18</daysSinceMaintenance>
 		</unit>
 		<unit id="349b1678-2125-4dcb-adff-83deeed05cc8" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Archangel" model="C-ANG-O (Berith)" type="Biped" commander="false" externalId="349b1678-2125-4dcb-adff-83deeed05cc8" quirks="command_mech::imp_com::imp_sensors::bad_rep_is::bad_rep_clan" c3UUID="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7" camoCategory="Word of Blake/Special Forces/" camoFileName="Opacus.jpg">
+			<entity chassis="Archangel" model="C-ANG-O (Berith)" type="Biped" commander="false"
+				externalId="349b1678-2125-4dcb-adff-83deeed05cc8"
+				quirks="command_mech::imp_com::imp_sensors::bad_rep_is::bad_rep_clan"
+				c3UUID="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Opacus.jpg">
 				<c3iset>
-					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
-					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513"/>
-					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9"/>
-					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22"/>
-					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7"/>
-					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282"/>
+					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435" />
+					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513" />
+					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9" />
+					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22" />
+					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7" />
+					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282" />
 				</c3iset>
 			</entity>
 			<driverId>468e1216-b649-440b-89e9-8f7a0b758648</driverId>
@@ -540,21 +576,23 @@
 			<daysSinceMaintenance>33</daysSinceMaintenance>
 		</unit>
 		<unit id="248f5ac6-ecbe-434a-bf6b-8d3ad9133f5c" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Mercury" model="MCY-102" type="Biped" commander="false" externalId="248f5ac6-ecbe-434a-bf6b-8d3ad9133f5c" quirks="easy_maintain::no_twist" c3UUID="60cd78c7-4c02-46f7-9564-5201731e7cab" camoCategory="Word of Blake/Special Forces/" camoFileName="Venatori.jpg">
-      The first slot in a location is at index="1".
-				<location index="0"> Head
-         <slot index="4" type="ISERSmallLaser" quirks="mod_weapons" isDestroyed="false"/>
+			<entity chassis="Mercury" model="MCY-102" type="Biped" commander="false"
+				externalId="248f5ac6-ecbe-434a-bf6b-8d3ad9133f5c" quirks="easy_maintain::no_twist"
+				c3UUID="60cd78c7-4c02-46f7-9564-5201731e7cab" camoCategory="Word of Blake/Special Forces/"
+				camoFileName="Venatori.jpg"> The first slot in a location is at index="1". <location
+					index="0"> Head <slot index="4" type="ISERSmallLaser" quirks="mod_weapons"
+						isDestroyed="false" />
 				</location>
-				<location index="4"> Right Arm
-         <slot index="5" type="ISERMediumLaser" quirks="mod_weapons" isDestroyed="false"/>
+				<location index="4"> Right Arm <slot index="5"
+						type="ISERMediumLaser" quirks="mod_weapons" isDestroyed="false" />
 				</location>
 				<c3iset>
-					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab"/>
-					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1"/>
-					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0"/>
-					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0"/>
-					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60"/>
-					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab"/>
+					<c3i_link link="f8ac6bd1-a2ab-40cf-868e-c6d167fe92ab" />
+					<c3i_link link="ef543e6e-43cf-4ac7-8dba-4ffb577499e1" />
+					<c3i_link link="9d441863-e2b0-46b4-9b29-4dc9e50b2bd0" />
+					<c3i_link link="e2c1e75a-03c7-4892-9da3-6604eba213f0" />
+					<c3i_link link="a323a277-8f14-4152-aca9-0e169c814e60" />
+					<c3i_link link="60cd78c7-4c02-46f7-9564-5201731e7cab" />
 				</c3iset>
 			</entity>
 			<driverId>3cf3806f-eb04-4fc1-8290-3dfaafd97098</driverId>
@@ -564,20 +602,23 @@
 			<daysSinceMaintenance>18</daysSinceMaintenance>
 		</unit>
 		<unit id="32c115a5-bef8-41d4-b594-e8182e1e0ab7" type="mekhq.campaign.unit.Unit">
-			<entity chassis="Grigori" model="C-GRG-O (Rufus)" type="Biped" commander="false" externalId="32c115a5-bef8-41d4-b594-e8182e1e0ab7" quirks="imp_com::imp_sensors::bad_rep_is::bad_rep_clan" c3UUID="ef0cd71d-2e48-4576-90bd-b90258b0f282">
-      The first slot in a location is at index="1".
-				<location index="3"> Left Torso
-					<slot index="7" type="IS Ammo MML-7 SRM Artemis-capable" shots="14"/>
-					<slot index="8" type="IS Ammo MML-7 LRM Artemis-capable" shots="17"/>
-					<slot index="9" type="IS Ammo MML-7 LRM Artemis-capable" shots="17"/>
+			<entity chassis="Grigori" model="C-GRG-O (Rufus)" type="Biped" commander="false"
+				externalId="32c115a5-bef8-41d4-b594-e8182e1e0ab7"
+				quirks="imp_com::imp_sensors::bad_rep_is::bad_rep_clan"
+				c3UUID="ef0cd71d-2e48-4576-90bd-b90258b0f282"> The first slot in a location is at index="1". <location
+					index="3"> Left Torso <slot index="7" type="IS Ammo MML-7 SRM Artemis-capable" shots="14" />
+					<slot
+						index="8" type="IS Ammo MML-7 LRM Artemis-capable" shots="17" />
+					<slot index="9"
+						type="IS Ammo MML-7 LRM Artemis-capable" shots="17" />
 				</location>
 				<c3iset>
-					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435"/>
-					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513"/>
-					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9"/>
-					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22"/>
-					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7"/>
-					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282"/>
+					<c3i_link link="15498450-6969-4f52-aba7-84c03ace7435" />
+					<c3i_link link="6df625a9-5be3-48b5-bc5f-c632558e6513" />
+					<c3i_link link="a8cab9a9-4cda-4c97-aa92-6604591ef9d9" />
+					<c3i_link link="5fd55c97-5efc-43ae-a949-22321cf58c22" />
+					<c3i_link link="ef561cea-94b5-44a5-8e6d-e9fa1ed6a1c7" />
+					<c3i_link link="ef0cd71d-2e48-4576-90bd-b90258b0f282" />
 				</c3iset>
 			</entity>
 			<driverId>5afd413b-0776-4f93-8c44-e382b956fe37</driverId>
@@ -594,18 +635,32 @@
 			<primaryRole>1</primaryRole>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>Lyran-born and raised, St. John lived the privileged life. After his father went to prison for embezzlement and his mother committed suicide, he took the remains of the family’s fortune to Solaris and lost it all with one bad bet.
+			<biography>Lyran-born and raised, St. John lived the privileged life. After his father went to
+				prison for embezzlement and his mother committed suicide, he took the remains of the
+				family’s fortune to Solaris and lost it all with one bad bet.
 
-Destitute and homeless, he finagled a job with the Skye Tigers as a hangar sweeper. Within five years, he was fighting in the Class C circuit among the Reaches. Due to a multitude of nearcatastrophic
-accidents, St. John underwent several experimental
-cybernetic operations. 
+				Destitute and homeless, he finagled a job with the Skye Tigers as a hangar sweeper. Within
+				five years, he was fighting in the Class C circuit among the Reaches. Due to a multitude of
+				nearcatastrophic
+				accidents, St. John underwent several experimental
+				cybernetic operations.
 
-During a chance encounter one evening, he discovered that his employer was heavily on the take with the Mafia. Disgusted at being surrounded by another corrupt organization, he willingly betrayed the stable’s secrets to a competitor, which happened to
-be a Word of Blake front.
+				During a chance encounter one evening, he discovered that his employer was heavily on the
+				take with the Mafia. Disgusted at being surrounded by another corrupt organization, he
+				willingly betrayed the stable’s secrets to a competitor, which happened to
+				be a Word of Blake front.
 
-St. John’s true test came during the Word’s invasion of 3068, where he publicly declared his allegiance to the Word’s crusade by ambushing and killing all three of the Tiger’s top warriors. With his help and information, the Skye Tigers were gutted both in manpower and materiel within three months. In return for his help, the Word formally inducted St. John into their Militia as an Acolyte.
+				St. John’s true test came during the Word’s invasion of 3068, where he publicly declared his
+				allegiance to the Word’s crusade by ambushing and killing all three of the Tiger’s top
+				warriors. With his help and information, the Skye Tigers were gutted both in manpower and
+				materiel within three months. In return for his help, the Word formally inducted St. John
+				into their Militia as an Acolyte.
 
-Impressed by his singular focus, photographic memory and ferocious fighting skills, Precentor Berith invited St. John to train with the Light of Mankind in late 3068. His willingness to push himself beyond his limits, even with second-rate cybernetics, impressed the unit’s Manei Domini. In 3070, St. John’s hardware was replaced and augmented, and he was inducted into the Order.</biography>
+				Impressed by his singular focus, photographic memory and ferocious fighting skills,
+				Precentor Berith invited St. John to train with the Light of Mankind in late 3068. His
+				willingness to push himself beyond his limits, even with second-rate cybernetics, impressed
+				the unit’s Manei Domini. In 3070, St. John’s hardware was replaced and augmented, and he was
+				inducted into the Order.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Achillius_St._John.jpg</portraitFile>
 			<xp>0</xp>
@@ -623,18 +678,22 @@ Impressed by his singular focus, photographic memory and ferocious fighting skil
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>7</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<implants>bvdni</implants>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Adept</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Adept</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="468e1216-b649-440b-89e9-8f7a0b758648" type="mekhq.campaign.personnel.Person">
@@ -646,13 +705,29 @@ Impressed by his singular focus, photographic memory and ferocious fighting skil
 			<commander>true</commander>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>Originally born as “Benjamin Emory”, Berith’s first battlefield action occurred when fighting Clan Steel Viper among the hellish landscape of Devil’s Bath on Tukkayid. Showing incredible natural combat skills, he rapidly advanced into the Blake’s Wrath section of ROM. Though not completely sold on ComStar’s new secular policy, he did not defect to the Word of Blake but remained loyal to Terra.
+			<biography>Originally born as “Benjamin Emory”, Berith’s first battlefield action occurred
+				when fighting Clan Steel Viper among the hellish landscape of Devil’s Bath on Tukkayid.
+				Showing incredible natural combat skills, he rapidly advanced into the Blake’s Wrath section
+				of ROM. Though not completely sold on ComStar’s new secular policy, he did not defect to the
+				Word of Blake but remained loyal to Terra.
 
-Berith’s impressive record and superior combat skills earned him a position as one of the lead instructors for the Light of Mankind (LoM). Until approached by Precentor Apollyon in 3068, Berith served a dual-capacity as an instructor, as well as one of LoMs most effective small squad leaders. In the opening months of the Jihad, Berith led an impressive fourteen sorties to various Protectorate worlds, with only two team member casualties.
+				Berith’s impressive record and superior combat skills earned him a position as one of the
+				lead instructors for the Light of Mankind (LoM). Until approached by Precentor Apollyon in
+				3068, Berith served a dual-capacity as an instructor, as well as one of LoMs most effective
+				small squad leaders. In the opening months of the Jihad, Berith led an impressive fourteen
+				sorties to various Protectorate worlds, with only two team member casualties.
 
-A freak training accident on Circinus took Berith’s left arm. After accepting the superior cybernetic replacement, he has become one of the Manei Domini’s leading instructors of its more fanatical converts. Berith has also received other augmentations, including the addition of a triple-core processor, communications implants, a new cybernetic eye, and a second-generation VDNI system.
+				A freak training accident on Circinus took Berith’s left arm. After accepting the superior
+				cybernetic replacement, he has become one of the Manei Domini’s leading instructors of its
+				more fanatical converts. Berith has also received other augmentations, including the
+				addition of a triple-core processor, communications implants, a new cybernetic eye, and a
+				second-generation VDNI system.
 
-Precentor Berith’s greatest strength is in his diplomatic skills. Though he adheres to the “steel fist in velvet glove” approach, he is not afraid to bring sufficient force to bear if needed. Though many of the more fanatical Domini believe Berith’s compassion for Frails is a weakness, they have yet to see a mission fail when led by this phenomenal, yet simple, soldier.</biography>
+				Precentor Berith’s greatest strength is in his diplomatic skills. Though he adheres to the
+				“steel fist in velvet glove” approach, he is not afraid to bring sufficient force to bear if
+				needed. Though many of the more fanatical Domini believe Berith’s compassion for Frails is a
+				weakness, they have yet to see a mission fail when led by this phenomenal, yet simple,
+				soldier.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Berith.jpg</portraitFile>
 			<xp>0</xp>
@@ -665,18 +740,22 @@ Precentor Berith’s greatest strength is in his diplomatic skills. Though he ad
 			<status>ACTIVE</status>
 			<birthday>3030-04-30</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>6</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>6</level>
 				<bonus>0</bonus>
 			</skill>
 			<implants>boost_comm_implant::bvdni</implants>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Precentor</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Precentor</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="5afd413b-0776-4f93-8c44-e382b956fe37" type="mekhq.campaign.personnel.Person">
@@ -687,16 +766,30 @@ Precentor Berith’s greatest strength is in his diplomatic skills. Though he ad
 			<primaryRole>1</primaryRole>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>Devoted to Blake’s philosophies and conversant in most of his writings, Black Bear considers himself the Opacus Venatori’s spiritual officer. His first contact with the Order began at the tender age of six. Brilliant in the extreme when it comes to logic and reasoning, he struggled in the more technological arts and was
-in danger of being shifted to Periphery HPG service when the Heretics rose to power in June of 3052.
+			<biography>Devoted to Blake’s philosophies and conversant in most of his writings, Black Bear
+				considers himself the Opacus Venatori’s spiritual officer. His first contact with the Order
+				began at the tender age of six. Brilliant in the extreme when it comes to logic and
+				reasoning, he struggled in the more technological arts and was
+				in danger of being shifted to Periphery HPG service when the Heretics rose to power in June
+				of 3052.
 
-Infuriated with the false Blake documents “discovered” by Focht and espoused by Mori, Black Bear defected with Precentor Aziz and joined the Toyama sect in their migration to Gibson. He and his compatriots in Psi/Mu rejoiced long and loud when Terra was
-expunged of the heretical taint.
+				Infuriated with the false Blake documents “discovered” by Focht and espoused by Mori, Black
+				Bear defected with Precentor Aziz and joined the Toyama sect in their migration to Gibson.
+				He and his compatriots in Psi/Mu rejoiced long and loud when Terra was
+				expunged of the heretical taint.
 
-During a tour on Circinus, Black Bear ran afoul of Precentor Emory during a training assignment. Intrigued by the Precentor’s Manei Domini students and their utter devotion to Toyama and his teachings, Black Bear requested and received reassignment into the Light of Mankind. Tasked as a Spiritual Advisor, the Acolyte learned a great deal regarding the Order’s newest branch and was seized strongly with the opinion that the Manei Domini way was indeed the Path to Universal Truth.
+				During a tour on Circinus, Black Bear ran afoul of Precentor Emory during a training
+				assignment. Intrigued by the Precentor’s Manei Domini students and their utter devotion to
+				Toyama and his teachings, Black Bear requested and received reassignment into the Light of
+				Mankind. Tasked as a Spiritual Advisor, the Acolyte learned a great deal regarding the
+				Order’s newest branch and was seized strongly with the opinion that the Manei Domini way was
+				indeed the Path to Universal Truth.
 
-Impressed by Black Bear’s teachings on the Circinian HPG network, the Manei Domini offered the Acolyte a chance to receive augmentation, which he gladly accepted. He was reassigned as the Shadow Hunter’s Advisor upon recommendation by Precentor Berith, who was more impressed with the Acolyte’s conviction,
-rather than his skills.</biography>
+				Impressed by Black Bear’s teachings on the Circinian HPG network, the Manei Domini offered
+				the Acolyte a chance to receive augmentation, which he gladly accepted. He was reassigned as
+				the Shadow Hunter’s Advisor upon recommendation by Precentor Berith, who was more impressed
+				with the Acolyte’s conviction,
+				rather than his skills.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Rufus_Black_Bear.jpg</portraitFile>
 			<xp>0</xp>
@@ -709,20 +802,32 @@ rather than his skills.</biography>
 			<status>ACTIVE</status>
 			<birthday>3021-03-15</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<implants>dermal_armor::vdni</implants>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Adept</desc><type>SERVICE</type></logEntry>
-				<logEntry><date>3073-01-24</date><desc>Removed from Grigori C-GRG-O (Rufus)</desc><type>SERVICE</type></logEntry>
-				<logEntry><date>3073-01-24</date><desc>Assigned to Grigori C-GRG-O (Rufus)</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Adept</desc>
+					<type>SERVICE</type>
+				</logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Removed from Grigori C-GRG-O (Rufus)</desc>
+					<type>SERVICE</type>
+				</logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Assigned to Grigori C-GRG-O (Rufus)</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="d636251e-4e78-441c-8f7c-ff151de2ab18" type="mekhq.campaign.personnel.Person">
@@ -735,13 +840,22 @@ rather than his skills.</biography>
 			<secondaryDesignator>RHO</secondaryDesignator>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>Originally born Portia DeLaRosa, Thomas grew up in the ’Mech bays of VEST on Solaris VII. Progressing slowly up the Solaris ranks, she became jaded with the hypocrisy around her. The final straw came after being thrown into prison for striking a Top Twenty
-warrior who was insistent she throw her next match. Bailed out by a friend, she broke her contract and joined up with ComStar, leaving the Game World behind.
+			<biography>Originally born Portia DeLaRosa, Thomas grew up in the ’Mek bays of VEST on Solaris
+				VII. Progressing slowly up the Solaris ranks, she became jaded with the hypocrisy around
+				her. The final straw came after being thrown into prison for striking a Top Twenty
+				warrior who was insistent she throw her next match. Bailed out by a friend, she broke her
+				contract and joined up with ComStar, leaving the Game World behind.
 
-Thomas later defected to the Word of Blake. She continued doing what she did best: serving the Word through devotion to combat. Ascending to the rank of Adept, she became a Militia BattleMech instructor and transferred to Sandhurst after the liberation of Terra.
+				Thomas later defected to the Word of Blake. She continued doing what she did best: serving
+				the Word through devotion to combat. Ascending to the rank of Adept, she became a Militia
+				BattleMek instructor and transferred to Sandhurst after the liberation of Terra.
 
-She briefly joined the Venatori in 3068 as a replacement but was soon sent back to Terra to recover from injuries taken during a savage firefight on Dieron. Though her right arm was replaced
-with a prosthetic, she was unable to re-enter active duty for over a year due to a bout with pancreatic cancer. Impressed with her drive and determination, she was welcomed back into the Opacus Venatori after their brutal mission in the Northwind system.</biography>
+				She briefly joined the Venatori in 3068 as a replacement but was soon sent back to Terra to
+				recover from injuries taken during a savage firefight on Dieron. Though her right arm was
+				replaced
+				with a prosthetic, she was unable to re-enter active duty for over a year due to a bout with
+				pancreatic cancer. Impressed with her drive and determination, she was welcomed back into
+				the Opacus Venatori after their brutal mission in the Northwind system.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Portia_Thomas.jpg</portraitFile>
 			<xp>0</xp>
@@ -754,17 +868,21 @@ with a prosthetic, she was unable to re-enter active duty for over a year due to
 			<status>ACTIVE</status>
 			<birthday>3015-04-09</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>7</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Adept Epsilon X</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Adept Epsilon X</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="34affb3a-6a1b-4788-81d9-b1e7efbb4def" type="mekhq.campaign.personnel.Person">
@@ -777,13 +895,21 @@ with a prosthetic, she was unable to re-enter active duty for over a year due to
 			<secondaryDesignator>RHO</secondaryDesignator>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>The newest member of the Shadow Hunters, Adept Norman was raised in the Order from the age of two. She showed incredible aptitude during her education and was slated to enter ROM as one of its youngest-ever agents when she was accused of beating an instructor. While her claims of harassment were eventually proven, the black mark on her record for insubordination kept her from entering ROM until she was twenty-two.
+			<biography>The newest member of the Shadow Hunters, Adept Norman was raised in the Order from
+				the age of two. She showed incredible aptitude during her education and was slated to enter
+				ROM as one of its youngest-ever agents when she was accused of beating an instructor. While
+				her claims of harassment were eventually proven, the black mark on her record for
+				insubordination kept her from entering ROM until she was twenty-two.
 
-Her ability to manipulate complex algorithms and formulas
-proved invaluable to the LoM and she was immediately reassigned to the last opening within the Opacus Venatori after the defeat of the Ghosts of the Black Watch.
+				Her ability to manipulate complex algorithms and formulas
+				proved invaluable to the LoM and she was immediately reassigned to the last opening within
+				the Opacus Venatori after the defeat of the Ghosts of the Black Watch.
 
-What Adept Norman lacks in combat ability she more than
-makes up for as the unit’s communications specialist. She is constantly trying to decipher thousands of bytes of code and transmissions, searching for clues and information that can help the unit get an edge. During her downtime she spends hours writing in her ever-present journal.</biography>
+				What Adept Norman lacks in combat ability she more than
+				makes up for as the unit’s communications specialist. She is constantly trying to decipher
+				thousands of bytes of code and transmissions, searching for clues and information that can
+				help the unit get an edge. During her downtime she spends hours writing in her ever-present
+				journal.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Jacqueline_Norman.jpg</portraitFile>
 			<xp>0</xp>
@@ -796,17 +922,21 @@ makes up for as the unit’s communications specialist. She is constantly trying
 			<status>ACTIVE</status>
 			<birthday>3048-04-20</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Adept Epsilon II</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Adept Epsilon II</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="75057ad3-1c20-4258-8515-01c825f6502b" type="mekhq.campaign.personnel.Person">
@@ -817,11 +947,20 @@ makes up for as the unit’s communications specialist. She is constantly trying
 			<primaryRole>1</primaryRole>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>A survivor of Tukayyid, Kari Marita faced the bitter truth that ComStar was becoming nothing but a puppet for former House nobility. In 3061, she and over thirty percent of her command defected from ComStar and wound up on Outreach. Using her charisma and strong tactical sense, she and her Broadsword Legion managed to gain membership into the AMC and fought against Waco’s Uprising, prepping the knife for the fateful plunge.
-Her actions helped seal the Word’s victory on Outreach, eliminating one of the most famous mercenary units in the Inner Sphere. 
-Or so she thought.
+			<biography>A survivor of Tukayyid, Kari Marita faced the bitter truth that ComStar was
+				becoming nothing but a puppet for former House nobility. In 3061, she and over thirty
+				percent of her command defected from ComStar and wound up on Outreach. Using her charisma
+				and strong tactical sense, she and her Broadsword Legion managed to gain membership into the
+				AMC and fought against Waco’s Uprising, prepping the knife for the fateful plunge.
+				Her actions helped seal the Word’s victory on Outreach, eliminating one of the most famous
+				mercenary units in the Inner Sphere.
+				Or so she thought.
 
-Precentor Marita shoulders the blame for the Legion’s destruction and the escape of the reborn Black Widows. A broken woman, Marita was recalled to Mars fully expecting to die for her failure. Now fueled by an insatiable desire to exact revenge on the very unit she thought destroyed, her judgment can be clouded at times—which, in the eyes of the rest of the Shadow Hunters, makes her a liability.</biography>
+				Precentor Marita shoulders the blame for the Legion’s destruction and the escape of the
+				reborn Black Widows. A broken woman, Marita was recalled to Mars fully expecting to die for
+				her failure. Now fueled by an insatiable desire to exact revenge on the very unit she
+				thought destroyed, her judgment can be clouded at times—which, in the eyes of the rest of
+				the Shadow Hunters, makes her a liability.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Kari_Marita.jpg</portraitFile>
 			<xp>0</xp>
@@ -834,17 +973,21 @@ Precentor Marita shoulders the blame for the Legion’s destruction and the esca
 			<status>ACTIVE</status>
 			<birthday>3020-03-29</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>6</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Demi-Precentor Epsilon II</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Demi-Precentor Epsilon II</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="3cf3806f-eb04-4fc1-8290-3dfaafd97098" type="mekhq.campaign.personnel.Person">
@@ -857,14 +1000,24 @@ Precentor Marita shoulders the blame for the Legion’s destruction and the esca
 			<secondaryDesignator>RHO</secondaryDesignator>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>Fraternal twin to Byron Montague (now XO of the Star Seeds mercenary unit), Cassius followed his brother’s footsteps into the Order. The two came to blows in 3055 regarding the path the new ComStar was taking; Montague left his home and his family for the Word on Gibson.
+			<biography>Fraternal twin to Byron Montague (now XO of the Star Seeds mercenary unit), Cassius
+				followed his brother’s footsteps into the Order. The two came to blows in 3055 regarding the
+				path the new ComStar was taking; Montague left his home and his family for the Word on
+				Gibson.
 
-His complete devotion to the ideology of Toyama and the guidance of Blake caught the attention of many in the upper echelons of ROM, which eventually opened the door for his inclusion into the initial incarnation of the Venatori.
+				His complete devotion to the ideology of Toyama and the guidance of Blake caught the
+				attention of many in the upper echelons of ROM, which eventually opened the door for his
+				inclusion into the initial incarnation of the Venatori.
 
-Montague’s natural good looks make him an excellent intelligence agent among diplomats; armed with protocols and favors, he would then help ferret out enemy agents who became marked for elimination by the Venatori. His looks also kept him warm at night with numerous companions—his unofficial call sign within the LoM community became Casanova.
+				Montague’s natural good looks make him an excellent intelligence agent among diplomats;
+				armed with protocols and favors, he would then help ferret out enemy agents who became
+				marked for elimination by the Venatori. His looks also kept him warm at night with numerous
+				companions—his unofficial call sign within the LoM community became Casanova.
 
-Fearful of aging, Montague underwent cosmetic augmentation in 3072. Though not considered a Manei Domini—he has not received an invitation to join that Order—he believes that formality is only a matter of time. Whether other Manei Domini agree or not
-is beside the point.</biography>
+				Fearful of aging, Montague underwent cosmetic augmentation in 3072. Though not considered a
+				Manei Domini—he has not received an invitation to join that Order—he believes that formality
+				is only a matter of time. Whether other Manei Domini agree or not
+				is beside the point.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Cassius_Montague.jpg</portraitFile>
 			<xp>0</xp>
@@ -877,17 +1030,21 @@ is beside the point.</biography>
 			<status>ACTIVE</status>
 			<birthday>3024-01-21</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Adept Epsilon XVIII</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Adept Epsilon XVIII</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="8bbc8205-4809-4649-9ef9-779909f9b32d" type="mekhq.campaign.personnel.Person">
@@ -900,11 +1057,21 @@ is beside the point.</biography>
 			<secondaryDesignator>MU</secondaryDesignator>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>Abused, raised in a brothel and cursed with looks only a blind man could love, Rodriguez feared for her life after murdering a Hegemony soldier at the age of ten. Finding refuge and compassion within a Word of Blake HPG compound, the local administrator whisked her off-planet and she disappeared into the Order.
+			<biography>Abused, raised in a brothel and cursed with looks only a blind man could love,
+				Rodriguez feared for her life after murdering a Hegemony soldier at the age of ten. Finding
+				refuge and compassion within a Word of Blake HPG compound, the local administrator whisked
+				her off-planet and she disappeared into the Order.
 
-She began training on her own time with the LoM forces on Circinus in basic calisthenics and other mundane exercises.  Impressed by her drive and determination, she was offered a spot as part of the opposition in a training exercise, where she racked up three kills in a decidedly unorthodox manner. Though she had violated her mission parameters, her ingenious response impressed the instructors, and she was transferred into the LoM.
+				She began training on her own time with the LoM forces on Circinus in basic calisthenics and
+				other mundane exercises. Impressed by her drive and determination, she was offered a spot as
+				part of the opposition in a training exercise, where she racked up three kills in a
+				decidedly unorthodox manner. Though she had violated her mission parameters, her ingenious
+				response impressed the instructors, and she was transferred into the LoM.
 
-Diagnosed with a rare spinal disease in 3071, Rodriguez has resigned herself to the fact that she can never qualify for augmentation. This resignation has produced a tremendous surge of recklessness and risk-taking, which Precentor Berith uses to the unit’s advantage whenever possible.</biography>
+				Diagnosed with a rare spinal disease in 3071, Rodriguez has resigned herself to the fact
+				that she can never qualify for augmentation. This resignation has produced a tremendous
+				surge of recklessness and risk-taking, which Precentor Berith uses to the unit’s advantage
+				whenever possible.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Elizabeth_Rodriguez.jpg</portraitFile>
 			<xp>0</xp>
@@ -917,17 +1084,21 @@ Diagnosed with a rare spinal disease in 3071, Rodriguez has resigned herself to 
 			<status>ACTIVE</status>
 			<birthday>3047-07-13</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>6</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>3</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Adept Epsilon II</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Adept Epsilon II</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="4002e95b-a3a6-4ab6-b3bd-5659acbe8c6e" type="mekhq.campaign.personnel.Person">
@@ -940,14 +1111,25 @@ Diagnosed with a rare spinal disease in 3071, Rodriguez has resigned herself to 
 			<secondaryDesignator>RHO</secondaryDesignator>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>Bryn Rivenschild entered ComStar service after his application to the famed Highlanders was rejected. Happily, he aced the initial tests and was trained with the Com Guards as an infantry soldier. On the day of his first posting, he also received his first tattoo—an
-elaborate Celtic design that was also part of his family’s crest.
+			<biography>Bryn Rivenschild entered ComStar service after his application to the famed
+				Highlanders was rejected. Happily, he aced the initial tests and was trained with the Com
+				Guards as an infantry soldier. On the day of his first posting, he also received his first
+				tattoo—an
+				elaborate Celtic design that was also part of his family’s crest.
 
-Horrified with the secularized changes occurring within the Order, he and the entire ComStar garrison overwhelmed and seized control of the local HPG on Saiph. In a short shadow war, the garrison maintained control of the station against two Com- Star-aligned ROM teams until help arrived.
+				Horrified with the secularized changes occurring within the Order, he and the entire ComStar
+				garrison overwhelmed and seized control of the local HPG on Saiph. In a short shadow war,
+				the garrison maintained control of the station against two Com- Star-aligned ROM teams until
+				help arrived.
 
-Adept Rivenschild was one of the first LoM members selected for the Venatori. Utilizing his computer skills to great effect, he was invaluable to the Hunter’s missions in eliminating Wolfnet across the Chaos March. Known for stealing nine BattleMechs, due to his own custom code-cracking programs, Rivenschild was often loaned out to assist other LoM operations against corporate entities.
+				Adept Rivenschild was one of the first LoM members selected for the Venatori. Utilizing his
+				computer skills to great effect, he was invaluable to the Hunter’s missions in eliminating
+				Wolfnet across the Chaos March. Known for stealing nine BattleMeks, due to his own custom
+				code-cracking programs, Rivenschild was often loaned out to assist other LoM operations
+				against corporate entities.
 
-For every successful operation, Rivenschild adds to his Celtic knot; nearly eighty percent of his body is now covered with the continuous tattoo.</biography>
+				For every successful operation, Rivenschild adds to his Celtic knot; nearly eighty percent
+				of his body is now covered with the continuous tattoo.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Bryn_Rivenschild.jpg</portraitFile>
 			<xp>0</xp>
@@ -960,17 +1142,21 @@ For every successful operation, Rivenschild adds to his Celtic knot; nearly eigh
 			<status>ACTIVE</status>
 			<birthday>3028-12-16</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Adept Epsilon IX</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Adept Epsilon IX</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="95b2a383-8ffe-4184-9289-2e38a2fbacb3" type="mekhq.campaign.personnel.Person">
@@ -981,16 +1167,29 @@ For every successful operation, Rivenschild adds to his Celtic knot; nearly eigh
 			<primaryRole>1</primaryRole>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>Orphaned during the Ronin War of 3034, Tomitaki grew up in a ComStar-sponsored orphanage until her sixteenth birthday. On that day, she formally joined the Order and served first in Rho/ Gamma before passing the tests to enter the Com Guards.
+			<biography>Orphaned during the Ronin War of 3034, Tomitaki grew up in a ComStar-sponsored
+				orphanage until her sixteenth birthday. On that day, she formally joined the Order and
+				served first in Rho/ Gamma before passing the tests to enter the Com Guards.
 
-One of the few survivors from the 138th Division—decimated by the Clan Wolf counterattack at Skupo—her path to eventual command seemed assured. Those dreams were shattered when Tomitaki suffered acute Post-Traumatic Stress Disorder and was“rehabilitated” on Terra.
+				One of the few survivors from the 138th Division—decimated by the Clan Wolf counterattack at
+				Skupo—her path to eventual command seemed assured. Those dreams were shattered when Tomitaki
+				suffered acute Post-Traumatic Stress Disorder and was“rehabilitated” on Terra.
 
-Liberated along with other “detainees” from the psychiatric ward during Operation Odysseus, Tomitaki led a volunteer unit into the fray in the urban jungles of Lower Geneva. Impressed with her fanatical zeal and utter hatred for the heretical ComStar, ROM re-inducted Tomitaki into the Word of Blake Militia.
+				Liberated along with other “detainees” from the psychiatric ward during Operation Odysseus,
+				Tomitaki led a volunteer unit into the fray in the urban jungles of Lower Geneva. Impressed
+				with her fanatical zeal and utter hatred for the heretical ComStar, ROM re-inducted Tomitaki
+				into the Word of Blake Militia.
 
-Tomitaki was elevated into the Light of Mankind after salvaging an operation gone sour. Though the mission on Procyon is still highly classified, her devotion to the Word’s objectives and outstanding performance was obvious by the immediate fasttracking of her career.
+				Tomitaki was elevated into the Light of Mankind after salvaging an operation gone sour.
+				Though the mission on Procyon is still highly classified, her devotion to the Word’s
+				objectives and outstanding performance was obvious by the immediate fasttracking of her
+				career.
 
-A ROM operative who voluntarily underwent augmentation, she was also one of the first Manei Domini in the Shadows. The only obvious mark of her induction into that terrifying order is her multi-model cybernetic eye. She is rumored to have much
-more internal work done; her survival of a ten-story fall during an Opacus mission on Thorin lends much truth to those stories.</biography>
+				A ROM operative who voluntarily underwent augmentation, she was also one of the first Manei
+				Domini in the Shadows. The only obvious mark of her induction into that terrifying order is
+				her multi-model cybernetic eye. She is rumored to have much
+				more internal work done; her survival of a ten-story fall during an Opacus mission on Thorin
+				lends much truth to those stories.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Mi_Tomitaki.jpg</portraitFile>
 			<xp>0</xp>
@@ -1003,18 +1202,22 @@ more internal work done; her survival of a ten-story fall during an Opacus missi
 			<status>ACTIVE</status>
 			<birthday>3026-01-17</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>6</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<implants>dermal_armor::vdni</implants>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Adept</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Adept</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="1133a093-b3cc-45f7-8ef0-83e6976fef41" type="mekhq.campaign.personnel.Person">
@@ -1025,13 +1228,27 @@ more internal work done; her survival of a ten-story fall during an Opacus missi
 			<primaryRole>1</primaryRole>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>One of the few remaining pure-blooded Zulu warrior-citizens of Africa, Kendali Morris was considered one of the Light of Mankind’s deadliest operatives until a fateful explosion on Muphrid cost her nearly half of her face and jaw. At that time, she was offered and accepted severe augmentation, and joined the ranks of the Manei Domini.
+			<biography>One of the few remaining pure-blooded Zulu warrior-citizens of Africa, Kendali
+				Morris was considered one of the Light of Mankind’s deadliest operatives until a fateful
+				explosion on Muphrid cost her nearly half of her face and jaw. At that time, she was offered
+				and accepted severe augmentation, and joined the ranks of the Manei Domini.
 
-Her LoM service record is heavily shrouded in sealed operations occurring deep in the Free Rasalhague Republic and the Dominion. Excelling in solo or dual-team missions, one of her key contributions can be seen in the recent development of the heavy gyroscopic system now in use with the Protectorate.
+				Her LoM service record is heavily shrouded in sealed operations occurring deep in the Free
+				Rasalhague Republic and the Dominion. Excelling in solo or dual-team missions, one of her
+				key contributions can be seen in the recent development of the heavy gyroscopic system now
+				in use with the Protectorate.
 
-Known for her keen eyesight—rivaling many augmented Manei Domini inductees—and her berserker fury in her Preta, Precentor Morris recently underwent further augmentation to her jaw and teeth. Two one-inch steel incisors were implanted with a unique venom-delivery system, coupled with a myomer-enhanced jaw that exerts enough pressure to crack large bones in half. Coupled with her myomer-enhanced legs, Morris is a deadly in-fighter.
+				Known for her keen eyesight—rivaling many augmented Manei Domini inductees—and her berserker
+				fury in her Preta, Precentor Morris recently underwent further augmentation to her jaw and
+				teeth. Two one-inch steel incisors were implanted with a unique venom-delivery system,
+				coupled with a myomer-enhanced jaw that exerts enough pressure to crack large bones in half.
+				Coupled with her myomer-enhanced legs, Morris is a deadly in-fighter.
 
-Morris is legendary among her native Zulu as the only female warrior to capture and kill one of the genetically enhanced liions of the Serengeti. According to the tribal tales, she stalked the predator for three days before ambushing and wrestling it to the ground, tearing its throat out. When queried about the incident, Morris refuses comment; the myth may indeed have some truth to it, as Morris is rarely without a bone bracelet strung with liion claws.</biography>
+				Morris is legendary among her native Zulu as the only female warrior to capture and kill one
+				of the genetically enhanced liions of the Serengeti. According to the tribal tales, she
+				stalked the predator for three days before ambushing and wrestling it to the ground, tearing
+				its throat out. When queried about the incident, Morris refuses comment; the myth may indeed
+				have some truth to it, as Morris is rarely without a bone bracelet strung with liion claws.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Kendali_Morris.jpg</portraitFile>
 			<xp>0</xp>
@@ -1044,18 +1261,22 @@ Morris is legendary among her native Zulu as the only female warrior to capture 
 			<status>ACTIVE</status>
 			<birthday>3045-04-08</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<implants>boost_comm_implant::bvdni::pl_masc</implants>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Demi-Precentor</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Demi-Precentor</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 		<person id="4c9f3722-7bc1-4ef0-964c-b05c91f882ea" type="mekhq.campaign.personnel.Person">
@@ -1066,15 +1287,29 @@ Morris is legendary among her native Zulu as the only female warrior to capture 
 			<primaryRole>1</primaryRole>
 			<faction>WOB</faction>
 			<clan>false</clan>
-			<biography>Growing up in a rebel cell environment showed Adept Cazer early on that authority was a necessary tenet of life. Resenting her parents and extended family for their constant guerilla war against the Free Rasalhague government—they were Combine supporters abandoned by the DCMS in 3034—she took a monumental step at the tender age of fourteen: she turned the entire cell in to MIMR.
+			<biography>Growing up in a rebel cell environment showed Adept Cazer early on that authority
+				was a necessary tenet of life. Resenting her parents and extended family for their constant
+				guerilla war against the Free Rasalhague government—they were Combine supporters abandoned
+				by the DCMS in 3034—she took a monumental step at the tender age of fourteen: she turned the
+				entire cell in to MIMR.
 
-After living on the streets for four years, she joined ComStar in 3058 and excelled in her basic training. Still desperate for direction, she joined a covert Word of Blake sect within the HPG garrison, finding for the first time a sense of purpose and direction. When ComStar ROM operatives flushed out the small group, she fled into the Orestes wilderness.
+				After living on the streets for four years, she joined ComStar in 3058 and excelled in her
+				basic training. Still desperate for direction, she joined a covert Word of Blake sect within
+				the HPG garrison, finding for the first time a sense of purpose and direction. When ComStar
+				ROM operatives flushed out the small group, she fled into the Orestes wilderness.
 
-After several months of crossing the main continent, she managed to smuggle herself off-world and made her way to Terra, where she was accepted by the Word with open arms. Impressed by her resilience and dedication to the Word’s ideals, she was promoted to the Light of Mankind and caught the eye of Precentor Emory.
+				After several months of crossing the main continent, she managed to smuggle herself
+				off-world and made her way to Terra, where she was accepted by the Word with open arms.
+				Impressed by her resilience and dedication to the Word’s ideals, she was promoted to the
+				Light of Mankind and caught the eye of Precentor Emory.
 
-The only Opacus Venatori warrior who does not sport a VDNI implant, Cazer is important to the unit as its chief infiltration agent. Already blessed with “knockout” looks, she opted for some smaller cosmetic enhancements, including a pheromone effuser (hidden as an elaborate tattoo). Her infiltration skills are unsurpassed; Berith often uses her as the unit’s lead scout to gather intelligence before forming an operational plan.
+				The only Opacus Venatori warrior who does not sport a VDNI implant, Cazer is important to
+				the unit as its chief infiltration agent. Already blessed with “knockout” looks, she opted
+				for some smaller cosmetic enhancements, including a pheromone effuser (hidden as an
+				elaborate tattoo). Her infiltration skills are unsurpassed; Berith often uses her as the
+				unit’s lead scout to gather intelligence before forming an operational plan.
 
-It is likely that Adept Cazer may be a future choice for Ascension.</biography>
+				It is likely that Adept Cazer may be a future choice for Ascension.</biography>
 			<portraitCategory>Opacus Venatori/</portraitCategory>
 			<portraitFile>Havalah_Cazer.jpg</portraitFile>
 			<xp>0</xp>
@@ -1087,17 +1322,21 @@ It is likely that Adept Cazer may be a future choice for Ascension.</biography>
 			<status>ACTIVE</status>
 			<birthday>3040-10-16</birthday>
 			<skill>
-				<type>Piloting/Mech</type>
+				<type>Piloting/Mek</type>
 				<level>5</level>
 				<bonus>0</bonus>
 			</skill>
 			<skill>
-				<type>Gunnery/Mech</type>
+				<type>Gunnery/Mek</type>
 				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 			<personnelLog>
-				<logEntry><date>3073-01-24</date><desc>Promoted to Adept</desc><type>SERVICE</type></logEntry>
+				<logEntry>
+					<date>3073-01-24</date>
+					<desc>Promoted to Adept</desc>
+					<type>SERVICE</type>
+				</logEntry>
 			</personnelLog>
 		</person>
 	</personnel>
@@ -1108,51 +1347,71 @@ It is likely that Adept Cazer may be a future choice for Ascension.</biography>
 			<systemId>Terra</systemId>
 			<status>0</status>
 			<desc>Fortress Alamo
-Terra, Word of Blake Protectorate
-13 January 3073
+				Terra, Word of Blake Protectorate
+				13 January 3073
 
-Final loading of the Oblivion proceeds apace. Our orders are very clear at this point: eliminate the threat the Black Widows pose to the security and safety of the Protectorate. Though these orders came countersigned by the Precentor Martial, it is obvious who the true originator is.
+				Final loading of the Oblivion proceeds apace. Our orders are very clear at this point:
+				eliminate the threat the Black Widows pose to the security and safety of the Protectorate.
+				Though these orders came countersigned by the Precentor Martial, it is obvious who the true
+				originator is.
 
-We are but extensions of His Hands. We will do this, and move on.  Truth be told, I am excited. Finally, an adversary worthy of our attention. Lately all we do is procedural mop-up work. A true hunt like this is something we were born for.
+				We are but extensions of His Hands. We will do this, and move on. Truth be told, I am
+				excited. Finally, an adversary worthy of our attention. Lately all we do is procedural
+				mop-up work. A true hunt like this is something we were born for.
 
-Destined for.
+				Destined for.
 
-Designed for.
+				Designed for.
 
-And for some of us, created for.
+				And for some of us, created for.
 
-While our Hunter companions are Frails, they are as close to being Domini as they can be, which makes them worthy of our respect and cooperation. They will not fail us. And of course, we won’t fail them.
+				While our Hunter companions are Frails, they are as close to being Domini as they can be,
+				which makes them worthy of our respect and cooperation. They will not fail us. And of
+				course, we won’t fail them.
 
-Or Him.
+				Or Him.
 
-So to the stars we go, to eliminate these spawn of Clan rejects. Though they are not true Clan, they are as close to it as our Hunters are to the Shadows. It is enough.
+				So to the stars we go, to eliminate these spawn of Clan rejects. Though they are not true
+				Clan, they are as close to it as our Hunters are to the Shadows. It is enough.
 
-As Clans do, these shall bleed just as easily.
+				As Clans do, these shall bleed just as easily.
 
-We are Manei Domini.
-We are the Master’s Hands.
+				We are Manei Domini.
+				We are the Master’s Hands.
 
-—From the personal journal of Precentor Berith</desc>
+				—From the personal journal of Precentor Berith</desc>
 			<id>1</id>
 			<scenarios>
 				<scenario id="2" type="mekhq.campaign.mission.Scenario">
 					<name>Touchpoint:Liberty</name>
-					<desc>Not two weeks out and we’re directed to Liberty to provide “assistance.” Only when we land do I find out that the ragged
-remains of the AMC has come calling— according to ROM, anyway. Though I’m sure the Protectorate Militia can handle
-such down-and-out mercenaries, this is the perfect time to test Demi-Precentor Marita’s battle acumen.
+					<desc>Not two weeks out and we’re directed to Liberty to provide “assistance.” Only when
+						we land do I find out that the ragged
+						remains of the AMC has come calling— according to ROM, anyway. Though I’m sure the
+						Protectorate Militia can handle
+						such down-and-out mercenaries, this is the perfect time to test Demi-Precentor Marita’s
+						battle acumen.
 
-While I appreciate her burning desire to avenge the loss of her men and women to these Dragoon upstarts, I cannot know if she is to be trusted except in the crucible of battle. I am responsible for the entire unit—and failure by one part of our machine will not be tolerated. Thus, I must find out now if this new piece is flawed…or can handle the incredible stress we normally deal with. Best to find out now if I have to kill her. Assets can be replaced.
-Loyalty cannot.
-—From the personal journal of Precentor Berith
+						While I appreciate her burning desire to avenge the loss of her men and women to these
+						Dragoon upstarts, I cannot know if she is to be trusted except in the crucible of
+						battle. I am responsible for the entire unit—and failure by one part of our machine will
+						not be tolerated. Thus, I must find out now if this new piece is flawed…or can handle
+						the incredible stress we normally deal with. Best to find out now if I have to kill her.
+						Assets can be replaced.
+						Loyalty cannot.
+						—From the personal journal of Precentor Berith
 
 
-SITUATION
-Womac Village
-Liberty, WOB Protectorate
-24 January 3073
-Battered and bruised, the AMC has reverted from a viable coalition opposed to the Word of Blake’s efforts in the Protectorate to an ad-hoc amalgamation of commands executing raids and guerilla actions on several worlds. The sorely damaged Battle Corps, in desperate need of repair and refit, have decided to come to Liberty and ground with the local rebel forces.
-Thanks to a ROM agent within the unit, their arrival is anticipated.
-</desc>
+						SITUATION
+						Womac Village
+						Liberty, WOB Protectorate
+						24 January 3073
+						Battered and bruised, the AMC has reverted from a viable coalition opposed to the Word
+						of Blake’s efforts in the Protectorate to an ad-hoc amalgamation of commands executing
+						raids and guerilla actions on several worlds. The sorely damaged Battle Corps, in
+						desperate need of repair and refit, have decided to come to Liberty and ground with the
+						local rebel forces.
+						Thanks to a ROM agent within the unit, their arrival is anticipated.
+					</desc>
 					<report></report>
 					<status>0</status>
 					<id>2</id>
@@ -1163,16 +1422,20 @@ Thanks to a ROM agent within the unit, their arrival is anticipated.
 	<forces>
 		<force id="0" type="mekhq.campaign.force.Force">
 			<name>Opacus Venatori</name>
-			<desc>This is the Opacus Venatori as per the start of the campaign in the Starter Book: Wolf vs. Blake by Catalyst Game Labs.
+			<desc>This is the Opacus Venatori as per the start of the campaign in the Starter Book: Wolf
+				vs. Blake by Catalyst Game Labs.
 
-All mechs and personal are set up exactly like the book.  Anyone that wants to use these will need to add the additional support personal and equipment and will need to define what MHQ and MM rules they want to use with the Campaign.
+				All meks and personal are set up exactly like the book. Anyone that wants to use these will
+				need to add the additional support personal and equipment and will need to define what MHQ
+				and MM rules they want to use with the Campaign.
 
-It should be noted that this starter book did not included skills beyond piloting and gunnery and those will need set.
-Enjoy.
+				It should be noted that this starter book did not included skills beyond piloting and
+				gunnery and those will need set.
+				Enjoy.
 
-Conversion by Hammer
+				Conversion by Hammer
 
-Thanks to pfarland for the Camo for the Opacus Venatori</desc>
+				Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<combatForce>true</combatForce>
 			<iconCategory>Units/</iconCategory>
 			<iconFileName>Opacus_Venatori.jpg</iconFileName>
@@ -1182,32 +1445,32 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 					<name>Opacus Level II</name>
 					<desc></desc>
 					<combatForce>true</combatForce>
-					<iconCategory>Mech/</iconCategory>
-					<iconFileName>hmech.png</iconFileName>
+					<iconCategory>Mek/</iconCategory>
+					<iconFileName>hmek.png</iconFileName>
 					<scenarioId>-1</scenarioId>
 					<units>
-						<unit id="349b1678-2125-4dcb-adff-83deeed05cc8"/>
-						<unit id="86e8442a-bc36-438a-87b3-df8a41e1a6e9"/>
-						<unit id="c1b16001-6600-46c9-9c35-97c965a3a107"/>
-						<unit id="52249633-3534-4be5-a983-55e18d74655c"/>
-						<unit id="f9936e32-1953-4888-beb3-ee243fad60c3"/>
-						<unit id="32c115a5-bef8-41d4-b594-e8182e1e0ab7"/>
+						<unit id="349b1678-2125-4dcb-adff-83deeed05cc8" />
+						<unit id="86e8442a-bc36-438a-87b3-df8a41e1a6e9" />
+						<unit id="c1b16001-6600-46c9-9c35-97c965a3a107" />
+						<unit id="52249633-3534-4be5-a983-55e18d74655c" />
+						<unit id="f9936e32-1953-4888-beb3-ee243fad60c3" />
+						<unit id="32c115a5-bef8-41d4-b594-e8182e1e0ab7" />
 					</units>
 				</force>
 				<force id="3" type="mekhq.campaign.force.Force">
 					<name>Venatori Level II</name>
 					<desc></desc>
 					<combatForce>true</combatForce>
-					<iconCategory>Mech/</iconCategory>
-					<iconFileName>mmech.png</iconFileName>
+					<iconCategory>Mek/</iconCategory>
+					<iconFileName>mmek.png</iconFileName>
 					<scenarioId>2</scenarioId>
 					<units>
-						<unit id="77047b79-b2a9-4a2c-a7df-34b44c8938a1"/>
-						<unit id="d257aeeb-e278-4e31-9980-9f054c513e91"/>
-						<unit id="f6790aa4-c393-4af6-bdeb-2185c4b5711f"/>
-						<unit id="248f5ac6-ecbe-434a-bf6b-8d3ad9133f5c"/>
-						<unit id="29c37941-0aa5-40e3-817b-6575944e8459"/>
-						<unit id="3a0c56b6-a97e-4cbf-8c03-e2b99668e205"/>
+						<unit id="77047b79-b2a9-4a2c-a7df-34b44c8938a1" />
+						<unit id="d257aeeb-e278-4e31-9980-9f054c513e91" />
+						<unit id="f6790aa4-c393-4af6-bdeb-2185c4b5711f" />
+						<unit id="248f5ac6-ecbe-434a-bf6b-8d3ad9133f5c" />
+						<unit id="29c37941-0aa5-40e3-817b-6575944e8459" />
+						<unit id="3a0c56b6-a97e-4cbf-8c03-e2b99668e205" />
 					</units>
 				</force>
 			</subforces>
@@ -1228,7 +1491,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 	</kills>
 	<skillTypes>
 		<skillType>
-			<name>Piloting/Mech</name>
+			<name>Piloting/Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1238,7 +1501,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<costs>8,4,4,4,4,4,4,4,4,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/Mech</name>
+			<name>Gunnery/Mek</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1368,7 +1631,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<costs>16,8,8,8,8,8,8,8,-1,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Gunnery/Protomech</name>
+			<name>Gunnery/ProtoMek</name>
 			<target>7</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1388,7 +1651,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<costs>8,4,4,4,4,4,4,4,4,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Anti-Mech</name>
+			<name>Anti-Mek</name>
 			<target>8</target>
 			<countUp>false</countUp>
 			<greenLvl>2</greenLvl>
@@ -1398,7 +1661,7 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<costs>12,6,6,6,6,6,6,6,6,-1,-1</costs>
 		</skillType>
 		<skillType>
-			<name>Tech/Mech</name>
+			<name>Tech/Mek</name>
 			<target>10</target>
 			<countUp>false</countUp>
 			<greenLvl>1</greenLvl>
@@ -1560,8 +1823,8 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 			<removeAbilities>hopping_jack</removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1580,15 +1843,15 @@ Thanks to pfarland for the Camo for the Opacus Venatori</desc>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Sandblaster (AToW)</displayName>
 			<lookupName>sandblaster</lookupName>
 			<desc>A pilot with this ability gets a +4, +3, or +2 to the cluster table
-at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
+				at short, medium, or long/extended range, respectively, but only with a specialized weapon.</desc>
 			<xpCost>6</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1601,16 +1864,16 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Tactical Genius (aToW)</displayName>
 			<lookupName>tactical_genius</lookupName>
 			<desc>A pilot who has a Tactical Genius may reroll their initiative once per turn.
- The second roll must be accepted.
-Note: Only one Tactical Genius may be utilized per team.</desc>
+				The second roll must be accepted.
+				Note: Only one Tactical Genius may be utilized per team.</desc>
 			<xpCost>8</xpCost>
 			<weight>1</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1625,9 +1888,9 @@ Note: Only one Tactical Genius may be utilized per team.</desc>
 			<displayName>Dodge (MaxTech)</displayName>
 			<lookupName>dodge_maneuver</lookupName>
 			<desc>Enables the unit to make a dodge maneuver instead of a physical attack.
-This maneuver adds +2 to the BTH to physical attacks against the unit.
-NOTE: The dodge maneuver is declared during the weapons phase.
-Note: This ability is only used for BattleMechs.</desc>
+				This maneuver adds +2 to the BTH to physical attacks against the unit.
+				NOTE: The dodge maneuver is declared during the weapons phase.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>2</xpCost>
 			<weight>1</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1635,8 +1898,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1655,14 +1918,15 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
+				<skill>Gunnery/Mek::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Weapon Specialist (aToW)</displayName>
 			<lookupName>weapon_specialist</lookupName>
-			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all attacks with that weapon.</desc>
+			<desc>A pilot who specializes in a particular weapon receives a -2 to hit modifier on all
+				attacks with that weapon.</desc>
 			<xpCost>12</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1675,8 +1939,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
+				<skill>Gunnery/Mek::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1695,8 +1959,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft</skill>
 				<skill>Gunnery/Aerospace</skill>
 				<skill>Gunnery/Vehicle</skill>
-				<skill>Gunnery/Mech</skill>
-				<skill>Gunnery/Protomech</skill>
+				<skill>Gunnery/Mek</skill>
+				<skill>Gunnery/ProtoMek</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1715,14 +1979,15 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Weathered (Unofficial)</displayName>
 			<lookupName>weathered</lookupName>
-			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather conditions.</desc>
+			<desc>A pilot with this ability does not suffer the initial -1 to hit due to weather
+				conditions.</desc>
 			<xpCost>6</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1735,8 +2000,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1751,14 +2016,14 @@ Note: This ability is only used for BattleMechs.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Sensor Geek (Unofficial)</displayName>
 			<lookupName>sensor_geek</lookupName>
 			<desc>A pilot with this ability gets a -2 bonus on sensor checks.
- Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
+				Note that this is really only a bonus, if inclusive sensor ranges are in use.</desc>
 			<xpCost>3</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1772,8 +2037,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Piloting/VTOL::Green</skill>
 				<skill>Piloting/Aircraft::Green</skill>
-				<skill>Gunnery/Protomech::Green</skill>
-				<skill>Piloting/Mech::Green</skill>
+				<skill>Gunnery/ProtoMek::Green</skill>
+				<skill>Piloting/Mek::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1791,17 +2056,18 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Maneuvering Ace (aToW)</displayName>
 			<lookupName>maneuvering_ace</lookupName>
 			<desc>Enables the unit to move laterally like a Quad.
-Quads can move laterally for 1 less MP.
-Aerospace units can perform maneuvers for 1 less thrust point.
-Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of control.</desc>
+				Quads can move laterally for 1 less MP.
+				Aerospace units can perform maneuvers for 1 less thrust point.
+				Units also receive a -1 BTH to rolls against skidding, sideslipping, and going out of
+				control.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1814,8 +2080,8 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Piloting/VTOL::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1829,8 +2095,8 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1849,15 +2115,16 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
 				<skill>Gunnery/Vehicle::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
+				<skill>Gunnery/Mek::Veteran</skill>
+				<skill>Gunnery/ProtoMek::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Melee Specialist (aToW)</displayName>
 			<lookupName>melee_specialist</lookupName>
-			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
-Note: This ability is only used for BattleMechs.</desc>
+			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a
+				-1 to-hit modifier to physical attacks.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>4</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1865,15 +2132,16 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Gunnery Specialization (aToW)</displayName>
 			<lookupName>specialist</lookupName>
-			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
- +1 to-hit modifier when using other types of weapons.</desc>
+			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using
+				weapons of that type and a
+				+1 to-hit modifier when using other types of weapons.</desc>
 			<xpCost>6</xpCost>
 			<weight>4</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1886,18 +2154,18 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Pain Resistance (MaxTech)</displayName>
 			<lookupName>pain_resistance</lookupName>
 			<desc>When making consciousness rolls,
-1 is added to all rolls.
-Also,
-damage received from ammo explosions is reduced to 1.
-Note: This ability is only used for BattleMechs.</desc>
+				1 is added to all rolls.
+				Also,
+				damage received from ammo explosions is reduced to 1.
+				Note: This ability is only used for BattleMeks.</desc>
 			<xpCost>4</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1921,8 +2189,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Piloting/VTOL::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1937,7 +2205,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Aerospace::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1955,8 +2223,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
+				<skill>Gunnery/Mek::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1970,8 +2238,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
-				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/ProtoMek::Regular</skill>
+				<skill>Piloting/Mek::Regular</skill>
 			</skillPrereq>
 		</ability>
 	</specialAbilities>
@@ -2322,7 +2590,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="21" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>21</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2337,7 +2605,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="23" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>23</id>
 			<name>PPC Capacitor</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2352,7 +2620,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="26" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>26</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2367,7 +2635,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="29" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>29</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2382,7 +2650,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="30" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>30</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2397,7 +2665,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="31" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>31</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2426,7 +2694,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="35" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>35</id>
 			<name>Medium VSP Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2441,7 +2709,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="36" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>36</id>
 			<name>Snub-Nose PPC</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2937,7 +3205,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="72" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>72</id>
 			<name>Improved Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2952,7 +3220,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="73" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>73</id>
 			<name>Improved Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2967,7 +3235,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="74" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>74</id>
 			<name>Improved Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2982,7 +3250,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="75" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>75</id>
 			<name>Improved Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -2997,7 +3265,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="76" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>76</id>
 			<name>Improved Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -3012,7 +3280,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="77" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>77</id>
 			<name>Improved Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -3041,7 +3309,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="81" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>81</id>
 			<name>Small VSP Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -3056,7 +3324,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="82" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>82</id>
 			<name>TAG</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -3590,7 +3858,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="122" type="mekhq.campaign.parts.equipment.MASC">
 			<id>122</id>
 			<name>Supercharger</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -3605,7 +3873,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="123" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>123</id>
 			<name>ER Small Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4115,7 +4383,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="212" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>212</id>
 			<name>Targeting Computer</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>85</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4130,7 +4398,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="213" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>213</id>
 			<name>AMS</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>85</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4243,7 +4511,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="221" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>221</id>
 			<name>Medium VSP Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>85</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4739,7 +5007,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="259" type="mekhq.campaign.parts.equipment.MASC">
 			<id>259</id>
 			<name>Supercharger</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4754,7 +5022,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="260" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>260</id>
 			<name>Targeting Computer</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4783,7 +5051,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="263" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>263</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -4798,7 +5066,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="264" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>264</id>
 			<name>ER Medium Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8592,7 +8860,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="557" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>557</id>
 			<name>Medium VSP Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8607,7 +8875,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="558" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>558</id>
 			<name>Medium VSP Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>30</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8734,7 +9002,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="570" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>570</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8749,7 +9017,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="571" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>571</id>
 			<name>Large VSP Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8764,7 +9032,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="572" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>572</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8807,7 +9075,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="575" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>575</id>
 			<name>Large VSP Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>85</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8822,7 +9090,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="576" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>576</id>
 			<name>Ultra AC/20</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>85</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8879,7 +9147,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="580" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>580</id>
 			<name>Light PPC</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8894,7 +9162,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="581" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>581</id>
 			<name>PPC Capacitor</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8909,7 +9177,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="582" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>582</id>
 			<name>Improved Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8966,7 +9234,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="586" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>586</id>
 			<name>Light PPC</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8981,7 +9249,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="587" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>587</id>
 			<name>Heavy PPC</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -8996,7 +9264,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="588" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>588</id>
 			<name>PPC Capacitor</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9011,7 +9279,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="589" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>589</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9138,7 +9406,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="600" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>600</id>
 			<name>Large VSP Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9153,7 +9421,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="601" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>601</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>70</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9196,7 +9464,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="604" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>604</id>
 			<name>Improved Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>45</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9239,7 +9507,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="607" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>607</id>
 			<name>Light PPC</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9254,7 +9522,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="608" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>608</id>
 			<name>PPC Capacitor</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9269,7 +9537,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="609" type="mekhq.campaign.parts.equipment.HeatSink">
 			<id>609</id>
 			<name>Double Heat Sink</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>100</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9654,7 +9922,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="633" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>633</id>
 			<name>MML 7</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9669,7 +9937,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="634" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>634</id>
 			<name>Artemis IV FCS</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9684,7 +9952,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="635" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>635</id>
 			<name>MML 7</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9699,7 +9967,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="636" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>636</id>
 			<name>Artemis IV FCS</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9728,7 +9996,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="638" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>638</id>
 			<name>Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9743,7 +10011,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="639" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>639</id>
 			<name>Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9758,7 +10026,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="640" type="mekhq.campaign.parts.equipment.AmmoBin">
 			<id>640</id>
 			<name>MML 7 SRM Artemis-capable Ammo Bin</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9773,7 +10041,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="641" type="mekhq.campaign.parts.equipment.AmmoBin">
 			<id>641</id>
 			<name>MML 7 LRM Artemis-capable Ammo Bin</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9788,7 +10056,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="642" type="mekhq.campaign.parts.equipment.AmmoBin">
 			<id>642</id>
 			<name>MML 7 LRM Artemis-capable Ammo Bin</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9803,7 +10071,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="643" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>643</id>
 			<name>Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9818,7 +10086,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="644" type="mekhq.campaign.parts.equipment.JumpJet">
 			<id>644</id>
 			<name>Jump Jet</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9833,7 +10101,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="645" type="mekhq.campaign.parts.equipment.MASC">
 			<id>645</id>
 			<name>Supercharger</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9848,7 +10116,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="646" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>646</id>
 			<name>Light PPC</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9863,7 +10131,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="647" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>647</id>
 			<name>PPC Capacitor</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -9878,7 +10146,7 @@ Note: This ability is only used for BattleMechs.</desc>
 		<part id="648" type="mekhq.campaign.parts.equipment.EquipmentPart">
 			<id>648</id>
 			<name>Medium VSP Laser</name>
-			<omniPodded/>
+			<omniPodded />
 			<unitTonnage>60</unitTonnage>
 			<mode>NORMAL</mode>
 			<skillMin>1</skillMin>
@@ -10374,7 +10642,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
-			<name>armed_mechwarriors</name>
+			<name>armed_mekwarriors</name>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
@@ -10562,7 +10830,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<value>false</value>
 		</gameoption>
 		<gameoption>
-			<name>tacops_advanced_mech_hit_locations</name>
+			<name>tacops_advanced_mek_hit_locations</name>
 			<value>false</value>
 		</gameoption>
 		<gameoption>

@@ -1,5 +1,6 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Recon underestimated enemy strength, and additional enemy units are present.</additionalBriefingText>
+	<additionalBriefingText>Recon underestimated enemy strength, and additional enemy units are
+		present.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>

@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.logging.log4j.LogManager;
-
 import io.sentry.Sentry;
 import megamek.client.AbstractClient;
 import megamek.client.Client;
@@ -42,6 +40,7 @@ import megamek.common.Entity;
 import megamek.common.MapSettings;
 import megamek.common.WeaponOrderHandler;
 import megamek.common.preference.PreferenceManager;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.BotForce;
@@ -49,6 +48,8 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
 
 class GameThread extends Thread implements CloseClientListener {
+    private static final MMLogger logger = MMLogger.create(GameThread.class);
+
     // region Variable Declarations
     protected String myname;
     protected String password;
@@ -112,7 +113,7 @@ class GameThread extends Thread implements CloseClientListener {
             client.connect();
         } catch (Exception ex) {
             Sentry.captureException(ex);
-            LogManager.getLogger().error("MegaMek client failed to connect to server", ex);
+            logger.error("MegaMek client failed to connect to server", ex);
             return;
         }
 
@@ -125,12 +126,12 @@ class GameThread extends Thread implements CloseClientListener {
             for (int i = 0; (i < MekHQ.getMHQOptions().getStartGameClientRetryCount())
                     && client.getGame().getPhase().isUnknown(); i++) {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameClientDelay());
-                LogManager.getLogger()
+                logger
                         .warn("Client has not finished initialization, and is currently in an unknown phase.");
             }
 
             if ((client.getGame() != null) && client.getGame().getPhase().isLounge()) {
-                LogManager.getLogger().info("Thread in lounge");
+                logger.info("Thread in lounge");
                 client.getLocalPlayer().setCamouflage(app.getCampaign().getCamouflage().clone());
 
                 if (started) {
@@ -166,7 +167,7 @@ class GameThread extends Thread implements CloseClientListener {
                         try (InputStream is = new FileInputStream(mapgenFile)) {
                             mapSettings = MapSettings.getInstance(is);
                         } catch (FileNotFoundException ex) {
-                            LogManager.getLogger()
+                            logger
                                     .error(
                                             String.format("Could not load map file data/mapgen/%s.xml",
                                                     scenario.getMap()),
@@ -185,7 +186,7 @@ class GameThread extends Thread implements CloseClientListener {
                         mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                     }
                 } else {
-                    LogManager.getLogger().error(
+                    logger.error(
                             String.format("invalid map settings provided for scenario %s", scenario.getName()));
                 }
 
@@ -236,7 +237,7 @@ class GameThread extends Thread implements CloseClientListener {
                         botClient.connect();
                     } catch (Exception e) {
                         Sentry.captureException(e);
-                        LogManager.getLogger().error(
+                        logger.error(
                                 String.format("Could not connect with Bot name %s", bf.getName()), e);
                     }
                     swingGui.getLocalBots().put(name, botClient);
@@ -252,7 +253,7 @@ class GameThread extends Thread implements CloseClientListener {
             }
         } catch (Exception e) {
             Sentry.captureException(e);
-            LogManager.getLogger().error("", e);
+            logger.error("", e);
         } finally {
             swingGui.setDisconnectQuietly(true);
             client.die();
@@ -285,7 +286,7 @@ class GameThread extends Thread implements CloseClientListener {
             }
 
             if (botClient.getLocalPlayer() == null) {
-                LogManager.getLogger().error(
+                logger.error(
                         String.format("Could not configure bot %s", botClient.getName()));
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
@@ -310,7 +311,7 @@ class GameThread extends Thread implements CloseClientListener {
             }
         } catch (Exception ex) {
             Sentry.captureException(ex);
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
     }
 
@@ -351,7 +352,7 @@ class GameThread extends Thread implements CloseClientListener {
             WeaponOrderHandler.saveWeaponOrderFile();
         } catch (IOException e) {
             Sentry.captureException(e);
-            LogManager.getLogger().error("Error saving custom weapon orders!", e);
+            logger.error("Error saving custom weapon orders!", e);
         }
         stop = true;
     }

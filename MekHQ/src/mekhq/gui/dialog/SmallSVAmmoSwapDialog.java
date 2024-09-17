@@ -18,29 +18,43 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.AmmoType;
-import mekhq.MekHQ;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.InfantryAmmoBin;
-import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.AmmoType;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.InfantryAmmoBin;
+import mekhq.campaign.unit.Unit;
+
 /**
- * Configures amount of standard and inferno ammo available to small support vehicle weapons.
+ * Configures amount of standard and inferno ammo available to small support
+ * vehicle weapons.
  */
 public class SmallSVAmmoSwapDialog extends JDialog {
+    private static final MMLogger logger = MMLogger.create(SmallSVAmmoSwapDialog.class);
 
     private final List<WeaponRow> rows = new ArrayList<>();
     private boolean canceled = true;
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SmallSVAmmoSwapDialog",
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+            "mekhq.resources.SmallSVAmmoSwapDialog",
             MekHQ.getMHQOptions().getLocale());
 
     public SmallSVAmmoSwapDialog(final JFrame frame, final Unit unit) {
@@ -86,7 +100,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
             this.setName("dialog");
             preferences.manage(new JWindowPreference(this));
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error("Failed to set user preferences", ex);
         }
     }
 
@@ -139,8 +153,8 @@ public class SmallSVAmmoSwapDialog extends JDialog {
                 add(new JLabel(resourceMap.getString("inferno")), gbc);
                 gbc.gridx++;
                 add(spnInferno, gbc);
-                spnInferno.addChangeListener(ev ->
-                        lblStandardClips.setText(String.valueOf(totalClips - ((Integer) spnInferno.getValue()))));
+                spnInferno.addChangeListener(
+                        ev -> lblStandardClips.setText(String.valueOf(totalClips - ((Integer) spnInferno.getValue()))));
             } else {
                 gbc.gridwidth = GridBagConstraints.REMAINDER;
                 add(new JLabel(resourceMap.getString("noStandardBin")), gbc);

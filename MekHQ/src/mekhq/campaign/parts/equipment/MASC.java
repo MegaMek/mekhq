@@ -20,24 +20,26 @@
  */
 package mekhq.campaign.parts.equipment;
 
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
-import megamek.common.TechConstants;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class MASC extends EquipmentPart {
+    private static final MMLogger logger = MMLogger.create(MASC.class);
+
     protected int engineRating;
 
     public MASC() {
@@ -69,7 +71,7 @@ public class MASC extends EquipmentPart {
         if (null == type) {
             return 0;
         }
-        //supercharger tonnage will need to be set by hand in parts store
+        // supercharger tonnage will need to be set by hand in parts store
         if (isClan()) {
             return Math.round(getUnitTonnage() / 25.0f);
         }
@@ -79,7 +81,7 @@ public class MASC extends EquipmentPart {
     @Override
     public Money getStickerPrice() {
         if (isSupercharger()) {
-            return Money.of(engineRating * (isOmniPodded()? 1250 : 10000));
+            return Money.of(engineRating * (isOmniPodded() ? 1250 : 10000));
         } else {
             return Money.of(engineRating * getTonnage() * 1000);
         }
@@ -94,7 +96,7 @@ public class MASC extends EquipmentPart {
     }
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
+    public boolean isSamePartTypeAndStatus(Part part) {
         if (needsFixing() || part.needsFixing()) {
             return false;
         }
@@ -131,7 +133,7 @@ public class MASC extends EquipmentPart {
                     engineRating = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
         restore();
@@ -161,7 +163,7 @@ public class MASC extends EquipmentPart {
             return details + ", " + getEngineRating() + " rating";
         }
         return details + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
-     }
+    }
 
     @Override
     public boolean isOmniPoddable() {
