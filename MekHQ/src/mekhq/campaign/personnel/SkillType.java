@@ -20,25 +20,16 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.PrintWriter;
-import java.util.Hashtable;
-import java.util.Map;
-
+import megamek.common.*;
+import megamek.logging.MMLogger;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.ConvFighter;
-import megamek.common.Entity;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.ProtoMek;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
-import megamek.logging.MMLogger;
-import mekhq.utilities.MHQXMLUtility;
+import java.io.PrintWriter;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Skill type will hold static information for each skill type like base target
@@ -439,36 +430,56 @@ public class SkillType {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillType");
     }
 
-    public static void generateInstanceFromXML(Node wn) {
+    /**
+     * Generates an instance of {@link SkillType} from an XML node.
+     *
+     * @param workingNode The XML node containing the skill data.
+     */
+    public static void generateInstanceFromXML(Node workingNode) {
         try {
-            SkillType retVal = new SkillType();
-            NodeList nl = wn.getChildNodes();
+            SkillType relativeValue = new SkillType();
+            NodeList nodeList = workingNode.getChildNodes();
 
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
+            for (int x = 0; x < nodeList.getLength(); x++) {
+                Node wn2 = nodeList.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn2.getTextContent();
+                    // relativeValue.name = wn2.getTextContent();
+
+                    //Start <50.01 compatibility handler.
+                    // The above code can be uncommented once these handlers have been removed
+                    relativeValue.name = switch (wn2.getTextContent().toLowerCase()) {
+                        case "piloting/mech" -> "Piloting/Mek";
+                        case "gunnery/mech" -> "Gunnery/Mek";
+                        case "gunnery/battlesuit" -> "Gunnery/BattleArmor";
+                        case "gunnery/protomech" -> "Gunnery/ProtoMek";
+                        case "anti-mech" -> "Anti-Mek";
+                        case "tech/mech" -> "Tech/Mek";
+                        case "tech/ba" -> "Tech/BattleArmor";
+                        case "medtech" -> "MedTech";
+                        default -> wn2.getTextContent();
+                    };
+                    //End <50.01 compatibility handler
                 } else if (wn2.getNodeName().equalsIgnoreCase("target")) {
-                    retVal.target = Integer.parseInt(wn2.getTextContent());
+                    relativeValue.target = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("greenLvl")) {
-                    retVal.greenLvl = Integer.parseInt(wn2.getTextContent());
+                    relativeValue.greenLvl = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("regLvl")) {
-                    retVal.regLvl = Integer.parseInt(wn2.getTextContent());
+                    relativeValue.regLvl = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("vetLvl")) {
-                    retVal.vetLvl = Integer.parseInt(wn2.getTextContent());
+                    relativeValue.vetLvl = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
-                    retVal.eliteLvl = Integer.parseInt(wn2.getTextContent());
+                    relativeValue.eliteLvl = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
-                    retVal.countUp = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    relativeValue.countUp = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("costs")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
-                        retVal.costs[i] = Integer.parseInt(values[i]);
+                        relativeValue.costs[i] = Integer.parseInt(values[i]);
                     }
                 }
             }
 
-            lookupHash.put(retVal.name, retVal);
+            lookupHash.put(relativeValue.name, relativeValue);
         } catch (Exception ex) {
             logger.error("", ex);
         }
