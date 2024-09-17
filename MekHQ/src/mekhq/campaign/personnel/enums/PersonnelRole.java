@@ -625,8 +625,10 @@ public enum PersonnelRole {
         }
 
         // Error report, if parsing fails.
+        // Ignore IDEA's suggestion of concatenating the error log, as this functionality doesn't
+        // exist within MMLogger
         MMLogger.create(PersonnelRole.class)
-                .error("Unable to parse {} into a PersonnelRole. Returning NONE.", personnelRole);
+                .error("Unable to parse " + personnelRole + " into a PersonnelRole. Returning NONE.");
         return NONE;
     }
     // endregion File I/O
