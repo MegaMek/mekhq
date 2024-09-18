@@ -126,7 +126,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contractIds.put(lastId, contract);
         Faction employer = determineEmployer(campaign);
         contract.setEmployerCode(employer.getShortName(), campaign.getLocalDate());
-        contract.setContractType(determineMission(campaign));
+        contract.setContractType(determineMission(campaign, employer));
         return contract;
     }
 
@@ -215,7 +215,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return tags;
     }
 
-    private AtBContractType determineMission(Campaign campaign) {
+    private AtBContractType determineMission(Campaign campaign, Faction employer) {
         int roll = Compute.d6(2);
         if (campaign.getFaction().isPirate()) {
             if (roll < 6) {
@@ -223,9 +223,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             } else {
                 return AtBContractType.OBJECTIVE_RAID;
             }
-        } else if (campaign.getFaction().isMercenary()) {
-
         }
+        return findMissionType(getReputationModifier(campaign), employer.isISMajorOrSuperPower());
     }
 
     private class ContractModifiers {

@@ -1,6 +1,7 @@
 package mekhq.campaign.market.contractMarket;
 
 import megamek.Version;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -9,6 +10,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.utilities.MHQXMLUtility;
@@ -185,6 +187,24 @@ public abstract class AbstractContractMarket {
         } else {
             contract.setTransportComp(100);
         }
+    }
+
+    protected AtBContractType findMissionType(int unitRatingMod, boolean majorPower) {
+        final AtBContractType[][] table = {
+            // col 0: IS Houses
+            { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PIRATE_HUNTING,
+                AtBContractType.PLANETARY_ASSAULT, AtBContractType.OBJECTIVE_RAID,
+                AtBContractType.OBJECTIVE_RAID,
+                AtBContractType.EXTRACTION_RAID, AtBContractType.RECON_RAID, AtBContractType.GARRISON_DUTY,
+                AtBContractType.CADRE_DUTY, AtBContractType.RELIEF_DUTY },
+            // col 1: Others
+            { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PLANETARY_ASSAULT,
+                AtBContractType.OBJECTIVE_RAID, AtBContractType.EXTRACTION_RAID, AtBContractType.PIRATE_HUNTING,
+                AtBContractType.SECURITY_DUTY, AtBContractType.OBJECTIVE_RAID, AtBContractType.GARRISON_DUTY,
+                AtBContractType.CADRE_DUTY, AtBContractType.DIVERSIONARY_RAID }
+        };
+        int roll = MathUtility.clamp(Compute.d6(2) + unitRatingMod - IUnitRating.DRAGOON_C, 2, 12);
+        return table[majorPower ? 0 : 1][roll - 2];
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
