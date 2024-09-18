@@ -6,13 +6,21 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Faction.Tag;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HiringHallLevel;
+
+import java.util.*;
 
 public class CamOpsContractMarket extends AbstractContractMarket {
     private static int BASE_NEGOTIATION_TARGET = 8;
     private static int EMPLOYER_NEGOTIATION_SKILL_LEVEL = 5;
+
+    private ContractModifiers contractMods = null;
 
     public CamOpsContractMarket() {
         super(ContractMarketMethod.CAM_OPS);
@@ -35,7 +43,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // TODO: CamopsMarket: allow players to choose negotiators and send them out, removing them
         // from other tasks they're doing. For now just use the highest negotiation skill on the force.
         int ratingMod = getReputationModifier(campaign);
-        ContractModifiers contractMods = generateContractModifiers(campaign);
+        contractMods = generateContractModifiers(campaign);
         int negotiationSkill = findNegotiationSkill(campaign);
         int numOffers = getNumberOfOffers(
             rollNegotiation(negotiationSkill, ratingMod + contractMods.offersMod) - BASE_NEGOTIATION_TARGET);
@@ -113,21 +121,114 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     private @Nullable AtBContract generateContract(Campaign campaign, int ratingMod, int negotiationSkill) {
         AtBContract contract = new AtBContract("UnnamedContract");
-
+        lastId++;
+        contract.setId(lastId);
+        contractIds.put(lastId, contract);
+        Faction employer = determineEmployer(campaign);
+        contract.setEmployerCode(employer.getShortName(), campaign.getLocalDate());
+        contract.setContractType(determineMission(campaign));
         return contract;
     }
 
     private int getReputationModifier(Campaign campaign) {
-        return campaign.getReputation().getReputationRating() / 10;
+        return getReputationScore(campaign) / 10;
     }
 
-    private void determineMission(Campaign campaign) {
+    private int getReputationScore(Campaign campaign) {
+        return campaign.getReputation().getReputationRating();
+    }
+
+    private Faction determineEmployer(Campaign campaign) {
+        Collection<Tag> employerTags;
+        int roll = Compute.d6(2) + getReputationModifier(campaign) + contractMods.employersMod;
+        if (roll < 6) {
+            // Roll again on the independent employers column
+            roll = Compute.d6(2) + getReputationModifier(campaign) + contractMods.employersMod;
+            employerTags = getEmployerTags(campaign, roll, true);
+        } else {
+            employerTags = getEmployerTags(campaign, roll, false);
+        }
+        return getRandomEmployer(campaign, employerTags);
+    }
+
+    private Faction getRandomEmployer(Campaign campaign, Collection<Tag> employerTags) {
+        Collection<Faction> factions = Factions.getInstance().getActiveFactions(campaign.getLocalDate());
+        List<Faction> filtered = new ArrayList<>();
+        for (Faction faction : factions) {
+            // Clans only hire units within their own clan
+            if (faction.isClan() && !faction.equals(campaign.getFaction())) {
+                continue;
+            }
+            for (Tag employerTag : employerTags) {
+                if (!faction.is(employerTag)) {
+                    // The SMALL tag has to be converted to independent for now, since for some reason
+                    // independent is coded as a string.
+                    if (employerTag == Tag.SMALL && faction.isIndependent()) {
+                        continue;
+                    }
+                    break;
+                }
+                filtered.add(faction);
+            }
+        }
+        Random rand  = new Random();
+        return filtered.get(rand.nextInt(filtered.size()));
+    }
+
+    private Collection<Tag> getEmployerTags(Campaign campaign, int roll, boolean independent) {
+        Collection<Tag> tags = new ArrayList<>();
+        if (independent) {
+            tags.add(Tag.SMALL);
+            if (roll < 4) {
+                tags.add(Tag.NOBLE);
+            } else if (roll < 6) {
+                tags.add(Tag.PLANETARY_GOVERNMENT);
+            } else if (roll == 6) {
+                tags.add(Tag.MERC);
+            } else if (roll < 9) {
+                tags.add(Tag.PERIPHERY);
+                tags.add(Tag.MAJOR);
+            } else if (roll < 11) {
+                tags.add(Tag.PERIPHERY);
+                tags.add(Tag.MINOR);
+            } else {
+                tags.add(Tag.CORPORATION);
+            }
+        } else {
+            if (roll < 6) {
+                tags.add(Tag.SMALL);
+            } else if (roll < 8) {
+                tags.add(Tag.MINOR);
+            } else if (roll < 11) {
+                tags.add(Tag.MAJOR);
+            } else {
+                if (Factions.getInstance()
+                    .getActiveFactions(campaign.getLocalDate())
+                    .stream()
+                    .anyMatch(Faction::isSuperPower)) {
+                        tags.add(Tag.SUPER);
+                } else {
+                    tags.add(Tag.MAJOR);
+                }
+            }
+        }
+        return tags;
+    }
+
+    private AtBContractType determineMission(Campaign campaign) {
+        int roll = Compute.d6(2);
         if (campaign.getFaction().isPirate()) {
+            if (roll < 6) {
+                return AtBContractType.RECON_RAID;
+            } else {
+                return AtBContractType.OBJECTIVE_RAID;
+            }
+        } else if (campaign.getFaction().isMercenary()) {
 
         }
     }
 
-    private static class ContractModifiers {
+    private class ContractModifiers {
         protected int offersMod;
         protected int employersMod;
         protected int missionsMod;
