@@ -144,6 +144,7 @@ public class AtBContract extends Contract {
     protected int nextWeekBattleTypeMod;
 
     private StratconCampaignState stratconCampaignState;
+    private boolean isAttacker;
 
     private static final ResourceBundle resources = ResourceBundle.getBundle(
             "mekhq.resources.AtBContract",
@@ -161,6 +162,7 @@ public class AtBContract extends Contract {
 
         parentContract = null;
         mercSubcontract = false;
+        isAttacker = false;
 
         setContractType(AtBContractType.GARRISON_DUTY);
         setAllySkill(SkillLevel.REGULAR);
@@ -611,6 +613,14 @@ public class AtBContract extends Contract {
 
     public void setMercSubcontract(boolean sub) {
         mercSubcontract = sub;
+    }
+
+    public boolean isAttacker() {
+        return isAttacker;
+    }
+    
+    public void setAttacker(boolean isAttacker) {
+        this.isAttacker = isAttacker;
     }
 
     public void checkEvents(Campaign c) {

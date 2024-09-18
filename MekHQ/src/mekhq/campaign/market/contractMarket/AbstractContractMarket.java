@@ -13,6 +13,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -219,10 +220,95 @@ public abstract class AbstractContractMarket {
         }
     }
 
+    protected void setAttacker(AtBContract contract) {
+        boolean isAttacker = !contract.getContractType().isGarrisonType()
+            || (contract.getContractType().isReliefDuty() && (Compute.d6() < 4))
+            || contract.getEnemy().isRebel();
+        contract.setAttacker(isAttacker);
+    }
+
+    protected void setSystemId(AtBContract contract) throws NoContractLocationFoundException {
+        // FIXME : Windchild : I don't work properly
+        if (contract.isAttacker()) {
+            contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(),
+                contract.getEnemyCode()));
+        } else {
+            contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(),
+                contract.getEmployerCode()));
+        }
+        if (contract.getSystem() == null) {
+            String errorMsg = "Could not find contract location for "
+                + contract.getEmployerCode() + " vs. " + contract.getEnemyCode();
+            logger.warn(errorMsg);
+            throw new NoContractLocationFoundException(errorMsg);
+        }
+    }
+
     protected void setIsRiotDuty(AtBContract contract) {
         if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
             contract.setContractType(AtBContractType.RIOT_DUTY);
         }
+    }
+
+    protected void setAllyRating(AtBContract contract, int year) {
+        int mod = 0;
+        if (contract.getEnemy().isRebelOrPirate()) {
+            mod -= 1;
+        }
+
+        if (contract.getContractType().isGuerrillaWarfare() || contract.getContractType().isCadreDuty()) {
+            mod -= 3;
+        } else if (contract.getContractType().isGarrisonDuty() || contract.getContractType().isSecurityDuty()) {
+            mod -= 2;
+        }
+
+        if (AtBContract.isMinorPower(contract.getEmployerCode())) {
+            mod -= 1;
+        }
+
+        if (contract.getEnemy().isIndependent()) {
+            mod -= 2;
+        }
+
+        if (contract.getContractType().isPlanetaryAssault()) {
+            mod += 1;
+        }
+
+        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan() && !contract.isAttacker()) {
+            // facing front-line units
+            mod += 1;
+        }
+        contract.setAllySkill(getSkillRating(Compute.d6(2) + mod));
+        if (year > 2950 && year < 3039 &&
+            !Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
+            mod -= 1;
+        }
+        contract.setAllyQuality(getQualityRating(Compute.d6(2) + mod));
+    }
+
+    protected void setEnemyRating(AtBContract contract, int year) {
+        int mod = 0;
+        if (contract.getEnemy().isRebelOrPirate()) {
+            mod -= 2;
+        }
+        if (contract.getContractType().isGuerrillaWarfare()) {
+            mod += 2;
+        }
+        if (contract.getContractType().isPlanetaryAssault()) {
+            mod += 1;
+        }
+        if (AtBContract.isMinorPower(contract.getEmployerCode())) {
+            mod -= 1;
+        }
+        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
+            mod += contract.isAttacker() ? 2 : 4;
+        }
+        contract.setEnemySkill(getSkillRating(Compute.d6(2) + mod));
+        if (year > 2950 && year < 3039 &&
+            !Factions.getInstance().getFaction(contract.getEnemyCode()).isClan()) {
+            mod -= 1;
+        }
+        contract.setEnemyQuality(getQualityRating(Compute.d6(2) + mod));
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -346,5 +432,11 @@ public abstract class AbstractContractMarket {
     protected static class ClauseMods {
         public int[] rerollsUsed = {0, 0, 0, 0};
         public int[] mods = {0, 0, 0, 0};
+    }
+
+    public class NoContractLocationFoundException extends RuntimeException {
+        public NoContractLocationFoundException(String message) {
+            super(message);
+        }
     }
 }

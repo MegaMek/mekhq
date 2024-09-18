@@ -272,21 +272,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 contract.setContractType(AtBContractType.SECURITY_DUTY);
             }
         }
-
-        // FIXME : Windchild : I don't work properly
-        boolean isAttacker = !contract.getContractType().isGarrisonType()
-                || (contract.getContractType().isReliefDuty() && (Compute.d6() < 4))
-                || contract.getEnemy().isRebel();
-        if (isAttacker) {
-            contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(),
-                    contract.getEnemyCode()));
-        } else {
-            contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(),
-                    contract.getEmployerCode()));
-        }
-        if (contract.getSystem() == null) {
-            logger.warn("Could not find contract location for "
-                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
+        setAttacker(contract);
+        try {
+            setSystemId(contract);
+        } catch (NoContractLocationFoundException ex) {
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
         JumpPath jp = null;
@@ -302,8 +291,8 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
         }
 
-        setAllyRating(contract, isAttacker, campaign.getGameYear());
-        setEnemyRating(contract, isAttacker, campaign.getGameYear());
+        setAllyRating(contract, campaign.getGameYear());
+        setEnemyRating(contract, campaign.getGameYear());
 
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(SkillLevel.GREEN);
@@ -381,13 +370,10 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
-        // FIXME : Windchild : I don't work properly
-        boolean isAttacker = !contract.getContractType().isGarrisonType()
-                || (contract.getContractType().isReliefDuty() && (Compute.d6() < 4))
-                || contract.getEnemy().isRebel();
+        setAttacker(contract);
         contract.setSystemId(parent.getSystemId());
-        setAllyRating(contract, isAttacker, campaign.getGameYear());
-        setEnemyRating(contract, isAttacker, campaign.getGameYear());
+        setAllyRating(contract, campaign.getGameYear());
+        setEnemyRating(contract, campaign.getGameYear());
 
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(SkillLevel.GREEN);
@@ -463,67 +449,6 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         contracts.add(followup);
         followupContracts.put(followup.getId(), contract.getId());
-    }
-
-    public void setAllyRating(AtBContract contract, boolean isAttacker, int year) {
-        int mod = 0;
-        if (contract.getEnemy().isRebelOrPirate()) {
-            mod -= 1;
-        }
-
-        if (contract.getContractType().isGuerrillaWarfare() || contract.getContractType().isCadreDuty()) {
-            mod -= 3;
-        } else if (contract.getContractType().isGarrisonDuty() || contract.getContractType().isSecurityDuty()) {
-            mod -= 2;
-        }
-
-        if (AtBContract.isMinorPower(contract.getEmployerCode())) {
-            mod -= 1;
-        }
-
-        if (contract.getEnemy().isIndependent()) {
-            mod -= 2;
-        }
-
-        if (contract.getContractType().isPlanetaryAssault()) {
-            mod += 1;
-        }
-
-        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan() && !isAttacker) {
-            // facing front-line units
-            mod += 1;
-        }
-        contract.setAllySkill(getSkillRating(Compute.d6(2) + mod));
-        if (year > 2950 && year < 3039 &&
-                !Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
-            mod -= 1;
-        }
-        contract.setAllyQuality(getQualityRating(Compute.d6(2) + mod));
-    }
-
-    public void setEnemyRating(AtBContract contract, boolean isAttacker, int year) {
-        int mod = 0;
-        if (contract.getEnemy().isRebelOrPirate()) {
-            mod -= 2;
-        }
-        if (contract.getContractType().isGuerrillaWarfare()) {
-            mod += 2;
-        }
-        if (contract.getContractType().isPlanetaryAssault()) {
-            mod += 1;
-        }
-        if (AtBContract.isMinorPower(contract.getEmployerCode())) {
-            mod -= 1;
-        }
-        if (Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
-            mod += isAttacker ? 2 : 4;
-        }
-        contract.setEnemySkill(getSkillRating(Compute.d6(2) + mod));
-        if (year > 2950 && year < 3039 &&
-                !Factions.getInstance().getFaction(contract.getEnemyCode()).isClan()) {
-            mod -= 1;
-        }
-        contract.setEnemyQuality(getQualityRating(Compute.d6(2) + mod));
     }
 
     @Override
