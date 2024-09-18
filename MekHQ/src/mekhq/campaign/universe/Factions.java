@@ -20,6 +20,7 @@ package mekhq.campaign.universe;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import mekhq.campaign.Campaign;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -95,6 +97,12 @@ public class Factions {
 
     public Collection<Faction> getFactions() {
         return factions.values();
+    }
+
+    public Collection<Faction> getActiveFactions(LocalDate date) {
+        return getFactions().stream().filter(f ->
+            f.validIn(date) && !f.isInactive())
+            .collect(Collectors.toList());
     }
 
     public Collection<String> getFactionList() {

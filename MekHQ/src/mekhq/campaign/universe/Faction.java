@@ -319,6 +319,10 @@ public class Faction {
     public boolean isCorporation() {
         return is(Tag.CORPORATION);
     }
+
+    public boolean isInactive() {
+        return is(Tag.INACTIVE);
+    }
     // endregion Power Checks
     // endregion Checks
 
