@@ -18,26 +18,6 @@
  */
 package mekhq.gui.stratcon;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.event.ListSelectionEvent;
-
 import megamek.common.Minefield;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -52,7 +32,15 @@ import mekhq.campaign.stratcon.StratconScenario;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.stratcon.StratconTrackState;
 import mekhq.campaign.unit.Unit;
-import mekhq.utilities.ReportingUtilities;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.*;
+
+import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
 /**
  * UI for managing force/unit assignments for individual StratCon scenarios.
@@ -306,25 +294,26 @@ public class StratconScenarioWizard extends JDialog {
      * Adds an individual unit selector, given a list of individual units, a global
      * grid bag constraint set
      * and a maximum selection size.
-     * 
-     * @param units            The list of units to use as data source.
-     * @param gbc              Gridbag constraints to indicate where the control
-     *                         will go
+     *
+     * @param units            The list of units to use as a data source.
+     * @param gridBagConstraints              Gridbag constraints to indicate where the control will go
      * @param maxSelectionSize Maximum number of units that can be selected
      */
-    private JList<Unit> addIndividualUnitSelector(List<Unit> units, GridBagConstraints gbc, int maxSelectionSize) {
+    private JList<Unit> addIndividualUnitSelector(List<Unit> units, GridBagConstraints gridBagConstraints,
+                                                  int maxSelectionSize) {
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new GridBagLayout());
-        GridBagConstraints localGbc = new GridBagConstraints();
+        GridBagConstraints localGridBagConstraints = new GridBagConstraints();
 
-        localGbc.gridx = 0;
-        localGbc.gridy = 0;
-        localGbc.anchor = GridBagConstraints.WEST;
+        localGridBagConstraints.gridx = 0;
+        localGridBagConstraints.gridy = 0;
+        localGridBagConstraints.anchor = GridBagConstraints.WEST;
         JLabel instructions = new JLabel();
-        instructions.setText(String.format(resourceMap.getString("lblSelectIndividualUnits.text"), maxSelectionSize));
+        instructions.setText(String.format(resourceMap.getString("lblSelectIndividualUnits.text"),
+                maxSelectionSize));
         unitPanel.add(instructions);
 
-        localGbc.gridy++;
+        localGridBagConstraints.gridy++;
         DefaultListModel<Unit> availableModel = new DefaultListModel<>();
         availableModel.addAll(units);
 
@@ -334,8 +323,8 @@ public class StratconScenarioWizard extends JDialog {
         JLabel unitSelectionLabel = new JLabel();
         unitSelectionLabel.setText("0 selected");
 
-        localGbc.gridy++;
-        unitPanel.add(unitSelectionLabel, localGbc);
+        localGridBagConstraints.gridy++;
+        unitPanel.add(unitSelectionLabel, localGridBagConstraints);
 
         JList<Unit> availableUnits = new JList<>();
         availableUnits.setModel(availableModel);
@@ -345,15 +334,15 @@ public class StratconScenarioWizard extends JDialog {
 
         JScrollPane infantryContainer = new JScrollPane();
         infantryContainer.setViewportView(availableUnits);
-        localGbc.gridy++;
-        unitPanel.add(infantryContainer, localGbc);
+        localGridBagConstraints.gridy++;
+        unitPanel.add(infantryContainer, localGridBagConstraints);
 
         // add the 'status display' control
-        localGbc.gridx++;
-        localGbc.anchor = GridBagConstraints.NORTHWEST;
-        unitPanel.add(unitStatusLabel, localGbc);
+        localGridBagConstraints.gridx++;
+        localGridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        unitPanel.add(unitStatusLabel, localGridBagConstraints);
 
-        getContentPane().add(unitPanel, gbc);
+        getContentPane().add(unitPanel, gridBagConstraints);
 
         return availableUnits;
     }
@@ -412,22 +401,18 @@ public class StratconScenarioWizard extends JDialog {
      */
     private String buildForceCost(int forceID) {
         StringBuilder costBuilder = new StringBuilder();
-        costBuilder.append("(");
+        costBuilder.append('(');
 
         switch (StratconRulesManager.getReinforcementType(forceID, currentTrackState, campaign, currentCampaignState)) {
             case SupportPoint:
                 costBuilder.append(resourceMap.getString("supportPoint.text"));
+
                 if (currentCampaignState.getSupportPoints() <= 0) {
                     costBuilder.append(", ");
 
-                    if (currentCampaignState.getVictoryPoints() <= 1) {
-                        costBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                                .append("'>")
-                                .append(resourceMap.getString("reinforcementRoll.Text"))
-                                .append(ReportingUtilities.CLOSING_SPAN_TAG);
-                    } else {
-                        costBuilder.append(resourceMap.getString("supportPointConvert.text"));
-                    }
+                    costBuilder.append(messageSurroundedBySpanWithColor(
+                            MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                            resourceMap.getString("reinforcementRoll.Text")));
                 }
                 break;
             case ChainedScenario:
@@ -441,7 +426,7 @@ public class StratconScenarioWizard extends JDialog {
                 break;
         }
 
-        costBuilder.append(")");
+        costBuilder.append(')');
         return costBuilder.toString();
     }
 
@@ -538,7 +523,7 @@ public class StratconScenarioWizard extends JDialog {
     /**
      * Event handler for when the user makes a selection on the available force
      * selector.
-     * 
+     *
      * @param e The event fired.
      */
     private void availableForceSelectorChanged(ListSelectionEvent e, JLabel forceStatusLabel, boolean reinforcements) {
@@ -569,7 +554,7 @@ public class StratconScenarioWizard extends JDialog {
      * Event handler for when an available unit selector's selection changes.
      * Updates the "# units selected" label and the unit status label.
      * Also checks maximum selection size and disables commit button (TBD).
-     * 
+     *
      * @param e
      * @param selectionCountLabel Which label to update with how many items are
      *                            selected
@@ -625,7 +610,7 @@ public class StratconScenarioWizard extends JDialog {
 
     /**
      * Worker function that de-selects duplicate units.
-     * 
+     *
      * @param listToProcess
      * @param selectedUnits
      */

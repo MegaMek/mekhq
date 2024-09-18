@@ -18,11 +18,6 @@
  */
 package mekhq.campaign.stratcon;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.Minefield;
@@ -39,16 +34,10 @@ import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Person;
@@ -57,6 +46,11 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -575,8 +569,13 @@ public class StratconRulesManager {
     }
 
     /**
-     * Worker function that processes the effects of deploying a reinforcement force
-     * to a scenario
+     * Worker function that processes the effects of deploying a reinforcement force to a scenario
+     *
+     * @param reinforcementType the type of reinforcement being deployed
+     * @param campaignState the state of the campaign
+     * @param scenario the current scenario
+     * @param campaign the campaign instance
+     * @return {@code true} if the reinforcement deployment is successful, {@code false} otherwise
      */
     public static boolean processReinforcementDeployment(ReinforcementEligibilityType reinforcementType,
             StratconCampaignState campaignState, StratconScenario scenario, Campaign campaign) {
@@ -595,9 +594,6 @@ public class StratconRulesManager {
             case SupportPoint:
                 if (campaignState.getSupportPoints() > 0) {
                     campaignState.useSupportPoint();
-                    return true;
-                } else if (campaignState.getVictoryPoints() > 0) {
-                    campaignState.updateVictoryPoints(-1);
                     return true;
                 }
 
