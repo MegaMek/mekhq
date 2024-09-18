@@ -8113,7 +8113,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                     final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof ContractMarketMethod) {
-                    list.setToolTipText(((ContractMarketMethod) value).getToolTipText());
+                    list.setToolTipText(wordWrap(((ContractMarketMethod) value).getToolTipText()));
                 }
                 return this;
             }
