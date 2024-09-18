@@ -31,7 +31,7 @@ import javax.swing.*;
 
 /**
  * This class represents a nag dialog displayed when the campaign has an active mission and has one
- * or more pregnant personnel assigned to the TO&E
+ * or more pregnant personnel assigned to the TOE
  * It extends the {@link AbstractMHQNagDialog} class.
  */
 public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
