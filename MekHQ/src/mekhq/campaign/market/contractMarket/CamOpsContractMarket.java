@@ -131,6 +131,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
         contract.setContractType(determineMission(campaign, employer));
         setEnemyCode(contract);
+        setIsRiotDuty(contract);
         return contract;
     }
 

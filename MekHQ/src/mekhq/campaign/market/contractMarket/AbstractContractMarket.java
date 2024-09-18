@@ -219,6 +219,12 @@ public abstract class AbstractContractMarket {
         }
     }
 
+    protected void setIsRiotDuty(AtBContract contract) {
+        if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
+            contract.setContractType(AtBContractType.RIOT_DUTY);
+        }
+    }
+
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "method", method.toString());

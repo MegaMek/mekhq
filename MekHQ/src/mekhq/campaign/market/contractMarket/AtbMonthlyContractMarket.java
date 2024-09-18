@@ -256,10 +256,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                 Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
 
         setEnemyCode(contract);
-
-        if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
-            contract.setContractType(AtBContractType.RIOT_DUTY);
-        }
+        setIsRiotDuty(contract);
 
         /*
          * Addition to AtB rules: factions which are generally neutral
