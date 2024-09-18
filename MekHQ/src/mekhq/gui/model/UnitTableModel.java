@@ -136,6 +136,10 @@ public class UnitTableModel extends DataTableModel {
     public @Nullable String getTooltip(int rowIndex, int columnIndex) {
         Unit unit = getUnit(rowIndex);
 
+        if (unit == null) {
+            return null;
+        }
+
         return switch (columnIndex) {
             case COL_STATUS -> unit.isRefitting() ? unit.getRefit().getDesc() : null;
             case COL_CREW_STATE -> unit.getCrewState().getToolTipText();
@@ -172,14 +176,17 @@ public class UnitTableModel extends DataTableModel {
         }
 
         if (gunnersNeeded > 0) {
+            report.append("<br>");
             appendReport(report, "Gunners", gunnersAssigned, gunnersNeeded);
         }
 
         if (crewNeeded > 0) {
+            report.append("<br>");
             appendReport(report, "Crew", crewAssigned, crewNeeded);
         }
 
         if (navigatorsNeeded > 0) {
+            report.append("<br>");
             appendReport(report, "Navigator", navigatorsAssigned, navigatorsNeeded);
         }
 
@@ -196,8 +203,8 @@ public class UnitTableModel extends DataTableModel {
      * @param assigned the number of crew members assigned to the role
      * @param needed the number of crew members needed for the role
      */
-    static void appendReport(StringBuilder report, String title, int assigned, int needed) {
-        report.append(String.format("<br><b>%s: </b>%d/%d", title, assigned, needed));
+    private static void appendReport(StringBuilder report, String title, int assigned, int needed) {
+        report.append(String.format("<b>%s: </b>%d/%d", title, assigned, needed));
     }
 
     @Override
