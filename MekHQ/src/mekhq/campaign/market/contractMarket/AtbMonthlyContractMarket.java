@@ -255,14 +255,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.setContractType(findMissionType(unitRatingMod,
                 Factions.getInstance().getFaction(contract.getEmployerCode()).isISMajorOrSuperPower()));
 
-        if (contract.getContractType().isPirateHunting()) {
-            contract.setEnemyCode("PIR");
-        } else if (contract.getContractType().isRiotDuty()) {
-            contract.setEnemyCode("REB");
-        } else {
-            contract.setEnemyCode(RandomFactionGenerator.getInstance().getEnemy(contract.getEmployerCode(),
-                    contract.getContractType().isGarrisonType()));
-        }
+        setEnemyCode(contract);
 
         if (contract.getContractType().isGarrisonDuty() && contract.getEnemy().isRebel()) {
             contract.setContractType(AtBContractType.RIOT_DUTY);

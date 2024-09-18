@@ -13,6 +13,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -205,6 +206,17 @@ public abstract class AbstractContractMarket {
         };
         int roll = MathUtility.clamp(Compute.d6(2) + unitRatingMod - IUnitRating.DRAGOON_C, 2, 12);
         return table[majorPower ? 0 : 1][roll - 2];
+    }
+
+    protected void setEnemyCode(AtBContract contract) {
+        if (contract.getContractType().isPirateHunting()) {
+            contract.setEnemyCode("PIR");
+        } else if (contract.getContractType().isRiotDuty()) {
+            contract.setEnemyCode("REB");
+        } else {
+            contract.setEnemyCode(RandomFactionGenerator.getInstance().getEnemy(contract.getEmployerCode(),
+                contract.getContractType().isGarrisonType()));
+        }
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {

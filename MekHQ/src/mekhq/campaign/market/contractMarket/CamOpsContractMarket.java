@@ -126,7 +126,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contractIds.put(lastId, contract);
         Faction employer = determineEmployer(campaign);
         contract.setEmployerCode(employer.getShortName(), campaign.getLocalDate());
+        if (employer.isMercenary()) {
+            contract.setMercSubcontract(true);
+        }
         contract.setContractType(determineMission(campaign, employer));
+        setEnemyCode(contract);
         return contract;
     }
 
