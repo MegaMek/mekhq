@@ -7723,7 +7723,7 @@ public class Campaign implements ITechManager {
     /**
      * Checks if there are any scenarios that are due based on the current date.
      *
-     * @return true if there are scenarios due, false otherwise
+     * @return {@code true} if there are scenarios due, {@code false} otherwise
      */
     public boolean checkScenariosDue() {
         return getActiveMissions(true).stream()

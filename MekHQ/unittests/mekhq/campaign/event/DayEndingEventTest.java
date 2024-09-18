@@ -25,11 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
- * This class is responsible for unit testing the cancellation of DayEndingEvent.
+ * This class is responsible for unit testing the cancellation of {@link DayEndingEvent}.
  */
 class DayEndingEventTest {
     /**
-     * Unit test to verify if a DayEndingEvent can be canceled.
+     * Unit test to verify if a {@link DayEndingEvent} can be canceled.
      */
     @Test
     void checkDayEndingEventCancellable() {

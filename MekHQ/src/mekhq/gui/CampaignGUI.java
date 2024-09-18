@@ -2540,11 +2540,12 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Checks if there are any due Scenarios.
-     * If the checkScenariosDue method of the Campaign associated with the given DayEndingEvent returns true, a dialog
-     * shows up informing the user of the due scenarios, and the DayEndingEvent is canceled.
+     * Checks if there are any due instances of the {@link Scenario} class.
+     * If the {@code checkScenariosDue()} method of the {@link Campaign} associated with the given
+     * {@link DayEndingEvent} returns {@code true}, a dialo shows up informing the user of the due
+     * scenarios, and the {@link DayEndingEvent} is canceled.
      *
-     * @param dayEndingEvent the DayEndingEvent being checked.
+     * @param dayEndingEvent the {@link DayEndingEvent} being checked.
      * @return {@code true} if there are due scenarios and {@code false} otherwise.
      */
     private boolean checkForDueScenarios(DayEndingEvent dayEndingEvent) {
@@ -2563,10 +2564,11 @@ public class CampaignGUI extends JPanel {
 
     /**
      * Checks if there are any overdue loans
-     * If the checkOverDueLoans method of the Campaign associated with the given DayEndingEvent returns true,
-     * the funds get refreshed, a dialog shows up informing the user of the overdue loans, and the DayEndingEvent is canceled.
+     * If the {@code checkOverDueLoans()} method of the {@link Campaign} associated with the given
+     * {@link DayEndingEvent} returns {@code true}, the funds get refreshed, a dialog shows up
+     * informing the user of the overdue loans, and the {@link DayEndingEvent} is canceled.
      *
-     * @param dayEndingEvent the DayEndingEvent being checked.
+     * @param dayEndingEvent the {@link DayEndingEvent} being checked.
      * @return {@code true} if there are overdue loans and {@code false} otherwise.
      */
     private boolean checkForOverdueLoans(DayEndingEvent dayEndingEvent) {

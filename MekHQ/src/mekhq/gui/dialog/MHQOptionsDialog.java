@@ -49,7 +49,7 @@ import java.util.Objects;
 
 /**
  * MHQOptionsDialog is a dialog that allows the user to configure various options in MegaMekHQ.
- * It extends the AbstractMHQButtonDialog class and inherits its common dialog features.
+ * It extends the {@link AbstractMHQButtonDialog} class and inherits its common dialog features.
  * The dialog allows configuration of options related to display, colors, fonts, autosave,
  * startup behavior, notifications, and various other miscellaneous options.
  * <p>

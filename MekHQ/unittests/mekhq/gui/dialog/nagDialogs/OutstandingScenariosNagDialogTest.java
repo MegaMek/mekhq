@@ -34,6 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * This class is a test class for the {@link OutstandingScenariosNagDialog} class.
+ * It contains tests for various scenarios related to the {@code checkForOutstandingScenarios} method
+ */
 class OutstandingScenariosNagDialogTest {
     // Mock objects for the tests
     private Campaign campaign;
