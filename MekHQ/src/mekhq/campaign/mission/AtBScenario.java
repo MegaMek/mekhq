@@ -1962,10 +1962,16 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         lanceForceId = l.getForceId();
     }
 
+    /**
+     * @return Boolean indicating whether the player is the attacker in this contract.
+     */
     public boolean isAttacker() {
         return attacker;
     }
 
+    /**
+     * @param attacker Boolean indicating whether the player is the attacker in this contract.
+     */
     public void setAttacker(boolean attacker) {
         this.attacker = attacker;
     }

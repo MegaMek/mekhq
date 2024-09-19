@@ -99,6 +99,11 @@ public class Factions {
         return factions.values();
     }
 
+    /**
+     * Returns a list of all factions active in a specific year.
+     * @param date
+     * @return
+     */
     public Collection<Faction> getActiveFactions(LocalDate date) {
         return getFactions().stream().filter(f ->
             f.validIn(date) && !f.isInactive())
