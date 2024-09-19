@@ -21,24 +21,9 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
@@ -64,6 +49,16 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -169,7 +164,7 @@ public class AtBContract extends Contract {
         extensionLength = 0;
 
         sharesPct = 0;
-        setMoraleLevel(AtBMoraleLevel.NORMAL);
+        setMoraleLevel(AtBMoraleLevel.STALEMATE);
         routEnd = null;
         numBonusParts = 0;
         priorLogisticsFailure = false;
@@ -290,105 +285,121 @@ public class AtBContract extends Contract {
         setMultiplier(multiplier);
     }
 
-    public void checkMorale(LocalDate today, int dragoonRating) {
-        if (null != routEnd) {
+    /**
+     * Checks and updates the morale which depends on various conditions such as the rout end date,
+     * skill levels, victories, defeats, etc. This method also updates the enemy status based on the
+     * morale level.
+     *
+     * @param today       The current date in the context.
+     */
+    public void checkMorale(Campaign campaign, LocalDate today) {
+        // Check whether enemy forces have been reinforced, and whether any current rout continues
+        // beyond its expected date
+        boolean routContinue = Compute.randomInt(4) < 3;
+
+        // If there is a rout end date, and it's past today, update morale and enemy state accordingly
+        if (routEnd != null && !routContinue) {
             if (today.isAfter(routEnd)) {
-                setMoraleLevel(AtBMoraleLevel.NORMAL);
+                setMoraleLevel(AtBMoraleLevel.STALEMATE);
                 routEnd = null;
                 updateEnemy(today); // mix it up a little
             } else {
-                setMoraleLevel(AtBMoraleLevel.BROKEN);
+                setMoraleLevel(AtBMoraleLevel.ROUTED);
             }
             return;
         }
+
+        // Initialize counters for victories and defeats
         int victories = 0;
         int defeats = 0;
         LocalDate lastMonth = today.minusMonths(1);
 
-        for (Scenario s : getScenarios()) {
-            if ((s.getDate() != null) && lastMonth.isAfter(s.getDate())) {
+        // Loop through scenarios, counting victories and defeats that fall within the target month
+        for (Scenario scenario : getScenarios()) {
+            if ((scenario.getDate() != null) && lastMonth.isAfter(scenario.getDate())) {
                 continue;
             }
 
-            if (s.getStatus().isOverallVictory()) {
+            if (scenario.getStatus().isOverallVictory()) {
                 victories++;
-            } else if (s.getStatus().isOverallDefeat()) {
+            } else if (scenario.getStatus().isOverallDefeat()) {
                 defeats++;
+            }
+
+            if (scenario.getStatus().isDecisiveVictory()) {
+                victories++;
+            } else if (scenario.getStatus().isDecisiveDefeat()) {
+                defeats++;
+            } else if (scenario.getStatus().isPyrrhicVictory()) {
+                victories--;
             }
         }
 
-        //
-        // From: Official AtB Rules 2.31
-        //
+        // Calculate various modifiers for morale
+        int enemySkillModifier = getEnemySkill().getAdjustedValue() - SkillLevel.REGULAR.getAdjustedValue();
+        int allySkillModifier = getAllySkill().getAdjustedValue() - SkillLevel.REGULAR.getAdjustedValue();
 
-        // Enemy skill rating: Green -1, Veteran +1, Elite +2
-        int mod = Math.max(getEnemySkill().ordinal() - 3, -1);
+        int performanceModifier = 0;
 
-        // Player Dragoon/MRBC rating: F +2, D +1, B -1, A -2
-        mod -= dragoonRating - IUnitRating.DRAGOON_C;
+        if (victories > (defeats * 2)) {
+            performanceModifier -= 2;
+        } else if (victories > defeats) {
+            performanceModifier--;
+        } else if (defeats > (victories * 2)) {
+            performanceModifier += 2;
+        } else {
+            performanceModifier++;
+        }
 
-        // For every 5 player victories in last month: -1
-        mod -= victories / 5;
+        int miscModifiers = moraleMod;
 
-        // For every 2 player defeats in last month: +1
-        mod += defeats / 2;
-
-        // "Several weekly events affect the morale roll, so, beyond the
-        // modifiers presented here, notice that some events add
-        // bonuses/minuses to this roll."
-        mod += moraleMod;
-
-        // Enemy type: Pirates: -2
-        // Rebels/Mercs/Minor factions: -1
-        // Clans: +2
+        // Additional morale modifications depending on faction properties
         if (Factions.getInstance().getFaction(enemyCode).isPirate()) {
-            mod -= 2;
-        } else if (Factions.getInstance().getFaction(enemyCode).isRebel() ||
-                isMinorPower(enemyCode) ||
-                Factions.getInstance().getFaction(enemyCode).isMercenary()) {
-            mod -= 1;
+            miscModifiers -= 2;
+        } else if (Factions.getInstance().getFaction(enemyCode).isRebel()
+                || isMinorPower(enemyCode)
+                || Factions.getInstance().getFaction(enemyCode).isMercenary()) {
+            miscModifiers -= 1;
         } else if (Factions.getInstance().getFaction(enemyCode).isClan()) {
-            mod += 2;
+            miscModifiers += 2;
         }
 
-        // If no player victories in last month: +1
-        if (victories == 0) {
-            mod++;
-        }
+        // Total morale modifier calculation
+        int totalModifier = enemySkillModifier - allySkillModifier + performanceModifier + miscModifiers;
+        int roll = Compute.d6(2) + totalModifier;
 
-        // If no player defeats in last month: -1
-        if (defeats == 0) {
-            mod--;
-        }
-
-        // After finding the applicable modifiers, roll according to the
-        // following table to find the new morale level:
-        // 1 or less: Morale level decreases 2 levels
-        // 2 – 5: Morale level decreases 1 level
-        // 6 – 8: Morale level remains the same
-        // 9 - 12: Morale level increases 1 level
-        // 13 or more: Morale increases 2 levels
-        int roll = Compute.d6(2) + mod;
-
+        // Morale level determination based on roll value
         final AtBMoraleLevel[] moraleLevels = AtBMoraleLevel.values();
-        if (roll <= 1) {
+
+        if (roll < 2) {
             setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() - 2, 0)]);
-        } else if (roll <= 5) {
+        } else if (roll < 5) {
             setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() - 1, 0)]);
-        } else if ((roll >= 9) && (roll <= 12)) {
-            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
-        } else if (roll >= 13) {
+        } else if ((roll > 12)) {
             setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 2, moraleLevels.length - 1)]);
+        } else if ((roll > 9)) {
+            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
         }
 
-        // Enemy defeated, retreats or do not offer opposition to the player
-        // forces, equal to a early victory for contracts that are not
-        // Garrison-type, and a 1d6-3 (minimum 1) months without enemy
-        // activity for Garrison-type contracts.
-        if (getMoraleLevel().isRout() && getContractType().isGarrisonType()) {
-            routEnd = today.plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
+        // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
+        if (getMoraleLevel().isRouted()) {
+            if (getContractType().isGarrisonType()) {
+                routEnd = today.plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
+            } else {
+                campaign.addReport("With the enemy routed, any remaining objectives have been successfully completed." +
+                        " The contract will conclude tomorrow.");
+                setEndDate(today.plusDays(1));
+            }
         }
 
+        // Process the results of the reinforcement roll
+        if (!getMoraleLevel().isRouted() && !routContinue) {
+            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
+            campaign.addReport("Long ranged scans have detected the arrival of additional enemy forces.");
+            return;
+        }
+
+        // Reset external morale modifier
         moraleMod = 0;
     }
 
@@ -474,7 +485,7 @@ public class AtBContract extends Contract {
                     && (((AtBScenario) s).getScenarioType() == AtBScenario.BASEATTACK)
                     && ((AtBScenario) s).isAttacker() && s.getStatus().isOverallVictory()) {
                 earlySuccess = true;
-            } else if (getMoraleLevel().isRout() && !getContractType().isGarrisonType()) {
+            } else if (getMoraleLevel().isRouted() && !getContractType().isGarrisonType()) {
                 earlySuccess = true;
             }
         }

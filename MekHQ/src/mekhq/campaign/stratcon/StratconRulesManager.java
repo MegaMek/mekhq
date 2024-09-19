@@ -18,11 +18,6 @@
  */
 package mekhq.campaign.stratcon;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.Minefield;
@@ -39,16 +34,10 @@ import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Person;
@@ -57,6 +46,11 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -112,7 +106,12 @@ public class StratconRulesManager {
         // generated
         // and use the random force to drive opfor generation (#required lances
         // multiplies the BV budget of all
-        for (int scenarioIndex = 0; scenarioIndex < track.getRequiredLanceCount(); scenarioIndex++) {
+        int scenarioRolls = track.getRequiredLanceCount();
+
+        if (contract.getMoraleLevel().isOverwhelming()) {
+            scenarioRolls++;
+        }
+        for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
             int targetNum = calculateScenarioOdds(track, contract, false);
 
             // if we haven't already used all the player forces and are required to randomly
@@ -1414,35 +1413,43 @@ public class StratconRulesManager {
     public static int calculateScenarioOdds(StratconTrackState track, AtBContract contract,
             boolean playerDeployingForce) {
         // rules:
-        // broken morale: 0%
-        // very low morale: -10% when deploying forces to track, 0% attack
-        // low morale: -5%
-        // high morale: +5%
-        // very high morale: +10%
-        // unbreakable: special case, let's do +15% for now
+        // ROUTED: 0%
+        // CRITICAL: -10% when deploying forces to track, 0% attack
+        // WEAKENED: -5%
+        // ADVANCING: +5%
+        // DOMINATING: +10%
+        // OVERWHELMING: +100%
         int moraleModifier = 0;
 
         switch (contract.getMoraleLevel()) {
-            case BROKEN:
+            case ROUTED:
                 return 0;
-            case VERY_LOW:
+            case CRITICAL:
                 if (playerDeployingForce) {
                     moraleModifier = -10;
                 } else {
                     return 0;
                 }
                 break;
-            case LOW:
+            case WEAKENED:
                 moraleModifier = -5;
                 break;
-            case HIGH:
+            case ADVANCING:
                 moraleModifier = 5;
                 break;
-            case VERY_HIGH:
-                moraleModifier = 10;
+            case DOMINATING:
+                if (playerDeployingForce) {
+                    moraleModifier = 20;
+                } else {
+                    return 10;
+                }
                 break;
-            case UNBREAKABLE:
-                moraleModifier = 15;
+            case OVERWHELMING:
+                if (playerDeployingForce) {
+                    moraleModifier = 50;
+                } else {
+                    return 25;
+                }
                 break;
             default:
                 break;
