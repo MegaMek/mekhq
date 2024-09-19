@@ -21,23 +21,6 @@
  */
 package mekhq.campaign;
 
-import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
-import static mekhq.campaign.personnel.education.EducationController.getAcademy;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
-
-import java.io.PrintWriter;
-import java.text.MessageFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import javax.swing.JOptionPane;
-
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
@@ -54,11 +37,7 @@ import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.EntitySavingException;
-import megamek.common.options.GameOptions;
-import megamek.common.options.IBasicOption;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.OptionsConstants;
+import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
 import megamek.common.weapons.autocannons.ACWeapon;
 import megamek.common.weapons.flamers.FlamerWeapon;
@@ -71,11 +50,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.event.*;
-import mekhq.campaign.finances.Accountant;
-import mekhq.campaign.finances.CurrencyManager;
-import mekhq.campaign.finances.Finances;
-import mekhq.campaign.finances.Loan;
-import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -90,12 +65,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -105,12 +75,7 @@ import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.AbstractDeath;
 import mekhq.campaign.personnel.death.DisabledRandomDeath;
@@ -118,12 +83,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
@@ -136,21 +96,16 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
-import mekhq.campaign.unit.HangarStatistics;
-import mekhq.campaign.unit.TestUnit;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.UnitOrder;
-import mekhq.campaign.unit.UnitTechProgression;
+import mekhq.campaign.unit.*;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
@@ -170,6 +125,22 @@ import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
+
+import javax.swing.*;
+import java.io.PrintWriter;
+import java.text.MessageFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
+import static mekhq.campaign.personnel.education.EducationController.getAcademy;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -4019,21 +3990,28 @@ public class Campaign implements ITechManager {
 
     /**
      * This method iterates through the list of personnel and deletes the records of
-     * those who have
-     * departed the unit and who match additional checks.
+     * those who have left the unit and who match additional checks.
      */
     public void processPersonnelRemoval() {
-        getPersonnel().stream()
-                .filter(p -> p.getStatus().isDepartedUnit())
-                .forEach(person -> {
-                    PersonnelStatus status = person.getStatus();
+        List<Person> personnelToRemove = new ArrayList<>();
 
-                    if (shouldRemovePerson(person, status)) {
-                        removePerson(person, false);
-                    }
-                });
+        for (Person person : getPersonnel()) {
+            PersonnelStatus status = person.getStatus();
 
-        addReport(resources.getString("personnelRemoval.text"));
+            if (status.isDepartedUnit()) {
+                if (shouldRemovePerson(person, status)) {
+                    personnelToRemove.add(person);
+                }
+            }
+        }
+
+        for (Person person : personnelToRemove) {
+            removePerson(person, false);
+        }
+
+        if (!personnelToRemove.isEmpty()) {
+            addReport(resources.getString("personnelRemoval.text"));
+        }
     }
 
     /**
