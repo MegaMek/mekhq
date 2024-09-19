@@ -6515,6 +6515,20 @@ public class Campaign implements ITechManager {
         };
     }
 
+    /**
+     * Returns the Strategy skill of the designated commander in the campaign.
+     *
+     * @return The value of the commander's strategy skill if a commander exists, otherwise 0.
+     */
+    public int getCommanderStrategy() {
+        int cmdrStrategy = 0;
+        if (getFlaggedCommander() != null &&
+            getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
+            cmdrStrategy = getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
+        }
+        return cmdrStrategy;
+    }
+
     @Deprecated
     public int getUnitRatingAsInteger() {
         return getAtBUnitRatingMod();
