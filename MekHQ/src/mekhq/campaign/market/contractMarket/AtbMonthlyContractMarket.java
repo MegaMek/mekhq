@@ -303,7 +303,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(contract, unitRatingMod, campaign);
 
-        contract.calculatePaymentMultiplier(campaign);
+        calculatePaymentMultiplier(campaign, contract);
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
 
@@ -396,7 +396,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.setTransportComp(100);
 
-        contract.calculatePaymentMultiplier(campaign);
+        calculatePaymentMultiplier(campaign, contract);
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.calculateContract(campaign);
 
@@ -438,7 +438,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
 
-        followup.calculatePaymentMultiplier(campaign);
+        calculatePaymentMultiplier(campaign, followup);
 
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
 
@@ -450,6 +450,64 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
 
         contracts.add(followup);
         followupContracts.put(followup.getId(), contract.getId());
+    }
+
+    @Override
+    public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
+        int unitRatingMod = campaign.getAtBUnitRatingMod();
+        double multiplier = 1.0;
+        // IntOps reputation factor then Dragoons rating
+        if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
+            multiplier *= (unitRatingMod * 0.2) + 0.5;
+        } else {
+            if (unitRatingMod >= IUnitRating.DRAGOON_A) {
+                multiplier *= 2.0;
+            } else if (unitRatingMod == IUnitRating.DRAGOON_B) {
+                multiplier *= 1.5;
+            } else if (unitRatingMod == IUnitRating.DRAGOON_D) {
+                multiplier *= 0.8;
+            } else if (unitRatingMod == IUnitRating.DRAGOON_F) {
+                multiplier *= 0.5;
+            }
+        }
+
+        multiplier *= contract.getContractType().getPaymentMultiplier();
+
+        final Faction employer = Factions.getInstance().getFaction(contract.getEmployerCode());
+        final Faction enemy = contract.getEnemy();
+        if (employer.isISMajorOrSuperPower() || employer.isClan()) {
+            multiplier *= 1.2;
+        } else if (enemy.isIndependent()) {
+            multiplier *= 1.0;
+        } else {
+            multiplier *= 1.1;
+        }
+
+        if (enemy.isRebelOrPirate()) {
+            multiplier *= 1.1;
+        }
+
+        int cmdrStrategy = 0;
+        if (campaign.getFlaggedCommander() != null &&
+            campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
+            cmdrStrategy = campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
+        }
+        int maxDeployedLances = campaign.getCampaignOptions().getBaseStrategyDeployment() +
+            campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
+                cmdrStrategy;
+
+        if (contract.isSubcontract()) {
+            contract.setRequiredLances(1);
+        } else {
+            int requiredLances = contract.getRequiredLances();
+            contract.setRequiredLances(Math.max(AtBContract.getEffectiveNumUnits(campaign) / 6, 1));
+            if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().isAdjustPaymentForStrategy()) {
+                multiplier *= (double) maxDeployedLances / (double) requiredLances;
+                contract.setRequiredLances(maxDeployedLances);
+            }
+        }
+
+        return multiplier;
     }
 
     private void setContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {

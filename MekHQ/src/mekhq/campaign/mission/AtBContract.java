@@ -245,62 +245,6 @@ public class AtBContract extends Contract {
         return !faction.isMajorOrSuperPower() && !faction.isClan();
     }
 
-    public void calculatePaymentMultiplier(Campaign campaign) {
-        int unitRatingMod = campaign.getAtBUnitRatingMod();
-        double multiplier = 1.0;
-        // IntOps reputation factor then Dragoons rating
-        if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            multiplier *= (unitRatingMod * 0.2) + 0.5;
-        } else {
-            if (unitRatingMod >= IUnitRating.DRAGOON_A) {
-                multiplier *= 2.0;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_B) {
-                multiplier *= 1.5;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_D) {
-                multiplier *= 0.8;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_F) {
-                multiplier *= 0.5;
-            }
-        }
-
-        multiplier *= getContractType().getPaymentMultiplier();
-
-        final Faction employer = Factions.getInstance().getFaction(employerCode);
-        final Faction enemy = getEnemy();
-        if (employer.isISMajorOrSuperPower() || employer.isClan()) {
-            multiplier *= 1.2;
-        } else if (enemy.isIndependent()) {
-            multiplier *= 1.0;
-        } else {
-            multiplier *= 1.1;
-        }
-
-        if (enemy.isRebelOrPirate()) {
-            multiplier *= 1.1;
-        }
-
-        int cmdrStrategy = 0;
-        if (campaign.getFlaggedCommander() != null &&
-                campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
-            cmdrStrategy = campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
-        }
-        int maxDeployedLances = campaign.getCampaignOptions().getBaseStrategyDeployment() +
-                campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
-                        cmdrStrategy;
-
-        if (isSubcontract()) {
-            requiredLances = 1;
-        } else {
-            requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
-            if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().isAdjustPaymentForStrategy()) {
-                multiplier *= (double) maxDeployedLances / (double) requiredLances;
-                requiredLances = maxDeployedLances;
-            }
-        }
-
-        setMultiplier(multiplier);
-    }
-
     /**
      * Checks the morale level of the campaign based on various factors.
      *

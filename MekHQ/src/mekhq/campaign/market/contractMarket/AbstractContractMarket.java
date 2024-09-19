@@ -62,6 +62,7 @@ public abstract class AbstractContractMarket {
     abstract public AtBContract addAtBContract(Campaign campaign);
     abstract public void generateContractOffers(Campaign campaign, boolean newCampaign);
     abstract public void addFollowup(Campaign campaign, AtBContract contract);
+    abstract public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract);
 
     protected AbstractContractMarket(final ContractMarketMethod method) {
         this.method = method;

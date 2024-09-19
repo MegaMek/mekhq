@@ -23,4 +23,9 @@ public class DisabledContractMarket extends AbstractContractMarket {
     public void addFollowup(Campaign campaign, AtBContract contract) {
 
     }
+
+    @Override
+    public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
+        return 1.0;
+    }
 }

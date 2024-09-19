@@ -231,7 +231,7 @@ public class ContractMarketDialog extends JDialog {
             // Changes in rating or force size since creation can alter some details
             if (c instanceof AtBContract atbContract) {
                 atbContract.initContractDetails(campaign);
-                atbContract.calculatePaymentMultiplier(campaign);
+                campaign.getContractMarket().calculatePaymentMultiplier(campaign, atbContract);
                 atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculatePartsAvailabilityLevel());
                 atbContract.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem()
                         ? (Integer) spnSharePct.getValue()

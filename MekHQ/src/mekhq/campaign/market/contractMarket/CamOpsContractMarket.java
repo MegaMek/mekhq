@@ -66,6 +66,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     }
 
+    @Override
+    public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
+        return 1.0;
+    }
+
     private HiringHallLevel getHiringHallLevel(Campaign campaign) {
         AtBConfiguration atbConfig = campaign.getAtBConfig();
         return atbConfig.getHiringHallLevel(campaign.getCurrentSystem()
@@ -146,7 +151,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(contract, campaign);
-        contract.calculatePaymentMultiplier(campaign);
+        calculatePaymentMultiplier(campaign, contract);
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
