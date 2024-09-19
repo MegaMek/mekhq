@@ -151,7 +151,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(contract, campaign);
-        calculatePaymentMultiplier(campaign, contract);
+        contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);

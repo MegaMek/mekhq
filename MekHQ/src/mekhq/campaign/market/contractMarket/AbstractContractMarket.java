@@ -12,6 +12,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -60,8 +61,11 @@ public abstract class AbstractContractMarket {
 
 
     abstract public AtBContract addAtBContract(Campaign campaign);
+
     abstract public void generateContractOffers(Campaign campaign, boolean newCampaign);
+
     abstract public void addFollowup(Campaign campaign, AtBContract contract);
+
     abstract public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract);
 
     protected AbstractContractMarket(final ContractMarketMethod method) {
@@ -112,6 +116,22 @@ public abstract class AbstractContractMarket {
         if (campaign.getCampaignOptions().isContractMarketReportRefresh()) {
             campaign.addReport("<a href='CONTRACT_MARKET'>Contract market updated</a>");
         }
+    }
+
+    public int calculateRequiredLances(Campaign campaign, AtBContract contract) {
+        int maxDeployedLances = calculateMaxDeployedLances(campaign);
+        if (contract.isSubcontract()) {
+            return 1;
+        } else {
+            int requiredLances = Math.max(AtBContract.getEffectiveNumUnits(campaign) / 6, 1);
+            return Math.min(requiredLances, maxDeployedLances);
+        }
+    }
+
+    public int calculateMaxDeployedLances(Campaign campaign) {
+        return campaign.getCampaignOptions().getBaseStrategyDeployment() +
+            campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
+                campaign.getCommanderStrategy();
     }
 
     protected SkillLevel getSkillRating(int roll) {

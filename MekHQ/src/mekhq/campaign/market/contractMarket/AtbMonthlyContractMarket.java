@@ -303,7 +303,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(contract, unitRatingMod, campaign);
 
-        calculatePaymentMultiplier(campaign, contract);
+        contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
 
@@ -396,7 +396,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
         contract.setTransportComp(100);
 
-        calculatePaymentMultiplier(campaign, contract);
+        contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
         contract.calculateContract(campaign);
 
@@ -438,7 +438,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
 
-        calculatePaymentMultiplier(campaign, followup);
+        contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
 
         followup.setPartsAvailabilityLevel(followup.getContractType().calculatePartsAvailabilityLevel());
 
@@ -458,7 +458,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         double multiplier = 1.0;
         // IntOps reputation factor then Dragoons rating
         if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            multiplier *= (unitRatingMod * 0.2) + 0.5;
+            multiplier *= campaign.getReputationFactor();
         } else {
             if (unitRatingMod >= IUnitRating.DRAGOON_A) {
                 multiplier *= 2.0;
@@ -487,24 +487,11 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             multiplier *= 1.1;
         }
 
-        int cmdrStrategy = 0;
-        if (campaign.getFlaggedCommander() != null &&
-            campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
-            cmdrStrategy = campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
-        }
-        int maxDeployedLances = campaign.getCampaignOptions().getBaseStrategyDeployment() +
-            campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
-                cmdrStrategy;
-
-        if (contract.isSubcontract()) {
-            contract.setRequiredLances(1);
-        } else {
-            int requiredLances = contract.getRequiredLances();
-            contract.setRequiredLances(Math.max(AtBContract.getEffectiveNumUnits(campaign) / 6, 1));
-            if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().isAdjustPaymentForStrategy()) {
-                multiplier *= (double) maxDeployedLances / (double) requiredLances;
-                contract.setRequiredLances(maxDeployedLances);
-            }
+        int requiredLances = calculateRequiredLances(campaign, contract);
+        int maxDeployedLances = calculateMaxDeployedLances(campaign);
+        contract.setRequiredLances(requiredLances);
+        if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().isAdjustPaymentForStrategy()) {
+            multiplier *= (double) maxDeployedLances / (double) requiredLances;
         }
 
         return multiplier;

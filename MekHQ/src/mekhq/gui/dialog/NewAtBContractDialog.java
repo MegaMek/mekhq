@@ -501,8 +501,9 @@ public class NewAtBContractDialog extends NewContractDialog {
     protected void updatePaymentMultiplier() {
         if (((AtBContract) contract).getEmployerCode() != null &&
                 ((AtBContract) contract).getEnemyCode() != null) {
-            campaign.getContractMarket().calculatePaymentMultiplier(campaign, (AtBContract) contract);
-            spnMultiplier.setValue(contract.getMultiplier());
+            double multiplier = campaign.getContractMarket().calculatePaymentMultiplier(campaign, (AtBContract) contract);
+            contract.setMultiplier(multiplier);
+            spnMultiplier.setValue(multiplier);
         }
     }
 
