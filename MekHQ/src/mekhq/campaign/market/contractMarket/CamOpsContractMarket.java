@@ -36,6 +36,12 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
+        Optional<AtBContract> c = generateContract(campaign);
+        if (c.isPresent()) {
+            AtBContract atbContract = c.get();
+            contracts.add(atbContract);
+            return atbContract;
+        }
         return null;
     }
 
@@ -58,8 +64,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             rollNegotiation(negotiationSkill, ratingMod + contractMods.offersMod) - BASE_NEGOTIATION_TARGET);
 
         for (int i = 0; i < numOffers; i++) {
-            Optional<AtBContract> c = generateContract(campaign);
-            c.ifPresent(contract -> contracts.add(contract));
+            addAtBContract(campaign);
         }
         updateReport(campaign);
     }
