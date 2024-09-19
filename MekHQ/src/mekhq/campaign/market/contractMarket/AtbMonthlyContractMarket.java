@@ -172,9 +172,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
                     contracts.add(c);
                 }
             }
-            if (campaign.getCampaignOptions().isContractMarketReportRefresh()) {
-                campaign.addReport("<a href='CONTRACT_MARKET'>Contract market updated</a>");
-            }
+            updateReport(campaign);
         }
     }
 

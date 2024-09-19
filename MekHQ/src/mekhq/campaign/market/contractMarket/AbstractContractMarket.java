@@ -107,6 +107,12 @@ public abstract class AbstractContractMarket {
         generateContractOffers(campaign, false);
     }
 
+    protected void updateReport(Campaign campaign) {
+        if (campaign.getCampaignOptions().isContractMarketReportRefresh()) {
+            campaign.addReport("<a href='CONTRACT_MARKET'>Contract market updated</a>");
+        }
+    }
+
     protected SkillLevel getSkillRating(int roll) {
         if (roll <= 5) {
             return SkillLevel.GREEN;

@@ -57,6 +57,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             Optional<AtBContract> c = generateContract(campaign, ratingMod, negotiationSkill);
             c.ifPresent(contract -> contracts.add(contract));
         }
+        updateReport(campaign);
     }
 
     @Override
