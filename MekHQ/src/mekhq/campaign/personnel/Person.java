@@ -19,20 +19,6 @@
  */
 package mekhq.campaign.personnel;
 
-import static java.lang.Math.abs;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.StringUtility;
@@ -62,24 +48,11 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.education.Academy;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.ManeiDominiRank;
-import mekhq.campaign.personnel.enums.ModifierValue;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Aggression;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Ambition;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Greed;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.PersonalityQuirk;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Social;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -92,6 +65,19 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static java.lang.Math.abs;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -162,6 +148,7 @@ public class Person {
     private Money salary;
     private Money totalEarnings;
     private int hits;
+    private int hitsPrior;
     private PrisonerStatus prisonerStatus;
 
     // Supports edge usage by a ship's engineer composite crewman
@@ -368,6 +355,7 @@ public class Person {
         status = PersonnelStatus.ACTIVE;
         prisonerStatus = PrisonerStatus.FREE;
         hits = 0;
+        hitsPrior = 0;
         toughness = 0;
         resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
         dateOfDeath = null;
@@ -2031,6 +2019,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hits", hits);
             }
 
+            if (hitsPrior > 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hitsPrior", hitsPrior);
+            }
+
             if (toughness != 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
@@ -2331,6 +2323,8 @@ public class Person {
                     retVal.nTasks = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("hitsPrior")) {
+                    retVal.hitsPrior = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
@@ -3396,6 +3390,22 @@ public class Person {
 
     public void setHits(final int hits) {
         this.hits = hits;
+    }
+
+    /**
+     * @return the number of hits sustained prior to the last completed scenario.
+     */
+    public int getHitsPrior() {
+        return hitsPrior;
+    }
+
+    /**
+     * Sets the number of hits sustained prior to the last completed scenario.
+     *
+     * @param hitsPrior the new value for {@code hitsPrior}
+     */
+    public void setHitsPrior(final int hitsPrior) {
+        this.hitsPrior = hitsPrior;
     }
 
     /**

@@ -21,29 +21,6 @@
  */
 package mekhq;
 
-import java.awt.FileDialog;
-import java.awt.Frame;
-import java.awt.Window;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.ObjectInputFilter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
-
-import javax.swing.InputMap;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.text.DefaultEditorKit;
-
 import io.sentry.Sentry;
 import megamek.MMLoggingConstants;
 import megamek.MegaMek;
@@ -84,6 +61,22 @@ import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
+
+import javax.swing.*;
+import javax.swing.text.DefaultEditorKit;
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.ObjectInputFilter;
+import java.io.ObjectInputFilter.Config;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
  * The main class of the application.
@@ -273,7 +266,7 @@ public class MekHQ implements GameListener {
      * Main method launching the application.
      */
     public static void main(String... args) {
-        ObjectInputFilter.Config.setSerialFilter(sanityInputFilter);
+        Config.setSerialFilter(sanityInputFilter);
 
         // Configure Sentry with defaults. Although the client defaults to enabled, the
         // properties file is used to disable
@@ -539,8 +532,8 @@ public class MekHQ implements GameListener {
                     int injuryCount = 0;
 
                     if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
-                        if (status.getHits() > person.getHits()) {
-                            injuryCount = status.getHits() - person.getHits();
+                        if (status.getHits() > person.getHitsPrior()) {
+                            injuryCount = status.getHits() - person.getHitsPrior();
                         }
                     }
 
