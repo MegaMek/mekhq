@@ -157,7 +157,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contract.calculateContract(campaign);
         contract.setName(String.format("%s - %s - %s %s",
             contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
-                .withLocale(MekHQ.getMHQOptions().getDateLocale())), employer,
+                .withLocale(MekHQ.getMHQOptions().getDateLocale())), contract.getEmployer(),
             contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
 
         return Optional.of(contract);
