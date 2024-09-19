@@ -8,6 +8,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -41,10 +42,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         if (!(campaign.getLocalDate().getDayOfMonth() == 1) && !newCampaign) {
             return;
         }
+        new ArrayList<>(contracts).forEach(this::removeContract);
         // TODO: Allow subcontracts?
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
+        //for (AtBContract contract : campaign.getActiveAtBContracts()) {
             //checkForSubcontracts(campaign, contract, unitRatingMod);
-        }
+        //}
         // TODO: CamopsMarket: allow players to choose negotiators and send them out, removing them
         // from other tasks they're doing. For now just use the highest negotiation skill on the force.
         int ratingMod = getReputationModifier(campaign);
