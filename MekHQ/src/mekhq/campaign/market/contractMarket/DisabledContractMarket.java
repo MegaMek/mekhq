@@ -23,9 +23,4 @@ public class DisabledContractMarket extends AbstractContractMarket {
     public void addFollowup(Campaign campaign, AtBContract contract) {
 
     }
-
-    @Override
-    protected void setAtBContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
-
-    }
 }

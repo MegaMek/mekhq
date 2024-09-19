@@ -62,7 +62,6 @@ public abstract class AbstractContractMarket {
     abstract public AtBContract addAtBContract(Campaign campaign);
     abstract public void generateContractOffers(Campaign campaign, boolean newCampaign);
     abstract public void addFollowup(Campaign campaign, AtBContract contract);
-    abstract protected void setAtBContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign);
 
     protected AbstractContractMarket(final ContractMarketMethod method) {
         this.method = method;

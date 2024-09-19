@@ -1,8 +1,9 @@
 package mekhq.campaign.market.contractMarket;
 
 import megamek.common.Compute;
-import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -10,11 +11,13 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class CamOpsContractMarket extends AbstractContractMarket {
@@ -51,20 +54,13 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             rollNegotiation(negotiationSkill, ratingMod + contractMods.offersMod) - BASE_NEGOTIATION_TARGET);
 
         for (int i = 0; i < numOffers; i++) {
-            AtBContract c = generateContract(campaign, ratingMod, negotiationSkill);
-            if (c != null) {
-                contracts.add(c);
-            }
+            Optional<AtBContract> c = generateContract(campaign, ratingMod, negotiationSkill);
+            c.ifPresent(contract -> contracts.add(contract));
         }
     }
 
     @Override
     public void addFollowup(Campaign campaign, AtBContract contract) {
-
-    }
-
-    @Override
-    protected void setAtBContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
 
     }
 
@@ -121,7 +117,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private @Nullable AtBContract generateContract(Campaign campaign, int ratingMod, int negotiationSkill) {
+    private Optional<AtBContract> generateContract(Campaign campaign, int ratingMod, int negotiationSkill) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
         contract.setId(lastId);
@@ -134,7 +130,30 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         contract.setContractType(determineMission(campaign, employer));
         setEnemyCode(contract);
         setIsRiotDuty(contract);
-        return contract;
+        setAttacker(contract);
+        try {
+            setSystemId(contract);
+        } catch (NoContractLocationFoundException ex) {
+            return Optional.empty();
+        }
+        setAllyRating(contract, campaign.getGameYear());
+        setEnemyRating(contract, campaign.getGameYear());
+        if (contract.getContractType().isCadreDuty()) {
+            contract.setAllySkill(SkillLevel.GREEN);
+            contract.setAllyQuality(IUnitRating.DRAGOON_F);
+        }
+        contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
+        setContractClauses(contract, campaign);
+        contract.calculatePaymentMultiplier(campaign);
+        contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
+        contract.initContractDetails(campaign);
+        contract.calculateContract(campaign);
+        contract.setName(String.format("%s - %s - %s %s",
+            contract.getStartDate().format(DateTimeFormatter.ofPattern("yyyy")
+                .withLocale(MekHQ.getMHQOptions().getDateLocale())), employer,
+            contract.getSystem().getName(contract.getStartDate()), contract.getContractType()));
+
+        return Optional.of(contract);
     }
 
     private int getReputationModifier(Campaign campaign) {
@@ -232,6 +251,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             }
         }
         return findMissionType(getReputationModifier(campaign), employer.isISMajorOrSuperPower());
+    }
+
+    private void setContractClauses(AtBContract contract, Campaign campaign) {
+
     }
 
     private class ContractModifiers {

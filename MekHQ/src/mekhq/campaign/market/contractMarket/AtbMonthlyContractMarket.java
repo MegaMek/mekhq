@@ -303,7 +303,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
-        setAtBContractClauses(contract, unitRatingMod, campaign);
+        setContractClauses(contract, unitRatingMod, campaign);
 
         contract.calculatePaymentMultiplier(campaign);
 
@@ -438,7 +438,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followup.setEnemySkill(contract.getEnemySkill());
         followup.setEnemyQuality(contract.getEnemyQuality());
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
-        setAtBContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
+        setContractClauses(followup, campaign.getAtBUnitRatingMod(), campaign);
 
         followup.calculatePaymentMultiplier(campaign);
 
@@ -454,8 +454,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         followupContracts.put(followup.getId(), contract.getId());
     }
 
-    @Override
-    protected void setAtBContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
+    private void setContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
         ClauseMods mods = new ClauseMods();
         clauseMods.put(contract.getId(), mods);
 
