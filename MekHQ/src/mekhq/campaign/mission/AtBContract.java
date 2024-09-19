@@ -618,7 +618,7 @@ public class AtBContract extends Contract {
     public boolean isAttacker() {
         return isAttacker;
     }
-    
+
     public void setAttacker(boolean isAttacker) {
         this.isAttacker = isAttacker;
     }
