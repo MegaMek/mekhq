@@ -27,6 +27,7 @@ import java.util.Set;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -52,6 +53,8 @@ import mekhq.campaign.universe.Systems;
  * @author Neoancient
  */
 public class AtbMonthlyContractMarket extends AbstractContractMarket {
+    private static final MMLogger logger = MMLogger.create(AtbMonthlyContractMarket.class);
+
     public AtbMonthlyContractMarket() {
         super(ContractMarketMethod.ATB_MONTHLY);
     }

@@ -2,6 +2,7 @@ package mekhq.campaign.market.contractMarket;
 
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -17,6 +18,7 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 import java.util.*;
 
 public class CamOpsContractMarket extends AbstractContractMarket {
+    private static final MMLogger logger = MMLogger.create(CamOpsContractMarket.class);
     private static int BASE_NEGOTIATION_TARGET = 8;
     private static int EMPLOYER_NEGOTIATION_SKILL_LEVEL = 5;
 

@@ -29,7 +29,7 @@ public abstract class AbstractContractMarket {
     public static final int CLAUSE_TRANSPORT = 3;
     public static final int CLAUSE_NUM = 4;
 
-    protected static final MMLogger logger = MMLogger.create(AbstractContractMarket.class);
+
     protected List<Contract> contracts = new ArrayList<>();
     protected int lastId = 0;
     protected Map<Integer, Contract> contractIds = new HashMap<>();
@@ -56,6 +56,7 @@ public abstract class AbstractContractMarket {
     protected final static int MAXIMUM_ATTEMPTS_TO_FIND_NON_MERC_EMPLOYER = 20;
 
     private final ContractMarketMethod method;
+    private static final MMLogger logger = MMLogger.create(AbstractContractMarket.class);
 
 
     abstract public AtBContract addAtBContract(Campaign campaign);
@@ -434,7 +435,7 @@ public abstract class AbstractContractMarket {
         public int[] mods = {0, 0, 0, 0};
     }
 
-    public class NoContractLocationFoundException extends RuntimeException {
+    public static class NoContractLocationFoundException extends RuntimeException {
         public NoContractLocationFoundException(String message) {
             super(message);
         }
