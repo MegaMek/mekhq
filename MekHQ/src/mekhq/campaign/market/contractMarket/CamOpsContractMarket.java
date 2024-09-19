@@ -20,6 +20,9 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Contract Market as described in Campaign Operations, 4th printing.
+ */
 public class CamOpsContractMarket extends AbstractContractMarket {
     private static final MMLogger logger = MMLogger.create(CamOpsContractMarket.class);
     private static int BASE_NEGOTIATION_TARGET = 8;

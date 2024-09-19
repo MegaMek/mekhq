@@ -12,7 +12,6 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.ContractCommandRights;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -23,6 +22,10 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.util.*;
 
+/**
+ * Abstract base class for various Contract Market types in AtB/Stratcon. Responsible for generation
+ * and initialization of AtBContracts.
+ */
 public abstract class AbstractContractMarket {
     public static final int CLAUSE_COMMAND = 0;
     public static final int CLAUSE_SALVAGE = 1;
@@ -60,22 +63,52 @@ public abstract class AbstractContractMarket {
     private static final MMLogger logger = MMLogger.create(AbstractContractMarket.class);
 
 
+    /**
+     * Generate a new contract and add it to the market.
+     * @param campaign
+     * @return The newly generated contract
+     */
     abstract public AtBContract addAtBContract(Campaign campaign);
 
+    /**
+     * Generate available contract offers for the player's force.
+     * @param campaign
+     * @param newCampaign Boolean indicating whether this is a fresh campaign.
+     */
     abstract public void generateContractOffers(Campaign campaign, boolean newCampaign);
 
+    /**
+     * Add a followup contract to an existing contract.
+     * @param campaign
+     * @param contract
+     */
     abstract public void addFollowup(Campaign campaign, AtBContract contract);
 
+    /**
+     * Calculate the total payment modifier for the contract based on the configured market method
+     * (e.g., CAM_OPS, ATB_MONTHLY).
+     * @param campaign
+     * @param contract
+     * @return a double representing the total payment multiplier.
+     */
     abstract public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract);
 
     protected AbstractContractMarket(final ContractMarketMethod method) {
         this.method = method;
     }
 
+    /**
+     *
+     * @return the Method (e.g., CAM_OPS, ATB_MONTHLY) associated with the Contract Market instance
+     */
     public ContractMarketMethod getMethod() {
         return method;
     }
 
+    /**
+     * Empty an available contract from the market.
+     * @param c contract to remove
+     */
     public void removeContract(Contract c) {
         contracts.remove(c);
         contractIds.remove(c.getId());
@@ -83,6 +116,12 @@ public abstract class AbstractContractMarket {
         followupContracts.remove(c.getId());
     }
 
+    /**
+     * Rerolls a specific clause in a contract, usually via negotiation.
+     * @param c the contract being negotiated
+     * @param clause ID representing the type of clause.
+     * @param campaign
+     */
     public void rerollClause(AtBContract c, int clause, Campaign campaign) {
         if (null != clauseMods.get(c.getId())) {
             switch (clause) {
@@ -97,6 +136,12 @@ public abstract class AbstractContractMarket {
         }
     }
 
+    /**
+     * Returns the number of rerolls used so far for a specific clause.
+     * @param c
+     * @param clause ID representing the type of clause.
+     * @return
+     */
     public int getRerollsUsed(Contract c, int clause) {
         if (null != clauseMods.get(c.getId())) {
             return clauseMods.get(c.getId()).rerollsUsed[clause];
@@ -104,10 +149,17 @@ public abstract class AbstractContractMarket {
         return 0;
     }
 
+    /**
+     * @return a list of currently active contracts on the market
+     */
     public List<Contract> getContracts() {
         return contracts;
     }
 
+    /**
+     * Empties the market and generates a new batch of contract offers for an existing campaign.
+     * @param campaign
+     */
     public void generateContractOffers(Campaign campaign) {
         generateContractOffers(campaign, false);
     }
@@ -118,6 +170,13 @@ public abstract class AbstractContractMarket {
         }
     }
 
+    /**
+     * Determines the number of required lances to be deployed for a contract. For Mercenary subcontracts
+     * this defaults to 1; otherwise the number is based on the number of combat units in the campaign.
+     * @param campaign
+     * @param contract
+     * @return The number of lances required to be deployed.
+     */
     public int calculateRequiredLances(Campaign campaign, AtBContract contract) {
         int maxDeployedLances = calculateMaxDeployedLances(campaign);
         if (contract.isSubcontract()) {
@@ -128,6 +187,12 @@ public abstract class AbstractContractMarket {
         }
     }
 
+    /**
+     * Determine the maximum number of lances the force can deploy. The result is based on the
+     * commander's Strategy skill and various campaign options.
+     * @param campaign
+     * @return the maximum number of lances that can be deployed on the contract.
+     */
     public int calculateMaxDeployedLances(Campaign campaign) {
         return campaign.getCampaignOptions().getBaseStrategyDeployment() +
             campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
@@ -461,6 +526,10 @@ public abstract class AbstractContractMarket {
         public int[] mods = {0, 0, 0, 0};
     }
 
+    /**
+     * Exception indicating that no valid location was generated for a contract and that the contract
+     * is invalid.
+     */
     public static class NoContractLocationFoundException extends RuntimeException {
         public NoContractLocationFoundException(String message) {
             super(message);

@@ -4,6 +4,10 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 
 import java.time.LocalDate;
 
+/**
+ * Class representing a Hiring Hall on a world on specific dates. This data is statically defined in
+ * data/universe/atbconfig.xml.
+ */
 public class HiringHall {
     private HiringHallLevel level;
     private LocalDate startDate;
