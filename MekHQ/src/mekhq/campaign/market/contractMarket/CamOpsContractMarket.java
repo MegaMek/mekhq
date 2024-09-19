@@ -58,7 +58,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
             rollNegotiation(negotiationSkill, ratingMod + contractMods.offersMod) - BASE_NEGOTIATION_TARGET);
 
         for (int i = 0; i < numOffers; i++) {
-            Optional<AtBContract> c = generateContract(campaign, ratingMod, negotiationSkill);
+            Optional<AtBContract> c = generateContract(campaign);
             c.ifPresent(contract -> contracts.add(contract));
         }
         updateReport(campaign);
@@ -127,7 +127,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private Optional<AtBContract> generateContract(Campaign campaign, int ratingMod, int negotiationSkill) {
+    private Optional<AtBContract> generateContract(Campaign campaign) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
         contract.setId(lastId);
