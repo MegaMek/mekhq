@@ -261,7 +261,6 @@ public class AtBConfiguration {
         }
 
         // Return the selected table
-        logger.info("TABLE: " + table.select(rollMod));
         return table.select(rollMod);
     }
 
