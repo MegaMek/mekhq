@@ -21,22 +21,6 @@
  */
 package mekhq.campaign.force;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.Vector;
-import java.util.stream.Collectors;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
@@ -54,6 +38,13 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This is a hierarchical object to define forces for TO&amp;E. Each Force
@@ -748,24 +739,28 @@ public class Force {
     /**
      * Calculates the force's total BV, including sub forces.
      *
-     * @param c The working campaign.
+     * @param campaign The working campaign.
      * @return Total BV
      */
-    public int getTotalBV(Campaign c) {
+    public int getTotalBV(Campaign campaign) {
         int bvTotal = 0;
 
-        for (Force sforce : getSubForces()) {
-            bvTotal += sforce.getTotalBV(c);
+        for (Force subforce : getSubForces()) {
+            bvTotal += subforce.getTotalBV(campaign);
         }
 
-        for (UUID id : getUnits()) {
+        for (UUID unitId : getUnits()) {
             // no idea how this would happen, but sometimes a unit in a forces unit ID list
             // has an invalid ID?
-            if (c.getUnit(id) == null) {
+            if (campaign.getUnit(unitId) == null) {
                 continue;
             }
 
-            bvTotal += c.getUnit(id).getEntity().calculateBattleValue();
+            if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+                bvTotal += campaign.getUnit(unitId).getEntity().getGenericBattleValue();
+            } else {
+                bvTotal += campaign.getUnit(unitId).getEntity().calculateBattleValue();
+            }
         }
 
         return bvTotal;
