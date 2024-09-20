@@ -20,7 +20,6 @@ package mekhq.campaign.mission;
 
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.*;
-import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.StratConSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
@@ -54,7 +53,6 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.unit.Unit;
@@ -259,15 +257,11 @@ public class AtBDynamicScenarioFactory {
             effectiveBV = calculateEffectiveBV(scenario, campaign);
             effectiveUnitCount = calculateEffectiveUnitCount(scenario, campaign);
 
-            // This helps account for high BV forces, helping reduce low weight unit spam
-            int weightModifier = effectiveBV / 10000;
-
             for (ScenarioForceTemplate forceTemplate : currentForceTemplates) {
                 if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedMUL.ordinal()) {
                     generatedLanceCount += generateFixedForce(scenario, contract, campaign, forceTemplate);
                 } else {
                     int weightClass = randomForceWeight();
-                    logger.info("WEIGHT: " + weightClass);
 
                     generatedLanceCount += generateForce(scenario, contract, campaign,
                             effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
@@ -815,25 +809,6 @@ public class AtBDynamicScenarioFactory {
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
         return generatedLanceCount;
-    }
-
-    /**
-     * Retrieves the unit rating from the given campaign.
-     *
-     * @param campaign the campaign from which the unit rating is to be retrieved
-     * @return the unit rating value as an integer
-     */
-    private static int getUnitRating(Campaign campaign) {
-        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        final UnitRatingMethod unitRatingMethod = campaignOptions.getUnitRatingMethod();
-
-        int unitRating = IUnitRating.DRAGOON_C;
-        if (unitRatingMethod.isFMMR()) {
-            unitRating = campaign.getUnitRating().getUnitRatingAsInteger();
-        } else if (unitRatingMethod.isCampaignOperations()) {
-            unitRating = campaign.getReputation().getAtbModifier();
-        }
-        return unitRating;
     }
 
     /**
@@ -2030,9 +2005,6 @@ public class AtBDynamicScenarioFactory {
 
         final AbstractSkillGenerator skillGenerator = new StratConSkillGenerator();
         skillGenerator.setLevel(skill);
-        if (faction.isClan()) {
-            skillGenerator.setType(SkillGeneratorType.CLAN);
-        }
         int[] skills = skillGenerator.generateRandomSkills(en);
 
         if (faction.isClan() && (Compute.d6(2) > (6 - skill.ordinal() + skills[0] + skills[1]))) {
