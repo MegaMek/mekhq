@@ -744,7 +744,11 @@ public class AtBDynamicScenarioFactory {
             // tracking
             // list
             for (Entity ent : generatedLance) {
-                forceBV += ent.calculateBattleValue();
+                if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+                    forceBV += ent.getGenericBattleValue();
+                } else {
+                    forceBV += ent.calculateBattleValue();
+                }
                 generatedEntities.add(ent);
             }
 
@@ -767,31 +771,10 @@ public class AtBDynamicScenarioFactory {
             currentLanceWeightString = currentLanceWeightString.substring(1);
         }
 
-        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-            logger.info("Generated a force with " + forceBV + '/' + forceBVBudget + " BV");
-        }
-
         // If over budget for both BV and unit count, pull units until it works
         while (forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
             int targetUnit = Compute.randomInt(generatedEntities.size());
             generatedEntities.remove(targetUnit);
-        }
-
-        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-            int adjustedBvBudget = (int) (forceBVBudget * 1.25);
-
-            while ((forceBV > adjustedBvBudget) && (generatedEntities.size() > 1)) {
-                int targetUnit = Compute.randomInt(generatedEntities.size());
-                int battleValue = generatedEntities.get(targetUnit).calculateBattleValue();
-                forceBV -= battleValue;
-
-                logger.info("Culled " + generatedEntities.get(targetUnit).getDisplayName()
-                        + " (" + battleValue + " BV)");
-
-                generatedEntities.remove(targetUnit);
-            }
-
-            logger.info("Final BV (approximately) " + forceBV);
         }
 
         // Units with infantry bays get conventional infantry or battle armor added
@@ -815,6 +798,43 @@ public class AtBDynamicScenarioFactory {
                         isTainted,
                         scenario.getTemperature());
             }
+        }
+
+        // re-calculate forceBV to account for extra units just added
+        for (Entity entity : generatedEntities) {
+            if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+                forceBV += entity.getGenericBattleValue();
+            } else {
+                forceBV += entity.calculateBattleValue();
+            }
+        }
+
+        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+            logger.info("Generated a force with " + forceBV + '/' + forceBVBudget + " Generic BV");
+
+            int adjustedBvBudget = (int) (forceBVBudget * 1.25);
+
+            String balancingType = "";
+            while ((forceBV > adjustedBvBudget) && (generatedEntities.size() > 1)) {
+                int targetUnit = Compute.randomInt(generatedEntities.size());
+
+                int battleValue;
+                if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+                    battleValue = generatedEntities.get(targetUnit).getGenericBattleValue();
+                    balancingType = " Generic";
+                } else {
+                    battleValue = generatedEntities.get(targetUnit).calculateBattleValue();
+                }
+
+                forceBV -= battleValue;
+
+                logger.info("Culled " + generatedEntities.get(targetUnit).getDisplayName()
+                        + " (" + battleValue + balancingType + " BV)");
+
+                generatedEntities.remove(targetUnit);
+            }
+
+            logger.info("Final force " + forceBV + '/' + forceBVBudget + balancingType + " BV)");
         }
 
         BotForce generatedForce = new BotForce();
@@ -2423,7 +2443,8 @@ public class AtBDynamicScenarioFactory {
         for (UUID unitID : scenario.getIndividualUnitIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
             if ((forceTemplate != null) && forceTemplate.getContributesToBV()) {
-                bvBudget += campaign.getUnit(unitID).getEntity().calculateBattleValue();
+                // bvBudget += campaign.getUnit(unitID).getEntity().calculateBattleValue();
+                bvBudget += campaign.getUnit(unitID).getEntity().getGenericBattleValue();
             }
         }
 
@@ -2520,7 +2541,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return the randomly generated {@link EntityWeightClass}
      */
-    private static int randomForceWeight() {
+    public static int randomForceWeight() {
         int roll = Compute.d6(2);
 
         return switch (roll) {
