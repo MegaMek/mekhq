@@ -24,7 +24,6 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.StratConSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
-import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
@@ -190,12 +189,11 @@ public class AtBDynamicScenarioFactory {
         scenario.getExternalIDLookup().clear();
         scenario.getBotUnitTemplates().clear();
 
-        // fix the force weight class and unit count at the current time.
-        int randomForceWeight = randomForceWeight(scenario, campaign);
+        // fix the force unit count at the current time.
         int playerForceUnitCount = calculateEffectiveUnitCount(scenario, campaign);
 
         // at this point, only the player forces are present and contributing to BV/unit count
-        int generatedLanceCount = generateForces(scenario, contract, campaign, randomForceWeight);
+        int generatedLanceCount = generateForces(scenario, contract, campaign);
 
         // approximate estimate, anyway.
         scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
@@ -228,11 +226,9 @@ public class AtBDynamicScenarioFactory {
      * @param contract    The contract on which we're currently working. Used for
      *                    skill/quality/planetary info parameters
      * @param campaign    The current campaign
-     * @param weightClass The average weight class across all forces
      * @return How many "lances" or other individual units were generated?
      */
-    private static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
-            int weightClass) {
+    private static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign) {
         int generatedLanceCount = 0;
         List<ScenarioForceTemplate> forceTemplates = scenario.getTemplate().getAllScenarioForces();
 
@@ -251,7 +247,7 @@ public class AtBDynamicScenarioFactory {
 
         // sort it by bucket in ascending order just in case
         Collections.sort(generationOrders);
-        int playerEffectiveBv = calculateEffectiveBV(scenario, campaign);
+        int effectiveBV;
         int effectiveUnitCount;
 
         // loop through all the generation orders we have, in ascending order
@@ -260,20 +256,21 @@ public class AtBDynamicScenarioFactory {
         // recalculate effective BV and unit count each time we change levels
         for (int generationOrder : generationOrders) {
             List<ScenarioForceTemplate> currentForceTemplates = orderedForceTemplates.get(generationOrder);
-            int totalEffectiveBv = playerEffectiveBv + getBotForcesBvBudgetAdjustment(scenario, campaign);
-
+            effectiveBV = calculateEffectiveBV(scenario, campaign);
             effectiveUnitCount = calculateEffectiveUnitCount(scenario, campaign);
 
-            // This helps account for high BV player forces, helping reduce low weight unit spam
-            int weightModifier = playerEffectiveBv / 10000;
-            weightClass = Math.min(EntityWeightClass.WEIGHT_ASSAULT, weightClass + weightModifier);
+            // This helps account for high BV forces, helping reduce low weight unit spam
+            int weightModifier = effectiveBV / 10000;
 
             for (ScenarioForceTemplate forceTemplate : currentForceTemplates) {
                 if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedMUL.ordinal()) {
                     generatedLanceCount += generateFixedForce(scenario, contract, campaign, forceTemplate);
                 } else {
+                    int weightClass = randomForceWeight();
+                    logger.info("WEIGHT: " + weightClass);
+
                     generatedLanceCount += generateForce(scenario, contract, campaign,
-                            totalEffectiveBv, effectiveUnitCount, weightClass, forceTemplate, false);
+                            effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
                 }
             }
         }
@@ -608,7 +605,6 @@ public class AtBDynamicScenarioFactory {
 
                 // All other unit types use the force generator system to randomly select units
             } else {
-
                 // Determine unit types for each unit of the formation. Normally this is all one
                 // type, but SPECIAL_UNIT_TYPE_ATB_MIX may generate all Meks, all vehicles, or
                 // a Mek/vehicle mixed formation.
@@ -2450,25 +2446,12 @@ public class AtBDynamicScenarioFactory {
 
         bvBudget += (int) Math.round(bvBudget * scenario.getEffectivePlayerBVMultiplier());
 
-        return bvBudget;
-    }
-
-    /**
-     * This method calculates the budget adjustment for the Bot forces.
-     *
-     * @param scenario The game scenario.
-     * @param campaign The ongoing campaign.
-     * @return The BV budget adjustment from friendly Bot forces.
-     */
-    private static int getBotForcesBvBudgetAdjustment(AtBDynamicScenario scenario, Campaign campaign) {
-        int bvBudget = 0;
-
         // allied bot forces that contribute to BV do not get multiplied by the
-        // difficulty even if the player is perfect, the AI doesn't get any better
+        // difficulty
+        // even if the player is super good, the AI doesn't get any better
         for (int index = 0; index < scenario.getNumBots(); index++) {
             BotForce botForce = scenario.getBotForce(index);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
-
             if (forceTemplate != null && forceTemplate.getContributesToBV()) {
                 bvBudget += botForce.getTotalBV(campaign);
             }
@@ -2546,25 +2529,16 @@ public class AtBDynamicScenarioFactory {
     /**
      * Generates a random force weight for a given scenario.
      *
-     * @param scenario the scenario the weight is being generated for
-     * @param campaign the current campaign
      * @return the randomly generated {@link EntityWeightClass}
      */
-    private static int randomForceWeight(AtBDynamicScenario scenario, Campaign campaign) {
+    private static int randomForceWeight() {
         int roll = Compute.d6(2);
 
-        roll += scenario.getContract(campaign).getEnemyQuality() - IUnitRating.DRAGOON_C;
-
-        roll = MathUtility.clamp(roll, 2, 12);
-
-        // this is based on the random force weight table found in Total Warfare
         return switch (roll) {
-            case 2, 3 -> EntityWeightClass.WEIGHT_ULTRA_LIGHT;
-            case 4, 5 -> EntityWeightClass.WEIGHT_LIGHT;
-            case 8, 9 -> EntityWeightClass.WEIGHT_HEAVY;
-            case 10, 11 -> EntityWeightClass.WEIGHT_ASSAULT;
-            case 12 -> EntityWeightClass.WEIGHT_SUPER_HEAVY;
-            default -> EntityWeightClass.WEIGHT_MEDIUM; // 6, 7
+            case 2, 3, 4 -> EntityWeightClass.WEIGHT_LIGHT;
+            case 8, 9, 10 -> EntityWeightClass.WEIGHT_HEAVY;
+            case 11, 12 -> EntityWeightClass.WEIGHT_ASSAULT;
+            default -> EntityWeightClass.WEIGHT_MEDIUM; // 5, 6, 7
         };
     }
 
