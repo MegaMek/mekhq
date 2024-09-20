@@ -833,43 +833,6 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        // re-calculate forceBV to account for extra units just added
-        for (Entity entity : generatedEntities) {
-            if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-                forceBV += entity.getGenericBattleValue();
-            } else {
-                forceBV += entity.calculateBattleValue();
-            }
-        }
-
-        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-            logger.info("Generated a force with " + forceBV + '/' + forceBVBudget + " Generic BV");
-
-            int adjustedBvBudget = (int) (forceBVBudget * 1.25);
-
-            String balancingType = "";
-            while ((forceBV > adjustedBvBudget) && (generatedEntities.size() > 1)) {
-                int targetUnit = Compute.randomInt(generatedEntities.size());
-
-                int battleValue;
-                if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-                    battleValue = generatedEntities.get(targetUnit).getGenericBattleValue();
-                    balancingType = " Generic";
-                } else {
-                    battleValue = generatedEntities.get(targetUnit).calculateBattleValue();
-                }
-
-                forceBV -= battleValue;
-
-                logger.info("Culled " + generatedEntities.get(targetUnit).getDisplayName()
-                        + " (" + battleValue + balancingType + " BV)");
-
-                generatedEntities.remove(targetUnit);
-            }
-
-            logger.info("Final force " + forceBV + '/' + forceBVBudget + balancingType + " BV)");
-        }
-
         BotForce generatedForce = new BotForce();
         generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
