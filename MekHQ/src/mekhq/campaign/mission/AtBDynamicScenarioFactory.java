@@ -767,17 +767,31 @@ public class AtBDynamicScenarioFactory {
             currentLanceWeightString = currentLanceWeightString.substring(1);
         }
 
+        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+            logger.info("Generated a force with " + forceBV + '/' + forceBVBudget + " BV");
+        }
+
         // If over budget for both BV and unit count, pull units until it works
         while (forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
-            generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
+            int targetUnit = Compute.randomInt(generatedEntities.size());
+            generatedEntities.remove(targetUnit);
         }
 
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-            while (((forceBV / forceBVBudget * 100) > targetPercentage) && (generatedEntities.size() > 1)) {
-                int targetEntity = Compute.randomInt(generatedEntities.size());
-                forceBV -= generatedEntities.get(targetEntity).calculateBattleValue();
-                generatedEntities.remove(targetEntity);
+            int adjustedBvBudget = (int) (forceBVBudget * 1.25);
+
+            while ((forceBV > adjustedBvBudget) && (generatedEntities.size() > 1)) {
+                int targetUnit = Compute.randomInt(generatedEntities.size());
+                int battleValue = generatedEntities.get(targetUnit).calculateBattleValue();
+                forceBV -= battleValue;
+
+                logger.info("Culled " + generatedEntities.get(targetUnit).getDisplayName()
+                        + " (" + battleValue + " BV)");
+
+                generatedEntities.remove(targetUnit);
             }
+
+            logger.info("Final BV (approximately) " + forceBV);
         }
 
         // Units with infantry bays get conventional infantry or battle armor added
@@ -2401,8 +2415,7 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
             if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                int forceBVBudget = (int) (campaign.getForce(forceID).getTotalBV(campaign) * difficultyMultiplier);
-                bvBudget += forceBVBudget;
+                bvBudget += campaign.getForce(forceID).getTotalBV(campaign);
             }
         }
 
@@ -2410,13 +2423,17 @@ public class AtBDynamicScenarioFactory {
         for (UUID unitID : scenario.getIndividualUnitIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
             if ((forceTemplate != null) && forceTemplate.getContributesToBV()) {
-                int unitBVBudget = (int) (campaign.getUnit(unitID).getEntity().calculateBattleValue()
-                        * difficultyMultiplier);
-                bvBudget += unitBVBudget;
+                bvBudget += campaign.getUnit(unitID).getEntity().calculateBattleValue();
             }
         }
 
-        bvBudget += (int) Math.round(bvBudget * scenario.getEffectivePlayerBVMultiplier());
+        double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
+
+        if (bvMultiplier > 0) {
+            bvBudget = (int) Math.round(bvBudget * scenario.getEffectivePlayerBVMultiplier() * difficultyMultiplier);
+        } else {
+            bvBudget = (int) Math.round(bvBudget * difficultyMultiplier);
+        }
 
         // allied bot forces that contribute to BV do not get multiplied by the
         // difficulty
