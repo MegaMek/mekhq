@@ -52,7 +52,6 @@
 /out/
 /RemoteSystemsTempFiles/
 /.classpath
-/.editorconfig
 /.metadata
 /.project
 /.vscode
