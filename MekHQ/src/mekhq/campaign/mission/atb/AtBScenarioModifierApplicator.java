@@ -64,12 +64,15 @@ public class AtBScenarioModifierApplicator {
     }
 
     /**
-     * Adds the given force to the scenario after primary forces have been
-     * generated.
+     * Adds the given force to the scenario after primary forces have been generated.
+     *
+     * @param campaign the current campaign
+     * @param scenario the current scenario
+     * @param templateToApply the force template to apply to the scenario
      */
     private static void postAddForce(Campaign campaign, AtBDynamicScenario scenario,
             ScenarioForceTemplate templateToApply) {
-        int effectiveBV = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign);
+        int effectiveBV = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
         int effectiveUnitCount = AtBDynamicScenarioFactory.calculateEffectiveUnitCount(scenario, campaign);
         int deploymentZone = AtBDynamicScenarioFactory.calculateDeploymentZone(templateToApply, scenario,
                 templateToApply.getForceName());

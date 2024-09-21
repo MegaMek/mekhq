@@ -739,14 +739,16 @@ public class Force {
     /**
      * Calculates the force's total BV, including sub forces.
      *
-     * @param campaign The working campaign.
-     * @return Total BV
+     * @param campaign The working campaign. This is the campaign object that the force belongs to.
+     * @param forceStandardBattleValue Flag indicating whether to override campaign settings that
+     *                                 call for the use of Generic BV
+     * @return The total battle value (BV) of the force.
      */
-    public int getTotalBV(Campaign campaign) {
+    public int getTotalBV(Campaign campaign, boolean forceStandardBattleValue) {
         int bvTotal = 0;
 
         for (Force subforce : getSubForces()) {
-            bvTotal += subforce.getTotalBV(campaign);
+            bvTotal += subforce.getTotalBV(campaign, forceStandardBattleValue);
         }
 
         for (UUID unitId : getUnits()) {
@@ -756,7 +758,7 @@ public class Force {
                 continue;
             }
 
-            if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            if (campaign.getCampaignOptions().isUseGenericBattleValue() && !forceStandardBattleValue) {
                 bvTotal += campaign.getUnit(unitId).getEntity().getGenericBattleValue();
             } else {
                 bvTotal += campaign.getUnit(unitId).getEntity().calculateBattleValue();

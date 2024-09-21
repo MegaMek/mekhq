@@ -257,7 +257,7 @@ public class AtBDynamicScenarioFactory {
         // recalculate effective BV and unit count each time we change levels
         for (int generationOrder : generationOrders) {
             List<ScenarioForceTemplate> currentForceTemplates = orderedForceTemplates.get(generationOrder);
-            effectiveBV = calculateEffectiveBV(scenario, campaign);
+            effectiveBV = calculateEffectiveBV(scenario, campaign, false);
             effectiveUnitCount = calculateEffectiveUnitCount(scenario, campaign);
 
             for (ScenarioForceTemplate forceTemplate : currentForceTemplates) {
@@ -806,7 +806,6 @@ public class AtBDynamicScenarioFactory {
 
                 generatedEntities.remove(targetUnit);
             }
-
             logger.info("Final force " + forceBV + '/' + adjustedBvBudget + balancingType + " BV)");
         }
 
@@ -830,6 +829,26 @@ public class AtBDynamicScenarioFactory {
                         isLowPressure,
                         isTainted,
                         scenario.getTemperature());
+            }
+        }
+
+        // simulate bidding away of forces
+        if (faction.isClan() && campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            logger.info("Beginning to bid away forces");
+
+            int playerBattleValue = calculateEffectiveBV(scenario, campaign, true);
+            int enemyBattleValue = 0;
+
+            for (Entity entity : generatedEntities) {
+                enemyBattleValue += entity.calculateBattleValue();
+            }
+
+            while ((enemyBattleValue > (playerBattleValue * 1.1)) && (generatedEntities.size() > 1)) {
+                int targetUnit = Compute.randomInt(generatedEntities.size());
+                enemyBattleValue -= generatedEntities.get(targetUnit).calculateBattleValue();
+                logger.info("Bid away " + generatedEntities.get(targetUnit).getDisplayName());
+
+                generatedEntities.remove(targetUnit);
             }
         }
 
@@ -2421,7 +2440,8 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The campaign in which the scenario resides.
      * @return Effective BV.
      */
-    public static int calculateEffectiveBV(AtBDynamicScenario scenario, Campaign campaign) {
+    public static int calculateEffectiveBV(AtBDynamicScenario scenario, Campaign campaign,
+                                           boolean forceStandardBattleValue) {
         // for each deployed player and bot force that's marked as contributing to the
         // BV budget
         int bvBudget = 0;
@@ -2431,7 +2451,7 @@ public class AtBDynamicScenarioFactory {
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
             if (forceTemplate != null && forceTemplate.getContributesToBV()) {
-                bvBudget += campaign.getForce(forceID).getTotalBV(campaign);
+                bvBudget += campaign.getForce(forceID).getTotalBV(campaign, forceStandardBattleValue);
             }
         }
 
@@ -2439,7 +2459,7 @@ public class AtBDynamicScenarioFactory {
         for (UUID unitID : scenario.getIndividualUnitIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
             if ((forceTemplate != null) && forceTemplate.getContributesToBV()) {
-                if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+                if (campaign.getCampaignOptions().isUseGenericBattleValue() && !forceStandardBattleValue) {
                     bvBudget += campaign.getUnit(unitID).getEntity().getGenericBattleValue();
                 } else {
                     bvBudget += campaign.getUnit(unitID).getEntity().calculateBattleValue();
