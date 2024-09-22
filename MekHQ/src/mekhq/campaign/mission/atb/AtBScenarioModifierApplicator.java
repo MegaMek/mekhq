@@ -73,7 +73,7 @@ public class AtBScenarioModifierApplicator {
     private static void postAddForce(Campaign campaign, AtBDynamicScenario scenario,
             ScenarioForceTemplate templateToApply) {
         int effectiveBV = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
-        int effectiveUnitCount = AtBDynamicScenarioFactory.calculateEffectiveUnitCount(scenario, campaign);
+        int effectiveUnitCount = AtBDynamicScenarioFactory.calculateEffectiveUnitCount(scenario, campaign, false);
         int deploymentZone = AtBDynamicScenarioFactory.calculateDeploymentZone(templateToApply, scenario,
                 templateToApply.getForceName());
 

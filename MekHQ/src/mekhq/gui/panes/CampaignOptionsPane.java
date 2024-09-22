@@ -667,6 +667,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // scenarios
     private JCheckBox chkUseGenericBattleValue;
+    private JCheckBox chkUseVerboseBidding;
     private JCheckBox chkDoubleVehicles;
     private JSpinner spnOpForLanceTypeMeks;
     private JSpinner spnOpForLanceTypeMixed;
@@ -3223,6 +3224,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkUseGenericBattleValue, gridBagConstraints);
+
+        chkUseVerboseBidding = new JCheckBox(resources.getString("chkUseVerboseBidding.text"));
+        chkUseVerboseBidding.setToolTipText(wordWrap(resources.getString("chkUseVerboseBidding.toolTipText")));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(chkUseVerboseBidding, gridBagConstraints);
 
         chkDoubleVehicles = new JCheckBox(resources.getString("chkDoubleVehicles.text"));
         chkDoubleVehicles.setToolTipText(resources.getString("chkDoubleVehicles.toolTipText"));
@@ -9045,6 +9057,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkGenerateChases.setSelected(options.isGenerateChases());
 
         chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());
+        chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
         chkDoubleVehicles.setSelected(options.isDoubleVehicles());
         spnOpForLanceTypeMeks.setValue(options.getOpForLanceTypeMeks());
         spnOpForLanceTypeMixed.setValue(options.getOpForLanceTypeMixed());
@@ -9634,6 +9647,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setClanVehicles(chkClanVehicles.isSelected());
             options.setAutoConfigMunitions(chkAutoConfigMunitions.isSelected());
             options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
+            options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
             options.setDoubleVehicles(chkDoubleVehicles.isSelected());
             options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
             options.setOpForLanceTypeMeks((Integer) spnOpForLanceTypeMeks.getValue());

@@ -22,6 +22,7 @@
 package mekhq.campaign.force;
 
 import megamek.Version;
+import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
@@ -45,6 +46,8 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.lang.Math.round;
 
 /**
  * This is a hierarchical object to define forces for TO&amp;E. Each Force
@@ -567,8 +570,7 @@ public class Force {
             // to get
             // the ordinal of the force's status. Then assign the operational status to
             // this.
-            final int index = (int) Math
-                    .round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
+            final int index = (int) round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
             final LayeredForceIconOperationalStatus status = LayeredForceIconOperationalStatus.values()[index];
             ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER,
                     new ArrayList<>());
@@ -766,6 +768,44 @@ public class Force {
         }
 
         return bvTotal;
+    }
+
+    /**
+     * Calculates the total count of units in the given force, including all sub forces.
+     *
+     * @param campaign the current campaign
+     * @param isClanBidding flag to indicate whether clan bidding is being performed
+     * @return the total count of units in the force (including sub forces)
+     */
+    public int getTotalUnitCount(Campaign campaign, boolean isClanBidding) {
+        int unitTotal = 0;
+
+        for (Force subforce : getSubForces()) {
+            unitTotal += subforce.getTotalUnitCount(campaign, isClanBidding);
+        }
+
+        // If we're getting the unit count specifically for Clan Bidding, we don't want to count
+        // Conventional Infantry, and we only count Battle Armor as half a unit.
+        // If we're not performing Clan Bidding, we just need the total count of units.
+        if (isClanBidding) {
+            double rollingCount = 0;
+
+            for (UUID unitId : getUnits()) {
+                Entity unit = campaign.getUnit(unitId).getEntity();
+
+                if (unit.isBattleArmor()) {
+                    rollingCount += 0.5;
+                } else if (!unit.isConventionalInfantry()) {
+                    rollingCount++;
+                }
+            }
+
+            unitTotal += (int) round(rollingCount);
+        } else {
+            unitTotal += getUnits().size();
+        }
+
+        return unitTotal;
     }
 
     /**
