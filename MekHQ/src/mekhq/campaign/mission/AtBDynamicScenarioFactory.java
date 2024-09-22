@@ -36,6 +36,7 @@ import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
 import megamek.utilities.BoardClassifier;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
@@ -50,7 +51,9 @@ import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
@@ -59,11 +62,12 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.enums.EraFlag;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -93,7 +97,10 @@ public class AtBDynamicScenarioFactory {
     private static final int COMSTAR_LANCE_SIZE = 6;
 
     private static final int REINFORCEMENT_ARRIVAL_SCALE = 30;
-    private static final Logger log = LogManager.getLogger(AtBDynamicScenarioFactory.class);
+
+    private static final ResourceBundle resources = ResourceBundle.getBundle(
+            "mekhq.resources.AtBDynamicScenarioFactory",
+            MekHQ.getMHQOptions().getLocale());
 
     /**
      * Method that sets some initial scenario parameters from the given template,
@@ -744,7 +751,8 @@ public class AtBDynamicScenarioFactory {
 
                 forceBV -= battleValue;
 
-                logger.info("Culled " + generatedEntities.get(targetUnit).getDisplayName() + " (" + battleValue + balancingType + " BV)");
+                logger.info("Culled " + generatedEntities.get(targetUnit).getDisplayName()
+                        + " (" + battleValue + balancingType + " BV)");
 
                 generatedEntities.remove(targetUnit);
             }
@@ -752,7 +760,8 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Units with infantry bays get conventional infantry or battle armor added
-        List<Entity> transportedEntities = fillTransports(scenario, generatedEntities, factionCode, skill, quality, requiredRoles, allowsConvInfantry, campaign);
+        List<Entity> transportedEntities = fillTransports(scenario, generatedEntities, factionCode,
+                skill, quality, requiredRoles, allowsConvInfantry, campaign);
         generatedEntities.addAll(transportedEntities);
 
         if (!transportedEntities.isEmpty()) {
@@ -762,79 +771,246 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        // Simulate bidding away of forces
-        List<String> bidAwayForces = new ArrayList<>();
-        int supplementedForces = 0;
-
-        if (faction.isClan() && campaign.getCampaignOptions().isUseGenericBattleValue()) {
-            bidAwayForces = new ArrayList<>();
-
-            // Player force values
-            int playerBattleValue = calculateEffectiveBV(scenario, campaign, true);
-            int playerUnitValue = calculateEffectiveUnitCount(scenario, campaign, true);
-
-            // Bot force values
-            int botBattleValue = 0;
-            for (Entity entity : generatedEntities) {
-                botBattleValue += entity.calculateBattleValue();
-            }
-
-            // First bid away units that exceed the player's estimated Battle Value
-            while ((botBattleValue > (playerBattleValue * 1.5)) && (generatedEntities.size() > 1)) {
-                int targetUnit = Compute.randomInt(generatedEntities.size());
-                bidAwayForces.add(generatedEntities.get(targetUnit).getShortNameRaw());
-
-                botBattleValue -= generatedEntities.get(targetUnit).calculateBattleValue();
-                generatedEntities.remove(targetUnit);
-            }
-
-            // Next, if the size of the forces results in a Player:Bot unit count ratio of >= 2:1,
-            // add additional units of Battle Armor to compensate.
-            int sizeDisparity = playerUnitValue - generatedEntities.size();
-            sizeDisparity = (int) round(sizeDisparity * 0.5);
-
-            List<Entity> allRemainingUnits = new ArrayList<>(generatedEntities);
-            Collections.shuffle(allRemainingUnits);
-
-            // First, attempt to add Mechanized Battle Armor
-            Iterator<Entity> entityIterator = allRemainingUnits.iterator();
-            while (entityIterator.hasNext() && sizeDisparity > 0) {
-                Entity entity = entityIterator.next();
-                if (!entity.isOmni()) {
-                    continue;
-                }
-
-                List<Entity> generatedBA = generateBAForNova(scenario, List.of(entity), factionCode, skill, quality, campaign, true);
-
-                if (!generatedBA.isEmpty()) {
-                    generatedEntities.addAll(generatedBA);
-                    supplementedForces += generatedBA.size();
-                    sizeDisparity -= generatedBA.size();
-                }
-            }
-
-            // If there is still a disproportionate size disparity, add loose Battle Armor
-            for (int i = 0; i < sizeDisparity; i++) {
-                Entity newEntity = getEntity(factionCode, skill, quality, UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED, campaign);
-                if (newEntity != null) {
-                    generatedEntities.add(newEntity);
-                    supplementedForces++;
-                }
-            }
-        }
-
         // Generate the force
         BotForce generatedForce = new BotForce();
         generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
-        // Report the bidding results (if any) to the player
-        if (!bidAwayForces.isEmpty() || supplementedForces > 0) {
-            reportResultsOfBidding(scenario, campaign, bidAwayForces, generatedForce, supplementedForces);
+        boolean batchallAccepted = initiateBatchall(campaign, factionCode, generatedForce, contract.getName(), scenario.getName());
+
+        if (batchallAccepted) {
+            // Simulate bidding away of forces
+            List<String> bidAwayForces = new ArrayList<>();
+            int supplementedForces = 0;
+
+            if (faction.isClan() && campaign.getCampaignOptions().isUseGenericBattleValue()) {
+                // Add dialog
+                bidAwayForces = new ArrayList<>();
+
+                // Player force values
+                int playerBattleValue = calculateEffectiveBV(scenario, campaign, true);
+                int playerUnitValue = calculateEffectiveUnitCount(scenario, campaign, true);
+
+                // Bot force values
+                int botBattleValue = 0;
+                for (Entity entity : generatedForce.getFullEntityList(campaign)) {
+                    botBattleValue += entity.calculateBattleValue();
+                }
+
+                // First bid away units that exceed the player's estimated Battle Value
+                while ((botBattleValue > (playerBattleValue * 1.5)) && (generatedForce.getFullEntityList(campaign).size() > 1)) {
+                    int targetUnit = Compute.randomInt(generatedForce.getFullEntityList(campaign).size());
+                    bidAwayForces.add(generatedForce.getFullEntityList(campaign).get(targetUnit).getShortNameRaw());
+                    botBattleValue -= generatedForce.getFullEntityList(campaign).get(targetUnit).calculateBattleValue();
+                    generatedForce.removeEntity(targetUnit);
+                }
+
+                // Next, if the size of the forces results in a Player:Bot unit count ratio of >= 2:1,
+                // add additional units of Battle Armor to compensate.
+                int sizeDisparity = playerUnitValue - generatedForce.getFullEntityList(campaign).size();
+                sizeDisparity = (int) round(sizeDisparity * 0.5);
+
+                List<Entity> allRemainingUnits = new ArrayList<>(generatedForce.getFullEntityList(campaign));
+                Collections.shuffle(allRemainingUnits);
+
+                // First, attempt to add Mechanized Battle Armor
+                Iterator<Entity> entityIterator = allRemainingUnits.iterator();
+                while (entityIterator.hasNext() && sizeDisparity > 0) {
+                    Entity entity = entityIterator.next();
+                    if (!entity.isOmni()) {
+                        continue;
+                    }
+
+                    List<Entity> generatedBA = generateBAForNova(scenario, List.of(entity), factionCode,
+                            skill, quality, campaign, true);
+
+                    if (!generatedBA.isEmpty()) {
+                        for (Entity battleArmor : generatedBA) {
+                            generatedForce.addEntity(battleArmor);
+                        }
+                        supplementedForces += generatedBA.size();
+                        sizeDisparity -= generatedBA.size();
+                    }
+                }
+
+                // If there is still a disproportionate size disparity, add loose Battle Armor
+                for (int i = 0; i < sizeDisparity; i++) {
+                    Entity newEntity = getEntity(factionCode, skill, quality, UnitType.BATTLE_ARMOR,
+                            UNIT_WEIGHT_UNSPECIFIED, campaign);
+                    if (newEntity != null) {
+                        generatedForce.addEntity(newEntity);
+                        supplementedForces++;
+                    }
+                }
+            }
+
+            // Report the bidding results (if any) to the player
+            if (!bidAwayForces.isEmpty() || supplementedForces > 0) {
+                reportResultsOfBidding(scenario, campaign, bidAwayForces, generatedForce, supplementedForces);
+            }
         }
 
         return generatedLanceCount;
+    }
+
+    /**
+     * Initiates a batchall. Prompts the player with a message and options to accept or refuse the
+     * batchall.
+     *
+     * @param campaign       The campaign object.
+     * @param factionCode    The faction code.
+     * @param generatedForce The generated force object.
+     * @param contractName   The contract name.
+     * @param scenarioName   The scenario name.
+     * @return {@code true} if the batchall is accepted, {@code false} otherwise.
+     */
+    private static boolean initiateBatchall(Campaign campaign, String factionCode, BotForce generatedForce,
+                                            String contractName, String scenarioName) {
+        // Set the title of the dialog
+        String title = resources.getString("incomingTransmission.title");
+
+        // Generate the list of entities involved in the campaign
+        List<Entity> entityList = generatedForce.getFullEntityList(campaign);
+        int unitCount = entityList.size();
+
+        int highestBattleValue = 0;
+        Entity commandEntity = null;
+
+        // Find the entity with the highest battle value
+        for (Entity entity : generatedForce.getFullEntityList(campaign)) {
+            int battleValue = entity.calculateBattleValue();
+
+            if (battleValue > highestBattleValue) {
+                highestBattleValue = battleValue;
+                commandEntity = entity;
+            }
+        }
+
+        // Hold the portrait of the commander
+        ImageIcon portrait = null;
+
+        // Assign an appropriate portrait to the commander
+        if (commandEntity != null) {
+            Person dummyPerson = new Person(campaign);
+            dummyPerson.setClanPersonnel(true);
+            dummyPerson.setPrimaryRole(campaign, deriveRoleFromUnitType(commandEntity));
+            campaign.assignRandomPortraitFor(dummyPerson);
+            commandEntity.getCrew().setPortrait(dummyPerson.getPortrait(), 0);
+            portrait = commandEntity.getCrew().getPortrait(0).getImageIcon(128);
+        }
+
+        // Determine the rank of the commander based on the unit count
+        String rank;
+        if (unitCount <= 5) {
+            rank = resources.getString("starCommander.text");
+        } else if (unitCount <= 15) {
+            rank = resources.getString("starCaptain.text");
+        } else {
+            rank = resources.getString("starColonel.text");
+        }
+
+        // Generate the batchall statement according to the faction code
+        String batchallStatement = switch (factionCode) {
+            case "CBS" -> resources.getString("batchallStatementCBS.text");
+            case "CB" -> resources.getString("batchallStatementCB.text");
+            case "CCC" -> resources.getString("batchallStatementCCC.text");
+            case "CCO" -> resources.getString("batchallStatementCCO.text");
+            case "CFM" -> resources.getString("batchallStatementCFM.text");
+            case "CGB" -> resources.getString("batchallStatementCGB.text");
+            case "CGS" -> resources.getString("batchallStatementCGS.text");
+            case "CHH" -> resources.getString("batchallStatementCHH.text");
+            case "CIH" -> resources.getString("batchallStatementCIH.text");
+            case "CJF" -> resources.getString("batchallStatementCJF.text");
+            case "CMG" -> resources.getString("batchallStatementCMG.text");
+            case "CNC" -> resources.getString("batchallStatementCNC.text");
+            case "CDS" -> resources.getString("batchallStatementCDS.text");
+            case "CSJ" -> resources.getString("batchallStatementCSJ.text");
+            case "CSR" -> resources.getString("batchallStatementCSR.text");
+            case "CSA" -> resources.getString("batchallStatementCSA.text");
+            case "CSV" -> resources.getString("batchallStatementCSV.text");
+            case "CSL" -> resources.getString("batchallStatementCSL.text");
+            case "CWI" -> resources.getString("batchallStatementCWI.text");
+            case "CW" -> resources.getString("batchallStatementCW.text");
+            case "CWIE" -> resources.getString("batchallStatementCWIE.text");
+            case "CWOV" -> resources.getString("batchallStatementCWOV.text");
+            default -> resources.getString("batchallStatementGeneric.text");
+        };
+
+        // Prepare the name of the commander
+        String commander = resources.getString("nameRedacted.text");
+        if (commandEntity != null) {
+            commander = commandEntity.getCrew().getName(0);
+        }
+
+        // Prepare the display message for the dialog
+        String message = String.format(resources.getString("batchallOpener.text"),
+                contractName, scenarioName, rank, commander, generatedForce.getName(),
+                campaign.getLocation().getPlanet().getName(campaign.getLocalDate()));
+        message = message + batchallStatement;
+        message = message + resources.getString("batchallCloser.text");
+
+        // Create a pane to display both the message and the commander's portrait
+        JTextPane textPane = new JTextPane();
+        textPane.setContentType("text/html");
+        textPane.setText(message);
+        textPane.setEditable(false);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        if (portrait != null) {
+            JLabel imageLabel = new JLabel(portrait);
+            panel.add(imageLabel, BorderLayout.CENTER);
+        }
+        panel.add(textPane, BorderLayout.SOUTH);
+
+        // Prepare the options for the dialog
+        Object[] options = {
+                resources.getString("responseAccept.text"),
+                resources.getString("responseRefuse.text")
+        };
+
+        // Display the dialog and capture the response
+        int optionDialog = JOptionPane.showOptionDialog(null, panel, title,
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+        // Handle the response
+        if (optionDialog == JOptionPane.NO_OPTION) {
+            // Report refusal of the batchall
+            campaign.addReport(resources.getString("refusalReport.text"));
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Derives the personnel role based on the unit type of the given entity.
+     *
+     * @param entity The entity whose unit type needs to be evaluated.
+     * @return The personnel role derived from the unit type of the entity.
+     */
+    private static PersonnelRole deriveRoleFromUnitType(Entity entity) {
+        if (entity.isAerospaceFighter()) {
+            return PersonnelRole.AEROSPACE_PILOT;
+        } else if (entity.isBattleArmor()) {
+            return PersonnelRole.BATTLE_ARMOUR;
+        } else if (entity.isConventionalFighter()) {
+            return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+        } else if (entity.isNaval()) {
+            return PersonnelRole.NAVAL_VEHICLE_DRIVER;
+        } else if (entity.isProtoMek()) {
+            return PersonnelRole.PROTOMEK_PILOT;
+        } else if (entity.isConventionalInfantry()) {
+            return PersonnelRole.SOLDIER;
+        } else if (entity.isAirborneVTOLorWIGE()) {
+            return PersonnelRole.VTOL_PILOT;
+        } else if (entity.isVehicle()) {
+            return PersonnelRole.GROUND_VEHICLE_DRIVER;
+        } else if (entity.isLargeCraft() || entity.isSmallCraft()) {
+            return PersonnelRole.VESSEL_PILOT;
+        } else {
+            return PersonnelRole.MEKWARRIOR;
+        }
     }
 
     /**
@@ -855,34 +1031,29 @@ public class AtBDynamicScenarioFactory {
         if (useVerboseBidding) {
             for (String unitName : bidAwayForces) {
                 if (report.isEmpty()) {
-                        report.append(generatedForce.getName()).append(" (<b>")
-                                .append(scenario.getName()).append('/')
-                                .append(scenario.getContract(campaign)).append("</b>")
-                                .append(") has bid away the following forces:<br><br>")
-                                .append(unitName).append("<br>");
+                    report.append(String.format(resources.getString("bidAwayForcesVerbose.text"),
+                            generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
+                            unitName));
                 } else {
                     report.append(unitName).append("<br>");
                 }
             }
         } else {
-            report.append(generatedForce.getName()).append(" (<b>")
-                    .append(scenario.getName()).append('/')
-                    .append(scenario.getContract(campaign)).append("</b>")
-                    .append(") has bid away ").append(bidAwayForces.size())
-                    .append(" units.");
+            report.append(String.format(resources.getString("bidAwayForces.text"),
+                    generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
+                    bidAwayForces.size()));
         }
 
         if (supplementedForces > 0) {
             if (report.isEmpty()) {
-                report.append(generatedForce.getName()).append(" (<b>").append(scenario.getName())
-                        .append('/').append(scenario.getContract(campaign)).append("</b>")
-                        .append(") has ");
+                report.append(String.format(resources.getString("addedBattleArmorNewReport.text"),
+                        generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
+                        supplementedForces));
             } else {
-                report.append(("They also"));
+                report.append(String.format(
+                        resources.getString("addedBattleArmorContinueReport.text"),
+                        supplementedForces));
             }
-
-            report.append(" supplemented their force with ")
-                    .append(supplementedForces).append(" additional units of Battle Armor.");
         }
 
         if (!report.isEmpty()) {
