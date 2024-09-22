@@ -802,7 +802,8 @@ public class AtBDynamicScenarioFactory {
                 }
 
                 // First bid away units that exceed the player's estimated Battle Value
-                while ((botBattleValue > (playerBattleValue * 1.5)) && (generatedForce.getFullEntityList(campaign).size() > 1)) {
+                while ((botBattleValue > (playerBattleValue * getHonorRating(campaign, factionCode)))
+                        && (generatedForce.getFullEntityList(campaign).size() > 1)) {
                     int targetUnit = Compute.randomInt(generatedForce.getFullEntityList(campaign).size());
                     bidAwayForces.add(generatedForce.getFullEntityList(campaign).get(targetUnit).getShortNameRaw());
                     botBattleValue -= generatedForce.getFullEntityList(campaign).get(targetUnit).calculateBattleValue();
@@ -858,6 +859,32 @@ public class AtBDynamicScenarioFactory {
         }
 
         return generatedLanceCount;
+    }
+
+    /**
+     * Calculates the honor rating for a given Clan.
+     *
+     * @param campaign    the ongoing campaign
+     * @param factionCode the faction code for which to calculate honor rating
+     * @return the honor rating as a double value
+     */
+    private static double getHonorRating(Campaign campaign, String factionCode) {
+        final double STRICT = 1.25;
+        final double OPPORTUNISTIC = 1.5;
+        final double LIBERAL = 1.75;
+
+        boolean isPostInvasion = campaign.getLocalDate().getYear() > 3061;
+
+        // This is based on the table found on page 274 of Total Warfare
+        // Any Clan not mentioned on that table is assumed to be Strict → Opportunistic
+        return switch (factionCode) {
+            case "CCC", "CHH", "CIH", "CNC", "CSR" -> OPPORTUNISTIC;
+            case "CCO", "CGS", "CSV" -> STRICT;
+            case "CGB", "CWIE" -> isPostInvasion ? STRICT : LIBERAL;
+            case "CDS" -> LIBERAL;
+            case "CW" -> isPostInvasion ? LIBERAL : OPPORTUNISTIC;
+            default -> isPostInvasion ? STRICT : OPPORTUNISTIC;
+        };
     }
 
     /**
