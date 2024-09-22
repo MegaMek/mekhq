@@ -1063,7 +1063,11 @@ public class AtBDynamicScenarioFactory {
         }
 
         if (!report.isEmpty()) {
-            report.append(resources.getString("batchallConcluded.text"));
+            if (Compute.randomInt(8) == 0) {
+                report.append(resources.getString("batchallConcludedVersion2.text"));
+            } else {
+                report.append(resources.getString("batchallConcludedVersion1.text"));
+            }
         }
 
         campaign.addReport(report.toString());
