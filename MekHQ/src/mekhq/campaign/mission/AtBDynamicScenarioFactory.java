@@ -777,7 +777,10 @@ public class AtBDynamicScenarioFactory {
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
-        boolean batchallAccepted = initiateBatchall(campaign, factionCode, generatedForce, contract.getName(), scenario.getName());
+        boolean batchallAccepted = true;
+        if (generatedForce.getTeam() != 1) {
+            batchallAccepted = initiateBatchall(campaign, factionCode, generatedForce, contract.getName(), scenario.getName());
+        }
 
         if (batchallAccepted) {
             // Simulate bidding away of forces
@@ -846,8 +849,11 @@ public class AtBDynamicScenarioFactory {
             }
 
             // Report the bidding results (if any) to the player
-            if (!bidAwayForces.isEmpty() || supplementedForces > 0) {
-                reportResultsOfBidding(scenario, campaign, bidAwayForces, generatedForce, supplementedForces);
+            if (generatedForce.getTeam() != 1) {
+                if (!bidAwayForces.isEmpty() || supplementedForces > 0) {
+                    reportResultsOfBidding(scenario, campaign, bidAwayForces, generatedForce,
+                            supplementedForces);
+                }
             }
         }
 
