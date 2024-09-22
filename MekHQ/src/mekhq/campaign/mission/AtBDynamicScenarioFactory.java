@@ -1063,7 +1063,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         if (!report.isEmpty()) {
-            report.append("<br></html>");
+            report.append(resources.getString("batchallConcluded.text"));
         }
 
         campaign.addReport(report.toString());
