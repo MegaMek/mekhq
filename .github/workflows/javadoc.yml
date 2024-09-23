@@ -1,4 +1,4 @@
-name: MekHQ CI with Gradle
+name: JavaDoc Generation
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ env:
   GRADLE_OPTS: "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
 
 jobs:
-  ci_cd:
+  javadoc:
     runs-on: ${{ matrix.os }}
 
     outputs:
@@ -82,35 +82,7 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          build-scan-publish: true
-          build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
-          build-scan-terms-of-use-agree: "yes"
-
-      - name: Add MHQRevision file
-        run: |
-          echo ${{ github.sha }} >> mekhq/MekHQ/mhq-revision.txt
 
       - name: Build with Gradle
         working-directory: mekhq
-        run: ./gradlew build  -x checkstyleMain -x checkstyleTest --stacktrace --scan
-
-      - name: Upload Test Logs on Failure
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: cd-failure-logs
-          path: ./mekhq/MekHQ/build/reports/
-
-      - name: CodeCov.io Coverage Report
-        uses: codecov/codecov-action@v4
-        with:
-          directory: ./mekhq/MekHQ/build/reports/jacoco/test
-          fail_ci_if_error: false
-          verbose: true
-
-      - name: Upload Tar GZ Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mhq-release-tgz-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-          path: mekhq/MekHQ/build/distributions/*.tar.gz
+        run: ./gradlew javadoc
