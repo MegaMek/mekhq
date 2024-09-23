@@ -730,7 +730,8 @@ public class AtBDynamicScenarioFactory {
             if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
                 balancingType = " Generic";
             }
-            logger.info("Generated a force with " + forceBV + '/' + forceBVBudget + ' ' + balancingType + " BV");
+            logger.info(String.format("Generated a force with %s / %s %s BV",
+                    forceBV, forceBVBudget, balancingType));
 
             int adjustedBvBudget = (int) (forceBVBudget * 1.25);
 
@@ -746,12 +747,14 @@ public class AtBDynamicScenarioFactory {
 
                 forceBV -= battleValue;
 
-                logger.info("Culled " + generatedEntities.get(targetUnit).getDisplayName()
-                        + " (" + battleValue + balancingType + " BV)");
+                logger.info(String.format("Culled %s (%s %s BV)",
+                        generatedEntities.get(targetUnit).getDisplayName(), battleValue, balancingType));
 
                 generatedEntities.remove(targetUnit);
             }
-            logger.info("Final force " + forceBV + '/' + adjustedBvBudget + balancingType + " BV)");
+
+            logger.info(String.format("Final force %s / %s %s BV",
+                    forceBV, adjustedBvBudget, balancingType));
         }
 
         // Units with infantry bays get conventional infantry or battle armor added
