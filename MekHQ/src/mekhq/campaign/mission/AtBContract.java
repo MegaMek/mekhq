@@ -21,25 +21,12 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
+import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
@@ -52,9 +39,12 @@ import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition;
@@ -64,6 +54,19 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -117,6 +120,7 @@ public class AtBContract extends Contract {
     protected LocalDate routEnd;
     protected int partsAvailabilityLevel;
     protected int sharesPct;
+    private boolean batchallAccepted;
 
     protected int playerMinorBreaches;
     protected int employerMinorBreaches;
@@ -140,6 +144,10 @@ public class AtBContract extends Contract {
     protected int nextWeekBattleTypeMod;
 
     private StratconCampaignState stratconCampaignState;
+
+    private static final ResourceBundle resources = ResourceBundle.getBundle(
+            "mekhq.resources.AtBContract",
+            MekHQ.getMHQOptions().getLocale());
 
     protected AtBContract() {
         this(null);
@@ -169,6 +177,7 @@ public class AtBContract extends Contract {
         extensionLength = 0;
 
         sharesPct = 0;
+        batchallAccepted = true;
         setMoraleLevel(AtBMoraleLevel.NORMAL);
         routEnd = null;
         numBonusParts = 0;
@@ -844,6 +853,7 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extensionLength", extensionLength);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesPct", sharesPct);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "batchallAccepted", batchallAccepted);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "playerMinorBreaches", playerMinorBreaches);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerMinorBreaches", employerMinorBreaches);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractScoreArbitraryModifier", contractScoreArbitraryModifier);
@@ -920,6 +930,8 @@ public class AtBContract extends Contract {
                     extensionLength = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("sharesPct")) {
                     sharesPct = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("batchallAccepted")) {
+                    batchallAccepted = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("numBonusParts")) {
                     numBonusParts = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("playerMinorBreaches")) {
@@ -1184,6 +1196,24 @@ public class AtBContract extends Contract {
         sharesPct = pct;
     }
 
+    /**
+     * Checks if the Batchall has been accepted for the contract.
+     *
+     * @return {@code true} if the Batchall has been accepted, {@code false} otherwise.
+     */
+    public boolean isBatchallAccepted() {
+        return batchallAccepted;
+    }
+
+    /**
+     * Sets the {@code batchallAccepted} flag for this contract.
+     *
+     * @param batchallAccepted The value to set for the {@code batchallAccepted} flag.
+     */
+    public void setBatchallAccepted(final boolean batchallAccepted) {
+        this.batchallAccepted = batchallAccepted;
+    }
+
     public void addPlayerMinorBreach() {
         playerMinorBreaches++;
     }
@@ -1321,6 +1351,231 @@ public class AtBContract extends Contract {
     protected static class AtBContractRef extends AtBContract {
         public AtBContractRef(int id) {
             setId(id);
+        }
+    }
+
+
+
+    /**
+     * Initiates a batchall.
+     * Prompts the player with a message and options to accept or refuse the batchall.
+     *
+     * @param campaign       The current campaign.
+     * @return {@code true} if the batchall is accepted, {@code false} otherwise.
+     */
+    public boolean initiateBatchall(Campaign campaign) {
+        // Set the title of the dialog
+        String title = resources.getString("incomingTransmission.title");
+
+        // Hold the portrait of the commander
+
+        // Generate the batchall statement and fetch the faction image
+        String batchallStatement;
+        final String PORTRAIT_DIRECTORY = "data/images/force/Pieces/Logos/Clan/";
+        final String PORTRAIT_FILE_TYPE = ".png";
+
+        ImageIcon portrait;
+
+        switch (enemyCode) {
+            case "CBS" -> {
+                batchallStatement = resources.getString("batchallStatementCBS.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Blood Spirit" + PORTRAIT_FILE_TYPE);
+            }
+            case "CB" -> {
+                batchallStatement = resources.getString("batchallStatementCB.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Burrock" + PORTRAIT_FILE_TYPE);
+            }
+            case "CCC" -> {
+                batchallStatement = resources.getString("batchallStatementCCC.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Cloud Cobra" + PORTRAIT_FILE_TYPE);
+            }
+            case "CCO" -> {
+                batchallStatement = resources.getString("batchallStatementCCO.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Coyote" + PORTRAIT_FILE_TYPE);
+            }
+            case "CDS" -> {
+                if (campaign.getGameYear() >= 3100) {
+                    batchallStatement = resources.getString("batchallStatementCDSSeaFox.text");
+                    portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Sea Fox" + PORTRAIT_FILE_TYPE);
+                } else {
+                    batchallStatement = resources.getString("batchallStatementCDS.text");
+                    portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Diamond Shark" + PORTRAIT_FILE_TYPE);
+                }
+            }
+            case "CFM" -> {
+                batchallStatement = resources.getString("batchallStatementCFM.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Fire Mandrill" + PORTRAIT_FILE_TYPE);
+            }
+            case "CGB" -> {
+                if (campaign.getGameYear() >= 3060) {
+                    batchallStatement = resources.getString("batchallStatementCGBDominion.text");
+                    portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Ghost Bear Dominion" + PORTRAIT_FILE_TYPE);
+                } else {
+                    batchallStatement = resources.getString("batchallStatementCGB.text");
+                    portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ghost Bear" + PORTRAIT_FILE_TYPE);
+                }
+            }
+            case "CGS" -> {
+                batchallStatement = resources.getString("batchallStatementCGS.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Goliath Scorpion" + PORTRAIT_FILE_TYPE);
+            }
+            case "CHH" -> {
+                batchallStatement = resources.getString("batchallStatementCHH.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Hell's Horses" + PORTRAIT_FILE_TYPE);
+            }
+            case "CIH" -> {
+                batchallStatement = resources.getString("batchallStatementCIH.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ice Hellion" + PORTRAIT_FILE_TYPE);
+            }
+            case "CJF" -> {
+                batchallStatement = resources.getString("batchallStatementCJF.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Jade Falcon" + PORTRAIT_FILE_TYPE);
+            }
+            case "CMG" -> {
+                batchallStatement = resources.getString("batchallStatementCMG.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Mongoose" + PORTRAIT_FILE_TYPE);
+            }
+            case "CNC" -> {
+                batchallStatement = resources.getString("batchallStatementCNC.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Nova Cat" + PORTRAIT_FILE_TYPE);
+            }
+            case "CSJ" -> {
+                batchallStatement = resources.getString("batchallStatementCSJ.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Smoke Jaguar" + PORTRAIT_FILE_TYPE);
+            }
+            case "CSR" -> {
+                batchallStatement = resources.getString("batchallStatementCSR.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Snow Raven" + PORTRAIT_FILE_TYPE);
+            }
+            case "CSA" -> {
+                batchallStatement = resources.getString("batchallStatementCSA.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Star Adder" + PORTRAIT_FILE_TYPE);
+            }
+            case "CSV" -> {
+                batchallStatement = resources.getString("batchallStatementCSV.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Steel Viper" + PORTRAIT_FILE_TYPE);
+            }
+            case "CSL" -> {
+                batchallStatement = resources.getString("batchallStatementCSL.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Stone Lion" + PORTRAIT_FILE_TYPE);
+            }
+            case "CWI" -> {
+                batchallStatement = resources.getString("batchallStatementCWI.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Widowmaker" + PORTRAIT_FILE_TYPE);
+            }
+            case "CW" -> {
+                batchallStatement = resources.getString("batchallStatementCW.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf" + PORTRAIT_FILE_TYPE);
+            }
+            case "CWIE" -> {
+                batchallStatement = resources.getString("batchallStatementCWIE.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf-in-Exile" + PORTRAIT_FILE_TYPE);
+            }
+            case "CWOV" -> {
+                batchallStatement = resources.getString("batchallStatementCWOV.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolverine" + PORTRAIT_FILE_TYPE);
+            }
+            case "RD" -> {
+                batchallStatement = resources.getString("batchallStatementRD.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Rasalhague Dominion" + PORTRAIT_FILE_TYPE);
+            }
+            case "RA" -> {
+                batchallStatement = resources.getString("batchallStatementRA.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Raven Alliance" + PORTRAIT_FILE_TYPE);
+            }
+            case "SOC" -> {
+                batchallStatement = resources.getString("batchallStatementSOC.text");
+                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "The Society" + PORTRAIT_FILE_TYPE);
+            }
+            default -> {
+                batchallStatement = resources.getString("batchallStatementGeneric.text");
+                portrait = new ImageIcon("data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
+            }
+        }
+
+        // Determine the name of the commander based on faction
+        String rank = resources.getString("starColonel.text");
+        RandomNameGenerator randomNameGenerator = new RandomNameGenerator();
+        String commander = randomNameGenerator.generate(Gender.RANDOMIZE, true, enemyCode);
+        commander += ' ' + Bloodname.randomBloodname(enemyCode, Phenotype.MEKWARRIOR, campaign.getGameYear()).getName();
+
+        // Prepare the display message for the dialog
+        String message = String.format(resources.getString("batchallOpener.text"),
+                this.getName(), rank, commander, getEnemy().getFullName(campaign.getGameYear()),
+                getSystemName(campaign.getLocalDate()));
+        message = message + batchallStatement;
+        message = message + resources.getString("batchallCloser.text");
+
+        // Create a pane to display both the message and the commander's portrait
+        JTextPane textPane = new JTextPane();
+        textPane.setContentType("text/html");
+        textPane.setText(message);
+        textPane.setEditable(false);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel imageLabel = new JLabel(portrait);
+        panel.add(imageLabel, BorderLayout.CENTER);
+        panel.add(textPane, BorderLayout.SOUTH);
+
+        // Prepare the options for the dialog
+        Object[] options = {
+                resources.getString("responseAccept.text"),
+                resources.getString("responseRefuse.text")
+        };
+
+        // Display the dialog and capture the response
+        int batchallDialog = JOptionPane.showOptionDialog(null, panel, title,
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+        // Handle the response
+        if (batchallDialog == JOptionPane.NO_OPTION) {
+            // Display the dialog and capture the response
+            int refusalConfirmation = JOptionPane.showOptionDialog(null,
+                    resources.getString("refusalConfirmation.text"),
+                    resources.getString("responseRefuse.text"),
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
+                    options[0]);
+
+            // Handle the response
+            if (refusalConfirmation == JOptionPane.NO_OPTION) {
+                // Report refusal of the batchall
+                campaign.addReport(resources.getString("refusalReport.text"));
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Derives the personnel role based on the unit type of the given entity.
+     *
+     * @param entity The entity whose unit type needs to be evaluated.
+     * @return The personnel role derived from the unit type of the entity.
+     */
+    private static PersonnelRole deriveRoleFromUnitType(Entity entity) {
+        if (entity.isAerospaceFighter()) {
+            return PersonnelRole.AEROSPACE_PILOT;
+        } else if (entity.isBattleArmor()) {
+            return PersonnelRole.BATTLE_ARMOUR;
+        } else if (entity.isConventionalFighter()) {
+            return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
+        } else if (entity.isNaval()) {
+            return PersonnelRole.NAVAL_VEHICLE_DRIVER;
+        } else if (entity.isProtoMek()) {
+            return PersonnelRole.PROTOMEK_PILOT;
+        } else if (entity.isConventionalInfantry()) {
+            return PersonnelRole.SOLDIER;
+        } else if (entity.isAirborneVTOLorWIGE()) {
+            return PersonnelRole.VTOL_PILOT;
+        } else if (entity.isVehicle()) {
+            return PersonnelRole.GROUND_VEHICLE_DRIVER;
+        } else if (entity.isLargeCraft() || entity.isSmallCraft()) {
+            return PersonnelRole.VESSEL_PILOT;
+        } else {
+            return PersonnelRole.MEKWARRIOR;
         }
     }
 }

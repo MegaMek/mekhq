@@ -3615,6 +3615,16 @@ public class Campaign implements ITechManager {
             }
         }
 
+        for (AtBContract contract : getActiveAtBContracts()) {
+            if (campaignOptions.isUseGenericBattleValue()) {
+                if (contract.getStartDate().equals(getLocalDate()) && getLocation().isOnPlanet()) {
+                    if (contract.getEnemy().isClan()) {
+                        contract.setBatchallAccepted(contract.initiateBatchall(this));
+                    }
+                }
+            }
+        }
+
         processNewDayATBScenarios();
     }
 
