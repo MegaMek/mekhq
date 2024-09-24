@@ -43,7 +43,6 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
@@ -299,12 +298,19 @@ public class AtBContract extends Contract {
         setMultiplier(multiplier);
     }
 
-    public void checkMorale(LocalDate today, int dragoonRating) {
+    /**
+     * Checks the morale level of the campaign based on various factors.
+     *
+     * @param campaign The ongoing campaign.
+     * @param today The current date.
+     * @param dragoonRating The player's dragoon rating
+     */
+    public void checkMorale(Campaign campaign, LocalDate today, int dragoonRating) {
         if (null != routEnd) {
             if (today.isAfter(routEnd)) {
                 setMoraleLevel(AtBMoraleLevel.NORMAL);
                 routEnd = null;
-                updateEnemy(today); // mix it up a little
+                updateEnemy(campaign, today); // mix it up a little
             } else {
                 setMoraleLevel(AtBMoraleLevel.BROKEN);
             }
@@ -402,10 +408,12 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Changes the enemy to a randomly selected faction that's an enemy of
-     * the current employer
+     * Updates the enemy faction and enemy bot name for this contract.
+     *
+     * @param campaign The current campaign.
+     * @param today    The current LocalDate object.
      */
-    private void updateEnemy(LocalDate today) {
+    private void updateEnemy(Campaign campaign, LocalDate today) {
         String enemyCode = RandomFactionGenerator.getInstance().getEnemy(
                 Factions.getInstance().getFaction(employerCode), false, true);
         setEnemyCode(enemyCode);
@@ -414,6 +422,14 @@ public class AtBContract extends Contract {
         setEnemyBotName(enemyFaction.getFullName(today.getYear()));
         enemyName = ""; // wipe the old enemy name
         getEnemyName(today.getYear()); // we use this to update enemyName
+
+        // Update the Batchall information
+        batchallAccepted = true;
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            if (getEnemy().isClan()) {
+                setBatchallAccepted(initiateBatchall(campaign));
+            }
+        }
     }
 
     /**
@@ -1546,36 +1562,6 @@ public class AtBContract extends Contract {
             }
         } else {
             return true;
-        }
-    }
-
-    /**
-     * Derives the personnel role based on the unit type of the given entity.
-     *
-     * @param entity The entity whose unit type needs to be evaluated.
-     * @return The personnel role derived from the unit type of the entity.
-     */
-    private static PersonnelRole deriveRoleFromUnitType(Entity entity) {
-        if (entity.isAerospaceFighter()) {
-            return PersonnelRole.AEROSPACE_PILOT;
-        } else if (entity.isBattleArmor()) {
-            return PersonnelRole.BATTLE_ARMOUR;
-        } else if (entity.isConventionalFighter()) {
-            return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if (entity.isNaval()) {
-            return PersonnelRole.NAVAL_VEHICLE_DRIVER;
-        } else if (entity.isProtoMek()) {
-            return PersonnelRole.PROTOMEK_PILOT;
-        } else if (entity.isConventionalInfantry()) {
-            return PersonnelRole.SOLDIER;
-        } else if (entity.isAirborneVTOLorWIGE()) {
-            return PersonnelRole.VTOL_PILOT;
-        } else if (entity.isVehicle()) {
-            return PersonnelRole.GROUND_VEHICLE_DRIVER;
-        } else if (entity.isLargeCraft() || entity.isSmallCraft()) {
-            return PersonnelRole.VESSEL_PILOT;
-        } else {
-            return PersonnelRole.MEKWARRIOR;
         }
     }
 }
