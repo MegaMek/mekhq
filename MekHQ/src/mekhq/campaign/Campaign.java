@@ -111,6 +111,8 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
+import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
@@ -264,6 +266,7 @@ public class Campaign implements ITechManager {
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
+    private FameAndInfamyController fameAndInfamy;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
@@ -330,6 +333,7 @@ public class Campaign implements ITechManager {
         campaignSummary = new CampaignSummary(this);
         quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
+        fameAndInfamy = new FameAndInfamyController();
     }
 
     /**
@@ -3589,7 +3593,7 @@ public class Campaign implements ITechManager {
         for (AtBContract contract : getActiveAtBContracts()) {
             if (campaignOptions.isUseGenericBattleValue()) {
                 if (contract.getStartDate().equals(getLocalDate()) && getLocation().isOnPlanet()) {
-                    if (contract.getEnemy().isClan()) {
+                    if (BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
                         contract.setBatchallAccepted(contract.initiateBatchall(this));
                     }
                 }
@@ -4810,6 +4814,10 @@ public class Campaign implements ITechManager {
         return new ArrayList<>();
     }
 
+    public FameAndInfamyController getFameAndInfamy() {
+        return fameAndInfamy;
+    }
+
     public void writeToXML(final PrintWriter pw) {
         int indent = 0;
 
@@ -4945,6 +4953,11 @@ public class Campaign implements ITechManager {
         // current story arc
         if (null != storyArc) {
             storyArc.writeToXml(pw, indent);
+        }
+
+        // Fame and Infamy
+        if (fameAndInfamy != null) {
+            fameAndInfamy.writeToXml(pw, indent);
         }
 
         // Markets

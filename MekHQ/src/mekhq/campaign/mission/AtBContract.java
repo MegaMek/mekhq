@@ -52,6 +52,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1370,8 +1371,6 @@ public class AtBContract extends Contract {
         }
     }
 
-
-
     /**
      * Initiates a batchall.
      * Prompts the player with a message and options to accept or refuse the batchall.
@@ -1383,130 +1382,51 @@ public class AtBContract extends Contract {
         // Set the title of the dialog
         String title = resources.getString("incomingTransmission.title");
 
-        // Hold the portrait of the commander
-
         // Generate the batchall statement and fetch the faction image
-        String batchallStatement;
+        String batchallStatement = BatchallFactions.getGreeting(campaign, enemyCode);
         final String PORTRAIT_DIRECTORY = "data/images/force/Pieces/Logos/Clan/";
         final String PORTRAIT_FILE_TYPE = ".png";
 
         ImageIcon portrait;
 
         switch (enemyCode) {
-            case "CBS" -> {
-                batchallStatement = resources.getString("batchallStatementCBS.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Blood Spirit" + PORTRAIT_FILE_TYPE);
-            }
-            case "CB" -> {
-                batchallStatement = resources.getString("batchallStatementCB.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Burrock" + PORTRAIT_FILE_TYPE);
-            }
-            case "CCC" -> {
-                batchallStatement = resources.getString("batchallStatementCCC.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Cloud Cobra" + PORTRAIT_FILE_TYPE);
-            }
-            case "CCO" -> {
-                batchallStatement = resources.getString("batchallStatementCCO.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Coyote" + PORTRAIT_FILE_TYPE);
-            }
+            case "CBS" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Blood Spirit" + PORTRAIT_FILE_TYPE);
+            case "CB" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Burrock" + PORTRAIT_FILE_TYPE);
+            case "CCC" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Cloud Cobra" + PORTRAIT_FILE_TYPE);
+            case "CCO" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Coyote" + PORTRAIT_FILE_TYPE);
             case "CDS" -> {
                 if (campaign.getGameYear() >= 3100) {
-                    batchallStatement = resources.getString("batchallStatementCDSSeaFox.text");
                     portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Sea Fox" + PORTRAIT_FILE_TYPE);
                 } else {
-                    batchallStatement = resources.getString("batchallStatementCDS.text");
                     portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Diamond Shark" + PORTRAIT_FILE_TYPE);
                 }
             }
-            case "CFM" -> {
-                batchallStatement = resources.getString("batchallStatementCFM.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Fire Mandrill" + PORTRAIT_FILE_TYPE);
-            }
+            case "CFM" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Fire Mandrill" + PORTRAIT_FILE_TYPE);
             case "CGB" -> {
                 if (campaign.getGameYear() >= 3060) {
-                    batchallStatement = resources.getString("batchallStatementCGBDominion.text");
                     portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Ghost Bear Dominion" + PORTRAIT_FILE_TYPE);
                 } else {
-                    batchallStatement = resources.getString("batchallStatementCGB.text");
                     portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ghost Bear" + PORTRAIT_FILE_TYPE);
                 }
             }
-            case "CGS" -> {
-                batchallStatement = resources.getString("batchallStatementCGS.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Goliath Scorpion" + PORTRAIT_FILE_TYPE);
-            }
-            case "CHH" -> {
-                batchallStatement = resources.getString("batchallStatementCHH.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Hell's Horses" + PORTRAIT_FILE_TYPE);
-            }
-            case "CIH" -> {
-                batchallStatement = resources.getString("batchallStatementCIH.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ice Hellion" + PORTRAIT_FILE_TYPE);
-            }
-            case "CJF" -> {
-                batchallStatement = resources.getString("batchallStatementCJF.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Jade Falcon" + PORTRAIT_FILE_TYPE);
-            }
-            case "CMG" -> {
-                batchallStatement = resources.getString("batchallStatementCMG.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Mongoose" + PORTRAIT_FILE_TYPE);
-            }
-            case "CNC" -> {
-                batchallStatement = resources.getString("batchallStatementCNC.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Nova Cat" + PORTRAIT_FILE_TYPE);
-            }
-            case "CSJ" -> {
-                batchallStatement = resources.getString("batchallStatementCSJ.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Smoke Jaguar" + PORTRAIT_FILE_TYPE);
-            }
-            case "CSR" -> {
-                batchallStatement = resources.getString("batchallStatementCSR.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Snow Raven" + PORTRAIT_FILE_TYPE);
-            }
-            case "CSA" -> {
-                batchallStatement = resources.getString("batchallStatementCSA.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Star Adder" + PORTRAIT_FILE_TYPE);
-            }
-            case "CSV" -> {
-                batchallStatement = resources.getString("batchallStatementCSV.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Steel Viper" + PORTRAIT_FILE_TYPE);
-            }
-            case "CSL" -> {
-                batchallStatement = resources.getString("batchallStatementCSL.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Stone Lion" + PORTRAIT_FILE_TYPE);
-            }
-            case "CWI" -> {
-                batchallStatement = resources.getString("batchallStatementCWI.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Widowmaker" + PORTRAIT_FILE_TYPE);
-            }
-            case "CW" -> {
-                batchallStatement = resources.getString("batchallStatementCW.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf" + PORTRAIT_FILE_TYPE);
-            }
-            case "CWIE" -> {
-                batchallStatement = resources.getString("batchallStatementCWIE.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf-in-Exile" + PORTRAIT_FILE_TYPE);
-            }
-            case "CWOV" -> {
-                batchallStatement = resources.getString("batchallStatementCWOV.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolverine" + PORTRAIT_FILE_TYPE);
-            }
-            case "RD" -> {
-                batchallStatement = resources.getString("batchallStatementRD.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Rasalhague Dominion" + PORTRAIT_FILE_TYPE);
-            }
-            case "RA" -> {
-                batchallStatement = resources.getString("batchallStatementRA.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Raven Alliance" + PORTRAIT_FILE_TYPE);
-            }
-            case "SOC" -> {
-                batchallStatement = resources.getString("batchallStatementSOC.text");
-                portrait = new ImageIcon(PORTRAIT_DIRECTORY + "The Society" + PORTRAIT_FILE_TYPE);
-            }
-            default -> {
-                batchallStatement = resources.getString("batchallStatementGeneric.text");
-                portrait = new ImageIcon("data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
-            }
+            case "CGS" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Goliath Scorpion" + PORTRAIT_FILE_TYPE);
+            case "CHH" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Hell's Horses" + PORTRAIT_FILE_TYPE);
+            case "CIH" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ice Hellion" + PORTRAIT_FILE_TYPE);
+            case "CJF" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Jade Falcon" + PORTRAIT_FILE_TYPE);
+            case "CMG" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Mongoose" + PORTRAIT_FILE_TYPE);
+            case "CNC" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Nova Cat" + PORTRAIT_FILE_TYPE);
+            case "CSJ" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Smoke Jaguar" + PORTRAIT_FILE_TYPE);
+            case "CSR" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Snow Raven" + PORTRAIT_FILE_TYPE);
+            case "CSA" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Star Adder" + PORTRAIT_FILE_TYPE);
+            case "CSV" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Steel Viper" + PORTRAIT_FILE_TYPE);
+            case "CSL" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Stone Lion" + PORTRAIT_FILE_TYPE);
+            case "CWI" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Widowmaker" + PORTRAIT_FILE_TYPE);
+            case "CW", "CWE" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf" + PORTRAIT_FILE_TYPE);
+            case "CWIE" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf-in-Exile" + PORTRAIT_FILE_TYPE);
+            case "CEI" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Scorpion Empire" + PORTRAIT_FILE_TYPE);
+            case "RD" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Rasalhague Dominion" + PORTRAIT_FILE_TYPE);
+            case "RA" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Raven Alliance" + PORTRAIT_FILE_TYPE);
+            default -> portrait = new ImageIcon("data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
         }
 
         // Determine the name of the commander based on faction
@@ -1520,7 +1440,10 @@ public class AtBContract extends Contract {
                 this.getName(), rank, commander, getEnemy().getFullName(campaign.getGameYear()),
                 getSystemName(campaign.getLocalDate()));
         message = message + batchallStatement;
-        message = message + resources.getString("batchallCloser.text");
+
+        if (campaign.getFameAndInfamy().getFameForFaction(enemyCode) < 5) {
+            message = message + resources.getString("batchallCloser.text");
+        }
 
         // Create a pane to display both the message and the commander's portrait
         JTextPane textPane = new JTextPane();
@@ -1533,6 +1456,23 @@ public class AtBContract extends Contract {
         panel.add(imageLabel, BorderLayout.CENTER);
         panel.add(textPane, BorderLayout.SOUTH);
 
+        if (campaign.getFameAndInfamy().getFameForFaction(enemyCode) > 4) {
+            noBatchallOfferedDialog(panel, title);
+            return false;
+        } else {
+            return batchallDialog(campaign, panel, title);
+        }
+    }
+
+    /**
+     * Display a batchall dialog.
+     *
+     * @param campaign the current campaign
+     * @param panel the panel to display in the dialog
+     * @param title the title of the dialog
+     * @return {@code true} if the batchall is accepted, {@code false} otherwise
+     */
+    private boolean batchallDialog(Campaign campaign, JPanel panel, String title) {
         // Prepare the options for the dialog
         Object[] options = {
                 resources.getString("responseAccept.text"),
@@ -1547,7 +1487,8 @@ public class AtBContract extends Contract {
         if (batchallDialog == JOptionPane.NO_OPTION) {
             // Display the dialog and capture the response
             int refusalConfirmation = JOptionPane.showOptionDialog(null,
-                    resources.getString("refusalConfirmation.text"),
+                    String.format(resources.getString("refusalConfirmation.text"),
+                        getEnemy().getFullName(campaign.getGameYear())),
                     resources.getString("responseRefuse.text"),
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
                     options[0]);
@@ -1556,6 +1497,7 @@ public class AtBContract extends Contract {
             if (refusalConfirmation == JOptionPane.NO_OPTION) {
                 // Report refusal of the batchall
                 campaign.addReport(resources.getString("refusalReport.text"));
+                campaign.getFameAndInfamy().updateFameForFaction(campaign, enemyCode, -1);
                 return false;
             } else {
                 return true;
@@ -1563,5 +1505,21 @@ public class AtBContract extends Contract {
         } else {
             return true;
         }
+    }
+
+    /**
+     * Displays a dialog with a message for when the faction has refused to offer a Batchall due to
+     * past player refusals.
+     *
+     * @param panel The panel to display in the dialog.
+     * @param title The title of the dialog.
+     */
+    private void noBatchallOfferedDialog(JPanel panel, String title) {
+        Object[] options = {
+            resources.getString("responseBringItOn.text")
+        };
+
+        JOptionPane.showOptionDialog(null, panel, title, JOptionPane.DEFAULT_OPTION,
+            JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
     }
 }
