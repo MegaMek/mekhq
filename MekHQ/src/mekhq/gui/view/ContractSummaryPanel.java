@@ -174,7 +174,7 @@ public class ContractSummaryPanel extends JPanel {
             gridBagConstraintsLabels.gridy = ++y;
             mainPanel.add(lblEnemy, gridBagConstraintsLabels);
 
-            JLabel txtEnemy = new JLabel(((AtBContract) contract).getEnemyName(campaign.getGameYear()));
+            JLabel txtEnemy = new JLabel(((AtBContract) contract).getEnemyBotName());
             txtEnemy.setName("txtEnemy");
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtEnemy, gridBagConstraintsText);
@@ -226,7 +226,7 @@ public class ContractSummaryPanel extends JPanel {
                 days = 0;
                 jumps = 0;
             }
-            JLabel txtDistance = new JLabel(days + "(" + jumps + ")");
+            JLabel txtDistance = new JLabel(days + "(" + jumps + ')');
             txtDistance.setName("txtDistance");
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtDistance, gridBagConstraintsText);
@@ -551,7 +551,7 @@ public class ContractSummaryPanel extends JPanel {
     }
 
     private String generateRerollText(int rerolls) {
-        return resourceMap.getString("lblRenegotiate.text") + " (" + rerolls + ")";
+        return resourceMap.getString("lblRenegotiate.text") + " (" + rerolls + ')';
     }
 
     public void refreshAmounts() {

@@ -671,7 +671,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblEnemy, gridBagConstraints);
 
         txtEnemy.setName("txtEnemy");
-        txtEnemy.setText(contract.getEnemyName(campaign.getGameYear()));
+        txtEnemy.setText(contract.getEnemyBotName());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
