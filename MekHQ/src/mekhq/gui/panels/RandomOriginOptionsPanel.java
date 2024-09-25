@@ -18,9 +18,18 @@
  */
 package mekhq.gui.panels;
 
+import java.awt.Component;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.universe.Faction;
@@ -28,24 +37,20 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.*;
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
- * This is used to select a set of RandomOriginOptions. It requires either the faction or the
- * ComboBox from which a faction is selected, the former when the faction is constant and the
+ * This is used to select a set of RandomOriginOptions. It requires either the
+ * faction or the
+ * ComboBox from which a faction is selected, the former when the faction is
+ * constant and the
  * latter when it can change after this panel is initialized.
  *
  * @author Justin "Windchild" Bowen
  */
 public class RandomOriginOptionsPanel extends AbstractMHQPanel {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(RandomOriginOptionsPanel.class);
+
+    // region Variable Declarations
     private final Campaign campaign;
     private final Faction faction;
     private final MMComboBox<FactionDisplay> comboFaction;
@@ -60,31 +65,31 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
     private JSpinner spnOriginDistanceScale;
     private JCheckBox chkAllowClanOrigins;
     private JCheckBox chkExtraRandomOrigin;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public RandomOriginOptionsPanel(final JFrame frame, final Campaign campaign,
-                                    final Faction faction) {
+            final Faction faction) {
         this(frame, campaign, faction, null);
     }
 
     public RandomOriginOptionsPanel(final JFrame frame, final Campaign campaign,
-                                    final MMComboBox<FactionDisplay> comboFaction) {
+            final MMComboBox<FactionDisplay> comboFaction) {
         this(frame, campaign, null, comboFaction);
     }
 
     private RandomOriginOptionsPanel(final JFrame frame, final Campaign campaign,
-                                     final @Nullable Faction faction,
-                                     final @Nullable MMComboBox<FactionDisplay> comboFaction) {
+            final @Nullable Faction faction,
+            final @Nullable MMComboBox<FactionDisplay> comboFaction) {
         super(frame, "RandomOriginOptionsPanel");
         this.campaign = campaign;
         this.faction = faction;
         this.comboFaction = comboFaction;
         initialize();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public Campaign getCampaign() {
         return campaign;
     }
@@ -163,7 +168,7 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
             getComboSpecifiedPlanet().removeAllItems();
         } else {
             getComboSpecifiedPlanet().setModel(new DefaultComboBoxModel<>(
-                    planetarySystem.getPlanets().toArray(new Planet[]{})));
+                    planetarySystem.getPlanets().toArray(new Planet[] {})));
             getComboSpecifiedPlanet().setSelectedItem(planetarySystem.getPrimaryPlanet());
         }
     }
@@ -175,6 +180,7 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
     public void setSpnOriginSearchRadius(final JSpinner spnOriginSearchRadius) {
         this.spnOriginSearchRadius = spnOriginSearchRadius;
     }
+
     public JSpinner getSpnOriginDistanceScale() {
         return spnOriginDistanceScale;
     }
@@ -198,9 +204,9 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
     public void setChkExtraRandomOrigin(final JCheckBox chkExtraRandomOrigin) {
         this.chkExtraRandomOrigin = chkExtraRandomOrigin;
     }
-    //endregion Getters/Setters
+    // endregion Getters/Setters
 
-    //region Initialization
+    // region Initialization
     @Override
     protected void initialize() {
         // Initialize Labels Used in ActionListeners
@@ -215,7 +221,8 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         getChkRandomizeOrigin().addActionListener(evt -> {
             final boolean selected = getChkRandomizeOrigin().isSelected();
             getChkRandomizeAroundSpecifiedPlanet().setEnabled(selected);
-            getChkSpecifiedSystemFactionSpecific().setEnabled(selected && getChkRandomizeAroundSpecifiedPlanet().isSelected());
+            getChkSpecifiedSystemFactionSpecific()
+                    .setEnabled(selected && getChkRandomizeAroundSpecifiedPlanet().isSelected());
             lblSpecifiedPlanet.setEnabled(selected && getChkRandomizeAroundSpecifiedPlanet().isSelected());
             getComboSpecifiedSystem().setEnabled(selected && getChkRandomizeAroundSpecifiedPlanet().isSelected());
             getComboSpecifiedPlanet().setEnabled(selected && getChkRandomizeAroundSpecifiedPlanet().isSelected());
@@ -228,11 +235,14 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         });
 
         setChkRandomizeDependentsOrigin(new JCheckBox(resources.getString("chkRandomizeDependentsOrigin.text")));
-        getChkRandomizeDependentsOrigin().setToolTipText(resources.getString("chkRandomizeDependentsOrigin.toolTipText"));
+        getChkRandomizeDependentsOrigin()
+                .setToolTipText(resources.getString("chkRandomizeDependentsOrigin.toolTipText"));
         getChkRandomizeDependentsOrigin().setName("chkRandomizeDependentsOrigin");
 
-        setChkRandomizeAroundSpecifiedPlanet(new JCheckBox(resources.getString("chkRandomizeAroundSpecifiedPlanet.text")));
-        getChkRandomizeAroundSpecifiedPlanet().setToolTipText(resources.getString("chkRandomizeAroundSpecifiedPlanet.toolTipText"));
+        setChkRandomizeAroundSpecifiedPlanet(
+                new JCheckBox(resources.getString("chkRandomizeAroundSpecifiedPlanet.text")));
+        getChkRandomizeAroundSpecifiedPlanet()
+                .setToolTipText(resources.getString("chkRandomizeAroundSpecifiedPlanet.toolTipText"));
         getChkRandomizeAroundSpecifiedPlanet().setName("chkRandomizeAroundSpecifiedPlanet");
         getChkRandomizeAroundSpecifiedPlanet().addActionListener(evt -> {
             final boolean selected = getChkRandomizeAroundSpecifiedPlanet().isSelected()
@@ -244,7 +254,8 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         });
 
         setChkSpecifiedSystemFactionSpecific(new JCheckBox(resources.getString("FactionSpecific.text")));
-        getChkSpecifiedSystemFactionSpecific().setToolTipText(resources.getString("chkSpecifiedSystemFactionSpecific.toolTipText"));
+        getChkSpecifiedSystemFactionSpecific()
+                .setToolTipText(resources.getString("chkSpecifiedSystemFactionSpecific.toolTipText"));
         getChkSpecifiedSystemFactionSpecific().setName("chkSpecifiedSystemFactionSpecific");
         getChkSpecifiedSystemFactionSpecific().addActionListener(evt -> {
             final PlanetarySystem planetarySystem = getComboSpecifiedSystem().getSelectedItem();
@@ -263,8 +274,8 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         getComboSpecifiedSystem().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final int index, final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof PlanetarySystem) {
                     setText(((PlanetarySystem) value).getName(getCampaign().getLocalDate()));
@@ -286,8 +297,8 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
         getComboSpecifiedPlanet().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
+                    final int index, final boolean isSelected,
+                    final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof Planet) {
                     setText(((Planet) value).getName(getCampaign().getLocalDate()));
@@ -356,8 +367,7 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
                                 .addComponent(lblOriginDistanceScale)
                                 .addComponent(getSpnOriginDistanceScale(), Alignment.LEADING))
                         .addComponent(getChkAllowClanOrigins())
-                        .addComponent(getChkExtraRandomOrigin())
-        );
+                        .addComponent(getChkExtraRandomOrigin()));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
@@ -377,19 +387,18 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
                                 .addComponent(lblOriginDistanceScale)
                                 .addComponent(getSpnOriginDistanceScale()))
                         .addComponent(getChkAllowClanOrigins())
-                        .addComponent(getChkExtraRandomOrigin())
-        );
+                        .addComponent(getChkExtraRandomOrigin()));
     }
 
     private PlanetarySystem[] getPlanetarySystems(final @Nullable Faction faction) {
         return getCampaign().getSystems().stream()
                 .filter(p -> (faction == null) || p.getFactionSet(getCampaign().getLocalDate()).contains(faction))
                 .sorted(Comparator.comparing(p -> p.getName(getCampaign().getLocalDate())))
-                .collect(Collectors.toList()).toArray(new PlanetarySystem[]{});
+                .collect(Collectors.toList()).toArray(new PlanetarySystem[] {});
     }
-    //endregion Initialization
+    // endregion Initialization
 
-    //region Options
+    // region Options
     public void setOptions(final RandomOriginOptions options) {
         if (getChkRandomizeOrigin().isSelected() != options.isRandomizeOrigin()) {
             getChkRandomizeOrigin().doClick();
@@ -420,19 +429,23 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
             options.setAllowClanOrigins(getChkAllowClanOrigins().isSelected());
             options.setExtraRandomOrigin(getChkExtraRandomOrigin().isSelected());
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
         return options;
     }
 
     /**
-     * Validates the data contained in this panel, returning the current state of validation.
+     * Validates the data contained in this panel, returning the current state of
+     * validation.
+     * 
      * @param display to display dialogs containing the messages or not
-     * @return ValidationState.SUCCESS if the data validates successfully, ValidationState.WARNING
-     * if a warning was issued, or ValidationState.FAILURE if validation fails
+     * @return ValidationState.SUCCESS if the data validates successfully,
+     *         ValidationState.WARNING
+     *         if a warning was issued, or ValidationState.FAILURE if validation
+     *         fails
      */
     public ValidationState validateOptions(final boolean display) {
-        //region Errors
+        // region Errors
         // Specified System/Planet Validation
         if ((getComboSpecifiedSystem().getSelectedItem() == null)
                 || (getComboSpecifiedPlanet().getSelectedItem() == null)) {
@@ -444,10 +457,10 @@ public class RandomOriginOptionsPanel extends AbstractMHQPanel {
             }
             return ValidationState.FAILURE;
         }
-        //endregion Errors
+        // endregion Errors
 
         // The options specified are correct, and thus can be saved
         return ValidationState.SUCCESS;
     }
-    //endregion Options
+    // endregion Options
 }

@@ -4,11 +4,13 @@ import java.time.LocalDateTime
 
 plugins {
     id 'application'
+    id 'checkstyle'
+    id 'com.palantir.git-version' version '3.1.0'
     id 'edu.sc.seis.launch4j' version '3.0.6'
+    id "io.sentry.jvm.gradle" version "4.11.0"
     id 'jacoco'
     id 'java'
-    id "io.sentry.jvm.gradle" version "4.10.0"
-    id 'com.palantir.git-version' version '3.1.0'
+    id 'org.ec4j.editorconfig' version '0.1.0'
 }
 
 java {
@@ -106,6 +108,12 @@ application {
     mainClass = 'mekhq.MekHQ'
 }
 
+checkstyle {
+    toolVersion '10.18.1'
+    configFile file("config/checkstyle/checkstyle.xml")
+    ignoreFailures false
+}
+
 run {
     jvmArgs = mhqJvmOptions
 }
@@ -139,15 +147,6 @@ task stageFiles(type: Copy) {
     dependsOn generateDynamicFiles
     dependsOn gradle.includedBuild('megamek').task(':megamek:generateDynamicFiles')
     dependsOn gradle.includedBuild('megameklab').task(':megameklab:generateDynamicFiles')
-
-    dependsOn gradle.includedBuild('megamek').task(':megamek:stageFiles')
-    dependsOn gradle.includedBuild('megamek').task(':megamek:createStartScripts')
-
-    dependsOn gradle.includedBuild('megameklab').task(':megameklab:stageFiles')
-    dependsOn gradle.includedBuild('megameklab').task(':megameklab:createStartScripts')
-
-    dependsOn gradle.includedBuild('megamek').task(':megamek:createAllExecutables')
-    dependsOn gradle.includedBuild('megameklab').task(':megameklab:createAllExecutables')
 
     from projectDir
     include "${campaigns}/"
@@ -235,7 +234,7 @@ distributions {
 
             // MegaMekLab Includes
             from ("${mmlDir}/megameklab/build/files") {
-                exclude 'data/mechfiles'
+                exclude 'data/mekfiles'
             }
             from ("${mmlDir}/megameklab/build/launch4j/lib") {
                 into "${lib}"
@@ -306,23 +305,31 @@ launch4j {
     jarTask = project.tasks.jar
     windowTitle = 'MekHQ'
     internalName = 'MekHQ'
-    downloadUrl = 'https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
+    downloadUrl = 'https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
     supportUrl = 'https://megamek.org'
     copyright = '2024 MegaMek Development Team.'
     trademarks = 'MechWarrior, BattleMech, `Mech and Aerotech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
     companyName = "MegaMek Development Team"
     jreMinVersion = '17'
     dontWrapJar = true
-    messagesJreVersionError = 'We require a Java Runtime of version 17 or higher installed. https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
-    messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
+    messagesJreVersionError = 'We require a Java Runtime of version 17 or higher installed. https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
+    messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium-(Eclipse-Temurin-Open-Source-Java)'
 }
 
 tasks.register("packagePrepWork") {
     description = 'General Catch All for all distributions'
     dependsOn stageFiles
-    dependsOn createStartScripts
     dependsOn startScripts
+    dependsOn createStartScripts
     dependsOn createAllExecutables
+    dependsOn gradle.includedBuild('megamek').task(':megamek:stageFiles')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:stageFiles')
+    dependsOn gradle.includedBuild('megamek').task(':megamek:startScripts')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:startScripts')
+    dependsOn gradle.includedBuild('megamek').task(':megamek:createStartScripts')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:createStartScripts')
+    dependsOn gradle.includedBuild('megamek').task(':megamek:createAllExecutables')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:createAllExecutables')
 }
 
 distTar {
@@ -387,6 +394,15 @@ jacocoTestReport {
     dependsOn test
     reports {
         xml.required = true
+        html.required = true
+    }
+}
+
+tasks.withType(Checkstyle) {
+    minHeapSize = "200m"
+    maxHeapSize = "1g"
+    reports {
+        xml.required = false
         html.required = true
     }
 }

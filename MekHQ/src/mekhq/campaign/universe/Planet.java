@@ -19,22 +19,34 @@
  */
 package mekhq.campaign.universe;
 
+import java.time.LocalDate;
+import java.util.*;
+
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
+import megamek.logging.MMLogger;
 import mekhq.Utilities;
-import mekhq.adapter.*;
+import mekhq.adapter.AtmosphereAdapter;
+import mekhq.adapter.BooleanValueAdapter;
+import mekhq.adapter.ClimateAdapter;
+import mekhq.adapter.DateAdapter;
+import mekhq.adapter.HPGRatingAdapter;
+import mekhq.adapter.LifeFormAdapter;
+import mekhq.adapter.PressureAdapter;
+import mekhq.adapter.SocioIndustrialDataAdapter;
+import mekhq.adapter.StringListAdapter;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
-import org.apache.logging.log4j.LogManager;
-
-import java.time.LocalDate;
-import java.util.*;
 
 /**
  * This is the start of a planet object that will keep lots of information about
@@ -45,6 +57,8 @@ import java.util.*;
 @XmlRootElement(name = "planet")
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class Planet {
+    private static final MMLogger logger = MMLogger.create(Planet.class);
+
     @XmlElement(name = "xcood")
     private Double x;
     @XmlElement(name = "ycood")
@@ -58,13 +72,13 @@ public class Planet {
     private String shortName;
     private Integer sysPos;
 
-    //Orbital information
+    // Orbital information
     /** orbital radius (average distance to parent star), in AU */
     @XmlElement(name = "orbitalDist")
     private Double orbitRadius;
 
     // Stellar neighbourhood
-    //for reading in because lists are easier
+    // for reading in because lists are easier
     @XmlElement(name = "satellite")
     private List<Satellite> satellites;
     @XmlElement(name = "smallMoons")
@@ -93,7 +107,7 @@ public class Planet {
     private Integer volcanicActivity;
     @XmlElement(name = "tectonics")
     private Integer tectonicActivity;
-    @XmlElement(name="landMass")
+    @XmlElement(name = "landMass")
     private List<String> landMasses;
 
     // Atmospheric description
@@ -120,9 +134,9 @@ public class Planet {
     @XmlJavaTypeAdapter(StringListAdapter.class)
     private List<String> factions;
 
-    //private List<String> garrisonUnits;
+    // private List<String> garrisonUnits;
 
-    //the system that this planet belongs to
+    // the system that this planet belongs to
     private PlanetarySystem parentSystem;
 
     // Fluff
@@ -147,10 +161,13 @@ public class Planet {
     @XmlTransient
     CurrentEvents currentEvents;
 
-    //a hash to keep track of dynamic garrison changes
-    //TreeMap<LocalDate, List<String>> garrisonHistory;
+    // a hash to keep track of dynamic garrison changes
+    // TreeMap<LocalDate, List<String>> garrisonHistory;
 
-    /** @deprecated Use "event", which can have any number of changes to the planetary data */
+    /**
+     * @deprecated Use "event", which can have any number of changes to the
+     *             planetary data
+     */
     @Deprecated
     @XmlElement(name = "factionChange")
     private List<FactionChange> factionChanges;
@@ -172,15 +189,17 @@ public class Planet {
     /**
      * Overloaded constructor that parses out a single line of tsv data for a planet
      * with the help of a list of event years
+     *
      * @param tsvData tab-separated data line
-     * @param years The list of years acquired from the tsv file
+     * @param years   The list of years acquired from the tsv file
      * @throws Exception
      */
     public Planet(String tsvData, List<LocalDate> years) throws Exception {
         eventList = new ArrayList<>();
         events = new TreeMap<>();
 
-        // map of faction names that are different in the SUCS data, but have a correspondence to our factions
+        // map of faction names that are different in the SUCS data, but have a
+        // correspondence to our factions
         Map<String, String> factionReplacements = new HashMap<>();
         factionReplacements.put("LC", "LA");
         factionReplacements.put("U", "UND");
@@ -190,7 +209,7 @@ public class Planet {
 
         try {
             // "Name" \t X-coordinate \t Y-coordinate \t "Ownership info".
-            //      "Ownership info" breaks down to "FactionCode, irrelevantstuff"
+            // "Ownership info" breaks down to "FactionCode, irrelevant stuff"
             String[] infoElements = tsvData.split("\t");
 
             // sometimes, names are formatted like this:
@@ -224,10 +243,12 @@ public class Planet {
                     altName = nameString.substring(parenIndex + 1, closingParenIndex);
                 }
 
-                // there are a few situations where all this stuff with parens is for naught, which is
-                // PlanetName (FactionCode) or if the PlanetName (AltName) is already in our planets "database"
+                // there are a few situations where all this stuff with parens is for naught,
+                // which is PlanetName (FactionCode) or if the PlanetName (AltName) is already
+                // in our planets "database"
 
-                if ((null == Factions.getInstance().getFaction(altName)) && (null == Systems.getInstance().getSystemById(primaryName))) {
+                if ((null == Factions.getInstance().getFaction(altName))
+                        && (null == Systems.getInstance().getSystemById(primaryName))) {
                     primaryName = nameString.substring(0, parenIndex - 1);
 
                     PlanetaryEvent nameChangeEvent = getOrCreateEvent(nameChangeYearDate);
@@ -257,15 +278,17 @@ public class Planet {
                     newFaction = infoElement.substring(0, commaIndex);
                 }
 
-                //dirty hack, replace faction name with one we can use
+                // dirty hack, replace faction name with one we can use
                 if (factionReplacements.containsKey(newFaction)) {
                     newFaction = factionReplacements.get(newFaction);
                 }
 
-                // for brevity, only add the new event if the faction hasn't changed since the previous event
+                // for brevity, only add the new event if the faction hasn't changed since the
+                // previous event
                 // or if it's the first event
 
-                // dirty hack here assumes that there's only one faction per event, which is true in the case
+                // dirty hack here assumes that there's only one faction per event, which is
+                // true in the case
                 // of this spreadsheet
                 if ((x == 3) || !eventList.get(eventList.size() - 1).faction.get(0).equals(newFaction)) {
                     LocalDate eventDate = years.get(x - 3);
@@ -282,7 +305,7 @@ public class Planet {
         } catch (Exception e) {
             Exception ne = new Exception("Error running Planet constructor with following line:\n" + tsvData);
             ne.addSuppressed(e);
-            throw(ne);
+            throw (ne);
         }
     }
 
@@ -320,8 +343,7 @@ public class Planet {
         parentSystem = system;
     }
 
-
-    public ArrayList<Satellite> getSatellites() {
+    public List<Satellite> getSatellites() {
         return null != satellites ? new ArrayList<>(satellites) : null;
     }
 
@@ -356,7 +378,6 @@ public class Planet {
         return ring;
     }
 
-
     public List<String> getLandMasses() {
         return null != landMasses ? new ArrayList<>(landMasses) : null;
     }
@@ -374,7 +395,7 @@ public class Planet {
     }
 
     public Double getDayLength(LocalDate when) {
-        //yes day length can change because Venus
+        // yes day length can change because Venus
         return getEventData(when, dayLength, e -> e.dayLength);
     }
 
@@ -391,13 +412,15 @@ public class Planet {
     }
 
     /**
-     * This function returns a system position for the planet that does not account for asteroid belts. Therefore
-     * this result may be different than that actual sysPos variable.
+     * This function returns a system position for the planet that does not account
+     * for asteroid belts. Therefore this result may be different than that actual
+     * sysPos variable.
+     *
      * @return String of system position after removing asteroid belts
      */
     public String getDisplayableSystemPosition() {
-        //We won't give the actual system position here, because we don't want asteroid belts to count
-        //for system position
+        // We won't give the actual system position here, because we don't want asteroid
+        // belts to count for system position
         if ((null == getParentSystem()) || (null == sysPos)) {
             return "?";
         }
@@ -529,6 +552,7 @@ public class Planet {
 
         /**
          * Gets the current {@link PlanetaryEvent} for the time.
+         *
          * @param now The current time.
          * @return The up-to-date {@link PlanetaryEvent} as of {@code now}.
          */
@@ -626,7 +650,6 @@ public class Planet {
         return getEventData(when, population, e -> e.population);
     }
 
-
     public LifeForm getLifeForm(LocalDate when) {
         return getEventData(when, null != life ? life : LifeForm.NONE, e -> e.lifeForm);
     }
@@ -648,7 +671,8 @@ public class Planet {
     }
 
     public String getPressureName(LocalDate when) {
-        megamek.common.planetaryconditions.Atmosphere currentPressure = megamek.common.planetaryconditions.Atmosphere.getAtmosphere(getPressure(when));
+        megamek.common.planetaryconditions.Atmosphere currentPressure = megamek.common.planetaryconditions.Atmosphere
+                .getAtmosphere(getPressure(when));
         return null != currentPressure ? currentPressure.toString() : "unknown";
     }
 
@@ -701,7 +725,10 @@ public class Planet {
         return toReturn;
     }
 
-    /** @return the distance to another planet in light years (0 if both are in the same system) */
+    /**
+     * @return the distance to another planet in light years (0 if both are in the
+     *         same system)
+     */
     public double getDistanceTo(Planet anotherPlanet) {
         return Math.sqrt(Math.pow(x - anotherPlanet.x, 2) + Math.pow(y - anotherPlanet.y, 2));
     }
@@ -713,16 +740,19 @@ public class Planet {
 
     // Astronavigation
 
-    /** @return the average travel time from low orbit to the jump point at 1g, in Terran days */
+    /**
+     * @return the average travel time from low orbit to the jump point at 1g, in
+     *         Terran days
+     */
     public double getTimeToJumpPoint(double acceleration) {
-        //based on the formula in StratOps
+        // based on the formula in StratOps
         return Math.sqrt((getDistanceToJumpPoint() * 1000) / (StarUtil.G * acceleration)) / 43200;
     }
 
     /** @return the average distance to the system's jump point in km */
     public double getDistanceToJumpPoint() {
         if (null == parentSystem) {
-            LogManager.getLogger().error("reference to planet with no parent system");
+            logger.error("reference to planet with no parent system");
             return 0;
         }
         return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));
@@ -730,17 +760,20 @@ public class Planet {
 
     public double getOrbitRadiusKm() {
         if (null == orbitRadius) {
-            //TODO: figure out a better way to handle missing orbit radius (really this should not be missing)
+            // TODO: figure out a better way to handle missing orbit radius (really this
+            // should not be missing)
             return 0.5 * StarUtil.AU;
         }
-        return  orbitRadius * StarUtil.AU;
+        return orbitRadius * StarUtil.AU;
     }
 
-
     /**
-     * Returns whether the planet has not been discovered or is a dead planet. This code was adapted from
+     * Returns whether the planet has not been discovered or is a dead planet. This
+     * code was adapted from
      * InterstellarPlanetMapPanel.isPlanetEmpty
-     * @param when - the <code>LocalDate</code> object indicating what time we are asking about.
+     *
+     * @param when - the <code>LocalDate</code> object indicating what time we are
+     *             asking about.
      * @return true if the planet is empty; false if the planet is not empty
      */
     public boolean isEmpty(LocalDate when) {
@@ -759,17 +792,22 @@ public class Planet {
     }
 
     /**
-     * A function to return any planetary related modifiers to a target roll for acquiring
-     * parts. Feeds in the campaign options because this will include important information
+     * A function to return any planetary related modifiers to a target roll for
+     * acquiring
+     * parts. Feeds in the campaign options because this will include important
+     * information
      * about these mods as well as faction information.
      *
-     * @param target - current TargetRoll for acquisitions
-     * @param when - a LocalDate object for the campaign to retrieve information from the planet
-     * @param options - the campaign options from which important values need to be determined
+     * @param target  - current TargetRoll for acquisitions
+     * @param when    - a LocalDate object for the campaign to retrieve information
+     *                from the planet
+     * @param options - the campaign options from which important values need to be
+     *                determined
      * @return an updated TargetRoll with planet specific mods
      */
-    public TargetRoll getAcquisitionMods(TargetRoll target, LocalDate when, CampaignOptions options, Faction faction, boolean clanPart) {
-        //check faction limitations
+    public TargetRoll getAcquisitionMods(TargetRoll target, LocalDate when, CampaignOptions options, Faction faction,
+            boolean clanPart) {
+        // check faction limitations
         Set<Faction> planetFactions = getFactionSet(when);
         if (null != planetFactions) {
             boolean enemies = false;
@@ -784,7 +822,8 @@ public class Planet {
                 }
                 if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(faction, planetFaction, when)) {
                     enemies = true;
-                } else if (RandomFactionGenerator.getInstance().getFactionHints().isAlliedWith(faction, planetFaction, when)) {
+                } else if (RandomFactionGenerator.getInstance().getFactionHints().isAlliedWith(faction, planetFaction,
+                        when)) {
                     allies = true;
                 } else {
                     neutrals = true;
@@ -821,20 +860,20 @@ public class Planet {
 
         SocioIndustrialData socioIndustrial = getSocioIndustrial(when);
         if (null == socioIndustrial) {
-            //nothing has been coded for this planet, so we will assume C across the board
+            // nothing has been coded for this planet, so we will assume C across the board
             socioIndustrial = new SocioIndustrialData();
-            socioIndustrial.tech = EquipmentType.RATING_C;
-            socioIndustrial.industry = EquipmentType.RATING_C;
-            socioIndustrial.output = EquipmentType.RATING_C;
-            socioIndustrial.rawMaterials = EquipmentType.RATING_C;
-            socioIndustrial.agriculture = EquipmentType.RATING_C;
+            socioIndustrial.tech = ITechnology.RATING_C;
+            socioIndustrial.industry = ITechnology.RATING_C;
+            socioIndustrial.output = ITechnology.RATING_C;
+            socioIndustrial.rawMaterials = ITechnology.RATING_C;
+            socioIndustrial.agriculture = ITechnology.RATING_C;
         }
 
-        //don't allow acquisitions from caveman planets
-        if ((socioIndustrial.tech == EquipmentType.RATING_X)
-                || (socioIndustrial.industry == EquipmentType.RATING_X)
-                || (socioIndustrial.output == EquipmentType.RATING_X)) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE,"Regressed: Pre-industrial world");
+        // don't allow acquisitions from caveman planets
+        if ((socioIndustrial.tech == ITechnology.RATING_X)
+                || (socioIndustrial.industry == ITechnology.RATING_X)
+                || (socioIndustrial.output == ITechnology.RATING_X)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Regressed: Pre-industrial world");
         }
 
         target.addModifier(options.getPlanetTechAcquisitionBonus(socioIndustrial.tech),
@@ -850,7 +889,7 @@ public class Planet {
 
     // JAXB marshalling support
 
-    @SuppressWarnings({ "unused", "unchecked" })
+    @SuppressWarnings({ "unused" })
     private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
         if (null == id) {
             id = name;
@@ -888,10 +927,13 @@ public class Planet {
     }
 
     /**
-     * Updates the current planet's coordinates and faction ownership from the given other planet.
-     * Makes several assumptions about the way the other planet's ownership events are structured.
+     * Updates the current planet's coordinates and faction ownership from the given
+     * other planet.
+     * Makes several assumptions about the way the other planet's ownership events
+     * are structured.
+     *
      * @param tsvPlanet The planet from which to update.
-     * @param dryRun Whether to actually perform the updates.
+     * @param dryRun    Whether to actually perform the updates.
      * @return Human readable form of what was/would have been updated.
      */
     public String updateFromTSVPlanet(final Planet tsvPlanet, boolean dryRun) {
@@ -908,37 +950,46 @@ public class Planet {
         }
 
         // loop using index
-        // look ahead by one event (if possible) and check that getFaction(next event year) isn't already
-        // the same as the faction from the current event : sometimes, our data is more exact than the incoming data
+        // look ahead by one event (if possible) and check that getFaction(next event
+        // year) isn't already
+        // the same as the faction from the current event : sometimes, our data is more
+        // exact than the incoming data
         List<PlanetaryEvent> tsvEvents = tsvPlanet.getEvents();
         for (int eventIndex = 0; eventIndex < tsvEvents.size(); eventIndex++) {
             PlanetaryEvent event = tsvEvents.get(eventIndex);
             // check other planet events (currently only updating faction change events)
             // if the other planet has an 'ownership change' event with a non-"U" faction
-            // check that this planet does not have an existing non-"U" faction already owning it at the event date
+            // check that this planet does not have an existing non-"U" faction already
+            // owning it at the event date
             // and does not acquire such a faction between this and the next event
             // Then we will add the ownership change event
             if ((event.faction != null) && !event.faction.isEmpty()) {
-                // the purpose of this code is to evaluate whether the current "other planet" event
+                // the purpose of this code is to evaluate whether the current "other planet"
+                // event
                 // is a faction change to an active, valid faction.
                 Faction eventFaction = Factions.getInstance().getFaction(event.faction.get(0));
-                boolean eventHasActualFaction = eventFaction != null && (!eventFaction.is(Tag.INACTIVE) && !eventFaction.is(Tag.ABANDONED));
+                boolean eventHasActualFaction = eventFaction != null
+                        && (!eventFaction.is(Tag.INACTIVE) && !eventFaction.is(Tag.ABANDONED));
 
                 if (eventHasActualFaction) {
                     List<String> currentFactions = this.getFactions(event.date);
 
                     // if this planet has an "inactive and abandoned" current faction...
-                    // we also want to catch the situation where the next faction change isn't to the same exact faction
+                    // we also want to catch the situation where the next faction change isn't to
+                    // the same exact faction
                     if ((currentFactions.size() == 1)
                             && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.INACTIVE)
                             && Factions.getInstance().getFaction(currentFactions.get(0)).is(Tag.ABANDONED)) {
-                        // now we travel into the future, to the next "other" event, and if this planet has acquired a faction
+                        // now we travel into the future, to the next "other" event, and if this planet
+                        // has acquired a faction
                         // before the next "other" event, then we
                         int nextEventIndex = eventIndex + 1;
-                        PlanetaryEvent nextEvent = nextEventIndex < tsvEvents.size() ? tsvEvents.get(nextEventIndex) : null;
+                        PlanetaryEvent nextEvent = nextEventIndex < tsvEvents.size() ? tsvEvents.get(nextEventIndex)
+                                : null;
                         LocalDate nextEventDate;
 
-                        // if we're at the last event, then just check that the planet doesn't have a faction in the year 3600
+                        // if we're at the last event, then just check that the planet doesn't have a
+                        // faction in the year 3600
                         if (nextEvent == null) {
                             nextEventDate = LocalDate.ofYearDay(3600, 1);
                         } else {
@@ -974,7 +1025,8 @@ public class Planet {
     /**
      * Copy all but id from the other planet. Update event list. Events with the
      * same date as others already in the list get overwritten, others added.
-     * To effectively delete an event, simply create a new one with <i>just</i> the date.
+     * To effectively delete an event, simply create a new one with <i>just</i> the
+     * date.
      */
     public void copyDataFrom(Planet other) {
         if (null != other) {
@@ -1014,7 +1066,6 @@ public class Planet {
         }
     }
 
-
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
@@ -1051,7 +1102,7 @@ public class Planet {
     }
 
     /** A class representing some event, possibly changing planetary information */
-    @XmlRootElement(name="event")
+    @XmlRootElement(name = "event")
     public static final class PlanetaryEvent {
         @XmlJavaTypeAdapter(DateAdapter.class)
         public LocalDate date;
@@ -1081,7 +1132,7 @@ public class Planet {
         public Long population;
         public Double dayLength;
         // Events marked as "custom" are saved to scenario files and loaded from there
-        public transient boolean custom = false;
+        public boolean custom = false;
 
         public void copyDataFrom(PlanetaryEvent other) {
             climate = ObjectUtility.nonNull(other.climate, climate);
@@ -1136,9 +1187,9 @@ public class Planet {
         /** @return <code>true</code> if the event doesn't contain any change */
         public boolean isEmpty() {
             return (null == climate) && (null == faction) && (null == hpg) && (null == lifeForm)
-                && (null == message) && (null == name) && (null == shortName) && (null == socioIndustrial)
-                && (null == temperature) && (null == pressure) && (null == atmosphere)
-                && (null == composition) && (null == population) && (null == dayLength);
+                    && (null == message) && (null == name) && (null == shortName) && (null == socioIndustrial)
+                    && (null == temperature) && (null == pressure) && (null == atmosphere)
+                    && (null == composition) && (null == population) && (null == dayLength);
         }
     }
 

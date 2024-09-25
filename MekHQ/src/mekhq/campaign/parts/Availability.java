@@ -22,15 +22,18 @@ package mekhq.campaign.parts;
 
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
-import org.apache.logging.log4j.LogManager;
+import megamek.logging.MMLogger;
 
 /**
  * Helper functions for determining part availability and tech base
  * and the associated modifiers. A lot of this code is borrowed from
  * the deprecated SSWLibHelper.java
+ * 
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Availability {
+    private static final MMLogger logger = MMLogger.create(Availability.class);
+
     public static int getAvailabilityModifier(int availability) {
         switch (availability) {
             case ITechnology.RATING_A:
@@ -48,13 +51,16 @@ public class Availability {
             case ITechnology.RATING_FSTAR:
             case ITechnology.RATING_X:
                 // FIXME : Per IO, any IS equipment with a base SW availability of E-F that goes
-                // FIXME : extinct during the SW has it increased by 1 with F+1 meaning that there
-                // FIXME : is a 50% chance of being unobtainable. This doesn't work so well with the
-                // FIXME : rules in StratOps, so for now I'm considering it equivalent to X, which
+                // FIXME : extinct during the SW has it increased by 1 with F+1 meaning that
+                // there
+                // FIXME : is a 50% chance of being unobtainable. This doesn't work so well with
+                // the
+                // FIXME : rules in StratOps, so for now I'm considering it equivalent to X,
+                // which
                 // FIXME : gives a +5.
                 return 5;
             default:
-                LogManager.getLogger().error("Attempting to get availability modifier for unknown rating of " + availability);
+                logger.error("Attempting to get availability modifier for unknown rating of " + availability);
                 return 999;
         }
     }
@@ -74,7 +80,7 @@ public class Availability {
             case EquipmentType.RATING_F:
                 return 3;
             default:
-                LogManager.getLogger().error("Attempting to get tech modifier for unknown rating of " + tech);
+                logger.error("Attempting to get tech modifier for unknown rating of " + tech);
                 return 999;
         }
     }

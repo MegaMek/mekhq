@@ -18,16 +18,33 @@
  */
 package mekhq.gui.panes;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.panels.EntityImagePanel;
 import megamek.client.ui.panes.EntityViewPane;
-import megamek.client.ui.preferences.*;
+import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
+import megamek.client.ui.preferences.JTabbedPanePreference;
+import megamek.client.ui.preferences.JTablePreference;
+import megamek.client.ui.preferences.JToggleButtonPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -37,25 +54,16 @@ import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.sorter.WeightClassSorter;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 public class UnitMarketPane extends AbstractMHQSplitPane {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(UnitMarketPane.class);
+
+    // region Variable Declarations
     private final Campaign campaign;
 
-    //region Left Panel
+    // region Left Panel
     // Filters
-    private JCheckBox chkShowMechs;
+    private JCheckBox chkShowMeks;
     private JCheckBox chkShowVehicles;
     private JCheckBox chkShowAerospace;
     private JCheckBox chkShowConvAero;
@@ -69,34 +77,34 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     private JTable marketTable;
     private UnitMarketTableModel marketModel;
     private TableRowSorter<UnitMarketTableModel> marketSorter;
-    //endregion Left Panel
+    // endregion Left Panel
 
-    //region Right Panel
+    // region Right Panel
     private EntityViewPane entityViewPane;
-    //endregion Right Panel
-    //endregion Variable Declarations
+    // endregion Right Panel
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public UnitMarketPane(final JFrame frame, final Campaign campaign) {
         super(frame, "UnitMarketPane");
         this.campaign = campaign;
         initialize();
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public Campaign getCampaign() {
         return campaign;
     }
 
-    //region Left Panel
-    //region Filters
-    public JCheckBox getChkShowMechs() {
-        return chkShowMechs;
+    // region Left Panel
+    // region Filters
+    public JCheckBox getChkShowMeks() {
+        return chkShowMeks;
     }
 
-    public void setChkShowMechs(final JCheckBox chkShowMechs) {
-        this.chkShowMechs = chkShowMechs;
+    public void setChkShowMeks(final JCheckBox chkShowMeks) {
+        this.chkShowMeks = chkShowMeks;
     }
 
     public JCheckBox getChkShowVehicles() {
@@ -138,9 +146,9 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     public void setSpnCostPercentageThreshold(final JSpinner spnCostPercentageThreshold) {
         this.spnCostPercentageThreshold = spnCostPercentageThreshold;
     }
-    //endregion Filters
+    // endregion Filters
 
-    //region Unit Image
+    // region Unit Image
     public EntityImagePanel getEntityImagePanel() {
         return entityImagePanel;
     }
@@ -148,9 +156,9 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     public void setEntityImagePanel(final EntityImagePanel entityImagePanel) {
         this.entityImagePanel = entityImagePanel;
     }
-    //endregion Unit Image
+    // endregion Unit Image
 
-    //region Unit Table
+    // region Unit Table
     public JTable getMarketTable() {
         return marketTable;
     }
@@ -174,10 +182,10 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     public void setMarketSorter(final TableRowSorter<UnitMarketTableModel> marketSorter) {
         this.marketSorter = marketSorter;
     }
-    //endregion Unit Table
-    //endregion Left Panel
+    // endregion Unit Table
+    // endregion Left Panel
 
-    //region Right Panel
+    // region Right Panel
     public EntityViewPane getEntityViewPane() {
         return entityViewPane;
     }
@@ -185,10 +193,10 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     public void setEntityViewPane(final EntityViewPane entityViewPane) {
         this.entityViewPane = entityViewPane;
     }
-    //endregion Right Panel
-    //endregion Getters/Setters
+    // endregion Right Panel
+    // endregion Getters/Setters
 
-    //region Initialization
+    // region Initialization
     @Override
     protected Component createLeftComponent() {
         // Create Panel Components
@@ -215,8 +223,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                                 .addComponent(filtersPanel)
                                 .addComponent(getEntityImagePanel(), Alignment.LEADING))
                         .addComponent(marketTableScrollPane)
-                        .addComponent(lblMarketDescriptions)
-        );
+                        .addComponent(lblMarketDescriptions));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
@@ -224,18 +231,17 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                                 .addComponent(filtersPanel)
                                 .addComponent(getEntityImagePanel()))
                         .addComponent(marketTableScrollPane)
-                        .addComponent(lblMarketDescriptions, Alignment.TRAILING)
-        );
+                        .addComponent(lblMarketDescriptions, Alignment.TRAILING));
         return panel;
     }
 
     private JPanel createFiltersPanel() {
         // Create Panel Components
-        setChkShowMechs(new JCheckBox(resources.getString("chkShowMechs.text")));
-        getChkShowMechs().setToolTipText(resources.getString("chkShowMechs.toolTipText"));
-        getChkShowMechs().setName("chkShowMechs");
-        getChkShowMechs().setSelected(true);
-        getChkShowMechs().addActionListener(evt -> filterOffers());
+        setChkShowMeks(new JCheckBox(resources.getString("chkShowMeks.text")));
+        getChkShowMeks().setToolTipText(resources.getString("chkShowMeks.toolTipText"));
+        getChkShowMeks().setName("chkShowMeks");
+        getChkShowMeks().setSelected(true);
+        getChkShowMeks().addActionListener(evt -> filterOffers());
 
         setChkShowVehicles(new JCheckBox(resources.getString("chkShowVehicles.text")));
         getChkShowVehicles().setToolTipText(resources.getString("chkShowVehicles.toolTipText"));
@@ -256,19 +262,22 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         setChkFilterByPercentageOfCost(new JCheckBox(resources.getString("chkFilterByPercentageOfCost.text")));
         getChkFilterByPercentageOfCost().setToolTipText(resources.getString("chkFilterByPercentageOfCost.toolTipText"));
         getChkFilterByPercentageOfCost().setName("chkFilterByPercentageOfCost");
-        getChkFilterByPercentageOfCost().getAccessibleContext().setAccessibleDescription(resources.getString("chkFilterByPercentageOfCost.toolTipText"));
+        getChkFilterByPercentageOfCost().getAccessibleContext()
+                .setAccessibleDescription(resources.getString("chkFilterByPercentageOfCost.toolTipText"));
         getChkFilterByPercentageOfCost().addActionListener(evt -> filterOffers());
 
         setSpnCostPercentageThreshold(new JSpinner(new SpinnerNumberModel(100, 10, 1000, 10)));
         getSpnCostPercentageThreshold().setToolTipText(resources.getString("spnFilterByPercentageOfCost.toolTipText"));
         getSpnCostPercentageThreshold().setName("spnCostPercentageThreshold");
-        getSpnCostPercentageThreshold().getAccessibleContext().setAccessibleDescription(resources.getString("spnFilterByPercentageOfCost.toolTipText"));
+        getSpnCostPercentageThreshold().getAccessibleContext()
+                .setAccessibleDescription(resources.getString("spnFilterByPercentageOfCost.toolTipText"));
         getSpnCostPercentageThreshold().addChangeListener(evt -> filterOffers());
 
         JLabel lblCostPercentageThreshold = new JLabel(resources.getString("lblCostPercentageThreshold.text"));
         lblCostPercentageThreshold.setToolTipText(resources.getString("spnFilterByPercentageOfCost.toolTipText"));
         lblCostPercentageThreshold.setName("lblCostPercentageThreshold");
-        lblCostPercentageThreshold.getAccessibleContext().setAccessibleDescription(resources.getString("spnFilterByPercentageOfCost.toolTipText"));
+        lblCostPercentageThreshold.getAccessibleContext()
+                .setAccessibleDescription(resources.getString("spnFilterByPercentageOfCost.toolTipText"));
         lblCostPercentageThreshold.setLabelFor(getSpnCostPercentageThreshold());
 
         // Layout the UI
@@ -283,28 +292,26 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(getChkShowMechs())
+                                .addComponent(getChkShowMeks())
                                 .addComponent(getChkShowVehicles())
                                 .addComponent(getChkShowAerospace())
                                 .addComponent(getChkShowConvAero(), Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkFilterByPercentageOfCost())
                                 .addComponent(getSpnCostPercentageThreshold())
-                                .addComponent(lblCostPercentageThreshold, Alignment.LEADING))
-        );
+                                .addComponent(lblCostPercentageThreshold, Alignment.LEADING)));
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(getChkShowMechs())
+                                .addComponent(getChkShowMeks())
                                 .addComponent(getChkShowVehicles())
                                 .addComponent(getChkShowAerospace())
                                 .addComponent(getChkShowConvAero()))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkFilterByPercentageOfCost())
                                 .addComponent(getSpnCostPercentageThreshold())
-                                .addComponent(lblCostPercentageThreshold))
-        );
+                                .addComponent(lblCostPercentageThreshold)));
         return panel;
     }
 
@@ -364,7 +371,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     @Override
     protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         // Left Component
-        preferences.manage(new JToggleButtonPreference(getChkShowMechs()));
+        preferences.manage(new JToggleButtonPreference(getChkShowMeks()));
         preferences.manage(new JToggleButtonPreference(getChkShowVehicles()));
         preferences.manage(new JToggleButtonPreference(getChkShowAerospace()));
         preferences.manage(new JToggleButtonPreference(getChkShowConvAero()));
@@ -375,7 +382,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         // Right Component
         preferences.manage(new JTabbedPanePreference(getEntityViewPane()));
     }
-    //endregion Initialization
+    // endregion Initialization
 
     public @Nullable Entity getSelectedEntity() {
         return (getMarketTable().getSelectedRow() < 0) ? null
@@ -402,19 +409,19 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         return offers;
     }
 
-    //region Button Actions
+    // region Button Actions
     public void purchaseSelectedOffers() {
         final List<UnitMarketOffer> offers = getSelectedOffers();
         if (offers.isEmpty()) {
             return;
         }
 
-        for (final Iterator<UnitMarketOffer> offersIterator = offers.iterator(); offersIterator.hasNext(); ) {
+        for (final Iterator<UnitMarketOffer> offersIterator = offers.iterator(); offersIterator.hasNext();) {
             final UnitMarketOffer offer = offersIterator.next();
 
             final Entity entity = offer.getEntity();
             if (entity == null) {
-                LogManager.getLogger().error("Cannot purchase a null entity");
+                logger.error("Cannot purchase a null entity");
                 getCampaign().getUnitMarket().getOffers().remove(offer);
                 offersIterator.remove();
                 continue;
@@ -422,7 +429,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             final Money price = offer.getPrice();
             if (getCampaign().getFunds().isLessThan(price)) {
-                getCampaign().addReport(String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                getCampaign().addReport(String.format(
+                        "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
                                 + resources.getString("UnitMarketPane.CannotAfford.report") + "</font>",
                         entity.getShortName()));
                 offersIterator.remove();
@@ -432,7 +440,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             final int roll = Compute.d6();
             if (offer.getMarketType().isBlackMarket() && (roll < 3)) {
                 getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
-                        price.dividedBy(roll), String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
+                        price.dividedBy(roll),
+                        String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
                                 entity.getShortName()));
                 getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
                         + resources.getString("UnitMarketPane.BlackMarketSwindled.report") + "</font>");
@@ -442,7 +451,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             }
 
             getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
-                    price, String.format(resources.getString("UnitMarketPane.PurchasedUnit.finances"), entity.getShortName()));
+                    price,
+                    String.format(resources.getString("UnitMarketPane.PurchasedUnit.finances"), entity.getShortName()));
         }
 
         finalizeEntityAcquisition(offers, getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
@@ -460,8 +470,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     /**
      * Finalizes the acquisition of entities from the market.
      *
-     * @param offers           the list of UnitMarketOffers to be finalized
-     * @param instantDelivery  indicates if the delivery should be instantaneous
+     * @param offers          the list of UnitMarketOffers to be finalized
+     * @param instantDelivery indicates if the delivery should be instantaneous
      */
     private void finalizeEntityAcquisition(final List<UnitMarketOffer> offers, final boolean instantDelivery) {
         for (final UnitMarketOffer offer : offers) {
@@ -469,13 +479,12 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                     offer.getEntity(),
                     false,
                     instantDelivery ? 0 : offer.getTransitDuration(),
-                    UnitMarketType.getQuality(campaign, offer.getMarketType())
-            );
+                    UnitMarketType.getQuality(campaign, offer.getMarketType()));
 
             if (!instantDelivery) {
                 getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
                         + String.format(resources.getString("UnitMarketPane.UnitDeliveryLength.report") + "</font>",
-                        offer.getTransitDuration()));
+                                offer.getTransitDuration()));
             }
             getCampaign().getUnitMarket().getOffers().remove(offer);
         }
@@ -490,7 +499,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         getCampaign().getUnitMarket().getOffers().removeAll(offers);
         getMarketModel().setData(getCampaign().getUnitMarket().getOffers());
     }
-    //endregion Button Actions
+    // endregion Button Actions
 
     private void updateDisplay() {
         final Entity entity = getSelectedEntity();
@@ -513,7 +522,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
                 switch (offer.get().getUnitType()) {
                     case UnitType.MEK:
-                        return getChkShowMechs().isSelected();
+                        return getChkShowMeks().isSelected();
                     case UnitType.TANK:
                         return getChkShowVehicles().isSelected();
                     case UnitType.AEROSPACEFIGHTER:

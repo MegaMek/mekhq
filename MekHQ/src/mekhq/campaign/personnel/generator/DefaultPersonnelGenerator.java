@@ -24,6 +24,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.randomEvents.PersonalityController;
@@ -144,6 +145,9 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         // generate background
         BackgroundsController.generateBackground(campaign, person);
+
+        // generate personality
+        PersonalityController.generatePersonality(person);
 
         return person;
     }

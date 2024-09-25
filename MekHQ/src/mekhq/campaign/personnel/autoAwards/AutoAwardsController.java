@@ -31,11 +31,11 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.AutoAwardsDialog;
 
 import javax.swing.*;
 import java.awt.Dialog.ModalityType;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -83,10 +83,12 @@ public class AutoAwardsController {
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
                     MekHQ.getMHQOptions().getLocale());
 
-            JOptionPane.showMessageDialog(null,
-                    resources.getString("txtNoneEligible.text"),
-                    resources.getString("AutoAwardsDialog.title"),
-                    JOptionPane.INFORMATION_MESSAGE);
+            if (isManualPrompt) {
+                JOptionPane.showMessageDialog(null,
+                        resources.getString("txtNoneEligible.text"),
+                        resources.getString("AutoAwardsDialog.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         }
 
         logger.info("autoAwards (Manual) has finished");
@@ -243,38 +245,88 @@ public class AutoAwardsController {
      * Builds a list of personnel autoAwards should process
      */
     private List<UUID> getPersonnel() {
+        // Get whether to issue posthumous awards from campaign options.
         boolean issuePosthumous = campaign.getCampaignOptions().isIssuePosthumousAwards();
 
-        List<UUID> personnel = campaign.getPersonnel()
-                .stream()
-                .filter(person ->
-                        ((!person.getStatus().isDepartedUnit()) && (!person.getPrisonerStatus().isCurrentPrisoner()) && (!person.hasRole(PersonnelRole.DEPENDENT)))
-                                || ((issuePosthumous) && (person.getStatus().isDead()) && (filterOutPersonnel(person)))
-                )
-                .map(Person::getId)
-                .collect(Collectors.toList());
+        // Get the last mission end date.
+        LocalDate lastMissionEndDate = getLastMissionEndDate();
 
+        // Fetch all personnel in the campaign.
+        Collection<Person> rawPersonnel = campaign.getPersonnel();
+        // Create a list to store Ids of qualifying personnel.
+        List<UUID> personnel = new ArrayList<>();
+
+        // Iterate through each person in the rawPersonnel collection.
+        for (Person person : rawPersonnel) {
+            // Check conditions of the person being active, not currently a prisoner, and not a civilian.
+            // If all conditions are met, add their ID to the list.
+            if ((person.getStatus().isActive())
+                    && (!person.getPrisonerStatus().isCurrentPrisoner())
+                    && (!person.getPrimaryRole().isCivilian())) {
+                personnel.add(person.getId());
+            }
+
+            // Check the conditions of the person being dead, the issuePosthumous flag being true,
+            // the person not currently being a prisoner, and not a civilian.
+            // If all conditions are met, further check if the person's date of death
+            // is after or equal to the last mission's end date.
+            // If all these conditions are met, add their ID to the list.
+            if (person.getStatus().isDead()
+                    && (issuePosthumous)
+                    && (!person.getPrisonerStatus().isCurrentPrisoner())
+                    && (!person.getPrimaryRole().isCivilian())) {
+                if (person.getDateOfDeath().isAfter(lastMissionEndDate) || person.getDateOfDeath().equals(lastMissionEndDate)) {
+                    personnel.add(person.getId());
+                }
+            }
+        }
+
+        // Log the details of the personnel list.
         logger.debug("Personnel {}", personnel);
 
+        // Return the list of qualifying personnel IDs.
         return personnel;
     }
 
     /**
-     * Filters out personnel based on specific criteria.
+     * Returns the last mission end date based on the campaign's completed AtBContracts.
      *
-     * @param person the person to be filtered
-     * @return true if the person should be filtered out, false otherwise
+     * @return the date of the last mission end, or today's date if no completed contracts exist
      */
-    private boolean filterOutPersonnel(Person person) {
-        return !((person.getPrisonerStatus().isCurrentPrisoner()) || (person.hasRole(PersonnelRole.DEPENDENT)))
-                &&
-                !((person.getStatus().isRetired())
-                || (person.getStatus().isResigned())
-                || (person.getStatus().isSacked())
-                || (person.getStatus().isDeserted())
-                || (person.getStatus().isDefected())
-                || (person.getStatus().isMissing())
-                || (person.getStatus().isLeft()));
+    private LocalDate getLastMissionEndDate() {
+        // Get the current date from the campaign object.
+        LocalDate today = campaign.getLocalDate();
+
+        // Get the list of completed contracts from the campaign object.
+        List<AtBContract> completedContracts = campaign.getCompletedAtBContracts();
+
+        // If there are no completed contracts, return the current date.
+        if (completedContracts.isEmpty()) {
+            return today;
+        }
+
+        // Initialize a variable to hold the ending date of the last contract.
+        LocalDate lastContractEndingDate = null;
+
+        // Loop through each contract in the list of completed contracts.
+        for (AtBContract contract : completedContracts) {
+            // Get the ending date of the current contract.
+            LocalDate endingDate = contract.getEndingDate();
+
+            // If this is the first iteration, assign the ending date of the current contract to lastContractEndingDate and continue to the next iteration.
+            if (lastContractEndingDate == null) {
+                lastContractEndingDate = endingDate;
+                continue;
+            }
+
+            // If the ending date of the current contract is after the lastContractEndingDate, update lastContractEndingDate.
+            if (endingDate.isAfter(lastContractEndingDate)) {
+                lastContractEndingDate = endingDate;
+            }
+        }
+
+        // Return the ending date of the last contract.
+        return lastContractEndingDate;
     }
 
     /**
@@ -838,7 +890,7 @@ public class AutoAwardsController {
         // prep the kill award data so that we only have to process it once
         Map<Integer, List<Kill>> missionKillData = personnel.stream()
                 .flatMap(person -> campaign.getKillsFor(person).stream())
-                .filter(kill -> kill.getMissionId() == mission.getId())
+                .filter(kill -> mission != null && (kill.getMissionId() == mission.getId()))
                 .collect(Collectors.groupingBy(Kill::getForceId));
 
         // process the award data, checking for award eligibility

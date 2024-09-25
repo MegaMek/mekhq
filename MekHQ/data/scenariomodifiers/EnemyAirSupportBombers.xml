@@ -1,5 +1,6 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Enemy aircraft detected on approach and will arrive shortly after the start of the battle.</additionalBriefingText>
+	<additionalBriefingText>Enemy aircraft detected on approach and will arrive shortly after the
+		start of the battle.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<forceDefinition>
@@ -31,8 +32,8 @@
 		<generationOrder>5</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<objectiveLinkedForces>
-                    <objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
-                </objectiveLinkedForces>
+			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+		</objectiveLinkedForces>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>None</syncDeploymentType>

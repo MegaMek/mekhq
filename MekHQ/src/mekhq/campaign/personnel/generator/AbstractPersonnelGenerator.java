@@ -156,10 +156,10 @@ public abstract class AbstractPersonnelGenerator {
         //check for clan phenotypes
         if (person.isClanPersonnel()) {
             switch (person.getPrimaryRole()) {
-                case MECHWARRIOR:
+                case MEKWARRIOR:
                 case LAM_PILOT:
-                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.MECHWARRIOR))) {
-                        person.setPhenotype(Phenotype.MECHWARRIOR);
+                    if (Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.MEKWARRIOR))) {
+                        person.setPhenotype(Phenotype.MEKWARRIOR);
                     }
                     break;
                 case GROUND_VEHICLE_DRIVER:
@@ -179,10 +179,10 @@ public abstract class AbstractPersonnelGenerator {
                         person.setPhenotype(Phenotype.AEROSPACE);
                     }
                     break;
-                case PROTOMECH_PILOT:
+                case PROTOMEK_PILOT:
                     if ((campaign.getGameYear() > 3060)
-                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.PROTOMECH))) {
-                        person.setPhenotype(Phenotype.PROTOMECH);
+                            && Utilities.rollProbability(campaign.getCampaignOptions().getPhenotypeProbability(Phenotype.PROTOMEK))) {
+                        person.setPhenotype(Phenotype.PROTOMEK);
                     }
                     break;
                 case BATTLE_ARMOUR:

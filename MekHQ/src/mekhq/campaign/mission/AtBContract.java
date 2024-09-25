@@ -21,14 +21,30 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.*;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MissionChangedEvent;
@@ -49,17 +65,6 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -67,6 +72,8 @@ import java.util.UUID;
  * @author Neoancient
  */
 public class AtBContract extends Contract {
+    private static final MMLogger logger = MMLogger.create(AtBContract.class);
+
     public static final int EVT_NOEVENT = -1;
     public static final int EVT_BONUSROLL = 0;
     public static final int EVT_SPECIAL_SCENARIO = 1;
@@ -229,7 +236,7 @@ public class AtBContract extends Contract {
     }
 
     public void calculatePaymentMultiplier(Campaign campaign) {
-        int unitRatingMod = campaign.getUnitRatingMod();
+        int unitRatingMod = campaign.getAtBUnitRatingMod();
         double multiplier = 1.0;
         // IntOps reputation factor then Dragoons rating
         if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
@@ -265,13 +272,11 @@ public class AtBContract extends Contract {
         int cmdrStrategy = 0;
         if (campaign.getFlaggedCommander() != null &&
                 campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
-            cmdrStrategy = campaign.getFlaggedCommander().
-                    getSkill(SkillType.S_STRATEGY).getLevel();
+            cmdrStrategy = campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
         }
-        int maxDeployedLances =
-            campaign.getCampaignOptions().getBaseStrategyDeployment() +
-            campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
-            cmdrStrategy;
+        int maxDeployedLances = campaign.getCampaignOptions().getBaseStrategyDeployment() +
+                campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
+                        cmdrStrategy;
 
         if (isSubcontract()) {
             requiredLances = 1;
@@ -347,7 +352,7 @@ public class AtBContract extends Contract {
             mod += 2;
         }
 
-         // If no player victories in last month: +1
+        // If no player victories in last month: +1
         if (victories == 0) {
             mod++;
         }
@@ -403,21 +408,30 @@ public class AtBContract extends Contract {
         getEnemyName(today.getYear()); // we use this to update enemyName
     }
 
+    /**
+     * Retrieves the repair location based on the unit rating and contract type.
+     *
+     * @param unitRating The rating of the unit.
+     * @return The repair location.
+     */
     public int getRepairLocation(final int unitRating) {
-        int repairLocation;
-        if (getContractType().isGuerrillaWarfare() || getContractType().isRaidType()) {
+        int repairLocation = Unit.SITE_FACILITY_BASIC;
+
+        AtBContractType contractType = getContractType();
+
+        if (contractType.isGuerrillaWarfare()) {
             repairLocation = Unit.SITE_IMPROVISED;
-        } else if (!getContractType().isGarrisonType()) {
+        } else if (contractType.isRaidType()) {
             repairLocation = Unit.SITE_FIELD_WORKSHOP;
-        } else {
-            repairLocation = Unit.SITE_FACILITY_BASIC;
+        } else if (contractType.isGarrisonType()) {
+            repairLocation = Unit.SITE_FACILITY_MAINTENANCE;
         }
 
         if (unitRating >= IUnitRating.DRAGOON_B) {
             repairLocation++;
         }
 
-        return Math.min(repairLocation, Unit.SITE_FACILITY_BASIC);
+        return Math.min(repairLocation, Unit.SITE_FACTORY_CONDITIONS);
     }
 
     public void addMoraleMod(int mod) {
@@ -503,7 +517,7 @@ public class AtBContract extends Contract {
             case 3: /* 1d6 parts */
                 number = Compute.d6();
                 numBonusParts += number;
-                c.addReport("Bonus: " + number + " part" + ((number>1)?"s":""));
+                c.addReport("Bonus: " + number + " part" + ((number > 1) ? "s" : ""));
                 break;
             case 4: /* civilian vehicle */
                 rat = "CivilianUnits_CivVeh";
@@ -513,18 +527,19 @@ public class AtBContract extends Contract {
                 rat = "CivilianUnits_APC";
                 c.addReport("Bonus: civilian APC");
                 break;
-            case 6: /* civilian 'Mech */
-                rat = "CivilianUnits_PrimMech";
+            case 6: /* civilian 'Mek */
+                rat = "CivilianUnits_PrimMek";
                 c.addReport("Bonus: civilian Mek");
                 break;
             default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
+                throw new IllegalStateException(
+                        "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
         }
 
         if (null != rat) {
             Entity en = null;
             RandomUnitGenerator.getInstance().setChosenRAT(rat);
-            ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
+            ArrayList<MekSummary> msl = RandomUnitGenerator.getInstance().generate(1);
 
             int quality = 3;
 
@@ -534,9 +549,9 @@ public class AtBContract extends Contract {
 
             if (!msl.isEmpty() && (msl.get(0) != null)) {
                 try {
-                    en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
+                    en = new MekFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
                 } catch (EntityLoadingException ex) {
-                    LogManager.getLogger().error("Unable to load entity: {}: {}: {}",
+                    logger.error("Unable to load entity: {}: {}: {}",
                             msl.get(0).getSourceFile(),
                             msl.get(0).getEntryName(),
                             ex.getMessage(),
@@ -547,7 +562,8 @@ public class AtBContract extends Contract {
             if (null != en) {
                 c.addNewUnit(en, false, 0, quality);
             } else {
-                c.addReport("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Could not load unit</font></html>");
+                c.addReport("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
+                        + "'>Could not load unit</font></html>");
             }
         }
     }
@@ -635,12 +651,14 @@ public class AtBContract extends Contract {
                     c.addReport(text);
                     break;
                 case EVT_TREACHERY:
-                    c.addReport("<b>Special Event:</b> Treachery<br />Bad information from employer. Next Enemy Morale roll gets +1. Employer minor breach.");
+                    c.addReport(
+                            "<b>Special Event:</b> Treachery<br />Bad information from employer. Next Enemy Morale roll gets +1. Employer minor breach.");
                     moraleMod++;
                     employerMinorBreaches++;
                     break;
                 case EVT_LOGISTICSFAILURE:
-                    c.addReport("<b>Special Event:</b> Logistics Failure<br />Parts availability for the next month are one level lower.");
+                    c.addReport(
+                            "<b>Special Event:</b> Logistics Failure<br />Parts availability for the next month are one level lower.");
                     partsAvailabilityLevel--;
                     priorLogisticsFailure = true;
                     break;
@@ -677,7 +695,9 @@ public class AtBContract extends Contract {
                                     UnitMarketType.EMPLOYER, UnitType.MEK, getEmployerFaction(),
                                     IUnitRating.DRAGOON_F, 50);
                             if (unitName != null) {
-                                text += String.format("Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>", unitName);
+                                text += String.format(
+                                        "Surplus Sale: %s offered by employer on the <a href='UNIT_MARKET'>unit market</a>",
+                                        unitName);
                             }
                             break;
                     }
@@ -718,7 +738,8 @@ public class AtBContract extends Contract {
     }
 
     public LocalDate getRandomDayOfMonth(LocalDate today) {
-        return LocalDate.of(today.getYear(), today.getMonth(), Compute.randomInt(today.getMonth().length(today.isLeapYear())) + 1);
+        return LocalDate.of(today.getYear(), today.getMonth(),
+                Compute.randomInt(today.getMonth().length(today.isLeapYear())) + 1);
     }
 
     public boolean contractExtended(final Campaign campaign) {
@@ -756,7 +777,8 @@ public class AtBContract extends Contract {
         if (extensionLength == 0) {
             return super.getMonthlyPayOut();
         }
-        /* The transport clause and the advance monies have already been
+        /*
+         * The transport clause and the advance monies have already been
          * accounted for over the original length of the contract. The extension
          * uses the base monthly amounts for support and overhead, with a
          * 50% bonus to the base amount.
@@ -779,7 +801,8 @@ public class AtBContract extends Contract {
             int roll = Compute.d6();
             if (roll == 6) {
                 campaign.getContractMarket().addFollowup(campaign, this);
-                campaign.addReport("Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
+                campaign.addReport(
+                        "Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
             }
         }
     }
@@ -798,7 +821,7 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyBotName", getAllyBotName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyBotName", getEnemyBotName());
         if (!getAllyCamouflage().hasDefaultCategory()) {
-           MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyCamoCategory", getAllyCamouflage().getCategory());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyCamoCategory", getAllyCamouflage().getCategory());
         }
 
         if (!getAllyCamouflage().hasDefaultFilename()) {
@@ -860,8 +883,7 @@ public class AtBContract extends Contract {
                     enemyCode = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyName")) {
                     enemyName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("contractType")
-                        || wn2.getNodeName().equalsIgnoreCase("missionType")) { // Mission Type is Legacy - 0.49.2 removal
+                } else if (wn2.getNodeName().equalsIgnoreCase("contractType")) {
                     setContractType(AtBContractType.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("allySkill")) {
                     setAllySkill(SkillLevel.parseFromString(wn2.getTextContent().trim()));
@@ -881,24 +903,12 @@ public class AtBContract extends Contract {
                     getAllyCamouflage().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getTextContent().equalsIgnoreCase("allyColour")) {
                     setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("allyColorIndex")) { // Legacy - 0.47.15 removal
-                    setAllyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                    if (Camouflage.NO_CAMOUFLAGE.equals(getAllyCamouflage().getCategory())) {
-                        getAllyCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                        getAllyCamouflage().setFilename(getAllyColour().name());
-                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoCategory")) {
                     getEnemyCamouflage().setCategory(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyCamoFileName")) {
                     getEnemyCamouflage().setFilename(wn2.getTextContent().trim());
                 } else if (wn2.getTextContent().equalsIgnoreCase("enemyColour")) {
                     setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enemyColorIndex")) { // Legacy - 0.47.15 removal
-                    setEnemyColour(PlayerColour.parseFromString(wn2.getTextContent().trim()));
-                    if (Camouflage.NO_CAMOUFLAGE.equals(getEnemyCamouflage().getCategory())) {
-                        getEnemyCamouflage().setCategory(Camouflage.COLOUR_CAMOUFLAGE);
-                        getEnemyCamouflage().setFilename(getEnemyColour().name());
-                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("requiredLances")) {
                     requiredLances = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("moraleLevel")) {
@@ -937,13 +947,14 @@ public class AtBContract extends Contract {
                     parentContract = new AtBContractRef(Integer.parseInt(wn2.getTextContent()));
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
 
     /**
      * Restores any references to other contracts.
+     *
      * @param c The Campaign which holds this contract.
      */
     public void restore(Campaign c) {
@@ -953,12 +964,12 @@ public class AtBContract extends Contract {
                 if (m instanceof AtBContract) {
                     setParentContract((AtBContract) m);
                 } else {
-                    LogManager.getLogger().warn(String.format("Parent Contract reference #%d is not an AtBContract for contract %s",
+                    logger.warn(String.format("Parent Contract reference #%d is not an AtBContract for contract %s",
                             parentContract.getId(), getName()));
                     setParentContract(null);
                 }
             } else {
-                LogManager.getLogger().warn(String.format("Parent Contract #%d reference was not found for contract %s",
+                logger.warn(String.format("Parent Contract #%d reference was not found for contract %s",
                         parentContract.getId(), getName()));
                 setParentContract(null);
             }
@@ -1005,7 +1016,8 @@ public class AtBContract extends Contract {
      * Retrieves the name of the enemy for this contract.
      * If enemyName is not set, it generates and sets the name.
      *
-     * @param year the year for which to retrieve the enemy faction's full name (or 0, if year is unknown)
+     * @param year the year for which to retrieve the enemy faction's full name (or
+     *             0, if year is unknown)
      * @return the name of the enemy
      */
     public String getEnemyName(int year) {
@@ -1023,10 +1035,13 @@ public class AtBContract extends Contract {
     /**
      * Generates the name of the enemy for this contract.
      * If the enemy is a mercenary, a random mercenary company name is generated.
-     * Otherwise, the full name of the enemy faction is retrieved based on the given year.
-     * If the enemy or faction cannot be found, the short name of the enemy is used as a fallback.
+     * Otherwise, the full name of the enemy faction is retrieved based on the given
+     * year.
+     * If the enemy or faction cannot be found, the short name of the enemy is used
+     * as a fallback.
      *
-     * @param year the year for which to retrieve the enemy faction's full name (or 0, if year is unknown)
+     * @param year the year for which to retrieve the enemy faction's full name (or
+     *             0, if year is unknown)
      */
     public void generateEnemyName(@Nullable int year) {
         try {
@@ -1035,7 +1050,7 @@ public class AtBContract extends Contract {
             } else if (year != 0) {
                 enemyName = Factions.getInstance().getFaction(getEnemy().getShortName()).getFullName(year);
             }
-        // this is a fallback to ensure we don't end up with a null enemyName
+            // this is a fallback to ensure we don't end up with a null enemyName
         } catch (NullPointerException e) {
             enemyName = getEnemy().getShortName();
         }
@@ -1154,7 +1169,6 @@ public class AtBContract extends Contract {
         this.moraleLevel = moraleLevel;
     }
 
-
     /**
      * Retrieves the dynamic shares percentage for this contract.
      * This method shouldn't be called directly,
@@ -1236,8 +1250,10 @@ public class AtBContract extends Contract {
         setId(c.getId());
         setLength(c.getLength());
         setStartDate(c.getStartDate());
-        /*Set ending date; the other calculated values will be replaced
-         * from the original contract */
+        /*
+         * Set ending date; the other calculated values will be replaced
+         * from the original contract
+         */
         calculateContract(campaign);
         setMultiplier(c.getMultiplier());
         setTransportComp(c.getTransportComp());

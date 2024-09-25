@@ -44,9 +44,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultEditorKit;
 
-import org.apache.logging.log4j.LogManager;
-
 import io.sentry.Sentry;
+import megamek.MMLoggingConstants;
 import megamek.MegaMek;
 import megamek.SuiteConstants;
 import megamek.client.Client;
@@ -57,10 +56,11 @@ import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
-import megamek.server.Server;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
-import megamek.server.GameManager;
+import megamek.logging.MMLogger;
+import megamek.server.Server;
+import megamek.server.totalwarfare.TWGameManager;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
@@ -89,6 +89,8 @@ import mekhq.service.IAutosaveService;
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
+    private static final MMLogger logger = MMLogger.create(MekHQ.class);
+
     // region Variable Declarations
     private static final SuitePreferences mhqPreferences = new SuitePreferences();
     private static final MHQOptions mhqOptions = new MHQOptions();
@@ -237,8 +239,7 @@ public class MekHQ implements GameListener {
             financesDirectory = new ObservableString("financesDirectory", ".");
             preferences.manage(new StringPreference(financesDirectory));
         } catch (Exception ex) {
-            Sentry.captureException(ex);
-            LogManager.getLogger().error("Failed to set user preferences", ex);
+            logger.error(ex, "Failed to set user preferences");
         }
     }
 
@@ -290,12 +291,10 @@ public class MekHQ implements GameListener {
 
         // First, create a global default exception handler
         Thread.setDefaultUncaughtExceptionHandler((thread, t) -> {
-            Sentry.captureException(t);
-            LogManager.getLogger().error("Uncaught Exception Detected", t);
             final String name = t.getClass().getName();
-            JOptionPane.showMessageDialog(null, String.format(
-                    "Uncaught %s detected. Please open up an issue containing all logs, campaign save file, and customs at https://github.com/MegaMek/mekhq/issues",
-                    name), "Uncaught " + name, JOptionPane.ERROR_MESSAGE);
+            final String message = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION, name);
+            final String title = String.format(MMLoggingConstants.UNHANDLED_EXCEPTION_TITLE, name);
+            logger.error(t, message, title);
         });
 
         // Second, let's handle logging
@@ -311,9 +310,7 @@ public class MekHQ implements GameListener {
     }
 
     public static void initializeLogging(final String originProject) {
-        if (LogManager.getLogger().isInfoEnabled()) {
-            LogManager.getLogger().info(getUnderlyingInformation(originProject));
-        }
+        logger.info(getUnderlyingInformation(originProject));
     }
 
     /**
@@ -369,9 +366,8 @@ public class MekHQ implements GameListener {
 
         try {
             client = new Client(playerName, serverAddress, port);
-        } catch (Exception e) {
-            Sentry.captureException(e);
-            LogManager.getLogger().error("Failed to connect to server properly", e);
+        } catch (Exception ex) {
+            logger.error(ex, "Failed to connect to server properly");
             return;
         }
 
@@ -406,7 +402,7 @@ public class MekHQ implements GameListener {
         hostDialog.dispose();
 
         try {
-            myServer = new Server(password, port, new GameManager(), register, metaserver);
+            myServer = new Server(password, port, new TWGameManager(), register, metaserver);
             if (loadSavegame) {
                 FileDialog f = new FileDialog(campaignGUI.getFrame(), "Load Savegame");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
@@ -424,7 +420,7 @@ public class MekHQ implements GameListener {
             stopHost();
             return;
         } catch (Exception ex) {
-            LogManager.getLogger().error("Failed to start up server", ex);
+            logger.error(ex, "Failed to start up server");
             stopHost();
             return;
         }
@@ -555,7 +551,8 @@ public class MekHQ implements GameListener {
                 boolean isCivilianHelp = false;
 
                 if (tracker.getScenario() instanceof AtBScenario) {
-                    isCivilianHelp = ((AtBScenario) tracker.getScenario()).getScenarioType() == AtBScenario.CIVILIANHELP;
+                    isCivilianHelp = ((AtBScenario) tracker.getScenario())
+                            .getScenarioType() == AtBScenario.CIVILIANHELP;
                 }
 
                 AutoAwardsController autoAwardsController = new AutoAwardsController();
@@ -590,8 +587,7 @@ public class MekHQ implements GameListener {
                         .forEach(File::delete);
             }
         } catch (Exception ex) {
-            Sentry.captureException(ex);
-            LogManager.getLogger().error("", ex);
+            logger.error(ex, "gameVictory()");
         }
     }
 
@@ -687,7 +683,7 @@ public class MekHQ implements GameListener {
                 }
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                     | UnsupportedLookAndFeelException e) {
-                LogManager.getLogger().error("", e);
+                logger.error(e, "setLookAndFeel()");
             }
         };
         SwingUtilities.invokeLater(runnable);

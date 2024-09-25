@@ -18,14 +18,41 @@
  */
 package mekhq.campaign;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
-import mekhq.utilities.MHQXMLUtility;
+import mekhq.MekHQ;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -36,34 +63,26 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
-import mekhq.io.migration.FactionMigrator;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.swing.*;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
- * This is an object which holds a set of objects that collectively define the initial options setup
- * for a campaign.
+ * This is an object which holds a set of objects that collectively define the
+ * initial options setup for a campaign.
  *
- * It includes both startup values, which are only used on initial startup (the date, starting
- * planet, and rank system), and continuous options, which can be applied at any time (campaign
- * options, skills, SPAs).
+ * It includes both startup values, which are only used on initial startup (the
+ * date, starting planet, and rank system), and continuous options, which can be
+ * applied at any time (campaign options, skills, SPAs).
  *
- * It also includes a short title and description that allows one to create and save different
- * presets. The goal is to allow users to create and load various different presets.
+ * It also includes a short title and description that allows one to create and
+ * save different presets. The goal is to allow users to create and load various
+ * different presets.
+ *
  * @author Justin "Windchild" Bowen
  */
 public class CampaignPreset {
-    //region Variable Declarations
+    private static final MMLogger logger = MMLogger.create(CampaignPreset.class);
+
+    // region Variable Declarations
     private final boolean userData;
 
     private String title;
@@ -84,9 +103,9 @@ public class CampaignPreset {
     private RandomSkillPreferences randomSkillPreferences;
     private Map<String, SkillType> skills;
     private Map<String, SpecialAbility> specialAbilities;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     public CampaignPreset() {
         this(false);
     }
@@ -106,15 +125,15 @@ public class CampaignPreset {
     }
 
     public CampaignPreset(final String title, final String description, final boolean userData,
-                          final @Nullable LocalDate date, final @Nullable Faction faction,
-                          final @Nullable Planet planet, final @Nullable RankSystem rankSystem,
-                          final int contractCount, final boolean gm,
-                          final @Nullable CompanyGenerationOptions companyGenerationOptions,
-                          final @Nullable GameOptions gameOptions,
-                          final @Nullable CampaignOptions campaignOptions,
-                          final @Nullable RandomSkillPreferences randomSkillPreferences,
-                          final Map<String, SkillType> skills,
-                          final Map<String, SpecialAbility> specialAbilities) {
+            final @Nullable LocalDate date, final @Nullable Faction faction,
+            final @Nullable Planet planet, final @Nullable RankSystem rankSystem,
+            final int contractCount, final boolean gm,
+            final @Nullable CompanyGenerationOptions companyGenerationOptions,
+            final @Nullable GameOptions gameOptions,
+            final @Nullable CampaignOptions campaignOptions,
+            final @Nullable RandomSkillPreferences randomSkillPreferences,
+            final Map<String, SkillType> skills,
+            final Map<String, SpecialAbility> specialAbilities) {
         this.userData = userData;
 
         setTitle(title);
@@ -136,9 +155,9 @@ public class CampaignPreset {
         setSkills(skills);
         setSpecialAbilities(specialAbilities);
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters/Setters
+    // region Getters/Setters
     public boolean isUserData() {
         return userData;
     }
@@ -155,7 +174,7 @@ public class CampaignPreset {
         this.description = description;
     }
 
-    //region Startup
+    // region Startup
     public @Nullable LocalDate getDate() {
         return date;
     }
@@ -211,9 +230,9 @@ public class CampaignPreset {
     public void setCompanyGenerationOptions(final @Nullable CompanyGenerationOptions companyGenerationOptions) {
         this.companyGenerationOptions = companyGenerationOptions;
     }
-    //endregion Startup
+    // endregion Startup
 
-    //region Continuous
+    // region Continuous
     public @Nullable GameOptions getGameOptions() {
         return gameOptions;
     }
@@ -253,11 +272,12 @@ public class CampaignPreset {
     public void setSpecialAbilities(final Map<String, SpecialAbility> specialAbilities) {
         this.specialAbilities = specialAbilities;
     }
-    //endregion Continuous
-    //endregion Getters/Setters
+    // endregion Continuous
+    // endregion Getters/Setters
 
     /**
-     * @return a list of all of the campaign presets in the default and userdata folders
+     * @return a list of all of the campaign presets in the default and userdata
+     *         folders
      */
     public static List<CampaignPreset> getCampaignPresets() {
         final List<CampaignPreset> presets = loadCampaignPresetsFromDirectory(
@@ -265,7 +285,9 @@ public class CampaignPreset {
         presets.addAll(loadCampaignPresetsFromDirectory(
                 new File(MHQConstants.USER_CAMPAIGN_PRESET_DIRECTORY)));
         final NaturalOrderComparator naturalOrderComparator = new NaturalOrderComparator();
+
         presets.sort((p0, p1) -> naturalOrderComparator.compare(p0.toString(), p1.toString()));
+
         return presets;
     }
 
@@ -295,11 +317,12 @@ public class CampaignPreset {
         }
     }
 
-    //region File I/O
+    // region File I/O
     public void writeToFile(final JFrame frame, @Nullable File file) {
         if (file == null) {
             return;
         }
+
         String path = file.getPath();
         if (!path.endsWith(".xml")) {
             path += ".xml";
@@ -307,12 +330,12 @@ public class CampaignPreset {
         }
 
         try (OutputStream fos = new FileOutputStream(file);
-             OutputStream bos = new BufferedOutputStream(fos);
-             OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
-             PrintWriter pw = new PrintWriter(osw)) {
+                OutputStream bos = new BufferedOutputStream(fos);
+                OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
+                PrintWriter pw = new PrintWriter(osw)) {
             writeToXML(pw, 0);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("writeToFile() Exception", ex);
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
                     MekHQ.getMHQOptions().getLocale());
             JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
@@ -328,7 +351,7 @@ public class CampaignPreset {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "description", getDescription());
         }
 
-        //region Startup
+        // region Startup
         if (getDate() != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", getDate());
         }
@@ -350,9 +373,9 @@ public class CampaignPreset {
         if (getCompanyGenerationOptions() != null) {
             getCompanyGenerationOptions().writeToXML(pw, indent, null);
         }
-        //endregion Startup
+        // endregion Startup
 
-        //region Continuous
+        // region Continuous
         if (getGameOptions() != null) {
             getGameOptions().writeToXML(pw, indent);
         }
@@ -383,7 +406,7 @@ public class CampaignPreset {
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
         }
-        //endregion Continuous
+        // endregion Continuous
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaignPreset");
     }
 
@@ -400,32 +423,28 @@ public class CampaignPreset {
 
     public static @Nullable CampaignPreset parseFromFile(final @Nullable File file) {
         final Document xmlDoc;
+
         try (InputStream is = new FileInputStream(file)) {
             xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(is);
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
             return null;
         }
 
         final Element element = xmlDoc.getDocumentElement();
         element.normalize();
 
-        if (!element.getNodeName().equalsIgnoreCase("gamePreset") // Legacy - 0.49.3 removal
-                && !element.getNodeName().equalsIgnoreCase("campaignPreset")) {
-            return null;
-        }
-
-        // Legacy Parsing method for any presets created before 0.47.11, as they did not include a version
         final String versionString = element.getAttribute("version");
-        final Version version = new Version(versionString.isBlank() ? "0.47.11" : versionString);
+        final Version version = new Version(versionString);
         return parseFromXML(element.getChildNodes(), version);
     }
 
     public static @Nullable CampaignPreset parseFromXML(final NodeList nl, final Version version) {
         if (MHQConstants.VERSION.isLowerThan(version)) {
-            LogManager.getLogger().error(String.format(
+            String message = String.format(
                     "Cannot parse Campaign Preset from %s in older version %s.",
-                    version.toString(), MHQConstants.VERSION));
+                    version.toString(), MHQConstants.VERSION);
+            logger.error(message);
             return null;
         }
 
@@ -445,17 +464,12 @@ public class CampaignPreset {
                         preset.setDescription(wn.getTextContent().trim());
                         break;
 
-                    //region Startup
+                    // region Startup
                     case "date":
                         preset.setDate(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                         break;
                     case "faction":
-                        if (version.isLowerThan("0.49.7")) {
-                            preset.setFaction(Factions.getInstance().getFaction(
-                                    FactionMigrator.migrateCodePINDRemoval(wn.getTextContent().trim())));
-                        } else {
-                            preset.setFaction(Factions.getInstance().getFaction(wn.getTextContent().trim()));
-                        }
+                        preset.setFaction(Factions.getInstance().getFaction(wn.getTextContent().trim()));
                         break;
                     case "planet":
                         preset.setPlanet(Systems.getInstance()
@@ -472,11 +486,12 @@ public class CampaignPreset {
                         preset.setGM(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
                     case "companyGenerationOptions":
-                        preset.setCompanyGenerationOptions(CompanyGenerationOptions.parseFromXML(wn.getChildNodes(), version));
+                        preset.setCompanyGenerationOptions(
+                                CompanyGenerationOptions.parseFromXML(wn.getChildNodes(), version));
                         break;
-                    //endregion Startup
+                    // endregion Startup
 
-                    //region Continuous
+                    // region Continuous
                     case "gameOptions":
                         preset.setGameOptions(new GameOptions());
                         preset.getGameOptions().fillFromXML(wn.getChildNodes());
@@ -485,7 +500,8 @@ public class CampaignPreset {
                         preset.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                         break;
                     case "randomSkillPreferences":
-                        preset.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
+                        preset.setRandomSkillPreferences(
+                                RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
                         break;
                     case "skillTypes": {
                         final NodeList nl2 = wn.getChildNodes();
@@ -494,9 +510,12 @@ public class CampaignPreset {
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
-                                LogManager.getLogger().error("Unknown node type not loaded in Skill Type nodes: " + wn2.getNodeName());
+                                String message = String.format("Unknown node type not loaded in Skill Type nodes: %s",
+                                        wn2.getNodeName());
+                                logger.error(message);
                                 continue;
                             }
+
                             SkillType.generateSeparateInstanceFromXML(wn2, preset.getSkills());
                         }
                         break;
@@ -509,26 +528,29 @@ public class CampaignPreset {
                             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                                 continue;
                             } else if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
-                                LogManager.getLogger().error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
+                                String message = String.format(
+                                        "Unknown node type not loaded in Special Ability nodes: %s", wn2.getNodeName());
+                                logger.error(message);
                                 continue;
                             }
+
                             SpecialAbility.generateSeparateInstanceFromXML(wn2, preset.getSpecialAbilities(), options);
                         }
                         break;
                     }
-                    //end Continuous
+                    // end Continuous
 
                     default:
                         break;
                 }
             }
         } catch (Exception ex) {
-            LogManager.getLogger().error("", ex);
+            logger.error("parseFromXML() Error", ex);
             return null;
         }
         return preset;
     }
-    //endregion File I/O
+    // endregion File I/O
 
     @Override
     public String toString() {

@@ -20,26 +20,29 @@
  */
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+import java.util.StringJoiner;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.StringJoiner;
+import mekhq.utilities.MHQXMLUtility;
 
 /**
  * @author MKerensky
  */
 public class KFHeliumTank extends Part {
+    private static final MMLogger logger = MMLogger.create(KFHeliumTank.class);
+
     public static final TechAdvancement TA_HELIUM_TANK = new TechAdvancement(TECH_BASE_ALL)
             .setAdvancement(2107, 2120, 2300).setPrototypeFactions(F_TA)
             .setProductionFactions(F_TA).setTechRating(RATING_D)
@@ -101,10 +104,10 @@ public class KFHeliumTank extends Part {
     public int getBaseTime() {
         int time;
         if (isSalvaging()) {
-            //10x the repair time
+            // 10x the repair time
             time = 1800;
         } else {
-            //BattleSpace, p28
+            // BattleSpace, p28
             time = 180;
         }
         return time;
@@ -112,7 +115,7 @@ public class KFHeliumTank extends Part {
 
     @Override
     public int getDifficulty() {
-        //Battlespace, p28 - pretty easy to fix. Replacing's a pain.
+        // Battlespace, p28 - pretty easy to fix. Replacing's a pain.
         if (isSalvaging()) {
             return 4;
         }
@@ -132,10 +135,12 @@ public class KFHeliumTank extends Part {
         if (null != unit && unit.getEntity() instanceof Jumpship) {
             Jumpship js = ((Jumpship) unit.getEntity());
             js.setKFHeliumTankHit(false);
-            // Also repair your KF Drive integrity - up to 2/3 of the total if you have other components to fix
+            // Also repair your KF Drive integrity - up to 2/3 of the total if you have
+            // other components to fix
             // Otherwise, fix it all.
             if (js.isKFDriveDamaged()) {
-                js.setKFIntegrity(Math.min((js.getKFIntegrity() + js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
+                js.setKFIntegrity(
+                        Math.min((js.getKFIntegrity() + js.getKFHeliumTankIntegrity()), js.getOKFIntegrity()));
             } else {
                 js.setKFIntegrity(js.getOKFIntegrity());
             }
@@ -237,7 +242,7 @@ public class KFHeliumTank extends Part {
                     docks = Integer.parseInt(wn2.getTextContent());
                 }
             } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+                logger.error("", e);
             }
         }
     }
@@ -255,7 +260,7 @@ public class KFHeliumTank extends Part {
             joiner.add(details);
         }
         joiner.add(getUnitTonnage() + " tons")
-              .add(getDocks() + " collars");
+                .add(getDocks() + " collars");
         return joiner.toString();
     }
 

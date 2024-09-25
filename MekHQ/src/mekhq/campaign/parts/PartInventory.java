@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MegaMek is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MegaMek is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MegaMek. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.parts;
 
 /**
@@ -11,6 +30,7 @@ public class PartInventory {
 
     /**
      * Gets the count of a part on hand.
+     *
      * @return part count on hand.
      */
     public int getSupply() {
@@ -19,6 +39,7 @@ public class PartInventory {
 
     /**
      * Sets the count of a part on hand.
+     *
      * @param count count of a part on hand.
      */
     public void setSupply(int count) {
@@ -27,6 +48,7 @@ public class PartInventory {
 
     /**
      * Formats the count of a supply on hand as a String.
+     *
      * @return the count of a part's supply on hand as a String.
      */
     public String supplyAsString() {
@@ -35,6 +57,7 @@ public class PartInventory {
 
     /**
      * Gets the count in transit of a part.
+     *
      * @return the count of a part in transit.
      */
     public int getTransit() {
@@ -43,6 +66,7 @@ public class PartInventory {
 
     /**
      * Sets the count in transit of a part.
+     *
      * @param count count in transit of a part.
      */
     public void setTransit(int count) {
@@ -51,6 +75,7 @@ public class PartInventory {
 
     /**
      * Formats the count in transit of a part as a String.
+     *
      * @return the count in transit of a part as a String.
      */
     public String transitAsString() {
@@ -59,6 +84,7 @@ public class PartInventory {
 
     /**
      * Gets the count ordered of a part.
+     *
      * @return count ordered of a part.
      */
     public int getOrdered() {
@@ -67,6 +93,7 @@ public class PartInventory {
 
     /**
      * Sets the count ordered of a part.
+     *
      * @param count count ordered of a part.
      */
     public void setOrdered(int count) {
@@ -75,6 +102,7 @@ public class PartInventory {
 
     /**
      * Formats the count ordered of a part as a String.
+     *
      * @return count ordered of a part as a String.
      */
     public String orderedAsString() {
@@ -83,15 +111,18 @@ public class PartInventory {
 
     /**
      * Gets the modifier to display next to a count when formatted as a String.
+     *
      * @return modifier displayed next to a count when formatted as a String.
      */
     public String getCountModifier() {
         return this.countModifier;
     }
 
-    /** 
+    /**
      * Sets the modifier to display next to a count when formatted as a String.
-     * @param countModifier modifier to display next to a count when formatted as a String.
+     *
+     * @param countModifier modifier to display next to a count when formatted as a
+     *                      String.
      */
     public void setCountModifier(String countModifier) {
         if (countModifier != null && !countModifier.isBlank()) {
@@ -101,8 +132,10 @@ public class PartInventory {
 
     /**
      * Gets the transit and ordered counts formatted as a String.
-     * @return A String like, <code>&quot;XXX in transit, YYY on order&quot;</code>, describing 
-     * the transit and ordered counts.
+     *
+     * @return A String like, <code>&quot;XXX in transit, YYY on order&quot;</code>,
+     *         describing
+     *         the transit and ordered counts.
      * @see #transitAsString()
      * @see #orderedAsString()
      */

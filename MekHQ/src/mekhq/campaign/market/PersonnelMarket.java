@@ -18,10 +18,27 @@
  */
 package mekhq.campaign.market;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
-import megamek.common.*;
+import megamek.common.Entity;
+import megamek.common.MekFileParser;
+import megamek.common.MekSummary;
+import megamek.common.MekSummaryCache;
+import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
@@ -35,18 +52,12 @@ import mekhq.campaign.universe.Factions;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 import mekhq.utilities.MHQXMLUtility;
-import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class PersonnelMarket {
+    private static final MMLogger logger = MMLogger.create(PersonnelMarket.class);
+
     private List<Person> personnel = new ArrayList<>();
     private PersonnelMarketMethod method;
-
 
     public static final int TYPE_RANDOM = 0;
     public static final int TYPE_DYLANS = 1;
@@ -56,12 +67,14 @@ public class PersonnelMarket {
     public static final int TYPE_NONE = 5;
     public static final int TYPE_NUM = 6;
 
-    /* Used by AtB to track Units assigned to recruits; the key
-     * is the person UUID. */
+    /*
+     * Used by AtB to track Units assigned to recruits; the key
+     * is the person UUID.
+     */
     private Map<UUID, Entity> attachedEntities = new LinkedHashMap<>();
     /* Alternate types of rolls, set by PersonnelMarketDialog */
     private boolean paidRecruitment = false;
-    private PersonnelRole paidRecruitRole = PersonnelRole.MECHWARRIOR;
+    private PersonnelRole paidRecruitRole = PersonnelRole.MEKWARRIOR;
 
     public PersonnelMarket() {
         method = new PersonnelMarketDisabled();
@@ -76,6 +89,7 @@ public class PersonnelMarket {
 
     /**
      * Sets the method for generating potential recruits for the personnel market.
+     * 
      * @param key The lookup name of the market type to use.
      */
     public void setType(String key) {
@@ -129,7 +143,23 @@ public class PersonnelMarket {
         }
 
         if (updated && c.getCampaignOptions().isPersonnelMarketReportRefresh()) {
-            c.addReport("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
+            if (c.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops") && !personnel.isEmpty()) {
+                stringBuilder.append(':');
+                Person person = personnel.get(0);
+                String expLevel = SkillType.getExperienceLevelName(person.getExperienceLevel(c, false));
+                stringBuilder.append("<br>A ")
+                    .append("<b> ")
+                    .append(expLevel)
+                    .append(' ')
+                    .append(person.getPrimaryRole().toString())
+                    .append("</b>")
+                    .append(" named ")
+                    .append(person.getFullName())
+                    .append(" is available.");
+            }
+            c.addReport(stringBuilder.toString());
         }
     }
 
@@ -181,8 +211,9 @@ public class PersonnelMarket {
 
     /**
      * Assign an <code>Entity</code> to a recruit
-     * @param pid  The recruit's id
-     * @param en   The Entity to assign
+     * 
+     * @param pid The recruit's id
+     * @param en  The Entity to assign
      */
     public void addAttachedEntity(UUID pid, Entity en) {
         attachedEntities.put(pid, en);
@@ -190,8 +221,9 @@ public class PersonnelMarket {
 
     /**
      * Get the Entity associated with a recruit, if any
-     * @param p  The recruit
-     * @return   The Entity associated with the recruit, or null if there is none
+     * 
+     * @param p The recruit
+     * @return The Entity associated with the recruit, or null if there is none
      */
     public Entity getAttachedEntity(Person p) {
         return attachedEntities.get(p.getId());
@@ -199,8 +231,9 @@ public class PersonnelMarket {
 
     /**
      * Get the Entity associated with a recruit, if any
+     * 
      * @param pid The id of the recruit
-     * @return    The Entity associated with the recruit, or null if there is none
+     * @return The Entity associated with the recruit, or null if there is none
      */
     public Entity getAttachedEntity(UUID pid) {
         return attachedEntities.get(pid);
@@ -208,7 +241,8 @@ public class PersonnelMarket {
 
     /**
      * Clears the <code>Entity</code> associated with a recruit
-     * @param pid  The recruit's id
+     * 
+     * @param pid The recruit's id
      */
     public void removeAttachedEntity(UUID pid) {
         attachedEntities.remove(pid);
@@ -246,7 +280,8 @@ public class PersonnelMarket {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paidRecruitType", getPaidRecruitRole().name());
 
         for (UUID id : attachedEntities.keySet()) {
-            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "entity", "id", id, attachedEntities.get(id).getShortNameRaw());
+            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "entity", "id", id,
+                    attachedEntities.get(id).getShortNameRaw());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelMarket");
     }
@@ -279,12 +314,13 @@ public class PersonnelMarket {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
                     UUID id = UUID.fromString(wn2.getAttributes().getNamedItem("id").getTextContent());
-                    MechSummary ms = MechSummaryCache.getInstance().getMech(wn2.getTextContent());
+                    MekSummary ms = MekSummaryCache.getInstance().getMek(wn2.getTextContent());
                     Entity en = null;
                     try {
-                        en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+                        en = new MekFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
                     } catch (EntityLoadingException ex) {
-                        LogManager.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage(), ex);
+                        logger.error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": "
+                                + ex.getMessage(), ex);
                     }
                     if (null != en) {
                         retVal.attachedEntities.put(id, en);
@@ -295,10 +331,10 @@ public class PersonnelMarket {
                     retVal.setPaidRecruitRole(PersonnelRole.parseFromString(wn2.getTextContent().trim()));
                 } else if (null != retVal.method) {
                     retVal.method.loadFieldsFromXml(wn2);
-                } else  {
+                } else {
                     // Error condition of sorts!
                     // Errr, what should we do here?
-                    LogManager.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
+                    logger.error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
                 }
             }
 
@@ -313,7 +349,7 @@ public class PersonnelMarket {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            LogManager.getLogger().error("", ex);
+            logger.error("", ex);
         }
 
         return retVal;
@@ -344,8 +380,8 @@ public class PersonnelMarket {
 
     public static long getUnitMainForceType(Campaign c) {
         long mostTypes = getUnitMainForceTypes(c);
-        if ((mostTypes & Entity.ETYPE_MECH) != 0) {
-            return Entity.ETYPE_MECH;
+        if ((mostTypes & Entity.ETYPE_MEK) != 0) {
+            return Entity.ETYPE_MEK;
         } else if ((mostTypes & Entity.ETYPE_TANK) != 0) {
             return Entity.ETYPE_TANK;
         } else if ((mostTypes & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
@@ -354,8 +390,8 @@ public class PersonnelMarket {
             return Entity.ETYPE_BATTLEARMOR;
         } else if ((mostTypes & Entity.ETYPE_INFANTRY) != 0) {
             return Entity.ETYPE_INFANTRY;
-        } else if ((mostTypes & Entity.ETYPE_PROTOMECH) != 0) {
-            return Entity.ETYPE_PROTOMECH;
+        } else if ((mostTypes & Entity.ETYPE_PROTOMEK) != 0) {
+            return Entity.ETYPE_PROTOMEK;
         } else if ((mostTypes & Entity.ETYPE_CONV_FIGHTER) != 0) {
             return Entity.ETYPE_CONV_FIGHTER;
         } else if ((mostTypes & Entity.ETYPE_SMALL_CRAFT) != 0) {
@@ -363,22 +399,23 @@ public class PersonnelMarket {
         } else if ((mostTypes & Entity.ETYPE_DROPSHIP) != 0) {
             return Entity.ETYPE_DROPSHIP;
         } else {
-            return Entity.ETYPE_MECH;
+            return Entity.ETYPE_MEK;
         }
     }
 
     public static long getUnitMainForceTypes(Campaign c) {
         HangarStatistics hangarStats = c.getHangarStatistics();
-        int mechs = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
+        int meks = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_MEK);
         int ds = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int sc = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int cf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
         int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
-        int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) + hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
+        int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true)
+                + hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
         int inf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
         int ba = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
-        int proto = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
-        int most = mechs;
+        int proto = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMEK);
+        int most = meks;
         if (ds > most) {
             most = ds;
         }
@@ -404,8 +441,8 @@ public class PersonnelMarket {
             most = proto;
         }
         long retval = 0;
-        if (most == mechs) {
-            retval = retval | Entity.ETYPE_MECH;
+        if (most == meks) {
+            retval = retval | Entity.ETYPE_MEK;
         }
         if (most == ds) {
             retval = retval | Entity.ETYPE_DROPSHIP;
@@ -429,7 +466,7 @@ public class PersonnelMarket {
             retval = retval | Entity.ETYPE_BATTLEARMOR;
         }
         if (most == proto) {
-            retval = retval | Entity.ETYPE_PROTOMECH;
+            retval = retval | Entity.ETYPE_PROTOMEK;
         }
         return retval;
     }
@@ -446,7 +483,7 @@ public class PersonnelMarket {
             }
         }
         target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
-        target.addModifier(IUnitRating.DRAGOON_C - campaign.getUnitRatingMod(), "Unit Rating");
+        target.addModifier(IUnitRating.DRAGOON_C - campaign.getAtBUnitRatingMod(), "Unit Rating");
         return target;
     }
 }

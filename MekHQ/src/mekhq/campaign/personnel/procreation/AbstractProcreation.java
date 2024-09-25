@@ -137,6 +137,7 @@ public abstract class AbstractProcreation {
     /**
      * This method determines the duration for a pregnancy, with a variance determined through a
      * Gaussian distribution with a maximum spread of approximately six weeks.
+     * <p>
      * TODO : Swap me to instead use a distribution function that generates an overall length,
      * TODO : Including pre-term and post-term births
      *
@@ -354,6 +355,12 @@ public abstract class AbstractProcreation {
             } else if (campaign.getCampaignOptions().isAssignChildrenOfFoundersFounderTag()) {
                 baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
             }
+
+            // set education
+            baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+
+            // set loyalty
+            baby.setLoyalty(Compute.d6(4, 3));
 
             // Recruit the baby
             campaign.recruitPerson(baby, prisonerStatus, true, true);

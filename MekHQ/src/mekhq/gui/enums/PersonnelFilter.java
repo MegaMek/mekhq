@@ -30,34 +30,44 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import mekhq.MekHQ;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+
 public enum PersonnelFilter {
-    //region Enum Declarations
-    //region Standard Personnel Filters
+    // region Enum Declarations
+    // region Standard Personnel Filters
     ALL("PersonnelFilter.ALL.text", "PersonnelFilter.ALL.toolTipText"),
     ACTIVE("PersonnelFilter.ACTIVE.text", "PersonnelFilter.ACTIVE.toolTipText"),
     COMBAT("PersonnelFilter.COMBAT.text", "PersonnelFilter.COMBAT.toolTipText"),
     SUPPORT("PersonnelFilter.SUPPORT.text", "PersonnelFilter.SUPPORT.toolTipText"),
-    MECHWARRIORS("PersonnelFilter.MECHWARRIORS.text", "PersonnelFilter.MECHWARRIORS.toolTipText", true, false),
-    MECHWARRIOR("PersonnelFilter.MECHWARRIOR.text", "PersonnelFilter.MECHWARRIOR.toolTipText", false, true),
+    MEKWARRIORS("PersonnelFilter.MEKWARRIORS.text", "PersonnelFilter.MEKWARRIORS.toolTipText", true, false),
+    MEKWARRIOR("PersonnelFilter.MEKWARRIOR.text", "PersonnelFilter.MEKWARRIOR.toolTipText", false, true),
     LAM_PILOT("PersonnelFilter.LAM_PILOT.text", "PersonnelFilter.LAM_PILOT.toolTipText", false, true),
-    VEHICLE_CREWMEMBER("PersonnelFilter.VEHICLE_CREWMEMBER.text", "PersonnelFilter.VEHICLE_CREWMEMBER.toolTipText", true, false),
-    GROUND_VEHICLE_DRIVER("PersonnelFilter.GROUND_VEHICLE_DRIVER.text", "PersonnelFilter.GROUND_VEHICLE_DRIVER.toolTipText", false, true),
-    NAVAL_VEHICLE_DRIVER("PersonnelFilter.NAVAL_VEHICLE_DRIVER.text", "PersonnelFilter.NAVAL_VEHICLE_DRIVER.toolTipText", false, true),
+    VEHICLE_CREWMEMBER("PersonnelFilter.VEHICLE_CREWMEMBER.text", "PersonnelFilter.VEHICLE_CREWMEMBER.toolTipText",
+            true, false),
+    GROUND_VEHICLE_DRIVER("PersonnelFilter.GROUND_VEHICLE_DRIVER.text",
+            "PersonnelFilter.GROUND_VEHICLE_DRIVER.toolTipText", false, true),
+    NAVAL_VEHICLE_DRIVER("PersonnelFilter.NAVAL_VEHICLE_DRIVER.text",
+            "PersonnelFilter.NAVAL_VEHICLE_DRIVER.toolTipText", false, true),
     VTOL_PILOT("PersonnelFilter.VTOL_PILOT.text", "PersonnelFilter.VTOL_PILOT.toolTipText", false, true),
     VEHICLE_GUNNER("PersonnelFilter.VEHICLE_GUNNER.text", "PersonnelFilter.VEHICLE_GUNNER.toolTipText", false, true),
     VEHICLE_CREW("PersonnelFilter.VEHICLE_CREW.text", "PersonnelFilter.VEHICLE_CREW.toolTipText", false, true),
     AEROSPACE_PILOT("PersonnelFilter.AEROSPACE_PILOT.text", "PersonnelFilter.AEROSPACE_PILOT.toolTipText"),
-    CONVENTIONAL_AIRCRAFT_PILOT("PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.text", "PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.toolTipText"),
-    PROTOMECH_PILOT("PersonnelFilter.PROTOMECH_PILOT.text", "PersonnelFilter.PROTOMECH_PILOT.toolTipText"),
+    CONVENTIONAL_AIRCRAFT_PILOT("PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.text",
+            "PersonnelFilter.CONVENTIONAL_AIRCRAFT_PILOT.toolTipText"),
+    PROTOMEK_PILOT("PersonnelFilter.PROTOMEK_PILOT.text", "PersonnelFilter.PROTOMEK_PILOT.toolTipText"),
     BATTLE_ARMOUR("PersonnelFilter.BATTLE_ARMOUR.text", "PersonnelFilter.BATTLE_ARMOUR.toolTipText"),
     SOLDIER("PersonnelFilter.SOLDIER.text", "PersonnelFilter.SOLDIER.toolTipText"),
-    VESSEL_CREWMEMBER("PersonnelFilter.VESSEL_CREWMEMBER.text", "PersonnelFilter.VESSEL_CREWMEMBER.toolTipText", true, false),
+    VESSEL_CREWMEMBER("PersonnelFilter.VESSEL_CREWMEMBER.text", "PersonnelFilter.VESSEL_CREWMEMBER.toolTipText", true,
+            false),
     VESSEL_PILOT("PersonnelFilter.VESSEL_PILOT.text", "PersonnelFilter.VESSEL_PILOT.toolTipText", false, true),
     VESSEL_GUNNER("PersonnelFilter.VESSEL_GUNNER.text", "PersonnelFilter.VESSEL_GUNNER.toolTipText", false, true),
     VESSEL_CREW("PersonnelFilter.VESSEL_CREW.text", "PersonnelFilter.VESSEL_CREW.toolTipText", false, true),
-    VESSEL_NAVIGATOR("PersonnelFilter.VESSEL_NAVIGATOR.text", "PersonnelFilter.VESSEL_NAVIGATOR.toolTipText", false, true),
+    VESSEL_NAVIGATOR("PersonnelFilter.VESSEL_NAVIGATOR.text", "PersonnelFilter.VESSEL_NAVIGATOR.toolTipText", false,
+            true),
     TECH("PersonnelFilter.TECH.text", "PersonnelFilter.TECH.toolTipText", true, false),
-    MECH_TECH("PersonnelFilter.MECH_TECH.text", "PersonnelFilter.MECH_TECH.toolTipText", false, true),
+    MEK_TECH("PersonnelFilter.MEK_TECH.text", "PersonnelFilter.MEK_TECH.toolTipText", false, true),
     MECHANIC("PersonnelFilter.MECHANIC.text", "PersonnelFilter.MECHANIC.toolTipText", false, true),
     AERO_TECH("PersonnelFilter.AERO_TECH.text", "PersonnelFilter.AERO_TECH.toolTipText", false, true),
     BA_TECH("PersonnelFilter.BA_TECH.text", "PersonnelFilter.BA_TECH.toolTipText", false, true),
@@ -66,14 +76,18 @@ public enum PersonnelFilter {
     DOCTOR("PersonnelFilter.DOCTOR.text", "PersonnelFilter.DOCTOR.toolTipText", false, true),
     MEDIC("PersonnelFilter.MEDIC.text", "PersonnelFilter.MEDIC.toolTipText", false, true),
     ADMINISTRATOR("PersonnelFilter.ADMINISTRATOR.text", "PersonnelFilter.ADMINISTRATOR.toolTipText", true, false),
-    ADMINISTRATOR_COMMAND("PersonnelFilter.ADMINISTRATOR_COMMAND.text", "PersonnelFilter.ADMINISTRATOR_COMMAND.toolTipText", false, true),
-    ADMINISTRATOR_LOGISTICS("PersonnelFilter.ADMINISTRATOR_LOGISTICS.text", "PersonnelFilter.ADMINISTRATOR_LOGISTICS.toolTipText", false, true),
-    ADMINISTRATOR_TRANSPORT("PersonnelFilter.ADMINISTRATOR_TRANSPORT.text", "PersonnelFilter.ADMINISTRATOR_TRANSPORT.toolTipText", false, true),
-    ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR.text", "PersonnelFilter.ADMINISTRATOR_HR.toolTipText", false, true),
+    ADMINISTRATOR_COMMAND("PersonnelFilter.ADMINISTRATOR_COMMAND.text",
+            "PersonnelFilter.ADMINISTRATOR_COMMAND.toolTipText", false, true),
+    ADMINISTRATOR_LOGISTICS("PersonnelFilter.ADMINISTRATOR_LOGISTICS.text",
+            "PersonnelFilter.ADMINISTRATOR_LOGISTICS.toolTipText", false, true),
+    ADMINISTRATOR_TRANSPORT("PersonnelFilter.ADMINISTRATOR_TRANSPORT.text",
+            "PersonnelFilter.ADMINISTRATOR_TRANSPORT.toolTipText", false, true),
+    ADMINISTRATOR_HR("PersonnelFilter.ADMINISTRATOR_HR.text", "PersonnelFilter.ADMINISTRATOR_HR.toolTipText", false,
+            true),
     DEPENDENT("PersonnelFilter.DEPENDENT.text", "PersonnelFilter.DEPENDENT.toolTipText"),
-    //endregion Standard Personnel Filters
+    // endregion Standard Personnel Filters
 
-    //region Expanded Personnel Tab Filters
+    // region Expanded Personnel Tab Filters
     FOUNDER("PersonnelFilter.FOUNDER.text", "PersonnelFilter.FOUNDER.toolTipText", false, false),
     KIDS("PersonnelFilter.KIDS.text", "PersonnelFilter.KIDS.toolTipText"),
     PRISONER("PersonnelFilter.PRISONER.text", "PersonnelFilter.PRISONER.toolTipText", false, false),
@@ -88,29 +102,29 @@ public enum PersonnelFilter {
     MISSING("PersonnelFilter.MISSING.text", "PersonnelFilter.MISSING.toolTipText", false, false),
     KIA("PersonnelFilter.KIA.text", "PersonnelFilter.KIA.toolTipText", false, false),
     DEAD("PersonnelFilter.DEAD.text", "PersonnelFilter.DEAD.toolTipText", false, false);
-    //endregion Expanded Personnel Tab Filters
-    //endregion Enum Declarations
+    // endregion Expanded Personnel Tab Filters
+    // endregion Enum Declarations
 
-    //region Variable Declarations
+    // region Variable Declarations
     private final String name;
     private final String toolTipText;
     private final boolean baseline;
     private final boolean standard;
     private final boolean individualRole;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
-    //region Constructors
+    // region Constructors
     PersonnelFilter(final String name, final String toolTipText) {
         this(name, toolTipText, true, true, true);
     }
 
     PersonnelFilter(final String name, final String toolTipText, final boolean standard,
-                    final boolean individualRole) {
+            final boolean individualRole) {
         this(name, toolTipText, false, standard, individualRole);
     }
 
     PersonnelFilter(final String name, final String toolTipText, final boolean baseline,
-                    final boolean standard, final boolean individualRole) {
+            final boolean standard, final boolean individualRole) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
@@ -119,9 +133,9 @@ public enum PersonnelFilter {
         this.standard = standard;
         this.individualRole = individualRole;
     }
-    //endregion Constructors
+    // endregion Constructors
 
-    //region Getters
+    // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
@@ -137,9 +151,9 @@ public enum PersonnelFilter {
     public boolean isIndividualRole() {
         return individualRole;
     }
-    //endregion Getters
+    // endregion Getters
 
-    //region Boolean Comparison Methods
+    // region Boolean Comparison Methods
     public boolean isAll() {
         return this == ALL;
     }
@@ -156,19 +170,19 @@ public enum PersonnelFilter {
         return this == SUPPORT;
     }
 
-    public boolean isMechWarriors() {
-        return this == MECHWARRIORS;
+    public boolean isMekWarriors() {
+        return this == MEKWARRIORS;
     }
 
-    public boolean isMechWarrior() {
-        return this == MECHWARRIOR;
+    public boolean isMekWarrior() {
+        return this == MEKWARRIOR;
     }
 
     public boolean isLAMPilot() {
         return this == LAM_PILOT;
     }
 
-    public boolean isVehicleCrewmember() {
+    public boolean isVehicleCrewMember() {
         return this == VEHICLE_CREWMEMBER;
     }
 
@@ -200,8 +214,8 @@ public enum PersonnelFilter {
         return this == CONVENTIONAL_AIRCRAFT_PILOT;
     }
 
-    public boolean isProtoMechPilot() {
-        return this == PROTOMECH_PILOT;
+    public boolean isProtoMekPilot() {
+        return this == PROTOMEK_PILOT;
     }
 
     public boolean isBattleArmor() {
@@ -212,7 +226,7 @@ public enum PersonnelFilter {
         return this == SOLDIER;
     }
 
-    public boolean isVesselCrewmember() {
+    public boolean isVesselCrewMember() {
         return this == VESSEL_CREWMEMBER;
     }
 
@@ -236,15 +250,15 @@ public enum PersonnelFilter {
         return this == TECH;
     }
 
-    public boolean isMechTech() {
-        return this == MECH_TECH;
+    public boolean isMekTech() {
+        return this == MEK_TECH;
     }
 
     public boolean isMechanic() {
         return this == MECHANIC;
     }
 
-    public boolean isAeroTech() {
+    public boolean isAeroTek() {
         return this == AERO_TECH;
     }
 
@@ -331,7 +345,7 @@ public enum PersonnelFilter {
     public boolean isDead() {
         return this == DEAD;
     }
-    //endregion Boolean Comparison Methods
+    // endregion Boolean Comparison Methods
 
     public static List<PersonnelFilter> getStandardPersonnelFilters() {
         return Stream.of(values()).filter(filter -> filter.isBaseline() || filter.isStandard())
