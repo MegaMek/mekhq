@@ -569,8 +569,13 @@ public class StratconRulesManager {
     }
 
     /**
-     * Worker function that processes the effects of deploying a reinforcement force
-     * to a scenario
+     * Worker function that processes the effects of deploying a reinforcement force to a scenario
+     *
+     * @param reinforcementType the type of reinforcement being deployed
+     * @param campaignState the state of the campaign
+     * @param scenario the current scenario
+     * @param campaign the campaign instance
+     * @return {@code true} if the reinforcement deployment is successful, {@code false} otherwise
      */
     public static boolean processReinforcementDeployment(ReinforcementEligibilityType reinforcementType,
             StratconCampaignState campaignState, StratconScenario scenario, Campaign campaign) {
@@ -589,9 +594,6 @@ public class StratconRulesManager {
             case SupportPoint:
                 if (campaignState.getSupportPoints() > 0) {
                     campaignState.useSupportPoint();
-                    return true;
-                } else if (campaignState.getVictoryPoints() > 0) {
-                    campaignState.updateVictoryPoints(-1);
                     return true;
                 }
 
