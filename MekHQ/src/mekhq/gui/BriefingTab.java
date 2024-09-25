@@ -18,28 +18,6 @@
  */
 package mekhq.gui;
 
-import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
-import java.util.stream.Collectors;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.generator.ReconfigurationParameters;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
@@ -61,13 +39,7 @@ import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -87,6 +59,17 @@ import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
 import mekhq.gui.view.MissionViewPanel;
 import mekhq.gui.view.ScenarioViewPanel;
+
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.io.File;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 
 /**
  * Displays Mission/Contract and Scenario details.
@@ -762,8 +745,8 @@ public final class BriefingTab extends CampaignGuiTab {
                 int injuryCount = 0;
 
                 if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
-                    if (status.getHits() > person.getHits()) {
-                        injuryCount = status.getHits() - person.getHits();
+                    if (status.getHits() > person.getHitsPrior()) {
+                        injuryCount = status.getHits() - person.getHitsPrior();
                     }
                 }
 
@@ -955,7 +938,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * Designed to fully kit out all non-player-controlled forces prior to battle.
      * Does not do any checks for supplies, only for availability to each faction
      * during the current timeframe.
-     * 
+     *
      * @param scenario
      * @param chosen
      */
