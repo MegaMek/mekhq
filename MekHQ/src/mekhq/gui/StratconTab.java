@@ -194,7 +194,7 @@ public class StratconTab extends CampaignGuiTab {
         // current support points
         TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
         if (currentTDI == null) {
-            campaignStatusText.setText("No active contract selected.");
+            campaignStatusText.setText("No active contract selected, or contract has not started.");
             expandedObjectivePanel.setVisible(false);
             return;
         }
