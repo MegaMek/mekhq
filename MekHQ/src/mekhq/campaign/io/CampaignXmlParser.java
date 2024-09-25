@@ -18,44 +18,12 @@
  */
 package mekhq.campaign.io;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-
-import javax.xml.parsers.DocumentBuilder;
-
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.Jumpship;
-import megamek.common.Mek;
-import megamek.common.MekSummaryCache;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
@@ -63,12 +31,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.Kill;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
@@ -81,20 +44,8 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingEnginePart;
-import mekhq.campaign.parts.MissingMekActuator;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.MASC;
-import mekhq.campaign.parts.equipment.MissingAmmoBin;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.parts.equipment.MissingMASC;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -112,9 +63,18 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.*;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class CampaignXmlParser {
     private static final MMLogger logger = MMLogger.create(CampaignXmlParser.class);
@@ -298,6 +258,8 @@ public class CampaignXmlParser {
                     processSpecialAbilityNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("storyArc")) {
                     processStoryArcNodes(retVal, wn, version);
+                } else if (xn.equalsIgnoreCase("fameAndInfamy")) {
+                    processFameAndInfamyNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     retVal.getGameOptions().fillFromXML(wn.getChildNodes());
                 } else if (xn.equalsIgnoreCase("kills")) {
@@ -955,6 +917,11 @@ public class CampaignXmlParser {
         StoryArc storyArc = StoryArc.parseFromXML(wn.getChildNodes(), retVal, version);
         MekHQ.registerHandler(storyArc);
         retVal.useStoryArc(storyArc, false);
+    }
+
+    private static void processFameAndInfamyNodes(Campaign relativeValue, Node workingNode) {
+        logger.info("Loading Fame and Infamy Nodes from XML...");
+        FameAndInfamyController.parseFromXML(workingNode.getChildNodes(), relativeValue);
     }
 
     private static void processSpecialAbilityNodes(Campaign retVal, Node wn, Version version) {

@@ -21,34 +21,10 @@
  */
 package mekhq.campaign.againstTheBot;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.function.Function;
-
-import javax.xml.parsers.DocumentBuilder;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Compute;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
@@ -57,6 +33,18 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author Neoancient
@@ -235,26 +223,45 @@ public class AtBConfiguration {
         return selectBotLances(org, weightClass, 0f);
     }
 
+    /**
+     * Selects a bot lance based on the organization, weight class, and roll modifier.
+     *
+     * @param org        The organization of the bot force tables.
+     * @param weightClass The weight class of the bot.
+     * @param rollMod    A modifier to the die roll, expressed as a fraction of the total weight.
+     * @return The selected bot lance, or null if the organization's bot force tables are not found or invalid.
+     */
     public @Nullable String selectBotLances(String org, int weightClass, float rollMod) {
-        if (botForceTables.containsKey(org)) {
-            final List<WeightedTable<String>> botForceTable = botForceTables.get(org);
-            int weightClassIndex = weightClassIndex(weightClass);
-            WeightedTable<String> table;
-            if ((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
-                logger.error(String.format(
-                        "Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values",
-                        org, weightClass));
-                weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
-            }
-            table = botForceTable.get(weightClassIndex);
-            if (null == table) {
-                table = getDefaultForceTable("botForce." + org, weightClassIndex);
-            }
-            return table.select(rollMod);
-        } else {
+        // Check if the bot force tables contain the required organization
+        if (!botForceTables.containsKey(org)) {
             logger.error(String.format("Bot force tables for organization \"%s\" not found, ignoring", org));
             return null;
         }
+
+        // Retrieve botForceTable for the organization
+        final List<WeightedTable<String>> botForceTable = botForceTables.get(org);
+
+        // Weight Class Index
+        int weightClassIndex = weightClassIndex(weightClass);
+
+        // Check if the weightClassIndex is within valid range
+        if (weightClassIndex < 0 || weightClassIndex >= botForceTable.size()) {
+            logger.error(String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass));
+
+            // Limit the weightClassIndex within valid range
+            weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
+        }
+
+        // Fetch table for the weight class
+        WeightedTable<String> table = botForceTable.get(weightClassIndex);
+
+        // If there isn't relevant table, provide a default one
+        if (table == null) {
+            table = getDefaultForceTable("botForce." + org, weightClassIndex);
+        }
+
+        // Return the selected table
+        return table.select(rollMod);
     }
 
     public @Nullable String selectBotUnitWeights(String org, int weightClass) {

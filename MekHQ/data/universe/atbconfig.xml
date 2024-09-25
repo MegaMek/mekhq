@@ -29,31 +29,16 @@ of 4. An entry of the form <entry>option</entry> has a weight of 1.
 		format. -->
         <botForce org="IS,CLAN,CS">
             <weightedTable weightClass="L">
-                <entry weight="9">M</entry>
-                <entry weight="7">LL</entry>
-                <entry weight="4">H</entry>
+                <entry weight="1">L</entry>
             </weightedTable>
             <weightedTable weightClass="M">
-                <entry weight="5">LL</entry>
-                <entry weight="5">H</entry>
-                <entry weight="10">ML</entry>
+                <entry weight="1">M</entry>
             </weightedTable>
             <weightedTable weightClass="H">
-                <entry weight="3">LLL</entry>
-                <entry weight="4">MM</entry>
-                <entry weight="2">A</entry>
-                <entry weight="3">HL</entry>
-                <entry weight="4">MLL</entry>
-                <entry weight="4">HM</entry>
+                <entry weight="1">H</entry>
             </weightedTable>
             <weightedTable weightClass="A">
-                <entry weight="4">MML</entry>
-                <entry weight="3">HLL</entry>
-                <entry weight="2">HH</entry>
-                <entry weight="2">AL</entry>
-                <entry weight="4">MMM</entry>
-                <entry weight="3">HML</entry>
-                <entry weight="2">AM</entry>
+                <entry weight="1">A</entry>
             </weightedTable>
         </botForce>
 
@@ -64,83 +49,81 @@ of 4. An entry of the form <entry>option</entry> has a weight of 1.
 
         <botLance org="IS">
             <weightedTable weightClass="L">
-                <entry weight="3">LLLL</entry>
+                <entry weight="1">LLLL</entry>
                 <entry weight="2">LLLM</entry>
-                <entry weight="1">LLMM</entry>
+                <entry weight="2">LLMM</entry>
+                <entry weight="1">LLMH</entry>
             </weightedTable>
             <weightedTable weightClass="M">
-                <entry weight="1">LLMM</entry>
-                <entry weight="2">LMMM</entry>
+                <entry weight="1">LMMH</entry>
                 <entry weight="2">MMMM</entry>
-                <entry weight="1">MMMH</entry>
+                <entry weight="2">MMMH</entry>
+                <entry weight="1">MMHH</entry>
             </weightedTable>
             <weightedTable weightClass="H">
-                <entry weight="1">MMHH</entry>
-                <entry weight="2">MHHH</entry>
+                <entry weight="1">MHHH</entry>
                 <entry weight="2">HHHH</entry>
+                <entry weight="2">MHHA</entry>
                 <entry weight="1">HHHA</entry>
             </weightedTable>
             <weightedTable weightClass="A">
+                <entry weight="1">MHAA</entry>
                 <entry weight="2">HHAA</entry>
-                <entry weight="3">HAAA</entry>
+                <entry weight="2">HAAA</entry>
                 <entry weight="1">AAAA</entry>
             </weightedTable>
         </botLance>
 
         <botLance org="CLAN">
             <weightedTable weightClass="L">
-                <entry>LLLLL</entry>
-                <entry>LLLLM</entry>
-                <entry>LLLMM</entry>
+                <entry weight="1">LLLLL</entry>
+                <entry weight="2">LLLLM</entry>
+                <entry weight="2">LLMMM</entry>
+                <entry weight="1">LLMMH</entry>
             </weightedTable>
             <weightedTable weightClass="M">
-                <entry weight="1">LLMMM</entry>
                 <entry weight="1">LMMMM</entry>
                 <entry weight="2">MMMMM</entry>
-                <entry weight="1">MMMMH</entry>
+                <entry weight="2">MMMMH</entry>
                 <entry weight="1">MMMHH</entry>
             </weightedTable>
             <weightedTable weightClass="H">
                 <entry weight="1">MMHHH</entry>
                 <entry weight="2">MHHHH</entry>
                 <entry weight="2">HHHHH</entry>
-                <entry weight="1">HHHHA</entry>
+                <entry weight="1">MHHHA</entry>
             </weightedTable>
             <weightedTable weightClass="A">
                 <entry weight="1">MHHAA</entry>
+                <entry weight="2">HHHHA</entry>
                 <entry weight="2">HHHAA</entry>
-                <entry weight="2">HHAAA</entry>
-                <entry weight="1">AAAAA</entry>
+                <entry weight="1">HHAAA</entry>
             </weightedTable>
         </botLance>
 
         <botLance org="CS">
             <weightedTable weightClass="L">
                 <entry weight="1">LLLLLL</entry>
-                <entry weight="2">LLLLLM</entry>
                 <entry weight="2">LLLLMM</entry>
-                <entry weight="1">LLLMMM</entry>
+                <entry weight="2">LLLMMM</entry>
+                <entry weight="1">LLLMHH</entry>
             </weightedTable>
             <weightedTable weightClass="M">
-                <entry weight="1">LLLMMM</entry>
-                <entry weight="1">LLMMMM</entry>
-                <entry weight="1">LMMMMM</entry>
-                <entry weight="1">MMMMMM</entry>
-                <entry weight="1">MMMMMH</entry>
-                <entry weight="1">MMMMHH</entry>
+                <entry weight="1">LLMMHH</entry>
+                <entry weight="2">MMMMMM</entry>
+                <entry weight="2">MMMMHH</entry>
+                <entry weight="1">MMMHHH</entry>
             </weightedTable>
             <weightedTable weightClass="H">
-                <entry>MMMHHH</entry>
-                <entry>MMHHHH</entry>
-                <entry>MHHHHH</entry>
-                <entry>HHHHHH</entry>
-                <entry>HHHHHA</entry>
-                <entry>HHHHAA</entry>
+                <entry weight="1">MMHHHH</entry>
+                <entry weight="2">HHHHHH</entry>
+                <entry weight="2">MMHHAA</entry>
+                <entry weight="1">HHHHAA</entry>
             </weightedTable>
             <weightedTable weightClass="A">
+                <entry weight="1">MMHAAA</entry>
                 <entry weight="2">HHHAAA</entry>
-                <entry weight="1">HHAAAA</entry>
-                <entry weight="2">HAAAAA</entry>
+                <entry weight="2">HHAAAA</entry>
                 <entry weight="1">AAAAAA</entry>
             </weightedTable>
         </botLance>
