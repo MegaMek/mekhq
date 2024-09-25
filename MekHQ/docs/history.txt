@@ -31,6 +31,22 @@ MEKHQ VERSION HISTORY:
 + PR #4846: Restored Missing Portrait Folders
 + PR #4847: Added Post-Name Change Compatibility Handlers to SkillType.java
 + FIX #4833: Added Post-Name Change Compatibility Handlers, Added JavaDocs to PersonnelRole.java
++ Fix #4882: Filter out inactive factions when determining capitals for personnel market generation
++ PR #4848: Added Tooltip for Crew Requirements in Hangar Tab Display
++ Fix #4834: Refactored Nag Dialogs, Split UnableToAffordExpensesNagDialog into Two Dialogs, Added Unit Tests
++ PR #4521: Relationship & Childhood Overhaul
++ PR #4888: Added 'Part Quality Report' Dialog
++ PR #4884: Refactored GM Person Editing to Handle Multiple Selections
++ Fix #4748: Refactored Award Drawing Methods
++ Fix #4745: Added Mission Check for 'prisonerofwar' Award Eligibility
++ Fix #4701: Updated StratCon Status Message for Inactive Contracts
++ Fix #4870: Enhanced Random-Death Reporting
++ PR #4865: Implemented Force Generation 3, Including Clan Bidding & Batchall System
++ Fix #4785: Added the Tracking of Hits Obtained Prior to the Completion of a Scenario
++ Fix #4779: Added Adult Apprenticeship and Updated Tuition Fees
++ Fix #4771 & #4781: Fixed ConcurrentModificationException in Personnel Removal Process
++ Fix #4736: Regenerate Personality Descriptions for NPCs
++ Fix #4721: Removed Automatic Conversion of CVP into SP when Reinforcing in StratCon
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
