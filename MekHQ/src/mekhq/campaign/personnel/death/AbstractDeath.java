@@ -18,6 +18,18 @@
  */
 package mekhq.campaign.personnel.death;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
@@ -33,20 +45,6 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomDeathMethod;
 import mekhq.campaign.personnel.enums.TenYearAgeRange;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.utilities.ReportingUtilities;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
 public abstract class AbstractDeath {
     private static final MMLogger logger = MMLogger.create(AbstractDeath.class);
@@ -160,13 +158,6 @@ public abstract class AbstractDeath {
         }
 
         if (randomlyDies(age, person.getGender())) {
-            // We double-report here, to make sure the user definitely notices that a random death has occurred.
-            // Prior to this change, it was exceptionally easy to miss these events.
-            String color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
-            String formatOpener = ReportingUtilities.spanOpeningWithCustomColor(color);
-            campaign.addReport(String.format("%s has %s<b>died</b>%s.",
-                person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
-
             person.changeStatus(campaign, today, getCause(person, ageGroup, age));
             return person.getStatus().isDead();
         } else {
