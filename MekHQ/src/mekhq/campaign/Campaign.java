@@ -21,23 +21,6 @@
  */
 package mekhq.campaign;
 
-import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
-import static mekhq.campaign.personnel.education.EducationController.getAcademy;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
-
-import java.io.PrintWriter;
-import java.text.MessageFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import javax.swing.JOptionPane;
-
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
@@ -54,11 +37,7 @@ import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.EntitySavingException;
-import megamek.common.options.GameOptions;
-import megamek.common.options.IBasicOption;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.OptionsConstants;
+import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
 import megamek.common.weapons.autocannons.ACWeapon;
 import megamek.common.weapons.flamers.FlamerWeapon;
@@ -71,11 +50,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.event.*;
-import mekhq.campaign.finances.Accountant;
-import mekhq.campaign.finances.CurrencyManager;
-import mekhq.campaign.finances.Finances;
-import mekhq.campaign.finances.Loan;
-import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.*;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -90,12 +65,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -105,12 +75,7 @@ import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.Skill;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.AbstractDeath;
 import mekhq.campaign.personnel.death.DisabledRandomDeath;
@@ -118,12 +83,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
@@ -136,21 +96,16 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
-import mekhq.campaign.unit.HangarStatistics;
-import mekhq.campaign.unit.TestUnit;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.UnitOrder;
-import mekhq.campaign.unit.UnitTechProgression;
+import mekhq.campaign.unit.*;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
@@ -170,6 +125,25 @@ import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
+
+import javax.swing.*;
+import java.io.PrintWriter;
+import java.text.MessageFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
+import static mekhq.campaign.personnel.education.EducationController.getAcademy;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -3618,33 +3592,64 @@ public class Campaign implements ITechManager {
         processNewDayATBScenarios();
     }
 
+    /**
+     * Processes the new day for all active personnel.
+     * <p>
+     * This method loops through all active personnel and performs the necessary actions
+     * for each person for a new day.
+     * </p>
+     * <p>
+     * The following tasks are performed for each person:
+     * <ul>
+     *   <li>Death - If the person has died, skip processing further for the dead person.</li>
+     *   <li>Marriage - Process any marriage-related actions.</li>
+     *   <li>Reset minutes left for the person.</li>
+     *   <li>Reset acquisitions made to 0.</li>
+     *   <li>Healing - If the person needs healing and advanced medical is not used,
+     *   decrement the days to wait for healing and heal naturally or with a doctor.</li>
+     *   <li>Advanced Medical - If advanced medical is used, resolve the daily healing for the person.</li>
+     *   <li>Reset current edge points for support personnel on Mondays.</li>
+     *   <li>Idle XP - If idle XP is enabled and it's the first day of the month,
+     *   check if the person qualifies for idle XP and award them if they do.</li>
+     *   <li>Divorce - Process any divorce-related actions.</li>
+     *   <li>Procreation - Process any procreation-related actions.</li>
+     *   <li>Anniversaries - Check if it's the person's birthday or 18th birthday
+     *   and announce it if needed.</li>
+     *   <li>Auto Awards - If it's the first day of the month, calculate the auto award
+     *   support points based on the person's roles and experience level.</li>
+     * </ul>
+     * </p>
+     * <p>
+     * Note: This method uses several other methods to perform the specific actions for each task.
+     * </p>
+     */
     public void processNewDayPersonnel() {
         // This MUST use getActivePersonnel as we only want to process active personnel,
         // and
         // furthermore, this allows us to add and remove personnel without issue
-        for (Person p : getActivePersonnel()) {
+        for (Person person : getActivePersonnel()) {
             // Death
-            if (getDeath().processNewDay(this, getLocalDate(), p)) {
+            if (getDeath().processNewDay(this, getLocalDate(), person)) {
                 // The person has died, so don't continue to process the dead
                 continue;
             }
 
             // Marriage
-            getMarriage().processNewDay(this, getLocalDate(), p);
+            getMarriage().processNewDay(this, getLocalDate(), person);
 
-            p.resetMinutesLeft();
+            person.resetMinutesLeft();
             // Reset acquisitions made to 0
-            p.setAcquisition(0);
-            if (p.needsFixing() && !getCampaignOptions().isUseAdvancedMedical()) {
-                p.decrementDaysToWaitForHealing();
-                Person doctor = getPerson(p.getDoctorId());
+            person.setAcquisition(0);
+            if (person.needsFixing() && !getCampaignOptions().isUseAdvancedMedical()) {
+                person.decrementDaysToWaitForHealing();
+                Person doctor = getPerson(person.getDoctorId());
                 if ((doctor != null) && doctor.isDoctor()) {
-                    if (p.getDaysToWaitForHealing() <= 0) {
-                        addReport(healPerson(p, doctor));
+                    if (person.getDaysToWaitForHealing() <= 0) {
+                        addReport(healPerson(person, doctor));
                     }
-                } else if (p.checkNaturalHealing(15)) {
-                    addReport(p.getHyperlinkedFullTitle() + " heals naturally!");
-                    Unit u = p.getUnit();
+                } else if (person.checkNaturalHealing(15)) {
+                    addReport(person.getHyperlinkedFullTitle() + " heals naturally!");
+                    Unit u = person.getUnit();
                     if (u != null) {
                         u.resetPilotAndEntity();
                     }
@@ -3652,8 +3657,8 @@ public class Campaign implements ITechManager {
             }
             // TODO Advanced Medical needs to go away from here later on
             if (getCampaignOptions().isUseAdvancedMedical()) {
-                InjuryUtil.resolveDailyHealing(this, p);
-                Unit u = p.getUnit();
+                InjuryUtil.resolveDailyHealing(this, person);
+                Unit u = person.getUnit();
                 if (u != null) {
                     u.resetPilotAndEntity();
                 }
@@ -3664,43 +3669,50 @@ public class Campaign implements ITechManager {
             // TODO : p.isEngineer will need to stay, however
             // Reset edge points to the purchased value each week. This should only
             // apply for support personnel - combat troops reset with each new mm game
-            if ((p.isAdministrator() || p.isDoctor() || p.isEngineer() || p.isTech())
+            if ((person.isAdministrator() || person.isDoctor() || person.isEngineer() || person.isTech())
                     && (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
-                p.resetCurrentEdge();
+                person.resetCurrentEdge();
             }
 
             if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
-                    && !p.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain
+                    && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain
                                                                      // xp
-                p.setIdleMonths(p.getIdleMonths() + 1);
-                if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
+                person.setIdleMonths(person.getIdleMonths() + 1);
+                if (person.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-                        p.awardXP(this, getCampaignOptions().getIdleXP());
-                        addReport(p.getHyperlinkedFullTitle() + " has gained "
+                        person.awardXP(this, getCampaignOptions().getIdleXP());
+                        addReport(person.getHyperlinkedFullTitle() + " has gained "
                                 + getCampaignOptions().getIdleXP() + " XP");
                     }
-                    p.setIdleMonths(0);
+                    person.setIdleMonths(0);
                 }
             }
 
             // Divorce
-            getDivorce().processNewDay(this, getLocalDate(), p);
+            getDivorce().processNewDay(this, getLocalDate(), person);
 
             // Procreation
-            getProcreation().processNewDay(this, getLocalDate(), p);
+            getProcreation().processNewDay(this, getLocalDate(), person);
 
             // Anniversaries
-            if ((p.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-                if ((p.getBirthday().isEqual(getLocalDate())) && (campaignOptions.isAnnounceBirthdays())) {
+            LocalDate birthday = person.getBirthday();
+            birthday = birthday.withYear(Year.now().getValue());
+
+            if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
+                if ((birthday.isEqual(getLocalDate())) && (campaignOptions.isAnnounceBirthdays())) {
                     addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                            p.getHyperlinkedFullTitle(),
-                            p.getAge(getLocalDate())));
+                        person.getHyperlinkedFullTitle(),
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        person.getAge(getLocalDate()),
+                        CLOSING_SPAN_TAG));
                 }
-            } else if ((p.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-                if (p.getBirthday().isEqual(getLocalDate())) {
+            } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
+                if (birthday.isEqual(getLocalDate())) {
                     addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                            p.getHyperlinkedFullTitle(),
-                            18));
+                        person.getHyperlinkedFullTitle(),
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        person.getAge(getLocalDate()),
+                        CLOSING_SPAN_TAG));
                 }
             }
 
@@ -3710,8 +3722,8 @@ public class Campaign implements ITechManager {
 
                 int score = 0;
 
-                if (p.getPrimaryRole().isSupport(true)) {
-                    int dice = p.getExperienceLevel(this, false);
+                if (person.getPrimaryRole().isSupport(true)) {
+                    int dice = person.getExperienceLevel(this, false);
 
                     if (dice > 0) {
                         score = Compute.d6(dice);
@@ -3720,19 +3732,19 @@ public class Campaign implements ITechManager {
                     multiplier += 0.5;
                 }
 
-                if (p.getSecondaryRole().isSupport(true)) {
-                    int dice = p.getExperienceLevel(this, true);
+                if (person.getSecondaryRole().isSupport(true)) {
+                    int dice = person.getExperienceLevel(this, true);
 
                     if (dice > 0) {
                         score += Compute.d6(dice);
                     }
 
                     multiplier += 0.5;
-                } else if (p.getSecondaryRole().isNone()) {
+                } else if (person.getSecondaryRole().isNone()) {
                     multiplier += 0.5;
                 }
 
-                p.changeAutoAwardSupportPoints((int) (score * multiplier));
+                person.changeAutoAwardSupportPoints((int) (score * multiplier));
             }
         }
     }
