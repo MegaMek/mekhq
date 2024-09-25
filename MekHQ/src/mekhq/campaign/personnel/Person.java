@@ -327,7 +327,7 @@ public class Person {
         secondaryRole = PersonnelRole.NONE;
         primaryDesignator = ROMDesignation.NONE;
         secondaryDesignator = ROMDesignation.NONE;
-        setBirthday(LocalDate.now());
+        setDateOfBirth(LocalDate.now());
 
         originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
@@ -1329,7 +1329,12 @@ public class Person {
         return gender;
     }
 
-    public void setBirthday(final LocalDate birthday) {
+    /**
+     * Sets the date of birth (the date they are born) for the person.
+     *
+     * @param birthday the person's new date of birth
+     */
+    public void setDateOfBirth(final LocalDate birthday) {
         this.birthday = birthday;
     }
 

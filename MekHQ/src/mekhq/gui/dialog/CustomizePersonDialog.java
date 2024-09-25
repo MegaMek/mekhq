@@ -1181,7 +1181,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                     : (Gender) choiceGender.getSelectedItem());
         }
 
-        person.setBirthday(birthdate);
+        person.setDateOfBirth(birthdate);
         person.setRecruitment(recruitment);
         person.setLastRankChangeDate(lastRankChangeDate);
         person.setRetirement(retirement);

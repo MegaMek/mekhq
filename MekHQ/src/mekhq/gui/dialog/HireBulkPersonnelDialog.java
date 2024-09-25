@@ -18,23 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.personnel.SkillType.*;
-import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
-
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JSpinner.NumberEditor;
-
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -52,6 +35,20 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
+
+import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+import static mekhq.campaign.personnel.SkillType.*;
+import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
 
 /**
  * @author Jay Lawson
@@ -353,7 +350,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             if (useAge) {
                 if ((age > maxAgeVal) || (age < minAgeVal)) {
                     LocalDate birthDay = earliestBirthDate.plusDays(Compute.randomInt(days));
-                    person.setBirthday(birthDay);
+                    person.setDateOfBirth(birthDay);
                     age = person.getAge(today);
                 }
             }

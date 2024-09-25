@@ -322,7 +322,7 @@ public abstract class AbstractProcreation {
             final Person baby = campaign.newDependent(true);
             baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(mother, father, baby.getGender()));
-            baby.setBirthday(today);
+            baby.setDateOfBirth(today);
 
             // Create reports and log the birth
             campaign.addReport(String.format(resources.getString("babyBorn.report"),

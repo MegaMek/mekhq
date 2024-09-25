@@ -1458,7 +1458,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                     ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
                     : (Gender) choiceGender.getSelectedItem());
         }
-        person.setBirthday(birthdate);
+        person.setDateOfBirth(birthdate);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
         if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
             person.setOriginPlanet((Planet)choicePlanet.getSelectedItem());
