@@ -47,6 +47,7 @@ MEKHQ VERSION HISTORY:
 + Fix #4771 & #4781: Fixed ConcurrentModificationException in Personnel Removal Process
 + Fix #4736: Regenerate Personality Descriptions for NPCs
 + Fix #4721: Removed Automatic Conversion of CVP into SP when Reinforcing in StratCon
++ Fix #4782: Removed TN Modifier for IS Techs working on Clan Tech, Removed Clan Tech Knowledge SPA and Effects #4863
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
