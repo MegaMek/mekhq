@@ -1562,35 +1562,53 @@ public class AtBContract extends Contract {
      * @return {@code true} if the user accepts the refusal, {@code false} if the user cancels the refusal
      */
     private boolean refusalConfirmationDialog(Campaign campaign) {
-        // Display a dialog with options for accepting or refusing a batchall.
-        // The dialog message is retrieved from resources, including the full name of the enemy for
-        // the year of the campaign.
-        // OptionDialog will return an int relating to the option chosen by the user.
-        int refusalConfirmation = JOptionPane.showOptionDialog(
-            null,
-            String.format(resources.getString("refusalConfirmation.text"),
-                getEnemy().getFullName(campaign.getGameYear())),
-            resources.getString("responseRefuse.text"),
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            new Object[]{resources.getString("responseAccept.text"),
-                resources.getString("responseRefuse.text")},
-            resources.getString("responseAccept.text"));
+        // Create modal JDialog
+        JDialog dialog = new JDialog();
+        dialog.setLayout(new BorderLayout());
 
-        // If the refusal is confirmed (NO_OPTION selected), perform needed actions.
-        if (refusalConfirmation == JOptionPane.NO_OPTION) {
-            // Add a report to the campaign about the refusal
+        // Buffer for storing user response (acceptance/refusal)
+        final boolean[] response = {false};
+
+        // "Accept" Button
+        JButton acceptButton = new JButton(resources.getString("responseAccept.text"));
+        acceptButton.setToolTipText(resources.getString("responseAccept.tooltip"));
+        acceptButton.addActionListener(e -> {
+            response[0] = true;  // User has accepted
+            dialog.dispose();  // Close dialog
+        });
+
+        // "Refuse" Button
+        JButton refuseButton = new JButton(resources.getString("responseRefuse.text"));
+        refuseButton.setToolTipText(resources.getString("responseRefuse.tooltip"));
+        refuseButton.addActionListener(e -> {
+            // Update the campaign state on refusal
             campaign.addReport(resources.getString("refusalReport.text"));
-            // Update the fame factor for the enemy faction in this campaign
             campaign.getFameAndInfamy().updateFameForFaction(campaign, enemyCode, -1);
-            // Return false indicating that batchall is refused
-            return false;
-        }
+            response[0] = false;  // User has refused
+            dialog.dispose();  // Close dialog
+        });
 
-        // If the response is anything else than refusal (no option selected), it implies that the
-        // action is accepted.
-        return true;
+        // Panel for hosting buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(refuseButton);
+
+        // Message Label
+        JLabel messageLabel = new JLabel(String.format(resources.getString("refusalConfirmation.text"),
+            getEnemy().getFullName(campaign.getGameYear())));
+
+        // Add Message and Buttons to the dialog
+        dialog.add(messageLabel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Configure and display dialog
+        dialog.pack();  // Fit dialog to its contents
+        dialog.setLocationRelativeTo(null);  // Center dialog
+        dialog.setModal(true);  // Block access to other windows
+        dialog.setVisible(true);  // Display dialog
+
+        // Return user response
+        return response[0];
     }
 
     /**
@@ -1601,11 +1619,24 @@ public class AtBContract extends Contract {
      * @param title The title of the dialog.
      */
     private void noBatchallOfferedDialog(JPanel panel, String title) {
-        Object[] options = {
-            resources.getString("responseBringItOn.text")
-        };
+        // Create a new JDialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(title);
+        dialog.setLayout(new BorderLayout());
 
-        JOptionPane.showOptionDialog(null, panel, title, JOptionPane.DEFAULT_OPTION,
-            JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        JButton responseButton = new JButton(resources.getString("responseBringItOn.text"));
+        responseButton.setToolTipText(resources.getString("responseBringItOn.tooltip"));
+        responseButton.addActionListener(e -> dialog.dispose()); // Dispose the dialog when the button is clicked
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(responseButton); // Add the button to the panel
+
+        dialog.add(panel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.pack(); // Size the dialog to fit the preferred size and layouts of its components
+        dialog.setLocationRelativeTo(null); // Center the dialog on the screen
+        dialog.setModal(true); // Set the dialog to be modal
+        dialog.setVisible(true); // Show the dialog
     }
 }

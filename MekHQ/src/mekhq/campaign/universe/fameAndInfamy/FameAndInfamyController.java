@@ -43,8 +43,6 @@ public class FameAndInfamyController {
                 this.trackingFactions.put(shortName, 2.0);
             }
         }
-
-        // TODO add modifiers for inter-faction relationships
     }
 
     /**

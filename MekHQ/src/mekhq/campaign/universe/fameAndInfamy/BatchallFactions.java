@@ -76,7 +76,7 @@ public class BatchallFactions {
 
         // The rest of the method
         String greeting;
-        int type = 0;
+        int type;
 
         if (infamy == 5) {
             greeting = resources.getString("greetingCLANLevel5Type0.text");
@@ -87,6 +87,6 @@ public class BatchallFactions {
             greeting = resources.getString(greetingReference);
         }
 
-        return '"' + greeting + '"';
+        return greeting + '"';
     }
 }
