@@ -2,7 +2,7 @@
  * AtBContract.java
  *
  * Copyright (c) 2014 Carl Spain. All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,25 +21,9 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
-import megamek.common.annotations.Nullable;
+import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
@@ -64,6 +48,15 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.File;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.*;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -96,7 +89,6 @@ public class AtBContract extends Contract {
 
     protected String employerCode;
     protected String enemyCode;
-    protected String enemyName;
 
     protected AtBContractType contractType;
     protected SkillLevel allySkill;
@@ -149,7 +141,6 @@ public class AtBContract extends Contract {
         super(name, "Independent");
         employerCode = "IND";
         enemyCode = "IND";
-        enemyName = "Independent";
 
         parentContract = null;
         mercSubcontract = false;
@@ -187,8 +178,158 @@ public class AtBContract extends Contract {
             setOverheadComp(OH_NONE);
         }
 
-        allyBotName = getEmployerName(campaign.getGameYear());
-        enemyBotName = getEnemyName(campaign.getGameYear());
+        int currentYear = campaign.getGameYear();
+        allyBotName = getEmployerName(currentYear);
+        pickRandomCamouflage(currentYear, employerCode, false);
+
+        enemyBotName = getEnemyName(currentYear);
+        pickRandomCamouflage(currentYear, enemyCode, true);
+    }
+
+    /**
+     * Selects a random camouflage for the given faction based on the faction code and year.
+     * If there are no available files in the faction directory, it logs a warning and uses default
+     * camouflage.
+     *
+     * @param currentYear the current year in the game.
+     * @param factionCode the code representing the faction for which the camouflage is to be selected.
+     * @param isEnemy a boolean flag to denote if the selected camouflage is for an enemy ({@code true})
+     *               or employer ({@code false}).
+     */
+    private void pickRandomCamouflage(int currentYear, String factionCode, boolean isEnemy) {
+        // Define the root directory and get the faction-specific camouflage directory
+        final String ROOT_DIRECTORY = "data/images/camo/";
+        String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
+
+        // Use Java File to represent directories
+        File workingDirectory = new File(ROOT_DIRECTORY + camouflageDirectory + '/');
+
+        // List subdirectories and loose files in working directory
+        File[] folders = workingDirectory.listFiles(File::isDirectory);
+        File[] looseFiles = workingDirectory.listFiles();
+
+        // Gather all files
+        List<File> allFiles = new ArrayList<>();
+        if (looseFiles != null) {
+            Collections.addAll(allFiles, looseFiles);
+        }
+        if (folders != null) {
+            for (File folder : folders) {
+                File[] folderFiles = folder.listFiles();
+                if (folderFiles != null) {
+                    Collections.addAll(allFiles, folderFiles);
+                }
+            }
+        }
+
+        // Select a random file to set camouflage, if there are files available
+        if (!allFiles.isEmpty()) {
+            File randomFile = allFiles.get(new Random().nextInt(allFiles.size()));
+
+            String fileName = randomFile.getName();
+            String fileCategory = randomFile.getParent().replaceAll(ROOT_DIRECTORY, "");
+
+            if (isEnemy) {
+                enemyCamouflage = new Camouflage(fileCategory, fileName);
+            } else {
+                allyCamouflage = new Camouflage(fileCategory, fileName);
+            }
+        } else {
+            // Log if no files were found in the directory
+            logger.warn(String.format("No files in directory %s - returning default camouflage",
+                workingDirectory));
+        }
+    }
+
+
+    /**
+     * Retrieves the directory for the camouflage of a faction based on the current year and faction code.
+     *
+     * @param currentYear The current year in the game.
+     * @param factionCode The code representing the faction.
+     * @return The directory for the camouflage of the faction.
+     */
+    private String getCamouflageDirectory(int currentYear, String factionCode) {
+        return switch (factionCode) {
+            case "ARC" -> "Aurigan Coalition";
+            case "CDP" -> "Calderon Protectorate";
+            case "CC" -> "Capellan Confederation";
+            case "CIR" -> "Circinus Federation";
+            case "CS" -> "ComStar";
+            case "DC" -> "Draconis Combine";
+            case "CF" -> "Federated Commonwealth";
+            case "FS" -> "Federated Suns";
+            case "FVC" -> "Filtvelt Coalition";
+            case "FRR" -> "Free Rasalhague Republic";
+            case "FWL" -> "Free Worlds League";
+            case "FR" -> "Fronc Reaches";
+            case "HL" -> "Hanseatic League";
+            case "LL" -> "Lothian League";
+            case "LA" -> "Lyran Commonwealth";
+            case "MOC" -> "Magistracy of Canopus";
+            case "MH" -> "Marian Hegemony";
+            case "MERC" -> "Mercs";
+            case "OA" -> "Outworlds Alliance";
+            case "PIR" -> "Pirates";
+            case "ROS" -> "Republic of the Sphere";
+            case "SL" -> "Star League Defense Force";
+            case "TC" -> "Taurian Concordat";
+            case "WOB" -> "Word of Blake";
+            default -> {
+                Faction faction = Factions.getInstance().getFaction(factionCode);
+
+                if (faction.isClan()) {
+                    yield getClanCamouflageDirectory(currentYear, factionCode);
+                } else {
+                    yield "Standard Camouflage";
+                }
+            }
+        };
+    }
+
+    /**
+     * Retrieves the directory for the camouflage of a clan faction based on
+     * the current year and faction code.
+     *
+     * @param currentYear The current year in the game.
+     * @param factionCode The code representing the faction.
+     * @return The directory for the camouflage of the clan faction.
+     */
+    private String getClanCamouflageDirectory(int currentYear, String factionCode) {
+        final String ROOT_DIRECTORY = "Clans/";
+
+        return switch (factionCode) {
+            case "CBS" -> ROOT_DIRECTORY + "Blood Spirit";
+            case "CB" -> ROOT_DIRECTORY + "Burrock";
+            case "CCC" -> ROOT_DIRECTORY + "Cloud Cobra";
+            case "CCO" -> ROOT_DIRECTORY + "Coyote";
+            case "CDS" -> {
+                if (currentYear < 3100) {
+                    yield ROOT_DIRECTORY + "Diamond Shark";
+                } else {
+                    yield ROOT_DIRECTORY + "Sea Fox (Dark Age)";
+                }
+            }
+            case "CFM" -> ROOT_DIRECTORY + "Fire Mandrill";
+            case "CGB", "RD" -> ROOT_DIRECTORY + "Ghost Bear";
+            case "CGS" -> ROOT_DIRECTORY + "Goliath Scorpion";
+            case "CHH" -> ROOT_DIRECTORY + "Hell's Horses";
+            case "CIH" -> ROOT_DIRECTORY + "Ice Hellion";
+            case "CJF" -> ROOT_DIRECTORY + "Jade Falcon";
+            case "CMG" -> ROOT_DIRECTORY + "Mongoose";
+            case "CNC" -> ROOT_DIRECTORY + "Nova Cat";
+            case "CSJ" -> ROOT_DIRECTORY + "Smoke Jaguar";
+            case "CSR" -> ROOT_DIRECTORY + "Snow Raven";
+            case "SOC" -> ROOT_DIRECTORY + "Society";
+            case "CSA" -> ROOT_DIRECTORY + "Star Adder";
+            case "CSV" -> ROOT_DIRECTORY + "Steel Viper";
+            case "CSL" -> ROOT_DIRECTORY + "Stone Lion";
+            case "CWI" -> ROOT_DIRECTORY + "Widowmaker";
+            case "CW", "CWE" -> ROOT_DIRECTORY + "Wolf";
+            case "CWIE" -> ROOT_DIRECTORY + "Wolf-in-Exile";
+            case "CWOV" -> ROOT_DIRECTORY + "Wolverine";
+            default -> "Standard Camouflage";
+        };
     }
 
     public void calculateLength(final boolean variable) {
@@ -401,10 +542,16 @@ public class AtBContract extends Contract {
                 Factions.getInstance().getFaction(employerCode), false, true);
         setEnemyCode(enemyCode);
 
-        Faction enemyFaction = Factions.getInstance().getFaction(enemyCode);
-        setEnemyBotName(enemyFaction.getFullName(today.getYear()));
-        enemyName = ""; // wipe the old enemy name
-        getEnemyName(today.getYear()); // we use this to update enemyName
+        setEnemyBotName(getEnemyName(today.getYear()));
+
+        // We have a check in getEnemyName that prevents rolling over mercenary names,
+        // so we add this extra step to force a mercenary name re-roll,
+        // in the event one Mercenary faction is replaced with another.
+        if (Factions.getInstance().getFaction(enemyCode).isMercenary()) {
+            enemyBotName = BackgroundsController.randomMercenaryCompanyNameGenerator(null);
+        }
+
+        pickRandomCamouflage(today.getYear(), enemyCode, true);
     }
 
     /**
@@ -811,7 +958,6 @@ public class AtBContract extends Contract {
         indent = super.writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyName", getEnemyName(0));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allySkill", getAllySkill().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
@@ -880,8 +1026,6 @@ public class AtBContract extends Contract {
                     employerCode = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyCode")) {
                     enemyCode = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("enemyName")) {
-                    enemyName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractType")) {
                     setContractType(AtBContractType.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("allySkill")) {
@@ -986,11 +1130,13 @@ public class AtBContract extends Contract {
     public void setEmployerCode(final String code, final LocalDate date) {
         employerCode = code;
         setEmployer(getEmployerName(date.getYear()));
+        pickRandomCamouflage(date.getYear(), employerCode, false);
     }
 
     public void setEmployerCode(String code, int year) {
         employerCode = code;
         setEmployer(getEmployerName(year));
+        pickRandomCamouflage(year, employerCode, false);
     }
 
     public String getEmployerName(int year) {
@@ -1006,53 +1152,28 @@ public class AtBContract extends Contract {
         return enemyCode;
     }
 
-    public void setEnemyCode(String enemyCode) {
-        this.enemyCode = enemyCode;
-        this.enemyName = ""; // better reset it if we're changing the enemy code
-    }
-
     /**
      * Retrieves the name of the enemy for this contract.
-     * If enemyName is not set, it generates and sets the name.
      *
-     * @param year the year for which to retrieve the enemy faction's full name (or
-     *             0, if year is unknown)
-     * @return the name of the enemy
+     * @param year The current year in the game.
+     * @return The name of the enemy.
      */
     public String getEnemyName(int year) {
-        if (enemyName.isBlank()) {
-            generateEnemyName(year);
-        }
+        Faction faction = Factions.getInstance().getFaction(enemyCode);
 
-        return enemyName;
-    }
-
-    public void setEnemyName(final String enemyName) {
-        this.enemyName = enemyName;
-    }
-
-    /**
-     * Generates the name of the enemy for this contract.
-     * If the enemy is a mercenary, a random mercenary company name is generated.
-     * Otherwise, the full name of the enemy faction is retrieved based on the given
-     * year.
-     * If the enemy or faction cannot be found, the short name of the enemy is used
-     * as a fallback.
-     *
-     * @param year the year for which to retrieve the enemy faction's full name (or
-     *             0, if year is unknown)
-     */
-    public void generateEnemyName(@Nullable int year) {
-        try {
-            if (getEnemy().isMercenary()) {
-                enemyName = BackgroundsController.randomMercenaryCompanyNameGenerator(null);
-            } else if (year != 0) {
-                enemyName = Factions.getInstance().getFaction(getEnemy().getShortName()).getFullName(year);
+        if (faction.isMercenary()) {
+            if (Objects.equals(enemyBotName, "Enemy")) {
+                return BackgroundsController.randomMercenaryCompanyNameGenerator(null);
+            } else {
+                return enemyBotName;
             }
-            // this is a fallback to ensure we don't end up with a null enemyName
-        } catch (NullPointerException e) {
-            enemyName = getEnemy().getShortName();
+        } else {
+            return faction.getFullName(year);
         }
+    }
+
+    public void setEnemyCode(String enemyCode) {
+        this.enemyCode = enemyCode;
     }
 
     public AtBContractType getContractType() {
@@ -1311,8 +1432,14 @@ public class AtBContract extends Contract {
         requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
-        allyBotName = getEmployerName(campaign.getGameYear());
-        enemyBotName = getEnemyName(campaign.getGameYear()); // we set enemyName here, too
+
+        int currentYear = campaign.getGameYear();
+        allyBotName = getEmployerName(currentYear);
+        pickRandomCamouflage(currentYear, employerCode, false);
+
+        enemyBotName = getEnemyName(currentYear);
+        pickRandomCamouflage(currentYear, enemyCode, true);
+
     }
 
     /**
