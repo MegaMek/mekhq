@@ -18,34 +18,14 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.Period;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import javax.swing.*;
-
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.ExtraData;
+import mekhq.campaign.ExtraData.Key;
+import mekhq.campaign.ExtraData.StringKey;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryType;
@@ -56,15 +36,31 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.InjuryLevel;
 import mekhq.gui.view.Paperdoll;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.Period;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 public class MedicalViewDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(MedicalViewDialog.class);
 
     private static final String MENU_CMD_SEPARATOR = ",";
 
-    private static final ExtraData.Key<String> DOCTOR_NOTES = new ExtraData.StringKey("doctor_notes");
+    private static final Key<String> DOCTOR_NOTES = new StringKey("doctor_notes");
     // TODO: Custom paper dolls
     @SuppressWarnings("unused")
-    private static final ExtraData.Key<String> PAPERDOLL = new ExtraData.StringKey("paperdoll_xml_file");
+    private static final Key<String> PAPERDOLL = new StringKey("paperdoll_xml_file");
 
     private final Campaign campaign;
     private final Person person;
@@ -324,7 +320,7 @@ public class MedicalViewDialog extends JDialog {
             surname = p.getBloodname();
         }
 
-        Period age = Period.between(p.getBirthday(), c.getLocalDate());
+        Period age = Period.between(p.getDateOfBirth(), c.getLocalDate());
 
         String phenotype = p.getPhenotype().isNone() ? resourceMap.getString("baselinePhenotype.text")
                 : p.getPhenotype().toString();
@@ -343,7 +339,7 @@ public class MedicalViewDialog extends JDialog {
         panel.add(genWrittenPanel(givenName));
         panel.add(genLabel(resourceMap.getString("birthDate.text")));
         panel.add(genLabel(resourceMap.getString("age.text")));
-        panel.add(genWrittenPanel(MekHQ.getMHQOptions().getDisplayFormattedDate(p.getBirthday())));
+        panel.add(genWrittenPanel(MekHQ.getMHQOptions().getDisplayFormattedDate(p.getDateOfBirth())));
         panel.add(genWrittenPanel(String.format(resourceMap.getString("age.format"), age.getYears(), age.getMonths())));
         panel.add(genLabel(resourceMap.getString("gender.text")));
         panel.add(genLabel(resourceMap.getString("phenotype.text")));
@@ -373,7 +369,7 @@ public class MedicalViewDialog extends JDialog {
                         Collectors.groupingBy(entry -> MekHQ.getMHQOptions().getDisplayFormattedDate(entry.getDate())));
         groupedEntries.entrySet().stream()
                 .filter(e -> !e.getValue().isEmpty())
-                .sorted(Map.Entry.comparingByKey())
+                .sorted(Entry.comparingByKey())
                 .forEachOrdered(e -> {
                     if (e.getValue().size() > 1) {
                         panel.add(genWrittenText(e.getKey()));
@@ -433,7 +429,7 @@ public class MedicalViewDialog extends JDialog {
                 .forEach(bl -> levelMap.put(bl, getMaxInjuryLevel(p, bl)));
         return levelMap.entrySet().stream()
                 .sorted((entry1, entry2) -> Integer.compare(entry2.getValue().ordinal(), entry1.getValue().ordinal()))
-                .map(Map.Entry::getKey);
+                .map(Entry::getKey);
     }
 
     private JPanel fillInjuries(JPanel panel, Campaign c, Person p) {

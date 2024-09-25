@@ -18,21 +18,6 @@
  */
 package mekhq.campaign;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-
-import javax.swing.SwingWorker;
-
 import megamek.common.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.force.Force;
@@ -43,6 +28,13 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
+
+import javax.swing.*;
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 
 public class MercRosterAccess extends SwingWorker<Void, Void> {
     private static final MMLogger logger = MMLogger.create(MercRosterAccess.class);
@@ -91,7 +83,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         conProperties.put("password", passwd);
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connect = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + table, conProperties);
+            connect = DriverManager.getConnection("jdbc:mysql://" + hostname + ':' + port + '/' + table, conProperties);
         } catch (SQLException e) {
             throw e;
         } catch (ClassNotFoundException e) {
@@ -562,10 +554,10 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                 preparedStatement.setInt(6, forceId);
                 preparedStatement.setInt(7, 1);
                 // TODO: get joining date right
-                preparedStatement.setDate(8, Date.valueOf(p.getBirthday()));
+                preparedStatement.setDate(8, Date.valueOf(p.getDateOfBirth()));
                 // TODO: combine personnel log with biography
                 preparedStatement.setString(9, p.getBiography());
-                preparedStatement.setDate(10, Date.valueOf(p.getBirthday()));
+                preparedStatement.setDate(10, Date.valueOf(p.getDateOfBirth()));
                 preparedStatement.setString(11, p.getId().toString());
                 if (preparedStatement.executeUpdate() < 1) {
                     // no prior record so insert
@@ -578,9 +570,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
                     preparedStatement.setString(5, p.getStatus().toString());
                     preparedStatement.setInt(6, forceId);
                     preparedStatement.setInt(7, 1);
-                    preparedStatement.setDate(8, Date.valueOf(p.getBirthday()));
+                    preparedStatement.setDate(8, Date.valueOf(p.getDateOfBirth()));
                     preparedStatement.setString(9, p.getBiography());
-                    preparedStatement.setDate(10, Date.valueOf(p.getBirthday()));
+                    preparedStatement.setDate(10, Date.valueOf(p.getDateOfBirth()));
                     preparedStatement.setString(11, p.getId().toString());
                     preparedStatement.executeUpdate();
                 }

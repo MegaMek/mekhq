@@ -19,20 +19,6 @@
  */
 package mekhq.campaign.personnel;
 
-import static java.lang.Math.abs;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.StringUtility;
@@ -62,24 +48,11 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.education.Academy;
-import mekhq.campaign.personnel.enums.ManeiDominiClass;
-import mekhq.campaign.personnel.enums.ManeiDominiRank;
-import mekhq.campaign.personnel.enums.ModifierValue;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.Profession;
-import mekhq.campaign.personnel.enums.ROMDesignation;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Aggression;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Ambition;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Greed;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.PersonalityQuirk;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Social;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -92,6 +65,19 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static java.lang.Math.abs;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -1352,8 +1338,18 @@ public class Person {
      *
      * @return a LocalDate representing the person's date of birth
      */
-    public LocalDate getBirthday() {
+    public LocalDate getDateOfBirth() {
         return birthday;
+    }
+
+    /**
+     * Retrieves the birthday for a person, with the year set to the same as the provided year.
+     *
+     * @param currentYear the current in-game year
+     * @return the birthday with the year updated to match the provided year
+     */
+    public LocalDate getBirthday(int currentYear) {
+        return birthday.withYear(currentYear);
     }
 
     public @Nullable LocalDate getDateOfDeath() {
@@ -1371,7 +1367,7 @@ public class Person {
             today = getDateOfDeath();
         }
 
-        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
+        return Math.toIntExact(ChronoUnit.YEARS.between(getDateOfBirth(), today));
     }
 
     public @Nullable LocalDate getRecruitment() {
@@ -2042,7 +2038,7 @@ public class Person {
             if (overtimeLeft > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtimeLeft", overtimeLeft);
             }
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "birthday", getBirthday());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "birthday", getDateOfBirth());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deathday", getDateOfDeath());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitment", getRecruitment());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());

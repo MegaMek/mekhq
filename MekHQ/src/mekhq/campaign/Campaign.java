@@ -133,7 +133,6 @@ import java.text.MessageFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.Year;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.Map.Entry;
@@ -3597,7 +3596,6 @@ public class Campaign implements ITechManager {
      * <p>
      * This method loops through all active personnel and performs the necessary actions
      * for each person for a new day.
-     * </p>
      * <p>
      * The following tasks are performed for each person:
      * <ul>
@@ -3618,10 +3616,8 @@ public class Campaign implements ITechManager {
      *   <li>Auto Awards - If it's the first day of the month, calculate the auto award
      *   support points based on the person's roles and experience level.</li>
      * </ul>
-     * </p>
      * <p>
      * Note: This method uses several other methods to perform the specific actions for each task.
-     * </p>
      */
     public void processNewDayPersonnel() {
         // This MUST use getActivePersonnel as we only want to process active personnel,
@@ -3695,19 +3691,31 @@ public class Campaign implements ITechManager {
             getProcreation().processNewDay(this, getLocalDate(), person);
 
             // Anniversaries
-            LocalDate birthday = person.getBirthday();
-            birthday = birthday.withYear(Year.now().getValue());
-
             if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-                if ((birthday.isEqual(getLocalDate())) && (campaignOptions.isAnnounceBirthdays())) {
+                if ((person.getBirthday(getGameYear()).isEqual(getLocalDate()))
+                    && (campaignOptions.isAnnounceBirthdays())) {
                     addReport(String.format(resources.getString("anniversaryBirthday.text"),
                         person.getHyperlinkedFullTitle(),
                         ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
                         person.getAge(getLocalDate()),
                         CLOSING_SPAN_TAG));
                 }
+
+                LocalDate recruitmentDate = person.getRecruitment();
+                if (recruitmentDate != null) {
+                    LocalDate recruitmentAnniversary = recruitmentDate.withYear(getGameYear());
+                    int yearsOfEmployment = (int) ChronoUnit.YEARS.between(recruitmentDate, currentDay);
+
+                    if ((recruitmentAnniversary.isEqual(getLocalDate()))
+                        && (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
+                        addReport(String.format(resources.getString("anniversaryRecruitment.text"),
+                            person.getHyperlinkedFullTitle(),
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            yearsOfEmployment, CLOSING_SPAN_TAG, name));
+                    }
+                }
             } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-                if (birthday.isEqual(getLocalDate())) {
+                if (person.getBirthday(getGameYear()).isEqual(getLocalDate())) {
                     addReport(String.format(resources.getString("anniversaryBirthday.text"),
                         person.getHyperlinkedFullTitle(),
                         ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),

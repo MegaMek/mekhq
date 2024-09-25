@@ -157,7 +157,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     private void initializePilotAndOptions () {
-        birthdate = person.getBirthday();
+        birthdate = person.getDateOfBirth();
         selectedPhenotype = person.getPhenotype();
         options = person.getOptions();
         portrait = person.getPortrait();
@@ -937,7 +937,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 int endYear = person.getRecruitment() != null
                         ? Math.min(person.getRecruitment().getYear(), year)
                         : year;
-                if (faction.validBetween(person.getBirthday().getYear(), endYear)) {
+                if (faction.validBetween(person.getDateOfBirth().getYear(), endYear)) {
                     factionsModel.addElement(faction);
                 }
             }
@@ -964,8 +964,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
-                .filter(a -> a.getFactionSet(person.getBirthday()).contains(faction))
-                .sorted(Comparator.comparing(a -> a.getName(person.getBirthday())))
+                .filter(a -> a.getFactionSet(person.getDateOfBirth()).contains(faction))
+                .sorted(Comparator.comparing(a -> a.getName(person.getDateOfBirth())))
                 .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);

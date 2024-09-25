@@ -18,14 +18,6 @@
  */
 package mekhq.gui.enums;
 
-import java.util.Comparator;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-
-import javax.swing.JTable;
-import javax.swing.SortOrder;
-import javax.swing.SwingConstants;
-
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
@@ -41,19 +33,15 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Aggression;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Ambition;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Greed;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Social;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
-import mekhq.gui.sorter.BonusSorter;
-import mekhq.gui.sorter.DateStringComparator;
-import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.IntegerStringSorter;
-import mekhq.gui.sorter.LevelSorter;
-import mekhq.gui.sorter.PersonRankStringSorter;
+import mekhq.gui.sorter.*;
+
+import javax.swing.*;
+import java.util.Comparator;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public enum PersonnelTableModelColumn {
     // region Enum Declarations
@@ -495,7 +483,7 @@ public enum PersonnelTableModelColumn {
                 return person.getCallsign();
             case AGE:
             case BIRTHDAY:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getBirthday());
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDateOfBirth());
             case PERSONNEL_STATUS:
                 return person.getStatus().toString();
             case GENDER:

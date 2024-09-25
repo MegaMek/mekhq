@@ -19,17 +19,6 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.EquipmentType;
@@ -49,6 +38,12 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author natit
@@ -340,6 +335,7 @@ public class CampaignOptions {
 
     // Anniversaries
     private boolean announceBirthdays;
+    private boolean announceRecruitmentAnniversaries;
     private boolean announceOfficersOnly;
     private boolean announceChildBirthdays;
 
@@ -851,6 +847,7 @@ public class CampaignOptions {
 
         // Anniversaries
         setAnnounceBirthdays(true);
+        setAnnounceRecruitmentAnniversaries(true);
         setAnnounceOfficersOnly(true);
         setAnnounceChildBirthdays(true);
 
@@ -2196,6 +2193,25 @@ public class CampaignOptions {
 
     public void setAnnounceBirthdays(final boolean announceBirthdays) {
         this.announceBirthdays = announceBirthdays;
+    }
+
+    /**
+     * Checks if recruitment anniversaries should be announced.
+     *
+     * @return {@code true} if recruitment anniversaries should be announced, {@code false} otherwise.
+     */
+    public boolean isAnnounceRecruitmentAnniversaries() {
+        return announceRecruitmentAnniversaries;
+    }
+
+    /**
+     * Set whether to announce recruitment anniversaries.
+     *
+     * @param announceRecruitmentAnniversaries {@code true} to announce recruitment anniversaries,
+     * {@code false} otherwise
+     */
+    public void setAnnounceRecruitmentAnniversaries(final boolean announceRecruitmentAnniversaries) {
+        this.announceRecruitmentAnniversaries = announceRecruitmentAnniversaries;
     }
 
     public boolean isAnnounceOfficersOnly() {
@@ -4871,6 +4887,7 @@ public class CampaignOptions {
 
         // region Announcements
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceBirthdays", isAnnounceBirthdays());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceRecruitmentAnniversaries", isAnnounceRecruitmentAnniversaries());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceOfficersOnly", isAnnounceOfficersOnly());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceChildBirthdays", isAnnounceChildBirthdays());
         // endregion Announcements
@@ -5578,6 +5595,8 @@ public class CampaignOptions {
                     // region anniversaries
                 } else if (wn2.getNodeName().equalsIgnoreCase("announceBirthdays")) {
                     retVal.setAnnounceBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("announceRecruitmentAnniversaries")) {
+                    retVal.setAnnounceRecruitmentAnniversaries(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("announceOfficersOnly")) {
                     retVal.setAnnounceOfficersOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("announceChildBirthdays")) {
