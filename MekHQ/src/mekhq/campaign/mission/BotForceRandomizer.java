@@ -18,17 +18,6 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.commons.math3.distribution.GammaDistribution;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -36,16 +25,11 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -57,7 +41,6 @@ import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.UnitGeneratorParameters;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.math3.distribution.GammaDistribution;
-import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -501,7 +484,7 @@ public class BotForceRandomizer {
 
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
-        crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ? " " + crewNameArray[1] : "";
+        crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ? ' ' + crewNameArray[1] : "";
 
         Map<Integer, Map<String, String>> extraData = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();
@@ -552,7 +535,7 @@ public class BotForceRandomizer {
             if (!phenotype.isNone()) {
                 String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
                         campaign.getGameYear()).getName();
-                crewName += " " + bloodname;
+                crewName += ' ' + bloodname;
                 innerMap.put(Crew.MAP_BLOODNAME, bloodname);
                 innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
             }
@@ -714,7 +697,7 @@ public class BotForceRandomizer {
     }
 
     public String getShortDescription() {
-        String sb = forceMultiplier + " (" + balancingMethod.toString() + ")";
+        String sb = forceMultiplier + " (" + balancingMethod.toString() + ')';
         return sb;
     }
 
@@ -728,9 +711,9 @@ public class BotForceRandomizer {
     public String getDescription(Campaign campaign) {
         StringBuilder sb = new StringBuilder();
         sb.append(Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()));
-        sb.append(" ");
+        sb.append(' ');
         sb.append(skill.toString());
-        sb.append(" ");
+        sb.append(' ');
         String typeDesc = UnitType.getTypeDisplayableName(unitType);
         if (percentConventional > 0) {
             typeDesc = typeDesc + " and Conventional";
@@ -740,7 +723,7 @@ public class BotForceRandomizer {
         sb.append(forceMultiplier);
         sb.append(" multiplier (");
         sb.append(balancingMethod.toString());
-        sb.append(")");
+        sb.append(')');
         return sb.toString();
     }
 

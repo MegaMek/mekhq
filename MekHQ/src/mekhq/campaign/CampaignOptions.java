@@ -19,23 +19,13 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
@@ -45,10 +35,17 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author natit
@@ -6165,7 +6162,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioModBV")) {
                     retVal.setScenarioModBV(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoconfigMunitions")) {
-                    retVal.setAutoconfigMunitions(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    retVal.setAutoConfigMunitions(Boolean.parseBoolean(wn2.getTextContent().trim()));
 
                     //region Legacy
                     // Removed in 0.49.*
@@ -6217,7 +6214,7 @@ public class CampaignOptions {
                     } else if (values.length == 9) {
                         retVal.migrateMarriageSurnameWeights47(values);
                     } else {
-                        LogManager.getLogger().error("Unknown length of randomMarriageSurnameWeights");
+                        logger.error("Unknown length of randomMarriageSurnameWeights");
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) { // Legacy - 0.49.4 Removal
                     retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -6277,7 +6274,7 @@ public class CampaignOptions {
                         retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) { // Legacy
                     retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) { // Legacy

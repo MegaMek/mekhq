@@ -30,10 +30,6 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import mekhq.MekHQ;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-
 public enum PersonnelFilter {
     // region Enum Declarations
     // region Standard Personnel Filters
@@ -393,18 +389,20 @@ public enum PersonnelFilter {
             case SUPPORT ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             !person.getPrimaryRole().isCombat() : person.hasSupportRole(true));
-            case MECHWARRIORS ->
+            case MEKWARRIORS ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                            person.getPrimaryRole().isMechWarriorGrouping() : (person.getPrimaryRole().isMechWarriorGrouping() || person.getSecondaryRole().isMechWarriorGrouping()));
-            case MECHWARRIOR ->
+                            person.getPrimaryRole().isMekWarriorGrouping() :
+                        (person.getPrimaryRole().isMekWarriorGrouping() || person.getSecondaryRole().isMekWarriorGrouping()));
+            case MEKWARRIOR ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                            person.getPrimaryRole().isMechWarrior() : person.hasRole(PersonnelRole.MECHWARRIOR));
+                            person.getPrimaryRole().isMekWarrior() : person.hasRole(PersonnelRole.MEKWARRIOR));
             case LAM_PILOT ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             person.getPrimaryRole().isLAMPilot() : person.hasRole(PersonnelRole.LAM_PILOT));
             case VEHICLE_CREWMEMBER ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                            person.getPrimaryRole().isVehicleCrewmember() : (person.getPrimaryRole().isVehicleCrewmember() || person.getSecondaryRole().isVehicleCrewmember()));
+                            person.getPrimaryRole().isVehicleCrew() :
+                        (person.getPrimaryRole().isVehicleCrew() || person.getSecondaryRole().isVehicleCrew()));
             case GROUND_VEHICLE_DRIVER ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             person.getPrimaryRole().isGroundVehicleDriver() : person.hasRole(PersonnelRole.GROUND_VEHICLE_DRIVER));
@@ -426,9 +424,9 @@ public enum PersonnelFilter {
             case CONVENTIONAL_AIRCRAFT_PILOT ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             person.getPrimaryRole().isConventionalAircraftPilot() : person.hasRole(PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT));
-            case PROTOMECH_PILOT ->
+            case PROTOMEK_PILOT ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                            person.getPrimaryRole().isProtoMechPilot() : person.hasRole(PersonnelRole.PROTOMECH_PILOT));
+                            person.getPrimaryRole().isProtoMekPilot() : person.hasRole(PersonnelRole.PROTOMEK_PILOT));
             case BATTLE_ARMOUR ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             person.getPrimaryRole().isBattleArmour() : person.hasRole(PersonnelRole.BATTLE_ARMOUR));
@@ -437,7 +435,8 @@ public enum PersonnelFilter {
                             person.getPrimaryRole().isSoldier() : person.hasRole(PersonnelRole.SOLDIER));
             case VESSEL_CREWMEMBER ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                            person.getPrimaryRole().isVesselCrewmember() : (person.getPrimaryRole().isVesselCrewmember() || person.getSecondaryRole().isVesselCrewmember()));
+                            person.getPrimaryRole().isVesselCrew() :
+                        (person.getPrimaryRole().isVesselCrew() || person.getSecondaryRole().isVesselCrew()));
             case VESSEL_PILOT ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             person.getPrimaryRole().isVesselPilot() : person.hasRole(PersonnelRole.VESSEL_PILOT));
@@ -453,15 +452,15 @@ public enum PersonnelFilter {
             case TECH ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             person.getPrimaryRole().isTech() : person.isTech());
-            case MECH_TECH ->
+            case MEK_TECH ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                            person.getPrimaryRole().isMechTech() : person.hasRole(PersonnelRole.MECH_TECH));
+                            person.getPrimaryRole().isMekTech() : person.hasRole(PersonnelRole.MEK_TECH));
             case MECHANIC ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             person.getPrimaryRole().isMechanic() : person.hasRole(PersonnelRole.MECHANIC));
             case AERO_TECH ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
-                            person.getPrimaryRole().isAeroTech() : person.hasRole(PersonnelRole.AERO_TECH));
+                            person.getPrimaryRole().isAeroTek() : person.hasRole(PersonnelRole.AERO_TEK));
             case BA_TECH ->
                     active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole() ?
                             person.getPrimaryRole().isBATech() : person.hasRole(PersonnelRole.BA_TECH));
