@@ -4004,21 +4004,28 @@ public class Campaign implements ITechManager {
 
     /**
      * This method iterates through the list of personnel and deletes the records of
-     * those who have
-     * departed the unit and who match additional checks.
+     * those who have left the unit and who match additional checks.
      */
     public void processPersonnelRemoval() {
-        getPersonnel().stream()
-                .filter(p -> p.getStatus().isDepartedUnit())
-                .forEach(person -> {
-                    PersonnelStatus status = person.getStatus();
+        List<Person> personnelToRemove = new ArrayList<>();
 
-                    if (shouldRemovePerson(person, status)) {
-                        removePerson(person, false);
-                    }
-                });
+        for (Person person : getPersonnel()) {
+            PersonnelStatus status = person.getStatus();
 
-        addReport(resources.getString("personnelRemoval.text"));
+            if (status.isDepartedUnit()) {
+                if (shouldRemovePerson(person, status)) {
+                    personnelToRemove.add(person);
+                }
+            }
+        }
+
+        for (Person person : personnelToRemove) {
+            removePerson(person, false);
+        }
+
+        if (!personnelToRemove.isEmpty()) {
+            addReport(resources.getString("personnelRemoval.text"));
+        }
     }
 
     /**
