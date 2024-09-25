@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,30 +18,71 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
+import java.time.LocalDate;
+import java.util.List;
 
+/**
+ * This class represents a nag dialog displayed when the campaign one or more unresolved scenarios.
+ * It extends the {@link AbstractMHQNagDialog} class.
+ */
 public class OutstandingScenariosNagDialog extends AbstractMHQNagDialog {
+    private static String DIALOG_NAME = "OutstandingScenariosNagDialog";
+    private static String DIALOG_TITLE = "OutstandingScenariosNagDialog.title";
+    private static String DIALOG_BODY = "OutstandingScenariosNagDialog.text";
+
+    /**
+     * Checks if there are any outstanding scenarios in the given campaign.
+     * An outstanding scenario is defined as a scenario whose date is the same as the current date.
+     *
+     * @param campaign the campaign to check for outstanding scenarios
+     * @return {@code true} if there are outstanding scenarios, {@code false} otherwise
+     */
+    static boolean checkForOutstandingScenarios(Campaign campaign) {
+        List<AtBContract> activeContracts = campaign.getActiveAtBContracts(true);
+
+        LocalDate today = campaign.getLocalDate();
+
+        for (AtBContract contract : activeContracts) {
+            for (AtBScenario scenario : contract.getCurrentAtBScenarios()) {
+                LocalDate scenarioDate = scenario.getDate();
+
+                if (scenarioDate.equals(today)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     //region Constructors
+    /**
+     * Creates a new instance of the {@link OutstandingScenariosNagDialog} class.
+     *
+     * @param frame the parent JFrame for the dialog
+     * @param campaign the {@link Campaign} associated with the dialog
+     */
     public OutstandingScenariosNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "OutstandingScenariosNagDialog", "OutstandingScenariosNagDialog.title",
-                "OutstandingScenariosNagDialog.text", campaign,
-                MHQConstants.NAG_OUTSTANDING_SCENARIOS);
+        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_OUTSTANDING_SCENARIOS);
     }
     //endregion Constructors
 
+    /**
+     * Checks if there is a nag message to display.
+     *
+     * @return {@code true} if there is a nag message to display, {@code false} otherwise
+     */
     @Override
     protected boolean checkNag() {
-        // If this isn't ignored, check all active AtB contracts for current AtB scenarios whose
-        // date is today
         return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && getCampaign().getActiveAtBContracts(true).stream()
-                        .anyMatch(contract -> contract.getCurrentAtBScenarios().stream()
-                                .anyMatch(scenario -> (scenario.getDate() != null)
-                                        && scenario.getDate().isEqual(getCampaign().getLocalDate())));
+                && checkForOutstandingScenarios(getCampaign());
     }
 }

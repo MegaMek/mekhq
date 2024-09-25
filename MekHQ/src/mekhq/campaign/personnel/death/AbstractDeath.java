@@ -116,7 +116,7 @@ public abstract class AbstractDeath {
 
     /**
      * This is used to determine if a person can die.
-     * 
+     *
      * @param person      the person to determine for
      * @param ageGroup    the age group of the person in question
      * @param randomDeath if this is for random death or manual death
@@ -144,7 +144,7 @@ public abstract class AbstractDeath {
     // region New Day
     /**
      * Processes new day random death for an individual.
-     * 
+     *
      * @param campaign the campaign to process
      * @param today    the current day
      * @param person   the person to process
