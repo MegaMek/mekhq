@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,47 +18,85 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
-
+/**
+ * This class represents a nag dialog displayed when a campaign's Astech time deficit is greater than 0.
+ * It extends the {@link AbstractMHQNagDialog} class.
+ */
 public class InsufficientAstechTimeNagDialog extends AbstractMHQNagDialog {
-    //region Constructors
-    public InsufficientAstechTimeNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "InsufficientAstechTimeNagDialog", "InsufficientAstechTimeNagDialog.title",
-                "", campaign, MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME);
+    private static String DIALOG_NAME = "InsufficientAstechTimeNagDialog";
+    private static String DIALOG_TITLE = "InsufficientAstechTimeNagDialog.title";
+    private static String DIALOG_BODY = "InsufficientAstechTimeNagDialog.text";
+
+    /**
+     * Checks if the given campaign has a deficit in Astech time.
+     *
+     * @param campaign the {@link Campaign} to check for an Astech time deficit
+     * @return {@code true} if the campaign has a deficit in Astech time, {@code false} otherwise
+     */
+    static boolean checkAstechTimeDeficit(Campaign campaign) {
+        return getAstechTimeDeficit(campaign) > 0;
     }
-    //endregion Constructors
 
-    @Override
-    protected boolean checkNag() {
-        if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                || !getCampaign().getCampaignOptions().isCheckMaintenance()) {
-            return false;
-        }
-
+    /**
+     * Calculates the time deficit of Astechs needed for a given campaign.
+     * <p>
+     * The method calculates the Astech time deficit by determining the number of Astechs
+     * required to support maintenance for all valid units in the hangar of the campaign.
+     *
+     * @param campaign the {@link Campaign} for which to calculate the Astech time deficit
+     * @return the Astech time deficit, rounded up to the nearest whole number
+     */
+    static int getAstechTimeDeficit(Campaign campaign) {
         // Units are only valid if they are maintained, present, and not self crewed (as the crew
-        // maintain it in that case). For each unit this is valid for, we need six astechs to assist
-        // the tech for the maintenance.
-        final int need = getCampaign().getHangar().getUnitsStream()
+        // maintain it in that case).
+        // For each unit, this is valid for; we need six astechs to help the tech for the maintenance.
+        final int need = campaign.getHangar().getUnitsStream()
                 .filter(unit -> !unit.isUnmaintained() && unit.isPresent() && !unit.isSelfCrewed())
                 .mapToInt(unit -> unit.getMaintenanceTime() * 6).sum();
 
-        int available = getCampaign().getPossibleAstechPoolMinutes();
-        if (getCampaign().isOvertimeAllowed()) {
-            available += getCampaign().getPossibleAstechPoolOvertime();
+        int available = campaign.getPossibleAstechPoolMinutes();
+        if (campaign.isOvertimeAllowed()) {
+            available += campaign.getPossibleAstechPoolOvertime();
         }
 
-        if (available < need) {
-            final int astechsNeeded = (int) Math.ceil((need - available) / (double) Person.PRIMARY_ROLE_SUPPORT_TIME);
-            setDescription(String.format(resources.getString("InsufficientAstechTimeNagDialog.text"), astechsNeeded));
+        return (int) Math.ceil((need - available) / (double) Person.PRIMARY_ROLE_SUPPORT_TIME);
+    }
+
+    //region Constructors
+    /**
+     * Creates a new instance of the {@link InsufficientAstechTimeNagDialog} class.
+     *
+     * @param frame the parent JFrame for the dialog
+     * @param campaign the {@link Campaign} associated with the dialog
+     */
+    public InsufficientAstechTimeNagDialog(final JFrame frame, final Campaign campaign) {
+        super(frame, DIALOG_NAME, DIALOG_TITLE, DIALOG_BODY, campaign, MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME);
+    }
+    //endregion Constructors
+
+    /**
+     * Checks if the Astech time deficit is greater than zero.
+     * If the count is greater than zero and the Nag dialog for the current key is not ignored,
+     * it sets the description using the specified format and returns {@code true}.
+     * Otherwise, it returns {@code false}.
+     */
+    @Override
+    protected boolean checkNag() {
+        if (!MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
+                && checkAstechTimeDeficit(getCampaign())) {
+            setDescription(String.format(
+                    resources.getString(DIALOG_BODY),
+                    getAstechTimeDeficit(getCampaign())));
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 }
