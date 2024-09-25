@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * TODO : Add PoW, On Leave and AWOL implementations
+ * Enum class representing personnel status.
  */
 public enum PersonnelStatus {
     // region Enum Declarations
@@ -91,6 +91,14 @@ public enum PersonnelStatus {
     // endregion Variable Declarations
 
     // region Constructors
+    /**
+     * Initializes a new instance of the {@link PersonnelStatus} class with the given parameters.
+     *
+     * @param name        the name of the personnel status
+     * @param toolTipText the tooltip text for the personnel status
+     * @param reportText  the report text for the personnel status
+     * @param logText     the log text for the personnel status
+     */
     PersonnelStatus(final String name, final String toolTipText, final String reportText,
             final String logText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
@@ -102,131 +110,296 @@ public enum PersonnelStatus {
     }
     // endregion Constructors
 
+    /**
+     * Retrieves the tooltip text for a given component.
+     *
+     * @return The tooltip text of the component, or null if no tooltip text is set.
+     */
     // region Getters
     public String getToolTipText() {
         return toolTipText;
     }
 
+    /**
+     * Retrieves the report text.
+     *
+     * @return The report text as a string.
+     */
     public String getReportText() {
         return reportText;
     }
 
+    /**
+     * Retrieves the log text.
+     *
+     * @return The log text.
+     */
     public String getLogText() {
         return logText;
     }
     // endregion Getters
 
     // region Boolean Comparison Methods
+    /**
+     * Checks if the character has the {@code ACTIVE} personnel status.
+     *
+     * @return {@code true} if the character has the {@code ACTIVE} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isActive() {
         return this == ACTIVE;
     }
 
+    /**
+     * Checks if the character has the {@code MIA} personnel status.
+     *
+     * @return {@code true} if the character has the {@code MIA} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isMIA() {
         return this == MIA;
     }
 
+    /**
+     * Checks if the character has the {@code POW} personnel status.
+     *
+     * @return {@code true} if the character has the {@code POW} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isPoW() {
         return this == POW;
     }
 
+    /**
+     * Checks if the character has the {@code ON_LEAVE} personnel status.
+     *
+     * @return {@code true} if the character has the {@code ON_LEAVE} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isOnLeave() {
         return this == ON_LEAVE;
     }
 
+    /**
+     * Checks if the character has the {@code ON_MATERNITY_LEAVE} personnel status.
+     *
+     * @return {@code true} if the character has the {@code ON_MATERNITY_LEAVE} personnel status
+     * {@code false} otherwise.
+     */
     public boolean isOnMaternityLeave() {
         return this == ON_MATERNITY_LEAVE;
     }
 
+    /**
+     * Checks if the character has the {@code AWOL} personnel status.
+     *
+     * @return {@code true} if the character has the {@code AWOL} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isAwol() {
         return this == AWOL;
     }
 
+    /**
+     * Checks if the character has the {@code RETIRED} personnel status.
+     *
+     * @return {@code true} if the character has the {@code RETIRED} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isRetired() {
         return this == RETIRED;
     }
 
+    /**
+     * Checks if the character has the {@code RESIGNED} personnel status.
+     *
+     * @return {@code true} if the character has the {@code RESIGNED} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isResigned() {
         return this == RESIGNED;
     }
 
+    /**
+     * Checks if the character has the {@code SACKED} personnel status.
+     *
+     * @return {@code true} if the character has the {@code SACKED} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isSacked() {
         return this == SACKED;
     }
 
+    /**
+     * Checks if the character has the {@code LEFT} personnel status.
+     *
+     * @return {@code true} if the character has the {@code LEFT} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isLeft() {
         return this == LEFT;
     }
 
+    /**
+     * Checks if the character has the {@code DESERTED} personnel status.
+     *
+     * @return {@code true} if the character has the {@code DESERTED} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isDeserted() {
         return this == DESERTED;
     }
 
+    /**
+     * Checks if the character has the {@code DEFECTED} personnel status.
+     *
+     * @return {@code true} if the character has the {@code DEFECTED} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isDefected() {
         return this == DEFECTED;
     }
 
+    /**
+     * Checks if the character has the {@code STUDENT} personnel status.
+     *
+     * @return {@code true} if the character has the {@code STUDENT} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isStudent() {
         return this == STUDENT;
     }
 
+    /**
+     * Checks if the character has the {@code MISSING} personnel status.
+     *
+     * @return {@code true} if the character has the {@code MISSING} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isMissing() {
         return this == MISSING;
     }
 
+    /**
+     * Checks if the character has the {@code KIA} personnel status.
+     *
+     * @return {@code true} if the character has the {@code KIA} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isKIA() {
         return this == KIA;
     }
 
+    /**
+     * Checks if the character has the {@code HOMICIDE} personnel status.
+     *
+     * @return {@code true} if the character has the {@code HOMICIDE} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isHomicide() {
         return this == HOMICIDE;
     }
 
+    /**
+     * Checks if the character has the {@code WOUNDS} personnel status.
+     *
+     * @return {@code true} if the character has the {@code WOUNDS} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isWounds() {
         return this == WOUNDS;
     }
 
+    /**
+     * Checks if the character has the {@code DISEASE} personnel status.
+     *
+     * @return {@code true} if the character has the {@code DISEASE} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isDisease() {
         return this == DISEASE;
     }
 
+    /**
+     * Checks if the character has the {@code ACCIDENTAL} personnel status.
+     *
+     * @return {@code true} if the character has the {@code ACCIDENTAL} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isAccidental() {
         return this == ACCIDENTAL;
     }
 
+    /**
+     * Checks if the character has the {@code NATURAL_CAUSES} personnel status.
+     *
+     * @return {@code true} if the character has the {@code NATURAL_CAUSES} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isNaturalCauses() {
         return this == NATURAL_CAUSES;
     }
 
+    /**
+     * Checks if the character has the {@code OLD_AGE} personnel status.
+     *
+     * @return {@code true} if the character has the {@code OLD_AGE} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isOldAge() {
         return this == OLD_AGE;
     }
 
+    /**
+     * Checks if the character has the {@code MEDICAL_COMPLICATIONS} personnel status.
+     *
+     * @return {@code true} if the character has the {@code MEDICAL_COMPLICATIONS} personnel status
+     * {@code false} otherwise.
+     */
     public boolean isMedicalComplications() {
         return this == MEDICAL_COMPLICATIONS;
     }
 
+    /**
+     * Checks if the character has the {@code PREGNANCY_COMPLICATIONS} personnel status.
+     *
+     * @return {@code true} if the character has the {@code PREGNANCY_COMPLICATIONS} personnel status
+     * {@code false} otherwise.
+     */
     public boolean isPregnancyComplications() {
         return this == PREGNANCY_COMPLICATIONS;
     }
 
+    /**
+     * Checks if the character has the {@code UNDETERMINED} personnel status.
+     *
+     * @return {@code true} if the character has the {@code UNDETERMINED} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isUndetermined() {
         return this == UNDETERMINED;
     }
 
+    /**
+     * Checks if the character has the {@code SUICIDE} personnel status.
+     *
+     * @return {@code true} if the character has the {@code SUICIDE} personnel status {@code false}
+     * otherwise.
+     */
     public boolean isSuicide() {
         return this == SUICIDE;
     }
 
     /**
-     * @return true if a person is currently absent from the core force, otherwise
-     *         false
+     * @return {@code true} if a person is currently absent from the core force, otherwise
+     *         {@code false}
      */
     public boolean isAbsent() {
         return isMIA() || isPoW() || isOnLeave() || isOnMaternityLeave() || isAwol() || isStudent() || isMissing();
     }
 
     /**
-     * @return true if a person has left the unit, otherwise false
+     * @return {@code true} if a person has left the unit, otherwise {@code false}
      */
     public boolean isDepartedUnit() {
         return isDead() || isRetired() || isResigned() || isSacked() || isDeserted() || isDefected() || isMissing()
@@ -234,7 +407,7 @@ public enum PersonnelStatus {
     }
 
     /**
-     * @return true if a person is dead, otherwise false
+     * @return {@code true} if a person is dead, otherwise {@code false}
      */
     public boolean isDead() {
         return isKIA() || isHomicide() || isWounds() || isDisease() || isAccidental()
@@ -243,13 +416,16 @@ public enum PersonnelStatus {
     }
 
     /**
-     * @return true if a person is dead or MIA, otherwise false
+     * @return {@code true} if a person is dead or MIA, otherwise {@code false}
      */
     public boolean isDeadOrMIA() {
         return isDead() || isMIA();
     }
     // endregion Boolean Comparison Methods
 
+    /**
+     * @return The list of implemented personnel statuses.
+     */
     public static List<PersonnelStatus> getImplementedStatuses() {
         return Stream.of(values())
                 .collect(Collectors.toList());
@@ -257,15 +433,16 @@ public enum PersonnelStatus {
 
     // region File I/O
     /**
-     * @param text containing the PersonnelStatus
-     * @return the saved PersonnelStatus
+     * Parses a string representation of {@link PersonnelStatus} into a {@link PersonnelStatus} object.
+     * If the string representation cannot be parsed, it returns the default {@code PersonnelStatus.ACTIVE}.
+     *
+     * @param text The {@link String} representation of {@link PersonnelStatus}
+     * @return The parsed {@link PersonnelStatus} object or {@code PersonnelStatus.ACTIVE} if parsing fails
      */
     public static PersonnelStatus parseFromString(final String text) {
         try {
             return valueOf(text);
-        } catch (Exception ignored) {
-
-        }
+        } catch (Exception ignored) {}
 
         try {
             switch (Integer.parseInt(text)) {
@@ -320,11 +497,11 @@ public enum PersonnelStatus {
                 default:
                     break;
             }
-        } catch (Exception ignored) {
+        } catch (Exception ignored) {}
 
-        }
         String message = String.format("Unable to parse %s into a PersonnelStatus. Returning ACTIVE.",
                 text);
+
         MMLogger.create(PersonnelStatus.class).error(message);
         return ACTIVE;
     }

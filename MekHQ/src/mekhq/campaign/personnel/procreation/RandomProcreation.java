@@ -23,6 +23,9 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 
+/**
+ * Represents a random procreation method that is based on dice rolls.
+ */
 public class RandomProcreation extends AbstractProcreation {
     //region Variable Declarations
     private int relationshipDieSize;
@@ -30,6 +33,12 @@ public class RandomProcreation extends AbstractProcreation {
     //endregion Variable Declarations
 
     //region Constructors
+    /**
+     * Constructor to create a {@link RandomProcreation} object. This object is used to manage
+     * randomly determined procreation events within the game's campaign.
+     *
+     * @param options the campaign settings.
+     */
     public RandomProcreation(final CampaignOptions options) {
         super(RandomProcreationMethod.DICE_ROLL, options);
         setRelationshipDieSize(options.getRandomProcreationRelationshipDiceSize());
@@ -38,22 +47,23 @@ public class RandomProcreation extends AbstractProcreation {
     //endregion Constructors
 
     //region Getters/Setters
-    @SuppressWarnings(value = "unused")
-    public double getRelationshipDieSize() {
-        return relationshipDieSize;
-    }
-
-    @SuppressWarnings(value = "unused")
+    /**
+     * Sets the size of the relationship die.
+     * The relationship die size determines the probability of procreation for a person who has a spouse.
+     *
+     * @param relationshipDieSize the size of the relationship die
+     */
     public void setRelationshipDieSize(final int relationshipDieSize) {
         this.relationshipDieSize = relationshipDieSize;
     }
 
-    @SuppressWarnings(value = "unused")
-    public double getRelationshiplessDieSize() {
-        return relationshiplessDieSize;
-    }
-
-    @SuppressWarnings(value = "unused")
+    /**
+     * Sets the size of the relationshipless die.
+     * The relationship die size determines the probability of procreation for a person who does not
+     * have a spouse.
+     *
+     * @param relationshiplessDieSize the size of the relationship die
+     */
     public void setRelationshiplessDieSize(final int relationshiplessDieSize) {
         this.relationshiplessDieSize = relationshiplessDieSize;
     }

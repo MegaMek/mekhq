@@ -28,6 +28,13 @@ import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 
+/**
+ * The {@link RandomProcreationMethod} enum represents different methods of getting random procreation.
+ * <p>
+ * The available methods are:
+ * - {@code NONE}: No random procreation method.
+ * - {@code DICE_ROLL}: Random procreation method using dice roll.
+ */
 public enum RandomProcreationMethod {
     //region Enum Declarations
     NONE("RandomProcreationMethod.NONE.text", "RandomProcreationMethod.NONE.toolTipText"),
@@ -40,6 +47,13 @@ public enum RandomProcreationMethod {
     //endregion Variable Declarations
 
     //region Constructors
+    /**
+     * Constructor for the {@link RandomProcreationMethod} class.
+     * Initializes the name and toolTipText variables using the specified name and toolTipText resources.
+     *
+     * @param name          the name resource key used to retrieve the name from the resource bundle
+     * @param toolTipText   the tooltip text resource key used to retrieve the tool tip text from the resource bundle
+     */
     RandomProcreationMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
@@ -49,24 +63,40 @@ public enum RandomProcreationMethod {
     //endregion Constructors
 
     //region Getters
-    @SuppressWarnings(value = "unused")
+    /**
+     * @return The tooltip text associated with the current instance of the class.
+     */
     public String getToolTipText() {
         return toolTipText;
     }
     //endregion Getters
 
     //region Boolean Comparison Methods
-    @SuppressWarnings(value = "unused")
+    /**
+     * Checks if the current {@link RandomProcreationMethod} is {@code NONE}.
+     *
+     * @return {@code true} if the current {@link RandomProcreationMethod} is {@code NONE},
+     * {@code false} otherwise.
+     */
     public boolean isNone() {
         return this == NONE;
     }
 
-    @SuppressWarnings(value = "unused")
+    /**
+     * Checks if the current {@link RandomProcreationMethod} is {@code DICE_ROLL}.
+     *
+     * @return {@code true} if the current {@link RandomProcreationMethod} is {@code DICE_ROLL},
+     * {@code false} otherwise.
+     */
     public boolean isDiceRoll() {
         return this == DICE_ROLL;
     }
     //endregion Boolean Comparison Methods
 
+    /**
+     * @param options the {@link CampaignOptions} object used to initialize the {@link AbstractProcreation} instance
+     * @return an instance of {@link AbstractProcreation} based on the {@link RandomProcreationMethod}
+     */
     public AbstractProcreation getMethod(final CampaignOptions options) {
         if (this == DICE_ROLL) {
             return new RandomProcreation(options);
