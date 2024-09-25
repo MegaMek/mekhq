@@ -18,30 +18,6 @@
  */
 package mekhq.gui.adapter;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.Vector;
-import java.util.stream.Stream;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-
 import megamek.client.ui.dialogs.BVDisplayDialog;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.UnitEditorDialog;
@@ -65,32 +41,32 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.actions.ActivateUnitAction;
-import mekhq.campaign.unit.actions.CancelMothballUnitAction;
-import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
-import mekhq.campaign.unit.actions.IUnitAction;
-import mekhq.campaign.unit.actions.MothballUnitAction;
-import mekhq.campaign.unit.actions.RestoreUnitAction;
-import mekhq.campaign.unit.actions.StripUnitAction;
-import mekhq.campaign.unit.actions.SwapAmmoTypeAction;
+import mekhq.campaign.unit.actions.*;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
-import mekhq.gui.dialog.BombsDialog;
-import mekhq.gui.dialog.ChooseRefitDialog;
-import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
-import mekhq.gui.dialog.MarkdownEditorDialog;
-import mekhq.gui.dialog.MassMothballDialog;
-import mekhq.gui.dialog.QuirksDialog;
-import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
+import mekhq.gui.dialog.reportDialogs.PartQualityReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.*;
+import java.util.stream.Stream;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
 
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(UnitTableMouseAdapter.class);
@@ -129,6 +105,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_QUIRKS = "QUIRKS";
     public static final String COMMAND_BOMBS = "BOMBS";
     public static final String COMMAND_SUPPLY_COST = "SUPPLY_COST";
+    public static final String COMMAND_PARTS_REPORT = "PARTS_REPORT";
     public static final String COMMAND_TAG_CUSTOM = "TAG_CUSTOM";
     public static final String COMMAND_INDI_CAMO = "INDI_CAMO";
     public static final String COMMAND_REMOVE_INDI_CAMO = "REMOVE_INDI_CAMO";
@@ -205,6 +182,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             new MaintenanceReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SUPPLY_COST)) { // Single Unit only
             new MonthlyUnitCostReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
+        } else if (command.equals(COMMAND_PARTS_REPORT)) { // Single Unit only
+            new PartQualityReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SET_QUALITY)) {
             // TODO : Duplicated in PartsTableMouseAdapter#actionPerformed
             int q = -1;
@@ -815,6 +794,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     && gui.getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
                 menuItem = new JMenuItem("Show Monthly Supply Cost Report");
                 menuItem.setActionCommand(COMMAND_SUPPLY_COST);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneSelected && gui.getCampaign().getCampaignOptions().isCheckMaintenance()) {
+                menuItem = new JMenuItem("Show Part Quality Report");
+                menuItem.setActionCommand(COMMAND_PARTS_REPORT);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
