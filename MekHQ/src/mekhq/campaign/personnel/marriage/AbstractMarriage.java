@@ -65,47 +65,38 @@ public abstract class AbstractMarriage {
     //endregion Constructors
 
     //region Getters/Setters
-    @SuppressWarnings(value = "unused")
     public RandomMarriageMethod getMethod() {
         return method;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUseClanPersonnelMarriages() {
         return useClanPersonnelMarriages;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setUseClanPersonnelMarriages(final boolean useClanPersonnelMarriages) {
         this.useClanPersonnelMarriages = useClanPersonnelMarriages;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUsePrisonerMarriages() {
         return usePrisonerMarriages;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setUsePrisonerMarriages(final boolean usePrisonerMarriages) {
         this.usePrisonerMarriages = usePrisonerMarriages;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUseRandomClanPersonnelMarriages() {
         return useRandomClanPersonnelMarriages;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setUseRandomClanPersonnelMarriages(final boolean useRandomClanPersonnelMarriages) {
         this.useRandomClanPersonnelMarriages = useRandomClanPersonnelMarriages;
     }
 
-    @SuppressWarnings(value = "unused")
     public boolean isUseRandomPrisonerMarriages() {
         return useRandomPrisonerMarriages;
     }
 
-    @SuppressWarnings(value = "unused")
     public void setUseRandomPrisonerMarriages(final boolean useRandomPrisonerMarriages) {
         this.useRandomPrisonerMarriages = useRandomPrisonerMarriages;
     }
@@ -113,7 +104,6 @@ public abstract class AbstractMarriage {
 
     /**
      * This is used to determine if a person can marry
-     * @param campaign the campaign the person is a part of
      * @param today the current date
      * @param person the person to determine for
      * @param randomMarriage if this is for random marriage or manual marriage

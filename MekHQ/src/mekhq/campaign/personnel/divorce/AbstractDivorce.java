@@ -173,7 +173,7 @@ public abstract class AbstractDivorce {
     /**
      * This is a standardization method for the divorce surname style to use when a person's spouse
      * dies.
-     *
+     * <p>
      * TODO : I should be part of AbstractDeath
      *
      * @param campaign the campaign the person is in
@@ -300,6 +300,14 @@ public abstract class AbstractDivorce {
         MekHQ.triggerEvent(new PersonChangedEvent(origin));
     }
 
+    /**
+     * Processes divorce events that occur as part of a character's background.
+     *
+     * @param campaign the campaign associated with the divorce
+     * @param today the current date of the divorce
+     * @param origin the person whose background is being divorced
+     * @param style the splitting surname style to be applied
+     */
     public void backgroundDivorce(final Campaign campaign, final LocalDate today, final Person origin,
                         final SplittingSurnameStyle style) {
         final Person spouse = origin.getGenealogy().getSpouse();

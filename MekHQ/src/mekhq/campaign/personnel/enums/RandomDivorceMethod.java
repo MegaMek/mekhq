@@ -28,6 +28,15 @@ import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 
+/**
+ * An enumeration representing the available random divorce methods.
+ * <p>
+ * The {@link RandomDivorceMethod} enum is used to specify the method of randomly generating a divorce.
+ * It supports two methods: {@code NONE} and {@code DICE_ROLL}.
+ * <p>
+ * The {@code NONE} method represents no random divorce generation, and the {@code DICE_ROLL} method
+ * represents randomly generated divorce using dice rolls.
+ */
 public enum RandomDivorceMethod {
     //region Enum Declarations
     NONE("RandomDivorceMethod.NONE.text", "RandomDivorceMethod.NONE.toolTipText"),
@@ -40,6 +49,13 @@ public enum RandomDivorceMethod {
     //endregion Variable Declarations
 
     //region Constructors
+    /**
+     * Constructor for the {@link RandomDivorceMethod} class.
+     * Initializes the name and toolTipText variables using the specified name and toolTipText resources.
+     *
+     * @param name          the name resource key used to retrieve the name from the resource bundle
+     * @param toolTipText   the tooltip text resource key used to retrieve the tool tip text from the resource bundle
+     */
     RandomDivorceMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
@@ -49,24 +65,40 @@ public enum RandomDivorceMethod {
     //endregion Constructors
 
     //region Getters
-    @SuppressWarnings(value = "unused")
+    /**
+     * @return the tooltip text for the current object
+     */
     public String getToolTipText() {
         return toolTipText;
     }
     //endregion Getters
 
     //region Boolean Comparisons
-    @SuppressWarnings(value = "unused")
+    /**
+     * Checks if the current {@link RandomDivorceMethod} is {@code NONE}.
+     *
+     * @return {@code true} if the current {@link RandomDivorceMethod} is {@code NONE},
+     * {@code false} otherwise.
+     */
     public boolean isNone() {
         return this == NONE;
     }
 
-    @SuppressWarnings(value = "unused")
+    /**
+     * Checks if the current {@link RandomDivorceMethod} is {@code DICE_ROLL}.
+     *
+     * @return {@code true} if the current {@link RandomDivorceMethod} is {@code DICE_ROLL},
+     * {@code false} otherwise.
+     */
     public boolean isDiceRoll() {
         return this == DICE_ROLL;
     }
     //endregion Boolean Comparisons
 
+    /**
+     * @param options the {@link CampaignOptions} object used to initialize the {@link AbstractDivorce} instance
+     * @return an instance of {@link AbstractDivorce} based on the {@link RandomDivorceMethod}
+     */
     public AbstractDivorce getMethod(final CampaignOptions options) {
         if (this == DICE_ROLL) {
             return new RandomDivorce(options);

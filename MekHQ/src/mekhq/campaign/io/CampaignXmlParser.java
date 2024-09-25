@@ -252,7 +252,7 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("location")) {
                     retVal.setLocation(CurrentLocation.generateInstanceFromXML(wn, retVal));
                 } else if (xn.equalsIgnoreCase("skillTypes")) {
-                    processSkillTypeNodes(retVal, wn, version);
+                    processSkillTypeNodes(wn);
                 } else if (xn.equalsIgnoreCase("specialAbilities")) {
                     processSpecialAbilityNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("storyArc")) {
@@ -890,7 +890,7 @@ public class CampaignXmlParser {
         logger.info("Load Personnel Nodes Complete!");
     }
 
-    private static void processSkillTypeNodes(Campaign retVal, Node wn, Version version) {
+    private static void processSkillTypeNodes(Node wn) {
         logger.info("Loading Skill Type Nodes from XML...");
 
         NodeList wList = wn.getChildNodes();

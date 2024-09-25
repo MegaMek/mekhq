@@ -22,25 +22,42 @@ import megamek.common.Compute;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 
+/**
+ * The {@link RandomDivorce} class is an implementation of the {@link AbstractDivorce} class that
+ * represents a divorce method based on random chance.
+ * The divorce outcome is determined by rolling a die with a specified number of sides.
+ */
 public class RandomDivorce extends AbstractDivorce {
     //region Variable Declarations
     private int divorceDiceSize;
     //endregion Variable Declarations
 
     //region Constructors
+    /**
+     * The {@link RandomDivorce} class is an implementation of the {@link AbstractDivorce} class that
+     * represents a divorce method based on random chance.
+     */
     public RandomDivorce(final CampaignOptions options) {
         super(RandomDivorceMethod.DICE_ROLL, options);
         setDivorceDiceSize(options.getRandomDivorceDiceSize());
     }
     //endregion Constructors
 
+    /**
+     * Retrieves the size of the divorce dice.
+     *
+     * @return The size of the divorce dice as an integer.
+     */
     //region Getters/Setters
-    @SuppressWarnings(value = "unused")
     public int getDivorceDiceSize() {
         return divorceDiceSize;
     }
 
-    @SuppressWarnings(value = "unused")
+    /**
+     * Sets the size of the divorce dice.
+     *
+     * @param divorceDiceSize the size of the dice used to determine divorce outcomes
+     */
     public void setDivorceDiceSize(final int divorceDiceSize) {
         this.divorceDiceSize = divorceDiceSize;
     }
