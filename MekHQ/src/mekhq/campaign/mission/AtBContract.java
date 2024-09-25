@@ -1372,90 +1372,126 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Initiates a batchall.
+     * This method initiates a batchall, a challenge/dialog to decide on the conduct of a campaign.
      * Prompts the player with a message and options to accept or refuse the batchall.
      *
      * @param campaign       The current campaign.
      * @return {@code true} if the batchall is accepted, {@code false} otherwise.
      */
+    //
     public boolean initiateBatchall(Campaign campaign) {
-        // Set the title of the dialog
+        // Retrieves the title from the resources
         String title = resources.getString("incomingTransmission.title");
 
-        // Generate the batchall statement and fetch the faction image
+        // Retrieves the batchall statement based on infamy and enemy code
         String batchallStatement = BatchallFactions.getGreeting(campaign, enemyCode);
+
+        // Constants for the directory of the portraits and the file type
         final String PORTRAIT_DIRECTORY = "data/images/force/Pieces/Logos/Clan/";
         final String PORTRAIT_FILE_TYPE = ".png";
 
-        ImageIcon portrait;
+        // An ImageIcon to hold the clan's faction icon
+        ImageIcon icon;
 
+        // A switch statement that selects the icon based on the enemy code
         switch (enemyCode) {
-            case "CBS" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Blood Spirit" + PORTRAIT_FILE_TYPE);
-            case "CB" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Burrock" + PORTRAIT_FILE_TYPE);
-            case "CCC" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Cloud Cobra" + PORTRAIT_FILE_TYPE);
-            case "CCO" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Coyote" + PORTRAIT_FILE_TYPE);
+            // Each case sets the icon to the corresponding image
+            case "CBS" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Blood Spirit"
+                + PORTRAIT_FILE_TYPE);
+            case "CB" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Burrock"
+                + PORTRAIT_FILE_TYPE);
+            case "CCC" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Cloud Cobra"
+                + PORTRAIT_FILE_TYPE);
+            case "CCO" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Coyote"
+                + PORTRAIT_FILE_TYPE);
             case "CDS" -> {
                 if (campaign.getGameYear() >= 3100) {
-                    portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Sea Fox" + PORTRAIT_FILE_TYPE);
+                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Sea Fox"
+                        + PORTRAIT_FILE_TYPE);
                 } else {
-                    portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Diamond Shark" + PORTRAIT_FILE_TYPE);
+                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Diamond Shark"
+                        + PORTRAIT_FILE_TYPE);
                 }
             }
-            case "CFM" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Fire Mandrill" + PORTRAIT_FILE_TYPE);
+            case "CFM" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Fire Mandrill"
+                + PORTRAIT_FILE_TYPE);
             case "CGB" -> {
                 if (campaign.getGameYear() >= 3060) {
-                    portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Ghost Bear Dominion" + PORTRAIT_FILE_TYPE);
+                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Ghost Bear Dominion"
+                        + PORTRAIT_FILE_TYPE);
                 } else {
-                    portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ghost Bear" + PORTRAIT_FILE_TYPE);
+                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ghost Bear"
+                        + PORTRAIT_FILE_TYPE);
                 }
             }
-            case "CGS" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Goliath Scorpion" + PORTRAIT_FILE_TYPE);
-            case "CHH" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Hell's Horses" + PORTRAIT_FILE_TYPE);
-            case "CIH" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ice Hellion" + PORTRAIT_FILE_TYPE);
-            case "CJF" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Jade Falcon" + PORTRAIT_FILE_TYPE);
-            case "CMG" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Mongoose" + PORTRAIT_FILE_TYPE);
-            case "CNC" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Nova Cat" + PORTRAIT_FILE_TYPE);
-            case "CSJ" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Smoke Jaguar" + PORTRAIT_FILE_TYPE);
-            case "CSR" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Snow Raven" + PORTRAIT_FILE_TYPE);
-            case "CSA" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Star Adder" + PORTRAIT_FILE_TYPE);
-            case "CSV" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Steel Viper" + PORTRAIT_FILE_TYPE);
-            case "CSL" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Stone Lion" + PORTRAIT_FILE_TYPE);
-            case "CWI" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Widowmaker" + PORTRAIT_FILE_TYPE);
-            case "CW", "CWE" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf" + PORTRAIT_FILE_TYPE);
-            case "CWIE" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf-in-Exile" + PORTRAIT_FILE_TYPE);
-            case "CEI" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Scorpion Empire" + PORTRAIT_FILE_TYPE);
-            case "RD" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Rasalhague Dominion" + PORTRAIT_FILE_TYPE);
-            case "RA" -> portrait = new ImageIcon(PORTRAIT_DIRECTORY + "Raven Alliance" + PORTRAIT_FILE_TYPE);
-            default -> portrait = new ImageIcon("data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
+            case "CGS" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Goliath Scorpion"
+                + PORTRAIT_FILE_TYPE);
+            case "CHH" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Hell's Horses"
+                + PORTRAIT_FILE_TYPE);
+            case "CIH" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ice Hellion"
+                + PORTRAIT_FILE_TYPE);
+            case "CJF" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Jade Falcon"
+                + PORTRAIT_FILE_TYPE);
+            case "CMG" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Mongoose"
+                + PORTRAIT_FILE_TYPE);
+            case "CNC" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Nova Cat"
+                + PORTRAIT_FILE_TYPE);
+            case "CSJ" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Smoke Jaguar"
+                + PORTRAIT_FILE_TYPE);
+            case "CSR" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Snow Raven"
+                + PORTRAIT_FILE_TYPE);
+            case "CSA" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Star Adder"
+                + PORTRAIT_FILE_TYPE);
+            case "CSV" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Steel Viper"
+                + PORTRAIT_FILE_TYPE);
+            case "CSL" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Stone Lion"
+                + PORTRAIT_FILE_TYPE);
+            case "CWI" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Widowmaker"
+                + PORTRAIT_FILE_TYPE);
+            case "CW", "CWE" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf"
+                + PORTRAIT_FILE_TYPE);
+            case "CWIE" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf-in-Exile"
+                + PORTRAIT_FILE_TYPE);
+            case "CEI" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Scorpion Empire"
+                + PORTRAIT_FILE_TYPE);
+            case "RD" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Rasalhague Dominion"
+                + PORTRAIT_FILE_TYPE);
+            case "RA" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Raven Alliance"
+                + PORTRAIT_FILE_TYPE);
+            default -> icon = new ImageIcon("data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
         }
 
-        // Determine the name of the commander based on faction
+        // Set the commander's rank and use a name generator to generate the commander's name
         String rank = resources.getString("starColonel.text");
         RandomNameGenerator randomNameGenerator = new RandomNameGenerator();
         String commander = randomNameGenerator.generate(Gender.RANDOMIZE, true, enemyCode);
-        commander += ' ' + Bloodname.randomBloodname(enemyCode, Phenotype.MEKWARRIOR, campaign.getGameYear()).getName();
+        commander += ' ' + Bloodname.randomBloodname(enemyCode, Phenotype.MEKWARRIOR,
+            campaign.getGameYear()).getName();
 
-        // Prepare the display message for the dialog
+        // Construct the batchall message
         String message = String.format(resources.getString("batchallOpener.text"),
-                this.getName(), rank, commander, getEnemy().getFullName(campaign.getGameYear()),
-                getSystemName(campaign.getLocalDate()));
+            this.getName(), rank, commander, getEnemy().getFullName(campaign.getGameYear()),
+            getSystemName(campaign.getLocalDate()));
         message = message + batchallStatement;
 
+        // Append additional message text if the fame is less than 5
         if (campaign.getFameAndInfamy().getFameForFaction(enemyCode) < 5) {
             message = message + resources.getString("batchallCloser.text");
         }
 
-        // Create a pane to display both the message and the commander's portrait
+        // Create a text pane to display the message
         JTextPane textPane = new JTextPane();
         textPane.setContentType("text/html");
         textPane.setText(message);
         textPane.setEditable(false);
 
+        // Create a panel to display the icon and the batchall message
         JPanel panel = new JPanel(new BorderLayout());
-        JLabel imageLabel = new JLabel(portrait);
+        JLabel imageLabel = new JLabel(icon);
         panel.add(imageLabel, BorderLayout.CENTER);
         panel.add(textPane, BorderLayout.SOUTH);
 
+        // Choose dialog to display based on the fame
         if (campaign.getFameAndInfamy().getFameForFaction(enemyCode) > 4) {
             noBatchallOfferedDialog(panel, title);
             return false;
@@ -1465,7 +1501,7 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Display a batchall dialog.
+     * This function creates a dialog with accept and refuse buttons.
      *
      * @param campaign the current campaign
      * @param panel the panel to display in the dialog
@@ -1473,38 +1509,88 @@ public class AtBContract extends Contract {
      * @return {@code true} if the batchall is accepted, {@code false} otherwise
      */
     private boolean batchallDialog(Campaign campaign, JPanel panel, String title) {
-        // Prepare the options for the dialog
-        Object[] options = {
-                resources.getString("responseAccept.text"),
-                resources.getString("responseRefuse.text")
-        };
+        // We use a single-element array to store the result, because we need to modify it inside
+        // the action listeners, which requires the variable to be effectively final
+        final boolean[] result = {false};
 
-        // Display the dialog and capture the response
-        int batchallDialog = JOptionPane.showOptionDialog(null, panel, title,
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        // Create a custom dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(title);  // Set the title of the dialog
+        dialog.setLayout(new BorderLayout());  // Set a border layout manager
 
-        // Handle the response
-        if (batchallDialog == JOptionPane.NO_OPTION) {
-            // Display the dialog and capture the response
-            int refusalConfirmation = JOptionPane.showOptionDialog(null,
-                    String.format(resources.getString("refusalConfirmation.text"),
-                        getEnemy().getFullName(campaign.getGameYear())),
-                    resources.getString("responseRefuse.text"),
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options,
-                    options[0]);
+        // Create an accept button and add its action listener. When clicked, it will set the result
+        // to true and close the dialog
+        JButton acceptButton = new JButton(resources.getString("responseAccept.text"));
+        acceptButton.setToolTipText(resources.getString("responseAccept.tooltip"));
+        acceptButton.addActionListener(e -> {
+            result[0] = true;
+            dialog.dispose();
+        });
 
-            // Handle the response
-            if (refusalConfirmation == JOptionPane.NO_OPTION) {
-                // Report refusal of the batchall
-                campaign.addReport(resources.getString("refusalReport.text"));
-                campaign.getFameAndInfamy().updateFameForFaction(campaign, enemyCode, -1);
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-            return true;
+        // Create a refuse button and add its action listener.
+        // When clicked, it will trigger a refusal confirmation dialog
+        JButton refuseButton = new JButton(resources.getString("responseRefuse.text"));
+        refuseButton.setToolTipText(resources.getString("responseRefuse.tooltip"));
+        refuseButton.addActionListener(e -> {
+            dialog.dispose();  // Close the current dialog
+            // Use another method to show a refusal confirmation dialog and store the result
+            result[0] = refusalConfirmationDialog(campaign);
+        });
+
+        // Create a panel for buttons and add buttons to it
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(refuseButton);
+
+        // Add the original panel and button panel to the dialog
+        dialog.add(panel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.pack();  // Size the dialog to fit the preferred size and layouts of its components
+        dialog.setLocationRelativeTo(null);  // Center the dialog on the screen
+        dialog.setModal(true);  // Make the dialog block user input to other top-level windows
+        dialog.setVisible(true);  // Show the dialog
+
+        return result[0];  // Return the result when the dialog is disposed
+    }
+
+    /**
+     * This function displays a dialog asking for final confirmation to refuse a batchall,
+     * and performs related actions if the refusal is confirmed.
+     *
+     * @param campaign the current campaign
+     * @return {@code true} if the user accepts the refusal, {@code false} if the user cancels the refusal
+     */
+    private boolean refusalConfirmationDialog(Campaign campaign) {
+        // Display a dialog with options for accepting or refusing a batchall.
+        // The dialog message is retrieved from resources, including the full name of the enemy for
+        // the year of the campaign.
+        // OptionDialog will return an int relating to the option chosen by the user.
+        int refusalConfirmation = JOptionPane.showOptionDialog(
+            null,
+            String.format(resources.getString("refusalConfirmation.text"),
+                getEnemy().getFullName(campaign.getGameYear())),
+            resources.getString("responseRefuse.text"),
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            new Object[]{resources.getString("responseAccept.text"),
+                resources.getString("responseRefuse.text")},
+            resources.getString("responseAccept.text"));
+
+        // If the refusal is confirmed (NO_OPTION selected), perform needed actions.
+        if (refusalConfirmation == JOptionPane.NO_OPTION) {
+            // Add a report to the campaign about the refusal
+            campaign.addReport(resources.getString("refusalReport.text"));
+            // Update the fame factor for the enemy faction in this campaign
+            campaign.getFameAndInfamy().updateFameForFaction(campaign, enemyCode, -1);
+            // Return false indicating that batchall is refused
+            return false;
         }
+
+        // If the response is anything else than refusal (no option selected), it implies that the
+        // action is accepted.
+        return true;
     }
 
     /**

@@ -43,6 +43,8 @@ public class FameAndInfamyController {
                 this.trackingFactions.put(shortName, 2.0);
             }
         }
+
+        // TODO add modifiers for inter-faction relationships
     }
 
     /**
@@ -101,6 +103,41 @@ public class FameAndInfamyController {
      */
     public int getFameLevelForFaction(String factionCode) {
         return (int) round(trackingFactions.get(factionCode));
+    }
+
+    /**
+     * Retrieves the name of the fame level for a faction.
+     *
+     * @param factionCode The code of the faction.
+     * @param isInfamy Specifies whether to retrieve the fame name for infamy or fame.
+     * @return The name of the fame level for the faction.
+     */
+    public String getFameName(String factionCode, boolean isInfamy) {
+        final int level = getFameLevelForFaction(factionCode);
+
+        if (isInfamy) {
+            return switch (level) {
+                case 0 -> "Reviled";
+                case 1 -> "Disgraced";
+                case 2 -> "Insignificant";
+                case 3 -> "Venerated";
+                case 4 -> "Exalted";
+                case 5 -> "Legendary";
+                default -> throw new IllegalStateException("Unexpected value in getFameName, infamy: "
+                    + level);
+            };
+        } else {
+            return switch (level) {
+                case 0 -> "Insignificant";
+                case 1 -> "Obscure";
+                case 2 -> "Noted";
+                case 3 -> "Notorious";
+                case 4 -> "Infamous";
+                case 5 -> "Reviled";
+                default -> throw new IllegalStateException("Unexpected value in getFameName, fame: "
+                    + level);
+            };
+        }
     }
 
     /**
