@@ -18,11 +18,6 @@
  */
 package mekhq.campaign.stratcon;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.Minefield;
@@ -39,16 +34,10 @@ import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.StratconDeploymentEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Person;
@@ -57,6 +46,11 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -769,36 +763,6 @@ public class StratconRulesManager {
             }
         }
         return retVal;
-    }
-
-    /**
-     * Determine whether the user should be nagged about unresolved scenarios on AtB
-     * Stratcon tracks.
-     *
-     * @param campaign Campaign to check.
-     * @return An informative string containing the reasons the user was nagged.
-     */
-    public static String nagUnresolvedContacts(Campaign campaign) {
-        String sb = "";
-
-        // check every track attached to an active contract for unresolved scenarios
-        // to which the player must deploy forces today
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            if (contract.getStratconCampaignState() == null) {
-                continue;
-            }
-
-            for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
-                // "scenario name, track name"
-                sb = track.getScenarios().values().stream()
-                        .filter(scenario -> (scenario.getCurrentState() == ScenarioState.UNRESOLVED)
-                                && campaign.getLocalDate().equals(scenario.getDeploymentDate()))
-                        .map(scenario -> String.format("%s, %s\n", scenario.getName(), track.getDisplayableName()))
-                        .collect(Collectors.joining());
-            }
-        }
-
-        return sb;
     }
 
     /**

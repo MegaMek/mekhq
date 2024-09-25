@@ -178,6 +178,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
     public static final String NAG_INVALID_FACTION = "nagInvalidFaction";
     public static final String NAG_UNABLE_TO_AFFORD_EXPENSES = "nagUnableToAffordExpenses";
+    public static final String NAG_UNABLE_TO_AFFORD_LOAN_PAYMENT = "nagUnableToAffordLoanPayment";
     public static final String NAG_UNABLE_TO_AFFORD_JUMP = "nagUnableToAffordJump";
     // endregion Nag Tab
 
