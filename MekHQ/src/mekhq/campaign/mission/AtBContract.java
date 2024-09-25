@@ -180,10 +180,10 @@ public class AtBContract extends Contract {
 
         int currentYear = campaign.getGameYear();
         allyBotName = getEmployerName(currentYear);
-        pickRandomCamouflage(currentYear, employerCode, false);
+        allyCamouflage = pickRandomCamouflage(currentYear, employerCode);
 
         enemyBotName = getEnemyName(currentYear);
-        pickRandomCamouflage(currentYear, enemyCode, true);
+        enemyCamouflage = pickRandomCamouflage(currentYear, enemyCode);
     }
 
     /**
@@ -193,10 +193,8 @@ public class AtBContract extends Contract {
      *
      * @param currentYear the current year in the game.
      * @param factionCode the code representing the faction for which the camouflage is to be selected.
-     * @param isEnemy a boolean flag to denote if the selected camouflage is for an enemy ({@code true})
-     *               or employer ({@code false}).
      */
-    private void pickRandomCamouflage(int currentYear, String factionCode, boolean isEnemy) {
+    public static Camouflage pickRandomCamouflage(int currentYear, String factionCode) {
         // Define the root directory and get the faction-specific camouflage directory
         final String ROOT_DIRECTORY = "data/images/camo/";
         String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
@@ -229,15 +227,12 @@ public class AtBContract extends Contract {
             String fileName = randomFile.getName();
             String fileCategory = randomFile.getParent().replaceAll(ROOT_DIRECTORY, "");
 
-            if (isEnemy) {
-                enemyCamouflage = new Camouflage(fileCategory, fileName);
-            } else {
-                allyCamouflage = new Camouflage(fileCategory, fileName);
-            }
+            return new Camouflage(fileCategory, fileName);
         } else {
             // Log if no files were found in the directory
-            logger.warn(String.format("No files in directory %s - returning default camouflage",
+            logger.warn(String.format("No files in directory %s - using default camouflage",
                 workingDirectory));
+            return null;
         }
     }
 
@@ -249,7 +244,7 @@ public class AtBContract extends Contract {
      * @param factionCode The code representing the faction.
      * @return The directory for the camouflage of the faction.
      */
-    private String getCamouflageDirectory(int currentYear, String factionCode) {
+    private static String getCamouflageDirectory(int currentYear, String factionCode) {
         return switch (factionCode) {
             case "ARC" -> "Aurigan Coalition";
             case "CDP" -> "Calderon Protectorate";
@@ -295,7 +290,7 @@ public class AtBContract extends Contract {
      * @param factionCode The code representing the faction.
      * @return The directory for the camouflage of the clan faction.
      */
-    private String getClanCamouflageDirectory(int currentYear, String factionCode) {
+    private static String getClanCamouflageDirectory(int currentYear, String factionCode) {
         final String ROOT_DIRECTORY = "Clans/";
 
         return switch (factionCode) {
@@ -551,7 +546,8 @@ public class AtBContract extends Contract {
             enemyBotName = BackgroundsController.randomMercenaryCompanyNameGenerator(null);
         }
 
-        pickRandomCamouflage(today.getYear(), enemyCode, true);
+        allyCamouflage = pickRandomCamouflage(today.getYear(), employerCode);
+        enemyCamouflage = pickRandomCamouflage(today.getYear(), enemyCode);
     }
 
     /**
@@ -1130,13 +1126,13 @@ public class AtBContract extends Contract {
     public void setEmployerCode(final String code, final LocalDate date) {
         employerCode = code;
         setEmployer(getEmployerName(date.getYear()));
-        pickRandomCamouflage(date.getYear(), employerCode, false);
+        enemyCamouflage = pickRandomCamouflage(date.getYear(), enemyCode);
     }
 
     public void setEmployerCode(String code, int year) {
         employerCode = code;
         setEmployer(getEmployerName(year));
-        pickRandomCamouflage(year, employerCode, false);
+        allyCamouflage = pickRandomCamouflage(year, employerCode);
     }
 
     public String getEmployerName(int year) {
@@ -1435,11 +1431,10 @@ public class AtBContract extends Contract {
 
         int currentYear = campaign.getGameYear();
         allyBotName = getEmployerName(currentYear);
-        pickRandomCamouflage(currentYear, employerCode, false);
+        allyCamouflage = pickRandomCamouflage(currentYear, employerCode);
 
         enemyBotName = getEnemyName(currentYear);
-        pickRandomCamouflage(currentYear, enemyCode, true);
-
+        enemyCamouflage = pickRandomCamouflage(currentYear, enemyCode);
     }
 
     /**
