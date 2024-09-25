@@ -50,7 +50,7 @@ layeredForceIconLogoCategory - the category of the faction's logo piece
 layeredForceIconLogoFilename - the filename of the faction's logo piece
 tags - a comma-separated list of tags. Currently recognised tags: "is", "periphery",
 "deep_periphery", "clan", "pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden",
-"abandoned", "chaos", "playable", "super"
+"abandoned", "chaos", "playable", "super", "noble", "planetary_government", "corporation", "small"
 start - the founding date of the faction
 end - the date the faction ceases to exist
 successor - unimplemented tag describing another faction code as the specified faction's successor

@@ -138,28 +138,32 @@ of 4. An entry of the form <entry>option</entry> has a weight of 1.
 			*Note that start and end dates are optional, but must
 			follow yyyy-MM-dd format. Planet names much match the
 			name in planets.xml exactly.-->
-        <hiringHalls>
-            <hall start="3031-01-01" end="3067-10-15">Outreach</hall>
-            <hall start="2700-01-01">Solaris</hall>
-            <hall start="3057-01-01">Arc-Royal</hall>
-            <hall start="3058-01-01" end="3081-03-15">Fletcher</hall>
-            <hall start="2650-01-01">Galatea</hall>
-            <hall start="3000-01-01">Westerhand</hall>
-            <hall start="3057-01-01" end="3081-03-15">Northwind</hall>
-            <hall start="3020-01-01">Herotitus</hall>
-        </hiringHalls>
+		<hiringHalls>
+			<hall start="3031-01-01" end="3067-10-15" level="great">Outreach</hall>
+			<hall start="2700-01-01" level="minor">Solaris</hall>
+			<hall start="3057-01-01" level="standard">Arc-Royal</hall>
+			<hall start="3058-01-01" end="3081-03-15" level="minor" >Fletcher</hall>
+			<hall start="2650-01-01" level="great">Galatea</hall>
+			<hall start="3000-01-01" level="great">Westerhand</hall>
+			<hall start="3057-01-01" end="3081-03-15" level="great">Northwind</hall>
+			<hall start="3020-01-01" level="minor">Herotitus</hall>
+			<hall start="2694-01-01" level="questionable">Antallos (Port Krin)</hall>
+			<hall start="2912-01-01" level="questionable">Astrokaszy</hall>
+			<hall start="3052-01-01" level="minor">Noisiel</hall>
+			<hall start="2811-01-01" end="3045-01-01" level="minor">Le Blanc</hall>
+		</hiringHalls>
 
-    </contractGeneration>
+	</contractGeneration>
 
-    <!-- Values used for searching for an available ship to purchase. -->
-    <shipSearch>
-        <!-- The total cost of the search process -->
-        <shipSearchCost>100000</shipSearchCost>
+	<!-- Values used for searching for an available ship to purchase. -->
+	<shipSearch>
+		<!-- The total cost of the search process -->
+		<shipSearchCost>100000</shipSearchCost>
 
-        <!-- The number of weeks required to complete the ship search. -->
-        <shipSearchLengthWeeks>4</shipSearchLengthWeeks>
+		<!-- The number of weeks required to complete the ship search. -->
+		<shipSearchLengthWeeks>4</shipSearchLengthWeeks>
 
-        <!-- The target number to for the dice roll to determine whether the ship search
+		<!-- The target number to for the dice roll to determine whether the ship search
 		was successful. Acceptable values for unitType are Dropship, Jumpship, and Warship.
 		If the target number is missing or commented out, that type of ship is not available
 		in a search. -->
