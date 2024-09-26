@@ -58,6 +58,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static megamek.common.EntityWeightClass.WEIGHT_ULTRA_LIGHT;
 import static mekhq.campaign.personnel.Person.getLoyaltyName;
 
 /**
@@ -574,6 +575,8 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblAge2 = new JLabel();
         JLabel lblGender1 = new JLabel();
         JLabel lblGender2 = new JLabel();
+        JLabel lblOriginalUnit1 = new JLabel();
+        JLabel lblOriginalUnit2 = new JLabel();
         JLabel lblDueDate1 = new JLabel();
         JLabel lblDueDate2 = new JLabel();
         JLabel lblRecruited1 = new JLabel();
@@ -735,6 +738,45 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlInfo.add(lblGender2, gridBagConstraints);
         y++;
+
+        boolean displayOriginalUnit = person.getOriginalUnitId() != null
+            || person.getOriginalUnitWeight() != WEIGHT_ULTRA_LIGHT;
+
+        if (displayOriginalUnit) {
+            lblOriginalUnit1.setName("lblOriginalUnit1");
+            lblOriginalUnit1.setText(resourceMap.getString("lblOriginalUnit1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblOriginalUnit1, gridBagConstraints);
+
+            lblOriginalUnit2.setName("lblOriginalUnit2");
+
+            if (campaign.getUnit(person.getOriginalUnitId()) != null) {
+                lblOriginalUnit2.setText(campaign.getUnit(person.getOriginalUnitId()).getName());
+            } else {
+                List<String> originalUnitWeight = List.of("None", "Light", "Medium", "Heavy", "Assault");
+                int originalUnitWeightIndex = person.getOriginalUnitWeight();
+
+                List<String> originalUnitTech = List.of("IS1", "IS2", "Clan");
+                int originalUnitTechIndex = person.getOriginalUnitTech();
+
+                lblOriginalUnit2.setText(originalUnitWeight.get(originalUnitWeightIndex)
+                    + " (" + originalUnitTech.get(originalUnitTechIndex) + ')');
+            }
+            lblOriginalUnit1.setLabelFor(lblOriginalUnit2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlInfo.add(lblOriginalUnit2, gridBagConstraints);
+            y++;
+        }
 
         if (person.isPregnant()) {
             lblDueDate1.setName("lblDueDate1");
