@@ -41,7 +41,6 @@ import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
@@ -54,16 +53,6 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
 import mekhq.utilities.MHQXMLUtility;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -256,14 +245,19 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * Checks the morale level of the campaign based on various factors.
+     * Checks and updates the morale which depends on various conditions such as the rout end date,
+     * skill levels, victories, defeats, etc. This method also updates the enemy status based on the
+     * morale level.
      *
-     * @param campaign The ongoing campaign.
-     * @param today The current date.
-     * @param dragoonRating The player's dragoon rating
+     * @param today       The current date in the context.
      */
-    public void checkMorale(Campaign campaign, LocalDate today, int dragoonRating) {
-        if (null != routEnd) {
+    public void checkMorale(Campaign campaign, LocalDate today) {
+        // Check whether enemy forces have been reinforced, and whether any current rout continues
+        // beyond its expected date
+        boolean routContinue = Compute.randomInt(4) < 3;
+
+        // If there is a rout end date, and it's past today, update morale and enemy state accordingly
+        if (routEnd != null && !routContinue) {
             if (today.isAfter(routEnd)) {
                 setMoraleLevel(AtBMoraleLevel.STALEMATE);
                 routEnd = null;

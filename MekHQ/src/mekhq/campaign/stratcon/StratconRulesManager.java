@@ -108,8 +108,10 @@ public class StratconRulesManager {
         // multiplies the BV budget of all
         int scenarioRolls = track.getRequiredLanceCount();
 
-        if (contract.getMoraleLevel().isOverwhelming()) {
+        if (contract.getMoraleLevel().isDominating()) {
             scenarioRolls++;
+        } else if (contract.getMoraleLevel().isOverwhelming()) {
+            scenarioRolls += 2;
         }
         for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
             int targetNum = calculateScenarioOdds(track, contract, false);
