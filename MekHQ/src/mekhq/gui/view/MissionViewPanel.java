@@ -34,6 +34,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 /**
  * A custom panel that gets filled in with goodies from a scenario object
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -922,7 +924,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         lblMorale.setName("lblMorale");
         lblMorale.setText(resourceMap.getString("lblMorale.text"));
-        lblMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
+        lblMorale.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -932,7 +934,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtMorale.setName("txtMorale");
         txtMorale.setText(contract.getMoraleLevel().toString());
-        txtMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
+        txtMorale.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
