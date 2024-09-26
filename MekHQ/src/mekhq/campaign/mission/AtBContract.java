@@ -214,6 +214,11 @@ public class AtBContract extends Contract {
     public static Camouflage pickRandomCamouflage(int currentYear, String factionCode) {
         // Define the root directory and get the faction-specific camouflage directory
         final String ROOT_DIRECTORY = "data/images/camo/";
+
+        // Some operating systems use `\`, so when we sanitize the file path later,
+        // we need to be able to account for that.
+        final String ROOT_DIRECTORY_ALTERNATE = "data\\\\mages\\\\camo\\\\";
+
         String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
 
         // Use Java File to represent directories
@@ -243,6 +248,7 @@ public class AtBContract extends Contract {
 
             String fileName = randomFile.getName();
             String fileCategory = randomFile.getParent().replaceAll(ROOT_DIRECTORY, "");
+            fileCategory = fileCategory.replaceAll(ROOT_DIRECTORY_ALTERNATE, "");
 
             return new Camouflage(fileCategory, fileName);
         } else {
