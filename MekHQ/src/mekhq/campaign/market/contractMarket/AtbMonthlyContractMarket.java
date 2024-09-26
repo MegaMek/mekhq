@@ -126,8 +126,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
 
             if (campaign.getFaction().isMercenary() || campaign.getFaction().isPirate()) {
-                if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentSystem().getId(),
-                        campaign.getLocalDate())) {
+                if (campaign.getCurrentSystem().isHiringHall(campaign.getLocalDate())) {
                     numContracts++;
                     /* Though the rules do not state these modifiers are mutually exclusive, the fact that the
                      * distance of Galatea from a border means that it has no advantage for Mercs over border

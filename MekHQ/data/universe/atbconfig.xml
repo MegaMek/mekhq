@@ -129,32 +129,6 @@ of 4. An entry of the form <entry>option</entry> has a weight of 1.
         </botLance>
     </scenarioGeneration>
 
-    <contractGeneration>
-        <!-- Units stationed on worlds with hiring halls receive +1
-			to the monthly roll for number of contracts. This list
-			comes from information in the FM:Mercs(R), its supplementals,
-			and FM 3085. Dates are mostly approximate due to lack of precise detail
-			in the source material.
-			*Note that start and end dates are optional, but must
-			follow yyyy-MM-dd format. Planet names much match the
-			name in planets.xml exactly.-->
-		<hiringHalls>
-			<hall start="3031-01-01" end="3067-10-15" level="great">Outreach</hall>
-			<hall start="2700-01-01" level="minor">Solaris</hall>
-			<hall start="3057-01-01" level="standard">Arc-Royal</hall>
-			<hall start="3058-01-01" end="3081-03-15" level="minor" >Fletcher</hall>
-			<hall start="2650-01-01" level="great">Galatea</hall>
-			<hall start="3000-01-01" level="great">Westerhand</hall>
-			<hall start="3057-01-01" end="3081-03-15" level="great">Northwind</hall>
-			<hall start="3020-01-01" level="minor">Herotitus</hall>
-			<hall start="2694-01-01" level="questionable">Antallos (Port Krin)</hall>
-			<hall start="2912-01-01" level="questionable">Astrokaszy</hall>
-			<hall start="3052-01-01" level="minor">Noisiel</hall>
-			<hall start="2811-01-01" end="3045-01-01" level="minor">Le Blanc</hall>
-		</hiringHalls>
-
-	</contractGeneration>
-
 	<!-- Values used for searching for an available ship to purchase. -->
 	<shipSearch>
 		<!-- The total cost of the search process -->

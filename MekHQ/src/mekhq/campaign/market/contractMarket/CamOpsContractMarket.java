@@ -83,17 +83,9 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return 1.0;
     }
 
-    private HiringHallLevel getHiringHallLevel(Campaign campaign) {
-        AtBConfiguration atbConfig = campaign.getAtBConfig();
-        return atbConfig.getHiringHallLevel(campaign.getCurrentSystem()
-                .getPrimaryPlanet()
-                .getName(campaign.getLocalDate()),
-            campaign.getLocalDate());
-    }
-
     private ContractModifiers generateContractModifiers(Campaign campaign) {
         if (campaign.getFaction().isMercenary()) {
-            return new ContractModifiers(getHiringHallLevel(campaign));
+            return new ContractModifiers(campaign.getCurrentSystem().getHiringHallLevel(campaign.getLocalDate()));
         } else if (campaign.getFaction().isRebelOrPirate()) {
             return new ContractModifiers(HiringHallLevel.NONE);
         } else {

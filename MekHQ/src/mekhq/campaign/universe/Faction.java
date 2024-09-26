@@ -323,6 +323,10 @@ public class Faction {
     public boolean isInactive() {
         return is(Tag.INACTIVE);
     }
+
+    public boolean isChaos() {
+        return is(Tag.CHAOS);
+    }
     // endregion Power Checks
     // endregion Checks
 

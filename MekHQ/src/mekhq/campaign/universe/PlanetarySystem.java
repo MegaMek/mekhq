@@ -48,6 +48,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 
 /**
  * This is a PlanetarySystem object that will contain information
@@ -728,5 +729,63 @@ public class PlanetarySystem {
         }
 
         return academyString.toString();
+    }
+
+    /**
+     * Checks whether a hiring hall exists in the planetary system on the specified date
+     *
+     * @param  date Date to check for existence of hiring hall
+     * @return True if a hiring hall exists on the given date; otherwise false.
+     */
+    public boolean isHiringHall(LocalDate date) {
+        return getHiringHallLevel(date) != HiringHallLevel.NONE;
+    }
+
+    /**
+     * Retrieves the level of the Hiring Hall in the planetary system on the specified
+     * date. The level is dynamically determined on various planetary characteristics,
+     * including Technological Sophistication, HPG level, and planetary governments.
+     *
+     * @param  date Date to check for the level of the hiring hall
+     * @return The hiring hall level on the given date
+     */
+    public HiringHallLevel getHiringHallLevel(LocalDate date) {
+        if (getPopulation(date) == 0) {
+            return HiringHallLevel.NONE;
+        }
+        int score = 0;
+        for (Faction faction : getFactionSet(date)) {
+            if (faction.isPirate() || faction.isChaos()) {
+                return HiringHallLevel.QUESTIONABLE;
+            }
+        }
+        score += getHiringHallHpgBonus(date);
+        score += getHiringHallTechBonus(date);
+        if (score > 9) {
+            return HiringHallLevel.GREAT;
+        } else if (score > 6) {
+            return HiringHallLevel.STANDARD;
+        } else if (score > 4) {
+            return HiringHallLevel.MINOR;
+        }
+        return HiringHallLevel.NONE;
+    }
+
+    private int getHiringHallHpgBonus(LocalDate date) {
+        return switch (getHPG(date)) {
+            case EquipmentType.RATING_A -> 5;
+            case EquipmentType.RATING_B -> 3;
+            case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
+            default -> 0;
+        };
+    }
+
+    private int getHiringHallTechBonus(LocalDate date) {
+        return switch (getSocioIndustrial(date).tech) {
+            case -1 -> 5; // Ultra-Advanced; not accounted for in the EquipmentType.RATING constants
+            case EquipmentType.RATING_A, EquipmentType.RATING_B -> 3;
+            case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
+            default -> 0;
+        };
     }
 }
