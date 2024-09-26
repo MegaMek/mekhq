@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -97,7 +97,7 @@ public class UnitTableModel extends DataTableModel {
             case COL_FORCE -> "Force";
             case COL_CREW -> "Crew";
             case COL_TECH_CRW -> "Tech Crew";
-            case COL_MAINTAIN -> "Maintenance Costs";
+            case COL_MAINTAIN -> "Maintenance";
             case COL_BV -> "BV";
             case COL_REPAIR -> "# Repairs";
             case COL_PARTS -> "# Parts";
@@ -112,7 +112,8 @@ public class UnitTableModel extends DataTableModel {
         return switch (columnId) {
             case COL_NAME, COL_TECH, COL_PILOT, COL_FORCE, COL_TECH_CRW -> 150;
             case COL_TYPE, COL_WCLASS, COL_SITE -> 50;
-            case COL_COST, COL_STATUS, COL_RSTATUS -> 40;
+            case COL_COST, COL_STATUS, COL_RSTATUS, COL_CREW -> 40;
+            case COL_PARTS -> 10;
             default -> 20;
         };
     }
@@ -125,14 +126,85 @@ public class UnitTableModel extends DataTableModel {
         };
     }
 
-    public @Nullable String getTooltip(int row, int col) {
-        Unit u = getUnit(row);
-        return switch (col) {
-            case COL_STATUS -> u.isRefitting() ? u.getRefit().getDesc() : null;
-            case COL_CREW_STATE -> u.getCrewState().getToolTipText();
-            case COL_QUIRKS -> u.getQuirksList();
+    /**
+     * Returns the tooltip for the specified row and column.
+     *
+     * @param rowIndex    the index of the row
+     * @param columnIndex the index of the column
+     * @return the tooltip for the specified row and column, or {@code null} if no tooltip is available
+     */
+    public @Nullable String getTooltip(int rowIndex, int columnIndex) {
+        Unit unit = getUnit(rowIndex);
+
+        if (unit == null) {
+            return null;
+        }
+
+        return switch (columnIndex) {
+            case COL_STATUS -> unit.isRefitting() ? unit.getRefit().getDesc() : null;
+            case COL_CREW_STATE -> unit.getCrewState().getToolTipText();
+            case COL_CREW -> getCrewTooltip(unit);
+            case COL_QUIRKS -> unit.getQuirksList();
             default -> null;
         };
+    }
+
+    /**
+     * Returns the tooltip for the crew status of a given unit.
+     *
+     * @param unit the unit for which to get the crew tooltip
+     * @return the crew tooltip as an HTML string
+     */
+    static String getCrewTooltip(Unit unit) {
+        int gunnersNeeded = unit.getTotalGunnerNeeds();
+        int gunnersAssigned = unit.getGunners().size();
+
+        int driversNeeded = unit.getTotalDriverNeeds();
+        int driversAssigned = unit.getDrivers().size();
+
+        Entity entity = unit.getEntity();
+        int navigatorsNeeded = entity instanceof Jumpship && !(entity instanceof SpaceStation) ? 1 : 0;
+        int navigatorsAssigned = unit.getNavigator() == null ? 0 : 1;
+
+        int crewNeeded = unit.getTotalCrewNeeds();
+        int crewAssigned = unit.getCrew().size() - (gunnersAssigned + driversAssigned + navigatorsAssigned);
+
+        StringBuilder report = new StringBuilder("<html>");
+
+        if (driversNeeded > 0) {
+            appendReport(report, "Drivers", driversAssigned, driversNeeded);
+        }
+
+        if (gunnersNeeded > 0) {
+            report.append("<br>");
+            appendReport(report, "Gunners", gunnersAssigned, gunnersNeeded);
+        }
+
+        if (crewNeeded > 0) {
+            report.append("<br>");
+            appendReport(report, "Crew", crewAssigned, crewNeeded);
+        }
+
+        if (navigatorsNeeded > 0) {
+            report.append("<br>");
+            appendReport(report, "Navigator", navigatorsAssigned, navigatorsNeeded);
+        }
+
+        report.append("</html>");
+
+        return report.toString();
+    }
+
+    /**
+     * Appends a crew report line to the provided StringBuilder.
+     *
+     * @param report the {@link StringBuilder} to append to
+     * @param title the title of the crew role (e.g., "Driver", "Gunner")
+     * @param assigned the number of crew members assigned to the role
+     * @param needed the number of crew members needed for the role
+     */
+    private static void appendReport(StringBuilder report, String title, int assigned, int needed) {
+        report.append(String.format("<b>%s: </b>%d/%d", title, assigned, needed));
     }
 
     @Override

@@ -21,33 +21,13 @@
  */
 package mekhq.campaign.againstTheBot;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.function.Function;
-
-import javax.xml.parsers.DocumentBuilder;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Compute;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.universe.HiringHall;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -57,6 +37,18 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author Neoancient
@@ -89,7 +81,7 @@ public class AtBConfiguration {
     private HashMap<String, List<WeightedTable<String>>> botLanceTables = new HashMap<>();
 
     /* Contract generation */
-    private ArrayList<DatedRecord<String>> hiringHalls;
+    private HashMap<String, HiringHall> hiringHalls = new HashMap<>();
 
     /* Personnel and unit markets */
     private Money shipSearchCost;
@@ -105,7 +97,6 @@ public class AtBConfiguration {
             MekHQ.getMHQOptions().getLocale());
 
     private AtBConfiguration() {
-        hiringHalls = new ArrayList<>();
         dsTable = new WeightedTable<>();
         jsTable = new WeightedTable<>();
         shipSearchCost = Money.of(100000);
@@ -178,10 +169,16 @@ public class AtBConfiguration {
                 case "hiringHalls":
                     for (String entry : property.split("\\|")) {
                         String[] fields = entry.split(",");
-                        hiringHalls.add(new DatedRecord<>(
-                                !fields[0].isBlank() ? MHQXMLUtility.parseDate(fields[0]) : null,
-                                !fields[1].isBlank() ? MHQXMLUtility.parseDate(fields[1]) : null,
-                                fields[2]));
+                        LocalDate startDate = !fields[0].isBlank() ? MHQXMLUtility.parseDate(fields[0]) : null;
+                        LocalDate endDate = !fields[1].isBlank() ? MHQXMLUtility.parseDate(fields[1]) : null;
+                        HiringHallLevel level = null;
+                        try {
+                            level = HiringHallLevel.valueOf(fields[2].toUpperCase());
+                        } catch (IllegalArgumentException ex) {
+                            level = HiringHallLevel.GREAT;
+                        }
+                        String name = fields[3];
+                        hiringHalls.put(name, new HiringHall(level, startDate, endDate, name));
                     }
                     break;
                 case "shipSearchCost":
@@ -235,26 +232,45 @@ public class AtBConfiguration {
         return selectBotLances(org, weightClass, 0f);
     }
 
+    /**
+     * Selects a bot lance based on the organization, weight class, and roll modifier.
+     *
+     * @param org        The organization of the bot force tables.
+     * @param weightClass The weight class of the bot.
+     * @param rollMod    A modifier to the die roll, expressed as a fraction of the total weight.
+     * @return The selected bot lance, or null if the organization's bot force tables are not found or invalid.
+     */
     public @Nullable String selectBotLances(String org, int weightClass, float rollMod) {
-        if (botForceTables.containsKey(org)) {
-            final List<WeightedTable<String>> botForceTable = botForceTables.get(org);
-            int weightClassIndex = weightClassIndex(weightClass);
-            WeightedTable<String> table;
-            if ((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
-                logger.error(String.format(
-                        "Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values",
-                        org, weightClass));
-                weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
-            }
-            table = botForceTable.get(weightClassIndex);
-            if (null == table) {
-                table = getDefaultForceTable("botForce." + org, weightClassIndex);
-            }
-            return table.select(rollMod);
-        } else {
+        // Check if the bot force tables contain the required organization
+        if (!botForceTables.containsKey(org)) {
             logger.error(String.format("Bot force tables for organization \"%s\" not found, ignoring", org));
             return null;
         }
+
+        // Retrieve botForceTable for the organization
+        final List<WeightedTable<String>> botForceTable = botForceTables.get(org);
+
+        // Weight Class Index
+        int weightClassIndex = weightClassIndex(weightClass);
+
+        // Check if the weightClassIndex is within valid range
+        if (weightClassIndex < 0 || weightClassIndex >= botForceTable.size()) {
+            logger.error(String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass));
+
+            // Limit the weightClassIndex within valid range
+            weightClassIndex = Math.max(0, Math.min(weightClassIndex, botForceTable.size() - 1));
+        }
+
+        // Fetch table for the weight class
+        WeightedTable<String> table = botForceTable.get(weightClassIndex);
+
+        // If there isn't relevant table, provide a default one
+        if (table == null) {
+            table = getDefaultForceTable("botForce." + org, weightClassIndex);
+        }
+
+        // Return the selected table
+        return table.select(rollMod);
     }
 
     public @Nullable String selectBotUnitWeights(String org, int weightClass) {
@@ -308,8 +324,16 @@ public class AtBConfiguration {
     }
 
     public boolean isHiringHall(String planet, LocalDate date) {
-        return hiringHalls.stream().anyMatch(rec -> rec.getValue().equals(planet)
-                && rec.fitsDate(date));
+        HiringHall hall = hiringHalls.get(planet);
+        return hall != null && hall.isActive(date);
+    }
+
+    public HiringHallLevel getHiringHallLevel(String planet, LocalDate date) {
+        HiringHall hall = hiringHalls.get(planet);
+        if (hall != null && hall.isActive(date)) {
+            return hall.getLevel();
+        }
+        return HiringHallLevel.NONE;
     }
 
     public Money getShipSearchCost() {
@@ -492,7 +516,19 @@ public class AtBConfiguration {
                         if (wn2.getAttributes().getNamedItem("end") != null) {
                             end = MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("end").getTextContent());
                         }
-                        hiringHalls.add(new DatedRecord<>(start, end, wn2.getTextContent()));
+                        HiringHallLevel level = HiringHallLevel.NONE;
+                        if (wn2.getAttributes().getNamedItem("level") != null) {
+                            try {
+                                level = HiringHallLevel.valueOf(wn2.getAttributes().getNamedItem("level").getTextContent().toUpperCase());
+                            } catch (IllegalArgumentException e) {
+                                logger.warn("Invalid value for Hiring Hall level, falling back to NONE: " + e);
+                            }
+                        } else {
+                            // Backwards compatibility--hiring halls in atbconfig.xml should default to GREAT
+                            level = HiringHallLevel.GREAT;
+                        }
+                        String planetName = wn2.getTextContent();
+                        hiringHalls.put(planetName, new HiringHall(level, start, end, planetName));
                     }
                 }
             }

@@ -21,44 +21,6 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
-import java.util.*;
-import java.util.stream.IntStream;
-import java.util.zip.GZIPOutputStream;
-
-import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.xml.parsers.DocumentBuilder;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -67,21 +29,12 @@ import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.client.ui.swing.util.UIUtil;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.MULParser;
-import megamek.common.MekSummaryCache;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
-import mekhq.IconPackage;
-import mekhq.MHQConstants;
-import mekhq.MHQOptionsChangedEvent;
-import mekhq.MHQStaticDirectoryManager;
-import mekhq.MekHQ;
-import mekhq.Utilities;
+import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.CampaignOptions;
@@ -91,6 +44,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.icons.StandardForceIcon;
+import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
@@ -101,15 +55,11 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
 import mekhq.campaign.personnel.death.ExponentialRandomDeath;
 import mekhq.campaign.personnel.death.PercentageRandomDeath;
-import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.RandomDeathMethod;
-import mekhq.campaign.personnel.enums.RandomDivorceMethod;
-import mekhq.campaign.personnel.enums.RandomMarriageMethod;
-import mekhq.campaign.personnel.enums.RandomProcreationMethod;
-import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
+import mekhq.campaign.personnel.divorce.RandomDivorce;
+import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.marriage.RandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
+import mekhq.campaign.personnel.procreation.RandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.report.CargoReport;
@@ -121,17 +71,29 @@ import mekhq.campaign.universe.NewsItem;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
 import mekhq.gui.dialog.nagDialogs.*;
-import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
-import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
-import mekhq.gui.dialog.reportDialogs.NewsReportDialog;
-import mekhq.gui.dialog.reportDialogs.PersonnelReportDialog;
-import mekhq.gui.dialog.reportDialogs.ReputationReportDialog;
-import mekhq.gui.dialog.reportDialogs.TransportReportDialog;
-import mekhq.gui.dialog.reportDialogs.UnitRatingReportDialog;
+import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.xml.parsers.DocumentBuilder;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.List;
+import java.util.*;
+import java.util.stream.IntStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * The application's main frame.
@@ -1531,11 +1493,9 @@ public class CampaignGUI extends JPanel {
             getCampaign().getDivorce().setUseRandomSameSexDivorce(newOptions.isUseRandomSameSexDivorce());
             getCampaign().getDivorce().setUseRandomClanPersonnelDivorce(newOptions.isUseRandomClanPersonnelDivorce());
             getCampaign().getDivorce().setUseRandomPrisonerDivorce(newOptions.isUseRandomPrisonerDivorce());
-            if (getCampaign().getDivorce().getMethod().isPercentage()) {
-                ((PercentageRandomDivorce) getCampaign().getDivorce()).setOppositeSexPercentage(
-                        newOptions.getPercentageRandomDivorceOppositeSexChance());
-                ((PercentageRandomDivorce) getCampaign().getDivorce()).setSameSexPercentage(
-                        newOptions.getPercentageRandomDivorceSameSexChance());
+            if (getCampaign().getDivorce().getMethod().isDiceRoll()) {
+                ((RandomDivorce) getCampaign().getDivorce()).setDivorceDiceSize(
+                        newOptions.getRandomDivorceDiceSize());
             }
         }
 
@@ -1544,15 +1504,12 @@ public class CampaignGUI extends JPanel {
         } else {
             getCampaign().getMarriage().setUseClanPersonnelMarriages(newOptions.isUseClanPersonnelMarriages());
             getCampaign().getMarriage().setUsePrisonerMarriages(newOptions.isUsePrisonerMarriages());
-            getCampaign().getMarriage().setUseRandomSameSexMarriages(newOptions.isUseRandomSameSexMarriages());
             getCampaign().getMarriage()
                     .setUseRandomClanPersonnelMarriages(newOptions.isUseRandomClanPersonnelMarriages());
             getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
-            if (getCampaign().getMarriage().getMethod().isPercentage()) {
-                ((PercentageRandomMarriage) getCampaign().getMarriage()).setOppositeSexPercentage(
-                        newOptions.getPercentageRandomMarriageOppositeSexChance());
-                ((PercentageRandomMarriage) getCampaign().getMarriage()).setSameSexPercentage(
-                        newOptions.getPercentageRandomMarriageSameSexChance());
+            if (getCampaign().getMarriage().getMethod().isDiceRoll()) {
+                ((RandomMarriage) getCampaign().getMarriage()).setMarriageDiceSize(
+                        newOptions.getRandomMarriageDiceSize());
             }
         }
 
@@ -1566,11 +1523,11 @@ public class CampaignGUI extends JPanel {
             getCampaign().getProcreation()
                     .setUseRandomClanPersonnelProcreation(newOptions.isUseRandomClanPersonnelProcreation());
             getCampaign().getProcreation().setUseRandomPrisonerProcreation(newOptions.isUseRandomPrisonerProcreation());
-            if (getCampaign().getProcreation().getMethod().isPercentage()) {
-                ((PercentageRandomProcreation) getCampaign().getProcreation()).setPercentage(
-                        newOptions.getPercentageRandomProcreationRelationshipChance());
-                ((PercentageRandomProcreation) getCampaign().getProcreation()).setRelationshiplessPercentage(
-                        newOptions.getPercentageRandomProcreationRelationshiplessChance());
+            if (getCampaign().getProcreation().getMethod().isDiceRoll()) {
+                ((RandomProcreation) getCampaign().getProcreation()).setRelationshipDieSize(
+                        newOptions.getRandomProcreationRelationshipDiceSize());
+                ((RandomProcreation) getCampaign().getProcreation()).setRelationshiplessDieSize(
+                        newOptions.getRandomProcreationRelationshiplessDiceSize());
             }
         }
 
@@ -1587,6 +1544,11 @@ public class CampaignGUI extends JPanel {
             getCampaign().setUnitMarket(newOptions.getUnitMarketMethod().getUnitMarket());
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
             miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
+        }
+        
+        AbstractContractMarket contractMarket = getCampaign().getContractMarket();
+        if (contractMarket.getMethod() != newOptions.getContractMarketMethod()) {
+            getCampaign().setContractMarket(newOptions.getContractMarketMethod().getContractMarket());
         }
 
         if (atb != newOptions.isUseAtB()) {
@@ -2335,6 +2297,9 @@ public class CampaignGUI extends JPanel {
         getFrame().setTitle(getCampaign().getTitle());
     }
 
+    /**
+     * Refreshes the 'funds' display on the GUI.
+     */
     private void refreshFunds() {
         Money funds = getCampaign().getFunds();
         String inDebt = "";
@@ -2454,101 +2419,96 @@ public class CampaignGUI extends JPanel {
 
     // region Subscriptions
     @Subscribe
-    public void handleDayEnding(DayEndingEvent evt) {
-        // first check for overdue loan payments - don't allow advancement until
-        // these are addressed
-        if (getCampaign().checkOverDueLoans()) {
-            refreshFunds();
-            // FIXME : Localize
-            JOptionPane.showMessageDialog(null, "You must resolve overdue loans before advancing the day",
-                    "Overdue loans", JOptionPane.WARNING_MESSAGE);
-            evt.cancel();
+    public void handleDayEnding(DayEndingEvent dayEndingEvent) {
+        if (checkForOverdueLoans(dayEndingEvent)) {
             return;
         }
 
-        if (getCampaign().checkScenariosDue()) {
-            JOptionPane.showMessageDialog(null, getResourceMap().getString("dialogCheckDueScenarios.text"),
-                    getResourceMap().getString("dialogCheckDueScenarios.title"), JOptionPane.WARNING_MESSAGE);
-            evt.cancel();
+        if (checkForDueScenarios(dayEndingEvent)) {
             return;
         }
 
         if (new UnmaintainedUnitsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new PregnantCombatantNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new PrisonersNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new UntreatedPersonnelNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new EndContractNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new NoCommanderNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new InvalidFactionNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new UnableToAffordJumpNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new InsufficientAstechsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new InsufficientAstechTimeNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (new InsufficientMedicsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-            evt.cancel();
+            dayEndingEvent.cancel();
             return;
         }
 
         if (getCampaign().getLocalDate()
                 .equals(getCampaign().getLocalDate().with(TemporalAdjusters.lastDayOfMonth()))) {
             if (new UnableToAffordExpensesNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
+                dayEndingEvent.cancel();
                 return;
             }
         }
 
+        if (new UnableToAffordLoanPaymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            dayEndingEvent.cancel();
+            return;
+        }
+
         if (getCampaign().getCampaignOptions().isUseAtB()) {
             if (new ShortDeploymentNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
+                dayEndingEvent.cancel();
                 return;
             }
 
             if (new UnresolvedStratConContactsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
+                dayEndingEvent.cancel();
                 return;
             }
 
             if (new OutstandingScenariosNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
-                evt.cancel();
+                dayEndingEvent.cancel();
                 return;
             }
         }
@@ -2563,7 +2523,7 @@ public class CampaignGUI extends JPanel {
                 case 0:
                     // the user launched the turnover dialog
                     if (!showRetirementDefectionDialog()) {
-                        evt.cancel();
+                        dayEndingEvent.cancel();
                         return;
                     }
                 case 1:
@@ -2571,13 +2531,61 @@ public class CampaignGUI extends JPanel {
                     break;
                 case 2:
                     // the user canceled
-                    evt.cancel();
+                    dayEndingEvent.cancel();
                     return;
                 default:
                     throw new IllegalStateException(
                             "Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " + turnoverPrompt);
             }
         }
+    }
+
+    /**
+     * Checks if there are any due instances of the {@link Scenario} class.
+     * If the {@code checkScenariosDue()} method of the {@link Campaign} associated with the given
+     * {@link DayEndingEvent} returns {@code true}, a dialo shows up informing the user of the due
+     * scenarios, and the {@link DayEndingEvent} is canceled.
+     *
+     * @param dayEndingEvent the {@link DayEndingEvent} being checked.
+     * @return {@code true} if there are due scenarios and {@code false} otherwise.
+     */
+    private boolean checkForDueScenarios(DayEndingEvent dayEndingEvent) {
+        if (getCampaign().checkScenariosDue()) {
+            JOptionPane.showMessageDialog(null,
+                    getResourceMap().getString("dialogCheckDueScenarios.text"),
+                    getResourceMap().getString("dialogCheckDueScenarios.title"),
+                    JOptionPane.WARNING_MESSAGE);
+
+            dayEndingEvent.cancel();
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if there are any overdue loans
+     * If the {@code checkOverDueLoans()} method of the {@link Campaign} associated with the given
+     * {@link DayEndingEvent} returns {@code true}, the funds get refreshed, a dialog shows up
+     * informing the user of the overdue loans, and the {@link DayEndingEvent} is canceled.
+     *
+     * @param dayEndingEvent the {@link DayEndingEvent} being checked.
+     * @return {@code true} if there are overdue loans and {@code false} otherwise.
+     */
+    private boolean checkForOverdueLoans(DayEndingEvent dayEndingEvent) {
+        if (getCampaign().checkOverDueLoans()) {
+            refreshFunds();
+
+            JOptionPane.showMessageDialog(null,
+                    getResourceMap().getString("dialogOverdueLoans.text"),
+                    getResourceMap().getString("dialogOverdueLoans.title"),
+                    JOptionPane.WARNING_MESSAGE);
+
+            dayEndingEvent.cancel();
+
+            return true;
+        }
+        return false;
     }
 
     @Subscribe

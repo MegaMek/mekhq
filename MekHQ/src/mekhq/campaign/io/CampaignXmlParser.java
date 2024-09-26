@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,44 +18,12 @@
  */
 package mekhq.campaign.io;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-
-import javax.xml.parsers.DocumentBuilder;
-
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.Jumpship;
-import megamek.common.Mek;
-import megamek.common.MekSummaryCache;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.SmallCraft;
-import megamek.common.Tank;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
@@ -63,38 +31,22 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CurrentLocation;
-import mekhq.campaign.Kill;
-import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.Warehouse;
+import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.icons.UnitIcon;
-import mekhq.campaign.market.ContractMarket;
+import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingEnginePart;
-import mekhq.campaign.parts.MissingMekActuator;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.HeatSink;
-import mekhq.campaign.parts.equipment.MASC;
-import mekhq.campaign.parts.equipment.MissingAmmoBin;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
-import mekhq.campaign.parts.equipment.MissingMASC;
+import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.equipment.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
@@ -112,15 +64,24 @@ import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.io.*;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class CampaignXmlParser {
-    private static final MMLogger logger = MMLogger.create(CampaignXmlParser.class);
+    private final InputStream is;
+    private final MekHQ app;
 
-    private InputStream is;
-    private MekHQ app;
+    private static final MMLogger logger = MMLogger.create(CampaignXmlParser.class);
 
     public CampaignXmlParser(InputStream is, MekHQ app) {
         this.is = is;
@@ -298,6 +259,8 @@ public class CampaignXmlParser {
                     processSpecialAbilityNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("storyArc")) {
                     processStoryArcNodes(retVal, wn, version);
+                } else if (xn.equalsIgnoreCase("fameAndInfamy")) {
+                    processFameAndInfamyNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     retVal.getGameOptions().fillFromXML(wn.getChildNodes());
                 } else if (xn.equalsIgnoreCase("kills")) {
@@ -309,7 +272,7 @@ public class CampaignXmlParser {
                     foundPersonnelMarket = true;
                 } else if (xn.equalsIgnoreCase("contractMarket")) {
                     // CAW: implicit DEPENDS-ON to the <missions> node
-                    retVal.setContractMarket(ContractMarket.generateInstanceFromXML(wn, retVal, version));
+                    retVal.setContractMarket(AbstractContractMarket.generateInstanceFromXML(wn, retVal, version));
                     foundContractMarket = true;
                 } else if (xn.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
@@ -524,7 +487,7 @@ public class CampaignXmlParser {
         }
 
         if (!foundContractMarket) {
-            retVal.setContractMarket(new ContractMarket());
+            retVal.setContractMarket(new AtbMonthlyContractMarket());
         }
 
         if (!foundUnitMarket) {
@@ -588,6 +551,21 @@ public class CampaignXmlParser {
 
         retVal.setUnitRating(null);
 
+        // this is used to handle characters from pre-50.01 campaigns
+        retVal.getPersonnel().stream()
+                    .filter(person -> person.getJoinedCampaign() == null)
+                    .forEach(person -> {
+                        if (person.getRecruitment() != null) {
+                            person.setJoinedCampaign(person.getRecruitment());
+                            logger.info("{} doesn't have a date recorded showing when they joined the campaign. Using recruitment date.",
+                                    person.getFullTitle());
+                        } else {
+                            person.setJoinedCampaign(retVal.getLocalDate());
+                            logger.info("{} doesn't have a date recorded showing when they joined the campaign. Using current date.",
+                                    person.getFullTitle());
+                        }
+                    });
+
         logger.info("Load of campaign file complete!");
 
         return retVal;
@@ -616,8 +594,7 @@ public class CampaignXmlParser {
                     tech.removeTechUnit(u);
                 }
                 if (null != reason) {
-                    logger
-                            .warn(String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
+                    logger.warn(String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
                 }
             }
         }
@@ -883,9 +860,7 @@ public class CampaignXmlParser {
             if (!wn2.getNodeName().equalsIgnoreCase("person")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                String message = String.format("Unknown node type not loaded in Personnel nodes: {}",
-                        wn2.getNodeName());
-                logger.error(message);
+                logger.error("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
 
                 continue;
             }
@@ -957,6 +932,11 @@ public class CampaignXmlParser {
         retVal.useStoryArc(storyArc, false);
     }
 
+    private static void processFameAndInfamyNodes(Campaign relativeValue, Node workingNode) {
+        logger.info("Loading Fame and Infamy Nodes from XML...");
+        FameAndInfamyController.parseFromXML(workingNode.getChildNodes(), relativeValue);
+    }
+
     private static void processSpecialAbilityNodes(Campaign retVal, Node wn, Version version) {
         logger.info("Loading Special Ability Nodes from XML...");
 
@@ -979,8 +959,7 @@ public class CampaignXmlParser {
             if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                logger
-                        .error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
+                logger.error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
                 continue;
             }
             SpecialAbility.generateInstanceFromXML(wn2, options, version);
@@ -1032,16 +1011,14 @@ public class CampaignXmlParser {
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
-                logger
-                        .error("Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
+                logger.error("Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
                 return false;
             }
         }
         File customsDirCampaign = new File(sCustomsDirCampaign);
         if (!customsDirCampaign.exists()) {
             if (!customsDirCampaign.mkdir()) {
-                logger.error(
-                        "Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
+                logger.error("Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
                 return false;
             }
         }
@@ -1581,9 +1558,9 @@ public class CampaignXmlParser {
         }
     }
 
-    // region Migration Methods
-    // region Ancestry Migration
-    private static Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
+    //region Migration Methods
+    //region Ancestry Migration
+    private static final Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
 
     /**
      * This method is used to add people to the ancestry migration map that is used
@@ -1651,8 +1628,7 @@ public class CampaignXmlParser {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
                     father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
                 } else {
-                    logger.warn(
-                            "Person with id " + father.getId() + "does not exist, skipping adding Genealogy for them.");
+                    logger.warn("Person with id " + father.getId() + "does not exist, skipping adding Genealogy for them.");
                 }
 
                 if (mother == null) {
@@ -1661,8 +1637,7 @@ public class CampaignXmlParser {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
                     mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
                 } else {
-                    logger.warn("Person with id " + mother.getId()
-                            + " does not exist, skipping adding Genealogy for them.");
+                    logger.warn("Person with id " + mother.getId() + " does not exist, skipping adding Genealogy for them.");
                 }
             }
         }

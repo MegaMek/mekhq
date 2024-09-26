@@ -123,6 +123,7 @@ public class Person {
 
     private String biography;
     private LocalDate birthday;
+    private LocalDate joinedCampaign;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
     private LocalDate dateOfDeath;
@@ -148,6 +149,7 @@ public class Person {
     private Money salary;
     private Money totalEarnings;
     private int hits;
+    private int hitsPrior;
     private PrisonerStatus prisonerStatus;
 
     // Supports edge usage by a ship's engineer composite crewman
@@ -354,10 +356,12 @@ public class Person {
         status = PersonnelStatus.ACTIVE;
         prisonerStatus = PrisonerStatus.FREE;
         hits = 0;
+        hitsPrior = 0;
         toughness = 0;
         resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
         dateOfDeath = null;
         recruitment = null;
+        joinedCampaign = null;
         lastRankChangeDate = null;
         autoAwardSupportPoints = 0;
         retirement = null;
@@ -891,7 +895,7 @@ public class Person {
         return getSecondaryRole().getName(isClanPersonnel());
     }
 
-    public boolean canPerformRole(final PersonnelRole role, final boolean primary) {
+    public boolean canPerformRole(LocalDate today, Person person, final PersonnelRole role, final boolean primary) {
         if (primary) {
             // Primary Role:
             // We only do a few here, as it is better on the UX-side to correct the issues
@@ -925,6 +929,10 @@ public class Person {
                     || (role.isMedic() && getPrimaryRole().isMedicalStaff())) {
                 return false;
             }
+        }
+
+        if (person.isChild(today)) {
+            return false;
         }
 
         return switch (role) {
@@ -1001,7 +1009,7 @@ public class Person {
                     campaign.addReport(String.format(resources.getString("recoveredPoW.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.recoveredPoW(this, campaign.getLocalDate());
-                } else if (getStatus().isOnLeave()) {
+                } else if (getStatus().isOnLeave() || getStatus().isOnMaternityLeave()) {
                     campaign.addReport(String.format(resources.getString("returnedFromLeave.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
@@ -1373,6 +1381,14 @@ public class Person {
         }
 
         return Math.toIntExact(ChronoUnit.YEARS.between(getDateOfBirth(), today));
+    }
+
+    public @Nullable LocalDate getJoinedCampaign() {
+        return joinedCampaign;
+    }
+
+    public void setJoinedCampaign(final @Nullable LocalDate joinedCampaign) {
+        this.joinedCampaign = joinedCampaign;
     }
 
     public @Nullable LocalDate getRecruitment() {
@@ -2032,6 +2048,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hits", hits);
             }
 
+            if (hitsPrior > 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hitsPrior", hitsPrior);
+            }
+
             if (toughness != 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "toughness", toughness);
             }
@@ -2046,6 +2066,8 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "birthday", getDateOfBirth());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deathday", getDateOfDeath());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitment", getRecruitment());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "joinedCampaign", getJoinedCampaign());
+
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoAwardSupportPoints", getAutoAwardSupportPoints());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
@@ -2332,6 +2354,8 @@ public class Person {
                     retVal.nTasks = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     retVal.hits = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("hitsPrior")) {
+                    retVal.hitsPrior = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
                     retVal.setGender(Gender.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
@@ -2374,6 +2398,8 @@ public class Person {
                     retVal.dateOfDeath = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
                     retVal.recruitment = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("joinedCampaign")) {
+                    retVal.joinedCampaign = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
                     retVal.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoAwardSupportPoints")) {
@@ -3397,6 +3423,22 @@ public class Person {
 
     public void setHits(final int hits) {
         this.hits = hits;
+    }
+
+    /**
+     * @return the number of hits sustained prior to the last completed scenario.
+     */
+    public int getHitsPrior() {
+        return hitsPrior;
+    }
+
+    /**
+     * Sets the number of hits sustained prior to the last completed scenario.
+     *
+     * @param hitsPrior the new value for {@code hitsPrior}
+     */
+    public void setHitsPrior(final int hitsPrior) {
+        this.hitsPrior = hitsPrior;
     }
 
     /**

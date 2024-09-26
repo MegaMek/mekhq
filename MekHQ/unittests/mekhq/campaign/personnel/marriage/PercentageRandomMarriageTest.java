@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,44 +45,22 @@ public class PercentageRandomMarriageTest {
     public void beforeEach() {
         when(mockOptions.isUseClanPersonnelMarriages()).thenReturn(false);
         when(mockOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomSameSexMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
-        when(mockOptions.getPercentageRandomMarriageOppositeSexChance()).thenReturn(0.5);
-        when(mockOptions.getPercentageRandomMarriageSameSexChance()).thenReturn(0.5);
+        when(mockOptions.getRandomMarriageDiceSize()).thenReturn(5);
     }
 
     @Test
-    public void testRandomOppositeSexMarriage() {
-        final PercentageRandomMarriage percentageRandomMarriage = new PercentageRandomMarriage(mockOptions);
-        // This ignores the person, so just using a mocked person
-        // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
-        try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomFloat).thenReturn(0f);
-            assertTrue(percentageRandomMarriage.randomOppositeSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.49f);
-            assertTrue(percentageRandomMarriage.randomOppositeSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.5f);
-            assertFalse(percentageRandomMarriage.randomOppositeSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(1f);
-            assertFalse(percentageRandomMarriage.randomOppositeSexMarriage(mockPerson));
-        }
-    }
+    public void testRandomMarriage() {
+        final RandomMarriage randomMarriage = new RandomMarriage(mockOptions);
 
-    @Test
-    public void testRandomSameSexMarriage() {
-        final PercentageRandomMarriage percentageRandomMarriage = new PercentageRandomMarriage(mockOptions);
-        // This ignores the person, so just using a mocked person
-        // Testing Minimum (0f), Below Value (0.49f), At Value (0.5f), and Maximum (1f)
+        int diceSize = 5;
+
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
-            compute.when(Compute::randomFloat).thenReturn(0f);
-            assertTrue(percentageRandomMarriage.randomSameSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.49f);
-            assertTrue(percentageRandomMarriage.randomSameSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(0.5f);
-            assertFalse(percentageRandomMarriage.randomSameSexMarriage(mockPerson));
-            compute.when(Compute::randomFloat).thenReturn(1f);
-            assertFalse(percentageRandomMarriage.randomSameSexMarriage(mockPerson));
+            compute.when(() -> Compute.randomInt(diceSize)).thenReturn(0);
+            assertTrue(randomMarriage.randomMarriage());
+            compute.when(() -> Compute.randomInt(diceSize)).thenReturn(1);
+            assertFalse(randomMarriage.randomMarriage());
         }
     }
 }

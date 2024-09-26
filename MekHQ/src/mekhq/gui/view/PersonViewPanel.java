@@ -18,25 +18,6 @@
  */
 package mekhq.gui.view;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.campaign.personnel.Person.getLoyaltyName;
-
-import java.awt.*;
-import java.awt.Dialog.ModalityType;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-
-import javax.accessibility.AccessibleRelation;
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
@@ -48,11 +29,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -65,9 +42,23 @@ import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
-import mekhq.gui.utilities.ImageHelpers;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
+
+import javax.accessibility.AccessibleRelation;
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.Dialog.ModalityType;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.personnel.Person.getLoyaltyName;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -440,11 +431,13 @@ public class PersonViewPanel extends JScrollablePanel {
     private JPanel drawMedals() {
         JPanel pnlMedals = new JPanel();
 
-        List<Award> awards = person.getAwardController()
-                .getAwards()
-                .stream().filter(a -> a.getNumberOfMedalFiles() > 0)
-                .sorted()
-                .toList();
+        List<Award> awards = new ArrayList<>();
+        for (Award award : person.getAwardController().getAwards()) {
+            if (award.getNumberOfMedalFiles() > 0) {
+                awards.add(award);
+            }
+        }
+        Collections.sort(awards);
 
         for (Award award : awards) {
             JLabel medalLabel = new JLabel();
@@ -466,14 +459,11 @@ public class PersonViewPanel extends JScrollablePanel {
                 int height = medal.getHeight(null);
 
                 if (width == height) {
-                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(45, 45),
-                            Image.SCALE_DEFAULT);
+                    medal = medal.getScaledInstance(40, 40, Image.SCALE_FAST);
                 } else if (width < height) {
-                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60),
-                            Image.SCALE_DEFAULT);
+                    medal = medal.getScaledInstance(20, 40, Image.SCALE_FAST);
                 } else {
-                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(60, 30),
-                            Image.SCALE_DEFAULT);
+                    medal = medal.getScaledInstance(40, 20, Image.SCALE_FAST);
                 }
 
                 medalLabel.setIcon(new ImageIcon(medal));
@@ -491,36 +481,52 @@ public class PersonViewPanel extends JScrollablePanel {
      * Draws the misc awards below the medals.
      */
     private JPanel drawMiscAwards() {
-        JPanel pnlMiscAwards = new JPanel();
-        ArrayList<Award> awards = person.getAwardController().getAwards().stream()
-                .filter(a -> a.getNumberOfMiscFiles() > 0)
-                .collect(Collectors.toCollection(ArrayList::new));
+        JPanel pnlMiscs = new JPanel();
+
+        List<Award> awards = new ArrayList<>();
+        for (Award award : person.getAwardController().getAwards()) {
+            if (award.getNumberOfMiscFiles() > 0) {
+                awards.add(award);
+            }
+        }
+        Collections.sort(awards);
 
         for (Award award : awards) {
             JLabel miscLabel = new JLabel();
 
-            Image miscAward;
+            Image misc;
             try {
-                int maximumTiers = award.getNumberOfMiscFiles();
+                int maximumTiers = award.getNumberOfMedalFiles();
                 int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String miscFileName = award.getMiscFileName(awardTierCount);
 
-                Image miscAwardBufferedImage = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                        .getItem(award.getSet() + "/misc/", miscFileName);
-                if (miscAwardBufferedImage == null) {
+                misc = (Image) MHQStaticDirectoryManager.getAwardIcons()
+                    .getItem(award.getSet() + "/misc/", miscFileName);
+                if (misc == null) {
                     continue;
                 }
-                miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
-                        Image.SCALE_DEFAULT);
-                miscLabel.setIcon(new ImageIcon(miscAward));
+
+                int width = misc.getWidth(null);
+                int height = misc.getHeight(null);
+
+                if (width == height) {
+                    misc = misc.getScaledInstance(40, 40, Image.SCALE_FAST);
+                } else if (width < height) {
+                    misc = misc.getScaledInstance(20, 40, Image.SCALE_FAST);
+                } else {
+                    misc = misc.getScaledInstance(40, 20, Image.SCALE_FAST);
+                }
+
+                miscLabel.setIcon(new ImageIcon(misc));
                 miscLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
-                pnlMiscAwards.add(miscLabel);
+                pnlMiscs.add(miscLabel);
             } catch (Exception e) {
                 logger.error("", e);
             }
         }
-        return pnlMiscAwards;
+
+        return pnlMiscs;
     }
 
     /**
@@ -967,7 +973,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             lblSpouse2.setName("lblSpouse2");
             lblSpouse1.setLabelFor(lblSpouse2);
-            lblSpouse2.setText(String.format("<html>%s</html>", spouse.getHyperlinkedName()));
+            lblSpouse2.setText(String.format("<html>%s</html>", spouse.getHyperlinkedFullTitle()));
             lblSpouse2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             lblSpouse2.addMouseListener(new MouseAdapter() {
                 @Override
@@ -997,16 +1003,21 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
-            for (FormerSpouse formerSpouse : person.getGenealogy().getFormerSpouses()) {
+            List<FormerSpouse> formerSpouses = person.getGenealogy().getFormerSpouses();
+            Collections.reverse(person.getGenealogy().getFormerSpouses());
+
+            for (FormerSpouse formerSpouse : formerSpouses) {
                 Person ex = formerSpouse.getFormerSpouse();
+                String name = getRelativeName(ex);
+
                 gridBagConstraints.gridy = firsty;
                 lblFormerSpouses2 = new JLabel();
                 lblFormerSpouses2.setName("lblFormerSpouses2");
                 lblFormerSpouses2.getAccessibleContext().getAccessibleRelationSet().add(
                         new AccessibleRelation(AccessibleRelation.LABELED_BY, lblFormerSpouses1));
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
-                        ex.getFullName(), formerSpouse.getReason(),
+                lblFormerSpouses2.setText(String.format("<html>%s, %s, %s</html>",
+                        name, formerSpouse.getReason(),
                         MekHQ.getMHQOptions().getDisplayFormattedDate(formerSpouse.getDate())));
                 lblFormerSpouses2.addMouseListener(new MouseAdapter() {
                     @Override
@@ -1036,13 +1047,15 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.insets = new Insets(0, 10, 0, 0);
 
                 for (Person child : children) {
+                    String name = getRelativeName(child);
+
                     gridBagConstraints.gridy = firsty;
                     lblChildren2 = new JLabel();
                     lblChildren2.setName("lblChildren2");
                     lblChildren2.getAccessibleContext().getAccessibleRelationSet().add(
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblChildren1));
                     lblChildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblChildren2.setText(String.format("<html><a href='#'>%s</a></html>", child.getFullName()));
+                    lblChildren2.setText(String.format("<html>%s</html>", name));
                     lblChildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -1074,14 +1087,15 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
                 for (Person grandchild : grandchildren) {
+                    String name = getRelativeName(grandchild);
+
                     gridBagConstraints.gridy = firsty;
                     lblGrandchildren2 = new JLabel();
                     lblGrandchildren2.setName("lblGrandchildren2");
                     lblGrandchildren2.getAccessibleContext().getAccessibleRelationSet().add(
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandchildren1));
                     lblGrandchildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblGrandchildren2
-                            .setText(String.format("<html><a href='#'>%s</a></html>", grandchild.getFullName()));
+                    lblGrandchildren2.setText(String.format("<html>%s</html>", name));
                     lblGrandchildren2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -1141,8 +1155,10 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
                 for (Person sibling : siblings) {
+                    String name = getRelativeName(sibling);
+
                     gridBagConstraints.gridy = firsty;
-                    lblSiblings2 = new JLabel(String.format("<html>%s</html>", sibling.getHyperlinkedName()));
+                    lblSiblings2 = new JLabel(String.format("<html>%s</html>", name));
                     lblSiblings2.setName("lblSiblings2");
                     lblSiblings2.getAccessibleContext().getAccessibleRelationSet().add(
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblSiblings1));
@@ -1179,9 +1195,11 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
                 for (Person grandparent : grandparents) {
+                    String name = getRelativeName(grandparent);
+
                     gridBagConstraints.gridy = firsty;
                     lblGrandparents2 = new JLabel(String.format("<html>%s</html>",
-                            grandparent.getHyperlinkedName()));
+                            name));
                     lblGrandparents2.setName("lblGrandparents2");
                     lblGrandparents2.getAccessibleContext().getAccessibleRelationSet().add(
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandparents1));
@@ -1217,9 +1235,11 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
                 for (Person auntOrUncle : auntsAndUncles) {
+                    String name = getRelativeName(auntOrUncle);
+
                     gridBagConstraints.gridy = firsty;
                     lblAuntsOrUncles2 = new JLabel(String.format("<html>%s</html>",
-                            auntOrUncle.getHyperlinkedName()));
+                            name));
                     lblAuntsOrUncles2.setName("lblAuntsOrUncles2");
                     lblAuntsOrUncles2.getAccessibleContext().getAccessibleRelationSet().add(
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAuntsOrUncles1));
@@ -1255,13 +1275,15 @@ public class PersonViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 
                 for (Person cousin : cousins) {
+                    String name = getRelativeName(cousin);
+
                     gridBagConstraints.gridy = firsty;
                     lblCousins2 = new JLabel();
                     lblCousins2.setName("lblCousins2");
                     lblCousins2.getAccessibleContext().getAccessibleRelationSet().add(
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblCousins1));
                     lblCousins2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    lblCousins2.setText(String.format("<html>%s</html>", cousin.getHyperlinkedName()));
+                    lblCousins2.setText(String.format("<html>%s</html>", name));
                     lblCousins2.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -1275,6 +1297,21 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         return pnlFamily;
+    }
+
+    /**
+     * If the relative has joined the campaign, the hyperlinked full title is returned.
+     * Otherwise, the full name of the relative is returned.
+     *
+     * @param relative The relative.
+     * @return The relative's name.
+     */
+    private static String getRelativeName(Person relative) {
+        if (relative.getJoinedCampaign() == null) {
+            return relative.getFirstName();
+        } else {
+            return "<a href='#'>" + relative.getHyperlinkedFullTitle() + "</a>";
+        }
     }
 
     private JPanel fillSkills() {
@@ -1882,7 +1919,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     /**
      * Gets the advanced medical effects active for the person.
-     * 
+     *
      * @return an HTML encoded string of effects
      */
     private String getAdvancedMedalEffectString(Person p) {

@@ -1,7 +1,7 @@
 /*
  * GMToolsDialog.java
  *
- * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1369,16 +1369,14 @@ public class GMToolsDialog extends AbstractMHQDialog {
         getLblCurrentName().setText(getPerson().getFullName());
 
         // Gender is set based on the person's gender
-        getComboGender().setSelectedItem(getPerson().getGender().isExternal() ? getPerson().getGender()
-                : getPerson().getGender().getExternalVariant());
+        getComboGender().setSelectedItem(getPerson().getGender());
 
         // Current Callsign is set if applicable
         if (!StringUtility.isNullOrBlank(getPerson().getCallsign())) {
             getLblCurrentCallsign().setText(getPerson().getCallsign());
         }
 
-        // We set the clan personnel value based on whether or not the person is clan
-        // personell
+        // We set the clan personnel value based on whether the person is clan personnel
         getChkClanPersonnel().setSelected(getPerson().isClanPersonnel());
 
         // Now we figure out the person's origin faction

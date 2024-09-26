@@ -1470,6 +1470,7 @@ public class ResolveScenarioTracker {
                             campaign.getCampaignOptions().getFatigueRate() * (status.getHits() - person.getHits()));
                 }
 
+                person.setHitsPrior(person.getHits());
                 person.setHits(status.getHits());
             }
 

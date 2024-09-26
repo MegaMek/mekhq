@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -299,20 +299,20 @@ public class AbstractProcreationTest {
 
     @Test
     public void testAddPregnancy() {
-        doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any());
-        doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any(), anyInt());
+        doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any(), eq(false));
+        doCallRealMethod().when(mockProcreation).addPregnancy(any(), any(), any(), anyInt(), eq(false));
 
         final Person mother = new Person(mockCampaign);
         final Person father = new Person(mockCampaign);
 
         when(mockProcreation.determineNumberOfBabies(anyInt())).thenReturn(0);
-        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother);
+        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, false);
         assertNull(mother.getExpectedDueDate());
         assertNull(mother.getDueDate());
         assertTrue(mother.getExtraData().isEmpty());
 
         when(mockCampaignOptions.isLogProcreation()).thenReturn(false);
-        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 1);
+        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 1, false);
         assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
         assertNotNull(mother.getDueDate());
         assertFalse(mother.getExtraData().isEmpty());
@@ -321,7 +321,7 @@ public class AbstractProcreationTest {
         assertEquals(1, mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
 
         when(mockCampaignOptions.isLogProcreation()).thenReturn(true);
-        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 2);
+        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 2, false);
         assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
         assertNotNull(mother.getDueDate());
         assertFalse(mother.getExtraData().isEmpty());
@@ -330,7 +330,7 @@ public class AbstractProcreationTest {
         assertEquals(2, mother.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
 
         mother.getGenealogy().setSpouse(father);
-        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 10);
+        mockProcreation.addPregnancy(mockCampaign, LocalDate.ofYearDay(3025, 1), mother, 10, false);
         assertEquals(LocalDate.ofYearDay(3025, 281), mother.getExpectedDueDate());
         assertNotNull(mother.getDueDate());
         assertFalse(mother.getExtraData().isEmpty());
@@ -447,41 +447,28 @@ public class AbstractProcreationTest {
 
     //region New Day
     @Test
-    public void testProcessNewDay() {
-        doCallRealMethod().when(mockProcreation).processNewDay(any(), any(), any());
+    public void testProcessNewWeek() {
+        doCallRealMethod().when(mockProcreation).processNewWeek(any(), any(), any());
         doNothing().when(mockProcreation).birth(any(), any(), any());
-        doNothing().when(mockProcreation).addPregnancy(any(), any(), any());
 
         final Person mockPerson = mock(Person.class);
 
         when(mockPerson.getGender()).thenReturn(Gender.MALE);
-        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockPerson, never()).isPregnant();
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
 
         when(mockPerson.getGender()).thenReturn(Gender.FEMALE);
         when(mockPerson.isPregnant()).thenReturn(true);
         when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 2));
-        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockProcreation, never()).birth(any(), any(), any());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
 
         when(mockPerson.getDueDate()).thenReturn(LocalDate.ofYearDay(3025, 1));
-        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
+        mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockProcreation, times(1)).birth(any(), any(), any());
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
-
-        when(mockPerson.isPregnant()).thenReturn(false);
-
-        when(mockProcreation.randomlyProcreates(any(), any())).thenReturn(false);
-        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockProcreation, times(1)).birth(any(), any(), any());
-        verify(mockProcreation, times(1)).randomlyProcreates(any(), any());
-
-        when(mockProcreation.randomlyProcreates(any(), any())).thenReturn(true);
-        mockProcreation.processNewDay(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
-        verify(mockProcreation, times(2)).randomlyProcreates(any(), any());
-        verify(mockProcreation, times(1)).addPregnancy(any(), any(), any());
     }
 
     //region Random Procreation
@@ -494,18 +481,19 @@ public class AbstractProcreationTest {
         when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn("Pregnant");
         assertFalse(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
 
+        reset(mockProcreation);
+        doCallRealMethod().when(mockProcreation).randomlyProcreates(any(), any());
+
         when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn(null);
         when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(false);
         assertFalse(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
 
-        when(mockProcreation.isUseRelationshiplessProcreation()).thenReturn(true);
-        when(mockProcreation.relationshiplessProcreation(any())).thenReturn(true);
-        assertTrue(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
+        reset(mockProcreation);
+        doCallRealMethod().when(mockProcreation).randomlyProcreates(any(), any());
 
         person.getGenealogy().setSpouse(mock(Person.class));
-        when(mockProcreation.relationshipProcreation(any())).thenReturn(true);
+        when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn(null);
+        when(mockProcreation.procreation(any())).thenReturn(true);
         assertTrue(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
     }
-    //endregion Random Procreation
-    //endregion New Day
 }
