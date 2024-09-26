@@ -13,20 +13,14 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.options.*;
+import megamek.logging.MMLogger;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.options.AbstractOptionsInfo;
-import megamek.common.options.IBasicOptionGroup;
-import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
-import megamek.common.options.IOptionInfo;
-import megamek.common.options.OptionsConstants;
-import megamek.common.options.PilotOptions;
-import megamek.logging.MMLogger;
 
 /**
  * An extension of PilotOptions that adds MekHQ-specific SPAs and edge triggers
@@ -45,7 +39,6 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
 
-    public static final String TECH_CLAN_TECH_KNOWLEDGE = "clan_tech_knowledge";
     public static final String TECH_WEAPON_SPECIALIST = "tech_weapon_specialist";
     public static final String TECH_ARMOR_SPECIALIST = "tech_armor_specialist";
     public static final String TECH_INTERNAL_SPECIALIST = "tech_internal_specialist";
@@ -89,7 +82,6 @@ public class PersonnelOptions extends PilotOptions {
         }
 
         // Add MekHQ-specific options
-        addOption(l3a, TECH_CLAN_TECH_KNOWLEDGE, false);
         addOption(l3a, TECH_WEAPON_SPECIALIST, false);
         addOption(l3a, TECH_ARMOR_SPECIALIST, false);
         addOption(l3a, TECH_INTERNAL_SPECIALIST, false);

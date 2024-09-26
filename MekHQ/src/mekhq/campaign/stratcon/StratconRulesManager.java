@@ -574,8 +574,13 @@ public class StratconRulesManager {
     }
 
     /**
-     * Worker function that processes the effects of deploying a reinforcement force
-     * to a scenario
+     * Worker function that processes the effects of deploying a reinforcement force to a scenario
+     *
+     * @param reinforcementType the type of reinforcement being deployed
+     * @param campaignState the state of the campaign
+     * @param scenario the current scenario
+     * @param campaign the campaign instance
+     * @return {@code true} if the reinforcement deployment is successful, {@code false} otherwise
      */
     public static boolean processReinforcementDeployment(ReinforcementEligibilityType reinforcementType,
             StratconCampaignState campaignState, StratconScenario scenario, Campaign campaign) {
@@ -594,9 +599,6 @@ public class StratconRulesManager {
             case SupportPoint:
                 if (campaignState.getSupportPoints() > 0) {
                     campaignState.useSupportPoint();
-                    return true;
-                } else if (campaignState.getVictoryPoints() > 0) {
-                    campaignState.updateVictoryPoints(-1);
                     return true;
                 }
 
@@ -768,36 +770,6 @@ public class StratconRulesManager {
             }
         }
         return retVal;
-    }
-
-    /**
-     * Determine whether the user should be nagged about unresolved scenarios on AtB
-     * Stratcon tracks.
-     *
-     * @param campaign Campaign to check.
-     * @return An informative string containing the reasons the user was nagged.
-     */
-    public static String nagUnresolvedContacts(Campaign campaign) {
-        String sb = "";
-
-        // check every track attached to an active contract for unresolved scenarios
-        // to which the player must deploy forces today
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            if (contract.getStratconCampaignState() == null) {
-                continue;
-            }
-
-            for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
-                // "scenario name, track name"
-                sb = track.getScenarios().values().stream()
-                        .filter(scenario -> (scenario.getCurrentState() == ScenarioState.UNRESOLVED)
-                                && campaign.getLocalDate().equals(scenario.getDeploymentDate()))
-                        .map(scenario -> String.format("%s, %s\n", scenario.getName(), track.getDisplayableName()))
-                        .collect(Collectors.joining());
-            }
-        }
-
-        return sb;
     }
 
     /**

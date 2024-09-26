@@ -19,17 +19,6 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.EquipmentType;
@@ -49,6 +38,12 @@ import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.mrms.MRMSOption;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author natit
@@ -571,6 +566,8 @@ public class CampaignOptions {
     private boolean generateChases;
 
     // Scenarios
+    private boolean useGenericBattleValue;
+    private boolean useVerboseBidding;
     private boolean doubleVehicles;
     private int opForLanceTypeMeks;
     private int opForLanceTypeMixed;
@@ -1205,6 +1202,8 @@ public class CampaignOptions {
         generateChases = true;
 
         // Scenarios
+        useGenericBattleValue = true;
+        useVerboseBidding = false;
         doubleVehicles = false;
         setOpForLanceTypeMeks(1);
         setOpForLanceTypeMixed(2);
@@ -4259,6 +4258,43 @@ public class CampaignOptions {
         this.clanVehicles = clanVehicles;
     }
 
+    /**
+     * Returns whether Generic BV is being used.
+     *
+     * @return {@code true} if Generic BV is enabled, {@code false} otherwise.
+     */
+    public boolean isUseGenericBattleValue() {
+        return useGenericBattleValue;
+    }
+
+
+    /**
+     * Sets the flag indicating whether BV Balanced bot forces should use Generic BV.
+     *
+     * @param useGenericBattleValue flag indicating whether to use Generic BV
+     */
+    public void setUseGenericBattleValue(final boolean useGenericBattleValue) {
+        this.useGenericBattleValue = useGenericBattleValue;
+    }
+
+    /**
+     * Returns whether the verbose bidding mode is enabled.
+     *
+     * @return {@code true} if verbose bidding is enabled, {@code false} otherwise.
+     */
+    public boolean isUseVerboseBidding() {
+        return useVerboseBidding;
+    }
+
+    /**
+     * Sets the flag indicating whether verbose bidding should be used.
+     *
+     * @param useVerboseBidding flag indicating whether to use verbose bidding
+     */
+    public void setUseVerboseBidding(final boolean useVerboseBidding) {
+        this.useVerboseBidding = useVerboseBidding;
+    }
+
     public boolean isDoubleVehicles() {
         return doubleVehicles;
     }
@@ -5091,6 +5127,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAero", useAero);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVehicles", useVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanVehicles", clanVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useGenericBattleValue", useGenericBattleValue);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVerboseBidding", useVerboseBidding);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doubleVehicles", doubleVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPlayerVehicles", adjustPlayerVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMeks", getOpForLanceTypeMeks());
@@ -6069,6 +6107,10 @@ public class CampaignOptions {
                     retVal.useVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanVehicles")) {
                     retVal.clanVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useGenericBattleValue")) {
+                    retVal.useGenericBattleValue = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useVerboseBidding")) {
+                    retVal.useVerboseBidding = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doubleVehicles")) {
                     retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {

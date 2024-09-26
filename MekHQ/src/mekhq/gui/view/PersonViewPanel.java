@@ -18,25 +18,6 @@
  */
 package mekhq.gui.view;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.campaign.personnel.Person.getLoyaltyName;
-
-import java.awt.*;
-import java.awt.Dialog.ModalityType;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-
-import javax.accessibility.AccessibleRelation;
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
@@ -48,11 +29,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
@@ -65,9 +42,23 @@ import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
-import mekhq.gui.utilities.ImageHelpers;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
+
+import javax.accessibility.AccessibleRelation;
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.Dialog.ModalityType;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.campaign.personnel.Person.getLoyaltyName;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -440,11 +431,13 @@ public class PersonViewPanel extends JScrollablePanel {
     private JPanel drawMedals() {
         JPanel pnlMedals = new JPanel();
 
-        List<Award> awards = person.getAwardController()
-                .getAwards()
-                .stream().filter(a -> a.getNumberOfMedalFiles() > 0)
-                .sorted()
-                .toList();
+        List<Award> awards = new ArrayList<>();
+        for (Award award : person.getAwardController().getAwards()) {
+            if (award.getNumberOfMedalFiles() > 0) {
+                awards.add(award);
+            }
+        }
+        Collections.sort(awards);
 
         for (Award award : awards) {
             JLabel medalLabel = new JLabel();
@@ -466,14 +459,11 @@ public class PersonViewPanel extends JScrollablePanel {
                 int height = medal.getHeight(null);
 
                 if (width == height) {
-                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(45, 45),
-                            Image.SCALE_DEFAULT);
+                    medal = medal.getScaledInstance(40, 40, Image.SCALE_FAST);
                 } else if (width < height) {
-                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60),
-                            Image.SCALE_DEFAULT);
+                    medal = medal.getScaledInstance(20, 40, Image.SCALE_FAST);
                 } else {
-                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(60, 30),
-                            Image.SCALE_DEFAULT);
+                    medal = medal.getScaledInstance(40, 20, Image.SCALE_FAST);
                 }
 
                 medalLabel.setIcon(new ImageIcon(medal));
@@ -491,36 +481,52 @@ public class PersonViewPanel extends JScrollablePanel {
      * Draws the misc awards below the medals.
      */
     private JPanel drawMiscAwards() {
-        JPanel pnlMiscAwards = new JPanel();
-        ArrayList<Award> awards = person.getAwardController().getAwards().stream()
-                .filter(a -> a.getNumberOfMiscFiles() > 0)
-                .collect(Collectors.toCollection(ArrayList::new));
+        JPanel pnlMiscs = new JPanel();
+
+        List<Award> awards = new ArrayList<>();
+        for (Award award : person.getAwardController().getAwards()) {
+            if (award.getNumberOfMiscFiles() > 0) {
+                awards.add(award);
+            }
+        }
+        Collections.sort(awards);
 
         for (Award award : awards) {
             JLabel miscLabel = new JLabel();
 
-            Image miscAward;
+            Image misc;
             try {
-                int maximumTiers = award.getNumberOfMiscFiles();
+                int maximumTiers = award.getNumberOfMedalFiles();
                 int awardTierCount = getAwardTierCount(award, maximumTiers);
 
                 String miscFileName = award.getMiscFileName(awardTierCount);
 
-                Image miscAwardBufferedImage = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                        .getItem(award.getSet() + "/misc/", miscFileName);
-                if (miscAwardBufferedImage == null) {
+                misc = (Image) MHQStaticDirectoryManager.getAwardIcons()
+                    .getItem(award.getSet() + "/misc/", miscFileName);
+                if (misc == null) {
                     continue;
                 }
-                miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
-                        Image.SCALE_DEFAULT);
-                miscLabel.setIcon(new ImageIcon(miscAward));
+
+                int width = misc.getWidth(null);
+                int height = misc.getHeight(null);
+
+                if (width == height) {
+                    misc = misc.getScaledInstance(40, 40, Image.SCALE_FAST);
+                } else if (width < height) {
+                    misc = misc.getScaledInstance(20, 40, Image.SCALE_FAST);
+                } else {
+                    misc = misc.getScaledInstance(40, 20, Image.SCALE_FAST);
+                }
+
+                miscLabel.setIcon(new ImageIcon(misc));
                 miscLabel.setToolTipText(award.getTooltip(campaign.getCampaignOptions(), person));
-                pnlMiscAwards.add(miscLabel);
+                pnlMiscs.add(miscLabel);
             } catch (Exception e) {
                 logger.error("", e);
             }
         }
-        return pnlMiscAwards;
+
+        return pnlMiscs;
     }
 
     /**
@@ -1882,7 +1888,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     /**
      * Gets the advanced medical effects active for the person.
-     * 
+     *
      * @return an HTML encoded string of effects
      */
     private String getAdvancedMedalEffectString(Person p) {

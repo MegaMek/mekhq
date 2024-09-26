@@ -4,11 +4,13 @@ import java.time.LocalDateTime
 
 plugins {
     id 'application'
+    id 'checkstyle'
+    id 'com.palantir.git-version' version '3.1.0'
     id 'edu.sc.seis.launch4j' version '3.0.6'
+    id "io.sentry.jvm.gradle" version "4.11.0"
     id 'jacoco'
     id 'java'
-    id "io.sentry.jvm.gradle" version "4.11.0"
-    id 'com.palantir.git-version' version '3.1.0'
+    id 'org.ec4j.editorconfig' version '0.1.0'
 }
 
 java {
@@ -104,6 +106,12 @@ dependencies {
 
 application {
     mainClass = 'mekhq.MekHQ'
+}
+
+checkstyle {
+    toolVersion '10.18.1'
+    configFile file("config/checkstyle/checkstyle.xml")
+    ignoreFailures false
 }
 
 run {
@@ -386,6 +394,15 @@ jacocoTestReport {
     dependsOn test
     reports {
         xml.required = true
+        html.required = true
+    }
+}
+
+tasks.withType(Checkstyle) {
+    minHeapSize = "200m"
+    maxHeapSize = "1g"
+    reports {
+        xml.required = false
         html.required = true
     }
 }

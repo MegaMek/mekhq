@@ -93,7 +93,7 @@ jobs:
 
       - name: Build with Gradle
         working-directory: mekhq
-        run: ./gradlew build --stacktrace --scan
+        run: ./gradlew build  -x checkstyleMain -x checkstyleTest --stacktrace --scan
 
       - name: Upload Test Logs on Failure
         uses: actions/upload-artifact@v4
@@ -114,8 +114,3 @@ jobs:
         with:
           name: mhq-release-tgz-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
           path: mekhq/MekHQ/build/distributions/*.tar.gz
-#      - name: Upload Zip Release
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: mhq-release-zip-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-#          path: mekhq/MekHQ/build/distributions/*.zip

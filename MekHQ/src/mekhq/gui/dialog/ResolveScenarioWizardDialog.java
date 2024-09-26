@@ -56,6 +56,8 @@ import java.awt.event.*;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.personnel.randomEvents.PersonalityController.writeDescription;
+
 /**
  * @author Taharqa
  */
@@ -513,6 +515,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 }
                 prisonerCapturedCheck.setSelected(wasCaptured);
             }
+
+            // When generating NPC personnel, we use placeholder characters and then later re-assign
+            // their details to match expected values.
+            // This causes a disconnect between their name, at point of creation, and the name
+            // presented to the user.
+            // We therefore need to re-generate the personality description at this point,
+            // as this is the earliest point in which that description is visible to the user
+            writeDescription(status.getPerson());
         }
         pnlMain.add(pnlPrisonerStatus, PRISONERPANEL);
         //endregion Prisoner Status Panel

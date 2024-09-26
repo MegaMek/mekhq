@@ -59,10 +59,9 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.market.ContractMarket;
-import mekhq.campaign.market.PartsStore;
-import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.ShoppingList;
+import mekhq.campaign.market.*;
+import mekhq.campaign.market.contractMarket.AbstractContractMarket;
+import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
@@ -112,6 +111,8 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
+import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
+import mekhq.campaign.universe.fameAndInfamy.FameAndInfamyController;
 import mekhq.campaign.universe.selectors.factionSelectors.AbstractFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.DefaultFactionSelector;
 import mekhq.campaign.universe.selectors.factionSelectors.RangedFactionSelector;
@@ -209,8 +210,7 @@ public class Campaign implements ITechManager {
 
     private Boolean fieldKitchenWithinCapacity;
 
-    // this is updated and used per gaming session, it is enabled/disabled via the
-    // Campaign options
+    // this is updated and used per gaming session, it is enabled/disabled via the Campaign options
     // we're re-using the LogEntry class that is used to store Personnel entries
     public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
 
@@ -239,7 +239,7 @@ public class Campaign implements ITechManager {
     private ShoppingList shoppingList;
 
     private PersonnelMarket personnelMarket;
-    private ContractMarket contractMarket; // AtB
+    private AbstractContractMarket contractMarket;
     private AbstractUnitMarket unitMarket;
 
     private transient AbstractDeath death;
@@ -265,6 +265,7 @@ public class Campaign implements ITechManager {
     private final CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
     private StoryArc storyArc;
+    private FameAndInfamyController fameAndInfamy;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
@@ -317,7 +318,7 @@ public class Campaign implements ITechManager {
         shoppingList = new ShoppingList();
         news = new News(getGameYear(), id.getLeastSignificantBits());
         setPersonnelMarket(new PersonnelMarket());
-        setContractMarket(new ContractMarket());
+        setContractMarket(new AtbMonthlyContractMarket());
         setUnitMarket(new DisabledUnitMarket());
         setDeath(new DisabledRandomDeath(getCampaignOptions(), false));
         setDivorce(new DisabledRandomDivorce(getCampaignOptions()));
@@ -331,6 +332,7 @@ public class Campaign implements ITechManager {
         campaignSummary = new CampaignSummary(this);
         quartermaster = new Quartermaster(this);
         fieldKitchenWithinCapacity = false;
+        fameAndInfamy = new FameAndInfamyController();
     }
 
     /**
@@ -462,13 +464,11 @@ public class Campaign implements ITechManager {
         this.personnelMarket = personnelMarket;
     }
 
-    // TODO : AbstractContractMarket : Swap to AbstractContractMarket
-    public ContractMarket getContractMarket() {
+    public AbstractContractMarket getContractMarket() {
         return contractMarket;
     }
 
-    // TODO : AbstractContractMarket : Swap to AbstractContractMarket
-    public void setContractMarket(final ContractMarket contractMarket) {
+    public void setContractMarket(final AbstractContractMarket contractMarket) {
         this.contractMarket = contractMarket;
     }
 
@@ -1659,8 +1659,7 @@ public class Campaign implements ITechManager {
      * appropriate to the person's phenotype and the player's faction.
      *
      * @param person     The Bloodname candidate
-     * @param ignoreDice If true, skips the random roll and assigns a Bloodname
-     *                   automatically
+     * @param ignoreDice If true, skips the random roll and assigns a Bloodname automatically
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
         // if person is non-clan or does not have a phenotype
@@ -1668,8 +1667,7 @@ public class Campaign implements ITechManager {
             return;
         }
 
-        // Person already has a bloodname, we open up the dialog to ask if they want to
-        // keep the
+        // Person already has a bloodname, we open up the dialog to ask if they want to keep the
         // current bloodname or assign a new one
         if (!person.getBloodname().isEmpty()) {
             int result = JOptionPane.showConfirmDialog(null,
@@ -2216,6 +2214,18 @@ public class Campaign implements ITechManager {
 
     public Person findBestInRole(PersonnelRole role, String skill) {
         return findBestInRole(role, skill, null);
+    }
+
+    public @Nullable Person findBestAtSkill(String skill) {
+        Person person = null;
+        int highest = 0;
+        for (Person p : getActivePersonnel()) {
+            if (p.getSkill(skill) != null && p.getSkill(skill).getLevel() > highest) {
+                highest = p.getSkill(skill).getLevel();
+                person = p;
+            }
+        }
+        return person;
     }
 
     /**
@@ -3520,7 +3530,7 @@ public class Campaign implements ITechManager {
      * and processes ATB scenarios.
      */
     private void processNewDayATB() {
-        contractMarket.generateContractOffers(this); // TODO : AbstractContractMarket : Remove
+        contractMarket.generateContractOffers(this);
 
         if ((getShipSearchExpiration() != null) && !getShipSearchExpiration().isAfter(getLocalDate())) {
             setShipSearchExpiration(null);
@@ -3599,6 +3609,16 @@ public class Campaign implements ITechManager {
                 String report = "<html>Current enemy condition is '" + morale + "' on contract " + contract.getName() + "<br><br>" + morale.getToolTipText() + "</html>";
 
                 addReport(report);
+            }
+        }
+
+        for (AtBContract contract : getActiveAtBContracts()) {
+            if (campaignOptions.isUseGenericBattleValue()) {
+                if (contract.getStartDate().equals(getLocalDate()) && getLocation().isOnPlanet()) {
+                    if (BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
+                        contract.setBatchallAccepted(contract.initiateBatchall(this));
+                    }
+                }
             }
         }
 
@@ -4006,21 +4026,28 @@ public class Campaign implements ITechManager {
 
     /**
      * This method iterates through the list of personnel and deletes the records of
-     * those who have
-     * departed the unit and who match additional checks.
+     * those who have left the unit and who match additional checks.
      */
     public void processPersonnelRemoval() {
-        getPersonnel().stream()
-                .filter(p -> p.getStatus().isDepartedUnit())
-                .forEach(person -> {
-                    PersonnelStatus status = person.getStatus();
+        List<Person> personnelToRemove = new ArrayList<>();
 
-                    if (shouldRemovePerson(person, status)) {
-                        removePerson(person, false);
-                    }
-                });
+        for (Person person : getPersonnel()) {
+            PersonnelStatus status = person.getStatus();
 
-        addReport(resources.getString("personnelRemoval.text"));
+            if (status.isDepartedUnit()) {
+                if (shouldRemovePerson(person, status)) {
+                    personnelToRemove.add(person);
+                }
+            }
+        }
+
+        for (Person person : personnelToRemove) {
+            removePerson(person, false);
+        }
+
+        if (!personnelToRemove.isEmpty()) {
+            addReport(resources.getString("personnelRemoval.text"));
+        }
     }
 
     /**
@@ -4816,6 +4843,10 @@ public class Campaign implements ITechManager {
         return new ArrayList<>();
     }
 
+    public FameAndInfamyController getFameAndInfamy() {
+        return fameAndInfamy;
+    }
+
     public void writeToXML(final PrintWriter pw) {
         int indent = 0;
 
@@ -4951,6 +4982,11 @@ public class Campaign implements ITechManager {
         // current story arc
         if (null != storyArc) {
             storyArc.writeToXml(pw, indent);
+        }
+
+        // Fame and Infamy
+        if (fameAndInfamy != null) {
+            fameAndInfamy.writeToXml(pw, indent);
         }
 
         // Markets
@@ -6487,6 +6523,28 @@ public class Campaign implements ITechManager {
                 : reputation.getAtbModifier();
     }
 
+    public int getReputationFactor() {
+        return switch (campaignOptions.getUnitRatingMethod()) {
+            case NONE -> 5;
+            case FLD_MAN_MERCS_REV -> getAtBUnitRatingMod() * 2;
+            case CAMPAIGN_OPS -> (int) ((getReputation().getReputationRating() * 0.2) + 0.5);
+        };
+    }
+
+    /**
+     * Returns the Strategy skill of the designated commander in the campaign.
+     *
+     * @return The value of the commander's strategy skill if a commander exists, otherwise 0.
+     */
+    public int getCommanderStrategy() {
+        int cmdrStrategy = 0;
+        if (getFlaggedCommander() != null &&
+            getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
+            cmdrStrategy = getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
+        }
+        return cmdrStrategy;
+    }
+
     @Deprecated
     public int getUnitRatingAsInteger() {
         return getAtBUnitRatingMod();
@@ -7546,8 +7604,7 @@ public class Campaign implements ITechManager {
                 LocalDate join = null;
                 for (LogEntry e : p.getPersonnelLog()) {
                     if (join == null) {
-                        // If by some nightmare there is no date from the below, just use the first
-                        // entry.
+                        // If by some nightmare there is no date from the below, just use the first entry.
                         join = e.getDate();
                     }
 
@@ -7557,8 +7614,7 @@ public class Campaign implements ITechManager {
                     }
                 }
 
-                // For that one in a billion chance the log is empty. Clone today's date and
-                // subtract a year
+                // For that one in a billion chance the log is empty. Clone today's date and subtract a year
                 p.setLastRankChangeDate((join != null) ? join : getLocalDate().minusYears(1));
             }
         }
@@ -7670,8 +7726,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Checks if a turnover prompt should be displayed based on campaign options and
-     * current date.
+     * Checks if a turnover prompt should be displayed based on campaign options and current date.
      *
      * @return An integer representing the user's choice:
      *         -1 if turnover prompt should not be displayed.
@@ -7733,9 +7788,15 @@ public class Campaign implements ITechManager {
                 JOptionPane.INFORMATION_MESSAGE,
                 null,
                 options,
-                options[0]);
+                options[0]
+        );
     }
 
+    /**
+     * Checks if there are any scenarios that are due based on the current date.
+     *
+     * @return {@code true} if there are scenarios due, {@code false} otherwise
+     */
     public boolean checkScenariosDue() {
         return getActiveMissions(true).stream()
                 .flatMap(m -> m.getCurrentScenarios().stream())

@@ -51,6 +51,7 @@ import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
+import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
@@ -229,7 +230,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
          * 5 : Units
          * 6 : New Campaign / Campaign Loading
          * 7 : Campaign Application
-         * 
+         *
          * @return The loaded campaign
          * @throws Exception if anything goes wrong
          */
@@ -346,9 +347,11 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
                 // Setup Markets
                 campaign.getPersonnelMarket().generatePersonnelForDay(campaign);
-                // TODO : AbstractContractMarket : Uncomment
-                // campaign.getContractMarket().generateContractOffers(campaign, (preset ==
-                // null) ? 2 : preset.getContractCount());
+                ContractMarketMethod contractMarketMethod = campaign.getCampaignOptions().getContractMarketMethod();
+                campaign.setContractMarket(contractMarketMethod.getContractMarket());
+                if (!contractMarketMethod.isNone()) {
+                    campaign.getContractMarket().generateContractOffers(campaign, true);
+                }
                 if (!campaign.getCampaignOptions().getUnitMarketMethod().isNone()) {
                     campaign.setUnitMarket(campaign.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
                     campaign.getUnitMarket().generateUnitOffers(campaign);

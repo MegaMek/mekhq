@@ -18,43 +18,6 @@
  */
 package mekhq.gui.panes;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.time.LocalDate;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
-import java.util.stream.IntStream;
-
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JSpinner.NumberEditor;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.baseComponents.JDisableablePanel;
@@ -111,6 +74,29 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.RandomOriginOptionsPanel;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.IntStream;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
 
 /**
  * @author Justin 'Windchild' Bowen
@@ -680,6 +666,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkGenerateChases;
 
     // scenarios
+    private JCheckBox chkUseGenericBattleValue;
+    private JCheckBox chkUseVerboseBidding;
     private JCheckBox chkDoubleVehicles;
     private JSpinner spnOpForLanceTypeMeks;
     private JSpinner spnOpForLanceTypeMixed;
@@ -2959,14 +2947,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
 
             // TODO : AbstractContractMarket : Delink more from AtB
-            if (contractMarketPanel.isEnabled() != enabled) {
-                comboContractMarketMethod.setSelectedItem(enabled
-                        ? ContractMarketMethod.ATB_MONTHLY
-                        : ContractMarketMethod.NONE);
-                contractMarketPanel.setEnabled(enabled);
-                comboContractMarketMethod.setEnabled(false); // TODO : AbstractContractMarket : Remove
-                                                             // line
-            }
+//            if (contractMarketPanel.isEnabled() != enabled) {
+//                comboContractMarketMethod.setSelectedItem(enabled
+//                        ? ContractMarketMethod.ATB_MONTHLY
+//                        : ContractMarketMethod.NONE);
+//                contractMarketPanel.setEnabled(enabled);
+//                comboContractMarketMethod.setEnabled(true);
+//            }
         });
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -3226,6 +3213,28 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panSubAtBContract.add(chkGenerateChases, gridBagConstraints);
 
         int yTablePosition = 0;
+        chkUseGenericBattleValue = new JCheckBox(resources.getString("chkUseGenericBattleValue.text"));
+        chkUseGenericBattleValue.setToolTipText(wordWrap(resources.getString("chkUseGenericBattleValue.toolTipText")));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(chkUseGenericBattleValue, gridBagConstraints);
+
+        chkUseVerboseBidding = new JCheckBox(resources.getString("chkUseVerboseBidding.text"));
+        chkUseVerboseBidding.setToolTipText(wordWrap(resources.getString("chkUseVerboseBidding.toolTipText")));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(chkUseVerboseBidding, gridBagConstraints);
+
         chkDoubleVehicles = new JCheckBox(resources.getString("chkDoubleVehicles.text"));
         chkDoubleVehicles.setToolTipText(resources.getString("chkDoubleVehicles.toolTipText"));
         gridBagConstraints = new GridBagConstraints();
@@ -8104,7 +8113,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                     final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof ContractMarketMethod) {
-                    list.setToolTipText(((ContractMarketMethod) value).getToolTipText());
+                    list.setToolTipText(wordWrap(((ContractMarketMethod) value).getToolTipText()));
                 }
                 return this;
             }
@@ -8121,7 +8130,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkContractMarketReportRefresh.setEnabled(enabled);
             spnContractMaxSalvagePercentage.setEnabled(enabled);
         });
-        comboContractMarketMethod.setEnabled(false); // TODO : AbstractContractMarket : Remove line
+        comboContractMarketMethod.setEnabled(true);
 
         lblContractSearchRadius.setText(resources.getString("lblContractSearchRadius.text"));
         lblContractSearchRadius.setToolTipText(resources.getString("lblContractSearchRadius.toolTipText"));
@@ -9046,6 +9055,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         btnIntensityUpdate.doClick();
         chkGenerateChases.setSelected(options.isGenerateChases());
 
+        chkUseGenericBattleValue.setSelected(options.isUseGenericBattleValue());
+        chkUseVerboseBidding.setSelected(options.isUseVerboseBidding());
         chkDoubleVehicles.setSelected(options.isDoubleVehicles());
         spnOpForLanceTypeMeks.setValue(options.getOpForLanceTypeMeks());
         spnOpForLanceTypeMixed.setValue(options.getOpForLanceTypeMixed());
@@ -9634,6 +9645,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseVehicles(chkUseVehicles.isSelected());
             options.setClanVehicles(chkClanVehicles.isSelected());
             options.setAutoConfigMunitions(chkAutoConfigMunitions.isSelected());
+            options.setUseGenericBattleValue(chkUseGenericBattleValue.isSelected());
+            options.setUseVerboseBidding(chkUseVerboseBidding.isSelected());
             options.setDoubleVehicles(chkDoubleVehicles.isSelected());
             options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
             options.setOpForLanceTypeMeks((Integer) spnOpForLanceTypeMeks.getValue());

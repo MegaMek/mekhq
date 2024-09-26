@@ -1,5 +1,5 @@
 /*
-* MegaMek - Copyright (C) 2020 - The MegaMek Team
+* MegaMek - Copyright (C) 2020-2024 - The MegaMek Team
 *
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU General Public License as published by the Free Software
@@ -194,7 +194,7 @@ public class StratconTab extends CampaignGuiTab {
         // current support points
         TrackDropdownItem currentTDI = (TrackDropdownItem) cboCurrentTrack.getSelectedItem();
         if (currentTDI == null) {
-            campaignStatusText.setText("No active contract selected.");
+            campaignStatusText.setText("No active contract selected, or contract has not started.");
             expandedObjectivePanel.setVisible(false);
             return;
         }
@@ -347,7 +347,7 @@ public class StratconTab extends CampaignGuiTab {
                         break;
                     case AnyScenarioVictory:
                         sb.append("Engage and defeat hostile forces in ")
-                            .append(objective.getCurrentObjectiveCount()).append("/")
+                            .append(objective.getCurrentObjectiveCount()).append('/')
                             .append(objective.getDesiredObjectiveCount())
                             .append(" scenarios on ").append(track.getDisplayableName());
                         break;
@@ -471,10 +471,9 @@ public class StratconTab extends CampaignGuiTab {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof TrackDropdownItem)) {
+            if (!(other instanceof TrackDropdownItem otherTDI)) {
                 return false;
             } else {
-                TrackDropdownItem otherTDI = (TrackDropdownItem) other;
                 return otherTDI.contract.equals(this.contract) && otherTDI.track.equals(this.track);
             }
         }
