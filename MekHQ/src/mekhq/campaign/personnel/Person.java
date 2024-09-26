@@ -2497,6 +2497,9 @@ public class Person {
                             logger.error("Unknown node type not loaded in personnel log nodes: {}", wn3.getNodeName());
                             continue;
                         }
+
+                        retVal.getAwardController().addAwardFromXml(AwardsFactory.getInstance()
+                            .generateNewFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
                     NodeList nl2 = wn2.getChildNodes();

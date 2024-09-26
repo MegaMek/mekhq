@@ -18,19 +18,6 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
@@ -41,6 +28,18 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.AwardSet;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class is responsible to control the awards. It loads one instance of
@@ -113,11 +112,9 @@ public class AwardsFactory {
      * Generates a new award from an XML entry (when loading game, for example)
      *
      * @param node                xml node
-     * @param defaultSetMigration whether or not to check if the default set needs
-     *                            to be migrated
      * @return an award
      */
-    public @Nullable Award generateNewFromXML(final Node node, final boolean defaultSetMigration) {
+    public @Nullable Award generateNewFromXML(final Node node) {
         String name = null;
         String set = null;
         List<LocalDate> dates = new ArrayList<>();
@@ -138,10 +135,6 @@ public class AwardsFactory {
             }
         } catch (Exception ex) {
             logger.error("", ex);
-        }
-
-        if (defaultSetMigration && "Default Set".equalsIgnoreCase(set)) {
-            name = (name == null) ? "" : name;
         }
 
         final Award award = generateNew(set, name);
