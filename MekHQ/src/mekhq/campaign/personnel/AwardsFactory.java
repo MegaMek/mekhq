@@ -112,8 +112,6 @@ public class AwardsFactory {
      * Generates a new award from an XML entry (when loading game, for example)
      *
      * @param node                xml node
-     * @param defaultSetMigration whether or not to check if the default set needs
-     *                            to be migrated
      * @return an award
      */
     public @Nullable Award generateNewFromXML(final Node node) {
