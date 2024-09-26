@@ -23,6 +23,7 @@ import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -67,6 +68,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
 
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(UnitTableMouseAdapter.class);
@@ -125,7 +127,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_GM_MOTHBALL = COMMAND_MOTHBALL + COMMAND_GM;
     public static final String COMMAND_GM_ACTIVATE = COMMAND_ACTIVATE + COMMAND_GM;
     public static final String COMMAND_UNDEPLOY = "UNDEPLOY";
-    public static final String COMMAND_HIRE_FULL_GM = COMMAND_HIRE_FULL + COMMAND_GM;
+    public static final String COMMAND_HIRE_FULL_GM_RANDOM = COMMAND_HIRE_FULL + COMMAND_GM;
+    public static final String COMMAND_HIRE_FULL_GM_ELITE = COMMAND_HIRE_FULL + COMMAND_GM + "ELITE";
+    public static final String COMMAND_HIRE_FULL_GM_VETERAN = COMMAND_HIRE_FULL + COMMAND_GM + "VETERAN";
+    public static final String COMMAND_HIRE_FULL_GM_REGULAR = COMMAND_HIRE_FULL + COMMAND_GM + "REGULAR";
+    public static final String COMMAND_HIRE_FULL_GM_GREEN = COMMAND_HIRE_FULL + COMMAND_GM + "GREEN";
+    public static final String COMMAND_HIRE_FULL_GM_ULTRA_GREEN = COMMAND_HIRE_FULL + COMMAND_GM +"ULTRA_GREEN";
     public static final String COMMAND_EDIT_DAMAGE = "EDIT_DAMAGE";
     public static final String COMMAND_RESTORE_UNIT = "RESTORE_UNIT";
     public static final String COMMAND_SET_QUALITY = "SET_QUALITY";
@@ -324,10 +331,30 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         } else if (command.contains(COMMAND_HIRE_FULL)) {
-            boolean isGM = command.equals(COMMAND_HIRE_FULL_GM);
+            boolean isGM = command.contains("GM");
             HirePersonnelUnitAction hireAction = new HirePersonnelUnitAction(isGM);
             for (Unit unit : units) {
                 hireAction.execute(gui.getCampaign(), unit);
+
+                if (command.contains("RANDOM")) {
+                    continue;
+                }
+
+                SkillLevel skillLevel = SkillLevel.REGULAR;
+                if (command.contains("ELITE")) {
+                    skillLevel = SkillLevel.ELITE;
+                } else if (command.contains("VETERAN")) {
+                    skillLevel = SkillLevel.VETERAN;
+                } else if (command.contains("GREEN")) {
+                    skillLevel = SkillLevel.GREEN;
+                } else if (command.contains("ULTRA_GREEN")) {
+                    skillLevel = SkillLevel.ULTRA_GREEN;
+                }
+
+                for (Person person : unit.getCrew()) {
+                    overrideSkills(gui.getCampaign(), person, person.getPrimaryRole(), skillLevel.ordinal());
+                }
+
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
             ((MekLabTab) gui.getTab(MHQTabType.MEK_LAB)).loadUnit(selectedUnit);
@@ -978,10 +1005,39 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (oneAvailableUnitBelowMaxCrew) {
-                    menuItem = new JMenuItem(resources.getString("addMinimumComplement.text"));
-                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM);
+                    JMenu menuMinimumComplement = new JMenu(resources.getString("addMinimumComplement.text"));
+
+                    menuItem = new JMenuItem(resources.getString("addMinimumComplementRandom.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_RANDOM);
                     menuItem.addActionListener(this);
-                    menu.add(menuItem);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("addMinimumComplementElite.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_ELITE);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("addMinimumComplementVeteran.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_VETERAN);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("addMinimumComplementRegular.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_REGULAR);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("addMinimumComplementGreen.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_GREEN);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menuItem = new JMenuItem(resources.getString("addMinimumComplementUltraGreen.text"));
+                    menuItem.setActionCommand(COMMAND_HIRE_FULL_GM_ULTRA_GREEN);
+                    menuItem.addActionListener(this);
+                    menuMinimumComplement.add(menuItem);
+
+                    menu.add(menuMinimumComplement);
                 }
 
                 if (oneSelected) {

@@ -359,10 +359,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             Person person = campaign.newPerson(selectedItem.getRole());
 
             if ((useSkill) && (!selectedItem.getRole().isCivilian()) && (!selectedItem.getRole().isAssistant())) {
-                overrideSkills(
-                        person,
-                        selectedItem.getRole(),
-                        Objects.requireNonNull(skillLevel.getSelectedItem()).ordinal());
+                overrideSkills(campaign, person, selectedItem.getRole(),
+                    Objects.requireNonNull(skillLevel.getSelectedItem()).ordinal());
             }
 
             person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
@@ -416,15 +414,16 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     /**
-     * Replaces the skills for a {@link Person} based on their primary role and
-     * desired experience level.
+     * Replaces the skills for a {@link Person} based on their primary role and desired experience level.
      *
+     * @param campaign    The current campaign
      * @param person      The {@link Person} to add default skills.
      * @param primaryRole The primary role of the person
      * @param expLvl      The experience level of the person (e.g.
      *                    {@link SkillType#EXP_GREEN}).
      */
-    protected void overrideSkills(Person person, PersonnelRole primaryRole, int expLvl) {
+    public static void overrideSkills(Campaign campaign, Person person, PersonnelRole primaryRole,
+                                      int expLvl) {
         switch (primaryRole) {
             case MEKWARRIOR:
                 addSkillFixedExperienceLevel(person, S_PILOT_MEK, expLvl);

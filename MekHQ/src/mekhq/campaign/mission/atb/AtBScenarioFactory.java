@@ -18,14 +18,6 @@
  */
 package mekhq.campaign.mission.atb;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -33,6 +25,9 @@ import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.scenario.*;
+
+import java.time.LocalDate;
+import java.util.*;
 
 public class AtBScenarioFactory {
     private static final MMLogger logger = MMLogger.create(AtBScenarioFactory.class);
@@ -192,7 +187,7 @@ public class AtBScenarioFactory {
 
                     // Don't generate scenarios for contracts with morale below the morale limit of
                     // Low
-                    if (contract.getMoraleLevel().isVeryLow() || contract.getMoraleLevel().isRout()) {
+                    if (contract.getMoraleLevel().isCritical() || contract.getMoraleLevel().isRouted()) {
                         continue;
                     }
 
@@ -222,72 +217,74 @@ public class AtBScenarioFactory {
             }
             // endregion Generate Scenarios
 
-            // region Unbreakable Morale Missions
-            // Make sure Unbreakable morale missions have a base attack scenario generated
-            if (!hasBaseAttack && contract.getMoraleLevel().isUnbreakable()) {
-                /*
-                 * find a lance to act as defender, giving preference
-                 * first to those assigned to the same contract,
-                 * then to those assigned to defense roles
-                 */
-                List<Lance> lList = new ArrayList<>();
-                for (Lance l : lances.values()) {
-                    if ((l.getMissionId() == contract.getId()) && l.getRole().isDefence() && l.isEligible(c)) {
-                        lList.add(l);
-                    }
-                }
-
-                if (lList.isEmpty()) {
+            // region Overwhelming Morale Missions
+            // Make sure Overwhelming morale missions have a base attack scenario generated
+            if (!c.getCampaignOptions().isUseStratCon()) {
+                if (!hasBaseAttack && contract.getMoraleLevel().isOverwhelming()) {
+                    /*
+                     * find a lance to act as defender, giving preference
+                     * first to those assigned to the same contract,
+                     * then to those assigned to defense roles
+                     */
+                    List<Lance> lList = new ArrayList<>();
                     for (Lance l : lances.values()) {
-                        if ((l.getMissionId() == contract.getId()) && l.isEligible(c)) {
+                        if ((l.getMissionId() == contract.getId()) && l.getRole().isDefence() && l.isEligible(c)) {
                             lList.add(l);
                         }
                     }
-                }
 
-                if (lList.isEmpty()) {
-                    for (Lance l : lances.values()) {
-                        if (l.isEligible(c)) {
-                            lList.add(l);
+                    if (lList.isEmpty()) {
+                        for (Lance l : lances.values()) {
+                            if ((l.getMissionId() == contract.getId()) && l.isEligible(c)) {
+                                lList.add(l);
+                            }
                         }
                     }
-                }
 
-                if (!lList.isEmpty()) {
-                    Lance lance = ObjectUtility.getRandomItem(lList);
-                    AtBScenario atbScenario = AtBScenarioFactory.createScenario(c, lance,
-                            AtBScenario.BASEATTACK, false, Lance.getBattleDate(c.getLocalDate()));
-                    if (atbScenario != null) {
-                        if ((lance.getMissionId() == atbScenario.getMissionId())
-                                || (lance.getMissionId() == Lance.NO_MISSION)) {
-                            for (int i = 0; i < sList.size(); i++) {
-                                if (sList.get(i).getLanceForceId() == lance.getForceId()) {
-                                    if (dontGenerateForces.contains(atbScenario.getId())) {
-                                        dontGenerateForces.remove(atbScenario.getId());
+                    if (lList.isEmpty()) {
+                        for (Lance l : lances.values()) {
+                            if (l.isEligible(c)) {
+                                lList.add(l);
+                            }
+                        }
+                    }
+
+                    if (!lList.isEmpty()) {
+                        Lance lance = ObjectUtility.getRandomItem(lList);
+                        AtBScenario atbScenario = AtBScenarioFactory.createScenario(c, lance,
+                                AtBScenario.BASEATTACK, false, Lance.getBattleDate(c.getLocalDate()));
+                        if (atbScenario != null) {
+                            if ((lance.getMissionId() == atbScenario.getMissionId())
+                                    || (lance.getMissionId() == Lance.NO_MISSION)) {
+                                for (int i = 0; i < sList.size(); i++) {
+                                    if (sList.get(i).getLanceForceId() == lance.getForceId()) {
+                                        if (dontGenerateForces.contains(atbScenario.getId())) {
+                                            dontGenerateForces.remove(atbScenario.getId());
+                                        }
+                                        sList.set(i, atbScenario);
+                                        break;
                                     }
-                                    sList.set(i, atbScenario);
-                                    break;
                                 }
+                            } else {
+                                // edge case: lance assigned to another mission gets assigned the scenario,
+                                // we need to remove any scenario they are assigned to already
+                                c.getMission(lance.getMissionId()).getScenarios()
+                                        .removeIf(scenario -> (scenario instanceof AtBScenario)
+                                                && (((AtBScenario) scenario).getLanceForceId() == lance.getForceId()));
+                            }
+                            if (!sList.contains(atbScenario)) {
+                                sList.add(atbScenario);
+                            }
+                            if (!assignedLances.contains(lance.getForceId())) {
+                                assignedLances.add(lance.getForceId());
                             }
                         } else {
-                            // edge case: lance assigned to another mission gets assigned the scenario,
-                            // we need to remove any scenario they are assigned to already
-                            c.getMission(lance.getMissionId()).getScenarios()
-                                    .removeIf(scenario -> (scenario instanceof AtBScenario)
-                                            && (((AtBScenario) scenario).getLanceForceId() == lance.getForceId()));
-                        }
-                        if (!sList.contains(atbScenario)) {
-                            sList.add(atbScenario);
-                        }
-                        if (!assignedLances.contains(lance.getForceId())) {
-                            assignedLances.add(lance.getForceId());
+                            logger.error("Unable to generate Base Attack scenario.");
                         }
                     } else {
-                        logger.error("Unable to generate Base Attack scenario.");
+                        logger.warn("No lances assigned to mission " + contract.getName()
+                                + ". Can't generate an Unbreakable Morale base defense mission for this force.");
                     }
-                } else {
-                    logger.warn("No lances assigned to mission " + contract.getName()
-                            + ". Can't generate an Unbreakable Morale base defense mission for this force.");
                 }
             }
             // endregion Unbreakable Morale Missions
