@@ -36,6 +36,9 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
+        if (contractMods == null) {
+            contractMods = generateContractModifiers(campaign);
+        }
         Optional<AtBContract> c = generateContract(campaign);
         if (c.isPresent()) {
             AtBContract atbContract = c.get();
