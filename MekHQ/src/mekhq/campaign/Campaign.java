@@ -59,7 +59,9 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.market.*;
+import mekhq.campaign.market.PartsStore;
+import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -125,6 +127,7 @@ import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
 import mekhq.service.mrms.MRMSService;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 
 import javax.swing.*;
 import java.io.PrintWriter;
@@ -141,6 +144,7 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomM
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -1663,7 +1667,7 @@ public class Campaign implements ITechManager {
     private void simulateRelationshipHistory(Person person) {
         // how many weeks should the simulation run?
         LocalDate localDate = getLocalDate();
-        long weeksBetween = ChronoUnit.WEEKS.between(person.getBirthday().plusYears(18), localDate);
+        long weeksBetween = ChronoUnit.WEEKS.between(person.getDateOfBirth().plusYears(18), localDate);
 
         // this means there is nothing to simulate
         if (weeksBetween == 0) {
@@ -3787,6 +3791,34 @@ public class Campaign implements ITechManager {
         processNewDayATBScenarios();
     }
 
+    /**
+     * Processes the new day for all active personnel.
+     * <p>
+     * This method loops through all active personnel and performs the necessary actions
+     * for each person for a new day.
+     * <p>
+     * The following tasks are performed for each person:
+     * <ul>
+     *   <li>Death - If the person has died, skip processing further for the dead person.</li>
+     *   <li>Marriage - Process any marriage-related actions.</li>
+     *   <li>Reset minutes left for the person.</li>
+     *   <li>Reset acquisitions made to 0.</li>
+     *   <li>Healing - If the person needs healing and advanced medical is not used,
+     *   decrement the days to wait for healing and heal naturally or with a doctor.</li>
+     *   <li>Advanced Medical - If advanced medical is used, resolve the daily healing for the person.</li>
+     *   <li>Reset current edge points for support personnel on Mondays.</li>
+     *   <li>Idle XP - If idle XP is enabled and it's the first day of the month,
+     *   check if the person qualifies for idle XP and award them if they do.</li>
+     *   <li>Divorce - Process any divorce-related actions.</li>
+     *   <li>Procreation - Process any procreation-related actions.</li>
+     *   <li>Anniversaries - Check if it's the person's birthday or 18th birthday
+     *   and announce it if needed.</li>
+     *   <li>Auto Awards - If it's the first day of the month, calculate the auto award
+     *   support points based on the person's roles and experience level.</li>
+     * </ul>
+     * <p>
+     * Note: This method uses several other methods to perform the specific actions for each task.
+     */
     public void processNewDayPersonnel() {
         // This MUST use getActivePersonnel as we only want to process active personnel, and
         //  furthermore, this allows us to add and remove personnel without issue
@@ -3865,9 +3897,9 @@ public class Campaign implements ITechManager {
 
                         if ((person.getStatus().isOnMaternityLeave()) && (!children.isEmpty())) {
 
-                            children.sort(Comparator.comparing(Person::getBirthday).reversed());
+                            children.sort(Comparator.comparing(Person::getDateOfBirth).reversed());
 
-                            if (getLocalDate().isAfter(children.get(0).getBirthday().plusDays(41))) {
+                            if (getLocalDate().isAfter(children.get(0).getDateOfBirth().plusDays(41))) {
                                 person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
                             }
                         }
@@ -3877,16 +3909,35 @@ public class Campaign implements ITechManager {
 
             // Anniversaries
             if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-                if ((person.getBirthday().isEqual(getLocalDate())) && (campaignOptions.isAnnounceBirthdays())) {
+                if ((person.getBirthday(getGameYear()).isEqual(getLocalDate()))
+                    && (campaignOptions.isAnnounceBirthdays())) {
                     addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                            person.getHyperlinkedFullTitle(),
-                            person.getAge(getLocalDate())));
+                        person.getHyperlinkedFullTitle(),
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        person.getAge(getLocalDate()),
+                        CLOSING_SPAN_TAG));
                 }
-            } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays()) ){
-                if (person.getBirthday().isEqual(getLocalDate())) {
-                    addReport(String.format(resources.getString("anniversaryBirthday.text"),
+
+                LocalDate recruitmentDate = person.getRecruitment();
+                if (recruitmentDate != null) {
+                    LocalDate recruitmentAnniversary = recruitmentDate.withYear(getGameYear());
+                    int yearsOfEmployment = (int) ChronoUnit.YEARS.between(recruitmentDate, currentDay);
+
+                    if ((recruitmentAnniversary.isEqual(getLocalDate()))
+                        && (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
+                        addReport(String.format(resources.getString("anniversaryRecruitment.text"),
                             person.getHyperlinkedFullTitle(),
-                            18));
+                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                            yearsOfEmployment, CLOSING_SPAN_TAG, name));
+                    }
+                }
+            } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
+                if (person.getBirthday(getGameYear()).isEqual(getLocalDate())) {
+                    addReport(String.format(resources.getString("anniversaryBirthday.text"),
+                        person.getHyperlinkedFullTitle(),
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        person.getAge(getLocalDate()),
+                        CLOSING_SPAN_TAG));
                 }
             }
 

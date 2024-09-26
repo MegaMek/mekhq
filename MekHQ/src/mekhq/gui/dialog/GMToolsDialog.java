@@ -20,43 +20,14 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
-
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.function.Predicate;
-
-import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.EntityReadoutDialog;
-import megamek.client.ui.preferences.JComboBoxPreference;
-import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
-import megamek.client.ui.preferences.JTabbedPanePreference;
-import megamek.client.ui.preferences.JTextFieldPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.preferences.*;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.Messages;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
@@ -77,6 +48,19 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.ClanDisplay;
 import mekhq.gui.displayWrappers.FactionDisplay;
 import mekhq.gui.panels.LayeredForceIconCreationPanel;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.function.Predicate;
+
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 
 public class GMToolsDialog extends AbstractMHQDialog {
     private static final MMLogger logger = MMLogger.create(GMToolsDialog.class);
@@ -708,7 +692,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         final DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(Factions.getInstance().getFactions(),
-                (getPerson() == null) ? getGUI().getCampaign().getLocalDate() : getPerson().getBirthday()));
+                (getPerson() == null) ? getGUI().getCampaign().getLocalDate() : getPerson().getDateOfBirth()));
         setComboRATFaction(new MMComboBox<>("comboRATFaction", factionModel));
         getComboRATFaction().setSelectedIndex(0);
         gbc.gridx++;
@@ -854,7 +838,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         final DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(Factions.getInstance().getFactions(),
-                (getPerson() == null) ? getGUI().getCampaign().getLocalDate() : getPerson().getBirthday()));
+                (getPerson() == null) ? getGUI().getCampaign().getLocalDate() : getPerson().getDateOfBirth()));
         setComboNameGeneratorFaction(new MMComboBox<>("comboRATFaction", factionModel));
         getComboNameGeneratorFaction().setSelectedIndex(0);
         gbc.gridx++;
@@ -1396,7 +1380,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         getChkClanPersonnel().setSelected(getPerson().isClanPersonnel());
 
         // Now we figure out the person's origin faction
-        final FactionDisplay faction = new FactionDisplay(getPerson().getOriginFaction(), getPerson().getBirthday());
+        final FactionDisplay faction = new FactionDisplay(getPerson().getOriginFaction(), getPerson().getDateOfBirth());
         getComboRATFaction().setSelectedItem(faction);
         getComboNameGeneratorFaction().setSelectedItem(faction);
 

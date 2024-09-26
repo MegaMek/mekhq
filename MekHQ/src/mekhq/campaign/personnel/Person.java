@@ -329,7 +329,7 @@ public class Person {
         secondaryRole = PersonnelRole.NONE;
         primaryDesignator = ROMDesignation.NONE;
         secondaryDesignator = ROMDesignation.NONE;
-        setBirthday(LocalDate.now());
+        setDateOfBirth(LocalDate.now());
 
         originFaction = Factions.getInstance().getFaction(factionCode);
         originPlanet = null;
@@ -1337,7 +1337,12 @@ public class Person {
         return gender;
     }
 
-    public void setBirthday(final LocalDate birthday) {
+    /**
+     * Sets the date of birth (the date they are born) for the person.
+     *
+     * @param birthday the person's new date of birth
+     */
+    public void setDateOfBirth(final LocalDate birthday) {
         this.birthday = birthday;
     }
 
@@ -1346,8 +1351,18 @@ public class Person {
      *
      * @return a LocalDate representing the person's date of birth
      */
-    public LocalDate getBirthday() {
+    public LocalDate getDateOfBirth() {
         return birthday;
+    }
+
+    /**
+     * Retrieves the birthday for a person, with the year set to the same as the provided year.
+     *
+     * @param currentYear the current in-game year
+     * @return the birthday with the year updated to match the provided year
+     */
+    public LocalDate getBirthday(int currentYear) {
+        return birthday.withYear(currentYear);
     }
 
     public @Nullable LocalDate getDateOfDeath() {
@@ -1365,7 +1380,7 @@ public class Person {
             today = getDateOfDeath();
         }
 
-        return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
+        return Math.toIntExact(ChronoUnit.YEARS.between(getDateOfBirth(), today));
     }
 
     public @Nullable LocalDate getJoinedCampaign() {
@@ -2048,7 +2063,7 @@ public class Person {
             if (overtimeLeft > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtimeLeft", overtimeLeft);
             }
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "birthday", getBirthday());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "birthday", getDateOfBirth());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deathday", getDateOfDeath());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitment", getRecruitment());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "joinedCampaign", getJoinedCampaign());

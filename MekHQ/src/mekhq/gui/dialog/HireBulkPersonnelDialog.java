@@ -369,7 +369,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             if (useAge) {
                 if ((age > maxAgeVal) || (age < minAgeVal)) {
                     LocalDate birthDay = earliestBirthDate.plusDays(Compute.randomInt(days));
-                    person.setBirthday(birthDay);
+                    person.setDateOfBirth(birthDay);
                     age = person.getAge(today);
                 }
 

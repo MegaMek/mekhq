@@ -221,6 +221,6 @@ public abstract class AbstractPersonnelGenerator {
         int nDays = birthday.isLeapYear() ? 366 : 365;
 
         int randomDay = Compute.randomInt(nDays) + 1;
-        person.setBirthday(birthday.withDayOfYear(randomDay));
+        person.setDateOfBirth(birthday.withDayOfYear(randomDay));
     }
 }

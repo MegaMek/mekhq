@@ -18,25 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
@@ -55,20 +36,11 @@ import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.randomEvents.PersonalityController;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Aggression;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Ambition;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Greed;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Intelligence;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.PersonalityQuirk;
-import mekhq.campaign.personnel.randomEvents.enums.personalities.Social;
+import mekhq.campaign.personnel.randomEvents.enums.personalities.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
@@ -81,6 +53,14 @@ import mekhq.gui.control.EditKillLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
 import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.List;
+import java.util.*;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -165,7 +145,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     }
 
     private void initializePilotAndOptions() {
-        birthdate = person.getBirthday();
+        birthdate = person.getDateOfBirth();
         if (person.getRecruitment() != null) {
             recruitment = person.getRecruitment();
         }
@@ -1105,7 +1085,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 int endYear = person.getRecruitment() != null
                         ? Math.min(person.getRecruitment().getYear(), year)
                         : year;
-                if (faction.validBetween(person.getBirthday().getYear(), endYear)) {
+                if (faction.validBetween(person.getDateOfBirth().getYear(), endYear)) {
                     factionsModel.addElement(faction);
                 }
             }
@@ -1130,8 +1110,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         DefaultComboBoxModel<PlanetarySystem> model = new DefaultComboBoxModel<>();
 
         List<PlanetarySystem> orderedSystems = campaign.getSystems().stream()
-                .filter(a -> a.getFactionSet(person.getBirthday()).contains(faction))
-                .sorted(Comparator.comparing(a -> a.getName(person.getBirthday())))
+                .filter(a -> a.getFactionSet(person.getDateOfBirth()).contains(faction))
+                .sorted(Comparator.comparing(a -> a.getName(person.getDateOfBirth())))
                 .toList();
         for (PlanetarySystem system : orderedSystems) {
             model.addElement(system);
@@ -1194,7 +1174,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setGender((Gender) choiceGender.getSelectedItem());
         }
 
-        person.setBirthday(birthdate);
+        person.setDateOfBirth(birthdate);
         person.setRecruitment(recruitment);
         person.setLastRankChangeDate(lastRankChangeDate);
         person.setRetirement(retirement);

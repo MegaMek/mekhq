@@ -20,14 +20,6 @@
  */
 package mekhq.campaign.storyarc.storypoint;
 
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.Enumeration;
-import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -54,6 +46,13 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.CreateCharacterDialog;
 import mekhq.gui.dialog.CreateCharacterDialog.NameRestrictions;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.Enumeration;
+import java.util.UUID;
 
 /**
  * This StoryPoint opens a {@link CreateCharacterDialog CreateCharacterDialog}
@@ -180,7 +179,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPrefs);
         skillGenerator.generateSkills(getCampaign(), p, SkillType.EXP_ULTRA_GREEN);
 
-        p.setBirthday(getCampaign().getLocalDate().minusYears(age));
+        p.setDateOfBirth(getCampaign().getLocalDate().minusYears(age));
 
         // set education
         EducationController.setInitialEducation(campaign, p);
