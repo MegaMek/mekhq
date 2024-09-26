@@ -20,19 +20,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.swing.*;
-
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
@@ -54,6 +41,15 @@ import mekhq.gui.FactionComboBox;
 import mekhq.gui.utilities.JMoneyTextField;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.utilities.MarkdownEditorPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
 
 /**
  * @author Neoancient
@@ -215,7 +211,7 @@ public class CustomizeAtBContractDialog extends JDialog {
                     final boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AtBMoraleLevel) {
-                    list.setToolTipText(((AtBMoraleLevel) value).getToolTipText());
+                    list.setToolTipText(wordWrap(((AtBMoraleLevel) value).getToolTipText()));
                 }
                 return this;
             }

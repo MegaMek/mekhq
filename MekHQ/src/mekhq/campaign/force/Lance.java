@@ -21,19 +21,7 @@
  */
 package mekhq.campaign.force;
 
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.UUID;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.Infantry;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -45,6 +33,13 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * Used by Against the Bot to track additional information about each force
@@ -288,7 +283,7 @@ public class Lance {
         int roll;
         // thresholds are coded from charts with 1-100 range, so we add 1 to mod to
         // adjust 0-based random int
-        int battleTypeMod = 1 + (AtBMoraleLevel.NORMAL.ordinal() - getContract(c).getMoraleLevel().ordinal()) * 5;
+        int battleTypeMod = 1 + (AtBMoraleLevel.STALEMATE.ordinal() - getContract(c).getMoraleLevel().ordinal()) * 5;
         battleTypeMod += getContract(c).getBattleTypeMod();
 
         // debugging code that will allow you to force the generation of a particular

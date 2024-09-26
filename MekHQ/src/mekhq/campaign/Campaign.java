@@ -67,6 +67,7 @@ import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBLanceRole;
+import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mod.am.InjuryUtil;
@@ -3678,6 +3679,17 @@ public class Campaign implements ITechManager {
         }
     }
 
+    /**
+     * Processes the new day actions for various AtB systems
+     * <p>
+     * It generates contract offers in the contract market,
+     * updates ship search expiration and results,
+     * processes ship search on Mondays,
+     * awards training experience to eligible training lances on active contracts on Mondays,
+     * adds or removes dependents at the start of the year if the options are enabled,
+     * rolls for morale at the start of the month,
+     * and processes ATB scenarios.
+     */
     private void processNewDayATB() {
         contractMarket.generateContractOffers(this);
 
@@ -3752,9 +3764,13 @@ public class Campaign implements ITechManager {
             }
 
             for (AtBContract contract : getActiveAtBContracts()) {
-                contract.checkMorale(this, getLocalDate(), getAtBUnitRatingMod());
-                addReport("Enemy Morale is now " + contract.getMoraleLevel()
-                        + " on contract " + contract.getName());
+                contract.checkMorale(this, getLocalDate());
+
+                AtBMoraleLevel morale = contract.getMoraleLevel();
+
+                String report = "<html>Current enemy condition is '" + morale + "' on contract " + contract.getName() + "<br><br>" + morale.getToolTipText() + "</html>";
+
+                addReport(report);
             }
         }
 
