@@ -48,6 +48,7 @@ MEKHQ VERSION HISTORY:
 + Fix #4736: Regenerate Personality Descriptions for NPCs
 + Fix #4721: Removed Automatic Conversion of CVP into SP when Reinforcing in StratCon
 + Fix #4782: Removed TN Modifier for IS Techs working on Clan Tech, Removed Clan Tech Knowledge SPA and Effects #4863
++ PR #4463: Decoupled Dependents from AtB, Reworked Dependents, Reworked New Personnel Ages, Added Documentation
 + PR #4644: Initial work on CamOps RAW Contract Market
 + PR #4859: Reworked AtB Morale, Rebranding it as MekHQ Morale
 + PR #4885: Added Ability to Define Skill Levels When Using GM Hire Minimum Complement
