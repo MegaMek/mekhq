@@ -1060,6 +1060,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JPanel pnlMaintenanceDays = new JPanel();
         pnlMaintenanceDays.add(spnMaintenanceDays);
         pnlMaintenanceDays.add(new JLabel(resources.getString("lblMaintenanceDays.text")));
+        pnlMaintenanceDays.setToolTipText(wordWrap(resources.getString("lblMaintenanceDays.toolTipText")));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
