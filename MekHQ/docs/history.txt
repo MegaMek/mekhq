@@ -57,6 +57,21 @@ MEKHQ VERSION HISTORY:
 + PR #4889: Enhanced Academy Application Failure Report
 + FIX #4890: Change Logger Level from Error to Warn for SPA Loader
 + PR #4894: Multiple Post-Merge Corrections
++ PR #4904: Reduced Idle XP in Campaign Presets
++ Fix #4776: Added Default Maintenance Time Campaign Setting #4905 Fix
++ Fix #4897: Generate contract modifiers when adding contracts individually
++ Fix #4805: Fixed Two Instances of NPE Related to the TO&E #4907 Fix
++ Fix #4807: Added Display for Original Unit to Person View Panel #4908 Fix
++ Fix #4835: Added Clarification to Maintenance Cycle Campaign Setting #4909 fix
++ Fix #4839 && #4488: Loosened Skill Requirements for Vehicle Crewmember Role #4910 fix
++ Fix #4911: Simplified Tech Personnel Checks
++ Fix #4851: Added Several <50.01 Compatibility Handlers to CamOps Reputation Report #4913 Fix
++ Fix #4852: Restored Award Unmarshalling Method Call #4914 Fix
++ Fix #4891: Added <50.01 Compatibility BayType Handlers #4915 Fix
++ Fix #4892: Added <50.01 Compatibility Handler for VeeStabiliser Parts #4916 Fix
++ Fix #4902: Added <50.01 Compatibility Handler for Removed Clan Tech Knowledge SPA
++ Fix #4896: Fixed Random-Camouflage Path Handling for Alternate Directory Format
++ PR #4903: Implement dynamic hiring halls
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
