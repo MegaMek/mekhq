@@ -18,26 +18,8 @@
  */
 package mekhq.campaign.universe.generators.companyGenerators;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
 import megamek.client.generator.RandomCallsignGenerator;
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
@@ -63,6 +45,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
@@ -82,6 +65,14 @@ import mekhq.campaign.universe.selectors.planetSelectors.AbstractPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.DefaultPlanetSelector;
 import mekhq.campaign.universe.selectors.planetSelectors.RangedPlanetSelector;
 import mekhq.campaign.work.WorkTime;
+
+import java.time.LocalDate;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Startup:
@@ -643,18 +634,26 @@ public abstract class AbstractCompanyGenerator {
         // Now that they are recruited, we can simulate backwards a few years and
         // generate marriages
         // and children
+        for (final CompanyGenerationPersonTracker tracker : trackers) {
+            if (tracker.getPerson().getExperienceLevel(campaign, false) > 0) {
+                tracker.getPerson().setEduHighestEducation(EducationLevel.COLLEGE);
+            } else {
+                tracker.getPerson().setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
+            }
+        }
+
         if (getOptions().isRunStartingSimulation()) {
-            LocalDate date = campaign.getLocalDate().minusYears(getOptions().getSimulationDuration()).minusDays(1);
+            LocalDate date = campaign.getLocalDate().minusYears(getOptions().getSimulationDuration()).minusWeeks(1);
             while (date.isBefore(campaign.getLocalDate())) {
-                date = date.plusDays(1);
+                date = date.plusWeeks(1);
 
                 for (final CompanyGenerationPersonTracker tracker : trackers) {
                     if (getOptions().isSimulateRandomMarriages()) {
-                        campaign.getMarriage().processNewDay(campaign, date, tracker.getPerson());
+                        campaign.getMarriage().processNewWeek(campaign, date, tracker.getPerson());
                     }
 
                     if (getOptions().isSimulateRandomProcreation()) {
-                        campaign.getProcreation().processNewDay(campaign, date, tracker.getPerson());
+                        campaign.getProcreation().processNewWeek(campaign, date, tracker.getPerson());
                     }
                 }
             }

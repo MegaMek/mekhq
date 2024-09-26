@@ -25,6 +25,7 @@ import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
@@ -34,6 +35,7 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.service.mrms.MRMSOption;
@@ -57,7 +59,7 @@ public class CampaignOptions {
     public static final int TECH_ADVANCED = 2;
     public static final int TECH_EXPERIMENTAL = 3;
     public static final int TECH_UNOFFICIAL = 4;
-    // This must always be the highest tech level in order to hide parts
+    // This must always be the highest tech level to hide parts
     // that haven't been invented yet, or that are completely extinct
     public static final int TECH_UNKNOWN = 5;
 
@@ -274,14 +276,106 @@ public class CampaignOptions {
     // region Life Paths Tab
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
+    private int nonBinaryDiceSize;
 
     // Random Histories
     private RandomOriginOptions randomOriginOptions;
     private boolean useRandomPersonalities;
     private boolean useRandomPersonalityReputation;
     private boolean useIntelligenceXpMultiplier;
+    private boolean useSimulatedRelationships;
 
-    // Retirement
+
+    // Family
+    private FamilialRelationshipDisplayLevel familyDisplayLevel;
+
+    // Anniversaries
+    private boolean announceBirthdays;
+    private boolean announceOfficersOnly;
+    private boolean announceChildBirthdays;
+
+    // Marriage
+    private boolean useManualMarriages;
+    private boolean useClanPersonnelMarriages;
+    private boolean usePrisonerMarriages;
+    private int checkMutualAncestorsDepth;
+    private int noInterestInMarriageDiceSize;
+    private boolean logMarriageNameChanges;
+    private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
+    private RandomMarriageMethod randomMarriageMethod;
+    private boolean useRandomSameSexMarriages; // legacy, pre-50.01
+    private boolean useRandomClanPersonnelMarriages;
+    private boolean useRandomPrisonerMarriages;
+    private int randomMarriageAgeRange;
+    private int randomMarriageDiceSize;
+    private int randomSameSexMarriageDiceSize;
+    private int randomNewDependentMarriage;
+
+    // Divorce
+    private boolean useManualDivorce;
+    private boolean useClanPersonnelDivorce;
+    private boolean usePrisonerDivorce;
+    private Map<SplittingSurnameStyle, Integer> divorceSurnameWeights;
+    private RandomDivorceMethod randomDivorceMethod;
+    private boolean useRandomOppositeSexDivorce;
+    private boolean useRandomSameSexDivorce;
+    private boolean useRandomClanPersonnelDivorce;
+    private boolean useRandomPrisonerDivorce;
+    private int randomDivorceDiceSize;
+
+    // Procreation
+    private boolean useManualProcreation;
+    private boolean useClanPersonnelProcreation;
+    private boolean usePrisonerProcreation;
+    private int multiplePregnancyOccurrences;
+    private BabySurnameStyle babySurnameStyle;
+    private boolean assignNonPrisonerBabiesFounderTag;
+    private boolean assignChildrenOfFoundersFounderTag;
+    private boolean useMaternityLeave;
+    private boolean determineFatherAtBirth;
+    private boolean displayTrueDueDate;
+    private int noInterestInChildrenDiceSize;
+    private boolean logProcreation;
+    private RandomProcreationMethod randomProcreationMethod;
+    private boolean useRelationshiplessRandomProcreation;
+    private boolean useRandomClanPersonnelProcreation;
+    private boolean useRandomPrisonerProcreation;
+    private int randomProcreationRelationshipDiceSize;
+    private int randomProcreationRelationshiplessDiceSize;
+
+    // Education
+    private boolean useEducationModule;
+    private Integer curriculumXpRate;
+    private Integer maximumJumpCount;
+    private boolean useReeducationCamps;
+    private boolean enableLocalAcademies;
+    private boolean enablePrestigiousAcademies;
+    private boolean enableUnitEducation;
+    private boolean enableOverrideRequirements;
+    private boolean enableShowIneligibleAcademies;
+    private int entranceExamBaseTargetNumber;
+    private Double facultyXpRate;
+    private boolean enableBonuses;
+    private Integer adultDropoutChance;
+    private Integer childrenDropoutChance;
+    private boolean allAges;
+    private Integer militaryAcademyAccidents;
+
+    // Death
+    private boolean keepMarriedNameUponSpouseDeath;
+    private RandomDeathMethod randomDeathMethod;
+    private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
+    private boolean useRandomClanPersonnelDeath;
+    private boolean useRandomPrisonerDeath;
+    private boolean useRandomDeathSuicideCause;
+    private double percentageRandomDeathChance;
+    private double[] exponentialRandomDeathMaleValues;
+    private double[] exponentialRandomDeathFemaleValues;
+    private Map<TenYearAgeRange, Double> ageRangeRandomDeathMaleValues;
+    private Map<TenYearAgeRange, Double> ageRangeRandomDeathFemaleValues;
+    // endregion Life Paths Tab
+
+    //region Turnover and Retention
     private boolean useRandomRetirement;
 
     private int turnoverFixedTargetNumber;
@@ -329,95 +423,9 @@ public class CampaignOptions {
     private int fieldKitchenCapacity;
     private boolean fieldKitchenIgnoreNonCombatants;
     private int fatigueLeaveThreshold;
+    //endregion Turnover and Retention
 
-    // Family
-    private FamilialRelationshipDisplayLevel familyDisplayLevel;
-
-    // Anniversaries
-    private boolean announceBirthdays;
-    private boolean announceOfficersOnly;
-    private boolean announceChildBirthdays;
-
-    // Marriage
-    private boolean useManualMarriages;
-    private boolean useClanPersonnelMarriages;
-    private boolean usePrisonerMarriages;
-    private int minimumMarriageAge;
-    private int checkMutualAncestorsDepth;
-    private boolean logMarriageNameChanges;
-    private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
-    private RandomMarriageMethod randomMarriageMethod;
-    private boolean useRandomSameSexMarriages;
-    private boolean useRandomClanPersonnelMarriages;
-    private boolean useRandomPrisonerMarriages;
-    private int randomMarriageAgeRange;
-    private double percentageRandomMarriageOppositeSexChance;
-    private double percentageRandomMarriageSameSexChance;
-
-    // Divorce
-    private boolean useManualDivorce;
-    private boolean useClanPersonnelDivorce;
-    private boolean usePrisonerDivorce;
-    private Map<SplittingSurnameStyle, Integer> divorceSurnameWeights;
-    private RandomDivorceMethod randomDivorceMethod;
-    private boolean useRandomOppositeSexDivorce;
-    private boolean useRandomSameSexDivorce;
-    private boolean useRandomClanPersonnelDivorce;
-    private boolean useRandomPrisonerDivorce;
-    private double percentageRandomDivorceOppositeSexChance;
-    private double percentageRandomDivorceSameSexChance;
-
-    // Procreation
-    private boolean useManualProcreation;
-    private boolean useClanPersonnelProcreation;
-    private boolean usePrisonerProcreation;
-    private int multiplePregnancyOccurrences;
-    private BabySurnameStyle babySurnameStyle;
-    private boolean assignNonPrisonerBabiesFounderTag;
-    private boolean assignChildrenOfFoundersFounderTag;
-    private boolean determineFatherAtBirth;
-    private boolean displayTrueDueDate;
-    private boolean logProcreation;
-    private RandomProcreationMethod randomProcreationMethod;
-    private boolean useRelationshiplessRandomProcreation;
-    private boolean useRandomClanPersonnelProcreation;
-    private boolean useRandomPrisonerProcreation;
-    private double percentageRandomProcreationRelationshipChance;
-    private double percentageRandomProcreationRelationshiplessChance;
-
-    // Education
-    private boolean useEducationModule;
-    private Integer curriculumXpRate;
-    private Integer maximumJumpCount;
-    private boolean useReeducationCamps;
-    private boolean enableLocalAcademies;
-    private boolean enablePrestigiousAcademies;
-    private boolean enableUnitEducation;
-    private boolean enableOverrideRequirements;
-    private boolean enableShowIneligibleAcademies;
-    private int entranceExamBaseTargetNumber;
-    private Double facultyXpRate;
-    private boolean enableBonuses;
-    private Integer adultDropoutChance;
-    private Integer childrenDropoutChance;
-    private boolean allAges;
-    private Integer militaryAcademyAccidents;
-
-    // Death
-    private boolean keepMarriedNameUponSpouseDeath;
-    private RandomDeathMethod randomDeathMethod;
-    private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
-    private boolean useRandomClanPersonnelDeath;
-    private boolean useRandomPrisonerDeath;
-    private boolean useRandomDeathSuicideCause;
-    private double percentageRandomDeathChance;
-    private double[] exponentialRandomDeathMaleValues;
-    private double[] exponentialRandomDeathFemaleValues;
-    private Map<TenYearAgeRange, Double> ageRangeRandomDeathMaleValues;
-    private Map<TenYearAgeRange, Double> ageRangeRandomDeathFemaleValues;
-    // endregion Life Paths Tab
-
-    // region Finance tab
+    //region Finance tab
     private boolean payForParts;
     private boolean payForRepairs;
     private boolean payForUnits;
@@ -836,12 +844,14 @@ public class CampaignOptions {
         // region Life Paths Tab
         // Personnel Randomization
         setUseDylansRandomXP(false);
+        setNonBinaryDiceSize(60);
 
         // Random Histories
         setRandomOriginOptions(new RandomOriginOptions(true));
         setUseRandomPersonalities(false);
         setUseRandomPersonalityReputation(true);
         setUseIntelligenceXpMultiplier(true);
+        setUseSimulatedRelationships(false);
 
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
@@ -855,8 +865,8 @@ public class CampaignOptions {
         setUseManualMarriages(true);
         setUseClanPersonnelMarriages(false);
         setUsePrisonerMarriages(true);
-        setMinimumMarriageAge(16);
         setCheckMutualAncestorsDepth(4);
+        setNoInterestInMarriageDiceSize(10);
         setLogMarriageNameChanges(false);
         setMarriageSurnameWeights(new HashMap<>());
         getMarriageSurnameWeights().put(MergingSurnameStyle.NO_CHANGE, 100);
@@ -873,12 +883,12 @@ public class CampaignOptions {
         getMarriageSurnameWeights().put(MergingSurnameStyle.MALE, 500);
         getMarriageSurnameWeights().put(MergingSurnameStyle.FEMALE, 160);
         setRandomMarriageMethod(RandomMarriageMethod.NONE);
-        setUseRandomSameSexMarriages(false);
         setUseRandomClanPersonnelMarriages(false);
-        setUseRandomPrisonerMarriages(true);
+        setUseRandomPrisonerMarriages(false);
         setRandomMarriageAgeRange(10);
-        setPercentageRandomMarriageOppositeSexChance(0.00025);
-        setPercentageRandomMarriageSameSexChance(0.00002);
+        setRandomMarriageDiceSize(5000);
+        setRandomSameSexMarriageDiceSize(14);
+        setRandomNewDependentMarriage(20);
 
         // Divorce
         setUseManualDivorce(true);
@@ -894,26 +904,27 @@ public class CampaignOptions {
         setUseRandomSameSexDivorce(true);
         setUseRandomClanPersonnelDivorce(true);
         setUseRandomPrisonerDivorce(false);
-        setPercentageRandomDivorceOppositeSexChance(0.000001);
-        setPercentageRandomDivorceSameSexChance(0.000001);
+        setRandomDivorceDiceSize(900);
 
         // Procreation
         setUseManualProcreation(true);
         setUseClanPersonnelProcreation(false);
         setUsePrisonerProcreation(true);
-        setMultiplePregnancyOccurrences(50); // Hellin's Law is 89, but we make it more common so it shows up more
+        setMultiplePregnancyOccurrences(50); // Hellin's Law is 89, but we make it more common, so it shows up more
         setBabySurnameStyle(BabySurnameStyle.MOTHERS);
         setAssignNonPrisonerBabiesFounderTag(false);
         setAssignChildrenOfFoundersFounderTag(false);
+        setUseMaternityLeave(true);
         setDetermineFatherAtBirth(false);
         setDisplayTrueDueDate(false);
+        setNoInterestInChildrenDiceSize(3);
         setLogProcreation(false);
         setRandomProcreationMethod(RandomProcreationMethod.NONE);
         setUseRelationshiplessRandomProcreation(false);
         setUseRandomClanPersonnelProcreation(false);
         setUseRandomPrisonerProcreation(true);
-        setPercentageRandomProcreationRelationshipChance(0.0005);
-        setPercentageRandomProcreationRelationshiplessChance(0.00005);
+        setRandomProcreationRelationshipDiceSize(500);
+        setRandomProcreationRelationshiplessDiceSize(2000);
 
         // Education
         setUseEducationModule(false);
@@ -1626,7 +1637,7 @@ public class CampaignOptions {
 
     // region Expanded Personnel Information
     /**
-     * @return whether or not to use time in service
+     * @return whether to use time in service
      */
     public boolean isUseTimeInService() {
         return useTimeInService;
@@ -1655,14 +1666,14 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to use time in rank
+     * @return whether to use time in rank
      */
     public boolean isUseTimeInRank() {
         return useTimeInRank;
     }
 
     /**
-     * @param useTimeInRank the new value for whether or not to use time in rank
+     * @param useTimeInRank the new value for whether to use time in rank
      */
     public void setUseTimeInRank(final boolean useTimeInRank) {
         this.useTimeInRank = useTimeInRank;
@@ -1683,30 +1694,28 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to track the total earnings of personnel
+     * @return whether to track the total earnings of personnel
      */
     public boolean isTrackTotalEarnings() {
         return trackTotalEarnings;
     }
 
     /**
-     * @param trackTotalEarnings the new value for whether or not to track total
-     *                           earnings for personnel
+     * @param trackTotalEarnings the new value for whether to track total earnings for personnel
      */
     public void setTrackTotalEarnings(final boolean trackTotalEarnings) {
         this.trackTotalEarnings = trackTotalEarnings;
     }
 
     /**
-     * @return whether or not to track the total experience earnings of personnel
+     * @return whether to track the total experience earnings of personnel
      */
     public boolean isTrackTotalXPEarnings() {
         return trackTotalXPEarnings;
     }
 
     /**
-     * @param trackTotalXPEarnings the new value for whether or not to track total
-     *                             experience
+     * @param trackTotalXPEarnings the new value for whether to track total experience
      *                             earnings for personnel
      */
     public void setTrackTotalXPEarnings(final boolean trackTotalXPEarnings) {
@@ -1714,8 +1723,7 @@ public class CampaignOptions {
     }
 
     /**
-     * Gets a value indicating whether or not to show a person's origin faction when
-     * displaying
+     * Gets a value indicating whether to show a person's origin faction when displaying
      * their details.
      */
     public boolean isShowOriginFaction() {
@@ -1723,8 +1731,7 @@ public class CampaignOptions {
     }
 
     /**
-     * Sets a value indicating whether or not to show a person's origin faction when
-     * displaying
+     * Sets a value indicating whether to show a person's origin faction when displaying
      * their details.
      */
     public void setShowOriginFaction(final boolean showOriginFaction) {
@@ -1872,7 +1879,16 @@ public class CampaignOptions {
     public void setUseDylansRandomXP(final boolean useDylansRandomXP) {
         this.useDylansRandomXP = useDylansRandomXP;
     }
+    public int getNonBinaryDiceSize() {
+        return nonBinaryDiceSize;
+    }
 
+    public void setNonBinaryDiceSize(final int nonBinaryDiceSize) {
+        this.nonBinaryDiceSize = nonBinaryDiceSize;
+    }
+    //endregion Personnel Randomization
+
+    //region Random Histories
     public RandomOriginOptions getRandomOriginOptions() {
         return randomOriginOptions;
     }
@@ -1904,7 +1920,15 @@ public class CampaignOptions {
     public void setUseIntelligenceXpMultiplier(final boolean useIntelligenceXpMultiplier) {
         this.useIntelligenceXpMultiplier = useIntelligenceXpMultiplier;
     }
-    // endregion Personnel Randomization
+
+    public boolean isUseSimulatedRelationships() {
+        return useSimulatedRelationships;
+    }
+
+    public void setUseSimulatedRelationships(final boolean useSimulatedRelationships) {
+        this.useSimulatedRelationships = useSimulatedRelationships;
+    }
+    //endregion Random Histories
 
     // region Retirement
     public boolean isUseRandomRetirement() {
@@ -2318,14 +2342,14 @@ public class CampaignOptions {
 
     // region Marriage
     /**
-     * @return whether or not to use manual marriages
+     * @return whether to use manual marriages
      */
     public boolean isUseManualMarriages() {
         return useManualMarriages;
     }
 
     /**
-     * @param useManualMarriages whether or not to use manual marriages
+     * @param useManualMarriages whether to use manual marriages
      */
     public void setUseManualMarriages(final boolean useManualMarriages) {
         this.useManualMarriages = useManualMarriages;
@@ -2348,20 +2372,6 @@ public class CampaignOptions {
     }
 
     /**
-     * @return the minimum age a person can get married at
-     */
-    public int getMinimumMarriageAge() {
-        return minimumMarriageAge;
-    }
-
-    /**
-     * @param minimumMarriageAge the minimum age a person can get married at
-     */
-    public void setMinimumMarriageAge(final int minimumMarriageAge) {
-        this.minimumMarriageAge = minimumMarriageAge;
-    }
-
-    /**
      * This gets the number of recursions to use when checking mutual ancestors
      * between two personnel
      *
@@ -2381,8 +2391,16 @@ public class CampaignOptions {
         this.checkMutualAncestorsDepth = checkMutualAncestorsDepth;
     }
 
+    public int getNoInterestInMarriageDiceSize() {
+        return noInterestInMarriageDiceSize;
+    }
+
+    public void setNoInterestInMarriageDiceSize(final int noInterestInMarriageDiceSize) {
+        this.noInterestInMarriageDiceSize = noInterestInMarriageDiceSize;
+    }
+
     /**
-     * @return whether or not to log a name change in a marriage
+     * @return whether to log a name change in a marriage
      */
     public boolean isLogMarriageNameChanges() {
         return logMarriageNameChanges;
@@ -2419,16 +2437,17 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to use random same-sex marriages
+     * @return whether to use random same-sex marriages
      */
+    @Deprecated
     public boolean isUseRandomSameSexMarriages() {
         return useRandomSameSexMarriages;
     }
 
     /**
-     * @param useRandomSameSexMarriages whether or not to use random same-sex
-     *                                  marriages
+     * @param useRandomSameSexMarriages whether to use random same-sex marriages
      */
+    @Deprecated
     public void setUseRandomSameSexMarriages(final boolean useRandomSameSexMarriages) {
         this.useRandomSameSexMarriages = useRandomSameSexMarriages;
     }
@@ -2470,45 +2489,51 @@ public class CampaignOptions {
     }
 
     /**
-     * This gets the decimal chance (between 0 and 1) of a random opposite sex
-     * marriage occurring
-     *
-     * @return the chance, with a value between 0 and 1
+     * @return the number of sides on the die used to determine random marriage
      */
-    public double getPercentageRandomMarriageOppositeSexChance() {
-        return percentageRandomMarriageOppositeSexChance;
+    public int getRandomMarriageDiceSize() {
+        return randomMarriageDiceSize;
     }
 
     /**
-     * This sets the decimal chance (between 0 and 1) of a random opposite sex
-     * marriage occurring
+     * Sets the size of the random marriage die.
      *
-     * @param percentageRandomMarriageOppositeSexChance the chance, with a value
-     *                                                  between 0 and 1
+     * @param randomMarriageDiceSize the size of the random marriage die
      */
-    public void setPercentageRandomMarriageOppositeSexChance(final double percentageRandomMarriageOppositeSexChance) {
-        this.percentageRandomMarriageOppositeSexChance = percentageRandomMarriageOppositeSexChance;
+    public void setRandomMarriageDiceSize(final int randomMarriageDiceSize) {
+        this.randomMarriageDiceSize = randomMarriageDiceSize;
     }
 
     /**
-     * This gets the decimal chance (between 0 and 1) of a random same-sex marriage
-     * occurring
-     *
-     * @return the chance, with a value between 0 and 1
+     * @return the number of sides on the die used to determine random same-sex marriage
      */
-    public double getPercentageRandomMarriageSameSexChance() {
-        return percentageRandomMarriageSameSexChance;
+    public int getRandomSameSexMarriageDiceSize() {
+        return randomSameSexMarriageDiceSize;
     }
 
     /**
-     * This sets the decimal chance (between 0 and 1) of a random same-sex marriage
-     * occurring
+     * Sets the size of the random same-sex marriage die.
      *
-     * @param percentageRandomMarriageSameSexChance the chance, with a value between
-     *                                              0 and 1
+     * @param randomSameSexMarriageDiceSize the size of the random same-sex marriage die
      */
-    public void setPercentageRandomMarriageSameSexChance(final double percentageRandomMarriageSameSexChance) {
-        this.percentageRandomMarriageSameSexChance = percentageRandomMarriageSameSexChance;
+    public void setRandomSameSexMarriageDiceSize(final int randomSameSexMarriageDiceSize) {
+        this.randomSameSexMarriageDiceSize = randomSameSexMarriageDiceSize;
+    }
+
+    /**
+     * @return the number of sides on the die used to determine whether marriage occurs outside of current personnel
+     */
+    public int getRandomNewDependentMarriage() {
+        return randomNewDependentMarriage;
+    }
+
+    /**
+     * Sets the size of the die used to determine whether marriage occurs outside of current personnel
+     *
+     * @param randomNewDependentMarriage the size of the die used to determine whether marriage occurs outside of current personnel
+     */
+    public void setRandomNewDependentMarriage(final int randomNewDependentMarriage) {
+        this.randomNewDependentMarriage = randomNewDependentMarriage;
     }
     // endregion Marriage
 
@@ -2585,20 +2610,12 @@ public class CampaignOptions {
         this.useRandomPrisonerDivorce = useRandomPrisonerDivorce;
     }
 
-    public double getPercentageRandomDivorceOppositeSexChance() {
-        return percentageRandomDivorceOppositeSexChance;
+    public int getRandomDivorceDiceSize() {
+        return randomDivorceDiceSize;
     }
 
-    public void setPercentageRandomDivorceOppositeSexChance(final double percentageRandomDivorceOppositeSexChance) {
-        this.percentageRandomDivorceOppositeSexChance = percentageRandomDivorceOppositeSexChance;
-    }
-
-    public double getPercentageRandomDivorceSameSexChance() {
-        return percentageRandomDivorceSameSexChance;
-    }
-
-    public void setPercentageRandomDivorceSameSexChance(final double percentageRandomDivorceSameSexChance) {
-        this.percentageRandomDivorceSameSexChance = percentageRandomDivorceSameSexChance;
+    public void setRandomDivorceDiceSize(final int randomDivorceDiceSize) {
+        this.randomDivorceDiceSize = randomDivorceDiceSize;
     }
     // endregion Divorce
 
@@ -2628,18 +2645,15 @@ public class CampaignOptions {
     }
 
     /**
-     * @return the X occurrences for there to be a single multiple child occurrence
-     *         (i.e. 1 in X)
+     * @return the X occurrences for there to be a single multiple child occurrence (i.e., 1 in X)
      */
     public int getMultiplePregnancyOccurrences() {
         return multiplePregnancyOccurrences;
     }
 
     /**
-     * @param multiplePregnancyOccurrences the number of occurrences for there to be
-     *                                     a single
-     *                                     occurrence of a multiple child pregnancy
-     *                                     (i.e. 1 in X)
+     * @param multiplePregnancyOccurrences the number of occurrences for there to be a single
+     *                                     occurrence of a multiple child pregnancy (i.e., 1 in X)
      */
     public void setMultiplePregnancyOccurrences(final int multiplePregnancyOccurrences) {
         this.multiplePregnancyOccurrences = multiplePregnancyOccurrences;
@@ -2675,17 +2689,23 @@ public class CampaignOptions {
         this.assignChildrenOfFoundersFounderTag = assignChildrenOfFoundersFounderTag;
     }
 
+    public boolean isUseMaternityLeave() {
+        return useMaternityLeave;
+    }
+
+    public void setUseMaternityLeave(final boolean useMaternityLeave) {
+        this.useMaternityLeave = useMaternityLeave;
+    }
+
     /**
-     * @return whether or not to determine the father at birth instead of at
-     *         conception
+     * @return whether to determine the father at birth instead of at conception
      */
     public boolean isDetermineFatherAtBirth() {
         return determineFatherAtBirth;
     }
 
     /**
-     * @param determineFatherAtBirth whether or not to determine the father at birth
-     *                               instead of at conception
+     * @param determineFatherAtBirth whether to determine the father at birth instead of at conception
      */
     public void setDetermineFatherAtBirth(final boolean determineFatherAtBirth) {
         this.determineFatherAtBirth = determineFatherAtBirth;
@@ -2704,6 +2724,14 @@ public class CampaignOptions {
      */
     public void setDisplayTrueDueDate(final boolean displayTrueDueDate) {
         this.displayTrueDueDate = displayTrueDueDate;
+    }
+
+    public int getNoInterestInChildrenDiceSize() {
+        return noInterestInChildrenDiceSize;
+    }
+
+    public void setNoInterestInChildrenDiceSize(final int noInterestInChildrenDiceSize) {
+        this.noInterestInChildrenDiceSize = noInterestInChildrenDiceSize;
     }
 
     /**
@@ -2729,16 +2757,14 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to use random procreation for personnel without a
-     *         spouse
+     * @return whether to use random procreation for personnel without a spouse
      */
     public boolean isUseRelationshiplessRandomProcreation() {
         return useRelationshiplessRandomProcreation;
     }
 
     /**
-     * @param useRelationshiplessRandomProcreation whether or not to use random
-     *                                             procreation without a spouse
+     * @param useRelationshiplessRandomProcreation whether to use random procreation without a spouse
      */
     public void setUseRelationshiplessRandomProcreation(final boolean useRelationshiplessRandomProcreation) {
         this.useRelationshiplessRandomProcreation = useRelationshiplessRandomProcreation;
@@ -2766,43 +2792,31 @@ public class CampaignOptions {
      *
      * @return the chance, with a value between 0 and 1
      */
-    public double getPercentageRandomProcreationRelationshipChance() {
-        return percentageRandomProcreationRelationshipChance;
+    public int getRandomProcreationRelationshipDiceSize() {
+        return randomProcreationRelationshipDiceSize;
     }
 
     /**
-     * This sets the decimal chance (between 0 and 1) of random procreation
-     * occurring
-     *
-     * @param percentageRandomProcreationRelationshipChance the chance, with a value
-     *                                                      between 0 and 1
+     * This sets the dice size for random procreation
+     * @param randomProcreationRelationshipDiceSize the chance, with a value between 0 and 1
      */
-    public void setPercentageRandomProcreationRelationshipChance(
-            final double percentageRandomProcreationRelationshipChance) {
-        this.percentageRandomProcreationRelationshipChance = percentageRandomProcreationRelationshipChance;
+    public void setRandomProcreationRelationshipDiceSize(final int randomProcreationRelationshipDiceSize) {
+        this.randomProcreationRelationshipDiceSize = randomProcreationRelationshipDiceSize;
     }
 
     /**
-     * This gets the decimal chance (between 0 and 1) of random procreation
-     * occurring without a relationship
-     *
-     * @return the chance, with a value between 0 and 1
+     * @return the dice size for random procreation
      */
-    public double getPercentageRandomProcreationRelationshiplessChance() {
-        return percentageRandomProcreationRelationshiplessChance;
+    public int getRandomProcreationRelationshiplessDiceSize() {
+        return randomProcreationRelationshiplessDiceSize;
     }
 
     /**
-     * This sets the decimal chance (between 0 and 1) of random procreation
-     * occurring without a relationship
-     *
-     * @param percentageRandomProcreationRelationshiplessChance the chance, with a
-     *                                                          value between 0 and
-     *                                                          1
+     * This sets the decimal chance (between 0 and 1) of random procreation occurring without a relationship
+     * @param randomProcreationRelationshiplessDiceSize the chance, with a value between 0 and 1
      */
-    public void setPercentageRandomProcreationRelationshiplessChance(
-            final double percentageRandomProcreationRelationshiplessChance) {
-        this.percentageRandomProcreationRelationshiplessChance = percentageRandomProcreationRelationshiplessChance;
+    public void setRandomProcreationRelationshiplessDiceSize(final int randomProcreationRelationshiplessDiceSize) {
+        this.randomProcreationRelationshiplessDiceSize = randomProcreationRelationshiplessDiceSize;
     }
     // endregion Procreation
 
@@ -3336,17 +3350,14 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to export finances to CSV at the end of a financial
-     *         year
+     * @return whether to export finances to CSV at the end of a financial year
      */
     public boolean isNewFinancialYearFinancesToCSVExport() {
         return newFinancialYearFinancesToCSVExport;
     }
 
     /**
-     * @param newFinancialYearFinancesToCSVExport whether or not to export finances
-     *                                            to CSV at the end of a financial
-     *                                            year
+     * @param newFinancialYearFinancesToCSVExport whether to export finances to CSV at the end of a financial year
      */
     public void setNewFinancialYearFinancesToCSVExport(final boolean newFinancialYearFinancesToCSVExport) {
         this.newFinancialYearFinancesToCSVExport = newFinancialYearFinancesToCSVExport;
@@ -4842,12 +4853,17 @@ public class CampaignOptions {
         // region Life Paths Tab
         // region Personnel Randomization
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nonBinaryDiceSize", getNonBinaryDiceSize());
+       //endregion Personnel Randomization
+
+        //region Random Histories
         getRandomOriginOptions().writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalities", isUseRandomPersonalities());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPersonalityReputation",
                 isUseRandomPersonalityReputation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useIntelligenceXpMultiplier", isUseIntelligenceXpMultiplier());
-        // endregion Personnel Randomization
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSimulatedRelationships", isUseSimulatedRelationships());
+        //endregion Random Histories
 
         // region Retirement
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", isUseRandomRetirement());
@@ -4915,8 +4931,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualMarriages", isUseManualMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelMarriages", isUseClanPersonnelMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerMarriages", isUsePrisonerMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumMarriageAge", getMinimumMarriageAge());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noInterestInMarriageDiceSize", getNoInterestInMarriageDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "marriageSurnameWeights");
         for (final Entry<MergingSurnameStyle, Integer> entry : getMarriageSurnameWeights().entrySet()) {
@@ -4924,16 +4940,13 @@ public class CampaignOptions {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "marriageSurnameWeights");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageMethod", getRandomMarriageMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomSameSexMarriages", isUseRandomSameSexMarriages());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelMarriages",
-                isUseRandomClanPersonnelMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelMarriages", isUseRandomClanPersonnelMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomMarriageOppositeSexChance",
-                getPercentageRandomMarriageOppositeSexChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomMarriageSameSexChance",
-                getPercentageRandomMarriageSameSexChance());
-        // endregion Marriage
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageDiceSize", getRandomMarriageDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomSameSexMarriageDiceSize", getRandomSameSexMarriageDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomNewDependentMarriage", getRandomNewDependentMarriage());
+        //endregion Marriage
 
         // region Divorce
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualDivorce", isUseManualDivorce());
@@ -4949,11 +4962,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomSameSexDivorce", isUseRandomSameSexDivorce());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelDivorce", isUseRandomClanPersonnelDivorce());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerDivorce", isUseRandomPrisonerDivorce());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDivorceOppositeSexChance",
-                getPercentageRandomDivorceOppositeSexChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDivorceSameSexChance",
-                getPercentageRandomDivorceSameSexChance());
-        // endregion Divorce
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDivorceDiceSize", getRandomDivorceDiceSize());
+        //endregion Divorce
 
         // region Procreation
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualProcreation", isUseManualProcreation());
@@ -4961,12 +4971,12 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerProcreation", isUsePrisonerProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiplePregnancyOccurrences", getMultiplePregnancyOccurrences());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "babySurnameStyle", getBabySurnameStyle().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignNonPrisonerBabiesFounderTag",
-                isAssignNonPrisonerBabiesFounderTag());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignChildrenOfFoundersFounderTag",
-                isAssignChildrenOfFoundersFounderTag());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignChildrenOfFoundersFounderTag", isAssignChildrenOfFoundersFounderTag());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMaternityLeave", isUseMaternityLeave());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "determineFatherAtBirth", isDetermineFatherAtBirth());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayTrueDueDate", isDisplayTrueDueDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noInterestInChildrenDiceSize", getNoInterestInChildrenDiceSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logProcreation", isLogProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomProcreationMethod", getRandomProcreationMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRelationshiplessRandomProcreation",
@@ -4974,11 +4984,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelProcreation",
                 isUseRandomClanPersonnelProcreation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerProcreation", isUseRandomPrisonerProcreation());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomProcreationRelationshipChance",
-                getPercentageRandomProcreationRelationshipChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomProcreationRelationshiplessChance",
-                getPercentageRandomProcreationRelationshiplessChance());
-        // endregion Procreation
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomProcreationRelationshipDiceSize", getRandomProcreationRelationshipDiceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomProcreationRelationshiplessDiceSize", getRandomProcreationRelationshiplessDiceSize());
+        //endregion Procreation
 
         // region Education
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
@@ -5482,7 +5490,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
                     retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
-                    // Most of this is legacy - 0.47.X Removal
+                    // Most of this is legacy handlers - 0.47.X Removal
                     String prisonerStatus = wn2.getTextContent().trim();
 
                     try {
@@ -5589,6 +5597,11 @@ public class CampaignOptions {
                     // region Personnel Randomization
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXP")) {
                     retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("nonBinaryDiceSize")) {
+                    retVal.setNonBinaryDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                //endregion Personnel Randomization
+
+                    //region Random Histories
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomOriginOptions")) {
                     if (!wn2.hasChildNodes()) {
                         continue;
@@ -5605,7 +5618,9 @@ public class CampaignOptions {
                     retVal.setUseRandomPersonalityReputation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useIntelligenceXpMultiplier")) {
                     retVal.setUseIntelligenceXpMultiplier(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                    // endregion Personnel Randomization
+                } else if (wn2.getNodeName().equalsIgnoreCase("useSimulatedRelationships")) {
+                    retVal.setUseSimulatedRelationships(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    //endregion Random Histories
 
                     // region Family
                 } else if (wn2.getNodeName().equalsIgnoreCase("familyDisplayLevel")) {
@@ -5629,10 +5644,10 @@ public class CampaignOptions {
                     retVal.setUseClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerMarriages")) {
                     retVal.setUsePrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
-                    retVal.setMinimumMarriageAge(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("checkMutualAncestorsDepth")) {
                     retVal.setCheckMutualAncestorsDepth(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("noInterestInMarriageDiceSize")) {
+                    retVal.setNoInterestInMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChanges")) {
                     retVal.setLogMarriageNameChanges(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("marriageSurnameWeights")) {
@@ -5651,20 +5666,24 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageMethod")) {
                     retVal.setRandomMarriageMethod(RandomMarriageMethod.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
-                    retVal.setUseRandomSameSexMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelMarriages")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelMarriages")
+                        || wn2.getNodeName().equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
                     retVal.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerMarriages")) {
                     retVal.setUseRandomPrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageAgeRange")) {
                     retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageOppositeSexChance")) {
-                    retVal.setPercentageRandomMarriageOppositeSexChance(
-                            Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageSameSexChance")) {
-                    retVal.setPercentageRandomMarriageSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
-                    // endregion Marriage
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageDiceSize")) {
+                    retVal.setRandomMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomSameSexMarriageDiceSize")) {
+                    retVal.setRandomSameSexMarriageDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) { // Legacy, pre-50.01
+                    if (!Boolean.parseBoolean(wn2.getTextContent().trim())) {
+                        retVal.setRandomSameSexMarriageDiceSize(0);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomNewDependentMarriage")) {
+                    retVal.setRandomNewDependentMarriage(Integer.parseInt(wn2.getTextContent().trim()));
+                    //endregion Marriage
 
                     // region Divorce
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualDivorce")) {
@@ -5697,11 +5716,9 @@ public class CampaignOptions {
                     retVal.setUseRandomClanPersonnelDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerDivorce")) {
                     retVal.setUseRandomPrisonerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDivorceOppositeSexChance")) {
-                    retVal.setPercentageRandomDivorceOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDivorceSameSexChance")) {
-                    retVal.setPercentageRandomDivorceSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
-                    // endregion Divorce
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomDivorceDiceSize")) {
+                    retVal.setRandomDivorceDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    //endregion Divorce
 
                     // region Procreation
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualProcreation")) {
@@ -5718,10 +5735,14 @@ public class CampaignOptions {
                     retVal.setAssignNonPrisonerBabiesFounderTag(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("assignChildrenOfFoundersFounderTag")) {
                     retVal.setAssignChildrenOfFoundersFounderTag(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMaternityLeave")) {
+                    retVal.setUseMaternityLeave(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("determineFatherAtBirth")) {
                     retVal.setDetermineFatherAtBirth(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("displayTrueDueDate")) {
                     retVal.setDisplayTrueDueDate(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("noInterestInChildrenDiceSize")) {
+                    retVal.setNoInterestInChildrenDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("logProcreation")) {
                     retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomProcreationMethod")) {
@@ -5732,13 +5753,11 @@ public class CampaignOptions {
                     retVal.setUseRandomClanPersonnelProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerProcreation")) {
                     retVal.setUseRandomPrisonerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomProcreationRelationshipChance")) {
-                    retVal.setPercentageRandomProcreationRelationshipChance(
-                            Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomProcreationRelationshiplessChance")) {
-                    retVal.setPercentageRandomProcreationRelationshiplessChance(
-                            Double.parseDouble(wn2.getTextContent().trim()));
-                    // endregion Procreation
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomProcreationRelationshipDiceSize")) {
+                    retVal.setRandomProcreationRelationshipDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomProcreationRelationshiplessDiceSize")) {
+                    retVal.setRandomProcreationRelationshiplessDiceSize(Integer.parseInt(wn2.getTextContent().trim()));
+                    //endregion Procreation
 
                     // region Education
                 } else if (wn2.getNodeName().equalsIgnoreCase("useEducationModule")) {
@@ -6189,8 +6208,126 @@ public class CampaignOptions {
                     retVal.setScenarioModChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioModBV")) {
                     retVal.setScenarioModBV(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("autoConfigMunitions")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoconfigMunitions")) {
                     retVal.setAutoConfigMunitions(Boolean.parseBoolean(wn2.getTextContent().trim()));
+
+                    //region Legacy
+                    // Removed in 0.49.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) { // Legacy, 0.49.12 removal
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.getSalaryXPMultipliers().put(Skills.SKILL_LEVELS[i + 1], Double.parseDouble(values[i]));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ELITE, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.VETERAN, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.REGULAR, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.GREEN, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ULTRA_GREEN, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setRandomizeDependentOrigin(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("originSearchRadius")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setOriginSearchRadius(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("extraRandomOrigin")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
+                    retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) { // Legacy - 0.49.7 Removal
+                    final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
+                    retVal.setRandomDependentMethod((value && retVal.isUseAtB()) ? RandomDependentMethod.AGAINST_THE_BOT : RandomDependentMethod.NONE);
+                    retVal.setUseRandomDependentAddition(value);
+                } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
+                    retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.6 Removal
+                    retVal.setRandomMarriageAgeRange(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomMarriages")) { // Legacy - 0.49.6 Removal
+                    retVal.setRandomMarriageMethod(Boolean.parseBoolean(wn2.getTextContent().trim())
+                            ? RandomMarriageMethod.DICE_ROLL : RandomMarriageMethod.NONE);
+                } else if (wn2.getNodeName().equalsIgnoreCase("logMarriageNameChange")) { // Legacy - 0.49.6 Removal
+                    retVal.setLogMarriageNameChanges(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageSurnameWeights")) { // Legacy - 0.49.6 Removal
+                    final String[] values = wn2.getTextContent().split(",");
+                    if (values.length == 13) {
+                        final MergingSurnameStyle[] marriageSurnameStyles = MergingSurnameStyle.values();
+                        for (int i = 0; i < values.length; i++) {
+                            retVal.getMarriageSurnameWeights().put(marriageSurnameStyles[i], Integer.parseInt(values[i]));
+                        }
+                    } else if (values.length == 9) {
+                        retVal.migrateMarriageSurnameWeights47(values);
+                    } else {
+                        logger.error("Unknown length of randomMarriageSurnameWeights");
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("logConception")) { // Legacy - 0.49.4 Removal
+                    retVal.setLogProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) { // Legacy - 0.49.4 Removal
+                    retVal.setUseStaticRATs(true);
+                } else if (wn2.getNodeName().equalsIgnoreCase("ignoreRatEra")) { // Legacy - 0.49.4 Removal
+                    retVal.setIgnoreRATEra(true);
+                } else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) { // Legacy - 0.49.3 Removal
+                    final double value = Double.parseDouble(wn2.getTextContent());
+                    retVal.setClanUnitPriceMultiplier(value);
+                    retVal.setClanPartPriceMultiplier(value);
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueA")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[0] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueB")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[1] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueC")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[2] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueD")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[3] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueE")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[4] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValueF")) { // Legacy - 0.49.3 Removal
+                    retVal.getUsedPartPriceMultipliers()[5] = Double.parseDouble(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) { // Legacy - 0.49.3 Removal
+                    retVal.setDamagedPartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) { // Legacy - 0.49.3 Removal
+                    retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+
+                    // Removed in 0.47.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
+                    retVal.setPersonnelMarketName(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
+                    if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
+                        retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);
+                        retVal.setUseAtBPrisonerDefection(true);
+                        retVal.setUseAtBPrisonerRansom(true);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("intensity")) { // Legacy
+                    double intensity = Double.parseDouble(wn2.getTextContent().trim());
+
+                    retVal.atbBattleChance[AtBLanceRole.FIGHTING.ordinal()] = (int) Math.round(((40.0 * intensity) / (40.0 * intensity + 60.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[AtBLanceRole.DEFENCE.ordinal()] = (int) Math.round(((20.0 * intensity) / (20.0 * intensity + 80.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[AtBLanceRole.SCOUTING.ordinal()] = (int) Math.round(((60.0 * intensity) / (60.0 * intensity + 40.0)) * 100.0 + 0.5);
+                    retVal.atbBattleChance[AtBLanceRole.TRAINING.ordinal()] = (int) Math.round(((10.0 * intensity) / (10.0 * intensity + 90.0)) * 100.0 + 0.5);
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
+                    retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) { // Legacy
+                    retVal.setPrisonerCaptureStyle(Boolean.parseBoolean(wn2.getTextContent().trim())
+                            ? PrisonerCaptureStyle.TAHARQA : PrisonerCaptureStyle.NONE);
+                } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) { // Legacy
+                    MekHQ.getMHQOptions().setStartGameDelay(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) { // Legacy
+                    MekHQ.getMHQOptions().setHistoricalDailyLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRating") // Legacy
+                        || wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) { // Legacy
+                    if (!Boolean.parseBoolean(wn2.getTextContent())) {
+                        retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) { // Legacy
+                    retVal.phenotypeProbabilities[Phenotype.MEKWARRIOR.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) { // Legacy
+                    retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) { // Legacy
+                    retVal.phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) { // Legacy
+                    retVal.phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 }
             } catch (Exception ex) {
                 logger.error(ex, "Unknown Exception: generationCampaignOptionsFromXML");
@@ -6221,19 +6358,19 @@ public class CampaignOptions {
             }
         }
 
-        // Now we need to test to figure out the weights have changed. If not, we will
-        // keep the
-        // new default values. If they have, we save their changes and add the new
-        // surname weights
-        if ((weights[0] != getMarriageSurnameWeights().get(MergingSurnameStyle.NO_CHANGE))
-                || (weights[1] != getMarriageSurnameWeights().get(MergingSurnameStyle.YOURS) + 5)
-                || (weights[2] != getMarriageSurnameWeights().get(MergingSurnameStyle.SPOUSE) + 5)
-                || (weights[3] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_SPOUSE) + 5)
-                || (weights[4] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE) + 5)
-                || (weights[5] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_YOURS) + 5)
-                || (weights[6] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_YOURS) + 5)
-                || (weights[7] != getMarriageSurnameWeights().get(MergingSurnameStyle.MALE))
-                || (weights[8] != getMarriageSurnameWeights().get(MergingSurnameStyle.FEMALE))) {
+        // Now we need to test it to figure out the weights have changed. If not, we will keep the
+        // new default values. If they have, we save their changes and add the new surname weights
+        if (
+                (weights[0] != getMarriageSurnameWeights().get(MergingSurnameStyle.NO_CHANGE))
+                        || (weights[1] != getMarriageSurnameWeights().get(MergingSurnameStyle.YOURS) + 5)
+                        || (weights[2] != getMarriageSurnameWeights().get(MergingSurnameStyle.SPOUSE) + 5)
+                        || (weights[3] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_SPOUSE) + 5)
+                        || (weights[4] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE) + 5)
+                        || (weights[5] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_YOURS) + 5)
+                        || (weights[6] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_YOURS) + 5)
+                        || (weights[7] != getMarriageSurnameWeights().get(MergingSurnameStyle.MALE))
+                        || (weights[8] != getMarriageSurnameWeights().get(MergingSurnameStyle.FEMALE))
+        ) {
             getMarriageSurnameWeights().put(MergingSurnameStyle.NO_CHANGE, weights[0]);
             getMarriageSurnameWeights().put(MergingSurnameStyle.YOURS, weights[1]);
             getMarriageSurnameWeights().put(MergingSurnameStyle.SPOUSE, weights[2]);

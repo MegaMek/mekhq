@@ -16,11 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel.marriage;
+package mekhq.campaign.personnel.procreation;
 
 import megamek.common.Compute;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.familyTree.Genealogy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,10 +32,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(value = MockitoExtension.class)
-public class PercentageRandomMarriageTest {
+public class RandomProcreationTest {
     @Mock
     private CampaignOptions mockOptions;
 
@@ -43,24 +45,30 @@ public class PercentageRandomMarriageTest {
 
     @BeforeEach
     public void beforeEach() {
-        when(mockOptions.isUseClanPersonnelMarriages()).thenReturn(false);
-        when(mockOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
-        when(mockOptions.getRandomMarriageDiceSize()).thenReturn(5);
+        when(mockOptions.isUseClanPersonnelProcreation()).thenReturn(false);
+        when(mockOptions.isUsePrisonerProcreation()).thenReturn(false);
+        when(mockOptions.isUseRelationshiplessRandomProcreation()).thenReturn(false);
+        when(mockOptions.isUseRandomClanPersonnelProcreation()).thenReturn(false);
+        when(mockOptions.isUseRandomPrisonerProcreation()).thenReturn(false);
+        when(mockOptions.getRandomProcreationRelationshipDiceSize()).thenReturn(5);
+        when(mockOptions.getRandomProcreationRelationshiplessDiceSize()).thenReturn(5);
     }
 
     @Test
-    public void testRandomMarriage() {
-        final RandomMarriage randomMarriage = new RandomMarriage(mockOptions);
+    public void testProcreation() {
+        final RandomProcreation randomProcreation = new RandomProcreation(mockOptions);
+        Genealogy mockGenealogy = mock(Genealogy.class);
+
+        when(mockGenealogy.hasSpouse()).thenReturn(true);
+        when(mockPerson.getGenealogy()).thenReturn(mockGenealogy);
 
         int diceSize = 5;
 
         try (MockedStatic<Compute> compute = Mockito.mockStatic(Compute.class)) {
             compute.when(() -> Compute.randomInt(diceSize)).thenReturn(0);
-            assertTrue(randomMarriage.randomMarriage());
+            assertTrue(randomProcreation.procreation(mockPerson));
             compute.when(() -> Compute.randomInt(diceSize)).thenReturn(1);
-            assertFalse(randomMarriage.randomMarriage());
+            assertFalse(randomProcreation.procreation(mockPerson));
         }
     }
 }

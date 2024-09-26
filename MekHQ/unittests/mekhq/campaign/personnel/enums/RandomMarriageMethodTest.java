@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,11 +21,12 @@ package mekhq.campaign.personnel.enums;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
-import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
+import mekhq.campaign.personnel.marriage.RandomMarriage;
 import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -44,10 +45,10 @@ public class RandomMarriageMethodTest {
     //region Getters
     @Test
     public void testGetToolTipText() {
-        assertEquals(resources.getString("RandomMarriageMethod.NONE.toolTipText"),
+        assertEquals(wordWrap(resources.getString("RandomMarriageMethod.NONE.toolTipText")),
                 RandomMarriageMethod.NONE.getToolTipText());
-        assertEquals(resources.getString("RandomMarriageMethod.PERCENTAGE.toolTipText"),
-                RandomMarriageMethod.PERCENTAGE.getToolTipText());
+        assertEquals(wordWrap(resources.getString("RandomMarriageMethod.DICE_ROLL.toolTipText")),
+                RandomMarriageMethod.DICE_ROLL.getToolTipText());
     }
     //endregion Getters
 
@@ -66,10 +67,10 @@ public class RandomMarriageMethodTest {
     @Test
     public void testIsPercentage() {
         for (final RandomMarriageMethod randomMarriageMethod : methods) {
-            if (randomMarriageMethod == RandomMarriageMethod.PERCENTAGE) {
-                assertTrue(randomMarriageMethod.isPercentage());
+            if (randomMarriageMethod == RandomMarriageMethod.DICE_ROLL) {
+                assertTrue(randomMarriageMethod.isDiceRoll());
             } else {
-                assertFalse(randomMarriageMethod.isPercentage());
+                assertFalse(randomMarriageMethod.isDiceRoll());
             }
         }
     }
@@ -80,21 +81,19 @@ public class RandomMarriageMethodTest {
         final CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockOptions.isUseClanPersonnelMarriages()).thenReturn(false);
         when(mockOptions.isUsePrisonerMarriages()).thenReturn(false);
-        when(mockOptions.isUseRandomSameSexMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomClanPersonnelMarriages()).thenReturn(false);
         when(mockOptions.isUseRandomPrisonerMarriages()).thenReturn(false);
-        when(mockOptions.getPercentageRandomMarriageOppositeSexChance()).thenReturn(0.5);
-        when(mockOptions.getPercentageRandomMarriageSameSexChance()).thenReturn(0.5);
+        when(mockOptions.getRandomMarriageDiceSize()).thenReturn(5);
 
         assertInstanceOf(DisabledRandomMarriage.class, RandomMarriageMethod.NONE.getMethod(mockOptions));
-        assertInstanceOf(PercentageRandomMarriage.class, RandomMarriageMethod.PERCENTAGE.getMethod(mockOptions));
+        assertInstanceOf(RandomMarriage.class, RandomMarriageMethod.DICE_ROLL.getMethod(mockOptions));
     }
 
     @Test
     public void testToStringOverride() {
-        assertEquals(resources.getString("RandomMarriageMethod.NONE.text"),
-                RandomMarriageMethod.NONE.toString());
-        assertEquals(resources.getString("RandomMarriageMethod.PERCENTAGE.text"),
-                RandomMarriageMethod.PERCENTAGE.toString());
+        assertEquals(wordWrap(resources.getString("RandomMarriageMethod.NONE.text")).trim(),
+                RandomMarriageMethod.NONE.toString().trim());
+        assertEquals(wordWrap(resources.getString("RandomMarriageMethod.DICE_ROLL.text")).trim(),
+                RandomMarriageMethod.DICE_ROLL.toString().trim());
     }
 }

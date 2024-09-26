@@ -123,6 +123,7 @@ public class Person {
 
     private String biography;
     private LocalDate birthday;
+    private LocalDate joinedCampaign;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
     private LocalDate dateOfDeath;
@@ -360,6 +361,7 @@ public class Person {
         resetMinutesLeft(); // this assigns minutesLeft and overtimeLeft
         dateOfDeath = null;
         recruitment = null;
+        joinedCampaign = null;
         lastRankChangeDate = null;
         autoAwardSupportPoints = 0;
         retirement = null;
@@ -893,7 +895,7 @@ public class Person {
         return getSecondaryRole().getName(isClanPersonnel());
     }
 
-    public boolean canPerformRole(final PersonnelRole role, final boolean primary) {
+    public boolean canPerformRole(LocalDate today, Person person, final PersonnelRole role, final boolean primary) {
         if (primary) {
             // Primary Role:
             // We only do a few here, as it is better on the UX-side to correct the issues
@@ -927,6 +929,10 @@ public class Person {
                     || (role.isMedic() && getPrimaryRole().isMedicalStaff())) {
                 return false;
             }
+        }
+
+        if (person.isChild(today)) {
+            return false;
         }
 
         return switch (role) {
@@ -1003,7 +1009,7 @@ public class Person {
                     campaign.addReport(String.format(resources.getString("recoveredPoW.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.recoveredPoW(this, campaign.getLocalDate());
-                } else if (getStatus().isOnLeave()) {
+                } else if (getStatus().isOnLeave() || getStatus().isOnMaternityLeave()) {
                     campaign.addReport(String.format(resources.getString("returnedFromLeave.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
@@ -1360,6 +1366,14 @@ public class Person {
         }
 
         return Math.toIntExact(ChronoUnit.YEARS.between(getBirthday(), today));
+    }
+
+    public @Nullable LocalDate getJoinedCampaign() {
+        return joinedCampaign;
+    }
+
+    public void setJoinedCampaign(final @Nullable LocalDate joinedCampaign) {
+        this.joinedCampaign = joinedCampaign;
     }
 
     public @Nullable LocalDate getRecruitment() {
@@ -2037,6 +2051,8 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "birthday", getBirthday());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deathday", getDateOfDeath());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitment", getRecruitment());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "joinedCampaign", getJoinedCampaign());
+
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoAwardSupportPoints", getAutoAwardSupportPoints());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
@@ -2367,6 +2383,8 @@ public class Person {
                     retVal.dateOfDeath = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
                     retVal.recruitment = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("joinedCampaign")) {
+                    retVal.joinedCampaign = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRankChangeDate")) {
                     retVal.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("autoAwardSupportPoints")) {
