@@ -108,10 +108,12 @@ public class EducationController {
             // re-application
             person.addEduFailedApplications(academy);
             campaign.addReport(String.format(resources.getString("applicationFailure.text"),
-                    person.getHyperlinkedFullTitle(),
-                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
-                    ReportingUtilities.CLOSING_SPAN_TAG,
-                    academyNameInSet));
+                person.getHyperlinkedFullTitle(),
+                ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorNegativeHexColor()),
+                ReportingUtilities.CLOSING_SPAN_TAG,
+                academyNameInSet,
+                roll,
+                targetNumber));
 
             ServiceLogger.eduFailedApplication(person, campaign.getLocalDate(), academyNameInSet);
 
