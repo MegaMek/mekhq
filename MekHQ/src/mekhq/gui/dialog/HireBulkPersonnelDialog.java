@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2010-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -23,6 +23,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
+import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -30,11 +31,31 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
+import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+import static mekhq.campaign.personnel.SkillType.*;
+import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
 
 import javax.swing.*;
 import javax.swing.JSpinner.DefaultEditor;
@@ -59,7 +80,7 @@ public class HireBulkPersonnelDialog extends JDialog {
     private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
 
-    private Campaign campaign;
+    private final Campaign campaign;
 
     private JComboBox<PersonTypeItem> choiceType;
     private JComboBox<RankDisplay> choiceRanks;
@@ -351,19 +372,38 @@ public class HireBulkPersonnelDialog extends JDialog {
                     person.setBirthday(birthDay);
                     age = person.getAge(today);
                 }
+
+                // Limit skills by age for children and adolescents
+                if (age < 16) {
+                    person.removeAllSkills();
+                } else if (age < 18) {
+                    person.limitSkills(0);
+                }
+
+                // re-roll SPAs to include in any age and skill adjustments
+                Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
+
+                for (IOption option : Collections.list(options)) {
+                    person.getOptions().getOption(option.getName()).clearValue();
+                }
+
+                int experienceLevel = person.getExperienceLevel(campaign, false);
+
+                if (experienceLevel <= 0) {
+                    person.setLoyalty(Compute.d6(3) + 2);
+                } else if (experienceLevel == 1) {
+                    person.setLoyalty(Compute.d6(3) + 1);
+                } else {
+                    person.setLoyalty(Compute.d6(3));
+                }
+
+                if (experienceLevel > 0) {
+                    AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
+                    specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+                    specialAbilityGenerator.generateSpecialAbilities(campaign, person, experienceLevel);
+                }
             }
 
-            // Limit skills by age for children and adolescents
-            if (age < 12) {
-                person.removeAllSkills();
-            } else if (age < 14) {
-                person.limitSkills(0);
-            } else if (age < 18) {
-                person.limitSkills(age - 13);
-            }
-
-            // re-calculate initial education, as this might have changed since the person was first generated
-            EducationController.setInitialEducation(campaign, person);
 
             if (!campaign.recruitPerson(person, isGmHire)) {
                 number = 0;

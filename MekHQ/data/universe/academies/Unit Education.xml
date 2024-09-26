@@ -88,6 +88,42 @@
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
+        <name>Adult Apprenticeship</name>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>An adult apprenticeship is a hands-on training program where older recruits are integrated into a military or mercenary unit. The apprenticeship focuses heavily on learning in the field, with recruits shadowing seasoned veterans.</description>
+        <isHomeSchool>true</isHomeSchool>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>0</tuition>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <durationDays>150</durationDays>
+        <facultySkill>9</facultySkill>
+        <ageMin>16</ageMin>
+        <qualification>MekTech Apprenticeship</qualification>
+        <curriculum>Astech, Tech/Mek</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <qualification>Mechanic Apprenticeship</qualification>
+        <curriculum>Astech, Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>AeroTek Apprenticeship</qualification>
+        <curriculum>Astech, Tech/Aero</curriculum>
+        <qualificationStartYear>2314</qualificationStartYear>
+        <qualification>Battle Armor Technician Apprenticeship</qualification>
+        <curriculum>Astech, Tech/BattleArmor</curriculum>
+        <qualificationStartYear>3050</qualificationStartYear>
+        <qualification>Black Naval Tech Apprenticeship</qualification>
+        <curriculum>Astech, Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Administrative Apprenticeship</qualification>
+        <curriculum>Administration, Scrounge</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Medical Apprenticeship</qualification>
+        <curriculum>MedTech, Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
         <name>In-House Boot Camp</name>
         <type>Basic Training</type>
         <isMilitary>true</isMilitary>
@@ -95,7 +131,7 @@
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
-        <tuition>1250</tuition>
+        <tuition>0</tuition>
         <educationLevelMax>Early Childhood</educationLevelMax>
         <durationDays>70</durationDays>
         <facultySkill>9</facultySkill>
@@ -122,7 +158,7 @@
         <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
-        <tuition>1250</tuition>
+        <tuition>0</tuition>
         <educationLevelMax>Early Childhood</educationLevelMax>
         <durationDays>150</durationDays>
         <facultySkill>9</facultySkill>

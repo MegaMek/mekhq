@@ -18,36 +18,29 @@
  */
 package mekhq.campaign.mission.atb;
 
-import java.util.UUID;
-
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.HitData;
-import megamek.common.Mounted;
-import megamek.common.ToHitData;
+import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
-import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
+
+import java.util.UUID;
+
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.generateForce;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.randomForceWeight;
 
 /**
  * Class that handles the application of scenario modifier actions to
@@ -71,18 +64,23 @@ public class AtBScenarioModifierApplicator {
     }
 
     /**
-     * Adds the given force to the scenario after primary forces have been
-     * generated.
+     * Adds the given force to the scenario after primary forces have been generated.
+     *
+     * @param campaign the current campaign
+     * @param scenario the current scenario
+     * @param templateToApply the force template to apply to the scenario
      */
     private static void postAddForce(Campaign campaign, AtBDynamicScenario scenario,
             ScenarioForceTemplate templateToApply) {
-        int effectiveBV = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign);
-        int effectiveUnitCount = AtBDynamicScenarioFactory.calculateEffectiveUnitCount(scenario, campaign);
+        int effectiveBV = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
+        int effectiveUnitCount = AtBDynamicScenarioFactory.calculateEffectiveUnitCount(scenario, campaign, false);
         int deploymentZone = AtBDynamicScenarioFactory.calculateDeploymentZone(templateToApply, scenario,
                 templateToApply.getForceName());
 
-        AtBDynamicScenarioFactory.generateForce(scenario, scenario.getContract(campaign), campaign,
-                effectiveBV, effectiveUnitCount, EntityWeightClass.WEIGHT_ASSAULT, templateToApply, true);
+        int weightClass = randomForceWeight();
+
+        generateForce(scenario, scenario.getContract(campaign), campaign, effectiveBV,
+                effectiveUnitCount, weightClass, templateToApply, true);
 
         // the most recently added bot force is the one we just generated
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);

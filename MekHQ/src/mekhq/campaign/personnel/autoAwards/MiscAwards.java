@@ -19,13 +19,6 @@
 
 package mekhq.campaign.personnel.autoAwards;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -38,14 +31,16 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
+import java.time.LocalDate;
+import java.util.*;
+
 public class MiscAwards {
 
     /**
      * This function processes miscellaneous awards for a given person in a
      * campaign.
      * It checks the eligibility of the person for each type of award and returns a
-     * map
-     * of eligible awards grouped by their respective IDs.
+     * map of eligible awards grouped by their respective IDs.
      *
      * @param campaign               the current campaign
      * @param mission                the mission just completed (null if no mission
@@ -64,9 +59,8 @@ public class MiscAwards {
      * @return a map of eligible awards grouped by their respective IDs
      */
     public static Map<Integer, List<Object>> MiscAwardsProcessor(Campaign campaign, @Nullable Mission mission,
-            UUID person, List<Award> awards,
-            Boolean missionWasSuccessful, boolean isCivilianHelp, @Nullable Integer killCount,
-            @Nullable Integer injuryCount, @Nullable UUID supportPersonOfTheYear) {
+            UUID person, List<Award> awards, Boolean missionWasSuccessful, boolean isCivilianHelp,
+            @Nullable Integer killCount, @Nullable Integer injuryCount, @Nullable UUID supportPersonOfTheYear) {
         List<Award> eligibleAwards = new ArrayList<>();
 
         for (Award award : awards) {
@@ -102,7 +96,7 @@ public class MiscAwards {
                     }
                 }
                 case "prisonerofwar" -> {
-                    if (prisonerOfWar(campaign, award, person)) {
+                    if (mission != null && prisonerOfWar(campaign, award, person)) {
                         eligibleAwards.add(award);
                     }
                 }

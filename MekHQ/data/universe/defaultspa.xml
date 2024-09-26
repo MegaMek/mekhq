@@ -460,21 +460,6 @@
 
     <!-- Tech SPA -->
     <ability>
-        <lookupName>clan_tech_knowledge</lookupName>
-        <displayName>Clan Tech Knowledge (Unofficial)</displayName>
-        <desc>Can work on clan equipment without penalty</desc>
-        <xpCost>4</xpCost>
-        <weight>2</weight>
-        <skillPrereq>
-            <skill>Tech/Mek</skill>
-            <skill>Tech/Mechanic</skill>
-            <skill>Tech/Aero</skill>
-            <skill>Tech/BA</skill>
-            <skill>Tech/Vessel</skill>
-        </skillPrereq>
-        <miscPrereq>clanperson:false</miscPrereq>
-    </ability>
-    <ability>
         <lookupName>tech_weapon_specialist</lookupName>
         <displayName>Tech Specialist, Weapon (Unofficial)</displayName>
         <desc>-1 to repair and maintenance checks when working with weapons</desc>

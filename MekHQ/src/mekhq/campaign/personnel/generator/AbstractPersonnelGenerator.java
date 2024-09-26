@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,11 +18,8 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import java.time.LocalDate;
-import java.util.Objects;
-
-import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.Compute;
 import megamek.common.enums.Gender;
 import mekhq.Utilities;
@@ -32,6 +29,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+
+import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Represents a class which can generate new {@link Person} objects
@@ -95,11 +95,10 @@ public abstract class AbstractPersonnelGenerator {
 
     /**
      * Generates an experience level for a {@link Person}.
-     * @param campaign The {@link Campaign} which tracks the person.
      * @param person The {@link Person} being generated.
      * @return An integer value between {@link SkillType#EXP_ULTRA_GREEN} and {@link SkillType#EXP_ELITE}.
      */
-    protected int generateExperienceLevel(Campaign campaign, Person person) {
+    public int generateExperienceLevel(Person person) {
         int bonus = getSkillPreferences().getOverallRecruitBonus()
                 + getSkillPreferences().getRecruitBonus(person.getPrimaryRole());
 
@@ -112,13 +111,20 @@ public abstract class AbstractPersonnelGenerator {
     }
 
     /**
-     * Generates a name for a {@link Person}.
-     * @param campaign The {@link Campaign} to use to generate the person
-     * @param person The {@link Person} whose name is being generated.
-     * @param gender The person's gender, or a randomize value
+     * Generates and sets the name and gender of a person.
+     *
+     * @param campaign the campaign the person belongs to
+     * @param person the person whose name and gender is being generated
+     * @param gender the gender of the person. Can be Gender.MALE, Gender.FEMALE, Gender.NON_BINARY, or Gender.RANDOMIZE
      */
-    protected void generateName(Campaign campaign, Person person, Gender gender) {
-        person.setGender((gender == Gender.RANDOMIZE) ? RandomGenderGenerator.generate() : gender);
+    protected void generateNameAndGender(Campaign campaign, Person person, Gender gender) {
+        int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
+
+        if ((gender == Gender.RANDOMIZE) && (nonBinaryDiceSize > 0) && (Compute.randomInt(nonBinaryDiceSize) == 0)) {
+            person.setGender(RandomGenderGenerator.generateOther());
+        } else {
+            person.setGender(RandomGenderGenerator.generate());
+        }
 
         String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames()
                 ? person.getOriginFaction().getShortName()

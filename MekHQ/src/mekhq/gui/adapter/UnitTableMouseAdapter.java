@@ -49,6 +49,7 @@ import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
+import mekhq.gui.dialog.reportDialogs.PartQualityReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
@@ -106,6 +107,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_QUIRKS = "QUIRKS";
     public static final String COMMAND_BOMBS = "BOMBS";
     public static final String COMMAND_SUPPLY_COST = "SUPPLY_COST";
+    public static final String COMMAND_PARTS_REPORT = "PARTS_REPORT";
     public static final String COMMAND_TAG_CUSTOM = "TAG_CUSTOM";
     public static final String COMMAND_INDI_CAMO = "INDI_CAMO";
     public static final String COMMAND_REMOVE_INDI_CAMO = "REMOVE_INDI_CAMO";
@@ -187,6 +189,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             new MaintenanceReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SUPPLY_COST)) { // Single Unit only
             new MonthlyUnitCostReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
+        } else if (command.equals(COMMAND_PARTS_REPORT)) { // Single Unit only
+            new PartQualityReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SET_QUALITY)) {
             // TODO : Duplicated in PartsTableMouseAdapter#actionPerformed
             int q = -1;
@@ -817,6 +821,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     && gui.getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
                 menuItem = new JMenuItem("Show Monthly Supply Cost Report");
                 menuItem.setActionCommand(COMMAND_SUPPLY_COST);
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+
+            if (oneSelected && gui.getCampaign().getCampaignOptions().isCheckMaintenance()) {
+                menuItem = new JMenuItem("Show Part Quality Report");
+                menuItem.setActionCommand(COMMAND_PARTS_REPORT);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
