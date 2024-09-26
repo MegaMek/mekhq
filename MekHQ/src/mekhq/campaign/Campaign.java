@@ -25,8 +25,6 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.codeUtilities.MathUtility;
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.AmmoType.Munitions;
 import megamek.common.annotations.Nullable;
@@ -59,7 +57,9 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.market.*;
+import mekhq.campaign.market.PartsStore;
+import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -4283,7 +4283,7 @@ public class Campaign implements ITechManager {
                 }
 
                 if (roll <= (getAtBUnitRatingMod() * 2)) {
-                    final Person dependent = newDependent(false);
+                    final Person dependent = newDependent(false, Gender.RANDOMIZE);
 
                     recruitPerson(dependent, PrisonerStatus.FREE, true, false);
 
