@@ -944,9 +944,12 @@ public class Person {
             case NAVAL_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_NVEE);
             case VTOL_PILOT -> hasSkill(SkillType.S_PILOT_VTOL);
             case VEHICLE_GUNNER -> hasSkill(SkillType.S_GUN_VEE);
-            case VEHICLE_CREW, MECHANIC ->
-                hasSkill(SkillType.S_TECH_MECHANIC)
-                        && (getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case MECHANIC -> hasSkill(SkillType.S_TECH_MECHANIC)
+                    && (getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case VEHICLE_CREW ->
+                Stream.of(SkillType.S_TECH_MEK, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC,
+                    SkillType.S_TECH_BA, SkillType.S_DOCTOR, SkillType.S_MEDTECH, SkillType.S_ASTECH)
+                    .anyMatch(this::hasSkill);
             case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
             case PROTOMEK_PILOT -> hasSkill(SkillType.S_GUN_PROTO);
