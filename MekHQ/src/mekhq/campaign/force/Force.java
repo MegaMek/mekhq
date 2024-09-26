@@ -504,6 +504,9 @@ public class Force {
 
         for (UUID eligibleCommanderId : eligibleCommanders) {
             Person eligibleCommander = campaign.getPerson(eligibleCommanderId);
+            if (eligibleCommander == null) {
+                continue;
+            }
 
             if (eligibleCommander.outRanksUsingSkillTiebreaker(campaign, highestRankedPerson)) {
                 highestRankedPerson = eligibleCommander;
