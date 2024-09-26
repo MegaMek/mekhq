@@ -3863,30 +3863,22 @@ public class Person {
     }
 
     public boolean isTechMek() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_MEK)
-                && getSkill(SkillType.S_TECH_MEK).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-
+        boolean hasSkill = hasSkill(SkillType.S_TECH_MEK);
         return hasSkill && (getPrimaryRole().isMekTech() || getSecondaryRole().isMekTech());
     }
 
     public boolean isTechAero() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_AERO)
-                && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-
+        boolean hasSkill = hasSkill(SkillType.S_TECH_AERO);
         return hasSkill && (getPrimaryRole().isAeroTek() || getSecondaryRole().isAeroTek());
     }
 
     public boolean isTechMechanic() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_MECHANIC)
-                && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-
+        boolean hasSkill = hasSkill(SkillType.S_TECH_MECHANIC);
         return hasSkill && (getPrimaryRole().isMechanic() || getSecondaryRole().isMechanic());
     }
 
     public boolean isTechBA() {
-        boolean hasSkill = hasSkill(SkillType.S_TECH_BA)
-                && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-
+        boolean hasSkill = hasSkill(SkillType.S_TECH_BA);
         return hasSkill && (getPrimaryRole().isBATech() || getSecondaryRole().isBATech());
     }
 
