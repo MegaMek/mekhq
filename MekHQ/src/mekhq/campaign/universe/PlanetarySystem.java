@@ -750,6 +750,9 @@ public class PlanetarySystem {
      * @return The hiring hall level on the given date
      */
     public HiringHallLevel getHiringHallLevel(LocalDate date) {
+        if (getPopulation(date) == 0) {
+            return HiringHallLevel.NONE;
+        }
         int score = 0;
         for (Faction faction : getFactionSet(date)) {
             if (faction.isPirate() || faction.isChaos()) {
