@@ -38,7 +38,6 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
@@ -112,6 +111,7 @@ public class AtBContract extends Contract {
     protected LocalDate routEnd;
     protected int partsAvailabilityLevel;
     protected int sharesPct;
+    private boolean batchallAccepted;
 
     protected int playerMinorBreaches;
     protected int employerMinorBreaches;
@@ -135,6 +135,11 @@ public class AtBContract extends Contract {
     protected int nextWeekBattleTypeMod;
 
     private StratconCampaignState stratconCampaignState;
+    private boolean isAttacker;
+
+    private static final ResourceBundle resources = ResourceBundle.getBundle(
+            "mekhq.resources.AtBContract",
+            MekHQ.getMHQOptions().getLocale());
 
     protected AtBContract() {
         this(null);
@@ -148,6 +153,7 @@ public class AtBContract extends Contract {
 
         parentContract = null;
         mercSubcontract = false;
+        isAttacker = false;
 
         setContractType(AtBContractType.GARRISON_DUTY);
         setAllySkill(SkillLevel.REGULAR);
@@ -164,7 +170,8 @@ public class AtBContract extends Contract {
         extensionLength = 0;
 
         sharesPct = 0;
-        setMoraleLevel(AtBMoraleLevel.NORMAL);
+        batchallAccepted = true;
+        setMoraleLevel(AtBMoraleLevel.STALEMATE);
         routEnd = null;
         numBonusParts = 0;
         priorLogisticsFailure = false;
@@ -182,8 +189,153 @@ public class AtBContract extends Contract {
             setOverheadComp(OH_NONE);
         }
 
-        allyBotName = getEmployerName(campaign.getGameYear());
-        enemyBotName = getEnemyName(campaign.getGameYear());
+        int currentYear = campaign.getGameYear();
+        allyBotName = getEmployerName(currentYear);
+        allyCamouflage = pickRandomCamouflage(currentYear, employerCode);
+
+        enemyBotName = getEnemyName(currentYear);
+        enemyCamouflage = pickRandomCamouflage(currentYear, enemyCode);
+    }
+
+    /**
+     * Selects a random camouflage for the given faction based on the faction code and year.
+     * If there are no available files in the faction directory, it logs a warning and uses default
+     * camouflage.
+     *
+     * @param currentYear the current year in the game.
+     * @param factionCode the code representing the faction for which the camouflage is to be selected.
+     */
+    public static Camouflage pickRandomCamouflage(int currentYear, String factionCode) {
+        // Define the root directory and get the faction-specific camouflage directory
+        final String ROOT_DIRECTORY = "data/images/camo/";
+        String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
+
+        // Use Java File to represent directories
+        File workingDirectory = new File(ROOT_DIRECTORY + camouflageDirectory + '/');
+
+        // List subdirectories and loose files in working directory
+        File[] folders = workingDirectory.listFiles(File::isDirectory);
+        File[] looseFiles = workingDirectory.listFiles();
+
+        // Gather all files
+        List<File> allFiles = new ArrayList<>();
+        if (looseFiles != null) {
+            Collections.addAll(allFiles, looseFiles);
+        }
+        if (folders != null) {
+            for (File folder : folders) {
+                File[] folderFiles = folder.listFiles();
+                if (folderFiles != null) {
+                    Collections.addAll(allFiles, folderFiles);
+                }
+            }
+        }
+
+        // Select a random file to set camouflage, if there are files available
+        if (!allFiles.isEmpty()) {
+            File randomFile = allFiles.get(new Random().nextInt(allFiles.size()));
+
+            String fileName = randomFile.getName();
+            String fileCategory = randomFile.getParent().replaceAll(ROOT_DIRECTORY, "");
+
+            return new Camouflage(fileCategory, fileName);
+        } else {
+            // Log if no files were found in the directory
+            logger.warn(String.format("No files in directory %s - using default camouflage",
+                workingDirectory));
+            return null;
+        }
+    }
+
+
+    /**
+     * Retrieves the directory for the camouflage of a faction based on the current year and faction code.
+     *
+     * @param currentYear The current year in the game.
+     * @param factionCode The code representing the faction.
+     * @return The directory for the camouflage of the faction.
+     */
+    private static String getCamouflageDirectory(int currentYear, String factionCode) {
+        return switch (factionCode) {
+            case "ARC" -> "Aurigan Coalition";
+            case "CDP" -> "Calderon Protectorate";
+            case "CC" -> "Capellan Confederation";
+            case "CIR" -> "Circinus Federation";
+            case "CS" -> "ComStar";
+            case "DC" -> "Draconis Combine";
+            case "CF" -> "Federated Commonwealth";
+            case "FS" -> "Federated Suns";
+            case "FVC" -> "Filtvelt Coalition";
+            case "FRR" -> "Free Rasalhague Republic";
+            case "FWL" -> "Free Worlds League";
+            case "FR" -> "Fronc Reaches";
+            case "HL" -> "Hanseatic League";
+            case "LL" -> "Lothian League";
+            case "LA" -> "Lyran Commonwealth";
+            case "MOC" -> "Magistracy of Canopus";
+            case "MH" -> "Marian Hegemony";
+            case "MERC" -> "Mercs";
+            case "OA" -> "Outworlds Alliance";
+            case "PIR" -> "Pirates";
+            case "ROS" -> "Republic of the Sphere";
+            case "SL" -> "Star League Defense Force";
+            case "TC" -> "Taurian Concordat";
+            case "WOB" -> "Word of Blake";
+            default -> {
+                Faction faction = Factions.getInstance().getFaction(factionCode);
+
+                if (faction.isClan()) {
+                    yield getClanCamouflageDirectory(currentYear, factionCode);
+                } else {
+                    yield "Standard Camouflage";
+                }
+            }
+        };
+    }
+
+    /**
+     * Retrieves the directory for the camouflage of a clan faction based on
+     * the current year and faction code.
+     *
+     * @param currentYear The current year in the game.
+     * @param factionCode The code representing the faction.
+     * @return The directory for the camouflage of the clan faction.
+     */
+    private static String getClanCamouflageDirectory(int currentYear, String factionCode) {
+        final String ROOT_DIRECTORY = "Clans/";
+
+        return switch (factionCode) {
+            case "CBS" -> ROOT_DIRECTORY + "Blood Spirit";
+            case "CB" -> ROOT_DIRECTORY + "Burrock";
+            case "CCC" -> ROOT_DIRECTORY + "Cloud Cobra";
+            case "CCO" -> ROOT_DIRECTORY + "Coyote";
+            case "CDS" -> {
+                if (currentYear < 3100) {
+                    yield ROOT_DIRECTORY + "Diamond Shark";
+                } else {
+                    yield ROOT_DIRECTORY + "Sea Fox (Dark Age)";
+                }
+            }
+            case "CFM" -> ROOT_DIRECTORY + "Fire Mandrill";
+            case "CGB", "RD" -> ROOT_DIRECTORY + "Ghost Bear";
+            case "CGS" -> ROOT_DIRECTORY + "Goliath Scorpion";
+            case "CHH" -> ROOT_DIRECTORY + "Hell's Horses";
+            case "CIH" -> ROOT_DIRECTORY + "Ice Hellion";
+            case "CJF" -> ROOT_DIRECTORY + "Jade Falcon";
+            case "CMG" -> ROOT_DIRECTORY + "Mongoose";
+            case "CNC" -> ROOT_DIRECTORY + "Nova Cat";
+            case "CSJ" -> ROOT_DIRECTORY + "Smoke Jaguar";
+            case "CSR" -> ROOT_DIRECTORY + "Snow Raven";
+            case "SOC" -> ROOT_DIRECTORY + "Society";
+            case "CSA" -> ROOT_DIRECTORY + "Star Adder";
+            case "CSV" -> ROOT_DIRECTORY + "Steel Viper";
+            case "CSL" -> ROOT_DIRECTORY + "Stone Lion";
+            case "CWI" -> ROOT_DIRECTORY + "Widowmaker";
+            case "CW", "CWE" -> ROOT_DIRECTORY + "Wolf";
+            case "CWIE" -> ROOT_DIRECTORY + "Wolf-in-Exile";
+            case "CWOV" -> ROOT_DIRECTORY + "Wolverine";
+            default -> "Standard Camouflage";
+        };
     }
 
     public void calculateLength(final boolean variable) {
@@ -229,169 +381,131 @@ public class AtBContract extends Contract {
         return !faction.isMajorOrSuperPower() && !faction.isClan();
     }
 
-    public void calculatePaymentMultiplier(Campaign campaign) {
-        int unitRatingMod = campaign.getAtBUnitRatingMod();
-        double multiplier = 1.0;
-        // IntOps reputation factor then Dragoons rating
-        if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            multiplier *= (unitRatingMod * 0.2) + 0.5;
-        } else {
-            if (unitRatingMod >= IUnitRating.DRAGOON_A) {
-                multiplier *= 2.0;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_B) {
-                multiplier *= 1.5;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_D) {
-                multiplier *= 0.8;
-            } else if (unitRatingMod == IUnitRating.DRAGOON_F) {
-                multiplier *= 0.5;
-            }
-        }
+    /**
+     * Checks and updates the morale which depends on various conditions such as the rout end date,
+     * skill levels, victories, defeats, etc. This method also updates the enemy status based on the
+     * morale level.
+     *
+     * @param today       The current date in the context.
+     */
+    public void checkMorale(Campaign campaign, LocalDate today) {
+        // Check whether enemy forces have been reinforced, and whether any current rout continues
+        // beyond its expected date
+        boolean routContinue = Compute.randomInt(4) < 3;
 
-        multiplier *= getContractType().getPaymentMultiplier();
-
-        final Faction employer = Factions.getInstance().getFaction(employerCode);
-        final Faction enemy = getEnemy();
-        if (employer.isISMajorOrSuperPower() || employer.isClan()) {
-            multiplier *= 1.2;
-        } else if (enemy.isIndependent()) {
-            multiplier *= 1.0;
-        } else {
-            multiplier *= 1.1;
-        }
-
-        if (enemy.isRebelOrPirate()) {
-            multiplier *= 1.1;
-        }
-
-        int cmdrStrategy = 0;
-        if (campaign.getFlaggedCommander() != null &&
-                campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY) != null) {
-            cmdrStrategy = campaign.getFlaggedCommander().getSkill(SkillType.S_STRATEGY).getLevel();
-        }
-        int maxDeployedLances = campaign.getCampaignOptions().getBaseStrategyDeployment() +
-                campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
-                        cmdrStrategy;
-
-        if (isSubcontract()) {
-            requiredLances = 1;
-        } else {
-            requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
-            if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().isAdjustPaymentForStrategy()) {
-                multiplier *= (double) maxDeployedLances / (double) requiredLances;
-                requiredLances = maxDeployedLances;
-            }
-        }
-
-        setMultiplier(multiplier);
-    }
-
-    public void checkMorale(LocalDate today, int dragoonRating) {
-        if (null != routEnd) {
+        // If there is a rout end date, and it's past today, update morale and enemy state accordingly
+        if (routEnd != null && !routContinue) {
             if (today.isAfter(routEnd)) {
-                setMoraleLevel(AtBMoraleLevel.NORMAL);
+                setMoraleLevel(AtBMoraleLevel.STALEMATE);
                 routEnd = null;
-                updateEnemy(today); // mix it up a little
+                updateEnemy(campaign, today); // mix it up a little
             } else {
-                setMoraleLevel(AtBMoraleLevel.BROKEN);
+                setMoraleLevel(AtBMoraleLevel.ROUTED);
             }
             return;
         }
+
+        // Initialize counters for victories and defeats
         int victories = 0;
         int defeats = 0;
         LocalDate lastMonth = today.minusMonths(1);
 
-        for (Scenario s : getScenarios()) {
-            if ((s.getDate() != null) && lastMonth.isAfter(s.getDate())) {
+        // Loop through scenarios, counting victories and defeats that fall within the target month
+        for (Scenario scenario : getScenarios()) {
+            if ((scenario.getDate() != null) && lastMonth.isAfter(scenario.getDate())) {
                 continue;
             }
 
-            if (s.getStatus().isOverallVictory()) {
+            if (scenario.getStatus().isOverallVictory()) {
                 victories++;
-            } else if (s.getStatus().isOverallDefeat()) {
+            } else if (scenario.getStatus().isOverallDefeat()) {
                 defeats++;
+            }
+
+            if (scenario.getStatus().isDecisiveVictory()) {
+                victories++;
+            } else if (scenario.getStatus().isDecisiveDefeat()) {
+                defeats++;
+            } else if (scenario.getStatus().isPyrrhicVictory()) {
+                victories--;
             }
         }
 
-        //
-        // From: Official AtB Rules 2.31
-        //
+        // Calculate various modifiers for morale
+        int enemySkillModifier = getEnemySkill().getAdjustedValue() - SkillLevel.REGULAR.getAdjustedValue();
+        int allySkillModifier = getAllySkill().getAdjustedValue() - SkillLevel.REGULAR.getAdjustedValue();
 
-        // Enemy skill rating: Green -1, Veteran +1, Elite +2
-        int mod = Math.max(getEnemySkill().ordinal() - 3, -1);
+        int performanceModifier = 0;
 
-        // Player Dragoon/MRBC rating: F +2, D +1, B -1, A -2
-        mod -= dragoonRating - IUnitRating.DRAGOON_C;
+        if (victories > (defeats * 2)) {
+            performanceModifier -= 2;
+        } else if (victories > defeats) {
+            performanceModifier--;
+        } else if (defeats > (victories * 2)) {
+            performanceModifier += 2;
+        } else {
+            performanceModifier++;
+        }
 
-        // For every 5 player victories in last month: -1
-        mod -= victories / 5;
+        int miscModifiers = moraleMod;
 
-        // For every 2 player defeats in last month: +1
-        mod += defeats / 2;
-
-        // "Several weekly events affect the morale roll, so, beyond the
-        // modifiers presented here, notice that some events add
-        // bonuses/minuses to this roll."
-        mod += moraleMod;
-
-        // Enemy type: Pirates: -2
-        // Rebels/Mercs/Minor factions: -1
-        // Clans: +2
+        // Additional morale modifications depending on faction properties
         if (Factions.getInstance().getFaction(enemyCode).isPirate()) {
-            mod -= 2;
-        } else if (Factions.getInstance().getFaction(enemyCode).isRebel() ||
-                isMinorPower(enemyCode) ||
-                Factions.getInstance().getFaction(enemyCode).isMercenary()) {
-            mod -= 1;
+            miscModifiers -= 2;
+        } else if (Factions.getInstance().getFaction(enemyCode).isRebel()
+                || isMinorPower(enemyCode)
+                || Factions.getInstance().getFaction(enemyCode).isMercenary()) {
+            miscModifiers -= 1;
         } else if (Factions.getInstance().getFaction(enemyCode).isClan()) {
-            mod += 2;
+            miscModifiers += 2;
         }
 
-        // If no player victories in last month: +1
-        if (victories == 0) {
-            mod++;
-        }
+        // Total morale modifier calculation
+        int totalModifier = enemySkillModifier - allySkillModifier + performanceModifier + miscModifiers;
+        int roll = Compute.d6(2) + totalModifier;
 
-        // If no player defeats in last month: -1
-        if (defeats == 0) {
-            mod--;
-        }
-
-        // After finding the applicable modifiers, roll according to the
-        // following table to find the new morale level:
-        // 1 or less: Morale level decreases 2 levels
-        // 2 – 5: Morale level decreases 1 level
-        // 6 – 8: Morale level remains the same
-        // 9 - 12: Morale level increases 1 level
-        // 13 or more: Morale increases 2 levels
-        int roll = Compute.d6(2) + mod;
-
+        // Morale level determination based on roll value
         final AtBMoraleLevel[] moraleLevels = AtBMoraleLevel.values();
-        if (roll <= 1) {
+
+        if (roll < 2) {
             setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() - 2, 0)]);
-        } else if (roll <= 5) {
+        } else if (roll < 5) {
             setMoraleLevel(moraleLevels[Math.max(getMoraleLevel().ordinal() - 1, 0)]);
-        } else if ((roll >= 9) && (roll <= 12)) {
-            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
-        } else if (roll >= 13) {
+        } else if ((roll > 12)) {
             setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 2, moraleLevels.length - 1)]);
+        } else if ((roll > 9)) {
+            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
         }
 
-        // Enemy defeated, retreats or do not offer opposition to the player
-        // forces, equal to a early victory for contracts that are not
-        // Garrison-type, and a 1d6-3 (minimum 1) months without enemy
-        // activity for Garrison-type contracts.
-        if (getMoraleLevel().isRout() && getContractType().isGarrisonType()) {
-            routEnd = today.plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
+        // Additional morale updates if morale level is set to 'Routed' and contract type is a garrison type
+        if (getMoraleLevel().isRouted()) {
+            if (getContractType().isGarrisonType()) {
+                routEnd = today.plusMonths(Math.max(1, Compute.d6() - 3)).minusDays(1);
+            } else {
+                campaign.addReport("With the enemy routed, any remaining objectives have been successfully completed." +
+                        " The contract will conclude tomorrow.");
+                setEndDate(today.plusDays(1));
+            }
         }
 
+        // Process the results of the reinforcement roll
+        if (!getMoraleLevel().isRouted() && !routContinue) {
+            setMoraleLevel(moraleLevels[Math.min(getMoraleLevel().ordinal() + 1, moraleLevels.length - 1)]);
+            campaign.addReport("Long ranged scans have detected the arrival of additional enemy forces.");
+            return;
+        }
+
+        // Reset external morale modifier
         moraleMod = 0;
     }
 
     /**
-     * Changes the enemy to a randomly selected faction that's an enemy of
-     * the current employer
+     * Updates the enemy faction and enemy bot name for this contract.
+     *
+     * @param campaign The current campaign.
+     * @param today    The current LocalDate object.
      */
-    private void updateEnemy(LocalDate today) {
+    private void updateEnemy(Campaign campaign, LocalDate today) {
         String enemyCode = RandomFactionGenerator.getInstance().getEnemy(
                 Factions.getInstance().getFaction(employerCode), false, true);
         setEnemyCode(enemyCode);
@@ -400,6 +514,24 @@ public class AtBContract extends Contract {
         setEnemyBotName(enemyFaction.getFullName(today.getYear()));
         enemyName = ""; // wipe the old enemy name
         getEnemyName(today.getYear()); // we use this to update enemyName
+
+        // We have a check in getEnemyName that prevents rolling over mercenary names,
+        // so we add this extra step to force a mercenary name re-roll,
+        // in the event one Mercenary faction is replaced with another.
+        if (Factions.getInstance().getFaction(enemyCode).isMercenary()) {
+            enemyBotName = BackgroundsController.randomMercenaryCompanyNameGenerator(null);
+        }
+
+        allyCamouflage = pickRandomCamouflage(today.getYear(), employerCode);
+        enemyCamouflage = pickRandomCamouflage(today.getYear(), enemyCode);
+
+        // Update the Batchall information
+        batchallAccepted = true;
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            if (getEnemy().isClan()) {
+                setBatchallAccepted(initiateBatchall(campaign));
+            }
+        }
     }
 
     /**
@@ -469,7 +601,7 @@ public class AtBContract extends Contract {
                     && (((AtBScenario) s).getScenarioType() == AtBScenario.BASEATTACK)
                     && ((AtBScenario) s).isAttacker() && s.getStatus().isOverallVictory()) {
                 earlySuccess = true;
-            } else if (getMoraleLevel().isRout() && !getContractType().isGarrisonType()) {
+            } else if (getMoraleLevel().isRouted() && !getContractType().isGarrisonType()) {
                 earlySuccess = true;
             }
         }
@@ -500,7 +632,7 @@ public class AtBContract extends Contract {
                     c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
 
                     for (int i = 0; i < number; i++) {
-                        Person p = c.newDependent(false);
+                        Person p = c.newDependent(false, Gender.RANDOMIZE);
                         c.recruitPerson(p);
                     }
                 }
@@ -580,6 +712,14 @@ public class AtBContract extends Contract {
 
     public void setMercSubcontract(boolean sub) {
         mercSubcontract = sub;
+    }
+
+    public boolean isAttacker() {
+        return isAttacker;
+    }
+
+    public void setAttacker(boolean isAttacker) {
+        this.isAttacker = isAttacker;
     }
 
     public void checkEvents(Campaign c) {
@@ -806,7 +946,6 @@ public class AtBContract extends Contract {
         indent = super.writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyName", getEnemyName(0));
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allySkill", getAllySkill().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allyQuality", getAllyQuality());
@@ -839,6 +978,7 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partsAvailabilityLevel", getPartsAvailabilityLevel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "extensionLength", extensionLength);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesPct", sharesPct);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "batchallAccepted", batchallAccepted);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "playerMinorBreaches", playerMinorBreaches);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerMinorBreaches", employerMinorBreaches);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractScoreArbitraryModifier", contractScoreArbitraryModifier);
@@ -875,8 +1015,6 @@ public class AtBContract extends Contract {
                     employerCode = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyCode")) {
                     enemyCode = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("enemyName")) {
-                    enemyName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractType")) {
                     setContractType(AtBContractType.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("allySkill")) {
@@ -915,6 +1053,8 @@ public class AtBContract extends Contract {
                     extensionLength = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("sharesPct")) {
                     sharesPct = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("batchallAccepted")) {
+                    batchallAccepted = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("numBonusParts")) {
                     numBonusParts = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("playerMinorBreaches")) {
@@ -981,11 +1121,13 @@ public class AtBContract extends Contract {
     public void setEmployerCode(final String code, final LocalDate date) {
         employerCode = code;
         setEmployer(getEmployerName(date.getYear()));
+        enemyCamouflage = pickRandomCamouflage(date.getYear(), enemyCode);
     }
 
     public void setEmployerCode(String code, int year) {
         employerCode = code;
         setEmployer(getEmployerName(year));
+        allyCamouflage = pickRandomCamouflage(year, employerCode);
     }
 
     public String getEmployerName(int year) {
@@ -1001,53 +1143,28 @@ public class AtBContract extends Contract {
         return enemyCode;
     }
 
-    public void setEnemyCode(String enemyCode) {
-        this.enemyCode = enemyCode;
-        this.enemyName = ""; // better reset it if we're changing the enemy code
-    }
-
     /**
      * Retrieves the name of the enemy for this contract.
-     * If enemyName is not set, it generates and sets the name.
      *
-     * @param year the year for which to retrieve the enemy faction's full name (or
-     *             0, if year is unknown)
-     * @return the name of the enemy
+     * @param year The current year in the game.
+     * @return The name of the enemy.
      */
     public String getEnemyName(int year) {
-        if (enemyName.isBlank()) {
-            generateEnemyName(year);
-        }
+        Faction faction = Factions.getInstance().getFaction(enemyCode);
 
-        return enemyName;
-    }
-
-    public void setEnemyName(final String enemyName) {
-        this.enemyName = enemyName;
-    }
-
-    /**
-     * Generates the name of the enemy for this contract.
-     * If the enemy is a mercenary, a random mercenary company name is generated.
-     * Otherwise, the full name of the enemy faction is retrieved based on the given
-     * year.
-     * If the enemy or faction cannot be found, the short name of the enemy is used
-     * as a fallback.
-     *
-     * @param year the year for which to retrieve the enemy faction's full name (or
-     *             0, if year is unknown)
-     */
-    public void generateEnemyName(@Nullable int year) {
-        try {
-            if (getEnemy().isMercenary()) {
-                enemyName = BackgroundsController.randomMercenaryCompanyNameGenerator(null);
-            } else if (year != 0) {
-                enemyName = Factions.getInstance().getFaction(getEnemy().getShortName()).getFullName(year);
+        if (faction.isMercenary()) {
+            if (Objects.equals(enemyBotName, "Enemy")) {
+                return BackgroundsController.randomMercenaryCompanyNameGenerator(null);
+            } else {
+                return enemyBotName;
             }
-            // this is a fallback to ensure we don't end up with a null enemyName
-        } catch (NullPointerException e) {
-            enemyName = getEnemy().getShortName();
+        } else {
+            return faction.getFullName(year);
         }
+    }
+
+    public void setEnemyCode(String enemyCode) {
+        this.enemyCode = enemyCode;
     }
 
     public AtBContractType getContractType() {
@@ -1179,6 +1296,24 @@ public class AtBContract extends Contract {
         sharesPct = pct;
     }
 
+    /**
+     * Checks if the Batchall has been accepted for the contract.
+     *
+     * @return {@code true} if the Batchall has been accepted, {@code false} otherwise.
+     */
+    public boolean isBatchallAccepted() {
+        return batchallAccepted;
+    }
+
+    /**
+     * Sets the {@code batchallAccepted} flag for this contract.
+     *
+     * @param batchallAccepted The value to set for the {@code batchallAccepted} flag.
+     */
+    public void setBatchallAccepted(final boolean batchallAccepted) {
+        this.batchallAccepted = batchallAccepted;
+    }
+
     public void addPlayerMinorBreach() {
         playerMinorBreaches++;
     }
@@ -1306,8 +1441,13 @@ public class AtBContract extends Contract {
         requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
 
         setPartsAvailabilityLevel(getContractType().calculatePartsAvailabilityLevel());
-        allyBotName = getEmployerName(campaign.getGameYear());
-        enemyBotName = getEnemyName(campaign.getGameYear()); // we set enemyName here, too
+
+        int currentYear = campaign.getGameYear();
+        allyBotName = getEmployerName(currentYear);
+        allyCamouflage = pickRandomCamouflage(currentYear, employerCode);
+
+        enemyBotName = getEnemyName(currentYear);
+        enemyCamouflage = pickRandomCamouflage(currentYear, enemyCode);
     }
 
     /**
@@ -1317,5 +1457,274 @@ public class AtBContract extends Contract {
         public AtBContractRef(int id) {
             setId(id);
         }
+    }
+
+    /**
+     * This method initiates a batchall, a challenge/dialog to decide on the conduct of a campaign.
+     * Prompts the player with a message and options to accept or refuse the batchall.
+     *
+     * @param campaign       The current campaign.
+     * @return {@code true} if the batchall is accepted, {@code false} otherwise.
+     */
+    //
+    public boolean initiateBatchall(Campaign campaign) {
+        // Retrieves the title from the resources
+        String title = resources.getString("incomingTransmission.title");
+
+        // Retrieves the batchall statement based on infamy and enemy code
+        String batchallStatement = BatchallFactions.getGreeting(campaign, enemyCode);
+
+        // Constants for the directory of the portraits and the file type
+        final String PORTRAIT_DIRECTORY = "data/images/force/Pieces/Logos/Clan/";
+        final String PORTRAIT_FILE_TYPE = ".png";
+
+        // An ImageIcon to hold the clan's faction icon
+        ImageIcon icon;
+
+        // A switch statement that selects the icon based on the enemy code
+        switch (enemyCode) {
+            // Each case sets the icon to the corresponding image
+            case "CBS" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Blood Spirit"
+                + PORTRAIT_FILE_TYPE);
+            case "CB" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Burrock"
+                + PORTRAIT_FILE_TYPE);
+            case "CCC" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Cloud Cobra"
+                + PORTRAIT_FILE_TYPE);
+            case "CCO" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Coyote"
+                + PORTRAIT_FILE_TYPE);
+            case "CDS" -> {
+                if (campaign.getGameYear() >= 3100) {
+                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Sea Fox"
+                        + PORTRAIT_FILE_TYPE);
+                } else {
+                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Diamond Shark"
+                        + PORTRAIT_FILE_TYPE);
+                }
+            }
+            case "CFM" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Fire Mandrill"
+                + PORTRAIT_FILE_TYPE);
+            case "CGB" -> {
+                if (campaign.getGameYear() >= 3060) {
+                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Ghost Bear Dominion"
+                        + PORTRAIT_FILE_TYPE);
+                } else {
+                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ghost Bear"
+                        + PORTRAIT_FILE_TYPE);
+                }
+            }
+            case "CGS" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Goliath Scorpion"
+                + PORTRAIT_FILE_TYPE);
+            case "CHH" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Hell's Horses"
+                + PORTRAIT_FILE_TYPE);
+            case "CIH" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ice Hellion"
+                + PORTRAIT_FILE_TYPE);
+            case "CJF" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Jade Falcon"
+                + PORTRAIT_FILE_TYPE);
+            case "CMG" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Mongoose"
+                + PORTRAIT_FILE_TYPE);
+            case "CNC" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Nova Cat"
+                + PORTRAIT_FILE_TYPE);
+            case "CSJ" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Smoke Jaguar"
+                + PORTRAIT_FILE_TYPE);
+            case "CSR" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Snow Raven"
+                + PORTRAIT_FILE_TYPE);
+            case "CSA" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Star Adder"
+                + PORTRAIT_FILE_TYPE);
+            case "CSV" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Steel Viper"
+                + PORTRAIT_FILE_TYPE);
+            case "CSL" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Stone Lion"
+                + PORTRAIT_FILE_TYPE);
+            case "CWI" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Widowmaker"
+                + PORTRAIT_FILE_TYPE);
+            case "CW", "CWE" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf"
+                + PORTRAIT_FILE_TYPE);
+            case "CWIE" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf-in-Exile"
+                + PORTRAIT_FILE_TYPE);
+            case "CEI" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Scorpion Empire"
+                + PORTRAIT_FILE_TYPE);
+            case "RD" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Rasalhague Dominion"
+                + PORTRAIT_FILE_TYPE);
+            case "RA" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Raven Alliance"
+                + PORTRAIT_FILE_TYPE);
+            default -> icon = new ImageIcon("data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
+        }
+
+        // Set the commander's rank and use a name generator to generate the commander's name
+        String rank = resources.getString("starColonel.text");
+        RandomNameGenerator randomNameGenerator = new RandomNameGenerator();
+        String commander = randomNameGenerator.generate(Gender.RANDOMIZE, true, enemyCode);
+        commander += ' ' + Bloodname.randomBloodname(enemyCode, Phenotype.MEKWARRIOR,
+            campaign.getGameYear()).getName();
+
+        // Construct the batchall message
+        String message = String.format(resources.getString("batchallOpener.text"),
+            this.getName(), rank, commander, getEnemy().getFullName(campaign.getGameYear()),
+            getSystemName(campaign.getLocalDate()));
+        message = message + batchallStatement;
+
+        // Append additional message text if the fame is less than 5
+        if (campaign.getFameAndInfamy().getFameForFaction(enemyCode) < 5) {
+            message = message + resources.getString("batchallCloser.text");
+        }
+
+        // Create a text pane to display the message
+        JTextPane textPane = new JTextPane();
+        textPane.setContentType("text/html");
+        textPane.setText(message);
+        textPane.setEditable(false);
+
+        // Create a panel to display the icon and the batchall message
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel imageLabel = new JLabel(icon);
+        panel.add(imageLabel, BorderLayout.CENTER);
+        panel.add(textPane, BorderLayout.SOUTH);
+
+        // Choose dialog to display based on the fame
+        if (campaign.getFameAndInfamy().getFameForFaction(enemyCode) > 4) {
+            noBatchallOfferedDialog(panel, title);
+            return false;
+        } else {
+            return batchallDialog(campaign, panel, title);
+        }
+    }
+
+    /**
+     * This function creates a dialog with accept and refuse buttons.
+     *
+     * @param campaign the current campaign
+     * @param panel the panel to display in the dialog
+     * @param title the title of the dialog
+     * @return {@code true} if the batchall is accepted, {@code false} otherwise
+     */
+    private boolean batchallDialog(Campaign campaign, JPanel panel, String title) {
+        // We use a single-element array to store the result, because we need to modify it inside
+        // the action listeners, which requires the variable to be effectively final
+        final boolean[] result = {false};
+
+        // Create a custom dialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(title);  // Set the title of the dialog
+        dialog.setLayout(new BorderLayout());  // Set a border layout manager
+
+        // Create an accept button and add its action listener. When clicked, it will set the result
+        // to true and close the dialog
+        JButton acceptButton = new JButton(resources.getString("responseAccept.text"));
+        acceptButton.setToolTipText(resources.getString("responseAccept.tooltip"));
+        acceptButton.addActionListener(e -> {
+            result[0] = true;
+            dialog.dispose();
+        });
+
+        // Create a refuse button and add its action listener.
+        // When clicked, it will trigger a refusal confirmation dialog
+        JButton refuseButton = new JButton(resources.getString("responseRefuse.text"));
+        refuseButton.setToolTipText(resources.getString("responseRefuse.tooltip"));
+        refuseButton.addActionListener(e -> {
+            dialog.dispose();  // Close the current dialog
+            // Use another method to show a refusal confirmation dialog and store the result
+            result[0] = refusalConfirmationDialog(campaign);
+        });
+
+        // Create a panel for buttons and add buttons to it
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(refuseButton);
+
+        // Add the original panel and button panel to the dialog
+        dialog.add(panel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.pack();  // Size the dialog to fit the preferred size and layouts of its components
+        dialog.setLocationRelativeTo(null);  // Center the dialog on the screen
+        dialog.setModal(true);  // Make the dialog block user input to other top-level windows
+        dialog.setVisible(true);  // Show the dialog
+
+        return result[0];  // Return the result when the dialog is disposed
+    }
+
+    /**
+     * This function displays a dialog asking for final confirmation to refuse a batchall,
+     * and performs related actions if the refusal is confirmed.
+     *
+     * @param campaign the current campaign
+     * @return {@code true} if the user accepts the refusal, {@code false} if the user cancels the refusal
+     */
+    private boolean refusalConfirmationDialog(Campaign campaign) {
+        // Create modal JDialog
+        JDialog dialog = new JDialog();
+        dialog.setLayout(new BorderLayout());
+
+        // Buffer for storing user response (acceptance/refusal)
+        final boolean[] response = {false};
+
+        // "Accept" Button
+        JButton acceptButton = new JButton(resources.getString("responseAccept.text"));
+        acceptButton.setToolTipText(resources.getString("responseAccept.tooltip"));
+        acceptButton.addActionListener(e -> {
+            response[0] = true;  // User has accepted
+            dialog.dispose();  // Close dialog
+        });
+
+        // "Refuse" Button
+        JButton refuseButton = new JButton(resources.getString("responseRefuse.text"));
+        refuseButton.setToolTipText(resources.getString("responseRefuse.tooltip"));
+        refuseButton.addActionListener(e -> {
+            // Update the campaign state on refusal
+            campaign.addReport(resources.getString("refusalReport.text"));
+            campaign.getFameAndInfamy().updateFameForFaction(campaign, enemyCode, -1);
+            response[0] = false;  // User has refused
+            dialog.dispose();  // Close dialog
+        });
+
+        // Panel for hosting buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(refuseButton);
+
+        // Message Label
+        JLabel messageLabel = new JLabel(String.format(resources.getString("refusalConfirmation.text"),
+            getEnemy().getFullName(campaign.getGameYear())));
+
+        // Add Message and Buttons to the dialog
+        dialog.add(messageLabel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Configure and display dialog
+        dialog.pack();  // Fit dialog to its contents
+        dialog.setLocationRelativeTo(null);  // Center dialog
+        dialog.setModal(true);  // Block access to other windows
+        dialog.setVisible(true);  // Display dialog
+
+        // Return user response
+        return response[0];
+    }
+
+    /**
+     * Displays a dialog with a message for when the faction has refused to offer a Batchall due to
+     * past player refusals.
+     *
+     * @param panel The panel to display in the dialog.
+     * @param title The title of the dialog.
+     */
+    private void noBatchallOfferedDialog(JPanel panel, String title) {
+        // Create a new JDialog
+        JDialog dialog = new JDialog();
+        dialog.setTitle(title);
+        dialog.setLayout(new BorderLayout());
+
+        JButton responseButton = new JButton(resources.getString("responseBringItOn.text"));
+        responseButton.setToolTipText(resources.getString("responseBringItOn.tooltip"));
+        responseButton.addActionListener(e -> dialog.dispose()); // Dispose the dialog when the button is clicked
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(responseButton); // Add the button to the panel
+
+        dialog.add(panel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.pack(); // Size the dialog to fit the preferred size and layouts of its components
+        dialog.setLocationRelativeTo(null); // Center the dialog on the screen
+        dialog.setModal(true); // Set the dialog to be modal
+        dialog.setVisible(true); // Show the dialog
     }
 }

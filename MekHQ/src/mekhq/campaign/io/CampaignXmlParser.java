@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -78,10 +78,10 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class CampaignXmlParser {
-    private static final MMLogger logger = MMLogger.create(CampaignXmlParser.class);
+    private final InputStream is;
+    private final MekHQ app;
 
-    private InputStream is;
-    private MekHQ app;
+    private static final MMLogger logger = MMLogger.create(CampaignXmlParser.class);
 
     public CampaignXmlParser(InputStream is, MekHQ app) {
         this.is = is;
@@ -551,6 +551,21 @@ public class CampaignXmlParser {
 
         retVal.setUnitRating(null);
 
+        // this is used to handle characters from pre-50.01 campaigns
+        retVal.getPersonnel().stream()
+                    .filter(person -> person.getJoinedCampaign() == null)
+                    .forEach(person -> {
+                        if (person.getRecruitment() != null) {
+                            person.setJoinedCampaign(person.getRecruitment());
+                            logger.info("{} doesn't have a date recorded showing when they joined the campaign. Using recruitment date.",
+                                    person.getFullTitle());
+                        } else {
+                            person.setJoinedCampaign(retVal.getLocalDate());
+                            logger.info("{} doesn't have a date recorded showing when they joined the campaign. Using current date.",
+                                    person.getFullTitle());
+                        }
+                    });
+
         logger.info("Load of campaign file complete!");
 
         return retVal;
@@ -579,8 +594,7 @@ public class CampaignXmlParser {
                     tech.removeTechUnit(u);
                 }
                 if (null != reason) {
-                    logger
-                            .warn(String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
+                    logger.warn(String.format("Tech %s %s %s (fixed)", tech.getFullName(), reason, unitDesc));
                 }
             }
         }
@@ -846,9 +860,7 @@ public class CampaignXmlParser {
             if (!wn2.getNodeName().equalsIgnoreCase("person")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                String message = String.format("Unknown node type not loaded in Personnel nodes: {}",
-                        wn2.getNodeName());
-                logger.error(message);
+                logger.error("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
 
                 continue;
             }
@@ -947,8 +959,7 @@ public class CampaignXmlParser {
             if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                logger
-                        .error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
+                logger.error("Unknown node type not loaded in Special Ability nodes: " + wn2.getNodeName());
                 continue;
             }
             SpecialAbility.generateInstanceFromXML(wn2, options, version);
@@ -1000,16 +1011,14 @@ public class CampaignXmlParser {
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
             if (!customsDir.mkdir()) {
-                logger
-                        .error("Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
+                logger.error("Failed to create directory " + sCustomsDir + ", and therefore cannot save the unit.");
                 return false;
             }
         }
         File customsDirCampaign = new File(sCustomsDirCampaign);
         if (!customsDirCampaign.exists()) {
             if (!customsDirCampaign.mkdir()) {
-                logger.error(
-                        "Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
+                logger.error("Failed to create directory " + sCustomsDirCampaign + ", and therefore cannot save the unit.");
                 return false;
             }
         }
@@ -1549,9 +1558,9 @@ public class CampaignXmlParser {
         }
     }
 
-    // region Migration Methods
-    // region Ancestry Migration
-    private static Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
+    //region Migration Methods
+    //region Ancestry Migration
+    private static final Map<UUID, List<Person>> ancestryMigrationMap = new HashMap<>();
 
     /**
      * This method is used to add people to the ancestry migration map that is used
@@ -1619,8 +1628,7 @@ public class CampaignXmlParser {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
                     father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
                 } else {
-                    logger.warn(
-                            "Person with id " + father.getId() + "does not exist, skipping adding Genealogy for them.");
+                    logger.warn("Person with id " + father.getId() + "does not exist, skipping adding Genealogy for them.");
                 }
 
                 if (mother == null) {
@@ -1629,8 +1637,7 @@ public class CampaignXmlParser {
                     person.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
                     mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, person);
                 } else {
-                    logger.warn("Person with id " + mother.getId()
-                            + " does not exist, skipping adding Genealogy for them.");
+                    logger.warn("Person with id " + mother.getId() + " does not exist, skipping adding Genealogy for them.");
                 }
             }
         }

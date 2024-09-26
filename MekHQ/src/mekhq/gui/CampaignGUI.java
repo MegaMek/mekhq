@@ -55,11 +55,11 @@ import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
 import mekhq.campaign.personnel.death.ExponentialRandomDeath;
 import mekhq.campaign.personnel.death.PercentageRandomDeath;
-import mekhq.campaign.personnel.divorce.PercentageRandomDivorce;
+import mekhq.campaign.personnel.divorce.RandomDivorce;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.marriage.PercentageRandomMarriage;
+import mekhq.campaign.personnel.marriage.RandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.procreation.PercentageRandomProcreation;
+import mekhq.campaign.personnel.procreation.RandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.report.CargoReport;
@@ -1493,11 +1493,9 @@ public class CampaignGUI extends JPanel {
             getCampaign().getDivorce().setUseRandomSameSexDivorce(newOptions.isUseRandomSameSexDivorce());
             getCampaign().getDivorce().setUseRandomClanPersonnelDivorce(newOptions.isUseRandomClanPersonnelDivorce());
             getCampaign().getDivorce().setUseRandomPrisonerDivorce(newOptions.isUseRandomPrisonerDivorce());
-            if (getCampaign().getDivorce().getMethod().isPercentage()) {
-                ((PercentageRandomDivorce) getCampaign().getDivorce()).setOppositeSexPercentage(
-                        newOptions.getPercentageRandomDivorceOppositeSexChance());
-                ((PercentageRandomDivorce) getCampaign().getDivorce()).setSameSexPercentage(
-                        newOptions.getPercentageRandomDivorceSameSexChance());
+            if (getCampaign().getDivorce().getMethod().isDiceRoll()) {
+                ((RandomDivorce) getCampaign().getDivorce()).setDivorceDiceSize(
+                        newOptions.getRandomDivorceDiceSize());
             }
         }
 
@@ -1506,15 +1504,12 @@ public class CampaignGUI extends JPanel {
         } else {
             getCampaign().getMarriage().setUseClanPersonnelMarriages(newOptions.isUseClanPersonnelMarriages());
             getCampaign().getMarriage().setUsePrisonerMarriages(newOptions.isUsePrisonerMarriages());
-            getCampaign().getMarriage().setUseRandomSameSexMarriages(newOptions.isUseRandomSameSexMarriages());
             getCampaign().getMarriage()
                     .setUseRandomClanPersonnelMarriages(newOptions.isUseRandomClanPersonnelMarriages());
             getCampaign().getMarriage().setUseRandomPrisonerMarriages(newOptions.isUseRandomPrisonerMarriages());
-            if (getCampaign().getMarriage().getMethod().isPercentage()) {
-                ((PercentageRandomMarriage) getCampaign().getMarriage()).setOppositeSexPercentage(
-                        newOptions.getPercentageRandomMarriageOppositeSexChance());
-                ((PercentageRandomMarriage) getCampaign().getMarriage()).setSameSexPercentage(
-                        newOptions.getPercentageRandomMarriageSameSexChance());
+            if (getCampaign().getMarriage().getMethod().isDiceRoll()) {
+                ((RandomMarriage) getCampaign().getMarriage()).setMarriageDiceSize(
+                        newOptions.getRandomMarriageDiceSize());
             }
         }
 
@@ -1528,11 +1523,11 @@ public class CampaignGUI extends JPanel {
             getCampaign().getProcreation()
                     .setUseRandomClanPersonnelProcreation(newOptions.isUseRandomClanPersonnelProcreation());
             getCampaign().getProcreation().setUseRandomPrisonerProcreation(newOptions.isUseRandomPrisonerProcreation());
-            if (getCampaign().getProcreation().getMethod().isPercentage()) {
-                ((PercentageRandomProcreation) getCampaign().getProcreation()).setPercentage(
-                        newOptions.getPercentageRandomProcreationRelationshipChance());
-                ((PercentageRandomProcreation) getCampaign().getProcreation()).setRelationshiplessPercentage(
-                        newOptions.getPercentageRandomProcreationRelationshiplessChance());
+            if (getCampaign().getProcreation().getMethod().isDiceRoll()) {
+                ((RandomProcreation) getCampaign().getProcreation()).setRelationshipDieSize(
+                        newOptions.getRandomProcreationRelationshipDiceSize());
+                ((RandomProcreation) getCampaign().getProcreation()).setRelationshiplessDieSize(
+                        newOptions.getRandomProcreationRelationshiplessDiceSize());
             }
         }
 

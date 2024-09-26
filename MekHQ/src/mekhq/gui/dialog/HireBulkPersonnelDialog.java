@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2010-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,28 +18,12 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.personnel.SkillType.*;
-import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
-
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JSpinner.NumberEditor;
-
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
 import megamek.common.enums.SkillLevel;
+import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -47,11 +31,45 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
+import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+import static mekhq.campaign.personnel.SkillType.*;
+import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
+
+import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+import static mekhq.campaign.personnel.SkillType.*;
+import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
 
 /**
  * @author Jay Lawson
@@ -62,7 +80,7 @@ public class HireBulkPersonnelDialog extends JDialog {
     private static final Insets ZERO_INSETS = new Insets(0, 0, 0, 0);
     private static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
 
-    private Campaign campaign;
+    private final Campaign campaign;
 
     private JComboBox<PersonTypeItem> choiceType;
     private JComboBox<RankDisplay> choiceRanks;
@@ -341,10 +359,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             Person person = campaign.newPerson(selectedItem.getRole());
 
             if ((useSkill) && (!selectedItem.getRole().isCivilian()) && (!selectedItem.getRole().isAssistant())) {
-                overrideSkills(
-                        person,
-                        selectedItem.getRole(),
-                        Objects.requireNonNull(skillLevel.getSelectedItem()).ordinal());
+                overrideSkills(campaign, person, selectedItem.getRole(),
+                    Objects.requireNonNull(skillLevel.getSelectedItem()).ordinal());
             }
 
             person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
@@ -356,19 +372,38 @@ public class HireBulkPersonnelDialog extends JDialog {
                     person.setBirthday(birthDay);
                     age = person.getAge(today);
                 }
+
+                // Limit skills by age for children and adolescents
+                if (age < 16) {
+                    person.removeAllSkills();
+                } else if (age < 18) {
+                    person.limitSkills(0);
+                }
+
+                // re-roll SPAs to include in any age and skill adjustments
+                Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
+
+                for (IOption option : Collections.list(options)) {
+                    person.getOptions().getOption(option.getName()).clearValue();
+                }
+
+                int experienceLevel = person.getExperienceLevel(campaign, false);
+
+                if (experienceLevel <= 0) {
+                    person.setLoyalty(Compute.d6(3) + 2);
+                } else if (experienceLevel == 1) {
+                    person.setLoyalty(Compute.d6(3) + 1);
+                } else {
+                    person.setLoyalty(Compute.d6(3));
+                }
+
+                if (experienceLevel > 0) {
+                    AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
+                    specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+                    specialAbilityGenerator.generateSpecialAbilities(campaign, person, experienceLevel);
+                }
             }
 
-            // Limit skills by age for children and adolescents
-            if (age < 12) {
-                person.removeAllSkills();
-            } else if (age < 14) {
-                person.limitSkills(0);
-            } else if (age < 18) {
-                person.limitSkills(age - 13);
-            }
-
-            // re-calculate initial education, as this might have changed since the person was first generated
-            EducationController.setInitialEducation(campaign, person);
 
             if (!campaign.recruitPerson(person, isGmHire)) {
                 number = 0;
@@ -379,15 +414,16 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     /**
-     * Replaces the skills for a {@link Person} based on their primary role and
-     * desired experience level.
+     * Replaces the skills for a {@link Person} based on their primary role and desired experience level.
      *
+     * @param campaign    The current campaign
      * @param person      The {@link Person} to add default skills.
      * @param primaryRole The primary role of the person
      * @param expLvl      The experience level of the person (e.g.
      *                    {@link SkillType#EXP_GREEN}).
      */
-    protected void overrideSkills(Person person, PersonnelRole primaryRole, int expLvl) {
+    public static void overrideSkills(Campaign campaign, Person person, PersonnelRole primaryRole,
+                                      int expLvl) {
         switch (primaryRole) {
             case MEKWARRIOR:
                 addSkillFixedExperienceLevel(person, S_PILOT_MEK, expLvl);

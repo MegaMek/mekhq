@@ -44,6 +44,7 @@ public class Genealogy {
     // region Variables
     private final Person origin;
     private Person spouse;
+    private Person originSpouse; // the person who originated the marriage
     private final List<FormerSpouse> formerSpouses = new ArrayList<>();
     private final Map<FamilialRelationshipType, List<Person>> family = new HashMap<>();
     // endregion Variables
@@ -78,6 +79,20 @@ public class Genealogy {
      */
     public void setSpouse(final @Nullable Person spouse) {
         this.spouse = spouse;
+    }
+
+    /**
+     * @return the person who originated the marriage
+     */
+    public @Nullable Person getOriginSpouse() {
+        return originSpouse;
+    }
+
+    /**
+     * @param originSpouse the person who originated the marriage
+     */
+    public void setOriginSpouse(final @Nullable Person originSpouse) {
+        this.originSpouse = originSpouse;
     }
 
     /**

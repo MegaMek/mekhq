@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,6 +33,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -671,7 +673,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblEnemy, gridBagConstraints);
 
         txtEnemy.setName("txtEnemy");
-        txtEnemy.setText(contract.getEnemyName(campaign.getGameYear()));
+        txtEnemy.setText(contract.getEnemyBotName());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -922,7 +924,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         lblMorale.setName("lblMorale");
         lblMorale.setText(resourceMap.getString("lblMorale.text"));
-        lblMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
+        lblMorale.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -932,7 +934,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         txtMorale.setName("txtMorale");
         txtMorale.setText(contract.getMoraleLevel().toString());
-        txtMorale.setToolTipText(contract.getMoraleLevel().getToolTipText());
+        txtMorale.setToolTipText(wordWrap(contract.getMoraleLevel().getToolTipText()));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;

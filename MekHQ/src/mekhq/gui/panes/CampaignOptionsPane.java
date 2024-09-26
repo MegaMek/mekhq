@@ -348,27 +348,30 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // region Life Paths Tab
     // Personnel Randomization
     private JCheckBox chkUseDylansRandomXP;
+    private JSpinner spnNonBinaryDiceSize;
+
+    // Random Histories
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
     private JCheckBox chkUseRandomPersonalities;
     private JCheckBox chkUseRandomPersonalityReputation;
     private JCheckBox chkUseIntelligenceXpMultiplier;
+    private JCheckBox chkUseSimulatedRelationships;
 
     // Marriage
     private JCheckBox chkUseManualMarriages;
     private JCheckBox chkUseClanPersonnelMarriages;
     private JCheckBox chkUsePrisonerMarriages;
-    private JSpinner spnMinimumMarriageAge;
     private JSpinner spnCheckMutualAncestorsDepth;
+    private JSpinner spnNoInterestInMarriageDiceSize;
     private JCheckBox chkLogMarriageNameChanges;
     private Map<MergingSurnameStyle, JSpinner> spnMarriageSurnameWeights;
     private MMComboBox<RandomMarriageMethod> comboRandomMarriageMethod;
-    private JCheckBox chkUseRandomSameSexMarriages;
     private JCheckBox chkUseRandomClanPersonnelMarriages;
     private JCheckBox chkUseRandomPrisonerMarriages;
     private JSpinner spnRandomMarriageAgeRange;
-    private JSpinner spnPercentageRandomMarriageOppositeSexChance;
-    private JLabel lblPercentageRandomMarriageSameSexChance;
-    private JSpinner spnPercentageRandomMarriageSameSexChance;
+    private JSpinner spnRandomMarriageDiceSize;
+    private JSpinner spnRandomSameSexMarriageDiceSize;
+    private JSpinner spnRandomNewDependentMarriage;
 
     // Divorce
     private JCheckBox chkUseManualDivorce;
@@ -380,10 +383,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseRandomSameSexDivorce;
     private JCheckBox chkUseRandomClanPersonnelDivorce;
     private JCheckBox chkUseRandomPrisonerDivorce;
-    private JLabel lblPercentageRandomDivorceOppositeSexChance;
-    private JSpinner spnPercentageRandomDivorceOppositeSexChance;
-    private JLabel lblPercentageRandomDivorceSameSexChance;
-    private JSpinner spnPercentageRandomDivorceSameSexChance;
+    private JLabel lblRandomDivorceDiceSize;
+    private JSpinner spnRandomDivorceDiceSize;
 
     // Procreation
     private JCheckBox chkUseManualProcreation;
@@ -395,14 +396,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkAssignChildrenOfFoundersFounderTag;
     private JCheckBox chkDetermineFatherAtBirth;
     private JCheckBox chkDisplayTrueDueDate;
+    private JSpinner spnNoInterestInChildrenDiceSize;
+    private JCheckBox chkUseMaternityLeave;
     private JCheckBox chkLogProcreation;
     private MMComboBox<RandomProcreationMethod> comboRandomProcreationMethod;
     private JCheckBox chkUseRelationshiplessRandomProcreation;
     private JCheckBox chkUseRandomClanPersonnelProcreation;
     private JCheckBox chkUseRandomPrisonerProcreation;
-    private JSpinner spnPercentageRandomProcreationRelationshipChance;
-    private JLabel lblPercentageRandomProcreationRelationshiplessChance;
-    private JSpinner spnPercentageRandomProcreationRelationshiplessChance;
+    private JSpinner spnRandomProcreationRelationshipDiceSize;
+    private JLabel lblRandomProcreationRelationshiplessDiceSize;
+    private JSpinner spnRandomProcreationRelationshiplessDiceSize;
 
     // Awards
     private MMComboBox<AwardBonus> comboAwardBonusStyle;
@@ -3037,8 +3040,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridy = 4;
         panSubAtBContract.add(spnBonusPartExchangeValue, gridBagConstraints);
 
-        JLabel lblBonusPartMaxExchangeCount = new JLabel(
-                resources.getString("lblBonusPartMaxExchangeCount.text"));
+        JLabel lblBonusPartMaxExchangeCount = new JLabel(resources.getString("lblBonusPartMaxExchangeCount.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 1;
@@ -4616,8 +4618,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseSubContractSoldiers.setEnabled(isUseTurnover);
 
         JLabel lblServiceContractDuration = new JLabel(resources.getString("lblServiceContractDuration.text"));
-        lblServiceContractDuration
-                .setToolTipText(resources.getString("lblServiceContractDuration.toolTipText"));
+        lblServiceContractDuration.setToolTipText(resources.getString("lblServiceContractDuration.toolTipText"));
         lblServiceContractDuration.setName("lblServiceContractDuration");
         lblServiceContractDuration.setEnabled(isUseTurnover);
 
@@ -4628,8 +4629,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnServiceContractDuration.setEnabled(isUseTurnover);
 
         JLabel lblServiceContractModifier = new JLabel(resources.getString("lblServiceContractModifier.text"));
-        lblServiceContractModifier
-                .setToolTipText(resources.getString("lblServiceContractModifier.toolTipText"));
+        lblServiceContractModifier.setToolTipText(resources.getString("lblServiceContractModifier.toolTipText"));
         lblServiceContractModifier.setName("lblServiceContractModifier");
         lblServiceContractModifier.setEnabled(isUseTurnover);
 
@@ -4892,10 +4892,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPayoutRateEnlisted.setName("lblPayoutRateEnlisted");
         spnPayoutRateEnlisted.setEnabled(isUseTurnover);
 
-        JLabel lblPayoutRetirementMultiplier = new JLabel(
-                resources.getString("lblPayoutRetirementMultiplier.text"));
-        lblPayoutRetirementMultiplier
-                .setToolTipText(resources.getString("lblPayoutRetirementMultiplier.toolTipText"));
+        JLabel lblPayoutRetirementMultiplier = new JLabel(resources.getString("lblPayoutRetirementMultiplier.text"));
+        lblPayoutRetirementMultiplier.setToolTipText(resources.getString("lblPayoutRetirementMultiplier.toolTipText"));
         lblPayoutRetirementMultiplier.setName("lblPayoutRetirementMultiplier");
         lblPayoutRetirementMultiplier.setEnabled(isUseTurnover);
 
@@ -5169,6 +5167,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseDylansRandomXP.setToolTipText(resources.getString("chkUseDylansRandomXP.toolTipText"));
         chkUseDylansRandomXP.setName("chkUseDylansRandomXP");
 
+        JLabel lblNonBinaryDiceSize = new JLabel(resources.getString("lblNonBinaryDiceSize.text"));
+        lblNonBinaryDiceSize.setToolTipText(resources.getString("lblNonBinaryDiceSize.toolTipText"));
+        lblNonBinaryDiceSize.setName("lblNonBinaryDiceSize");
+
+        spnNonBinaryDiceSize = new JSpinner(new SpinnerNumberModel(60, 0, 100000, 1));
+        spnNonBinaryDiceSize.setToolTipText(wordWrap(resources.getString("lblNonBinaryDiceSize.toolTipText")));
+        spnNonBinaryDiceSize.setName("spnNonBinaryDiceSize");
+
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory
@@ -5182,11 +5188,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chkUseDylansRandomXP));
+                        .addComponent(chkUseDylansRandomXP)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblNonBinaryDiceSize)
+                                .addComponent(spnNonBinaryDiceSize, Alignment.LEADING))
+        );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(chkUseDylansRandomXP));
+                        .addComponent(chkUseDylansRandomXP)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblNonBinaryDiceSize)
+                                .addComponent(spnNonBinaryDiceSize))
+        );
 
         return panel;
     }
@@ -5210,6 +5224,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 .setToolTipText(resources.getString("chkUseIntelligenceXpMultiplier.toolTipText"));
         chkUseIntelligenceXpMultiplier.setName("chkUseIntelligenceXpMultiplier");
 
+        chkUseSimulatedRelationships = new JCheckBox(resources.getString("chkUseSimulatedRelationships.text"));
+        chkUseSimulatedRelationships.setToolTipText(resources.getString("chkUseSimulatedRelationships.toolTipText"));
+        chkUseSimulatedRelationships.setName("chkUseSimulatedRelationships");
+
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomHistoriesPanel.title")));
@@ -5225,14 +5243,18 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(randomOriginOptionsPanel)
                         .addComponent(chkUseRandomPersonalities)
                         .addComponent(chkUseRandomPersonalityReputation)
-                        .addComponent(chkUseIntelligenceXpMultiplier));
+                        .addComponent(chkUseIntelligenceXpMultiplier)
+                        .addComponent(chkUseSimulatedRelationships)
+        );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(randomOriginOptionsPanel)
                         .addComponent(chkUseRandomPersonalities)
                         .addComponent(chkUseRandomPersonalityReputation)
-                        .addComponent(chkUseIntelligenceXpMultiplier));
+                        .addComponent(chkUseIntelligenceXpMultiplier)
+                        .addComponent(chkUseSimulatedRelationships)
+        );
 
         return panel;
     }
@@ -5672,13 +5694,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                     .setEnabled(!method.isNone() && chkUsePrisonerMarriages.isSelected());
         });
 
-        final JLabel lblMinimumMarriageAge = new JLabel(resources.getString("lblMinimumMarriageAge.text"));
-        lblMinimumMarriageAge.setToolTipText(resources.getString("lblMinimumMarriageAge.toolTipText"));
-        lblMinimumMarriageAge.setName("lblMinimumMarriageAge");
+        final JLabel lblNoInterestInMarriageDiceSize = new JLabel(resources.getString("lblNoInterestInMarriageDiceSize.text"));
+        lblNoInterestInMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblNoInterestInMarriageDiceSize.toolTipText")));
+        lblNoInterestInMarriageDiceSize.setName("lblNoInterestInMarriageDiceSize");
 
-        spnMinimumMarriageAge = new JSpinner(new SpinnerNumberModel(16, 14, null, 1));
-        spnMinimumMarriageAge.setToolTipText(resources.getString("lblMinimumMarriageAge.toolTipText"));
-        spnMinimumMarriageAge.setName("spnMinimumMarriageAge");
+        spnNoInterestInMarriageDiceSize = new JSpinner(new SpinnerNumberModel(10, 1, 100000, 1));
+        spnNoInterestInMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblNoInterestInMarriageDiceSize.toolTipText")));
+        spnNoInterestInMarriageDiceSize.setName("spnNoInterestInMarriageDiceSize");
 
         final JLabel lblCheckMutualAncestorsDepth = new JLabel(
                 resources.getString("lblCheckMutualAncestorsDepth.text"));
@@ -5700,7 +5722,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final JPanel randomMarriagePanel = createRandomMarriagePanel();
 
         // Programmatically Assign Accessibility Labels
-        lblMinimumMarriageAge.setLabelFor(spnMinimumMarriageAge);
         lblCheckMutualAncestorsDepth.setLabelFor(spnCheckMutualAncestorsDepth);
 
         // Layout the Panel
@@ -5719,8 +5740,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseClanPersonnelMarriages)
                         .addComponent(chkUsePrisonerMarriages)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblMinimumMarriageAge)
-                                .addComponent(spnMinimumMarriageAge, Alignment.LEADING))
+                                .addComponent(lblNoInterestInMarriageDiceSize)
+                                .addComponent(spnNoInterestInMarriageDiceSize, Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCheckMutualAncestorsDepth)
                                 .addComponent(spnCheckMutualAncestorsDepth,
@@ -5735,8 +5756,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseClanPersonnelMarriages)
                         .addComponent(chkUsePrisonerMarriages)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblMinimumMarriageAge)
-                                .addComponent(spnMinimumMarriageAge))
+                                .addComponent(lblNoInterestInMarriageDiceSize)
+                                .addComponent(spnNoInterestInMarriageDiceSize))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCheckMutualAncestorsDepth)
                                 .addComponent(spnCheckMutualAncestorsDepth))
@@ -5807,33 +5828,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 return;
             }
             final boolean enabled = !method.isNone();
-            final boolean sameSexEnabled = enabled && chkUseRandomSameSexMarriages.isSelected();
-            final boolean percentageEnabled = method.isPercentage();
-            chkUseRandomSameSexMarriages.setEnabled(enabled);
-            chkUseRandomClanPersonnelMarriages
-                    .setEnabled(enabled && chkUseClanPersonnelMarriages.isSelected());
+            final boolean percentageEnabled = method.isDiceRoll();
+            chkUseRandomClanPersonnelMarriages.setEnabled(enabled && chkUseClanPersonnelMarriages.isSelected());
             chkUseRandomPrisonerMarriages.setEnabled(enabled && chkUsePrisonerMarriages.isSelected());
             lblRandomMarriageAgeRange.setEnabled(enabled);
             spnRandomMarriageAgeRange.setEnabled(enabled);
             percentageRandomMarriagePanel.setEnabled(percentageEnabled);
-            lblPercentageRandomMarriageSameSexChance.setEnabled(sameSexEnabled && percentageEnabled);
-            spnPercentageRandomMarriageSameSexChance.setEnabled(sameSexEnabled && percentageEnabled);
-        });
-
-        chkUseRandomSameSexMarriages = new JCheckBox(resources.getString("chkUseRandomSameSexMarriages.text"));
-        chkUseRandomSameSexMarriages
-                .setToolTipText(resources.getString("chkUseRandomSameSexMarriages.toolTipText"));
-        chkUseRandomSameSexMarriages.setName("chkUseRandomSameSexMarriages");
-        chkUseRandomSameSexMarriages.addActionListener(evt -> {
-            final RandomMarriageMethod method = comboRandomMarriageMethod.getSelectedItem();
-            if (method == null) {
-                return;
-            }
-            final boolean sameSexEnabled = chkUseRandomSameSexMarriages.isEnabled()
-                    && chkUseRandomSameSexMarriages.isSelected();
-            final boolean percentageEnabled = sameSexEnabled && method.isPercentage();
-            lblPercentageRandomMarriageSameSexChance.setEnabled(percentageEnabled);
-            spnPercentageRandomMarriageSameSexChance.setEnabled(percentageEnabled);
         });
 
         chkUseRandomClanPersonnelMarriages = new JCheckBox(
@@ -5876,9 +5876,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblRandomMarriageMethod)
-                                .addComponent(comboRandomMarriageMethod,
-                                        Alignment.LEADING))
-                        .addComponent(chkUseRandomSameSexMarriages)
+                                .addComponent(comboRandomMarriageMethod, Alignment.LEADING))
                         .addComponent(chkUseRandomClanPersonnelMarriages)
                         .addComponent(chkUseRandomPrisonerMarriages)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -5892,7 +5890,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblRandomMarriageMethod)
                                 .addComponent(comboRandomMarriageMethod))
-                        .addComponent(chkUseRandomSameSexMarriages)
                         .addComponent(chkUseRandomClanPersonnelMarriages)
                         .addComponent(chkUseRandomPrisonerMarriages)
                         .addGroup(layout.createSequentialGroup()
@@ -5905,40 +5902,36 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private void createPercentageRandomMarriagePanel(final JPanel panel) {
         // Create Panel Components
-        final JLabel lblPercentageRandomMarriageOppositeSexChance = new JLabel(
-                resources.getString("lblPercentageRandomMarriageOppositeSexChance.text"));
-        lblPercentageRandomMarriageOppositeSexChance
-                .setToolTipText(resources
-                        .getString("lblPercentageRandomMarriageOppositeSexChance.toolTipText"));
-        lblPercentageRandomMarriageOppositeSexChance.setName("lblPercentageRandomMarriageOppositeSexChance");
+        final JLabel lblRandomMarriageOppositeSexDiceSize = new JLabel(resources.getString("lblRandomMarriageOppositeSexDiceSize.text"));
+        lblRandomMarriageOppositeSexDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomMarriageOppositeSexDiceSize.toolTipText")));
+        lblRandomMarriageOppositeSexDiceSize.setName("lblRandomMarriageOppositeSexDiceSize");
 
-        spnPercentageRandomMarriageOppositeSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnPercentageRandomMarriageOppositeSexChance
-                .setToolTipText(resources
-                        .getString("lblPercentageRandomMarriageOppositeSexChance.toolTipText"));
-        spnPercentageRandomMarriageOppositeSexChance.setName("spnPercentageRandomMarriageOppositeSexChance");
+        spnRandomMarriageDiceSize = new JSpinner(new SpinnerNumberModel(542, 0, 100000, 1));
+        spnRandomMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomMarriageOppositeSexDiceSize.toolTipText")));
+        spnRandomMarriageDiceSize.setName("spnPercentageRandomMarriageOppositeSexChance");
 
-        lblPercentageRandomMarriageSameSexChance = new JLabel(
-                resources.getString("lblPercentageRandomMarriageSameSexChance.text"));
-        lblPercentageRandomMarriageSameSexChance
-                .setToolTipText(resources
-                        .getString("lblPercentageRandomMarriageSameSexChance.toolTipText"));
-        lblPercentageRandomMarriageSameSexChance.setName("lblPercentageRandomMarriageSameSexChance");
+        final JLabel lblRandomSameSexMarriageDiceSize = new JLabel(resources.getString("lblRandomSameSexMarriageDiceSize.text"));
+        lblRandomSameSexMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomSameSexMarriageDiceSize.toolTipText")));
+        lblRandomSameSexMarriageDiceSize.setName("lblRandomSameSexMarriageDiceSize");
 
-        spnPercentageRandomMarriageSameSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnPercentageRandomMarriageSameSexChance
-                .setToolTipText(resources
-                        .getString("lblPercentageRandomMarriageSameSexChance.toolTipText"));
-        spnPercentageRandomMarriageSameSexChance.setName("spnPercentageRandomMarriageSameSexChance");
+        spnRandomSameSexMarriageDiceSize = new JSpinner(new SpinnerNumberModel(542, 0, 100000, 1));
+        spnRandomSameSexMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomSameSexMarriageDiceSize.toolTipText")));
+        spnRandomSameSexMarriageDiceSize.setName("spnRandomSameSexMarriageDiceSize");
+
+        final JLabel lblRandomNewDependentMarriage = new JLabel(resources.getString("lblRandomNewDependentMarriage.text"));
+        lblRandomNewDependentMarriage.setToolTipText(wordWrap(resources.getString("lblRandomNewDependentMarriage.toolTipText")));
+        lblRandomNewDependentMarriage.setName("lblRandomNewDependentMarriage");
+
+        spnRandomNewDependentMarriage = new JSpinner(new SpinnerNumberModel(542, 0, 100000, 1));
+        spnRandomNewDependentMarriage.setToolTipText(wordWrap(resources.getString("lblRandomNewDependentMarriage.toolTipText")));
+        spnRandomNewDependentMarriage.setName("spnRandomNewDependentMarriage");
 
         // Programmatically Assign Accessibility Labels
-        lblPercentageRandomMarriageOppositeSexChance.setLabelFor(spnPercentageRandomMarriageOppositeSexChance);
-        lblPercentageRandomMarriageSameSexChance.setLabelFor(spnPercentageRandomMarriageSameSexChance);
+        lblRandomMarriageOppositeSexDiceSize.setLabelFor(spnRandomMarriageDiceSize);
 
         // Layout the Panel
-        panel.setBorder(BorderFactory
-                .createTitledBorder(resources.getString("percentageRandomMarriagePanel.title")));
-        panel.setToolTipText(RandomMarriageMethod.PERCENTAGE.getToolTipText());
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomMarriagePanel.title")));
+        panel.setToolTipText(RandomMarriageMethod.DICE_ROLL.getToolTipText());
 
         final GroupLayout layout = new GroupLayout(panel);
         layout.setAutoCreateGaps(true);
@@ -5948,22 +5941,28 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomMarriageOppositeSexChance)
-                                .addComponent(spnPercentageRandomMarriageOppositeSexChance,
-                                        Alignment.LEADING))
+                                .addComponent(lblRandomMarriageOppositeSexDiceSize)
+                                .addComponent(spnRandomMarriageDiceSize, Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomMarriageSameSexChance)
-                                .addComponent(spnPercentageRandomMarriageSameSexChance,
-                                        Alignment.LEADING)));
+                                .addComponent(lblRandomSameSexMarriageDiceSize)
+                                .addComponent(spnRandomSameSexMarriageDiceSize, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblRandomSameSexMarriageDiceSize)
+                                .addComponent(spnRandomNewDependentMarriage, Alignment.LEADING))
+        );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPercentageRandomMarriageOppositeSexChance)
-                                .addComponent(spnPercentageRandomMarriageOppositeSexChance))
+                                .addComponent(lblRandomMarriageOppositeSexDiceSize)
+                                .addComponent(spnRandomMarriageDiceSize))
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPercentageRandomMarriageSameSexChance)
-                                .addComponent(spnPercentageRandomMarriageSameSexChance)));
+                                .addComponent(lblRandomSameSexMarriageDiceSize)
+                                .addComponent(spnRandomSameSexMarriageDiceSize))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomSameSexMarriageDiceSize)
+                                .addComponent(spnRandomNewDependentMarriage))
+        );
     }
 
     private JPanel createDivorcePanel() {
@@ -6087,18 +6086,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 return;
             }
             final boolean enabled = !method.isNone();
-            final boolean oppositeSexEnabled = enabled && chkUseRandomOppositeSexDivorce.isSelected();
-            final boolean sameSexEnabled = enabled && chkUseRandomSameSexDivorce.isSelected();
-            final boolean percentageEnabled = method.isPercentage();
+            final boolean percentageEnabled = method.isDiceRoll();
             chkUseRandomOppositeSexDivorce.setEnabled(enabled);
             chkUseRandomSameSexDivorce.setEnabled(enabled);
             chkUseRandomClanPersonnelDivorce.setEnabled(enabled && chkUseClanPersonnelDivorce.isSelected());
             chkUseRandomPrisonerDivorce.setEnabled(enabled && chkUsePrisonerDivorce.isSelected());
             percentageRandomDivorcePanel.setEnabled(percentageEnabled);
-            lblPercentageRandomDivorceOppositeSexChance.setEnabled(oppositeSexEnabled && percentageEnabled);
-            spnPercentageRandomDivorceOppositeSexChance.setEnabled(oppositeSexEnabled && percentageEnabled);
-            lblPercentageRandomDivorceSameSexChance.setEnabled(sameSexEnabled && percentageEnabled);
-            spnPercentageRandomDivorceSameSexChance.setEnabled(sameSexEnabled && percentageEnabled);
+            lblRandomDivorceDiceSize.setEnabled(percentageEnabled);
+            spnRandomDivorceDiceSize.setEnabled(percentageEnabled);
         });
 
         chkUseRandomOppositeSexDivorce = new JCheckBox(
@@ -6106,33 +6101,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomOppositeSexDivorce
                 .setToolTipText(resources.getString("chkUseRandomOppositeSexDivorce.toolTipText"));
         chkUseRandomOppositeSexDivorce.setName("chkUseRandomOppositeSexDivorce");
-        chkUseRandomOppositeSexDivorce.addActionListener(evt -> {
-            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
-            if (method == null) {
-                return;
-            }
-            final boolean selected = chkUseRandomOppositeSexDivorce.isEnabled()
-                    && chkUseRandomOppositeSexDivorce.isSelected();
-            final boolean percentageEnabled = selected && method.isPercentage();
-            lblPercentageRandomDivorceOppositeSexChance.setEnabled(percentageEnabled);
-            spnPercentageRandomDivorceOppositeSexChance.setEnabled(percentageEnabled);
-        });
 
         chkUseRandomSameSexDivorce = new JCheckBox(resources.getString("chkUseRandomSameSexDivorce.text"));
         chkUseRandomSameSexDivorce
                 .setToolTipText(resources.getString("chkUseRandomSameSexDivorce.toolTipText"));
         chkUseRandomSameSexDivorce.setName("chkUseRandomSameSexDivorce");
-        chkUseRandomSameSexDivorce.addActionListener(evt -> {
-            final RandomDivorceMethod method = comboRandomDivorceMethod.getSelectedItem();
-            if (method == null) {
-                return;
-            }
-            final boolean selected = chkUseRandomSameSexDivorce.isEnabled()
-                    && chkUseRandomSameSexDivorce.isSelected();
-            final boolean percentageEnabled = selected && method.isPercentage();
-            lblPercentageRandomDivorceSameSexChance.setEnabled(percentageEnabled);
-            spnPercentageRandomDivorceSameSexChance.setEnabled(percentageEnabled);
-        });
 
         chkUseRandomClanPersonnelDivorce = new JCheckBox(
                 resources.getString("chkUseRandomClanPersonnelDivorce.text"));
@@ -6188,44 +6161,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private void createPercentageRandomDivorcePanel(final JPanel panel) {
         // Create Panel Components
-        lblPercentageRandomDivorceOppositeSexChance = new JLabel(
-                resources.getString("lblPercentageRandomDivorceOppositeSexChance.text"));
-        lblPercentageRandomDivorceOppositeSexChance
-                .setToolTipText(resources
-                        .getString("lblPercentageRandomDivorceOppositeSexChance.toolTipText"));
-        lblPercentageRandomDivorceOppositeSexChance.setName("lblPercentageRandomDivorceOppositeSexChance");
+        lblRandomDivorceDiceSize = new JLabel(resources.getString("lblRandomDivorceDiceSize.text"));
+        lblRandomDivorceDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomDivorceDiceSize.toolTipText")));
+        lblRandomDivorceDiceSize.setName("lblRandomDivorceDiceSize");
 
-        spnPercentageRandomDivorceOppositeSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.00001));
-        spnPercentageRandomDivorceOppositeSexChance
-                .setToolTipText(resources
-                        .getString("lblPercentageRandomDivorceOppositeSexChance.toolTipText"));
-        spnPercentageRandomDivorceOppositeSexChance.setName("spnPercentageRandomDivorceOppositeSexChance");
-        spnPercentageRandomDivorceOppositeSexChance
-                .setEditor(new NumberEditor(spnPercentageRandomDivorceOppositeSexChance, "0.00000"));
-
-        lblPercentageRandomDivorceSameSexChance = new JLabel(
-                resources.getString("lblPercentageRandomDivorceSameSexChance.text"));
-        lblPercentageRandomDivorceSameSexChance
-                .setToolTipText(resources
-                        .getString("lblPercentageRandomDivorceSameSexChance.toolTipText"));
-        lblPercentageRandomDivorceSameSexChance.setName("lblPercentageRandomDivorceSameSexChance");
-
-        spnPercentageRandomDivorceSameSexChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 0.00001));
-        spnPercentageRandomDivorceSameSexChance
-                .setToolTipText(resources
-                        .getString("lblPercentageRandomDivorceSameSexChance.toolTipText"));
-        spnPercentageRandomDivorceSameSexChance.setName("spnPercentageRandomDivorceSameSexChance");
-        spnPercentageRandomDivorceSameSexChance
-                .setEditor(new NumberEditor(spnPercentageRandomDivorceSameSexChance, "0.00000"));
+        spnRandomDivorceDiceSize = new JSpinner(new SpinnerNumberModel(3221, 0, 100000, 1));
+        spnRandomDivorceDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomDivorceDiceSize.toolTipText")));
+        spnRandomDivorceDiceSize.setName("spnRandomDivorceDiceSize");
 
         // Programmatically Assign Accessibility Labels
-        lblPercentageRandomDivorceOppositeSexChance.setLabelFor(spnPercentageRandomDivorceOppositeSexChance);
-        lblPercentageRandomDivorceSameSexChance.setLabelFor(spnPercentageRandomDivorceSameSexChance);
+        lblRandomDivorceDiceSize.setLabelFor(spnRandomDivorceDiceSize);
 
         // Layout the Panel
-        panel.setBorder(BorderFactory
-                .createTitledBorder(resources.getString("percentageRandomDivorcePanel.title")));
-        panel.setToolTipText(RandomDivorceMethod.PERCENTAGE.getToolTipText());
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomDivorcePanel.title")));
+        panel.setToolTipText(RandomDivorceMethod.DICE_ROLL.getToolTipText());
 
         final GroupLayout layout = new GroupLayout(panel);
         layout.setAutoCreateGaps(true);
@@ -6235,22 +6184,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomDivorceOppositeSexChance)
-                                .addComponent(spnPercentageRandomDivorceOppositeSexChance,
-                                        Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomDivorceSameSexChance)
-                                .addComponent(spnPercentageRandomDivorceSameSexChance,
-                                        Alignment.LEADING)));
+                                .addComponent(lblRandomDivorceDiceSize)
+                                .addComponent(spnRandomDivorceDiceSize, Alignment.LEADING))
+        );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPercentageRandomDivorceOppositeSexChance)
-                                .addComponent(spnPercentageRandomDivorceOppositeSexChance))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPercentageRandomDivorceSameSexChance)
-                                .addComponent(spnPercentageRandomDivorceSameSexChance)));
+                                .addComponent(lblRandomDivorceDiceSize)
+                                .addComponent(spnRandomDivorceDiceSize))
+        );
     }
 
     private JPanel createProcreationPanel() {
@@ -6343,6 +6286,18 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkDisplayTrueDueDate.setToolTipText(resources.getString("chkDisplayTrueDueDate.toolTipText"));
         chkDisplayTrueDueDate.setName("chkDisplayTrueDueDate");
 
+        final JLabel lblNoInterestInChildrenDiceSize = new JLabel(resources.getString("lblNoInterestInChildrenDiceSize.text"));
+        lblNoInterestInChildrenDiceSize.setToolTipText(wordWrap(resources.getString("lblNoInterestInChildrenDiceSize.toolTipText")));
+        lblNoInterestInChildrenDiceSize.setName("lblNoInterestInChildrenDiceSize");
+
+        spnNoInterestInChildrenDiceSize = new JSpinner(new SpinnerNumberModel(3, 1, 100000, 1));
+        spnNoInterestInChildrenDiceSize.setToolTipText(wordWrap(resources.getString("lblNoInterestInChildrenDiceSize.toolTipText")));
+        spnNoInterestInChildrenDiceSize.setName("spnNoInterestInChildrenDiceSize");
+
+        chkUseMaternityLeave = new JCheckBox(resources.getString("chkUseMaternityLeave.text"));
+        chkUseMaternityLeave.setToolTipText(wordWrap(resources.getString("chkUseMaternityLeave.toolTipText")));
+        chkUseMaternityLeave.setName("chkUseMaternityLeave");
+
         chkLogProcreation = new JCheckBox(resources.getString("chkLogProcreation.text"));
         chkLogProcreation.setToolTipText(resources.getString("chkLogProcreation.toolTipText"));
         chkLogProcreation.setName("chkLogProcreation");
@@ -6380,6 +6335,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
                         .addComponent(chkDisplayTrueDueDate)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblNoInterestInChildrenDiceSize)
+                                .addComponent(spnNoInterestInChildrenDiceSize, Alignment.LEADING))
+                        .addComponent(chkUseMaternityLeave)
                         .addComponent(chkLogProcreation)
                         .addComponent(randomProcreationPanel));
 
@@ -6399,6 +6358,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkAssignChildrenOfFoundersFounderTag)
                         .addComponent(chkDetermineFatherAtBirth)
                         .addComponent(chkDisplayTrueDueDate)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblNoInterestInChildrenDiceSize)
+                                .addComponent(spnNoInterestInChildrenDiceSize))
+                        .addComponent(chkUseMaternityLeave)
                         .addComponent(chkLogProcreation)
                         .addComponent(randomProcreationPanel));
 
@@ -6802,18 +6765,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 return;
             }
             final boolean enabled = !method.isNone();
-            final boolean percentageEnabled = method.isPercentage();
-            final boolean relationshiplessEnabled = enabled
-                    && chkUseRelationshiplessRandomProcreation.isSelected();
+            final boolean percentageEnabled = method.isDiceRoll();
+            final boolean relationshiplessEnabled = enabled && chkUseRelationshiplessRandomProcreation.isSelected();
             chkUseRelationshiplessRandomProcreation.setEnabled(enabled);
             chkUseRandomClanPersonnelProcreation
                     .setEnabled(enabled && chkUseClanPersonnelProcreation.isSelected());
             chkUseRandomPrisonerProcreation.setEnabled(enabled && chkUsePrisonerProcreation.isSelected());
             percentageRandomProcreationPanel.setEnabled(percentageEnabled);
-            lblPercentageRandomProcreationRelationshiplessChance
-                    .setEnabled(relationshiplessEnabled && percentageEnabled);
-            spnPercentageRandomProcreationRelationshiplessChance
-                    .setEnabled(relationshiplessEnabled && percentageEnabled);
+            lblRandomProcreationRelationshiplessDiceSize.setEnabled(relationshiplessEnabled && percentageEnabled);
+            spnRandomProcreationRelationshiplessDiceSize.setEnabled(relationshiplessEnabled && percentageEnabled);
         });
 
         chkUseRelationshiplessRandomProcreation = new JCheckBox(
@@ -6829,9 +6789,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
             final boolean sameSexEnabled = chkUseRelationshiplessRandomProcreation.isEnabled()
                     && chkUseRelationshiplessRandomProcreation.isSelected();
-            final boolean percentageEnabled = sameSexEnabled && method.isPercentage();
-            lblPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
-            spnPercentageRandomProcreationRelationshiplessChance.setEnabled(percentageEnabled);
+            final boolean percentageEnabled = sameSexEnabled && method.isDiceRoll();
+            lblRandomProcreationRelationshiplessDiceSize.setEnabled(percentageEnabled);
+            spnRandomProcreationRelationshiplessDiceSize.setEnabled(percentageEnabled);
         });
 
         chkUseRandomClanPersonnelProcreation = new JCheckBox(
@@ -6888,49 +6848,29 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private void createPercentageRandomProcreationPanel(final JPanel panel) {
         // Create Panel Components
-        final JLabel lblPercentageRandomProcreationRelationshipChance = new JLabel(
-                resources.getString("lblPercentageRandomProcreationRelationshipChance.text"));
-        lblPercentageRandomProcreationRelationshipChance
-                .setToolTipText(resources.getString(
-                        "lblPercentageRandomProcreationRelationshipChance.toolTipText"));
-        lblPercentageRandomProcreationRelationshipChance
-                .setName("lblPercentageRandomProcreationRelationshipChance");
+        final JLabel lblRandomProcreationRelationshipDiceSize = new JLabel(resources.getString("lblRandomProcreationRelationshipDiceSize.text"));
+        lblRandomProcreationRelationshipDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomProcreationRelationshipDiceSize.toolTipText")));
+        lblRandomProcreationRelationshipDiceSize.setName("lblRandomProcreationRelationshipDiceSize");
 
-        spnPercentageRandomProcreationRelationshipChance = new JSpinner(
-                new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnPercentageRandomProcreationRelationshipChance
-                .setToolTipText(resources.getString(
-                        "lblPercentageRandomProcreationRelationshipChance.toolTipText"));
-        spnPercentageRandomProcreationRelationshipChance
-                .setName("spnPercentageRandomProcreationRelationshipChance");
+        spnRandomProcreationRelationshipDiceSize = new JSpinner(new SpinnerNumberModel(621, 0, 100000, 1));
+        spnRandomProcreationRelationshipDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomProcreationRelationshipDiceSize.toolTipText")));
+        spnRandomProcreationRelationshipDiceSize.setName("spnRandomProcreationRelationshipDiceSize");
 
-        lblPercentageRandomProcreationRelationshiplessChance = new JLabel(
-                resources.getString("lblPercentageRandomProcreationRelationshiplessChance.text"));
-        lblPercentageRandomProcreationRelationshiplessChance.setToolTipText(
-                resources.getString(
-                        "lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
-        lblPercentageRandomProcreationRelationshiplessChance
-                .setName("lblPercentageRandomProcreationRelationshiplessChance");
+        lblRandomProcreationRelationshiplessDiceSize = new JLabel(resources.getString("lblRandomProcreationRelationshiplessDiceSize.text"));
+        lblRandomProcreationRelationshiplessDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomProcreationRelationshiplessDiceSize.toolTipText")));
+        lblRandomProcreationRelationshiplessDiceSize.setName("lblRandomProcreationRelationshiplessDiceSize");
 
-        spnPercentageRandomProcreationRelationshiplessChance = new JSpinner(
-                new SpinnerNumberModel(0, 0, 100, 0.001));
-        spnPercentageRandomProcreationRelationshiplessChance.setToolTipText(
-                resources.getString(
-                        "lblPercentageRandomProcreationRelationshiplessChance.toolTipText"));
-        spnPercentageRandomProcreationRelationshiplessChance
-                .setName("spnPercentageRandomProcreationRelationshiplessChance");
+        spnRandomProcreationRelationshiplessDiceSize = new JSpinner(new SpinnerNumberModel(1861, 0, 100000, 1));
+        spnRandomProcreationRelationshiplessDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomProcreationRelationshipDiceSize.toolTipText")));
+        spnRandomProcreationRelationshiplessDiceSize.setName("spnRandomProcreationRelationshiplessDiceSize");
 
         // Programmatically Assign Accessibility Labels
-        lblPercentageRandomProcreationRelationshipChance
-                .setLabelFor(spnPercentageRandomProcreationRelationshipChance);
-        lblPercentageRandomProcreationRelationshiplessChance
-                .setLabelFor(spnPercentageRandomProcreationRelationshiplessChance);
+        lblRandomProcreationRelationshipDiceSize.setLabelFor(spnRandomProcreationRelationshipDiceSize);
+        lblRandomProcreationRelationshiplessDiceSize.setLabelFor(spnRandomProcreationRelationshipDiceSize);
 
         // Layout the Panel
-        panel.setBorder(
-                BorderFactory.createTitledBorder(
-                        resources.getString("percentageRandomProcreationPanel.title")));
-        panel.setToolTipText(RandomProcreationMethod.PERCENTAGE.getToolTipText());
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomProcreationPanel.title")));
+        panel.setToolTipText(RandomProcreationMethod.DICE_ROLL.getToolTipText());
 
         final GroupLayout layout = new GroupLayout(panel);
         layout.setAutoCreateGaps(true);
@@ -6940,22 +6880,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomProcreationRelationshipChance)
-                                .addComponent(spnPercentageRandomProcreationRelationshipChance,
-                                        Alignment.LEADING))
+                                .addComponent(lblRandomProcreationRelationshipDiceSize)
+                                .addComponent(spnRandomProcreationRelationshipDiceSize, Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomProcreationRelationshiplessChance)
-                                .addComponent(spnPercentageRandomProcreationRelationshiplessChance,
-                                        Alignment.LEADING)));
+                                .addComponent(lblRandomProcreationRelationshiplessDiceSize)
+                                .addComponent(spnRandomProcreationRelationshiplessDiceSize, Alignment.LEADING))
+        );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPercentageRandomProcreationRelationshipChance)
-                                .addComponent(spnPercentageRandomProcreationRelationshipChance))
+                                .addComponent(lblRandomProcreationRelationshipDiceSize)
+                                .addComponent(spnRandomProcreationRelationshipDiceSize))
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPercentageRandomProcreationRelationshiplessChance)
-                                .addComponent(spnPercentageRandomProcreationRelationshiplessChance)));
+                                .addComponent(lblRandomProcreationRelationshiplessDiceSize)
+                                .addComponent(spnRandomProcreationRelationshiplessDiceSize))
+        );
     }
 
     private JPanel createDeathPanel() {
@@ -7145,9 +7085,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblPercentageRandomDeathChance.setLabelFor(spnPercentageRandomDeathChance);
 
         // Layout the Panel
-        panel.setBorder(BorderFactory
-                .createTitledBorder(resources.getString("percentageRandomDeathPanel.title")));
-        panel.setToolTipText(RandomProcreationMethod.PERCENTAGE.getToolTipText());
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("percentageRandomDeathPanel.title")));
+        panel.setToolTipText(RandomProcreationMethod.DICE_ROLL.getToolTipText());
 
         final GroupLayout layout = new GroupLayout(panel);
         layout.setAutoCreateGaps(true);
@@ -8613,10 +8552,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // region Life Paths Tab
         // Personnel Randomization
         chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
+        spnNonBinaryDiceSize.setValue(options.getNonBinaryDiceSize());
+
+        // Random Histories
         randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
         chkUseRandomPersonalities.setSelected(options.isUseRandomPersonalities());
         chkUseRandomPersonalityReputation.setSelected(options.isUseRandomPersonalityReputation());
         chkUseIntelligenceXpMultiplier.setSelected(options.isUseIntelligenceXpMultiplier());
+        chkUseSimulatedRelationships.setSelected(options.isUseSimulatedRelationships());
 
         // Family
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
@@ -8630,27 +8573,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseManualMarriages.setSelected(options.isUseManualMarriages());
         chkUseClanPersonnelMarriages.setSelected(options.isUseClanPersonnelMarriages());
         chkUsePrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
-        spnMinimumMarriageAge.setValue(options.getMinimumMarriageAge());
+        spnNoInterestInMarriageDiceSize.setValue(options.getNoInterestInMarriageDiceSize());
         spnCheckMutualAncestorsDepth.setValue(options.getCheckMutualAncestorsDepth());
         chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
         for (final Entry<MergingSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
             entry.getValue().setValue(options.getMarriageSurnameWeights().get(entry.getKey()) / 10.0);
         }
         comboRandomMarriageMethod.setSelectedItem(options.getRandomMarriageMethod());
-        if (chkUseRandomSameSexMarriages.isSelected() != options.isUseRandomSameSexMarriages()) {
-            if (chkUseRandomSameSexMarriages.isEnabled()) {
-                chkUseRandomSameSexMarriages.doClick();
-            } else {
-                chkUseRandomSameSexMarriages.setSelected(options.isUseRandomSameSexMarriages());
-            }
-        }
         chkUseRandomClanPersonnelMarriages.setSelected(options.isUseRandomClanPersonnelMarriages());
         chkUseRandomPrisonerMarriages.setSelected(options.isUseRandomPrisonerMarriages());
         spnRandomMarriageAgeRange.setValue(options.getRandomMarriageAgeRange());
-        spnPercentageRandomMarriageOppositeSexChance
-                .setValue(options.getPercentageRandomMarriageOppositeSexChance() * 100.0);
-        spnPercentageRandomMarriageSameSexChance
-                .setValue(options.getPercentageRandomMarriageSameSexChance() * 100.0);
+        spnRandomMarriageDiceSize.setValue(options.getRandomMarriageDiceSize());
+        spnRandomSameSexMarriageDiceSize.setValue(options.getRandomSameSexMarriageDiceSize());
+        spnRandomNewDependentMarriage.setValue(options.getRandomNewDependentMarriage());
 
         // Divorce
         chkUseManualDivorce.setSelected(options.isUseManualDivorce());
@@ -8677,10 +8612,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
         chkUseRandomClanPersonnelDivorce.setSelected(options.isUseRandomClanPersonnelDivorce());
         chkUseRandomPrisonerDivorce.setSelected(options.isUseRandomPrisonerDivorce());
-        spnPercentageRandomDivorceOppositeSexChance
-                .setValue(options.getPercentageRandomDivorceOppositeSexChance() * 100.0);
-        spnPercentageRandomDivorceSameSexChance
-                .setValue(options.getPercentageRandomDivorceSameSexChance() * 100.0);
+        spnRandomDivorceDiceSize.setValue(options.getRandomDivorceDiceSize());
 
         // Procreation
         chkUseManualProcreation.setSelected(options.isUseManualProcreation());
@@ -8692,6 +8624,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAssignChildrenOfFoundersFounderTag.setSelected(options.isAssignChildrenOfFoundersFounderTag());
         chkDetermineFatherAtBirth.setSelected(options.isDetermineFatherAtBirth());
         chkDisplayTrueDueDate.setSelected(options.isDisplayTrueDueDate());
+        spnNoInterestInChildrenDiceSize.setValue(options.getNoInterestInChildrenDiceSize());
+        chkUseMaternityLeave.setSelected(options.isUseMaternityLeave());
         chkLogProcreation.setSelected(options.isLogProcreation());
         comboRandomProcreationMethod.setSelectedItem(options.getRandomProcreationMethod());
         if (chkUseRelationshiplessRandomProcreation.isSelected() != options
@@ -8705,10 +8639,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
         chkUseRandomClanPersonnelProcreation.setSelected(options.isUseRandomClanPersonnelProcreation());
         chkUseRandomPrisonerProcreation.setSelected(options.isUseRandomPrisonerProcreation());
-        spnPercentageRandomProcreationRelationshipChance
-                .setValue(options.getPercentageRandomProcreationRelationshipChance() * 100.0);
-        spnPercentageRandomProcreationRelationshiplessChance
-                .setValue(options.getPercentageRandomProcreationRelationshiplessChance() * 100.0);
+        spnRandomProcreationRelationshipDiceSize.setValue(options.getRandomProcreationRelationshipDiceSize());
+        spnRandomProcreationRelationshiplessDiceSize.setValue(options.getRandomProcreationRelationshiplessDiceSize());
 
         // Education
         chkUseEducationModule.setSelected(options.isUseEducationModule());
@@ -9363,8 +9295,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // region Life Paths Tab
             // Personnel Randomization
             options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
+            options.setNonBinaryDiceSize((int) spnNonBinaryDiceSize.getValue());
+
+            // Random Histories
             options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
             options.setUseRandomPersonalities(chkUseRandomPersonalities.isSelected());
+            options.setUseSimulatedRelationships(chkUseSimulatedRelationships.isSelected());
             options.setUseRandomPersonalityReputation(chkUseRandomPersonalityReputation.isSelected());
             options.setUseIntelligenceXpMultiplier(chkUseIntelligenceXpMultiplier.isSelected());
 
@@ -9380,7 +9316,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseManualMarriages(chkUseManualMarriages.isSelected());
             options.setUseClanPersonnelMarriages(chkUseClanPersonnelMarriages.isSelected());
             options.setUsePrisonerMarriages(chkUsePrisonerMarriages.isSelected());
-            options.setMinimumMarriageAge((Integer) spnMinimumMarriageAge.getValue());
+            options.setNoInterestInMarriageDiceSize((int) spnNoInterestInMarriageDiceSize.getValue());
             options.setCheckMutualAncestorsDepth((Integer) spnCheckMutualAncestorsDepth.getValue());
             options.setLogMarriageNameChanges(chkLogMarriageNameChanges.isSelected());
             for (final Entry<MergingSurnameStyle, JSpinner> entry : spnMarriageSurnameWeights.entrySet()) {
@@ -9388,14 +9324,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         (int) Math.round((Double) entry.getValue().getValue() * 10.0));
             }
             options.setRandomMarriageMethod(comboRandomMarriageMethod.getSelectedItem());
-            options.setUseRandomSameSexMarriages(chkUseRandomSameSexMarriages.isSelected());
             options.setUseRandomClanPersonnelMarriages(chkUseRandomClanPersonnelMarriages.isSelected());
             options.setUseRandomPrisonerMarriages(chkUseRandomPrisonerMarriages.isSelected());
             options.setRandomMarriageAgeRange((Integer) spnRandomMarriageAgeRange.getValue());
-            options.setPercentageRandomMarriageOppositeSexChance(
-                    (Double) spnPercentageRandomMarriageOppositeSexChance.getValue() / 100.0);
-            options.setPercentageRandomMarriageSameSexChance(
-                    (Double) spnPercentageRandomMarriageSameSexChance.getValue() / 100.0);
+            options.setRandomMarriageDiceSize((int) spnRandomMarriageDiceSize.getValue());
+            options.setRandomSameSexMarriageDiceSize((int) spnRandomSameSexMarriageDiceSize.getValue());
+            options.setRandomNewDependentMarriage((int) spnRandomNewDependentMarriage.getValue());
 
             // Divorce
             options.setUseManualDivorce(chkUseManualDivorce.isSelected());
@@ -9410,10 +9344,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseRandomSameSexDivorce(chkUseRandomSameSexDivorce.isSelected());
             options.setUseRandomClanPersonnelDivorce(chkUseRandomClanPersonnelDivorce.isSelected());
             options.setUseRandomPrisonerDivorce(chkUseRandomPrisonerDivorce.isSelected());
-            options.setPercentageRandomDivorceOppositeSexChance(
-                    (Double) spnPercentageRandomDivorceOppositeSexChance.getValue() / 100.0);
-            options.setPercentageRandomDivorceSameSexChance(
-                    (Double) spnPercentageRandomDivorceSameSexChance.getValue() / 100.0);
+            options.setRandomDivorceDiceSize((int) spnRandomDivorceDiceSize.getValue());
 
             // Procreation
             options.setUseManualProcreation(chkUseManualProcreation.isSelected());
@@ -9426,17 +9357,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                     chkAssignChildrenOfFoundersFounderTag.isSelected());
             options.setDetermineFatherAtBirth(chkDetermineFatherAtBirth.isSelected());
             options.setDisplayTrueDueDate(chkDisplayTrueDueDate.isSelected());
+            options.setNoInterestInChildrenDiceSize((int) spnNoInterestInChildrenDiceSize.getValue());
+            options.setUseMaternityLeave(chkUseMaternityLeave.isSelected());
             options.setLogProcreation(chkLogProcreation.isSelected());
             options.setRandomProcreationMethod(comboRandomProcreationMethod.getSelectedItem());
             options.setUseRelationshiplessRandomProcreation(
                     chkUseRelationshiplessRandomProcreation.isSelected());
             options.setUseRandomClanPersonnelProcreation(chkUseRandomClanPersonnelProcreation.isSelected());
             options.setUseRandomPrisonerProcreation(chkUseRandomPrisonerProcreation.isSelected());
-            options.setPercentageRandomProcreationRelationshipChance(
-                    (Double) spnPercentageRandomProcreationRelationshipChance.getValue() / 100.0);
-            options.setPercentageRandomProcreationRelationshiplessChance(
-                    (Double) spnPercentageRandomProcreationRelationshiplessChance.getValue()
-                            / 100.0);
+            options.setRandomProcreationRelationshipDiceSize((Integer) spnRandomProcreationRelationshipDiceSize.getValue());
+            options.setRandomProcreationRelationshiplessDiceSize((Integer) spnRandomProcreationRelationshiplessDiceSize.getValue());
 
             // Education
             options.setUseEducationModule(chkUseEducationModule.isSelected());
@@ -10072,7 +10002,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         /*
          * This table does not use any data from the main TableModel,
-         * so just return a value based on the row parameter.
+         * so return a value based on the row parameter.
          */
         @Override
         public Object getValueAt(int row, int column) {

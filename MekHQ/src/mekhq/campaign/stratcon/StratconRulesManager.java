@@ -106,7 +106,14 @@ public class StratconRulesManager {
         // generated
         // and use the random force to drive opfor generation (#required lances
         // multiplies the BV budget of all
-        for (int scenarioIndex = 0; scenarioIndex < track.getRequiredLanceCount(); scenarioIndex++) {
+        int scenarioRolls = track.getRequiredLanceCount();
+
+        if (contract.getMoraleLevel().isDominating()) {
+            scenarioRolls++;
+        } else if (contract.getMoraleLevel().isOverwhelming()) {
+            scenarioRolls += 2;
+        }
+        for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
             int targetNum = calculateScenarioOdds(track, contract, false);
 
             // if we haven't already used all the player forces and are required to randomly
@@ -1380,35 +1387,43 @@ public class StratconRulesManager {
     public static int calculateScenarioOdds(StratconTrackState track, AtBContract contract,
             boolean playerDeployingForce) {
         // rules:
-        // broken morale: 0%
-        // very low morale: -10% when deploying forces to track, 0% attack
-        // low morale: -5%
-        // high morale: +5%
-        // very high morale: +10%
-        // unbreakable: special case, let's do +15% for now
+        // ROUTED: 0%
+        // CRITICAL: -10% when deploying forces to track, 0% attack
+        // WEAKENED: -5%
+        // ADVANCING: +5%
+        // DOMINATING: +10%
+        // OVERWHELMING: +100%
         int moraleModifier = 0;
 
         switch (contract.getMoraleLevel()) {
-            case BROKEN:
+            case ROUTED:
                 return 0;
-            case VERY_LOW:
+            case CRITICAL:
                 if (playerDeployingForce) {
                     moraleModifier = -10;
                 } else {
                     return 0;
                 }
                 break;
-            case LOW:
+            case WEAKENED:
                 moraleModifier = -5;
                 break;
-            case HIGH:
+            case ADVANCING:
                 moraleModifier = 5;
                 break;
-            case VERY_HIGH:
-                moraleModifier = 10;
+            case DOMINATING:
+                if (playerDeployingForce) {
+                    moraleModifier = 20;
+                } else {
+                    return 10;
+                }
                 break;
-            case UNBREAKABLE:
-                moraleModifier = 15;
+            case OVERWHELMING:
+                if (playerDeployingForce) {
+                    moraleModifier = 50;
+                } else {
+                    return 25;
+                }
                 break;
             default:
                 break;

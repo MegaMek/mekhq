@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The Megamek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The Megamek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,17 +18,6 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.commons.math3.distribution.GammaDistribution;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -36,13 +25,7 @@ import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Compute;
-import megamek.common.Crew;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
@@ -57,6 +40,12 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.UnitGeneratorParameters;
 import mekhq.utilities.MHQXMLUtility;
+import org.apache.commons.math3.distribution.GammaDistribution;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.*;
 
 /**
  * A class that can be used to generate a random force with some parameters.
@@ -270,7 +259,7 @@ public class BotForceRandomizer {
      * given parameters. The
      * intent is that this function is called from GameThread when the game is
      * started.
-     * 
+     *
      * @param playerUnits      A List of Units for the player's deployed force in
      *                         the relevant scenario. This
      *                         is used to determine the total points allowed for
@@ -367,7 +356,7 @@ public class BotForceRandomizer {
      * given parameters. The
      * intent is that this function is called from GameThread when the game is
      * started.
-     * 
+     *
      * @param playerUnits      A List of Units for the player's deployed force in
      *                         the relevant scenario. This
      *                         is used to determine the total points allowed for
@@ -387,7 +376,7 @@ public class BotForceRandomizer {
      * 1 to generate entities individually. The larger this number is the greater
      * the chance of overshooting
      * the target number of points.
-     * 
+     *
      * @param size        an int giving the number of units to generate
      * @param uType       The UnitType of generated units
      * @param weightClass an int giving the weight class of generated units. The
@@ -483,10 +472,19 @@ public class BotForceRandomizer {
 
         RandomNameGenerator rng = RandomNameGenerator.getInstance();
         rng.setChosenFaction(faction.getNameGenerator());
-        Gender gender = RandomGenderGenerator.generate();
+
+        Gender gender;
+        int nonBinaryDiceSize = campaign.getCampaignOptions().getNonBinaryDiceSize();
+
+        if ((nonBinaryDiceSize > 0) && (Compute.randomInt(nonBinaryDiceSize) == 0)) {
+            gender = RandomGenderGenerator.generateOther();
+        } else {
+            gender = RandomGenderGenerator.generate();
+        }
+
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
-        crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ? " " + crewNameArray[1] : "";
+        crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ? ' ' + crewNameArray[1] : "";
 
         Map<Integer, Map<String, String>> extraData = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();
@@ -537,7 +535,7 @@ public class BotForceRandomizer {
             if (!phenotype.isNone()) {
                 String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
                         campaign.getGameYear()).getName();
-                crewName += " " + bloodname;
+                crewName += ' ' + bloodname;
                 innerMap.put(Crew.MAP_BLOODNAME, bloodname);
                 innerMap.put(Crew.MAP_PHENOTYPE, phenotype.name());
             }
@@ -556,7 +554,7 @@ public class BotForceRandomizer {
      * This function samples from the given gamma distribution to get a random
      * weight class. Results are trimmed
      * to reasonable values and rounded to integers.
-     * 
+     *
      * @param gamma The GammaDistribution from which a random value is drawn
      * @return and integer giving the sampled weight class
      */
@@ -572,7 +570,7 @@ public class BotForceRandomizer {
      * and can refer to different things depending on the selected BalancingMethod.
      * The maximum points are defined by
      * a multiple of the player unit points.
-     * 
+     *
      * @param playerUnits A List of Units from the player's units assigned to a
      *                    given scenario
      * @return a double giving the targeted maximum points for the generated force.
@@ -592,7 +590,7 @@ public class BotForceRandomizer {
      * entities that are part of the BotForce.
      * The term "points" is abstract and can refer to different things depending on
      * the selected BalancingMethod.
-     * 
+     *
      * @param botEntities - A List of Entities, typically specified as fixed units
      *                    in BotForce
      * @return a double giving the starting points already used by the fixed units
@@ -611,7 +609,7 @@ public class BotForceRandomizer {
      * This function calculates how many "points" a given entity counts for. The use
      * of points is abstract and
      * will be determined differently depending on the provided BalancingMethod
-     * 
+     *
      * @param e - an Entity
      * @return a double giving the points provided by this entity
      */
@@ -631,7 +629,7 @@ public class BotForceRandomizer {
      * WEIGHT_ADJ BalancingMethod.
      * Units get points by weight, but a multiplier is applied to these weights by
      * unit type.
-     * 
+     *
      * @param e an Entity
      * @return a double indicating the adjusted weight points of a unit.
      */
@@ -679,7 +677,7 @@ public class BotForceRandomizer {
 
     /**
      * Calculates the mean weight class of a List of Units
-     * 
+     *
      * @param playerUnits - A List of Units
      * @return a double indicating the mean weight class
      */
@@ -699,27 +697,23 @@ public class BotForceRandomizer {
     }
 
     public String getShortDescription() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(forceMultiplier);
-        sb.append(" (");
-        sb.append(balancingMethod.toString());
-        sb.append(")");
-        return sb.toString();
+        String sb = forceMultiplier + " (" + balancingMethod.toString() + ')';
+        return sb;
     }
 
     /**
      * This method returns a description of the random parameters of this object
      * that will be shown in the
      * ScenarioViewPanel
-     * 
+     *
      * @return a String giving the description.
      */
     public String getDescription(Campaign campaign) {
         StringBuilder sb = new StringBuilder();
         sb.append(Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()));
-        sb.append(" ");
+        sb.append(' ');
         sb.append(skill.toString());
-        sb.append(" ");
+        sb.append(' ');
         String typeDesc = UnitType.getTypeDisplayableName(unitType);
         if (percentConventional > 0) {
             typeDesc = typeDesc + " and Conventional";
@@ -729,7 +723,7 @@ public class BotForceRandomizer {
         sb.append(forceMultiplier);
         sb.append(" multiplier (");
         sb.append(balancingMethod.toString());
-        sb.append(")");
+        sb.append(')');
         return sb.toString();
     }
 
