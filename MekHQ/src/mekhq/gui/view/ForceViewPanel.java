@@ -555,7 +555,13 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         if (force.getForceCommanderID() != null) {
-            commander = campaign.getPerson(force.getForceCommanderID()).getFullTitle();
+            Person forceCommander = campaign.getPerson(force.getForceCommanderID());
+
+            if (forceCommander != null) {
+                commander = forceCommander.getFullTitle();
+            } else {
+                commander = "No Commander";
+            }
         }
 
         StringBuilder summary = new StringBuilder();
