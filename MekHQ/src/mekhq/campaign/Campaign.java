@@ -1338,6 +1338,7 @@ public class Campaign implements ITechManager {
         }
 
         Unit unit = new Unit(en, this);
+        unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
         getHangar().addUnit(unit);
 
         // reset the game object

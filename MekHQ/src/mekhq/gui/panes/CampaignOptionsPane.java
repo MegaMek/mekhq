@@ -152,6 +152,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUsePlanetaryModifiers;
     private JCheckBox useUnofficialMaintenance;
     private JCheckBox logMaintenance;
+    private JSpinner spnDefaultMaintenanceTime;
     // endregion Repair and Maintenance Tab
 
     // region Supplies and Acquisitions Tab
@@ -1040,6 +1041,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 chkUsePlanetaryModifiers.setEnabled(true);
                 spnMaintenanceBonus.setEnabled(true);
                 logMaintenance.setEnabled(true);
+                spnDefaultMaintenanceTime.setEnabled(true);
             } else {
                 spnMaintenanceDays.setEnabled(false);
                 useQualityMaintenance.setEnabled(false);
@@ -1049,6 +1051,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 chkUsePlanetaryModifiers.setEnabled(false);
                 spnMaintenanceBonus.setEnabled(false);
                 logMaintenance.setEnabled(false);
+                spnDefaultMaintenanceTime.setEnabled(false);
             }
         });
 
@@ -1074,9 +1077,26 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         pnlMaintenanceBonus.add(spnMaintenanceBonus);
         pnlMaintenanceBonus.add(new JLabel(resources.getString("lblMaintenanceBonus.text")));
 
+        spnDefaultMaintenanceTime = new JSpinner(new SpinnerNumberModel(4, 1, 4, 1));
+        ((DefaultEditor) spnDefaultMaintenanceTime.getEditor()).getTextField().setEditable(false);
+        spnDefaultMaintenanceTime.setToolTipText(resources.getString("lblDefaultMaintenanceTime.toolTipText"));
+
+        JPanel pnlDefaultMaintenanceTime = new JPanel();
+        pnlDefaultMaintenanceTime.add(spnDefaultMaintenanceTime);
+        pnlDefaultMaintenanceTime.add(new JLabel(resources.getString("lblDefaultMaintenanceTime.text")));
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubMaintenance.add(pnlDefaultMaintenanceTime, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
@@ -1087,7 +1107,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         useQualityMaintenance.setToolTipText(resources.getString("useQualityMaintenance.toolTipText"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
@@ -1098,7 +1118,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         reverseQualityNames.setToolTipText(resources.getString("reverseQualityNames.toolTipText"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
@@ -1111,7 +1131,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomUnitQualities.setToolTipText(resources.getString("chkUseRandomUnitQualities.toolTipText"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
@@ -1122,7 +1142,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUsePlanetaryModifiers.setToolTipText(resources.getString("chkUsePlanetaryModifiers.toolTipText"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
@@ -1133,7 +1153,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         useUnofficialMaintenance.setToolTipText(resources.getString("useUnofficialMaintenance.toolTipText"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
@@ -1143,7 +1163,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         logMaintenance = new JCheckBox(resources.getString("logMaintenance.text"));
         logMaintenance.setToolTipText(resources.getString("logMaintenance.toolTipText"));
         logMaintenance.setName("logMaintenance");
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
@@ -8340,6 +8360,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
         spnMaintenanceDays.setValue(options.getMaintenanceCycleDays());
         spnMaintenanceBonus.setValue(options.getMaintenanceBonus());
+        spnDefaultMaintenanceTime.setValue(options.getDefaultMaintenanceTime());
         useQualityMaintenance.setSelected(options.isUseQualityMaintenance());
         reverseQualityNames.setSelected(options.isReverseQualityNames());
         chkUseRandomUnitQualities.setSelected(options.isUseRandomUnitQualities());
@@ -8997,6 +9018,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
             options.setLogMaintenance(logMaintenance.isSelected());
             options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getValue());
+            options.setDefaultMaintenanceTime((Integer) spnDefaultMaintenanceTime.getValue());
             options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getValue());
             options.setPayForParts(payForPartsBox.isSelected());
             options.setPayForRepairs(payForRepairsBox.isSelected());
