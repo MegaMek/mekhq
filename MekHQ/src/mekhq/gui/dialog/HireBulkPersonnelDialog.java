@@ -18,23 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import static mekhq.campaign.personnel.SkillType.*;
-import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
-
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JSpinner.NumberEditor;
-
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -68,6 +51,20 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+import static mekhq.campaign.personnel.SkillType.*;
+import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
+
+import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -362,10 +359,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             Person person = campaign.newPerson(selectedItem.getRole());
 
             if ((useSkill) && (!selectedItem.getRole().isCivilian()) && (!selectedItem.getRole().isAssistant())) {
-                overrideSkills(
-                        person,
-                        selectedItem.getRole(),
-                        Objects.requireNonNull(skillLevel.getSelectedItem()).ordinal());
+                overrideSkills(campaign, person, selectedItem.getRole(),
+                    Objects.requireNonNull(skillLevel.getSelectedItem()).ordinal());
             }
 
             person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
@@ -419,15 +414,16 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     /**
-     * Replaces the skills for a {@link Person} based on their primary role and
-     * desired experience level.
+     * Replaces the skills for a {@link Person} based on their primary role and desired experience level.
      *
+     * @param campaign    The current campaign
      * @param person      The {@link Person} to add default skills.
      * @param primaryRole The primary role of the person
      * @param expLvl      The experience level of the person (e.g.
      *                    {@link SkillType#EXP_GREEN}).
      */
-    protected void overrideSkills(Person person, PersonnelRole primaryRole, int expLvl) {
+    public static void overrideSkills(Campaign campaign, Person person, PersonnelRole primaryRole,
+                                      int expLvl) {
         switch (primaryRole) {
             case MEKWARRIOR:
                 addSkillFixedExperienceLevel(person, S_PILOT_MEK, expLvl);
