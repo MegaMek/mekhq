@@ -26,6 +26,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -329,6 +330,19 @@ public class PlanetViewPanel extends JScrollablePanel {
             panel.add(txtHPG, gbcText);
             ++ infoRow;
         }
+
+        //Hiring Hall Level
+        JLabel lblHiringHall = new JLabel(resourceMap.getString("lblHiringHall.text"));
+        gbcLabel.gridy = infoRow;
+        panel.add(lblHiringHall, gbcLabel);
+        JLabel textHiringHall = new JLabel(StringUtils.capitalize(
+            planet.getParentSystem()
+            .getHiringHallLevel(currentDate)
+            .name()
+            .toLowerCase()));
+        gbcText.gridy = infoRow;
+        panel.add(textHiringHall, gbcText);
+        ++ infoRow;
 
         // Academies
         List<Academy> filteredAcademies = system.getFilteredAcademies(campaign);
