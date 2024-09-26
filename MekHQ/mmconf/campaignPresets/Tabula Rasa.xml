@@ -110,22 +110,23 @@
 		<resetToFirstTech>false</resetToFirstTech>
 		<useQuirks>false</useQuirks>
 		<xpCostMultiplier>1.0</xpCostMultiplier>
-		<scenarioXP>1</scenarioXP>
-		<killsForXP>0</killsForXP>
-		<killXPAward>0</killXPAward>
-		<nTasksXP>25</nTasksXP>
-		<tasksXP>1</tasksXP>
-		<mistakeXP>0</mistakeXP>
-		<successXP>0</successXP>
-		<idleXP>0</idleXP>
-		<targetIdleXP>10</targetIdleXP>
-		<monthsIdleXP>2</monthsIdleXP>
-		<contractNegotiationXP>0</contractNegotiationXP>
-		<adminWeeklyXP>0</adminWeeklyXP>
-		<adminXPPeriod>1</adminXPPeriod>
-		<missionXpFail>0</missionXpFail>
-		<missionXpSuccess>0</missionXpSuccess>
-		<missionXpOutstandingSuccess>0</missionXpOutstandingSuccess>
+        <scenarioXP>0</scenarioXP>
+        <killsForXP>0</killsForXP>
+        <killXPAward>0</killXPAward>
+        <nTasksXP>25</nTasksXP>
+        <tasksXP>0</tasksXP>
+        <mistakeXP>0</mistakeXP>
+        <successXP>0</successXP>
+        <idleXP>5</idleXP>
+        <targetIdleXP>7</targetIdleXP>
+        <monthsIdleXP>1</monthsIdleXP>
+        <contractNegotiationXP>0</contractNegotiationXP>
+        <adminWeeklyXP>0</adminWeeklyXP>
+        <adminXPPeriod>1</adminXPPeriod>
+        <missionXpFail>1</missionXpFail>
+        <missionXpSuccess>3</missionXpSuccess>
+        <missionXpOutstandingSuccess>5</missionXpOutstandingSuccess>
+        <edgeCost>100</edgeCost>
 		<edgeCost>10</edgeCost>
 		<limitByYear>true</limitByYear>
 		<disallowExtinctStuff>false</disallowExtinctStuff>

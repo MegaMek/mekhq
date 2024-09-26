@@ -117,7 +117,7 @@
 		<tasksXP>0</tasksXP>
 		<mistakeXP>0</mistakeXP>
 		<successXP>0</successXP>
-		<idleXP>10</idleXP>
+		<idleXP>5</idleXP>
 		<targetIdleXP>7</targetIdleXP>
 		<monthsIdleXP>1</monthsIdleXP>
 		<contractNegotiationXP>0</contractNegotiationXP>
