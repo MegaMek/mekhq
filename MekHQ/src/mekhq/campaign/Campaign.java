@@ -5290,6 +5290,11 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillTypes");
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "specialAbilities");
         for (String key : SpecialAbility.getSpecialAbilities().keySet()) {
+            // <50.01 compatibility handler
+            if (Objects.equals(key, "clan_tech_knowledge")) {
+                continue;
+            }
+
             SpecialAbility.getAbility(key).writeToXML(pw, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "specialAbilities");
