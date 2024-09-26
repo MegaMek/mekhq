@@ -217,7 +217,7 @@ public class AtBContract extends Contract {
 
         // Some operating systems use `\`, so when we sanitize the file path later,
         // we need to be able to account for that.
-        final String ROOT_DIRECTORY_ALTERNATE = "data\\\\mages\\\\camo\\\\";
+        final String ROOT_DIRECTORY_ALTERNATE = "data\\\\images\\\\camo\\\\";
 
         String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
 
