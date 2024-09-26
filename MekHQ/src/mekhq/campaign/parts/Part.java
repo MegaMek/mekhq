@@ -665,7 +665,7 @@ public abstract class Part implements IPartWork, ITechnology {
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
 
-        // reverse compatibility checks
+        // <50.01 compatibility handlers
         if (className.equalsIgnoreCase("mekhq.campaign.parts.MekEngine")) {
             className = "mekhq.campaign.parts.EnginePart";
         } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingMekEngine")) {
@@ -686,6 +686,8 @@ public abstract class Part implements IPartWork, ITechnology {
             className = "mekhq.campaign.parts.equipment.HeatSink";
         } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingHeatSink")) {
             className = "mekhq.campaign.parts.equipment.MissingHeatSink";
+        } else if (className.equalsIgnoreCase("mekhq.campaign.parts.VeeStabiliser")) {
+            className = "mekhq.campaign.parts.VeeStabilizer";
         }
 
         Part retVal = null;
