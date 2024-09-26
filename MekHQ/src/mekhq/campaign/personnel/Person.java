@@ -2602,7 +2602,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        logger.error("Error restoring advantage: {}", adv);
+                        logger.warn("Error restoring advantage: {}", adv);
                     }
                 }
             }
