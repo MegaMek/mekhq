@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.personnel.divorce;
 
+import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -26,11 +27,14 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FormerSpouseReason;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -150,8 +154,12 @@ public abstract class AbstractDivorce {
                 return resources.getString("cannotDivorce.RandomPrisoner.text");
             } else if (!isUseRandomPrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotDivorce.RandomPrisonerSpouse.text");
+            } else if (!person.equals(person.getGenealogy().getOriginSpouse())) {
+                return resources.getString("cannotDivorce.RandomNotOriginSpouse.text");
             }
+
             final boolean sameSex = person.getGenealogy().getSpouse().getGender() == person.getGender();
+
             if (!isUseRandomOppositeSexDivorce() && !sameSex) {
                 return resources.getString("cannotDivorce.OppositeSexDivorceDisabled.text");
             } else if (!isUseRandomSameSexDivorce() && sameSex) {
@@ -165,7 +173,7 @@ public abstract class AbstractDivorce {
     /**
      * This is a standardization method for the divorce surname style to use when a person's spouse
      * dies.
-     *
+     * <p>
      * TODO : I should be part of AbstractDeath
      *
      * @param campaign the campaign the person is in
@@ -234,12 +242,101 @@ public abstract class AbstractDivorce {
             spouse.getGenealogy().setSpouse(null);
         }
 
-        // Add to former spouse list
+        // Add to the former spouse list
         spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, today, reason));
         origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, today, reason));
 
+        // Clear origin spouses
+        origin.getGenealogy().setOriginSpouse(null);
+        spouse.getGenealogy().setOriginSpouse(null);
+
+        // roll for removal of marriageable flag
+        if (Compute.d6(1) <= 2) {
+            origin.setMarriageable(false);
+        }
+
+        if (Compute.d6(1) <= 2) {
+            spouse.setMarriageable(false);
+        }
+
+        List<Person> departingPartners = new ArrayList<>();
+
+        if (origin.getPrimaryRole().isDependent()) {
+            departingPartners.add(origin);
+        }
+
+        if (spouse.getPrimaryRole().isDependent()) {
+            departingPartners.add(origin);
+        }
+
+        if (!departingPartners.isEmpty()) {
+            for (Person departingPartner : departingPartners) {
+                departingPartner.changeStatus(campaign, today, PersonnelStatus.LEFT);
+
+                for (Person child : departingPartner.getGenealogy().getChildren()) {
+                    int remainingParents = child.getGenealogy().getParents().size();
+
+                    if ((remainingParents == 0) || (Compute.randomInt(2) == 0)) {
+                        child.changeStatus(campaign, today, PersonnelStatus.LEFT);
+                    }
+                }
+            }
+        }
+
+        // Process any relevant loyalty changes
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            if (origin.getStatus().isLeft() && !spouse.getStatus().isLeft()) {
+                spouse.performRandomizedLoyaltyChange(campaign, false, true);
+            } else if (!origin.getStatus().isLeft() && spouse.getStatus().isLeft()) {
+                origin.performRandomizedLoyaltyChange(campaign, false, true);
+            } else if (origin.getStatus().isLeft() && spouse.getStatus().isLeft()) {
+                origin.performForcedDirectionLoyaltyChange(campaign, false, false, true);
+                spouse.performForcedDirectionLoyaltyChange(campaign, false, false, true);
+            }
+        }
+
+        // trigger person changed events
         MekHQ.triggerEvent(new PersonChangedEvent(spouse));
         MekHQ.triggerEvent(new PersonChangedEvent(origin));
+    }
+
+    /**
+     * Processes divorce events that occur as part of a character's background.
+     *
+     * @param campaign the campaign associated with the divorce
+     * @param today the current date of the divorce
+     * @param origin the person whose background is being divorced
+     * @param style the splitting surname style to be applied
+     */
+    public void backgroundDivorce(final Campaign campaign, final LocalDate today, final Person origin,
+                        final SplittingSurnameStyle style) {
+        final Person spouse = origin.getGenealogy().getSpouse();
+
+        style.apply(campaign, origin, spouse);
+
+        final FormerSpouseReason reason = FormerSpouseReason.DIVORCE;
+
+        PersonalLogger.divorcedFrom(origin, spouse, today);
+        PersonalLogger.divorcedFrom(spouse, origin, today);
+
+        spouse.setMaidenName(null);
+        origin.setMaidenName(null);
+
+        spouse.getGenealogy().setSpouse(null);
+        origin.getGenealogy().setSpouse(null);
+
+        // Add to the former spouse list
+        spouse.getGenealogy().addFormerSpouse(new FormerSpouse(origin, today, reason));
+        origin.getGenealogy().addFormerSpouse(new FormerSpouse(spouse, today, reason));
+
+        // Clear origin spouses
+        origin.getGenealogy().setOriginSpouse(null);
+        spouse.getGenealogy().setOriginSpouse(null);
+
+        // roll for removal of marriageable flag
+        if (Compute.d6(1) <= 2) {
+            origin.setMarriageable(false);
+        }
     }
 
     //region New Day
@@ -248,32 +345,28 @@ public abstract class AbstractDivorce {
      * @param campaign the campaign to process
      * @param today the current day
      * @param person the person to process
+     * @param isBackground whether the divorce occurred during a character's backstory
      */
-    public void processNewDay(final Campaign campaign, final LocalDate today, final Person person) {
+    public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person, boolean isBackground) {
         if (canDivorce(person, true) != null) {
             return;
         }
 
-        if ((person.getGenealogy().getSpouse().getGender() == person.getGender())
-                ? randomSameSexDivorce(person) : randomOppositeSexDivorce(person)) {
-            divorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
+        if (randomDivorce()) {
+            if (isBackground) {
+                backgroundDivorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
+            } else {
+                divorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
+            }
         }
     }
 
     //region Random Divorce
     /**
-     * This determines if a person will randomly divorce their opposite sex spouse
-     * @param person the person to determine if they are to randomly divorce their opposite sex spouse
+     * This determines if a person will randomly divorce their spouse
      * @return true if the person is to randomly divorce
      */
-    protected abstract boolean randomOppositeSexDivorce(final Person person);
-
-    /**
-     * This determines if a person will randomly divorce their same-sex spouse.
-     * @param person the person who may be randomly divorcing their same-sex spouse
-     * @return true if the person is to randomly divorce
-     */
-    protected abstract boolean randomSameSexDivorce(final Person person);
+    protected abstract boolean randomDivorce();
     //endregion Random Divorce
     //endregion New Day
 }

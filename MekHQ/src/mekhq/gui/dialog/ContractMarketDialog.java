@@ -46,7 +46,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.market.ContractMarket;
+import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Factions;
@@ -72,7 +72,7 @@ public class ContractMarketDialog extends JDialog {
     private static int sharePct = 20;
 
     private Campaign campaign;
-    private ContractMarket contractMarket;
+    private AbstractContractMarket contractMarket;
     private Contract selectedContract = null;
     private List<String> possibleRetainerContracts;
 
@@ -231,7 +231,7 @@ public class ContractMarketDialog extends JDialog {
             // Changes in rating or force size since creation can alter some details
             if (c instanceof AtBContract atbContract) {
                 atbContract.initContractDetails(campaign);
-                atbContract.calculatePaymentMultiplier(campaign);
+                campaign.getContractMarket().calculatePaymentMultiplier(campaign, atbContract);
                 atbContract.setPartsAvailabilityLevel(atbContract.getContractType().calculatePartsAvailabilityLevel());
                 atbContract.setAtBSharesPercent(campaign.getCampaignOptions().isUseShareSystem()
                         ? (Integer) spnSharePct.getValue()

@@ -18,13 +18,12 @@
  */
 package mekhq.gui.stratcon;
 
-import java.awt.*;
-
-import javax.swing.*;
-
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Handles rendering of individual lances in the StratCon scenario wizard.
@@ -56,8 +55,8 @@ public class ScenarioWizardLanceRenderer extends JLabel implements ListCellRende
         if (lance != null) {
             roleString = lance.getRole().toString() + ", ";
         }
-        
-        setText(String.format("%s (%sBV: %d)", value.getName(), roleString, value.getTotalBV(campaign)));
+
+        setText(String.format("%s (%sBV: %d)", value.getName(), roleString, value.getTotalBV(campaign, false)));
 
         return this;
     }

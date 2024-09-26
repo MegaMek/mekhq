@@ -24,7 +24,7 @@ package mekhq.gui.view;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.market.ContractMarket;
+import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
@@ -319,12 +319,12 @@ public class ContractSummaryPanel extends JPanel {
                 }
                 if (contract instanceof AtBContract) {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
-                            ContractMarket.CLAUSE_COMMAND, campaign);
+                            AbstractContractMarket.CLAUSE_COMMAND, campaign);
                     setCommandRerollButtonText((JButton) ev.getSource());
                     txtCommand.setText(contract.getCommandRights().toString());
                     txtCommand.setToolTipText(contract.getCommandRights().getToolTipText());
                     if (campaign.getContractMarket().getRerollsUsed(contract,
-                            ContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
+                            AbstractContractMarket.CLAUSE_COMMAND) >= cmdRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
@@ -367,11 +367,11 @@ public class ContractSummaryPanel extends JPanel {
                 }
                 if (contract instanceof AtBContract) {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
-                            ContractMarket.CLAUSE_TRANSPORT, campaign);
+                            AbstractContractMarket.CLAUSE_TRANSPORT, campaign);
                     setTransportRerollButtonText((JButton) ev.getSource());
                     txtTransport.setText(contract.getTransportComp() + "%");
                     if (campaign.getContractMarket().getRerollsUsed(contract,
-                            ContractMarket.CLAUSE_TRANSPORT) >= tranRerolls) {
+                            AbstractContractMarket.CLAUSE_TRANSPORT) >= tranRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
@@ -412,12 +412,12 @@ public class ContractSummaryPanel extends JPanel {
                 }
                 if (contract instanceof AtBContract) {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
-                        ContractMarket.CLAUSE_SALVAGE, campaign);
+                        AbstractContractMarket.CLAUSE_SALVAGE, campaign);
                     setSalvageRerollButtonText((JButton) ev.getSource());
                     txtSalvageRights.setText(contract.getSalvagePct() + "%"
                         + (contract.isSalvageExchange() ? " (Exchange)" : ""));
                     if (campaign.getContractMarket().getRerollsUsed(contract,
-                        ContractMarket.CLAUSE_SALVAGE) >= logRerolls) {
+                        AbstractContractMarket.CLAUSE_SALVAGE) >= logRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
@@ -460,12 +460,12 @@ public class ContractSummaryPanel extends JPanel {
                 }
                 if (contract instanceof AtBContract) {
                     campaign.getContractMarket().rerollClause((AtBContract) contract,
-                            ContractMarket.CLAUSE_SUPPORT, campaign);
+                            AbstractContractMarket.CLAUSE_SUPPORT, campaign);
                     setSupportRerollButtonText((JButton) ev.getSource());
                     txtStraightSupport.setText(contract.getStraightSupport() + "%");
                     txtBattleLossComp.setText(contract.getBattleLossComp() + "%");
                     if (campaign.getContractMarket().getRerollsUsed(contract,
-                            ContractMarket.CLAUSE_SUPPORT) >= logRerolls) {
+                            AbstractContractMarket.CLAUSE_SUPPORT) >= logRerolls) {
                         btn.setEnabled(false);
                     }
                     refreshAmounts();
@@ -504,7 +504,7 @@ public class ContractSummaryPanel extends JPanel {
 
     private boolean hasTransportRerolls() {
         return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
-                ContractMarket.CLAUSE_TRANSPORT) < tranRerolls);
+                AbstractContractMarket.CLAUSE_TRANSPORT) < tranRerolls);
     }
 
     private boolean hasCommandRerolls() {
@@ -513,40 +513,40 @@ public class ContractSummaryPanel extends JPanel {
                 && (campaign.getFaction().isMercenary()
                     || campaign.getFaction().isPirate())
                 && (campaign.getContractMarket().getRerollsUsed(contract,
-                    ContractMarket.CLAUSE_COMMAND) < cmdRerolls);
+                    AbstractContractMarket.CLAUSE_COMMAND) < cmdRerolls);
     }
 
     private boolean hasSalvageRerolls() {
         return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
-            ContractMarket.CLAUSE_SALVAGE) < logRerolls);
+            AbstractContractMarket.CLAUSE_SALVAGE) < logRerolls);
     }
 
     private boolean hasSupportRerolls() {
         return allowRerolls && (campaign.getContractMarket().getRerollsUsed(contract,
-                ContractMarket.CLAUSE_SUPPORT) < logRerolls);
+                AbstractContractMarket.CLAUSE_SUPPORT) < logRerolls);
     }
 
     private void setCommandRerollButtonText(JButton rerollButton) {
         int rerolls = (cmdRerolls - campaign.getContractMarket().getRerollsUsed(contract,
-                ContractMarket.CLAUSE_COMMAND));
+                AbstractContractMarket.CLAUSE_COMMAND));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
     private void setTransportRerollButtonText(JButton rerollButton) {
         int rerolls = (tranRerolls - campaign.getContractMarket().getRerollsUsed(contract,
-                ContractMarket.CLAUSE_TRANSPORT));
+                AbstractContractMarket.CLAUSE_TRANSPORT));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
     private void setSalvageRerollButtonText(JButton rerollButton) {
         int rerolls = (logRerolls - campaign.getContractMarket().getRerollsUsed(contract,
-            ContractMarket.CLAUSE_SALVAGE));
+            AbstractContractMarket.CLAUSE_SALVAGE));
         rerollButton.setText(generateRerollText(rerolls));
     }
 
     private void setSupportRerollButtonText(JButton rerollButton) {
         int rerolls = (logRerolls - campaign.getContractMarket().getRerollsUsed(contract,
-                ContractMarket.CLAUSE_SUPPORT));
+                AbstractContractMarket.CLAUSE_SUPPORT));
         rerollButton.setText(generateRerollText(rerolls));
     }
 

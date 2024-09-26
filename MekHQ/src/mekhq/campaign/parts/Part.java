@@ -21,29 +21,8 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.StringJoiner;
-import java.util.UUID;
-
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
-import megamek.common.SimpleTechLevel;
-import megamek.common.Tank;
-import megamek.common.TargetRoll;
-import megamek.common.TechAdvancement;
-import megamek.common.WeaponType;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
@@ -62,6 +41,13 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.*;
 
 /**
  * Parts do the lions share of the work of repairing, salvaging, reloading,
@@ -283,10 +269,12 @@ public abstract class Part implements IPartWork, ITechnology {
      *
      * @return the part's actual value
      */
+    @Override
     public Money getActualValue() {
         return adjustCostsForCampaignOptions(getStickerPrice());
     }
 
+    @Override
     public boolean isPriceAdjustedForAmount() {
         return false;
     }
@@ -893,13 +881,6 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         if (tech != null) {
-            if ((isClanTechBase()
-                    || ((this instanceof MekLocation) && (getUnit() != null) && getUnit().getEntity().isClan()))
-                    && (!tech.isClanPersonnel()
-                            && !tech.getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
-                mods.addModifier(2, "Clan tech");
-            }
-
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
                             || (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
@@ -949,13 +930,6 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         if (getUnit().getTech() != null) {
-            if ((isClanTechBase() || ((this instanceof MekLocation) && getUnit().getEntity().isClan()))
-                    && (!getUnit().getTech().isClanPersonnel()
-                            && !getUnit().getTech().getOptions()
-                                    .booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
-                mods.addModifier(2, "Clan tech");
-            }
-
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
                             || (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {

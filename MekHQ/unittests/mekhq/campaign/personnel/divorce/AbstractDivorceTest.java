@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -54,29 +54,6 @@ public class AbstractDivorceTest {
         lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
     }
 
-    //region Getters/Setters
-    @Disabled // FIXME : Windchild : Test Missing
-    @Test
-    public void testGettersAndSetters() {
-/*
-        when(mockCampaignOptions.isUseClanPersonnelDivorce()).thenReturn(false);
-        when(mockCampaignOptions.isUsePrisonerDivorce()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomSameSexDivorce()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomClanPersonnelDivorce()).thenReturn(false);
-        when(mockCampaignOptions.isUseRandomPrisonerDivorce()).thenReturn(false);
-
-        final AbstractDivorce disabledDivorce = new DisabledRandomDivorce(mockCampaignOptions);
-
-        assertEquals(RandomDivorceMethod.NONE, disabledDivorce.getMethod());
-        assertFalse(disabledDivorce.isUseClanPersonnelDivorce());
-        assertFalse(disabledDivorce.isUsePrisonerDivorce());
-        assertFalse(disabledDivorce.isUseRandomSameSexDivorce());
-        assertFalse(disabledDivorce.isUseRandomClanPersonnelDivorce());
-        assertFalse(disabledDivorce.isUseRandomPrisonerDivorce());
-*/
-    }
-    //endregion Getters/Setters
-
     @Disabled // FIXME : Windchild : Test Missing
     @Test
     public void testCanDivorce() {
@@ -125,7 +102,7 @@ public class AbstractDivorceTest {
     //region New Day
     @Disabled // FIXME : Windchild : Test Missing
     @Test
-    public void testProcessNewDay() {
+    public void testProcessNewWeek() {
 
     }
     //endregion New Day

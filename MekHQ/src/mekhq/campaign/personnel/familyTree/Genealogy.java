@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -38,6 +38,14 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The Genealogy class is used to track immediate familial relationships,
@@ -50,6 +58,7 @@ public class Genealogy {
     // region Variables
     private final Person origin;
     private Person spouse;
+    private Person originSpouse; // the person who originated the marriage
     private final List<FormerSpouse> formerSpouses = new ArrayList<>();
     private final Map<FamilialRelationshipType, List<Person>> family = new HashMap<>();
     // endregion Variables
@@ -84,6 +93,20 @@ public class Genealogy {
      */
     public void setSpouse(final @Nullable Person spouse) {
         this.spouse = spouse;
+    }
+
+    /**
+     * @return the person who originated the marriage
+     */
+    public @Nullable Person getOriginSpouse() {
+        return originSpouse;
+    }
+
+    /**
+     * @param originSpouse the person who originated the marriage
+     */
+    public void setOriginSpouse(final @Nullable Person originSpouse) {
+        this.originSpouse = originSpouse;
     }
 
     /**
@@ -207,6 +230,13 @@ public class Genealogy {
      */
     public boolean hasChildren() {
         return getFamily().get(FamilialRelationshipType.CHILD) != null;
+    }
+
+    /**
+     * @return true if the person has at least one kid, false otherwise
+     */
+    public boolean hasNonAdultChildren(LocalDate localDate) {
+        return getChildren().stream().anyMatch(child -> child.isChild(localDate));
     }
 
     /**

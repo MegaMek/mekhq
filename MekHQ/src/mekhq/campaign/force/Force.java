@@ -21,23 +21,8 @@
  */
 package mekhq.campaign.force;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.Vector;
-import java.util.stream.Collectors;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
+import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.logging.MMLogger;
@@ -54,6 +39,15 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.lang.Math.round;
 
 /**
  * This is a hierarchical object to define forces for TO&amp;E. Each Force
@@ -576,8 +570,7 @@ public class Force {
             // to get
             // the ordinal of the force's status. Then assign the operational status to
             // this.
-            final int index = (int) Math
-                    .round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
+            final int index = (int) round(statuses.stream().mapToInt(Enum::ordinal).sum() / (statuses.size() * 1.0));
             final LayeredForceIconOperationalStatus status = LayeredForceIconOperationalStatus.values()[index];
             ((LayeredForceIcon) getForceIcon()).getPieces().put(LayeredForceIconLayer.SPECIAL_MODIFIER,
                     new ArrayList<>());
@@ -748,27 +741,71 @@ public class Force {
     /**
      * Calculates the force's total BV, including sub forces.
      *
-     * @param c The working campaign.
-     * @return Total BV
+     * @param campaign The working campaign. This is the campaign object that the force belongs to.
+     * @param forceStandardBattleValue Flag indicating whether to override campaign settings that
+     *                                 call for the use of Generic BV
+     * @return The total battle value (BV) of the force.
      */
-    public int getTotalBV(Campaign c) {
+    public int getTotalBV(Campaign campaign, boolean forceStandardBattleValue) {
         int bvTotal = 0;
 
-        for (Force sforce : getSubForces()) {
-            bvTotal += sforce.getTotalBV(c);
+        for (Force subforce : getSubForces()) {
+            bvTotal += subforce.getTotalBV(campaign, forceStandardBattleValue);
         }
 
-        for (UUID id : getUnits()) {
+        for (UUID unitId : getUnits()) {
             // no idea how this would happen, but sometimes a unit in a forces unit ID list
             // has an invalid ID?
-            if (c.getUnit(id) == null) {
+            if (campaign.getUnit(unitId) == null) {
                 continue;
             }
 
-            bvTotal += c.getUnit(id).getEntity().calculateBattleValue();
+            if (campaign.getCampaignOptions().isUseGenericBattleValue() && !forceStandardBattleValue) {
+                bvTotal += campaign.getUnit(unitId).getEntity().getGenericBattleValue();
+            } else {
+                bvTotal += campaign.getUnit(unitId).getEntity().calculateBattleValue();
+            }
         }
 
         return bvTotal;
+    }
+
+    /**
+     * Calculates the total count of units in the given force, including all sub forces.
+     *
+     * @param campaign the current campaign
+     * @param isClanBidding flag to indicate whether clan bidding is being performed
+     * @return the total count of units in the force (including sub forces)
+     */
+    public int getTotalUnitCount(Campaign campaign, boolean isClanBidding) {
+        int unitTotal = 0;
+
+        for (Force subforce : getSubForces()) {
+            unitTotal += subforce.getTotalUnitCount(campaign, isClanBidding);
+        }
+
+        // If we're getting the unit count specifically for Clan Bidding, we don't want to count
+        // Conventional Infantry, and we only count Battle Armor as half a unit.
+        // If we're not performing Clan Bidding, we just need the total count of units.
+        if (isClanBidding) {
+            double rollingCount = 0;
+
+            for (UUID unitId : getUnits()) {
+                Entity unit = campaign.getUnit(unitId).getEntity();
+
+                if (unit.isBattleArmor()) {
+                    rollingCount += 0.5;
+                } else if (!unit.isConventionalInfantry()) {
+                    rollingCount++;
+                }
+            }
+
+            unitTotal += (int) round(rollingCount);
+        } else {
+            unitTotal += getUnits().size();
+        }
+
+        return unitTotal;
     }
 
     /**

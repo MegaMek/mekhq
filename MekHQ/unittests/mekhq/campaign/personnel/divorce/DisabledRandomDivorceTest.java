@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,12 +48,7 @@ public class DisabledRandomDivorceTest {
     }
 
     @Test
-    public void testRandomOppositeSexDivorce() {
-        assertFalse(new DisabledRandomDivorce(mockOptions).randomOppositeSexDivorce(mockPerson));
-    }
-
-    @Test
-    public void testRandomSameSexDivorce() {
-        assertFalse(new DisabledRandomDivorce(mockOptions).randomSameSexDivorce(mockPerson));
+    public void testRandomDivorce() {
+        assertFalse(new DisabledRandomDivorce(mockOptions).randomDivorce());
     }
 }

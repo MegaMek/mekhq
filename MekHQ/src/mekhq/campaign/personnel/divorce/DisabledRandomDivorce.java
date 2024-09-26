@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,7 +19,6 @@
 package mekhq.campaign.personnel.divorce;
 
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 
 public class DisabledRandomDivorce extends AbstractDivorce {
@@ -30,12 +29,7 @@ public class DisabledRandomDivorce extends AbstractDivorce {
     //endregion Constructors
 
     @Override
-    protected boolean randomOppositeSexDivorce(final Person person) {
-        return false;
-    }
-
-    @Override
-    protected boolean randomSameSexDivorce(final Person person) {
+    protected boolean randomDivorce() {
         return false;
     }
 }

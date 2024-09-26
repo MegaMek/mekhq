@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -104,6 +104,17 @@ class PersonnelStatusTest {
                 assertTrue(personnelStatus.isOnLeave());
             } else {
                 assertFalse(personnelStatus.isOnLeave());
+            }
+        }
+    }
+
+    @Test
+    public void testIsOnMaternityLeave() {
+        for (final PersonnelStatus personnelStatus : statuses) {
+            if (personnelStatus == PersonnelStatus.ON_MATERNITY_LEAVE) {
+                assertTrue(personnelStatus.isOnMaternityLeave());
+            } else {
+                assertFalse(personnelStatus.isOnMaternityLeave());
             }
         }
     }
@@ -282,6 +293,7 @@ class PersonnelStatusTest {
                 case ON_LEAVE:
                 case STUDENT:
                 case MISSING:
+                case ON_MATERNITY_LEAVE:
                 case AWOL:
                     assertTrue(personnelStatus.isAbsent());
                     break;
@@ -355,11 +367,36 @@ class PersonnelStatusTest {
     void testParseFromString() {
         // Normal Parsing
         assertEquals(PersonnelStatus.RETIRED, PersonnelStatus.parseFromString("RETIRED"));
-        assertEquals(PersonnelStatus.PREGNANCY_COMPLICATIONS,
-                PersonnelStatus.parseFromString("PREGNANCY_COMPLICATIONS"));
+        assertEquals(PersonnelStatus.PREGNANCY_COMPLICATIONS, PersonnelStatus.parseFromString("PREGNANCY_COMPLICATIONS"));
+
+        // Legacy Parsing
+        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("0"));
+        assertEquals(PersonnelStatus.RETIRED, PersonnelStatus.parseFromString("1"));
+        assertEquals(PersonnelStatus.KIA, PersonnelStatus.parseFromString("2"));
+        assertEquals(PersonnelStatus.MIA, PersonnelStatus.parseFromString("3"));
+        assertEquals(PersonnelStatus.STUDENT, PersonnelStatus.parseFromString("4"));
+        assertEquals(PersonnelStatus.MISSING, PersonnelStatus.parseFromString("5"));
+        assertEquals(PersonnelStatus.POW, PersonnelStatus.parseFromString("6"));
+        assertEquals(PersonnelStatus.ON_LEAVE, PersonnelStatus.parseFromString("7"));
+        assertEquals(PersonnelStatus.AWOL, PersonnelStatus.parseFromString("8"));
+        assertEquals(PersonnelStatus.RESIGNED, PersonnelStatus.parseFromString("9"));
+        assertEquals(PersonnelStatus.DESERTED, PersonnelStatus.parseFromString("10"));
+        assertEquals(PersonnelStatus.DEFECTED, PersonnelStatus.parseFromString("11"));
+        assertEquals(PersonnelStatus.HOMICIDE, PersonnelStatus.parseFromString("12"));
+        assertEquals(PersonnelStatus.WOUNDS, PersonnelStatus.parseFromString("13"));
+        assertEquals(PersonnelStatus.DISEASE, PersonnelStatus.parseFromString("14"));
+        assertEquals(PersonnelStatus.ACCIDENTAL, PersonnelStatus.parseFromString("15"));
+        assertEquals(PersonnelStatus.NATURAL_CAUSES, PersonnelStatus.parseFromString("16"));
+        assertEquals(PersonnelStatus.OLD_AGE, PersonnelStatus.parseFromString("17"));
+        assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, PersonnelStatus.parseFromString("18"));
+        assertEquals(PersonnelStatus.PREGNANCY_COMPLICATIONS, PersonnelStatus.parseFromString("19"));
+        assertEquals(PersonnelStatus.UNDETERMINED, PersonnelStatus.parseFromString("20"));
+        assertEquals(PersonnelStatus.SUICIDE, PersonnelStatus.parseFromString("21"));
+        assertEquals(PersonnelStatus.SACKED, PersonnelStatus.parseFromString("22"));
+        assertEquals(PersonnelStatus.ON_MATERNITY_LEAVE, PersonnelStatus.parseFromString("23"));
 
         // Error Case
-        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("23"));
+        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("24"));
         assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("blah"));
     }
     // endregion File I/O

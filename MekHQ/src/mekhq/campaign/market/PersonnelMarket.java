@@ -89,7 +89,7 @@ public class PersonnelMarket {
 
     /**
      * Sets the method for generating potential recruits for the personnel market.
-     * 
+     *
      * @param key The lookup name of the market type to use.
      */
     public void setType(String key) {
@@ -108,19 +108,20 @@ public class PersonnelMarket {
      * Generate new personnel to be added to the
      * market availability pool
      */
-    public void generatePersonnelForDay(Campaign c) {
+    public void generatePersonnelForDay(Campaign campaign) {
         List<String> capitals = Factions.getInstance().getFactions().stream()
-                .map(faction -> faction.getStartingPlanet(c.getLocalDate()))
+                .filter(faction -> faction.validIn(campaign.getLocalDate()))
+                .map(faction -> faction.getStartingPlanet(campaign.getLocalDate()))
                 .collect(Collectors.toList());
 
-        String currentSystem = c.getCurrentSystem().getId();
+        String currentSystem = campaign.getCurrentSystem().getId();
 
         boolean updated = false;
 
         if (!personnel.isEmpty()) {
-            removePersonnelForDay(c);
-            if (c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
-                    && !c.getAtBConfig().isHiringHall(currentSystem, c.getLocalDate())
+            removePersonnelForDay(campaign);
+            if (campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
+                    && !campaign.getAtBConfig().isHiringHall(currentSystem, campaign.getLocalDate())
                     && !capitals.contains(currentSystem)) {
                 removeAll();
             }
@@ -129,10 +130,10 @@ public class PersonnelMarket {
         if (null != method) {
             List<Person> newPersonnel = new ArrayList<>();
 
-            if (!c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
-                    || c.getAtBConfig().isHiringHall(currentSystem, c.getLocalDate())
+            if (!campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
+                    || campaign.getAtBConfig().isHiringHall(currentSystem, campaign.getLocalDate())
                     || capitals.contains(currentSystem)) {
-                newPersonnel = method.generatePersonnelForDay(c);
+                newPersonnel = method.generatePersonnelForDay(campaign);
             }
 
             if ((null != newPersonnel) && !newPersonnel.isEmpty()) {
@@ -142,13 +143,13 @@ public class PersonnelMarket {
             }
         }
 
-        if (updated && c.getCampaignOptions().isPersonnelMarketReportRefresh()) {
+        if (updated && campaign.getCampaignOptions().isPersonnelMarketReportRefresh()) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
-            if (c.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops") && !personnel.isEmpty()) {
+            if (campaign.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops") && !personnel.isEmpty()) {
                 stringBuilder.append(':');
                 Person person = personnel.get(0);
-                String expLevel = SkillType.getExperienceLevelName(person.getExperienceLevel(c, false));
+                String expLevel = SkillType.getExperienceLevelName(person.getExperienceLevel(campaign, false));
                 stringBuilder.append("<br>A ")
                     .append("<b> ")
                     .append(expLevel)
@@ -159,7 +160,7 @@ public class PersonnelMarket {
                     .append(person.getFullName())
                     .append(" is available.");
             }
-            c.addReport(stringBuilder.toString());
+            campaign.addReport(stringBuilder.toString());
         }
     }
 
@@ -211,7 +212,7 @@ public class PersonnelMarket {
 
     /**
      * Assign an <code>Entity</code> to a recruit
-     * 
+     *
      * @param pid The recruit's id
      * @param en  The Entity to assign
      */
@@ -221,7 +222,7 @@ public class PersonnelMarket {
 
     /**
      * Get the Entity associated with a recruit, if any
-     * 
+     *
      * @param p The recruit
      * @return The Entity associated with the recruit, or null if there is none
      */
@@ -231,7 +232,7 @@ public class PersonnelMarket {
 
     /**
      * Get the Entity associated with a recruit, if any
-     * 
+     *
      * @param pid The id of the recruit
      * @return The Entity associated with the recruit, or null if there is none
      */
@@ -241,7 +242,7 @@ public class PersonnelMarket {
 
     /**
      * Clears the <code>Entity</code> associated with a recruit
-     * 
+     *
      * @param pid The recruit's id
      */
     public void removeAttachedEntity(UUID pid) {

@@ -307,6 +307,22 @@ public class Faction {
     public boolean isSmall() {
         return is(Tag.SMALL);
     }
+
+    public boolean isNoble() {
+        return is(Tag.NOBLE);
+    }
+
+    public boolean isPlanetaryGovt() {
+        return is(Tag.PLANETARY_GOVERNMENT);
+    }
+
+    public boolean isCorporation() {
+        return is(Tag.CORPORATION);
+    }
+
+    public boolean isInactive() {
+        return is(Tag.INACTIVE);
+    }
     // endregion Power Checks
     // endregion Checks
 
@@ -451,6 +467,12 @@ public class Faction {
         /** Faction code is not intended to be for players */
         SPECIAL,
         /** Faction is meant to be played */
-        PLAYABLE
+        PLAYABLE,
+        /** Faction is an independent noble (Camops p. 39) */
+        NOBLE,
+        /** Faction is an independent planetary government (Camops p. 39) */
+        PLANETARY_GOVERNMENT,
+        /** Faction is an independent corporation (Camops p. 39) */
+        CORPORATION
     }
 }
