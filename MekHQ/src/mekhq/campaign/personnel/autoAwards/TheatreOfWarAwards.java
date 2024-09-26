@@ -19,12 +19,6 @@
 
 package mekhq.campaign.personnel.autoAwards;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.IntStream;
-
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -33,6 +27,12 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.IntStream;
 
 public class TheatreOfWarAwards {
     private static final MMLogger logger = MMLogger.create(TheatreOfWarAwards.class);
@@ -107,7 +107,7 @@ public class TheatreOfWarAwards {
                         continue;
                     }
                 } else if ((campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
-                    String enemy = ((AtBContract) mission).getEnemyName(campaign.getGameYear());
+                    String enemy = ((AtBContract) mission).getEnemyCode();
 
                     if (hasLoyalty(employer, attackers)) {
                         isEligible = hasLoyalty(enemy, defenders);
@@ -173,31 +173,19 @@ public class TheatreOfWarAwards {
         missionFaction = missionFaction.toLowerCase().replaceAll("\\s", "");
         belligerent = belligerent.toLowerCase().replaceAll("\\s", "");
 
-        switch (belligerent) {
-            case "majorpowers":
-                return faction.isMajorOrSuperPower();
-            case "innersphere":
-                return faction.isInnerSphere();
-            case "clans":
-                return faction.isClan();
-            case "periphery":
-                return faction.isPeriphery();
-            case "pirate":
-                return faction.isPirate();
-            case "mercenary":
-                return faction.isMercenary();
-            case "independent":
-                return faction.isIndependent();
-            case "deepperiphery":
-                return faction.isDeepPeriphery();
-            case "comstar":
-                return faction.isComStar();
-            case "wob":
-                return faction.isWoB();
-            case "comstarorwob":
-                return faction.isComStarOrWoB();
-            default:
-                return missionFaction.equals(belligerent);
-        }
+        return switch (belligerent) {
+            case "majorpowers" -> faction.isMajorOrSuperPower();
+            case "innersphere" -> faction.isInnerSphere();
+            case "clans" -> faction.isClan();
+            case "periphery" -> faction.isPeriphery();
+            case "pirate" -> faction.isPirate();
+            case "mercenary" -> faction.isMercenary();
+            case "independent" -> faction.isIndependent();
+            case "deepperiphery" -> faction.isDeepPeriphery();
+            case "comstar" -> faction.isComStar();
+            case "wob" -> faction.isWoB();
+            case "comstarorwob" -> faction.isComStarOrWoB();
+            default -> missionFaction.equals(belligerent);
+        };
     }
 }

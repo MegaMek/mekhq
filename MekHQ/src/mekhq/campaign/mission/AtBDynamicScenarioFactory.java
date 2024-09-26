@@ -20,6 +20,8 @@ package mekhq.campaign.mission;
 
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.*;
+import megamek.client.generator.enums.SkillGeneratorType;
+import megamek.client.generator.*;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.StratConSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
@@ -60,6 +62,12 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.enums.EraFlag;
+
+import java.io.File;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -364,6 +372,8 @@ public class AtBDynamicScenarioFactory {
             forceTemplate.setForceAlignment(forceAlignment.ordinal());
         }
 
+        boolean unidentifiedThirdPartyPresent = false;
+
         switch (forceAlignment) {
             case Allied:
             case Player:
@@ -382,6 +392,8 @@ public class AtBDynamicScenarioFactory {
                 skill = scenario.getEffectiveOpforSkill();
                 quality = scenario.getEffectiveOpforQuality();
                 if (forceTemplate.getForceName().toLowerCase().contains("unidentified")) {
+                    unidentifiedThirdPartyPresent = true;
+
                     if (Factions.getInstance().getFaction(getPlanetOwnerFaction(contract, currentDate)).isClan()) {
                         factionCode = "BAN";
                     } else {
@@ -773,6 +785,9 @@ public class AtBDynamicScenarioFactory {
         BotForce generatedForce = new BotForce();
         generatedForce.setFixedEntityList(generatedEntities);
         setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
+        if (unidentifiedThirdPartyPresent) {
+            generatedForce.setCamouflage(AtBContract.pickRandomCamouflage(currentDate.getYear(), factionCode));
+        }
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
         if (contract.isBatchallAccepted()) {

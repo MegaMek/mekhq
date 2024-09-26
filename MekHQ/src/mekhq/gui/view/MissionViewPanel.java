@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -673,7 +673,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblEnemy, gridBagConstraints);
 
         txtEnemy.setName("txtEnemy");
-        txtEnemy.setText(contract.getEnemyName(campaign.getGameYear()));
+        txtEnemy.setText(contract.getEnemyBotName());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
