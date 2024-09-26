@@ -124,6 +124,7 @@ public class CampaignOptions {
     private boolean usePlanetaryModifiers;
     private boolean useUnofficialMaintenance;
     private boolean logMaintenance;
+    private int defaultMaintenanceTime;
 
     // Mass Repair / Mass Salvage
     private boolean mrmsUseRepair;
@@ -633,6 +634,7 @@ public class CampaignOptions {
         setUsePlanetaryModifiers(true);
         useUnofficialMaintenance = false;
         logMaintenance = false;
+        defaultMaintenanceTime = 4;
 
         // Mass Repair / Mass Salvage
         setMRMSUseRepair(true);
@@ -1341,6 +1343,22 @@ public class CampaignOptions {
 
     public void setLogMaintenance(final boolean logMaintenance) {
         this.logMaintenance = logMaintenance;
+    }
+
+    /**
+     * @return the default maintenance time in minutes
+     */
+    public int getDefaultMaintenanceTime() {
+        return defaultMaintenanceTime;
+    }
+
+    /**
+     * Sets the default maintenance time.
+     *
+     * @param defaultMaintenanceTime the default maintenance time multiplier
+     */
+    public void setDefaultMaintenanceTime(final int defaultMaintenanceTime) {
+        this.defaultMaintenanceTime = defaultMaintenanceTime;
     }
     // endregion Maintenance
 
@@ -4656,6 +4674,7 @@ public class CampaignOptions {
         // region Repair and Maintenance Tab
         // region Maintenance
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMaintenance", logMaintenance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "defaultMaintenanceTime", defaultMaintenanceTime);
         // endregion Maintenance
 
         // region Mass Repair / Mass Salvage
@@ -5231,6 +5250,8 @@ public class CampaignOptions {
                     retVal.setUseUnofficialMaintenance(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("logMaintenance")) {
                     retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("defaultMaintenanceTime")) {
+                    retVal.defaultMaintenanceTime = Integer.parseInt(wn2.getTextContent());
 
                     // region Mass Repair / Mass Salvage
                 } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseRepair")) {

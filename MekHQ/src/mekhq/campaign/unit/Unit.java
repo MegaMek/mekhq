@@ -21,30 +21,6 @@
  */
 package mekhq.campaign.unit;
 
-import static mekhq.campaign.parts.Part.QUALITY_A;
-import static mekhq.campaign.parts.Part.QUALITY_B;
-import static mekhq.campaign.parts.Part.QUALITY_C;
-import static mekhq.campaign.parts.Part.QUALITY_D;
-import static mekhq.campaign.parts.Part.QUALITY_E;
-import static mekhq.campaign.parts.Part.QUALITY_F;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Image;
-import java.io.PrintWriter;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import javax.swing.UIManager;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
@@ -85,6 +61,22 @@ import mekhq.campaign.unit.enums.CrewAssignmentState;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static mekhq.campaign.parts.Part.*;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to
@@ -194,7 +186,7 @@ public class Unit implements ITechnology {
         this.history = "";
         this.lastMaintenanceReport = "";
         this.fluffName = "";
-        this.maintenanceMultiplier = 1;
+        this.maintenanceMultiplier = 4;
         reCalc();
     }
 
