@@ -100,6 +100,7 @@ public class InterstellarMapPanel extends JPanel {
     private JRadioButton optHPG;
     private JRadioButton optRecharge;
     private JRadioButton optAcademies;
+    private JRadioButton optHiringHalls;
 
     private JCheckBox optEmptySystems;
     private JCheckBox optHPGNetwork;
@@ -814,6 +815,8 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(optRecharge);
         optAcademies = createOptionRadioButton("Academies", checkboxIcon, checkboxSelectedIcon);
         optionPanel.add(optAcademies);
+        optHiringHalls = createOptionRadioButton("Hiring Halls", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optHiringHalls);
 
         ButtonGroup colorChoice = new ButtonGroup();
         colorChoice.add(optFactions);
@@ -826,6 +829,7 @@ public class InterstellarMapPanel extends JPanel {
         colorChoice.add(optHPG);
         colorChoice.add(optRecharge);
         colorChoice.add(optAcademies);
+        colorChoice.add(optHiringHalls);
         // factions by default
         optFactions.setSelected(true);
 
@@ -1196,6 +1200,15 @@ public class InterstellarMapPanel extends JPanel {
             };
         }
 
+        if (optHiringHalls.isSelected()) {
+            return switch (p.getHiringHallLevel(campaign.getLocalDate())) {
+                case QUESTIONABLE -> new Color(187, 55, 84);
+                case MINOR -> new Color(249, 140, 10);
+                case STANDARD -> new Color(253, 231, 37);
+                case GREAT -> new Color(93, 200, 99);
+                default -> Color.BLACK;
+            };
+        }
         return Color.GRAY;
     }
 
