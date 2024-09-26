@@ -19,27 +19,6 @@
  */
 package mekhq;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
-
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.w3c.dom.Node;
-
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.codeUtilities.MathUtility;
@@ -63,6 +42,21 @@ import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.w3c.dom.Node;
+
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 public class Utilities {
     private static final MMLogger logger = MMLogger.create(Utilities.class);
@@ -839,27 +833,30 @@ public class Utilities {
         return Compute.randomInt(100) <= prob;
     }
 
+    /**
+     * Calculates the age of a character based on their experience level and clan status.
+     *
+     * @param expLevel the experience level of the character represented by an integer value.
+     * @param clan     a boolean value indicating whether the character is a clan character.
+     * @return the age of the character calculated based on the provided expLevel and clan.
+     */
     public static int getAgeByExpLevel(int expLevel, boolean clan) {
-        int baseAge = 19;
-        int nDice = 1;
-        switch (expLevel) {
-            case SkillType.EXP_REGULAR:
-                nDice = 2;
-                break;
-            case SkillType.EXP_VETERAN:
-                nDice = 3;
-                break;
-            case SkillType.EXP_ELITE:
-                nDice = 4;
-                break;
-            default:
-                break;
-        }
+        int baseAge = 18;
+
+        int nDice = switch (expLevel) {
+            case SkillType.EXP_NONE -> 7;
+            case SkillType.EXP_GREEN -> 1;
+            case SkillType.EXP_REGULAR -> 2;
+            case SkillType.EXP_VETERAN -> 4;
+            case SkillType.EXP_ELITE -> 8;
+            default -> 0;
+        };
 
         int age = baseAge;
-        while (nDice > 0) {
-            int roll = Compute.d6();
-            // reroll all sixes once
+
+        for (int i = 0; i < nDice; i++) {
+            int roll = Compute.d6(1);
+
             if (roll == 6) {
                 roll += (Compute.d6() - 1);
             }
@@ -867,9 +864,14 @@ public class Utilities {
             if (clan) {
                 roll = (int) Math.ceil(roll / 2.0);
             }
+
             age += roll;
-            nDice--;
         }
+
+        if (expLevel == SkillType.EXP_NONE) {
+            age -= baseAge; // only use the result of the dice roll
+        }
+
         return age;
     }
 

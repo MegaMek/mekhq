@@ -13,19 +13,15 @@
  */
 package mekhq.campaign.unit;
 
+import megamek.common.*;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.logging.MMLogger;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-
-import megamek.common.Entity;
-import megamek.common.ITechnology;
-import megamek.common.MekFileParser;
-import megamek.common.MekSummary;
-import megamek.common.MekSummaryCache;
-import megamek.common.loaders.EntityLoadingException;
-import megamek.logging.MMLogger;
 
 /**
  * Provides an ITechnology interface for every MekSummary, optionally customized

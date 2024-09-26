@@ -235,7 +235,6 @@ public class CampaignOptions {
     private boolean useAtBPrisonerRansom;
 
     // Dependent
-    private RandomDependentMethod randomDependentMethod;
     private boolean useRandomDependentAddition;
     private boolean useRandomDependentRemoval;
 
@@ -767,9 +766,8 @@ public class CampaignOptions {
         setUseAtBPrisonerRansom(false);
 
         // Dependent
-        setRandomDependentMethod(RandomDependentMethod.NONE);
-        setUseRandomDependentAddition(true);
-        setUseRandomDependentRemoval(true);
+        setUseRandomDependentAddition(false);
+        setUseRandomDependentRemoval(false);
 
         // Personnel Removal
         setUsePersonnelRemoval(false);
@@ -2259,15 +2257,7 @@ public class CampaignOptions {
     }
     // endregion anniversaries
 
-    // region Dependent
-    public RandomDependentMethod getRandomDependentMethod() {
-        return randomDependentMethod;
-    }
-
-    public void setRandomDependentMethod(final RandomDependentMethod randomDependentMethod) {
-        this.randomDependentMethod = randomDependentMethod;
-    }
-
+    //region Dependents
     public boolean isUseRandomDependentAddition() {
         return useRandomDependentAddition;
     }
@@ -4823,8 +4813,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerRansom", isUseAtBPrisonerRansom());
         // endregion Prisoners
 
-        // region Dependent
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDependentMethod", getRandomDependentMethod().name());
+        //region Dependent
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentAddition", isUseRandomDependentAddition());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentRemoval", isUseRandomDependentRemoval());
         // endregion Dependent
@@ -5530,9 +5519,7 @@ public class CampaignOptions {
                     retVal.setUseAtBPrisonerRansom(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     // endregion Prisoners
 
-                    // region Dependent
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomDependentMethod")) {
-                    retVal.setRandomDependentMethod(RandomDependentMethod.valueOf(wn2.getTextContent().trim()));
+                    //region Dependent
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDependentAddition")) {
                     retVal.setUseRandomDependentAddition(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDependentRemoval")) {
@@ -6262,10 +6249,6 @@ public class CampaignOptions {
                     retVal.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
                     retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) { // Legacy - 0.49.7 Removal
-                    final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
-                    retVal.setRandomDependentMethod((value && retVal.isUseAtB()) ? RandomDependentMethod.AGAINST_THE_BOT : RandomDependentMethod.NONE);
-                    retVal.setUseRandomDependentAddition(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
                     retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("marriageAgeRange")) { // Legacy - 0.49.6 Removal

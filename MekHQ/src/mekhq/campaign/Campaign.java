@@ -25,8 +25,6 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.codeUtilities.MathUtility;
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.AmmoType.Munitions;
 import megamek.common.annotations.Nullable;
@@ -1457,7 +1455,7 @@ public class Campaign implements ITechManager {
             person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE,
                     new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions()),
                     new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions()),
-                    gender);
+                    Gender.RANDOMIZE);
         } else {
             person = newPerson(PersonnelRole.DEPENDENT);
         }
@@ -3716,48 +3714,6 @@ public class Campaign implements ITechManager {
                     .forEach(this::awardTrainingXP);
         }
 
-        // Add or remove dependents - only if one of the two options makes this possible
-        // is enabled
-        if ((getLocalDate().getDayOfYear() == 1)
-                && getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
-                && (getCampaignOptions().isUseRandomDependentRemoval()
-                        || getCampaignOptions().isUseRandomDependentAddition())) {
-            int numPersonnel = 0;
-            List<Person> dependents = new ArrayList<>();
-            for (Person p : getActivePersonnel()) {
-                numPersonnel++;
-                if (p.getPrimaryRole().isDependent() && p.getGenealogy().isEmpty()) {
-                    dependents.add(p);
-                }
-            }
-
-            final int roll = MathUtility.clamp(Compute.d6(2) + getAtBUnitRatingMod() - 2, 2, 12);
-
-            int change = numPersonnel * (roll - 5) / 100;
-            if (change < 0) {
-                if (getCampaignOptions().isUseRandomDependentRemoval()) {
-                    while ((change < 0) && !dependents.isEmpty()) {
-                        final Person person = ObjectUtility.getRandomItem(dependents);
-                        addReport(String.format(resources.getString("dependentLeavesForce.text"),
-                                person.getFullTitle()));
-                        removePerson(person, false);
-                        dependents.remove(person);
-                        change++;
-                    }
-                }
-            } else {
-                if (getCampaignOptions().isUseRandomDependentAddition()) {
-                    for (int i = 0; i < change; i++) {
-                        final Person person = newDependent(false, Gender.RANDOMIZE);
-                        recruitPerson(person, PrisonerStatus.FREE, true, false);
-
-                        addReport(String.format(resources.getString("dependentJoinsForce.text"),
-                                person.getHyperlinkedFullTitle()));
-                    }
-                }
-            }
-        }
-
         if (getLocalDate().getDayOfMonth() == 1) {
             /*
              * First of the month; roll Morale.
@@ -4261,20 +4217,20 @@ public class Campaign implements ITechManager {
     /**
      * This method processes the random dependents for a campaign. It shuffles the active dependents list and performs
      * actions based on the campaign options and unit rating modifiers.
-     *
+     * <p>
      * First, it determines the dependent capacity based on 20% of the active personnel count. Then, it calculates
      * the number of dependents currently in the list.
-     *
+     * <p>
      * If the campaign options allow random dependent removal, it iterates over each dependent and determines if they
      * should leave the force based on a lower roll value. If the roll value is less than or equal to 4 minus the unit
      * rating modifier, the dependent is removed from the force.
-     *
+     * <p>
      * If the campaign options allow random dependent addition and the number of dependents is less than the dependent
      * capacity, it iterates a number of times equal to the difference between the dependent capacity and the number of
      * dependents. It determines if a lower roll value is less than or equal to the unit rating modifier multiplied by 2.
      * If true, it recruits a new dependent and adds a report indicating the dependent has joined the force.
      */
-    private void processRandomDependents() {
+    void processRandomDependents() {
         List<Person> dependents = getActiveDependents();
         Collections.shuffle(dependents);
 
@@ -4288,36 +4244,94 @@ public class Campaign implements ITechManager {
                 .toList();
 
         int dependentCapacity = (int) Math.max(1, (activeNonDependents.size() * 0.05));
-        int dependentCount = dependents.size();
 
         // roll for random removal
+        int dependentCount = dependentsRollForRemoval(dependents, currentDate, dependentCapacity);
+
+        // then roll for random addition
+        dependentsAddNew(dependentCount, dependentCapacity);
+    }
+
+    /**
+     * Randomly removes dependents from the given list if the campaign options allow random
+     * dependent removal.
+     *
+     * @param dependents The list of dependents.
+     * @param currentDate The current date.
+     * @param dependentCapacity The maximum number of dependents allowed.
+     * @return The updated number of dependents.
+     */
+    int dependentsRollForRemoval(List<Person> dependents, LocalDate currentDate, int dependentCapacity) {
         if (getCampaignOptions().isUseRandomDependentRemoval()) {
             for (Person dependent : dependents) {
                 if (!isRemovalEligible(dependent, currentDate)) {
                     continue;
                 }
 
-                int lowerRoll = (dependents.size() > dependentCapacity) ? getLowerRandomInt() : Compute.randomInt(100);
+                int roll = Compute.randomInt(100);
 
-                if (lowerRoll <= 4 - getAtBUnitRatingMod()) {
+                if (dependents.size() > dependentCapacity) {
+                    roll = getLowerRandomInt(roll);
+                }
+
+                int targetNumber = 5 - getAtBUnitRatingMod();
+
+                if (roll <= targetNumber) {
                     addReport(String.format(resources.getString("dependentLeavesForce.text"),
                             dependent.getFullTitle()));
 
                     removePerson(dependent, false);
-                    dependentCount--;
                 }
             }
         }
 
-        // then roll for random addition
+        return dependents.size();
+    }
+
+    /**
+     * @return The lower integer value between the given input and the randomly generated integer.
+     *
+     * @param firstRoll The input integer to compare with the randomly generated integer.
+     */
+    private int getLowerRandomInt(int firstRoll) {
+        int secondRoll = Compute.randomInt(100);
+        return Math.min(firstRoll, secondRoll);
+    }
+
+    /**
+     * Checks if a dependent is eligible for removal.
+     *
+     * @param dependent the person to check
+     * @param currentDate the current date
+     * @return {@code true} if the person is eligible for removal, {@code false} otherwise
+     */
+    boolean isRemovalEligible(Person dependent, LocalDate currentDate) {
+        boolean hasNonAdultChildren = dependent.getGenealogy().hasNonAdultChildren(currentDate);
+        boolean hasSpouse = dependent.getGenealogy().hasSpouse();
+        boolean isChild = dependent.isChild(currentDate);
+
+        return !hasNonAdultChildren && !hasSpouse && !isChild;
+    }
+
+    /**
+     * Randomly adds new dependents to the campaign.
+     *
+     * @param dependentCount the current number of dependents
+     * @param dependentCapacity the maximum capacity for dependents
+     */
+    void dependentsAddNew(int dependentCount, int dependentCapacity) {
         if ((getCampaignOptions().isUseRandomDependentAddition()) && (dependentCount < dependentCapacity)) {
             int availableCapacity = dependentCapacity - dependentCount;
             int rollCount = (int) Math.max(1, availableCapacity * 0.2);
 
             for (int i = 0; i < rollCount; i++) {
-                int lowerRoll = (dependentCount <= (dependentCapacity / 2)) ? getLowerRandomInt() : Compute.randomInt(100);
+                int roll = Compute.randomInt(100);
 
-                if (lowerRoll <= (getAtBUnitRatingMod() * 2)) {
+                if (dependentCount < (dependentCapacity / 2)) {
+                    roll = getLowerRandomInt(roll);
+                }
+
+                if (roll <= (getAtBUnitRatingMod() * 2)) {
                     final Person dependent = newDependent(false, Gender.RANDOMIZE);
 
                     recruitPerson(dependent, PrisonerStatus.FREE, true, false);
@@ -4329,30 +4343,6 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-    }
-
-    /**
-     * Returns the lower value between two random integers generated between 0 and 99 (inclusive).
-     *
-     * @return the lower random integer value
-     */
-    private int getLowerRandomInt() {
-        int roll = Compute.randomInt(100);
-        int secondRoll = Compute.randomInt(100);
-        return Math.min(roll, secondRoll);
-    }
-
-    /**
-     * Checks if a dependent is eligible for removal.
-     *
-     * @param dependent the person to check
-     * @param currentDate the current date
-     * @return {@code true} if the person is eligible for removal, {@code false} otherwise
-     */
-    private boolean isRemovalEligible(Person dependent, LocalDate currentDate) {
-        return !(dependent.getGenealogy().hasNonAdultChildren(currentDate)
-                || dependent.getGenealogy().hasSpouse()
-                || dependent.isChild(currentDate));
     }
 
     /**
