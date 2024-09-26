@@ -59,7 +59,9 @@ import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
-import mekhq.campaign.market.*;
+import mekhq.campaign.market.PartsStore;
+import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.contractMarket.AbstractContractMarket;
 import mekhq.campaign.market.contractMarket.AtbMonthlyContractMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
@@ -83,9 +85,7 @@ import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
-import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
-import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
+import mekhq.campaign.personnel.generator.*;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -144,22 +144,6 @@ import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-
-import javax.swing.*;
-import java.io.PrintWriter;
-import java.text.MessageFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
-import static mekhq.campaign.personnel.education.EducationController.getAcademy;
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-import static mekhq.campaign.unit.Unit.SITE_FACILITY_MAINTENANCE;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -1682,7 +1666,7 @@ public class Campaign implements ITechManager {
     private void simulateRelationshipHistory(Person person) {
         // how many weeks should the simulation run?
         LocalDate localDate = getLocalDate();
-        long weeksBetween = ChronoUnit.WEEKS.between(person.getBirthday().plusYears(18), localDate);
+        long weeksBetween = ChronoUnit.WEEKS.between(person.getDateOfBirth().plusYears(18), localDate);
 
         // this means there is nothing to simulate
         if (weeksBetween == 0) {
@@ -3897,9 +3881,9 @@ public class Campaign implements ITechManager {
 
                         if ((person.getStatus().isOnMaternityLeave()) && (!children.isEmpty())) {
 
-                            children.sort(Comparator.comparing(Person::getBirthday).reversed());
+                            children.sort(Comparator.comparing(Person::getDateOfBirth).reversed());
 
-                            if (getLocalDate().isAfter(children.get(0).getBirthday().plusDays(41))) {
+                            if (getLocalDate().isAfter(children.get(0).getDateOfBirth().plusDays(41))) {
                                 person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
                             }
                         }

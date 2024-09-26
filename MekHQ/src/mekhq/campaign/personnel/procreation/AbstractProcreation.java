@@ -441,7 +441,7 @@ public abstract class AbstractProcreation {
             baby.setSurname(campaign.getCampaignOptions().getBabySurnameStyle()
                     .generateBabySurname(mother, father, baby.getGender()));
 
-            baby.setBirthday(today);// Limit skills by age for children and adolescents
+            baby.setDateOfBirth(today);// Limit skills by age for children and adolescents
 
             baby.removeAllSkills();
 
