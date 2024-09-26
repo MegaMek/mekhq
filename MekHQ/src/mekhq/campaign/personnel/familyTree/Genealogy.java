@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,19 +18,6 @@
  */
 package mekhq.campaign.personnel.familyTree;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
@@ -38,6 +25,13 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The Genealogy class is used to track immediate familial relationships,
@@ -207,6 +201,13 @@ public class Genealogy {
      */
     public boolean hasChildren() {
         return getFamily().get(FamilialRelationshipType.CHILD) != null;
+    }
+
+    /**
+     * @return {@code true} if the person has at least one child, {@code false} otherwise
+     */
+    public boolean hasNonAdultChildren(LocalDate localDate) {
+        return getChildren().stream().anyMatch(child -> child.isChild(localDate));
     }
 
     /**

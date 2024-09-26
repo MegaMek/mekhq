@@ -218,9 +218,8 @@
 		<prisonerBabyStatus>true</prisonerBabyStatus>
 		<useAtBPrisonerDefection>false</useAtBPrisonerDefection>
 		<useAtBPrisonerRansom>false</useAtBPrisonerRansom>
-		<randomDependentMethod>NONE</randomDependentMethod>
-		<useRandomDependentAddition>true</useRandomDependentAddition>
-		<useRandomDependentRemoval>true</useRandomDependentRemoval>
+		<useRandomDependentAddition>false</useRandomDependentAddition>
+		<useRandomDependentRemoval>false</useRandomDependentRemoval>
 		<usePersonnelRemoval>true</usePersonnelRemoval>
 		<useRemovalExemptCemetery>true</useRemovalExemptCemetery>
 		<useRemovalExemptRetirees>true</useRemovalExemptRetirees>
