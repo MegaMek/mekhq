@@ -257,6 +257,7 @@
 		<enableMiscAwards>true</enableMiscAwards>
 		<awardSetFilterList></awardSetFilterList>
 		<useDylansRandomXP>false</useDylansRandomXP>
+		<nonBinaryDiceSize>60</nonBinaryDiceSize>
 		<randomOriginOptions>
 			<randomizeOrigin>false</randomizeOrigin>
 			<randomizeDependentOrigin>false</randomizeDependentOrigin>
@@ -269,6 +270,7 @@
 		<useRandomPersonalities>false</useRandomPersonalities>
 		<useRandomPersonalityReputation>false</useRandomPersonalityReputation>
 		<useIntelligenceXpMultiplier>false</useIntelligenceXpMultiplier>
+		<useSimulatedRelationships>false</useSimulatedRelationships>
 		<useRandomRetirement>false</useRandomRetirement>
 		<turnoverBaseTn>3</turnoverBaseTn>
 		<turnoverFrequency>MONTHLY</turnoverFrequency>
@@ -312,13 +314,14 @@
 		<fatigueLeaveThreshold>13</fatigueLeaveThreshold>
 		<familyDisplayLevel>SPOUSE</familyDisplayLevel>
 		<announceBirthdays>false</announceBirthdays>
+        <announceRecruitmentAnniversaries>false</announceRecruitmentAnniversaries>
 		<announceOfficersOnly>true</announceOfficersOnly>
 		<announceChildBirthdays>false</announceChildBirthdays>
 		<useManualMarriages>true</useManualMarriages>
 		<useClanPersonnelMarriages>false</useClanPersonnelMarriages>
 		<usePrisonerMarriages>true</usePrisonerMarriages>
-		<minimumMarriageAge>16</minimumMarriageAge>
 		<checkMutualAncestorsDepth>4</checkMutualAncestorsDepth>
+		<noInterestInMarriageDiceSize>10</noInterestInMarriageDiceSize>
 		<logMarriageNameChanges>false</logMarriageNameChanges>
 		<marriageSurnameWeights>
 			<MALE>500</MALE>
@@ -340,8 +343,9 @@
 		<useRandomClanPersonnelMarriages>false</useRandomClanPersonnelMarriages>
 		<useRandomPrisonerMarriages>true</useRandomPrisonerMarriages>
 		<randomMarriageAgeRange>10</randomMarriageAgeRange>
-		<percentageRandomMarriageOppositeSexChance>2.5E-4</percentageRandomMarriageOppositeSexChance>
-		<percentageRandomMarriageSameSexChance>2.0E-5</percentageRandomMarriageSameSexChance>
+		<randomMarriageDiceSize>5000</randomMarriageDiceSize>
+		<randomSameSexMarriageDiceSize>14</randomSameSexMarriageDiceSize>
+		<randomNewDependentMarriage>20</randomNewDependentMarriage>
 		<useManualDivorce>true</useManualDivorce>
 		<useClanPersonnelDivorce>true</useClanPersonnelDivorce>
 		<usePrisonerDivorce>false</usePrisonerDivorce>
@@ -356,8 +360,7 @@
 		<useRandomSameSexDivorce>true</useRandomSameSexDivorce>
 		<useRandomClanPersonnelDivorce>true</useRandomClanPersonnelDivorce>
 		<useRandomPrisonerDivorce>false</useRandomPrisonerDivorce>
-		<percentageRandomDivorceOppositeSexChance>1.0E-6</percentageRandomDivorceOppositeSexChance>
-		<percentageRandomDivorceSameSexChance>1.0E-6</percentageRandomDivorceSameSexChance>
+		<randomDivorceDiceSize>900</randomDivorceDiceSize>
 		<useManualProcreation>true</useManualProcreation>
 		<useClanPersonnelProcreation>false</useClanPersonnelProcreation>
 		<usePrisonerProcreation>true</usePrisonerProcreation>
@@ -365,15 +368,17 @@
 		<babySurnameStyle>MOTHERS</babySurnameStyle>
 		<assignNonPrisonerBabiesFounderTag>false</assignNonPrisonerBabiesFounderTag>
 		<assignChildrenOfFoundersFounderTag>false</assignChildrenOfFoundersFounderTag>
+        <useMaternityLeave>false</useMaternityLeave>
 		<determineFatherAtBirth>false</determineFatherAtBirth>
 		<displayTrueDueDate>false</displayTrueDueDate>
+		<noInterestInChildrenDiceSize>3</noInterestInChildrenDiceSize>
 		<logProcreation>false</logProcreation>
 		<randomProcreationMethod>NONE</randomProcreationMethod>
 		<useRelationshiplessRandomProcreation>true</useRelationshiplessRandomProcreation>
 		<useRandomClanPersonnelProcreation>false</useRandomClanPersonnelProcreation>
 		<useRandomPrisonerProcreation>true</useRandomPrisonerProcreation>
-		<percentageRandomProcreationRelationshipChance>1.0E-4</percentageRandomProcreationRelationshipChance>
-		<percentageRandomProcreationRelationshiplessChance>2.0E-5</percentageRandomProcreationRelationshiplessChance>
+		<randomProcreationRelationshipDiceSize>500</randomProcreationRelationshipDiceSize>
+		<randomProcreationRelationshiplessDiceSize>2000</randomProcreationRelationshiplessDiceSize>
 		<useEducationModule>false</useEducationModule>
 		<curriculumXpRate>3</curriculumXpRate>
 		<maximumJumpCount>5</maximumJumpCount>
@@ -501,6 +506,8 @@
 		<useAero>false</useAero>
 		<useVehicles>true</useVehicles>
 		<clanVehicles>true</clanVehicles>
+		<useGenericBattleValue>true</useGenericBattleValue>
+		<useVerboseBidding>false</useVerboseBidding>
 		<doubleVehicles>false</doubleVehicles>
 		<adjustPlayerVehicles>false</adjustPlayerVehicles>
 		<opForLanceTypeMeks>5</opForLanceTypeMeks>

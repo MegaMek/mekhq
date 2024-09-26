@@ -5912,7 +5912,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblRandomMarriageOppositeSexDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomMarriageOppositeSexDiceSize.toolTipText")));
         lblRandomMarriageOppositeSexDiceSize.setName("lblRandomMarriageOppositeSexDiceSize");
 
-        spnRandomMarriageDiceSize = new JSpinner(new SpinnerNumberModel(542, 0, 100000, 1));
+        spnRandomMarriageDiceSize = new JSpinner(new SpinnerNumberModel(5000, 0, 100000, 1));
         spnRandomMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomMarriageOppositeSexDiceSize.toolTipText")));
         spnRandomMarriageDiceSize.setName("spnPercentageRandomMarriageOppositeSexChance");
 
@@ -5920,7 +5920,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblRandomSameSexMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomSameSexMarriageDiceSize.toolTipText")));
         lblRandomSameSexMarriageDiceSize.setName("lblRandomSameSexMarriageDiceSize");
 
-        spnRandomSameSexMarriageDiceSize = new JSpinner(new SpinnerNumberModel(542, 0, 100000, 1));
+        spnRandomSameSexMarriageDiceSize = new JSpinner(new SpinnerNumberModel(14, 0, 100000, 1));
         spnRandomSameSexMarriageDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomSameSexMarriageDiceSize.toolTipText")));
         spnRandomSameSexMarriageDiceSize.setName("spnRandomSameSexMarriageDiceSize");
 
@@ -5928,7 +5928,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblRandomNewDependentMarriage.setToolTipText(wordWrap(resources.getString("lblRandomNewDependentMarriage.toolTipText")));
         lblRandomNewDependentMarriage.setName("lblRandomNewDependentMarriage");
 
-        spnRandomNewDependentMarriage = new JSpinner(new SpinnerNumberModel(542, 0, 100000, 1));
+        spnRandomNewDependentMarriage = new JSpinner(new SpinnerNumberModel(20, 0, 100000, 1));
         spnRandomNewDependentMarriage.setToolTipText(wordWrap(resources.getString("lblRandomNewDependentMarriage.toolTipText")));
         spnRandomNewDependentMarriage.setName("spnRandomNewDependentMarriage");
 
@@ -5953,7 +5953,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblRandomSameSexMarriageDiceSize)
                                 .addComponent(spnRandomSameSexMarriageDiceSize, Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblRandomSameSexMarriageDiceSize)
+                                .addComponent(lblRandomNewDependentMarriage)
                                 .addComponent(spnRandomNewDependentMarriage, Alignment.LEADING))
         );
 
@@ -5966,7 +5966,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblRandomSameSexMarriageDiceSize)
                                 .addComponent(spnRandomSameSexMarriageDiceSize))
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRandomSameSexMarriageDiceSize)
+                                .addComponent(lblRandomNewDependentMarriage)
                                 .addComponent(spnRandomNewDependentMarriage))
         );
     }
@@ -6171,7 +6171,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblRandomDivorceDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomDivorceDiceSize.toolTipText")));
         lblRandomDivorceDiceSize.setName("lblRandomDivorceDiceSize");
 
-        spnRandomDivorceDiceSize = new JSpinner(new SpinnerNumberModel(3221, 0, 100000, 1));
+        spnRandomDivorceDiceSize = new JSpinner(new SpinnerNumberModel(900, 0, 100000, 1));
         spnRandomDivorceDiceSize.setToolTipText(wordWrap(resources.getString("lblRandomDivorceDiceSize.toolTipText")));
         spnRandomDivorceDiceSize.setName("spnRandomDivorceDiceSize");
 
