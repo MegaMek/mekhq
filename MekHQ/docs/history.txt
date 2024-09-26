@@ -48,6 +48,11 @@ MEKHQ VERSION HISTORY:
 + Fix #4736: Regenerate Personality Descriptions for NPCs
 + Fix #4721: Removed Automatic Conversion of CVP into SP when Reinforcing in StratCon
 + Fix #4782: Removed TN Modifier for IS Techs working on Clan Tech, Removed Clan Tech Knowledge SPA and Effects #4863
++ PR #4644: Initial work on CamOps RAW Contract Market
++ PR #4859: Reworked AtB Morale, Rebranding it as MekHQ Morale
++ PR #4885: Added Ability to Define Skill Levels When Using GM Hire Minimum Complement
++ PR #4886: Fixed Birthday Anniversary Events, Added Employment Anniversary Events
++ PR #4887: Refactored Enemy Name Retrieval and Added Automatic Camouflage Assignment
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
