@@ -18,6 +18,20 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
+import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getAtBModifier;
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getReputationModifier;
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getSkillLevel;
@@ -28,25 +42,6 @@ import static mekhq.campaign.rating.CamOpsReputation.FinancialRating.calculateFi
 import static mekhq.campaign.rating.CamOpsReputation.OtherModifiers.calculateOtherModifiers;
 import static mekhq.campaign.rating.CamOpsReputation.SupportRating.calculateSupportRating;
 import static mekhq.campaign.rating.CamOpsReputation.TransportationRating.calculateTransportationRating;
-
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.utilities.MHQXMLUtility;
 
 public class ReputationController {
     // utilities
@@ -248,16 +243,30 @@ public class ReputationController {
                 resources.getString("smallCraft.text"), true));
         description
                 .append(getTransportString("asfCount", "asfBays", "asf", resources.getString("fighters.text"), false));
-        description.append(
-                getTransportString("mekCount", "mekBays", "mek", resources.getString("battleMeks.text"), false));
+        // <50.01 compatibility handler
+        try {
+            description.append(getTransportString("mekCount", "mekBays", "mek",
+                resources.getString("battleMeks.text"), false));
+        } catch (Exception e) {
+            description.append(getTransportString("mechCount", "mechBays", "mech",
+                resources.getString("battleMeks.text"), false));
+        }
+
         description.append(getTransportString("superHeavyVehicleCount", "superHeavyVehicleBays", "superHeavyVehicle",
                 resources.getString("vehicleSuperHeavy.text"), true));
         description.append(getTransportString("heavyVehicleCount", "heavyVehicleBays", "heavyVehicle",
                 resources.getString("vehicleHeavy.text"), true));
         description.append(getTransportString("lightVehicleCount", "lightVehicleBays", "lightVehicle",
                 resources.getString("vehicleLight.text"), false));
-        description.append(getTransportString("protoMekCount", "protoMekBays", "protoMek",
-                resources.getString("protoMeks.text"), false));
+        // <50.01 compatibility handler
+        try {
+            description.append(getTransportString("protoMekCount", "protoMekBays",
+                "protoMek", resources.getString("protoMeks.text"), false));
+        } catch (Exception e) {
+            description.append(getTransportString("protoMechCount", "protoMechBays",
+                "protoMech", resources.getString("protoMeks.text"), false));
+        }
+
         description.append(getTransportString("battleArmorCount", "battleArmorBays", "battleArmor",
                 resources.getString("battleArmor.text"), false));
         description.append(getTransportString("infantryCount", "infantryBays", "infantry",
@@ -279,7 +288,12 @@ public class ReputationController {
         description.append(String.format(resources.getString("technicianRequirements.text"),
                 technicianRequirements.get("rating").get(0)));
 
-        description.append(getTechnicianString("mek"));
+        // <50.01 compatibility handler
+        try {
+            description.append(getTechnicianString("mek"));
+        } catch (Exception e) {
+            description.append(getTechnicianString("mech"));
+        }
         description.append(getTechnicianString("vehicle"));
         description.append(getTechnicianString("aero"));
         description.append(getTechnicianString("battleArmor"));
@@ -352,7 +366,8 @@ public class ReputationController {
 
         if ((technicianRequirement.get(0) > 0) || (technicianRequirement.get(1) > 0)) {
             String label = switch (type) {
-                case "mek" -> resources.getString("battleMeksAndProtoMeks.text");
+                // <50.01 compatibility handler
+                case "mek", "mech" -> resources.getString("battleMeksAndProtoMeks.text");
                 case "vehicle" -> resources.getString("vehicles.text");
                 case "aero" -> resources.getString("fightersAndSmallCraft.text");
                 case "battleArmor" -> resources.getString("battleArmor.text");
