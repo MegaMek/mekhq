@@ -750,9 +750,39 @@ public class PlanetarySystem {
      * @return The hiring hall level on the given date
      */
     public HiringHallLevel getHiringHallLevel(LocalDate date) {
-        //TODO: Determine formula for determining hiring hall level
-        Integer hpg = getHPG(date);
-        int tech = getSocioIndustrial(date).tech;
+        int score = 0;
+        for (Faction faction : getFactionSet(date)) {
+            if (faction.isPirate() || faction.isChaos()) {
+                return HiringHallLevel.QUESTIONABLE;
+            }
+        }
+        score += getHiringHallHpgBonus(date);
+        score += getHiringHallTechBonus(date);
+        if (score > 9) {
+            return HiringHallLevel.GREAT;
+        } else if (score > 6) {
+            return HiringHallLevel.STANDARD;
+        } else if (score > 4) {
+            return HiringHallLevel.MINOR;
+        }
         return HiringHallLevel.NONE;
+    }
+
+    private int getHiringHallHpgBonus(LocalDate date) {
+        return switch (getHPG(date)) {
+            case EquipmentType.RATING_A -> 5;
+            case EquipmentType.RATING_B -> 3;
+            case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
+            default -> 0;
+        };
+    }
+
+    private int getHiringHallTechBonus(LocalDate date) {
+        return switch (getSocioIndustrial(date).tech) {
+            case -1 -> 5; // Ultra-Advanced; not accounted for in the EquipmentType.RATING constants
+            case EquipmentType.RATING_A, EquipmentType.RATING_B -> 3;
+            case EquipmentType.RATING_C, EquipmentType.RATING_D -> 1;
+            default -> 0;
+        };
     }
 }
