@@ -56,8 +56,6 @@ import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -74,7 +72,6 @@ import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
 
 public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private static final MMLogger logger = MMLogger.create(UnitTableMouseAdapter.class);
-    private static final Logger log = LogManager.getLogger(UnitTableMouseAdapter.class);
 
     // region Variable Declarations
     private CampaignGUI gui;
