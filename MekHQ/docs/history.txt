@@ -54,6 +54,9 @@ MEKHQ VERSION HISTORY:
 + PR #4885: Added Ability to Define Skill Levels When Using GM Hire Minimum Complement
 + PR #4886: Fixed Birthday Anniversary Events, Added Employment Anniversary Events
 + PR #4887: Refactored Enemy Name Retrieval and Added Automatic Camouflage Assignment
++ PR #4889: Enhanced Academy Application Failure Report
++ FIX #4890: Change Logger Level from Error to Warn for SPA Loader
++ PR #4894: Multiple Post-Merge Corrections
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
