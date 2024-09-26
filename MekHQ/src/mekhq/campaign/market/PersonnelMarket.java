@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import mekhq.campaign.universe.PlanetarySystem;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -114,15 +115,15 @@ public class PersonnelMarket {
                 .map(faction -> faction.getStartingPlanet(campaign.getLocalDate()))
                 .collect(Collectors.toList());
 
-        String currentSystem = campaign.getCurrentSystem().getId();
+        PlanetarySystem currentSystem = campaign.getCurrentSystem();
 
         boolean updated = false;
 
         if (!personnel.isEmpty()) {
             removePersonnelForDay(campaign);
             if (campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
-                    && !campaign.getAtBConfig().isHiringHall(currentSystem, campaign.getLocalDate())
-                    && !capitals.contains(currentSystem)) {
+                    && !currentSystem.isHiringHall(campaign.getLocalDate())
+                    && !capitals.contains(currentSystem.getId())) {
                 removeAll();
             }
         }
@@ -131,8 +132,8 @@ public class PersonnelMarket {
             List<Person> newPersonnel = new ArrayList<>();
 
             if (!campaign.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
-                    || campaign.getAtBConfig().isHiringHall(currentSystem, campaign.getLocalDate())
-                    || capitals.contains(currentSystem)) {
+                    || currentSystem.isHiringHall(campaign.getLocalDate())
+                    || capitals.contains(currentSystem.getId())) {
                 newPersonnel = method.generatePersonnelForDay(campaign);
             }
 

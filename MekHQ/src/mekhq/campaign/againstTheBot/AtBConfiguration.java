@@ -25,9 +25,6 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.universe.HiringHall;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -36,7 +33,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
-import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -79,9 +75,6 @@ public class AtBConfiguration {
     /* Scenario generation */
     private HashMap<String, List<WeightedTable<String>>> botForceTables = new HashMap<>();
     private HashMap<String, List<WeightedTable<String>>> botLanceTables = new HashMap<>();
-
-    /* Contract generation */
-    private HashMap<String, HiringHall> hiringHalls = new HashMap<>();
 
     /* Personnel and unit markets */
     private Money shipSearchCost;
@@ -165,21 +158,6 @@ public class AtBConfiguration {
                         list.add(parseDefaultWeightedTable(entry));
                     }
                     botLanceTables.put(key.replace("botLance.", ""), list);
-                    break;
-                case "hiringHalls":
-                    for (String entry : property.split("\\|")) {
-                        String[] fields = entry.split(",");
-                        LocalDate startDate = !fields[0].isBlank() ? MHQXMLUtility.parseDate(fields[0]) : null;
-                        LocalDate endDate = !fields[1].isBlank() ? MHQXMLUtility.parseDate(fields[1]) : null;
-                        HiringHallLevel level = null;
-                        try {
-                            level = HiringHallLevel.valueOf(fields[2].toUpperCase());
-                        } catch (IllegalArgumentException ex) {
-                            level = HiringHallLevel.GREAT;
-                        }
-                        String name = fields[3];
-                        hiringHalls.put(name, new HiringHall(level, startDate, endDate, name));
-                    }
                     break;
                 case "shipSearchCost":
                     shipSearchCost = Money.of(Double.parseDouble(property));
@@ -323,19 +301,6 @@ public class AtBConfiguration {
         }
     }
 
-    public boolean isHiringHall(String planet, LocalDate date) {
-        HiringHall hall = hiringHalls.get(planet);
-        return hall != null && hall.isActive(date);
-    }
-
-    public HiringHallLevel getHiringHallLevel(String planet, LocalDate date) {
-        HiringHall hall = hiringHalls.get(planet);
-        if (hall != null && hall.isActive(date)) {
-            return hall.getLevel();
-        }
-        return HiringHallLevel.NONE;
-    }
-
     public Money getShipSearchCost() {
         return shipSearchCost;
     }
@@ -431,9 +396,6 @@ public class AtBConfiguration {
                 case "scenarioGeneration":
                     retVal.loadScenarioGenerationNodeFromXml(wn);
                     break;
-                case "contractGeneration":
-                    retVal.loadContractGenerationNodeFromXml(wn);
-                    break;
                 case "shipSearch":
                     retVal.loadShipSearchNodeFromXml(wn);
                     break;
@@ -497,42 +459,6 @@ public class AtBConfiguration {
             }
         }
         return retVal;
-    }
-
-    private void loadContractGenerationNodeFromXml(Node node) {
-        NodeList nl = node.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            Node wn = nl.item(i);
-            if (wn.getNodeName().equals("hiringHalls")) {
-                hiringHalls.clear();
-                for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
-                    Node wn2 = wn.getChildNodes().item(j);
-                    if (wn2.getNodeName().equals("hall")) {
-                        LocalDate start = null;
-                        LocalDate end = null;
-                        if (wn2.getAttributes().getNamedItem("start") != null) {
-                            start = MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("start").getTextContent());
-                        }
-                        if (wn2.getAttributes().getNamedItem("end") != null) {
-                            end = MHQXMLUtility.parseDate(wn2.getAttributes().getNamedItem("end").getTextContent());
-                        }
-                        HiringHallLevel level = HiringHallLevel.NONE;
-                        if (wn2.getAttributes().getNamedItem("level") != null) {
-                            try {
-                                level = HiringHallLevel.valueOf(wn2.getAttributes().getNamedItem("level").getTextContent().toUpperCase());
-                            } catch (IllegalArgumentException e) {
-                                logger.warn("Invalid value for Hiring Hall level, falling back to NONE: " + e);
-                            }
-                        } else {
-                            // Backwards compatibility--hiring halls in atbconfig.xml should default to GREAT
-                            level = HiringHallLevel.GREAT;
-                        }
-                        String planetName = wn2.getTextContent();
-                        hiringHalls.put(planetName, new HiringHall(level, start, end, planetName));
-                    }
-                }
-            }
-        }
     }
 
     private void loadShipSearchNodeFromXml(Node node) {

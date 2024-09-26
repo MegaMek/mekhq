@@ -69,7 +69,7 @@ import mekhq.campaign.universe.Systems.HPGLink;
 /**
  * This is not functional yet. Just testing things out.
  * A lot of this code is borrowed from InterstellarMap.java in MekWars
- * 
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class InterstellarMapPanel extends JPanel {
@@ -304,7 +304,7 @@ public class InterstellarMapPanel extends JPanel {
                      * selectedSystem.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar
                      * ())));
                      * item.addActionListener(new ActionListener() {
-                     * 
+                     *
                      * @Override
                      * public void actionPerformed(ActionEvent ae) {
                      * openPlanetEventEditor(selectedSystem);
@@ -731,8 +731,7 @@ public class InterstellarMapPanel extends JPanel {
                                         g2.fill(arc);
                                     }
                                     if (campaign.getCampaignOptions().isUseAtB()
-                                            && campaign.getAtBConfig().isHiringHall(system.getId(),
-                                                    campaign.getLocalDate())) {
+                                            && system.isHiringHall(campaign.getLocalDate())) {
                                         g2.setPaint(new Color(176, 196, 222));
                                         arc.setArcByCenter(x, y, size + 4, 0,
                                                 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
@@ -1065,7 +1064,7 @@ public class InterstellarMapPanel extends JPanel {
     /**
      * Return a planet color based on what the user has selected from the radio
      * button options
-     * 
+     *
      * @param p PlanetarySystem object
      * @return a Color
      */
