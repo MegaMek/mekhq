@@ -65,6 +65,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
+
 /**
  * Contract class for use with Against the Bot rules
  *
@@ -535,10 +537,9 @@ public class AtBContract extends Contract {
 
         // Update the Batchall information
         batchallAccepted = true;
-        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
-            if (getEnemy().isClan()) {
-                setBatchallAccepted(initiateBatchall(campaign));
-            }
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()
+            && BatchallFactions.usesBatchalls(enemyCode)) {
+            setBatchallAccepted(initiateBatchall(campaign));
         }
     }
 
@@ -1625,7 +1626,27 @@ public class AtBContract extends Contract {
 
         // Create a refuse button and add its action listener.
         // When clicked, it will trigger a refusal confirmation dialog
-        JButton refuseButton = new JButton(resources.getString("responseRefuse.text"));
+        String refusalOption = resources.getString("responseRefuse.text");
+
+
+        // If the campaign is not a Clan faction, check whether this is the first contact they've had
+        // with the Clans.
+        // If so, whether at least a month has passed since the Wolf's Dragoons conference on
+        // Outreach (which explained who and what the Clans were).
+        if (!campaign.getFaction().isClan()
+            && campaign.getLocalDate().isBefore(LocalDate.of(3051, 2, 1))) {
+
+            boolean isFirstClanEncounter = BATCHALL_FACTIONS.stream()
+                .mapToDouble(factionCode -> campaign.getFameAndInfamy().getFameLevelForFaction(factionCode))
+                .noneMatch(infamy -> infamy != 0);
+
+            if (isFirstClanEncounter) {
+                refusalOption = resources.getString("responseFirstEncounter.text");
+            }
+        }
+
+        JButton refuseButton = new JButton(refusalOption);
+
         refuseButton.setToolTipText(resources.getString("responseRefuse.tooltip"));
         refuseButton.addActionListener(e -> {
             dialog.dispose();  // Close the current dialog
