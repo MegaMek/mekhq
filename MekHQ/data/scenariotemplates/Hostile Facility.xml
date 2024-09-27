@@ -124,7 +124,6 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Base Turrets</associatedForceName>
                 <associatedForceName>Primary Opfor</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
@@ -132,7 +131,7 @@
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
@@ -143,10 +142,37 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 75% of all hostile units present:</description>
+            <description>Destroy or rout 75% of the defending force(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>75</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Player</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
+            <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>

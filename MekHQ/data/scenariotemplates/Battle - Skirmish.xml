@@ -1,56 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Allied Facility - Heavy</name>
-    <shortBriefing>Allied facility</shortBriefing>
-    <detailedBriefing>An allied facility has come under attack.</detailedBriefing>
-    <isHostileFacility>false</isHostileFacility>
-    <isAlliedFacility>true</isAlliedFacility>
+    <name>Battle - Skirmish</name>
+    <shortBriefing>Stand-up fight</shortBriefing>
+    <detailedBriefing>Engage and destroy or rout any enemy forces present.</detailedBriefing>
     <mapParameters>
-        <allowedTerrainTypes>
-            <allowedTerrainType>ColdFacility</allowedTerrainType>
-            <allowedTerrainType>HotFacility</allowedTerrainType>
-            <allowedTerrainType>TemperateFacility</allowedTerrainType>
-        </allowedTerrainTypes>
+        <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
         <heightScalingIncrement>5</heightScalingIncrement>
-        <mapLocation>SpecificGroundTerrain</mapLocation>
+        <mapLocation>AllGroundTerrain</mapLocation>
         <useStandardAtBSizing>true</useStandardAtBSizing>
         <widthScalingIncrement>5</widthScalingIncrement>
     </mapParameters>
     <scenarioForces>
-        <entry>
-            <key>Base Turrets</key>
-            <value>
-                <actualDeploymentZone>-1</actualDeploymentZone>
-                <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>7</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>false</canReinforceLinked>
-                <contributesToBV>true</contributesToBV>
-                <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>true</contributesToUnitCount>
-                <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>10</deploymentZone>
-                </deploymentZones>
-                <destinationZone>5</destinationZone>
-                <fixedUnitCount>0</fixedUnitCount>
-                <forceAlignment>1</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Base Turrets</forceName>
-                <generationMethod>2</generationMethod>
-                <generationOrder>4</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces />
-                <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
-                <useArtillery>false</useArtillery>
-            </value>
-        </entry>
         <entry>
             <key>Player</key>
             <value>
@@ -85,7 +48,6 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -104,17 +66,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>1</deploymentZone>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>3</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>5</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>7</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                </deploymentZones>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -122,12 +74,12 @@
                 <forceName>Primary Opfor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>3</minWeightClass>
-                <objectiveLinkedForces />
+                <maxWeightClass>3</maxWeightClass>
+                <minWeightClass>1</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -142,7 +94,7 @@
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
@@ -153,9 +105,36 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the attacking force(s):</description>
+            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Player</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>

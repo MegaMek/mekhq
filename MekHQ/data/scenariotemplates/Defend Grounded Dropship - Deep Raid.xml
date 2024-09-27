@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Defend Grounded Dropship - Heavy</name>
+    <name>Defend Grounded Dropship - Deep Raid</name>
     <shortBriefing>Defend grounded dropship.</shortBriefing>
     <detailedBriefing>Prevent a grounded dropship from becoming crippled. You have 30 turns to do so
         before it lifts off.</detailedBriefing>
@@ -26,7 +26,7 @@
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
+                    <howMuch>2</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
@@ -59,12 +59,45 @@
                     <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
-            <failureEffects />
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
             <additionalDetails />
             <description>Destroy, cripple or force to withdraw 50% of the following force(s) and
                 unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Player</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
@@ -141,7 +174,7 @@
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>3</minWeightClass>
+                <minWeightClass>2</minWeightClass>
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>

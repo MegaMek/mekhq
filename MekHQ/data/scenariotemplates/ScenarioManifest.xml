@@ -2,19 +2,19 @@
 	<scenarioFileNames>
 		<entry>
 			<key>0</key>
-			<value>Battle.xml</value>
+			<value>Battle - Skirmish.xml</value>
 		</entry>
 		<entry>
 			<key>1</key>
-			<value>Capture.xml</value>
+			<value>Capture - Frontier.xml</value>
 		</entry>
 		<entry>
 			<key>2</key>
-			<value>Assassinate.xml</value>
+			<value>Assassinate - Frontier.xml</value>
 		</entry>
 		<entry>
 			<key>3</key>
-			<value>Convoy Attack.xml</value>
+			<value>Convoy Attack - Disruption.xml</value>
 		</entry>
 		<entry>
 			<key>4</key>
@@ -22,11 +22,11 @@
 		</entry>
 		<entry>
 			<key>5</key>
-			<value>Engage.xml</value>
+			<value>Decoy - Interception.xml</value>
 		</entry>
 		<entry>
 			<key>6</key>
-			<value>Diversion.xml</value>
+			<value>Diversion - Decoy.xml</value>
 		</entry>
 		<entry>
 			<key>7</key>
@@ -34,7 +34,7 @@
 		</entry>
 		<entry>
 			<key>8</key>
-			<value>Breakthrough.xml</value>
+			<value>Breakthrough - Picket Line.xml</value>
 		</entry>
 		<entry>
 			<key>9</key>
@@ -46,23 +46,23 @@
 		</entry>
 		<entry>
 			<key>11</key>
-			<value>Harass.xml</value>
+			<value>Harass - Skirmish.xml</value>
 		</entry>
 		<entry>
 			<key>12</key>
-			<value>Convoy Escort.xml</value>
+			<value>Convoy Escort - Frontier.xml</value>
 		</entry>
 		<entry>
 			<key>13</key>
-			<value>Irregular Forces.xml</value>
+			<value>Irregular Forces - Frontier.xml</value>
 		</entry>
 		<entry>
 			<key>14</key>
-			<value>Defend Grounded Dropship.xml</value>
+			<value>Defend Grounded Dropship - Interception.xml</value>
 		</entry>
 		<entry>
 			<key>15</key>
-			<value>Destroy Grounded Dropship.xml</value>
+			<value>Destroy Grounded Dropship - Interception.xml</value>
 		</entry>
 		<entry>
 			<key>16</key>
@@ -102,63 +102,67 @@
 		</entry>
 		<entry>
 			<key>25</key>
-			<value>Allied Facility - Heavy.xml</value>
+			<value>Allied Facility - Frontline.xml</value>
 		</entry>
 		<entry>
 			<key>26</key>
-			<value>Assassinate - Assault.xml</value>
+			<value>Assassinate - Frontline.xml</value>
 		</entry>
 		<entry>
 			<key>27</key>
-			<value>Battle - Heavy.xml</value>
+			<value>Battle - Frontline.xml</value>
 		</entry>
 		<entry>
 			<key>28</key>
-			<value>Breakthrough - Heavy.xml</value>
+			<value>Breakthrough - Frontline.xml</value>
 		</entry>
 		<entry>
 			<key>29</key>
-			<value>Capture - Heavy.xml</value>
+			<value>Capture - Frontline.xml</value>
 		</entry>
 		<entry>
 			<key>30</key>
-			<value>Convoy Attack - Heavy.xml</value>
+			<value>Convoy Attack - Critical.xml</value>
 		</entry>
 		<entry>
 			<key>31</key>
-			<value>Convoy Escort - Heavy.xml</value>
+			<value>Convoy Escort - Critical .xml</value>
 		</entry>
 		<entry>
 			<key>32</key>
-			<value>Defend Grounded Dropship - Heavy.xml</value>
+			<value>Defend Grounded Dropship - Deep Raid.xml</value>
 		</entry>
 		<entry>
 			<key>33</key>
-			<value>Destroy Grounded Dropship - Heavy.xml</value>
+			<value>Destroy Grounded Dropship - Deep Raid.xml</value>
 		</entry>
 		<entry>
 			<key>34</key>
-			<value>Diversion - Heavy.xml</value>
+			<value>Diversion - Interception.xml</value>
 		</entry>
 		<entry>
 			<key>35</key>
-			<value>Engage - Heavy.xml</value>
+			<value>Decoy - Diversion.xml</value>
 		</entry>
 		<entry>
 			<key>36</key>
-			<value>Harass - Heavy.xml</value>
+			<value>Harass - Frontline.xml</value>
 		</entry>
 		<entry>
 			<key>37</key>
-			<value>Hostile Facility - Heavy.xml</value>
+			<value>Hostile Facility - Frontline.xml</value>
 		</entry>
 		<entry>
 			<key>38</key>
-			<value>Irregular Forces - Heavy.xml</value>
+			<value>Irregular Forces - Frontline.xml</value>
 		</entry>
 		<entry>
 			<key>39</key>
 			<value>Recon - Heavy.xml</value>
+		</entry>
+		<entry>
+			<key>40</key>
+			<value>Pivotal Battle.xml</value>
 		</entry>
 	</scenarioFileNames>
 </scenarioManifest>

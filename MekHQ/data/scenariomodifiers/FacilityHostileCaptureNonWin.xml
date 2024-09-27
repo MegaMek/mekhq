@@ -39,7 +39,6 @@
 		<objective>
 			<associatedForceNames>
 				<associatedForceName>Primary Opfor</associatedForceName>
-				<associatedForceName>Base Turrets</associatedForceName>
 			</associatedForceNames>
 			<associatedUnitIDs />
 			<successEffects>

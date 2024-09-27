@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Assassinate</name>
-    <shortBriefing>Eliminate the designated target.</shortBriefing>
-    <detailedBriefing>Destroy the designated target, or disable it while routing any escorts. The
-        target cannot be allowed to leave the battlefield.</detailedBriefing>
+    <name>Breakthrough - Frontline</name>
+    <shortBriefing>Break through blocking hostile force.</shortBriefing>
+    <detailedBriefing>Break through to the opposite edge of the map or rout the hostile force.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
-        <allowRotation>false</allowRotation>
-        <baseHeight>0</baseHeight>
-        <baseWidth>0</baseWidth>
-        <heightScalingIncrement>5</heightScalingIncrement>
+        <allowRotation>true</allowRotation>
+        <baseHeight>50</baseHeight>
+        <baseWidth>17</baseWidth>
+        <heightScalingIncrement>0</heightScalingIncrement>
         <mapLocation>AllGroundTerrain</mapLocation>
-        <useStandardAtBSizing>true</useStandardAtBSizing>
-        <widthScalingIncrement>5</widthScalingIncrement>
+        <useStandardAtBSizing>false</useStandardAtBSizing>
+        <widthScalingIncrement>1</widthScalingIncrement>
     </mapParameters>
     <scenarioForces>
         <entry>
@@ -28,17 +27,7 @@
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>0</deploymentZone>
-                    <deploymentZone>1</deploymentZone>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>3</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>5</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>7</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
+                    <deploymentZone>11</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -49,6 +38,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -62,35 +52,37 @@
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>true</canReinforceLinked>
+                <canReinforceLinked>false</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones />
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
+                <forceMultiplier>1.5</forceMultiplier>
                 <forceName>Primary Opfor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>1</minWeightClass>
+                <minWeightClass>2</minWeightClass>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
+                <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
         <entry>
-            <key>Designated Target</key>
+            <key>Reinforcements</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
+                <arrivalTurn>-3</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>false</contributesToMapSize>
@@ -98,17 +90,17 @@
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones />
                 <destinationZone>5</destinationZone>
-                <fixedUnitCount>1</fixedUnitCount>
-                <forceAlignment>2</forceAlignment>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>0</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Designated Target</forceName>
-                <generationMethod>3</generationMethod>
-                <generationOrder>5</generationOrder>
+                <forceName>Reinforcements</forceName>
+                <generationMethod>0</generationMethod>
+                <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>1</minWeightClass>
+                <minWeightClass>2</minWeightClass>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <subjectToRandomRemoval>false</subjectToRandomRemoval>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
@@ -118,14 +110,44 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Designated Target</associatedForceName>
+                <associatedForceName>Player</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
+                    <howMuch>2</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails>
+                <additionalDetail>Crippled units do not count towards this objective.</additionalDetail>
+            </additionalDetails>
+            <description>Reach the destination edge with 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ReachMapEdge</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimit>0</timeLimit>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Primary Opfor</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
@@ -136,10 +158,11 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy the following force(s) and unit(s):</description>
+            <description>Destroy or rout 50% the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Destroy</objectiveCriterion>
-            <percentage>100</percentage>
+            <percentage>50</percentage>
+            <timeLimit>0</timeLimit>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>

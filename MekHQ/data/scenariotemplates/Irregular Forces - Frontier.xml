@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Diversion - Heavy</name>
-    <shortBriefing>Hostile force </shortBriefing>
-    <detailedBriefing>A hostile force is attempting to delay your force from its objective. Destroy
-        or bypass them quickly.</detailedBriefing>
+    <name>Irregular Forces - Frontier</name>
+    <shortBriefing>Destroy enemy infantry and irregular forces, and their support.</shortBriefing>
+    <detailedBriefing>Hostile infantry and irregular forces are being supported by military units.
+        Engage and destroy.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
-        <allowedTerrainTypes />
+        <allowedTerrainTypes>
+            <allowedTerrainType>ColdUrban</allowedTerrainType>
+            <allowedTerrainType>HotUrban</allowedTerrainType>
+            <allowedTerrainType>Urban</allowedTerrainType>
+        </allowedTerrainTypes>
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
@@ -28,10 +34,15 @@
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
+                    <deploymentZone>1</deploymentZone>
                     <deploymentZone>2</deploymentZone>
+                    <deploymentZone>3</deploymentZone>
                     <deploymentZone>4</deploymentZone>
+                    <deploymentZone>5</deploymentZone>
                     <deploymentZone>6</deploymentZone>
+                    <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
+                    <deploymentZone>9</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -42,6 +53,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -62,18 +74,81 @@
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones />
                 <destinationZone>5</destinationZone>
-                <fixedUnitCount>0</fixedUnitCount>
+                <fixedUnitCount>-1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.25</forceMultiplier>
+                <forceMultiplier>1.0</forceMultiplier>
                 <forceName>Primary Opfor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>3</minWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>Opfor Infantry</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>3</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>false</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
+                <destinationZone>5</destinationZone>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>2.0</forceMultiplier>
+                <forceName>Opfor Infantry</forceName>
+                <generationMethod>2</generationMethod>
+                <generationOrder>5</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>Opfor Irregulars</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-1</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
+                <destinationZone>5</destinationZone>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>2.0</forceMultiplier>
+                <forceName>Opfor Irregulars</forceName>
+                <generationMethod>2</generationMethod>
+                <generationOrder>5</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -82,30 +157,30 @@
         <scenarioObjective>
             <associatedForceNames>
                 <associatedForceName>Primary Opfor</associatedForceName>
+                <associatedForceName>Opfor Infantry</associatedForceName>
+                <associatedForceName>Opfor Irregulars</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
+            <failureEffect>
+                <effectType>ScenarioDefeat</effectType>
+                <effectScaling>Fixed</effectScaling>
+                <howMuch>1</howMuch>
+            </failureEffect>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following enemy force(s) and unit(s):</description>
+            <description>Destroy, cripple or force the withdrawal of 50% of the following forces and
+                units:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitScaleFactor>2</timeLimitScaleFactor>
-            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+            <timeLimitType>None</timeLimitType>
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
@@ -116,7 +191,7 @@
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
@@ -126,17 +201,13 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails>
-                <additionalDetail>Crippled units do not count towards this objective.</additionalDetail>
-            </additionalDetails>
-            <description>Move at least 50% of the following force(s) and unit(s) to the destination
-                edge and leave the battlefield:</description>
+            <additionalDetails />
+            <description>Preserve 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>ReachMapEdge</objectiveCriterion>
+            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitScaleFactor>2</timeLimitScaleFactor>
-            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+            <timeLimitType>None</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
 </ScenarioTemplate>

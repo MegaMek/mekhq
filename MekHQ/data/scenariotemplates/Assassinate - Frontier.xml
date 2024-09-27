@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Battle</name>
-    <shortBriefing>Stand-up fight</shortBriefing>
-    <detailedBriefing>Engage and destroy or rout any enemy forces present.</detailedBriefing>
+    <name>Assassinate - Frontier</name>
+    <shortBriefing>Eliminate the designated target.</shortBriefing>
+    <detailedBriefing>Destroy the designated target, or disable it while routing any escorts. The
+        target cannot be allowed to leave the battlefield.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -83,11 +84,41 @@
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
+        <entry>
+            <key>Designated Target</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>true</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>false</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones />
+                <destinationZone>5</destinationZone>
+                <fixedUnitCount>1</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Designated Target</forceName>
+                <generationMethod>3</generationMethod>
+                <generationOrder>5</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>3</minWeightClass>
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <subjectToRandomRemoval>false</subjectToRandomRemoval>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
     </scenarioForces>
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Primary Opfor</associatedForceName>
+                <associatedForceName>Designated Target</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -105,10 +136,10 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
+            <description>Destroy the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
+            <objectiveCriterion>Destroy</objectiveCriterion>
+            <percentage>100</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>
