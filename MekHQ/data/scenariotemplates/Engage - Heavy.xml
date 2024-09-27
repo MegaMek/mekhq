@@ -2,8 +2,7 @@
 <ScenarioTemplate>
     <name>Engage - Heavy</name>
     <shortBriefing>Engage enemy force.</shortBriefing>
-    <detailedBriefing>Engage enemy force with weapons fire or physical attacks for the specified
-        duration.</detailedBriefing>
+    <detailedBriefing>Engage enemy forces for the specified duration, or defeat 75% of the opposing force.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -113,6 +112,33 @@
             <timeLimitAtMost>false</timeLimitAtMost>
             <timeLimitScaleFactor>2</timeLimitScaleFactor>
             <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Primary Opfor</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>0</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Destroy or rout 75% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>75</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
 </ScenarioTemplate>
