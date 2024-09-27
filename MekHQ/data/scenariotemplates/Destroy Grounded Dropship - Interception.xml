@@ -2,8 +2,7 @@
 <ScenarioTemplate>
     <name>Destroy Grounded Dropship - Interception</name>
     <shortBriefing>Destroy grounded hostile dropship.</shortBriefing>
-    <detailedBriefing>Destroy or cripple a grounded enemy dropship. You have 30 turns to do so
-        before it lifts off.</detailedBriefing>
+    <detailedBriefing>Destroy or cripple a grounded enemy dropship. You have 30 turns to do so 9,before it lifts off.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -95,7 +94,7 @@
                 <allowedUnitType>11</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>false</canReinforceLinked>
-                <contributesToBV>false</contributesToBV>
+                <contributesToBV>true</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
@@ -107,7 +106,7 @@
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
                 <forceName>Dropship</forceName>
-                <generationMethod>3</generationMethod>
+                <generationMethod>2</generationMethod>
                 <generationOrder>3</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Capture - Heavy</name>
+    <name>Capture - Frontline</name>
     <shortBriefing>Capture the designated target.</shortBriefing>
     <detailedBriefing>Capture the designated target by disabling their unit and routing their
         escorts or by forcing an ejection and picking up the ejected individual. The capture target
