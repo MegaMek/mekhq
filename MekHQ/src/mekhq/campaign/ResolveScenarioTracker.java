@@ -181,140 +181,140 @@ public class ResolveScenarioTracker {
     }
 
     public void processGame() {
-        int pid = client.getLocalPlayer().getId();
+        int playerId = client.getLocalPlayer().getId();
         int team = client.getLocalPlayer().getTeam();
 
-        for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
-            Entity e = iter.nextElement();
-            if (!e.getSubEntities().isEmpty()) {
+        for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements();) {
+            Entity entity = entityIterator.nextElement();
+            if (!entity.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
 
-            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
             // Convenience data
-            idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
+            idMap.put(entity.getId(), UUID.fromString(entity.getExternalIdAsString()));
 
-            checkForLostLimbs(e, control);
-            if ((e.getOwnerId() == pid) || (e.getOwner().getTeam() == team) || scenario.isTraitor(e, campaign)) {
-                if (!"-1".equals(e.getExternalIdAsString())) {
-                    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+            checkForLostLimbs(entity, control);
+            if ((entity.getOwnerId() == playerId) || (entity.getOwner().getTeam() == team) || scenario.isTraitor(entity, campaign)) {
+                if (!"-1".equals(entity.getExternalIdAsString())) {
+                    UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
                     if (null == status && scenario instanceof AtBScenario) {
-                        status = processAlliedUnit(e);
+                        status = processAlliedUnit(entity);
                     }
 
                     if (null != status) {
-                        boolean lost = (!e.canEscape() && !control)
-                                || e.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
-                        status.assignFoundEntity(e, lost);
+                        boolean lost = (!entity.canEscape() && !control)
+                                || entity.getRemovalCondition() == IEntityRemovalConditions.REMOVE_DEVASTATED;
+                        status.assignFoundEntity(entity, lost);
                     }
                 }
-                if (null != e.getCrew()) {
-                    if (!"-1".equals(e.getCrew().getExternalIdAsString())) {
-                        if (!e.getCrew().isEjected() || (e instanceof EjectedCrew)) {
-                            pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+                if (null != entity.getCrew()) {
+                    if (!"-1".equals(entity.getCrew().getExternalIdAsString())) {
+                        if (!entity.getCrew().isEjected() || (entity instanceof EjectedCrew)) {
+                            pilots.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), entity.getCrew());
                         }
-                        if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
+                        if (entity instanceof EjectedCrew) {
+                            ejections.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), (EjectedCrew) entity);
                         }
                     }
                 }
-            } else if (e.getOwner().isEnemyOf(client.getLocalPlayer())) {
+            } else if (entity.getOwner().isEnemyOf(client.getLocalPlayer())) {
                 if (control) {
-                    if (e instanceof EjectedCrew) {
-                        enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
+                    if (entity instanceof EjectedCrew) {
+                        enemyEjections.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), (EjectedCrew) entity);
                         continue;
                     }
 
-                    if ((e instanceof BattleArmor) && e.isDestroyed()) {
+                    if ((entity instanceof BattleArmor) && entity.isDestroyed()) {
                         // BA can only be salvaged with a 10+ roll
                         if (Utilities.dice(2, 6) < 10) {
                             continue;
                         }
                     }
 
-                    TestUnit nu = generateNewTestUnit(e);
-                    UnitStatus us = new UnitStatus(nu);
-                    us.setTotalLoss(false);
-                    salvageStatus.put(nu.getId(), us);
-                    potentialSalvage.add(nu);
+                    TestUnit newUnit = generateNewTestUnit(entity);
+                    UnitStatus unitStatus = new UnitStatus(newUnit);
+                    unitStatus.setTotalLoss(false);
+                    salvageStatus.put(newUnit.getId(), unitStatus);
+                    potentialSalvage.add(newUnit);
                 }
             }
             // Kill credit automatically assigned only if they can't escape
-            if (!e.canEscape()) {
-                appendKillCredit(e);
+            if (!entity.canEscape()) {
+                appendKillCredit(entity);
             }
         }
 
         // If any units ended the game with others loaded in its bays, map those out
-        for (Enumeration<Entity> iter = victoryEvent.getEntities(); iter.hasMoreElements();) {
-            Entity e = iter.nextElement();
-            if (!e.getBayLoadedUnitIds().isEmpty()) {
+        for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements();) {
+            Entity entity = entityIterator.nextElement();
+            if (!entity.getBayLoadedUnitIds().isEmpty()) {
                 List<Entity> cargo = new ArrayList<>();
-                for (int id : e.getBayLoadedUnitIds()) {
-                    UUID extId = idMap.get(id);
+                for (int entityId : entity.getBayLoadedUnitIds()) {
+                    UUID extId = idMap.get(entityId);
                     if (extId != null) {
                         cargo.add(entities.get(extId));
                     }
                 }
-                bayLoadedEntities.put(UUID.fromString(e.getExternalIdAsString()), cargo);
+                bayLoadedEntities.put(UUID.fromString(entity.getExternalIdAsString()), cargo);
             }
         }
 
         // Utterly destroyed entities
-        for (Enumeration<Entity> iter = victoryEvent.getDevastatedEntities(); iter.hasMoreElements();) {
-            Entity e = iter.nextElement();
-            if (!e.getSubEntities().isEmpty()) {
+        for (Enumeration<Entity> entityIterator = victoryEvent.getDevastatedEntities(); entityIterator.hasMoreElements();) {
+            Entity entity = entityIterator.nextElement();
+            if (!entity.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
 
-            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 
-            if ((e.getOwnerId() == pid) || (e.getOwner().getTeam() == team) || scenario.isTraitor(e, campaign)) {
-                if (!"-1".equals(e.getExternalIdAsString())) {
-                    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+            if ((entity.getOwnerId() == playerId) || (entity.getOwner().getTeam() == team) || scenario.isTraitor(entity, campaign)) {
+                if (!"-1".equals(entity.getExternalIdAsString())) {
+                    UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
 
                     if (null == status && scenario instanceof AtBScenario) {
-                        status = processAlliedUnit(e);
+                        status = processAlliedUnit(entity);
                     }
 
                     if (null != status) {
-                        status.assignFoundEntity(e, true);
+                        status.assignFoundEntity(entity, true);
                     }
                 }
             }
 
-            appendKillCredit(e);
+            appendKillCredit(entity);
         }
 
         // add retreated units
-        for (Enumeration<Entity> iter = victoryEvent.getRetreatedEntities(); iter.hasMoreElements();) {
-            Entity e = iter.nextElement();
-            if (!e.getSubEntities().isEmpty()) {
+        for (Enumeration<Entity> entityIterator = victoryEvent.getRetreatedEntities(); entityIterator.hasMoreElements();) {
+            Entity entity = entityIterator.nextElement();
+            if (!entity.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
 
-            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 
-            checkForLostLimbs(e, control);
-            if ((e.getOwnerId() == pid) || (e.getOwner().getTeam() == team) || scenario.isTraitor(e, campaign)) {
-                if (!"-1".equals(e.getExternalIdAsString())) {
-                    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+            checkForLostLimbs(entity, control);
+            if ((entity.getOwnerId() == playerId) || (entity.getOwner().getTeam() == team) || scenario.isTraitor(entity, campaign)) {
+                if (!"-1".equals(entity.getExternalIdAsString())) {
+                    UnitStatus status = unitsStatus.get(UUID.fromString(entity.getExternalIdAsString()));
                     if (null == status && scenario instanceof AtBScenario) {
-                        status = processAlliedUnit(e);
+                        status = processAlliedUnit(entity);
                     }
 
                     if (null != status) {
-                        status.assignFoundEntity(e, false);
+                        status.assignFoundEntity(entity, false);
                     }
                 }
-                if (null != e.getCrew()) {
-                    if (!"-1".equals(e.getCrew().getExternalIdAsString())) {
-                        pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-                        if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
+                if (null != entity.getCrew()) {
+                    if (!"-1".equals(entity.getCrew().getExternalIdAsString())) {
+                        pilots.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), entity.getCrew());
+                        if (entity instanceof EjectedCrew) {
+                            ejections.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), (EjectedCrew) entity);
                         }
                     }
                 }
@@ -323,83 +323,85 @@ public class ResolveScenarioTracker {
 
         Enumeration<Entity> wrecks = victoryEvent.getGraveyardEntities();
         while (wrecks.hasMoreElements()) {
-            Entity e = wrecks.nextElement();
-            if (!e.getSubEntities().isEmpty()) {
+            Entity wreck = wrecks.nextElement();
+            if (!wreck.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
                 continue;
             }
 
-            entities.put(UUID.fromString(e.getExternalIdAsString()), e);
-            idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
+            entities.put(UUID.fromString(wreck.getExternalIdAsString()), wreck);
+            idMap.put(wreck.getId(), UUID.fromString(wreck.getExternalIdAsString()));
 
-            checkForLostLimbs(e, control);
-            if ((e.getOwnerId() == pid) || (e.getOwner().getTeam() == team) || scenario.isTraitor(e, campaign)) {
-                if (!"-1".equals(e.getExternalIdAsString())) {
-                    UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
+            checkForLostLimbs(wreck, control);
+            if ((wreck.getOwnerId() == playerId) || (wreck.getOwner().getTeam() == team) || scenario.isTraitor(wreck, campaign)) {
+                if (!"-1".equals(wreck.getExternalIdAsString())) {
+                    UnitStatus status = unitsStatus.get(UUID.fromString(wreck.getExternalIdAsString()));
 
                     if (null == status && scenario instanceof AtBScenario) {
-                        status = processAlliedUnit(e);
+                        status = processAlliedUnit(wreck);
                     }
 
                     if (null != status) {
-                        status.assignFoundEntity(e, !control);
-                        if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getExternalIdAsString()), (EjectedCrew) e);
+                        status.assignFoundEntity(wreck, !control);
+                        if (wreck instanceof EjectedCrew) {
+                            ejections.put(UUID.fromString(wreck.getExternalIdAsString()), (EjectedCrew) wreck);
                         }
                     }
                 }
-                if (null != e.getCrew()) {
-                    if (!"-1".equals(e.getCrew().getExternalIdAsString())) {
-                        if (e instanceof EjectedCrew) {
-                            ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
+                if (null != wreck.getCrew()) {
+                    if (!"-1".equals(wreck.getCrew().getExternalIdAsString())) {
+                        if (wreck instanceof EjectedCrew) {
+                            ejections.put(UUID.fromString(wreck.getCrew().getExternalIdAsString()), (EjectedCrew) wreck);
                         }
-                        if (!e.getCrew().isEjected() || e instanceof EjectedCrew) {
+                        if (!wreck.getCrew().isEjected() || wreck instanceof EjectedCrew) {
                             if (control) {
-                                pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+                                pilots.put(UUID.fromString(wreck.getCrew().getExternalIdAsString()), wreck.getCrew());
                             } else {
-                                mia.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+                                mia.put(UUID.fromString(wreck.getCrew().getExternalIdAsString()), wreck.getCrew());
                             }
                         }
                     }
                 }
-            } else if (e.getOwner().isEnemyOf(client.getLocalPlayer())) {
-                if (e instanceof EjectedCrew) {
-                    enemyEjections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew) e);
+            } else if (wreck.getOwner().isEnemyOf(client.getLocalPlayer())) {
+                if (wreck.isDropShip() && scenario.getBoardType() != Scenario.T_SPACE) {
+                    double dropShipBonusPercentage =
+                        (double) campaign.getCampaignOptions().getDropShipBonusPercentage() / 100;
+
+                    if (dropShipBonusPercentage > 0) {
+                        dropShipBonus = dropShipBonus.plus(
+                            generateNewTestUnit(wreck).getSellValue().multipliedBy(dropShipBonusPercentage));
+                    }
+
+                    continue;
+                }
+
+                if (wreck instanceof EjectedCrew) {
+                    enemyEjections.put(UUID.fromString(wreck.getCrew().getExternalIdAsString()), (EjectedCrew) wreck);
                     continue;
                 }
                 if (control) {
-                    double dropShipBonusPercentage = (double) campaign.getCampaignOptions().getDropShipBonusPercentage()
-                            / 100;
-
-                    if ((e.isDropShip()) && (scenario.getBoardType() == Scenario.T_GROUND)) {
-                        if (dropShipBonusPercentage > 0) {
-                            dropShipBonus = dropShipBonus.plus(
-                                    generateNewTestUnit(e).getSellValue().multipliedBy(dropShipBonusPercentage));
-                        }
-                    } else {
-                        TestUnit nu = generateNewTestUnit(e);
-                        UnitStatus us = new UnitStatus(nu);
-                        us.setTotalLoss(false);
-                        salvageStatus.put(nu.getId(), us);
-                        potentialSalvage.add(nu);
-                    }
+                    TestUnit nu = generateNewTestUnit(wreck);
+                    UnitStatus us = new UnitStatus(nu);
+                    us.setTotalLoss(false);
+                    salvageStatus.put(nu.getId(), us);
+                    potentialSalvage.add(nu);
                 }
             }
 
-            appendKillCredit(e);
+            appendKillCredit(wreck);
         }
         // If a unit in a bay was destroyed, add it. We still need to deal with the crew
-        for (Enumeration<Entity> iter = victoryEvent.getGraveyardEntities(); iter.hasMoreElements();) {
-            Entity e = iter.nextElement();
-            if (e.getTransportId() != Entity.NONE) {
-                UUID trnId = idMap.get(e.getTransportId());
+        for (Enumeration<Entity> entityIterator = victoryEvent.getGraveyardEntities(); entityIterator.hasMoreElements();) {
+            Entity entity = entityIterator.nextElement();
+            if (entity.getTransportId() != Entity.NONE) {
+                UUID trnId = idMap.get(entity.getTransportId());
                 List<Entity> cargo;
                 if (bayLoadedEntities.containsKey(trnId)) {
                     cargo = bayLoadedEntities.get(trnId);
                 } else {
                     cargo = new ArrayList<>();
                 }
-                cargo.add(e);
+                cargo.add(entity);
                 bayLoadedEntities.put(trnId, cargo);
             }
         }
