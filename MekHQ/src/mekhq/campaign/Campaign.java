@@ -3738,7 +3738,8 @@ public class Campaign implements ITechManager {
         for (AtBContract contract : getActiveAtBContracts()) {
             if (campaignOptions.isUseGenericBattleValue()) {
                 if (contract.getStartDate().equals(getLocalDate()) && getLocation().isOnPlanet()) {
-                    if (BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
+                    if (getCampaignOptions().isUseGenericBattleValue()
+                        && BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
                         contract.setBatchallAccepted(contract.initiateBatchall(this));
                     }
                 }
