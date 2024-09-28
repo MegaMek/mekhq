@@ -18,20 +18,6 @@
  */
 package mekhq.campaign.mission;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.xml.namespace.QName;
-
-import org.w3c.dom.Node;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
@@ -41,10 +27,15 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import megamek.common.OffBoardDirection;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
+import org.w3c.dom.Node;
+
+import javax.xml.namespace.QName;
+import java.io.PrintWriter;
+import java.util.*;
 
 /**
  * Contains metadata used to describe a scenario objective
- * 
+ *
  * @author NickAragua
  */
 public class ScenarioObjective {
@@ -452,7 +443,14 @@ public class ScenarioObjective {
                 if (objectiveContainsLinkedForce) {
                     ScenarioForceTemplate linkedForceTemplate = scenario.getTemplate().getScenarioForces()
                             .get(linkedForceName);
-                    return linkedForceTemplate.getForceAlignment() == forceTemplate.getForceAlignment();
+
+                    try {
+                        return linkedForceTemplate.getForceAlignment() == forceTemplate.getForceAlignment();
+                    } catch (Exception e) {
+                        // We don't want this to silently fail, as it means there is something
+                        // critically wrong with the forceTemplate
+                        logger.error(String.format("Failed to load %s.", forceTemplate.getForceName()));
+                    }
                 }
             }
         }
@@ -469,11 +467,11 @@ public class ScenarioObjective {
 
         if (objectiveCriterion == ObjectiveCriterion.ReachMapEdge ||
                 objectiveCriterion == ObjectiveCriterion.PreventReachMapEdge) {
-            sb.append("\n");
+            sb.append('\n');
 
             if ((destinationEdge != null) &&
                     (destinationEdge != OffBoardDirection.NONE)) {
-                sb.append(destinationEdge.toString());
+                sb.append(destinationEdge);
             } else {
                 sb.append("opposite deployment");
             }
@@ -490,28 +488,28 @@ public class ScenarioObjective {
         if (!associatedForceNames.isEmpty()) {
             sb.append("\nForces:");
             for (String forceName : associatedForceNames) {
-                sb.append("\n");
+                sb.append('\n');
                 sb.append(forceName);
             }
         }
 
         if (!associatedUnitIDs.isEmpty()) {
             for (String unitID : associatedUnitIDs) {
-                sb.append("\n");
+                sb.append('\n');
                 sb.append(unitID);
             }
         }
 
         if (!successEffects.isEmpty()) {
             for (ObjectiveEffect effect : successEffects) {
-                sb.append("\n");
+                sb.append('\n');
                 sb.append(effect.toString());
             }
         }
 
         if (!failureEffects.isEmpty()) {
             for (ObjectiveEffect effect : failureEffects) {
-                sb.append("\n");
+                sb.append('\n');
                 sb.append(effect.toString());
             }
         }
@@ -522,7 +520,7 @@ public class ScenarioObjective {
     /**
      * Serialize this instance of a ScenarioObjective to a PrintWriter
      * Omits initial xml declaration
-     * 
+     *
      * @param pw The destination print writer
      */
     public void Serialize(PrintWriter pw) {
@@ -542,7 +540,7 @@ public class ScenarioObjective {
     /**
      * Attempt to deserialize an instance of a ScenarioObjective from the passed-in
      * XML Node
-     * 
+     *
      * @param xmlNode The node with the scenario template
      * @return Possibly an instance of a ScenarioTemplate
      */
