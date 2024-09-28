@@ -52,7 +52,7 @@
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Primary Opfor</associatedForceName>
+                <associatedForceName>Primary OpFor</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -141,7 +141,7 @@
             </value>
         </entry>
         <entry>
-            <key>Escorted Dropship</key>
+            <key>Escorted DropShip</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -157,7 +157,7 @@
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Escorted Dropship</forceName>
+                <forceName>Escorted DropShip</forceName>
                 <generationMethod>4</generationMethod>
                 <generationOrder>4</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -171,7 +171,7 @@
             </value>
         </entry>
         <entry>
-            <key>Primary Opfor</key>
+            <key>Primary OpFor</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -187,7 +187,7 @@
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary Opfor</forceName>
+                <forceName>Primary OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>

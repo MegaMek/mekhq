@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>DropShip Raid</name>
     <shortBriefing>Destroy or cripple enemy DropShip.</shortBriefing>
-    <detailedBriefing>An enemy dropship has been intercepted shortly after landing. You have 30 turns to destroy or cripple it before it can lift off. The defenders are not the priority. Preserve 50% of your forces to ensure mission success.</detailedBriefing>
+    <detailedBriefing>An enemy DropShip has been intercepted shortly after landing. You have 30 turns to destroy or cripple it before it can lift off. The defenders are not the priority. Preserve 50% of your forces to ensure mission success.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -56,7 +56,7 @@
             </value>
         </entry>
         <entry>
-            <key>Primary Opfor</key>
+            <key>Primary OpFor</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -74,7 +74,7 @@
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary Opfor</forceName>
+                <forceName>Primary OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>

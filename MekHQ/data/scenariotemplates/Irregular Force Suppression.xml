@@ -60,7 +60,7 @@
             </value>
         </entry>
         <entry>
-            <key>Primary Opfor</key>
+            <key>Primary OpFor</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -76,7 +76,7 @@
                 <fixedUnitCount>-1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary Opfor</forceName>
+                <forceName>Primary OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -90,7 +90,7 @@
             </value>
         </entry>
         <entry>
-            <key>Opfor Infantry</key>
+            <key>OpFor Infantry</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -108,7 +108,7 @@
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>2.0</forceMultiplier>
-                <forceName>Opfor Infantry</forceName>
+                <forceName>OpFor Infantry</forceName>
                 <generationMethod>2</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -121,7 +121,7 @@
             </value>
         </entry>
         <entry>
-            <key>Opfor Irregulars</key>
+            <key>OpFor Irregulars</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -139,7 +139,7 @@
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>2.0</forceMultiplier>
-                <forceName>Opfor Irregulars</forceName>
+                <forceName>OpFor Irregulars</forceName>
                 <generationMethod>2</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -155,9 +155,9 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Primary Opfor</associatedForceName>
-                <associatedForceName>Opfor Infantry</associatedForceName>
-                <associatedForceName>Opfor Irregulars</associatedForceName>
+                <associatedForceName>Primary OpFor</associatedForceName>
+                <associatedForceName>OpFor Infantry</associatedForceName>
+                <associatedForceName>OpFor Irregulars</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>

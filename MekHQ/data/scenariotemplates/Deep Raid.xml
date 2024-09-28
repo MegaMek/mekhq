@@ -56,7 +56,7 @@
             </value>
         </entry>
         <entry>
-            <key>Primary Opfor</key>
+            <key>Primary OpFor</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -74,7 +74,7 @@
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary Opfor</forceName>
+                <forceName>Primary OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -87,7 +87,7 @@
             </value>
         </entry>
         <entry>
-            <key>Dropship</key>
+            <key>DropShip</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -122,7 +122,7 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Dropship</associatedForceName>
+                <associatedForceName>DropShip</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -140,7 +140,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails>
-                <additionalDetail>If the dropship cannot be deployed, this objective may be ignored.</additionalDetail>
+                <additionalDetail>If the DropShip cannot be deployed, this objective may be ignored.</additionalDetail>
             </additionalDetails>
             <description>Destroy or cripple the following unit(s):</description>
             <destinationEdge>NONE</destinationEdge>

@@ -182,7 +182,7 @@
             </value>
         </entry>
         <entry>
-            <key>Dropship</key>
+            <key>DropShip</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -200,7 +200,7 @@
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Dropship</forceName>
+                <forceName>DropShip</forceName>
                 <generationMethod>4</generationMethod>
                 <generationOrder>3</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
