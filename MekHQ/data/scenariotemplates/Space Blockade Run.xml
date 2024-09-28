@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
     <name>Space Blockade Run</name>
-    <shortBriefing>Break enemy blockade, escort allied DropShip.</shortBriefing>
-    <detailedBriefing>An allied DropShip is attempting to run an enemy blockade in space. Your mission is to ensure the DropShip survives the run. Either destroy 50% of the enemy forces or break through the blockade while preserving 50% of your own forces.</detailedBriefing>
+    <shortBriefing>Break enemy blockade, escort DropShip.</shortBriefing>
+    <detailedBriefing>A DropShip is attempting to run an enemy blockade in space. Your mission is to ensure the DropShip survives the run. Either destroy 50% of the enemy forces or break through the blockade while preserving 50% of your own forces.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -18,7 +18,7 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Escorted DropShip</associatedForceName>
+                <associatedForceName>DropShip</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -52,7 +52,7 @@
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Primary OpFor</associatedForceName>
+                <associatedForceName>OpFor</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -141,7 +141,7 @@
             </value>
         </entry>
         <entry>
-            <key>Escorted DropShip</key>
+            <key>DropShip</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -157,7 +157,7 @@
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Escorted DropShip</forceName>
+                <forceName>DropShip</forceName>
                 <generationMethod>4</generationMethod>
                 <generationOrder>4</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -171,7 +171,7 @@
             </value>
         </entry>
         <entry>
-            <key>Primary OpFor</key>
+            <key>OpFor</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -187,7 +187,7 @@
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary OpFor</forceName>
+                <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>

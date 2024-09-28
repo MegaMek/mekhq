@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
     <name>Deep Raid</name>
-    <shortBriefing>Destroy or cripple enemy DropShip.</shortBriefing>
-    <detailedBriefing>A grounded enemy DropShip must be destroyed or crippled within 30 turns before it lifts off. This raid takes place deep behind enemy lines, and the DropShip’s defenders are not important. Preserve 50% of your forces during the operation to ensure mission success.</detailedBriefing>
+    <shortBriefing>Destroy or cripple DropShip.</shortBriefing>
+    <detailedBriefing>A grounded DropShip must be destroyed or crippled within 30 turns before it lifts off. This raid takes place deep behind enemy lines, and the DropShip’s defenders are not important. Preserve 50% of your forces during the operation to ensure mission success.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -56,7 +56,7 @@
             </value>
         </entry>
         <entry>
-            <key>Primary OpFor</key>
+            <key>OpFor</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -74,7 +74,7 @@
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary OpFor</forceName>
+                <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -106,7 +106,7 @@
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
                 <forceName>DropShip</forceName>
-                <generationMethod>4</generationMethod>
+                <generationMethod>3</generationMethod>
                 <generationOrder>3</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>

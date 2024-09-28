@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
     <name>Space DropShip Intercept</name>
-    <shortBriefing>Prevent enemy DropShip escape.</shortBriefing>
-    <detailedBriefing>An enemy DropShip has been detected in space, attempting to escape. Your mission is to destroy or severely damage the DropShip before it can flee. Preserve at least 50% of your forces during the engagement to ensure success.</detailedBriefing>
+    <shortBriefing>Prevent DropShip escape.</shortBriefing>
+    <detailedBriefing>A DropShip has been detected in space, attempting to escape. Your mission is to destroy or severely damage the DropShip before it can flee. Preserve at least 50% of your forces during the engagement to ensure success.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -18,7 +18,7 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Enemy DropShips</associatedForceName>
+                <associatedForceName>DropShip</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -45,7 +45,7 @@
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Primary OpFor</associatedForceName>
+                <associatedForceName>OpFor</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -134,7 +134,7 @@
             </value>
         </entry>
         <entry>
-            <key>Primary OpFor</key>
+            <key>OpFor</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -150,7 +150,7 @@
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary OpFor</forceName>
+                <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -164,7 +164,7 @@
             </value>
         </entry>
         <entry>
-            <key>Enemy DropShips</key>
+            <key>DropShip</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -180,7 +180,7 @@
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Enemy DropShips</forceName>
+                <forceName>DropShip</forceName>
                 <generationMethod>3</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
