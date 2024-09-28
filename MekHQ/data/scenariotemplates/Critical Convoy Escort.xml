@@ -81,7 +81,7 @@
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-1</allowedUnitType>
+                <allowedUnitType>-2</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>false</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>
@@ -97,7 +97,7 @@
                 <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
+                <forceMultiplier>0.5</forceMultiplier>
                 <forceName>Convoy</forceName>
                 <generationMethod>2</generationMethod>
                 <generationOrder>4</generationOrder>
@@ -108,6 +108,12 @@
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>CIVILIAN</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>SUPPORT</forceRole>
+                    <forceRole>APC</forceRole>
+                </roleChoices>
             </value>
         </entry>
     </scenarioForces>

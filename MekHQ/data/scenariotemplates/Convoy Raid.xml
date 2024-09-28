@@ -77,7 +77,7 @@
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-1</allowedUnitType>
+                <allowedUnitType>-2</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
@@ -104,6 +104,12 @@
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>CIVILIAN</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>SUPPORT</forceRole>
+                    <forceRole>APC</forceRole>
+                </roleChoices>
             </value>
         </entry>
     </scenarioForces>
