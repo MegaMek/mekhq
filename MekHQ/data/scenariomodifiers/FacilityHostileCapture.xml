@@ -12,22 +12,12 @@
 			<associatedUnitIDs />
 			<successEffects>
 				<successEffect>
-					<effectType>ScenarioVictory</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>2</howMuch>
-				</successEffect>
-				<successEffect>
 					<effectType>FacilityCaptured</effectType>
 					<effectScaling>Fixed</effectScaling>
 					<howMuch>1</howMuch>
 				</successEffect>
 			</successEffects>
 			<failureEffects>
-				<failureEffect>
-					<effectType>ScenarioDefeat</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>1</howMuch>
-				</failureEffect>
 				<failureEffect>
 					<effectType>FacilityRemains</effectType>
 					<effectScaling>Fixed</effectScaling>
@@ -53,22 +43,12 @@
 			<associatedUnitIDs />
 			<successEffects>
 				<successEffect>
-					<effectType>ScenarioVictory</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>2</howMuch>
-				</successEffect>
-				<successEffect>
 					<effectType>FacilityCaptured</effectType>
 					<effectScaling>Fixed</effectScaling>
 					<howMuch>1</howMuch>
 				</successEffect>
 			</successEffects>
 			<failureEffects>
-				<failureEffect>
-					<effectType>ScenarioDefeat</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>1</howMuch>
-				</failureEffect>
 				<failureEffect>
 					<effectType>FacilityRemains</effectType>
 					<effectScaling>Fixed</effectScaling>

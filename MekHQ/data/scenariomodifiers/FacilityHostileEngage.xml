@@ -5,13 +5,11 @@
     <linkedModifiers>
         <entry>
             <key>FacilityHostileDestroy.xml</key>
-            <value>If destroyed, this facility will be considered to have been sufficiently
-                distracted.</value>
+            <value>If destroyed, this facility will be considered to have been sufficiently distracted.</value>
         </entry>
         <entry>
             <key>FacilityHostileCapture.xml</key>
-            <value>If captured, this facility will be considered to have been sufficiently
-                distracted.</value>
+            <value>If captured, this facility will be considered to have been sufficiently distracted.</value>
         </entry>
     </linkedModifiers>
     <modifierName>Engage</modifierName>
@@ -36,8 +34,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Engage any hostile units with weapons fire or physical attacks for the
-                specified number of turns.</description>
+            <description>Engage any hostile units for the specified number of turns.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Custom</objectiveCriterion>
             <percentage>1</percentage>
