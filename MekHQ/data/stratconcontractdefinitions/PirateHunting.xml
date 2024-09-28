@@ -29,9 +29,11 @@
 			<objectiveCount>-0.33</objectiveCount>
 			<objectiveType>AnyScenarioVictory</objectiveType>
 			<objectiveScenarios>
+				<objectiveScenario>Convoy Escort.xml</objectiveScenario>
+				<objectiveScenario>Critical Convoy Escort.xml</objectiveScenario>
 				<objectiveScenario>Deep Raid.xml</objectiveScenario>
+				<objectiveScenario>DropShip Raid.xml</objectiveScenario>
 				<objectiveScenario>Isolated DropShip Defense.xml</objectiveScenario>
-				<objectiveScenario>Low-Atmosphere DropShip Assault.xml</objectiveScenario>
 			</objectiveScenarios>
 		</objectiveParameter>
 	</objectiveParameters>

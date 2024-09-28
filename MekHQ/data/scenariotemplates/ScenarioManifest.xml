@@ -176,5 +176,9 @@
             <key>43</key>
             <value>VIP Capture.xml</value>
         </entry>
+        <entry>
+            <key>44</key>
+            <value>VIP Defense.xml</value>
+        </entry>
     </scenarioFileNames>
 </scenarioManifest>

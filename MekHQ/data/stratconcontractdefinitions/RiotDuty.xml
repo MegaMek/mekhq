@@ -28,6 +28,7 @@
 			<objectiveScenarios>
 				<objectiveScenario>Irregular Force Assault.xml</objectiveScenario>
 				<objectiveScenario>Irregular Force Suppression.xml</objectiveScenario>
+				<objectiveScenario>VIP Defense.xml</objectiveScenario>
 			</objectiveScenarios>
 		</objectiveParameter>
 	</objectiveParameters>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Convoy Raid</name>
-    <shortBriefing>Intercept and disrupt enemy convoy.</shortBriefing>
-    <detailedBriefing>An enemy convoy carrying supplies is moving through the area. The objective is to prevent at least 50% of the convoy units from reaching the far edge of the map. The convoy will surrender if 50% of its escorts are destroyed or routed. Preserve 50% of friendly forces.</detailedBriefing>
+    <name>VIP Defense</name>
+    <shortBriefing>Protect VIP and defeat enemy.</shortBriefing>
+    <detailedBriefing>Your mission is to protect a high-value VIP while engaging the enemy. Defeat at least 50% of enemy forces and preserve 50% of your own. Ensure the VIP remains safe throughout the engagement to achieve mission success.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -26,7 +26,19 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones />
+                <deploymentZones>
+                    <deploymentZone>0</deploymentZone>
+                    <deploymentZone>1</deploymentZone>
+                    <deploymentZone>2</deploymentZone>
+                    <deploymentZone>3</deploymentZone>
+                    <deploymentZone>4</deploymentZone>
+                    <deploymentZone>5</deploymentZone>
+                    <deploymentZone>6</deploymentZone>
+                    <deploymentZone>7</deploymentZone>
+                    <deploymentZone>8</deploymentZone>
+                    <deploymentZone>9</deploymentZone>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -38,8 +50,37 @@
                 <minWeightClass>0</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeArc</syncDeploymentType>
-                <syncedForceName>Convoy</syncedForceName>
+                <syncDeploymentType>None</syncDeploymentType>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>VIP</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-2</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>true</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>true</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones />
+                <destinationZone>5</destinationZone>
+                <fixedUnitCount>1</fixedUnitCount>
+                <forceAlignment>0</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <fixedUnitCount>1</fixedUnitCount>
+                <forceName>VIP</forceName>
+                <generationMethod>3</generationMethod>
+                <generationOrder>1</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>3</minWeightClass>
+                <retreatThreshold>0</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <syncDeploymentType>SameEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -64,53 +105,19 @@
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>1</minWeightClass>
+                <minWeightClass>2</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>SameEdge</syncDeploymentType>
-                <syncedForceName>Convoy</syncedForceName>
-                <useArtillery>false</useArtillery>
-            </value>
-        </entry>
-        <entry>
-            <key>Convoy</key>
-            <value>
-                <actualDeploymentZone>-1</actualDeploymentZone>
-                <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-1</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>true</canReinforceLinked>
-                <contributesToBV>false</contributesToBV>
-                <contributesToMapSize>true</contributesToMapSize>
-                <contributesToUnitCount>false</contributesToUnitCount>
-                <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                </deploymentZones>
-                <destinationZone>6</destinationZone>
-                <fixedUnitCount>0</fixedUnitCount>
-                <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Convoy</forceName>
-                <generationMethod>2</generationMethod>
-                <generationOrder>5</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>1</minWeightClass>
-                <retreatThreshold>50</retreatThreshold>
-                <subjectToRandomRemoval>false</subjectToRandomRemoval>
-                <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
     </scenarioForces>
     <scenarioObjectives>
-        <scenarioObjective>
+        <objective>
             <associatedForceNames>
-                <associatedForceName>Convoy</associatedForceName>
+                <associatedForceName>VIP</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -127,37 +134,14 @@
                     <howMuch>2</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails />
-            <description>Prevent the following force(s) and unit(s) from reaching the far map edge:</description>
+            <description>Preserve 100% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>PreventReachMapEdge</objectiveCriterion>
-            <percentage>50</percentage>
+            <objectiveCriterion>Preserve</objectiveCriterion>
+            <percentage>100</percentage>
+            <timeLimit>0</timeLimit>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Convoy</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>SupportPointUpdate</effectType>
-                    <effectScaling>Linear</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects />
-            <additionalDetails />
-            <description>Capture intact units from the following force(s) for additional support
-                points:</description>
-            <destinationEdge>NONE</destinationEdge>
-            <fixedAmount>1</fixedAmount>
-            <objectiveCriterion>Capture</objectiveCriterion>
-            <percentage>1</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
+        </objective>
         <scenarioObjective>
             <associatedForceNames>
                 <associatedForceName>OpFor</associatedForceName>
@@ -170,14 +154,15 @@
                     <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
-            <failureEffect>
-                <effectType>ScenarioDefeat</effectType>
-                <effectScaling>Fixed</effectScaling>
-                <howMuch>1</howMuch>
-            </failureEffect>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s) to force convoy
-                surrender:</description>
+            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>

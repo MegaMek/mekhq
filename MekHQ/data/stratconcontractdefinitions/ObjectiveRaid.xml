@@ -30,6 +30,7 @@
 				<objectiveScenario>Covert Strike.xml</objectiveScenario>
 				<objectiveScenario>Convoy Interdiction.xml</objectiveScenario>
 				<objectiveScenario>Convoy Raid.xml</objectiveScenario>
+				<objectiveScenario>Deep Raid.xml</objectiveScenario>
 			</objectiveScenarios>
 		</objectiveParameter>
 	</objectiveParameters>
