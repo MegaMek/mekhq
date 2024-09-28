@@ -22,7 +22,7 @@
 		<fixedUnitCount>1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Grounded DropShip</forceName>
+		<forceName>DropShip</forceName>
 		<generationMethod>2</generationMethod>
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
@@ -31,5 +31,14 @@
 		<syncDeploymentType>SameEdge</syncDeploymentType>
 		<syncedForceName>OpFor</syncedForceName>
 		<useArtillery>false</useArtillery>
+        <roleChoices>
+            <forceRole>MEK_CARRIER</forceRole>
+            <forceRole>MEK_CARRIER</forceRole>
+            <forceRole>ASF_CARRIER</forceRole>
+            <forceRole>VEE_CARRIER</forceRole>
+            <forceRole>INFANTRY_CARRIER</forceRole>
+            <forceRole>TROOP_CARRIER</forceRole>
+            <forceRole>CIVILIAN</forceRole>
+        </roleChoices>
 	</forceDefinition>
 </AtBScenarioModifier>

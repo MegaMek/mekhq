@@ -200,6 +200,7 @@
                 <useArtillery>false</useArtillery>
                 <roleChoices>
                     <forceRole>MEK_CARRIER</forceRole>
+                    <forceRole>MEK_CARRIER</forceRole>
                     <forceRole>ASF_CARRIER</forceRole>
                     <forceRole>VEE_CARRIER</forceRole>
                     <forceRole>INFANTRY_CARRIER</forceRole>
