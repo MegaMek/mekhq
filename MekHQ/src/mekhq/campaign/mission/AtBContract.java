@@ -21,6 +21,7 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Compute;
@@ -691,6 +692,7 @@ public class AtBContract extends Contract {
 
         reRollLoyalty(ronin, ronin.getExperienceLevel(campaign, false));
         reRollAdvantages(campaign, ronin, ronin.getExperienceLevel(campaign, false));
+        ronin.setCallsign(RandomCallsignGenerator.getInstance().generate());
 
         campaign.recruitPerson(ronin, true);
     }
