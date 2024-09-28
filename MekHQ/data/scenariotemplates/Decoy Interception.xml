@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Intercept Engagement</name>
-    <shortBriefing>Break through or destroy intercepting force.</shortBriefing>
-    <detailedBriefing>An enemy force has intercepted your unit, attempting to block your advance. You must either break through or destroy them quickly. Ensure that at least 50% of your forces reach the destination edge, or destroy 75% of the enemy forces to complete the mission.</detailedBriefing>
+    <name>Decoy Interception</name>
+    <shortBriefing>Intercept enemy, act as decoy.</shortBriefing>
+    <detailedBriefing>Intercept enemy forces to draw them away from their objective. Maintain engagement for the specified duration or defeat 75% of the opposing force. Your losses are not a factor, as the mission's goal is to act as a decoy and divert the enemy's attention.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
@@ -27,10 +27,17 @@
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
+                    <deploymentZone>0</deploymentZone>
+                    <deploymentZone>1</deploymentZone>
                     <deploymentZone>2</deploymentZone>
+                    <deploymentZone>3</deploymentZone>
                     <deploymentZone>4</deploymentZone>
+                    <deploymentZone>5</deploymentZone>
                     <deploymentZone>6</deploymentZone>
+                    <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
+                    <deploymentZone>9</deploymentZone>
+                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -68,7 +75,7 @@
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>2</minWeightClass>
+                <minWeightClass>1</minWeightClass>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
@@ -80,7 +87,7 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
+                <associatedForceName>Primary Opfor</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -94,19 +101,17 @@
                 <failureEffect>
                     <effectType>ScenarioDefeat</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails>
-                <additionalDetail>Crippled units do not count towards this objective.</additionalDetail>
-            </additionalDetails>
-            <description>Reach the destination edge with 50% of the following force(s) and unit(s):</description>
+            <additionalDetails />
+            <description>Engage the following enemy unit(s) and force(s):</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>ReachMapEdge</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
+            <objectiveCriterion>Custom</objectiveCriterion>
+            <percentage>1</percentage>
+            <timeLimitAtMost>false</timeLimitAtMost>
+            <timeLimitScaleFactor>2</timeLimitScaleFactor>
+            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
@@ -128,11 +133,37 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 50% the following force(s) and unit(s):</description>
+            <description>Destroy or rout 75% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Destroy</objectiveCriterion>
+            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+            <percentage>75</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Player</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
-            <timeLimit>0</timeLimit>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>

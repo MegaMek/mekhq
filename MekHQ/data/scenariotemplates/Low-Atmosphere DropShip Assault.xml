@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Pivotal Engagement</name>
-    <shortBriefing>Decisive battle—defeat enemy forces.</shortBriefing>
-    <detailedBriefing>This is a pivotal battle. The objective is to defeat 75% of enemy units while keeping at least 25% of your forces operational. Success in this critical engagement is essential for the overall campaign.</detailedBriefing>
+    <name>Low-Atmosphere DropShip Assault</name>
+    <shortBriefing>Destroy DropShip before it escape.</shortBriefing>
+    <detailedBriefing>A hostile DropShip is attempting to escape in low atmosphere. Your mission is to destroy the DropShip before it can break free. Preserve at least 50% of your forces to ensure operational integrity during the assault.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
-        <baseHeight>0</baseHeight>
-        <baseWidth>0</baseWidth>
+        <baseHeight>50</baseHeight>
+        <baseWidth>50</baseWidth>
         <heightScalingIncrement>5</heightScalingIncrement>
-        <mapLocation>AllGroundTerrain</mapLocation>
+        <mapLocation>LowAtmosphere</mapLocation>
         <useStandardAtBSizing>true</useStandardAtBSizing>
         <widthScalingIncrement>5</widthScalingIncrement>
     </mapParameters>
@@ -19,25 +19,18 @@
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-2</allowedUnitType>
+                <allowedUnitType>-3</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>true</canReinforceLinked>
+                <canReinforceLinked>false</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>0</deploymentZone>
-                    <deploymentZone>1</deploymentZone>
                     <deploymentZone>2</deploymentZone>
-                    <deploymentZone>3</deploymentZone>
                     <deploymentZone>4</deploymentZone>
-                    <deploymentZone>5</deploymentZone>
                     <deploymentZone>6</deploymentZone>
-                    <deploymentZone>7</deploymentZone>
                     <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                    <deploymentZone>10</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -48,18 +41,50 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
+                <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
         <entry>
-            <key>Primary Opfor</key>
+            <key>Opfor Dropship</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-2</allowedUnitType>
+                <allowedUnitType>11</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>false</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>false</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones />
+                <destinationZone>6</destinationZone>
+                <fixedUnitCount>1</fixedUnitCount>
+                <forceAlignment>2</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Opfor Dropship</forceName>
+                <generationMethod>3</generationMethod>
+                <generationOrder>5</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>5</startingAltitude>
+                <subjectToRandomRemoval>false</subjectToRandomRemoval>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Player</syncedForceName>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>Opfor Escorts</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-3</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>true</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
@@ -68,16 +93,17 @@
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones />
                 <destinationZone>5</destinationZone>
-                <fixedUnitCount>0</fixedUnitCount>
+                <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary Opfor</forceName>
+                <forceName>Opfor Escorts</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>2</minWeightClass>
+                <minWeightClass>1</minWeightClass>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
+                <startingAltitude>5</startingAltitude>
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
@@ -87,7 +113,7 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Primary Opfor</associatedForceName>
+                <associatedForceName>Opfor Dropship</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -105,39 +131,39 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 75% of the following force(s) and unit(s):</description>
+            <description>Destroy or cripple the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>75</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>Player</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 25% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>25</percentage>
+            <percentage>100</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
+    <scenarioObjective>
+        <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+        </associatedForceNames>
+        <associatedUnitIDs />
+        <successEffects>
+            <successEffect>
+                <effectType>ScenarioVictory</effectType>
+                <effectScaling>Fixed</effectScaling>
+                <howMuch>1</howMuch>
+            </successEffect>
+        </successEffects>
+        <failureEffects>
+            <failureEffect>
+                <effectType>ScenarioDefeat</effectType>
+                <effectScaling>Fixed</effectScaling>
+                <howMuch>1</howMuch>
+            </failureEffect>
+        </failureEffects>
+        <additionalDetails />
+        <description>Preserve 50% of the following force(s) and unit(s):</description>
+        <destinationEdge>NONE</destinationEdge>
+        <objectiveCriterion>Preserve</objectiveCriterion>
+        <percentage>50</percentage>
+        <timeLimitAtMost>true</timeLimitAtMost>
+        <timeLimitType>None</timeLimitType>
+    </scenarioObjective>
 </ScenarioTemplate>

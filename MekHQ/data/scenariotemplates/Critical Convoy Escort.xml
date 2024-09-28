@@ -1,55 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Facility Assault</name>
-    <shortBriefing>Assault and weaken enemy-held facility.</shortBriefing>
-    <detailedBriefing>An enemy-controlled facility has been located, and your mission is to assault it. Destroy at least 75% of the defending forces while preserving at least 50% of your own forces to weaken the facility’s defenses and secure the area.</detailedBriefing>
-    <isHostileFacility>true</isHostileFacility>
+    <name>Critical Convoy Escort</name>
+    <shortBriefing>Escort critical convoy or defeat attackers.</shortBriefing>
+    <detailedBriefing>A convoy carrying vital supplies must be escorted through hostile territory. Ensure that at least 50% of the convoy reaches its destination. Crippled units only count if the enemy force is routed. Alternatively, destroy 50% of enemy forces while preserving 50% of friendly forces.</detailedBriefing>
+    <isHostileFacility>false</isHostileFacility>
+    <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
-        <allowedTerrainTypes>
-            <allowedTerrainType>ColdFacility</allowedTerrainType>
-            <allowedTerrainType>HotFacility</allowedTerrainType>
-            <allowedTerrainType>TemperateFacility</allowedTerrainType>
-        </allowedTerrainTypes>
+        <allowedTerrainTypes />
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>
         <baseWidth>0</baseWidth>
         <heightScalingIncrement>5</heightScalingIncrement>
-        <mapLocation>SpecificGroundTerrain</mapLocation>
+        <mapLocation>AllGroundTerrain</mapLocation>
         <useStandardAtBSizing>true</useStandardAtBSizing>
         <widthScalingIncrement>5</widthScalingIncrement>
     </mapParameters>
     <scenarioForces>
-        <entry>
-            <key>Base Turrets</key>
-            <value>
-                <actualDeploymentZone>-1</actualDeploymentZone>
-                <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>7</allowedUnitType>
-                <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>false</canReinforceLinked>
-                <contributesToBV>false</contributesToBV>
-                <contributesToMapSize>false</contributesToMapSize>
-                <contributesToUnitCount>false</contributesToUnitCount>
-                <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>10</deploymentZone>
-                </deploymentZones>
-                <destinationZone>5</destinationZone>
-                <fixedUnitCount>0</fixedUnitCount>
-                <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Base Turrets</forceName>
-                <generationMethod>2</generationMethod>
-                <generationOrder>5</generationOrder>
-                <maxWeightClass>4</maxWeightClass>
-                <minWeightClass>0</minWeightClass>
-                <objectiveLinkedForces />
-                <retreatThreshold>50</retreatThreshold>
-                <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
-                <useArtillery>false</useArtillery>
-            </value>
-        </entry>
         <entry>
             <key>Player</key>
             <value>
@@ -62,17 +28,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>1</deploymentZone>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>3</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>5</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>7</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
-                    <deploymentZone>9</deploymentZone>
-                </deploymentZones>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>0</forceAlignment>
@@ -85,7 +41,8 @@
                 <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>None</syncDeploymentType>
+                <syncDeploymentType>SameEdge</syncDeploymentType>
+                <syncedForceName>Convoy</syncedForceName>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
@@ -101,9 +58,7 @@
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones>
-                    <deploymentZone>10</deploymentZone>
-                </deploymentZones>
+                <deploymentZones />
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
@@ -111,6 +66,41 @@
                 <forceName>Primary Opfor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
+                <maxWeightClass>4</maxWeightClass>
+                <minWeightClass>2</minWeightClass>
+                <objectiveLinkedForces />
+                <retreatThreshold>50</retreatThreshold>
+                <startingAltitude>0</startingAltitude>
+                <syncDeploymentType>OppositeEdge</syncDeploymentType>
+                <syncedForceName>Convoy</syncedForceName>
+                <useArtillery>false</useArtillery>
+            </value>
+        </entry>
+        <entry>
+            <key>Convoy</key>
+            <value>
+                <actualDeploymentZone>-1</actualDeploymentZone>
+                <allowAeroBombs>false</allowAeroBombs>
+                <allowedUnitType>-1</allowedUnitType>
+                <arrivalTurn>0</arrivalTurn>
+                <canReinforceLinked>false</canReinforceLinked>
+                <contributesToBV>true</contributesToBV>
+                <contributesToMapSize>true</contributesToMapSize>
+                <contributesToUnitCount>true</contributesToUnitCount>
+                <deployOffboard>false</deployOffboard>
+                <deploymentZones>
+                    <deploymentZone>2</deploymentZone>
+                    <deploymentZone>4</deploymentZone>
+                    <deploymentZone>6</deploymentZone>
+                    <deploymentZone>8</deploymentZone>
+                </deploymentZones>
+                <destinationZone>6</destinationZone>
+                <fixedUnitCount>0</fixedUnitCount>
+                <forceAlignment>1</forceAlignment>
+                <forceMultiplier>1.0</forceMultiplier>
+                <forceName>Convoy</forceName>
+                <generationMethod>2</generationMethod>
+                <generationOrder>4</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>
                 <objectiveLinkedForces />
@@ -122,6 +112,58 @@
         </entry>
     </scenarioForces>
     <scenarioObjectives>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Convoy</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>2</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>50% of the following force(s) must reach the far edge of the map:</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>ReachMapEdge</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimit>0</timeLimit>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Convoy</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>SupportPointUpdate</effectType>
+                    <effectScaling>Linear</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects />
+            <additionalDetails>
+                <additionalDetail>Crippled units only count if the opposing force is routed.</additionalDetail>
+            </additionalDetails>
+            <description>Preserve convoy units to receive 1 support point per surviving unit:</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
+            <percentage>50</percentage>
+            <timeLimit>0</timeLimit>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
                 <associatedForceName>Primary Opfor</associatedForceName>
@@ -142,10 +184,11 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy or rout 75% of the defending force(s):</description>
+            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>75</percentage>
+            <percentage>50</percentage>
+            <timeLimit>0</timeLimit>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>

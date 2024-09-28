@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Intercept Engagement</name>
-    <shortBriefing>Break through or destroy intercepting force.</shortBriefing>
-    <detailedBriefing>An enemy force has intercepted your unit, attempting to block your advance. You must either break through or destroy them quickly. Ensure that at least 50% of your forces reach the destination edge, or destroy 75% of the enemy forces to complete the mission.</detailedBriefing>
+    <name>Frontline Breakthrough</name>
+    <shortBriefing>Break through enemy battlelines.</shortBriefing>
+    <detailedBriefing>The mission is to penetrate the main enemy battlelines and reach the opposite edge of the battlefield. At least 50% of your units, fully operational, must break through. Alternatively, victory can be achieved by destroying at least 50% of the enemy forces defending the line.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes />
-        <allowRotation>false</allowRotation>
-        <baseHeight>0</baseHeight>
-        <baseWidth>0</baseWidth>
-        <heightScalingIncrement>5</heightScalingIncrement>
+        <allowRotation>true</allowRotation>
+        <baseHeight>50</baseHeight>
+        <baseWidth>17</baseWidth>
+        <heightScalingIncrement>0</heightScalingIncrement>
         <mapLocation>AllGroundTerrain</mapLocation>
-        <useStandardAtBSizing>true</useStandardAtBSizing>
-        <widthScalingIncrement>5</widthScalingIncrement>
+        <useStandardAtBSizing>false</useStandardAtBSizing>
+        <widthScalingIncrement>1</widthScalingIncrement>
     </mapParameters>
     <scenarioForces>
         <entry>
@@ -27,10 +27,7 @@
                 <contributesToUnitCount>true</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>
-                    <deploymentZone>2</deploymentZone>
-                    <deploymentZone>4</deploymentZone>
-                    <deploymentZone>6</deploymentZone>
-                    <deploymentZone>8</deploymentZone>
+                    <deploymentZone>11</deploymentZone>
                 </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
@@ -41,6 +38,7 @@
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
@@ -54,25 +52,27 @@
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>-2</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
-                <canReinforceLinked>true</canReinforceLinked>
+                <canReinforceLinked>false</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
-                <deploymentZones />
+                <deploymentZones>
+                    <deploymentZone>10</deploymentZone>
+                </deploymentZones>
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
-                <forceMultiplier>1.25</forceMultiplier>
+                <forceMultiplier>1.5</forceMultiplier>
                 <forceName>Primary Opfor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>2</minWeightClass>
+                <objectiveLinkedForces />
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
-                <syncDeploymentType>OppositeEdge</syncDeploymentType>
-                <syncedForceName>Player</syncedForceName>
+                <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
             </value>
         </entry>
