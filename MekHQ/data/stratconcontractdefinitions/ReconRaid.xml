@@ -31,7 +31,7 @@
 			<objectiveType>SpecificScenarioVictory</objectiveType>
 			<objectiveCount>-0.5</objectiveCount>
 			<objectiveScenarios>
-				<objectiveScenario>Recon.xml</objectiveScenario>
+				<objectiveScenario>Recon Evasion.xml</objectiveScenario>
 			</objectiveScenarios>
 		</objectiveParameter>
 	</objectiveParameters>

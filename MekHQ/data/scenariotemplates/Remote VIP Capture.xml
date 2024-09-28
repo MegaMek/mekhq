@@ -84,7 +84,7 @@
             </value>
         </entry>
         <entry>
-            <key>Designated Target</key>
+            <key>VIP</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -100,7 +100,7 @@
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Designated Target</forceName>
+                <forceName>VIP</forceName>
                 <generationMethod>3</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -117,7 +117,7 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Designated Target</associatedForceName>
+                <associatedForceName>VIP</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>

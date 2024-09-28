@@ -26,7 +26,8 @@
 			<objectiveCount>-0.5</objectiveCount>
 			<objectiveType>SpecificScenarioVictory</objectiveType>
 			<objectiveScenarios>
-				<objectiveScenario>Irregular Forces.xml</objectiveScenario>
+				<objectiveScenario>Irregular Force Assault.xml</objectiveScenario>
+				<objectiveScenario>Irregular Force Suppression.xml</objectiveScenario>
 			</objectiveScenarios>
 		</objectiveParameter>
 	</objectiveParameters>
