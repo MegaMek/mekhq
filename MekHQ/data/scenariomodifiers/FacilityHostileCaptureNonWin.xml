@@ -38,7 +38,7 @@
 		</objective>
 		<objective>
 			<associatedForceNames>
-				<associatedForceName>Primary Opfor</associatedForceName>
+				<associatedForceName>OpFor</associatedForceName>
 			</associatedForceNames>
 			<associatedUnitIDs />
 			<successEffects>

@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An enemy dropship has been grounded in this area, but its weapons are
+	<additionalBriefingText>An enemy DropShip has been grounded in this area, but its weapons are
 		still active so pay attention.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
@@ -22,14 +22,14 @@
 		<fixedUnitCount>1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Grounded Dropship</forceName>
+		<forceName>Grounded DropShip</forceName>
 		<generationMethod>2</generationMethod>
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<syncDeploymentType>SameEdge</syncDeploymentType>
-		<syncedForceName>Primary Opfor</syncedForceName>
+		<syncedForceName>OpFor</syncedForceName>
 		<useArtillery>false</useArtillery>
 	</forceDefinition>
 </AtBScenarioModifier>
