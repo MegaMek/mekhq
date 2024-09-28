@@ -21,6 +21,10 @@ public class BatchallFactions {
         "mekhq.resources.FameAndInfamy",
         MekHQ.getMHQOptions().getLocale());
 
+    public static final List<String> BATCHALL_FACTIONS = List.of("CBS", "CB", "CCC", "CCO",
+        "CDS", "CFM", "CGB", "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ", "CSR", "CSA", "CSV",
+        "CSL", "CWI", "CW", "CWE", "CWIE", "CEI", "RD", "RA", "CP", "AML", "CLAN");
+
     /**
      * Determines whether a given faction engages in batchalling.
      *
@@ -32,11 +36,7 @@ public class BatchallFactions {
             return false;
         }
 
-        List<String> factionCodes = List.of("CBS", "CB", "CCC", "CCO", "CDS", "CFM", "CGB",
-            "CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ", "CSR", "CSA", "CSV", "CSL", "CWI", "CW",
-            "CWE", "CWIE", "CEI", "RD", "RA", "CP", "AML", "CLAN");
-
-        return factionCodes.contains(factionCode);
+        return BATCHALL_FACTIONS.contains(factionCode);
     }
 
     /**

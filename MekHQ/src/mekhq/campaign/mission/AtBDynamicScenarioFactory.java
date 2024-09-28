@@ -20,8 +20,6 @@ package mekhq.campaign.mission;
 
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.*;
-import megamek.client.generator.enums.SkillGeneratorType;
-import megamek.client.generator.*;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.StratConSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
@@ -62,12 +60,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.enums.EraFlag;
-
-import java.io.File;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -100,6 +93,10 @@ public class AtBDynamicScenarioFactory {
     private static final int IS_LANCE_SIZE = 4;
     private static final int CLAN_MH_LANCE_SIZE = 5;
     private static final int COMSTAR_LANCE_SIZE = 6;
+
+    private static final double STRICT = 0.75;
+    private static final double OPPORTUNISTIC = 1.0;
+    private static final double LIBERAL = 1.25;
 
     private static final int REINFORCEMENT_ARRIVAL_SCALE = 30;
 
@@ -790,12 +787,19 @@ public class AtBDynamicScenarioFactory {
         }
         scenario.addBotForce(generatedForce, forceTemplate, campaign);
 
-        if (contract.isBatchallAccepted()) {
+        if (generatedForce.getTeam() != 1
+            && campaign.getCampaignOptions().isUseGenericBattleValue()
+            && BatchallFactions.usesBatchalls(factionCode)
+            && contract.isBatchallAccepted()) {
             // Simulate bidding away of forces
             List<String> bidAwayForces = new ArrayList<>();
             int supplementedForces = 0;
 
-            if (faction.isClan() && campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            if (generatedForce.getTeam() != 1
+                && campaign.getCampaignOptions().isUseGenericBattleValue()
+                && BatchallFactions.usesBatchalls(factionCode)
+                && contract.isBatchallAccepted()) {
+
                 // Add dialog
                 bidAwayForces = new ArrayList<>();
 
@@ -871,11 +875,12 @@ public class AtBDynamicScenarioFactory {
             }
 
             // Report the bidding results (if any) to the player
-            if (generatedForce.getTeam() != 1) {
-                if (!bidAwayForces.isEmpty() || supplementedForces > 0) {
-                    reportResultsOfBidding(scenario, campaign, bidAwayForces, generatedForce,
-                            supplementedForces);
-                }
+            if (generatedForce.getTeam() != 1
+                && campaign.getCampaignOptions().isUseGenericBattleValue()
+                && BatchallFactions.usesBatchalls(factionCode)
+                && contract.isBatchallAccepted()) {
+                reportResultsOfBidding(scenario, campaign, bidAwayForces, generatedForce,
+                    supplementedForces, factionCode);
             }
         }
 
@@ -890,21 +895,36 @@ public class AtBDynamicScenarioFactory {
      * @return the honor rating as a double value
      */
     private static double getHonorRating(Campaign campaign, String factionCode) {
-        final double STRICT = 1.25;
-        final double OPPORTUNISTIC = 1.5;
-        final double LIBERAL = 1.75;
-
-        boolean isPostInvasion = campaign.getLocalDate().getYear() > 3061;
+        // Our research showed the post-Invasion shift in Clan doctrine to occur between 3053 and 3055
+        boolean isPostInvasion = campaign.getLocalDate().getYear() >= 3053 + Compute.randomInt(2);
 
         // This is based on the table found on page 274 of Total Warfare
         // Any Clan not mentioned on that table is assumed to be Strict → Opportunistic
         return switch (factionCode) {
             case "CCC", "CHH", "CIH", "CNC", "CSR" -> OPPORTUNISTIC;
             case "CCO", "CGS", "CSV" -> STRICT;
-            case "CGB", "CWIE" -> isPostInvasion ? STRICT : LIBERAL;
+            case "CGB", "CWIE" -> {
+                if (isPostInvasion) {
+                    yield LIBERAL;
+                } else {
+                    yield STRICT;
+                }
+            }
             case "CDS" -> LIBERAL;
-            case "CW" -> isPostInvasion ? LIBERAL : OPPORTUNISTIC;
-            default -> isPostInvasion ? STRICT : OPPORTUNISTIC;
+            case "CW" -> {
+                if (isPostInvasion) {
+                    yield LIBERAL;
+                } else {
+                    yield OPPORTUNISTIC;
+                }
+            }
+            default -> {
+                if (isPostInvasion) {
+                    yield OPPORTUNISTIC;
+                } else {
+                    yield STRICT;
+                }
+            }
         };
     }
 
@@ -919,7 +939,22 @@ public class AtBDynamicScenarioFactory {
      */
     private static void reportResultsOfBidding(AtBDynamicScenario scenario, Campaign campaign,
                                                List<String> bidAwayForces, BotForce generatedForce,
-                                               int supplementedForces) {
+                                               int supplementedForces, String factionCode) {
+        double honor = getHonorRating(campaign, factionCode);
+        String honorLevel;
+
+        if (honor == STRICT) {
+            honorLevel = "STRICT";
+        } else if (honor == OPPORTUNISTIC) {
+            honorLevel = "OPPORTUNISTIC";
+        } else {
+            honorLevel = "LIBERAL";
+        }
+
+        logger.info(String.format("The honor of %s is rated as %s",
+            Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()),
+            honorLevel));
+
         boolean useVerboseBidding = campaign.getCampaignOptions().isUseVerboseBidding();
         StringBuilder report = new StringBuilder();
 
@@ -934,29 +969,46 @@ public class AtBDynamicScenarioFactory {
                 }
             }
         } else {
-            report.append(String.format(resources.getString("bidAwayForces.text"),
-                    generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
-                    bidAwayForces.size()));
+            if (!bidAwayForces.isEmpty()) {
+                report.append(String.format(resources.getString("bidAwayForces.text"),
+                        generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
+                        bidAwayForces.size(), bidAwayForces.size() > 1 ? "s" : ""));
+
+                boolean isUseLoggerHeader = true;
+                for (String unitName : bidAwayForces) {
+                    if (isUseLoggerHeader) {
+                        logger.info(String.format(resources.getString("bidAwayForcesLogger.text"),
+                            generatedForce.getName(), scenario.getName(), scenario.getContract(campaign)));
+                        isUseLoggerHeader = false;
+                    }
+                    logger.info(unitName);
+                }
+            }
         }
 
         if (supplementedForces > 0) {
             if (report.isEmpty()) {
                 report.append(String.format(resources.getString("addedBattleArmorNewReport.text"),
                         generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
-                        supplementedForces));
+                        supplementedForces, supplementedForces > 1 ? "s" : ""));
             } else {
                 report.append(String.format(
                         resources.getString("addedBattleArmorContinueReport.text"),
-                        supplementedForces));
+                        supplementedForces, supplementedForces > 1 ? "s" : ""));
             }
         }
 
-        if (!report.isEmpty()) {
+        if (supplementedForces > 0 || !bidAwayForces.isEmpty()) {
             if (Compute.randomInt(8) == 0) {
                 report.append(resources.getString("batchallConcludedVersion2.text"));
             } else {
                 report.append(resources.getString("batchallConcludedVersion1.text"));
             }
+        }
+
+        if (supplementedForces == 0 && bidAwayForces.isEmpty()) {
+            logger.info(String.format(resources.getString("nothingBidAway.text"),
+                generatedForce.getName(), scenario.getName(), scenario.getContract(campaign)));
         }
 
         campaign.addReport(report.toString());
