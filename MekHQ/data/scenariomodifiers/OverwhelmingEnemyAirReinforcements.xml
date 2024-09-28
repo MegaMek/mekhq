@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An overwhelming enemy aerospace force has been detected approaching the
-		area.</additionalBriefingText>
+	<additionalBriefingText>An overwhelming enemy aerospace force has been detected approaching the area.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>Space</allowedMapLocation>
 		<allowedMapLocation>LowAtmosphere</allowedMapLocation>
