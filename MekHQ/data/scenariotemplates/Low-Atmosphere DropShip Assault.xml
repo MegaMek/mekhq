@@ -77,6 +77,14 @@
                 <syncDeploymentType>OppositeEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>MEK_CARRIER</forceRole>
+                    <forceRole>ASF_CARRIER</forceRole>
+                    <forceRole>VEE_CARRIER</forceRole>
+                    <forceRole>INFANTRY_CARRIER</forceRole>
+                    <forceRole>TROOP_CARRIER</forceRole>
+                    <forceRole>CIVILIAN</forceRole>
+                </roleChoices>
             </value>
         </entry>
         <entry>
