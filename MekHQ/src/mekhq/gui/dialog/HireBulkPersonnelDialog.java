@@ -367,7 +367,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
             int experienceLevel = person.getExperienceLevel(campaign, false);
 
-            reRollLoyalty(campaign, person, experienceLevel);
+            reRollLoyalty(person, experienceLevel);
             reRollAdvantages(campaign, person, experienceLevel);
 
             if (!campaign.recruitPerson(person, isGmHire)) {
@@ -402,11 +402,10 @@ public class HireBulkPersonnelDialog extends JDialog {
     /**
      * Re-rolls the loyalty of a person based on their experience level.
      *
-     * @param campaign       The current campaign.
      * @param person         The person whose loyalty is being re-rolled.
      * @param experienceLevel The experience level of the person.
      */
-    public static void reRollLoyalty(Campaign campaign, Person person, int experienceLevel) {
+    public static void reRollLoyalty(Person person, int experienceLevel) {
         if (experienceLevel <= 0) {
             person.setLoyalty(Compute.d6(3) + 2);
         } else if (experienceLevel == 1) {

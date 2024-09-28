@@ -689,7 +689,7 @@ public class AtBContract extends Contract {
         overrideSkills(campaign, ronin, PersonnelRole.MEKWARRIOR,
             Objects.requireNonNull(SkillLevel.VETERAN).ordinal());
 
-        reRollLoyalty(campaign, ronin, ronin.getExperienceLevel(campaign, false));
+        reRollLoyalty(ronin, ronin.getExperienceLevel(campaign, false));
         reRollAdvantages(campaign, ronin, ronin.getExperienceLevel(campaign, false));
 
         campaign.recruitPerson(ronin, true);
