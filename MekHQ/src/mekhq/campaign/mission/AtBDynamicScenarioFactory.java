@@ -69,6 +69,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.lang.Math.round;
+import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
 
@@ -823,7 +824,8 @@ public class AtBDynamicScenarioFactory {
                 }
 
                 // There is no point in adding extra Battle Armor to non-ground scenarios
-                if (scenario.getBoardType() == T_GROUND) {
+                // Similarly, there is no point adding Battle Armor to scenarios they cannot survive in.
+                if (scenario.getBoardType() == T_GROUND && scenario.getWind() != TORNADO_F4) {
                     // We want to purposefully exclude off-board artillery, to stop them being
                     // assigned random units of Battle Armor.
                     // If we ever implement the ability to move those units on-board, or for players
