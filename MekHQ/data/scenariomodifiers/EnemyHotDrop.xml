@@ -13,9 +13,9 @@
 		<allowedUnitType>-2</allowedUnitType>
 		<arrivalTurn>-3</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>true</contributesToBV>
+		<contributesToBV>false</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>true</contributesToUnitCount>
+		<contributesToUnitCount>false</contributesToUnitCount>
 		<deploymentZones>
 			<deploymentZone>10</deploymentZone>
 		</deploymentZones>

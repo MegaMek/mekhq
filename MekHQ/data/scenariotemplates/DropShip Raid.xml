@@ -87,14 +87,14 @@
             </value>
         </entry>
         <entry>
-            <key>Dropship</key>
+            <key>DropShip</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
                 <allowedUnitType>11</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>false</canReinforceLinked>
-                <contributesToBV>true</contributesToBV>
+                <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
@@ -105,7 +105,7 @@
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Dropship</forceName>
+                <forceName>DropShip</forceName>
                 <generationMethod>2</generationMethod>
                 <generationOrder>3</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -122,7 +122,7 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Dropship</associatedForceName>
+                <associatedForceName>DropShip</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -140,7 +140,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails>
-                <additionalDetail>If the dropship cannot be deployed, this objective may be ignored.</additionalDetail>
+                <additionalDetail>If the DropShip cannot be deployed, this objective may be ignored.</additionalDetail>
             </additionalDetails>
             <description>Destroy or cripple the following unit(s):</description>
             <destinationEdge>NONE</destinationEdge>

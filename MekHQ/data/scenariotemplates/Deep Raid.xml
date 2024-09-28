@@ -94,7 +94,7 @@
                 <allowedUnitType>11</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>false</canReinforceLinked>
-                <contributesToBV>true</contributesToBV>
+                <contributesToBV>false</contributesToBV>
                 <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
@@ -105,8 +105,8 @@
                 <fixedUnitCount>1</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Dropship</forceName>
-                <generationMethod>2</generationMethod>
+                <forceName>DropShip</forceName>
+                <generationMethod>4</generationMethod>
                 <generationOrder>3</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>0</minWeightClass>

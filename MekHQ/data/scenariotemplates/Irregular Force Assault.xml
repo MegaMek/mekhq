@@ -98,7 +98,7 @@
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>false</canReinforceLinked>
                 <contributesToBV>false</contributesToBV>
-                <contributesToMapSize>false</contributesToMapSize>
+                <contributesToMapSize>true</contributesToMapSize>
                 <contributesToUnitCount>false</contributesToUnitCount>
                 <deployOffboard>false</deployOffboard>
                 <deploymentZones>

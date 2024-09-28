@@ -25,7 +25,7 @@
         <generationMethod>2</generationMethod>
         <generationOrder>1</generationOrder>
         <maxWeightClass>4</maxWeightClass>
-        <minWeightClass>2</minWeightClass>
+        <minWeightClass>1</minWeightClass>
         <retreatThreshold>0</retreatThreshold>
         <startingAltitude>0</startingAltitude>
         <objectiveLinkedForces>
