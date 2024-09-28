@@ -16,7 +16,7 @@
     <objectives>
         <objective>
             <associatedForceNames>
-                <associatedForceName>Base Turrets</associatedForceName>
+                <associatedForceName>Base Defenses</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>

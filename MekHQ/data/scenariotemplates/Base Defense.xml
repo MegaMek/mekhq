@@ -38,7 +38,7 @@
                 <destinationZone>5</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
-                <forceMultiplier>0.25</forceMultiplier>
+                <forceMultiplier>0.1</forceMultiplier>
                 <forceName>Base Defenses</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>4</generationOrder>
