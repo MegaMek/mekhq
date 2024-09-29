@@ -20,16 +20,15 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * This object tracks a specific skill prerequisite for a special ability. This
@@ -166,14 +165,14 @@ public class SkillPerquisite {
             int lvl = skillSet.get(key);
             String skillLvl = "";
             if (lvl >= SkillType.EXP_GREEN) {
-                skillLvl = SkillType.getExperienceLevelName(lvl) + " ";
+                skillLvl = SkillType.getExperienceLevelName(lvl) + ' ';
             }
             toReturn += skillLvl + SkillType.getType(key).getName();
             if (enumKeys.hasMoreElements()) {
                 toReturn += "<br>OR ";
             }
         }
-        return "{" + toReturn + "}";
+        return '{' + toReturn + '}';
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
@@ -201,6 +200,18 @@ public class SkillPerquisite {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("skill")) {
                     String skillName = wn2.getTextContent();
+
+                    // <50.01 compatibility handlers
+                    skillName = skillName.replaceAll("Piloting/Mech::", "Piloting/Mek::");
+                    skillName = skillName.replaceAll("Gunnery/Mech::", "Gunnery/Mek::");
+                    skillName = skillName.replaceAll("Gunnery/Battlesuit::", "Gunnery/BattleArmor::");
+                    skillName = skillName.replaceAll("Gunnery/ProtoMech::", "Gunnery/ProtoMek::");
+                    skillName = skillName.replaceAll("Anti-Mech::", "Anti-Mek::");
+                    skillName = skillName.replaceAll("Tech/Mech::", "Tech/Mek::");
+                    skillName = skillName.replaceAll("Tech/BA::", "Tech/BattleArmor::");
+                    skillName = skillName.replaceAll("Medtech::", "MedTech::");
+                    // end compatibility handlers
+
                     int level = 0;
                     if (skillName.contains("::")) {
                         level = parseStringForLevel(skillName);
