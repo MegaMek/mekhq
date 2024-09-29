@@ -18,20 +18,6 @@
  */
 package mekhq.gui;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
@@ -48,12 +34,18 @@ import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.UnitTableModel;
-import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.PersonTitleStringSorter;
-import mekhq.gui.sorter.UnitStatusSorter;
-import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.gui.sorter.WeightClassSorter;
+import mekhq.gui.sorter.*;
 import mekhq.gui.view.UnitViewPanel;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /**
  * Displays a table of all units in the force.
@@ -79,7 +71,7 @@ public final class HangarTab extends CampaignGuiTab {
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
-    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
             MekHQ.getMHQOptions().getLocale());
 
     // region Constructors
@@ -170,6 +162,7 @@ public final class HangarTab extends CampaignGuiTab {
         unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         unitSorter.setComparator(UnitTableModel.COL_PILOT, new PersonTitleStringSorter(getCampaign()));
         unitSorter.setComparator(UnitTableModel.COL_TECH_CRW, new PersonTitleStringSorter(getCampaign()));
+        unitSorter.setComparator(UnitTableModel.COL_MAINTAIN, new FormattedNumberSorter());
         unitTable.setRowSorter(unitSorter);
         List<SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
