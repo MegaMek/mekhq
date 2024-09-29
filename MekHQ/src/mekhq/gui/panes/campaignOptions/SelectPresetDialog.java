@@ -3,8 +3,6 @@ package mekhq.gui.panes.campaignOptions;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignPreset;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -17,7 +15,6 @@ import static megamek.client.ui.WrapLayout.wordWrap;
  * A dialog for selecting campaign presets.
  */
 public class SelectPresetDialog extends JDialog {
-    private static final Logger log = LogManager.getLogger(SelectPresetDialog.class);
     // region Variable Declarations
     private static String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,

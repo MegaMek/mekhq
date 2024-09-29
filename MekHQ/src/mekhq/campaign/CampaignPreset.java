@@ -52,11 +52,11 @@ import java.util.stream.Collectors;
 /**
  * This is an object which holds a set of objects that collectively define the
  * initial options setup for a campaign.
- *
+ * <p>
  * It includes both startup values, which are only used on initial startup (the
  * date, starting planet, and rank system), and continuous options, which can be
  * applied at any time (campaign options, skills, SPAs).
- *
+ * <p>
  * It also includes a short title and description that allows one to create and
  * save different presets. The goal is to allow users to create and load various
  * different presets.
