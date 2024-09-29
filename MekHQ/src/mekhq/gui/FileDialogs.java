@@ -18,19 +18,18 @@
  */
 package mekhq.gui;
 
-import java.io.File;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-
-import javax.swing.JFrame;
-
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignPreset;
+import mekhq.campaign.campaignOptions.CampaignPreset;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.io.FileType;
+
+import javax.swing.*;
+import java.io.File;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 /**
  * Utility class with methods to show the various open/save file dialogs

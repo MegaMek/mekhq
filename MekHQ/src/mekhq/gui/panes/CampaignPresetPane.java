@@ -18,24 +18,18 @@
  */
 package mekhq.gui.panes;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-
 import megamek.client.ui.preferences.JListPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.CampaignPreset;
+import mekhq.campaign.campaignOptions.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.renderers.CampaignPresetRenderer;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class CampaignPresetPane extends AbstractMHQScrollPane {
     private static final MMLogger logger = MMLogger.create(CampaignPresetPane.class);

@@ -18,19 +18,19 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Aggression;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Ambition;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Greed;
 import mekhq.campaign.personnel.randomEvents.enums.personalities.Social;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CommandRating {
     private static final MMLogger logger = MMLogger.create(CommandRating.class);

@@ -37,8 +37,8 @@ import megamek.logging.MMLogger;
 import mekhq.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.CampaignPreset;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignPreset;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
@@ -1545,7 +1545,7 @@ public class CampaignGUI extends JPanel {
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
             miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         }
-        
+
         AbstractContractMarket contractMarket = getCampaign().getContractMarket();
         if (contractMarket.getMethod() != newOptions.getContractMarketMethod()) {
             getCampaign().setContractMarket(newOptions.getContractMarketMethod().getContractMarket());

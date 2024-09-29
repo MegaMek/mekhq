@@ -18,7 +18,7 @@
  */
 package mekhq.gui.renderers;
 
-import mekhq.campaign.CampaignPreset;
+import mekhq.campaign.campaignOptions.CampaignPreset;
 import mekhq.gui.panels.CampaignPresetPanel;
 
 import javax.swing.*;

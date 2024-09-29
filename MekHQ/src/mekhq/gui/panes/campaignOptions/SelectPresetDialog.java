@@ -2,7 +2,7 @@ package mekhq.gui.panes.campaignOptions;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.CampaignPreset;
+import mekhq.campaign.campaignOptions.CampaignPreset;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;

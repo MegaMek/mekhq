@@ -18,7 +18,7 @@
  */
 package mekhq.campaign.personnel.divorce;
 
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 
 public class DisabledRandomDivorce extends AbstractDivorce {

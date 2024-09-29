@@ -19,7 +19,7 @@
 package mekhq.gui.dialog;
 
 import megamek.common.annotations.Nullable;
-import mekhq.campaign.CampaignPreset;
+import mekhq.campaign.campaignOptions.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.CampaignPresetPane;
 
