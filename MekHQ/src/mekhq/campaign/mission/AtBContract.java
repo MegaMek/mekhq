@@ -1753,8 +1753,7 @@ public class AtBContract extends Contract {
         // Estimate the power of the enemy forces
         SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(enemyCode, enemySkill);
         double enemySkillMultiplier = getSkillMultiplier(opposingSkill);
-        String enemy = sanitizeFactionCode(enemyCode, employerCode);
-        int enemyPower = getAverageBattleValue(campaign, enemy, enemyQuality);
+        int enemyPower = getAverageBattleValue(campaign, enemyCode, enemyQuality);
 
         // If we cannot calculate enemy power, abort.
         if (enemyPower == 0) {
@@ -1771,8 +1770,7 @@ public class AtBContract extends Contract {
         if (!getCommandRights().isIndependent()) {
             SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
             double allySkillMultiplier = getSkillMultiplier(alliedSkill);
-            String ally = sanitizeFactionCode(employerCode, enemyCode);
-            allyPower = getAverageBattleValue(campaign, ally, allyQuality);
+            allyPower = getAverageBattleValue(campaign, employerCode, allyQuality);
 
             // If we cannot calculate ally's power, use player power as a fallback.
             if (allyPower == 0) {
@@ -1793,27 +1791,6 @@ public class AtBContract extends Contract {
         double percentDifference = (difference / playerPower) * 100;
 
         return (int) round(percentDifference / 20);
-    }
-
-    /**
-     * Sanitizes the faction code.
-     * Some factions don't have entries in the RAT Generator, so we substitute similar factions in
-     * their stead.
-     *
-     * @param factionCode          the faction code to be sanitized
-     * @param opposingFactionCode  the opposing faction code
-     * @return the sanitized faction code
-     */
-    private String sanitizeFactionCode(String factionCode, String opposingFactionCode) {
-        if (Objects.equals(this.enemyCode, "REB")) {
-            return opposingFactionCode;
-        }
-
-        if (Objects.equals(this.enemyCode, "IND")) {
-            return "MERC";
-        }
-
-        return factionCode;
     }
 
     /**
@@ -1895,8 +1872,7 @@ public class AtBContract extends Contract {
             return ERROR;
         }
 
-        UnitTable unitTable = null;
-        boolean tableFetchSuccessful = false;
+        UnitTable unitTable;
         try {
             unitTable = findTable(
                 faction,
@@ -1910,35 +1886,7 @@ public class AtBContract extends Contract {
                 new ArrayList<>(),
                 0,
                 faction);
-
-            tableFetchSuccessful = true;
-        } catch (Exception e) {
-            // If we cannot get a unitTable for the faction, try its parent factions
-            for (String parentFaction : faction.getParentFactions()) {
-                faction = ratGenerator.getFaction(parentFaction);
-
-                try {
-                    unitTable = findTable(
-                        faction,
-                        MEK,
-                        campaign.getGameYear(),
-                        String.valueOf(quality),
-                        new ArrayList<>(),
-                        NETWORK_NONE,
-                        new ArrayList<>(),
-                        new ArrayList<>(),
-                        new ArrayList<>(),
-                        0,
-                        faction);
-
-                    tableFetchSuccessful = true;
-                    break;
-                } catch (Exception ignored) {}
-            }
-        }
-
-        // If all our fallback factions were also unsuccessful, return 0 as a default value.
-        if (!tableFetchSuccessful) {
+        } catch (Exception ignored) {
             return ERROR;
         }
 
