@@ -18,31 +18,23 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.*;
-import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.text.DefaultFormatterFactory;
-
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+
+import javax.swing.*;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.text.DefaultFormatterFactory;
+import java.awt.*;
+import java.awt.event.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import static megamek.client.ui.WrapLayout.wordWrap;
 
 /**
  * Hovanes Gambaryan Henry Demirchian CSUN, CS 585 Professor Mike Barnes
@@ -77,21 +69,38 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
 
+    private static final int ERA_AGE_OF_WAR = 0;
+    private static final int ERA_STAR_LEAGUE = 1;
+    private static final int ERA_EARLY_SUCCESSION_WAR = 2;
+    private static final int ERA_LATE_SUCCESSION_WAR_LOSTECH = 3;
+    private static final int ERA_LATE_SUCCESSION_WAR_RENAISSANCE = 4;
+    private static final int ERA_CLAN_INVASION = 5;
+    private static final int ERA_CIVIL_WAR = 6;
+    private static final int ERA_JIHAD = 7;
+    private static final int ERA_EARLY_REPUBLIC = 8;
+    private static final int ERA_LATE_REPUBLIC = 9;
+    private static final int ERA_DARK_AGE = 10;
+    private static final int ERA_ILCLAN = 11;
+
+    private static String RESOURCE_PACKAGE = "mekhq/resources/DateChooser";
+    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
+        MekHQ.getMHQOptions().getLocale());
+
     private static final List<String> monthNames;
     static {
         monthNames = new ArrayList<>(12);
-        monthNames.add("January");
-        monthNames.add("February");
-        monthNames.add("March");
-        monthNames.add("April");
-        monthNames.add("May");
-        monthNames.add("June");
-        monthNames.add("July");
-        monthNames.add("August");
-        monthNames.add("September");
-        monthNames.add("October ");
-        monthNames.add("November");
-        monthNames.add("December");
+        monthNames.add(resources.getString("monthNameJanuary.text"));
+        monthNames.add(resources.getString("monthNameFebruary.text"));
+        monthNames.add(resources.getString("monthNameMarch.text"));
+        monthNames.add(resources.getString("monthNameApril.text"));
+        monthNames.add(resources.getString("monthNameMay.text"));
+        monthNames.add(resources.getString("monthNameJune.text"));
+        monthNames.add(resources.getString("monthNameJuly.text"));
+        monthNames.add(resources.getString("monthNameAugust.text"));
+        monthNames.add(resources.getString("monthNameSeptember.text"));
+        monthNames.add(resources.getString("monthNameOctober.text"));
+        monthNames.add(resources.getString("monthNameNovember.text"));
+        monthNames.add(resources.getString("monthNameDecember.text"));
     }
 
     private LocalDate date;
@@ -114,7 +123,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      *                     this dialog
      */
     public DateChooser(JDialog parentDialog, LocalDate d) {
-        super(parentDialog, "Date Chooser", true);
+        super(parentDialog, resources.getString("DateChooser.title"), true);
         init(parentDialog, d);
     }
 
@@ -128,14 +137,13 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      *              this dialog
      */
     public DateChooser(JFrame owner, LocalDate d) {
-        super(owner, "Date Chooser", true);
+        super(owner, resources.getString("DateChooser.title"), true);
         init(owner, d);
     }
 
-    private void init(Component owner, LocalDate d) {
-
-        date = d;
-        workingDate = date;
+    private void init(Component owner, LocalDate date) {
+        this.date = date;
+        workingDate = this.date;
 
         // Ensure the dialog isn't hidden
         setAlwaysOnTop(true);
@@ -150,20 +158,19 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
         JButton[] navButton = new JButton[4];
 
-        // build the panel with month name and navigation buttons
+        // build the panel with month name and navigation buttons with FlowLayout
+        monthPane.setLayout(new FlowLayout(FlowLayout.CENTER));
         monthPane.add(navButton[0] = new JButton("<"));
-        monthPane.add(monthLabel = new JLabel(String.valueOf(
-                monthNames.get(date.getMonth().ordinal())), JLabel.CENTER));
+        monthPane.add(monthLabel = new JLabel(String.valueOf(monthNames.get(this.date.getMonth().ordinal())), JLabel.CENTER));
         monthLabel.setMinimumSize(new Dimension(80, 17));
         monthLabel.setMaximumSize(new Dimension(80, 17));
         monthLabel.setPreferredSize(new Dimension(80, 17));
         monthPane.add(navButton[1] = new JButton(">"));
 
-        // build the panel with year and navigation buttons
+        // build the panel with year and navigation buttons with FlowLayout
+        yearPane.setLayout(new FlowLayout(FlowLayout.CENTER));
         yearPane.add(navButton[2] = new JButton("<<"));
-        yearPane.add(
-                yearLabel = new JLabel(String.valueOf(date.getYear()), JLabel.CENTER),
-                BorderLayout.CENTER);
+        yearPane.add(yearLabel = new JLabel(String.valueOf(this.date.getYear()), JLabel.CENTER));
         yearLabel.setMinimumSize(new Dimension(50, 17));
         yearLabel.setMaximumSize(new Dimension(50, 17));
         yearLabel.setPreferredSize(new Dimension(50, 17));
@@ -175,10 +182,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         }
 
         // set the tool tip text on the navigation buttons
-        navButton[0].setToolTipText("Go to the previous month");
-        navButton[1].setToolTipText("Go to tne next month");
-        navButton[2].setToolTipText("Go to the previous year");
-        navButton[3].setToolTipText("Go to the next year");
+        navButton[0].setToolTipText(resources.getString("previousMonth.text"));
+        navButton[1].setToolTipText(resources.getString("nextMonth.text"));
+        navButton[2].setToolTipText(resources.getString("previousYear.text"));
+        navButton[3].setToolTipText(resources.getString("nextYear.text"));
 
         // put the panel for months and years together and add some formatting
         JPanel topPane = new JPanel();
@@ -188,15 +195,23 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         topPane.add(Box.createRigidArea(new Dimension(20, 0)));
         topPane.add(yearPane);
 
+        ImageIcon originalIcon = new ImageIcon("data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
+        Image originalImage = originalIcon.getImage();
+        Image scaledImage = originalImage.getScaledInstance(120, 63, Image.SCALE_FAST);
+        ImageIcon resizedIcon = new ImageIcon(scaledImage);
+
+        JLabel imageLabel = new JLabel(resizedIcon);
+        topPane.add(imageLabel, BorderLayout.BEFORE_FIRST_LINE);
+
         // create the panel that will hold the days of the months
         dayGrid = new JPanel(new GridLayout(7, 7));
         updateDayGrid(false);
 
-        contentPane.add(topPane, BorderLayout.NORTH);
+        contentPane.add(topPane, BorderLayout.BEFORE_FIRST_LINE);
         contentPane.add(dayGrid, BorderLayout.CENTER);
 
         // Set up the date input text field with the current campaign date.
-        dateField = new JFormattedTextField(date);
+        dateField = new JFormattedTextField(this.date);
         dateField.setName("dateField");
         dateField.addFocusListener(this);
         dateField.addKeyListener(this);
@@ -215,9 +230,29 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         contentPane.add(dateField, BorderLayout.SOUTH);
         dateField.setColumns(10);
 
+        JLabel dateLabel = new JLabel(resources.getString("dateField.text"), JLabel.CENTER);
+
+        // Create a panel for the dateField, buttons, and label and add them
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
+        bottomPanel.add(dateLabel, BorderLayout.NORTH);
+        bottomPanel.add(dateField, BorderLayout.CENTER);
+
+        // Create a panel for the buttons with a GridLayout
+        JPanel eraPanel = new JPanel(new GridLayout(3, 4));
+        for (int i = 0; i < 12; i++) {
+            JButton eraButton = createEraButton(i);
+            eraButton.setHorizontalAlignment(SwingConstants.CENTER);
+            eraPanel.add(eraButton);
+        }
+
+        bottomPanel.add(eraPanel, BorderLayout.SOUTH);
+        contentPane.add(bottomPanel, BorderLayout.SOUTH);
+
         // setResizable(false);
         ready = false;
         pack();
+        setMinimumSize(new Dimension(700, 300));
 
         // center this dialog over the owner
         setLocationRelativeTo(owner);
@@ -360,13 +395,13 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         int offset = LocalDate.of(y, m, 1).getDayOfWeek().ordinal();
 
         // display 7 days of the week across the top
-        dayGrid.add(new JLabel("Mon", JLabel.CENTER));
-        dayGrid.add(new JLabel("Tue", JLabel.CENTER));
-        dayGrid.add(new JLabel("Wed", JLabel.CENTER));
-        dayGrid.add(new JLabel("Thu", JLabel.CENTER));
-        dayGrid.add(new JLabel("Fri", JLabel.CENTER));
-        dayGrid.add(new JLabel("Sat", JLabel.CENTER));
-        dayGrid.add(new JLabel("Sun", JLabel.CENTER));
+        dayGrid.add(new JLabel(resources.getString("monday.text"), JLabel.CENTER));
+        dayGrid.add(new JLabel(resources.getString("tuesday.text"), JLabel.CENTER));
+        dayGrid.add(new JLabel(resources.getString("wednesday.text"), JLabel.CENTER));
+        dayGrid.add(new JLabel(resources.getString("thursday.text"), JLabel.CENTER));
+        dayGrid.add(new JLabel(resources.getString("friday.text"), JLabel.CENTER));
+        dayGrid.add(new JLabel(resources.getString("saturday.text"), JLabel.CENTER));
+        dayGrid.add(new JLabel(resources.getString("sunday.text"), JLabel.CENTER));
 
         // skip to the correct first day of the week for this month
         for (int i = 1; i <= offset; i++) {
@@ -378,7 +413,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         int workingDay = 1; // Start at the first day of the month.
         for (int i = 1; i <= getLastDay(); i++) {
             dayGrid.add(day = new JButton(String.valueOf(i)));
-            day.setToolTipText("Click on a day to choose it");
+            day.setToolTipText(resources.getString("dayPicker.tooltip"));
             day.addActionListener(this);
 
             // show the current day in bright red.
@@ -549,5 +584,123 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             return;
         }
         setDate(newDate);
+    }
+
+    /**
+     * Creates a JButton representing a specific era.
+     *
+     * @param era The era index.
+     *            The possible values are:
+     *            - 0: Age of War
+     *            - 1: Star League
+     *            - 2: Early Succession War
+     *            - 3: Late Succession War (Lostech)
+     *            - 4: Late Succession War (Renaissance)
+     *            - 5: Clan Invasion
+     *            - 6: Civil War
+     *            - 7: Jihad
+     *            - 8: Early Republic
+     *            - 9: Late Republic
+     *            - 10: Dark Age
+     *            - 11: IlClan
+     * @return The created JButton object representing the specified era.
+     */
+    private JButton createEraButton(int era) {
+        final List<Integer> eraYears = List.of(2400, 2571, 2781,  2901, 3020, 3050, 3062,
+            3068, 3081, 3101, 3131, 3151);
+
+        final String ERA_AGE_OF_WAR_LABEL = resources.getString("eraAgeOfWar.text");
+        final String ERA_AGE_OF_WAR_TOOLTIP = resources.getString("eraAgeOfWar.tooltip");
+        final String ERA_STAR_LEAGUE_LABEL = resources.getString("eraStarLeague.text");
+        final String ERA_STAR_LEAGUE_TOOLTIP = resources.getString("eraStarLeague.tooltip");
+        final String ERA_EARLY_SUCCESSION_WAR_LABEL = resources.getString("eraEarlySuccessionWar.text");
+        final String ERA_EARLY_SUCCESSION_WAR_TOOLTIP = resources.getString("eraEarlySuccessionWar.tooltip");
+        final String ERA_LATE_SUCCESSION_WAR_LOSTECH_LABEL = resources.getString("eraLateSuccessionWarLosTech.text");
+        final String ERA_LATE_SUCCESSION_WAR_LOSTECH_TOOLTIP = resources.getString("eraLateSuccessionWarLosTech.tooltip");
+        final String ERA_LATE_SUCCESSION_WAR_RENAISSANCE_LABEL = resources.getString("eraLateSuccessionWarRenaissance.text");
+        final String ERA_LATE_SUCCESSION_WAR_RENAISSANCE_TOOLTIP = resources.getString("eraLateSuccessionWarRenaissance.tooltip");
+        final String ERA_CLAN_INVASION_LABEL = resources.getString("eraClanInvasion.text");
+        final String ERA_CLAN_INVASION_TOOLTIP = resources.getString("eraClanInvasion.tooltip");
+        final String ERA_CIVIL_WAR_LABEL = resources.getString("eraCivilWar.text");
+        final String ERA_CIVIL_WAR_TOOLTIP = resources.getString("eraCivilWar.tooltip");
+        final String ERA_JIHAD_LABEL = resources.getString("eraJihad.text");
+        final String ERA_JIHAD_TOOLTIP = resources.getString("eraJihad.tooltip");
+        final String ERA_EARLY_REPUBLIC_LABEL = resources.getString("eraEarlyRepublic.text");
+        final String ERA_EARLY_REPUBLIC_TOOLTIP = resources.getString("eraEarlyRepublic.tooltip");
+        final String ERA_LATE_REPUBLIC_LABEL = resources.getString("eraLateRepublic.text");
+        final String ERA_LATE_REPUBLIC_TOOLTIP = resources.getString("eraLateRepublic.tooltip");
+        final String ERA_DARK_AGE_LABEL = resources.getString("eraDarkAge.text");
+        final String ERA_DARK_AGE_TOOLTIP = resources.getString("eraDarkAge.tooltip");
+        final String ERA_ILCLAN_LABEL = resources.getString("eraIlClan.text");
+        final String ERA_ILCLAN_TOOLTIP = resources.getString("eraIlClan.tooltip");
+
+          String eraLabel;
+          String eraTooltip;
+          switch (era) {
+            case 0 -> {
+                eraLabel = ERA_AGE_OF_WAR_LABEL;
+                eraTooltip = ERA_AGE_OF_WAR_TOOLTIP;
+            }
+            case 1 -> {
+                eraLabel = ERA_STAR_LEAGUE_LABEL;
+                eraTooltip = ERA_STAR_LEAGUE_TOOLTIP;
+            }
+            case 2 -> {
+                eraLabel = ERA_EARLY_SUCCESSION_WAR_LABEL;
+                eraTooltip = ERA_EARLY_SUCCESSION_WAR_TOOLTIP;
+            }
+            case 3 -> {
+                eraLabel = ERA_LATE_SUCCESSION_WAR_LOSTECH_LABEL;
+                eraTooltip = ERA_LATE_SUCCESSION_WAR_LOSTECH_TOOLTIP;
+            }
+            case 4 -> {
+                eraLabel = ERA_LATE_SUCCESSION_WAR_RENAISSANCE_LABEL;
+                eraTooltip = ERA_LATE_SUCCESSION_WAR_RENAISSANCE_TOOLTIP;
+            }
+            case 5 -> {
+                eraLabel = ERA_CLAN_INVASION_LABEL;
+                eraTooltip = ERA_CLAN_INVASION_TOOLTIP;
+            }
+            case 6 -> {
+                eraLabel = ERA_CIVIL_WAR_LABEL;
+                eraTooltip = ERA_CIVIL_WAR_TOOLTIP;
+            }
+            case 7 -> {
+                eraLabel = ERA_JIHAD_LABEL;
+                eraTooltip = ERA_JIHAD_TOOLTIP;
+            }
+            case 8 -> {
+                eraLabel = ERA_EARLY_REPUBLIC_LABEL;
+                eraTooltip = ERA_EARLY_REPUBLIC_TOOLTIP;
+            }
+            case 9 -> {
+                eraLabel = ERA_LATE_REPUBLIC_LABEL;
+                eraTooltip = ERA_LATE_REPUBLIC_TOOLTIP;
+            }
+            case 10 -> {
+                eraLabel = ERA_DARK_AGE_LABEL;
+                eraTooltip = ERA_DARK_AGE_TOOLTIP;
+            }
+            case 11 -> {
+                eraLabel = ERA_ILCLAN_LABEL;
+                eraTooltip = ERA_ILCLAN_TOOLTIP;
+            }
+            default -> {
+                eraLabel = "ERROR";
+                eraTooltip = "ERROR";
+            }
+          }
+
+        String label = String.format("<html><center>%s</center></html>", eraLabel);
+
+        JButton button = new JButton(label);
+        button.setToolTipText(wordWrap(eraTooltip));
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.addActionListener(e -> dateField.setText(
+            MekHQ.getMHQOptions().getDisplayFormattedDate(
+                LocalDate.of(eraYears.get(era), 1, 1))));
+
+        // Return the list of buttons
+        return button;
     }
 }
