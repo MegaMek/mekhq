@@ -39,26 +39,26 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 /**
  * Hovanes Gambaryan Henry Demirchian CSUN, CS 585 Professor Mike Barnes
  * December 06, 2000
- *
+ * <p>
  * DateChooser class is a general GUI based date chooser. It allows the user to
  * select an instance of LocalDate defined in java.time package.
- *
+ * <p>
  * Programming API is similar to JFC's JColorChooser or JFileChooser. This class
  * can be used in any application to enable the user to select a date from a
  * visually displayed calendar.
- *
+ * <p>
  * There is a lot of improvements that can be done over this class in areas of
  * functionality, usability, and appearance. But as is, the class can be easily
  * used from within any Java program.
- *
+ * <p>
  * Typical usage is like:
- *
+ * <p>
  * // initial date LocalDate date = LocalDate.now()
- *
+ * <p>
  * // The owner is the JFrame of the application ("AppClass.this")
- *
+ * <p>
  * // show the date chooser DateChooser dc = new DateChooser(owner, date);
- *
+ * <p>
  * // user can either choose a date or cancel by closing if
  * (dc.showDateChooser()
  * == DateChooser.OK_OPTION) { date = dc.getDate(); }
@@ -68,20 +68,6 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
     public static final int OK_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
-
-    private static final int ERA_AGE_OF_WAR = 0;
-    private static final int ERA_STAR_LEAGUE = 1;
-    private static final int ERA_EARLY_SUCCESSION_WAR = 2;
-    private static final int ERA_LATE_SUCCESSION_WAR_LOSTECH = 3;
-    private static final int ERA_LATE_SUCCESSION_WAR_RENAISSANCE = 4;
-    private static final int ERA_CLAN_INVASION = 5;
-    private static final int ERA_CIVIL_WAR = 6;
-    private static final int ERA_JIHAD = 7;
-    private static final int ERA_EARLY_REPUBLIC = 8;
-    private static final int ERA_LATE_REPUBLIC = 9;
-    private static final int ERA_DARK_AGE = 10;
-    private static final int ERA_ILCLAN = 11;
-
     private static String RESOURCE_PACKAGE = "mekhq/resources/DateChooser";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
         MekHQ.getMHQOptions().getLocale());
@@ -696,11 +682,11 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         JButton button = new JButton(label);
         button.setToolTipText(wordWrap(eraTooltip));
         button.setHorizontalAlignment(SwingConstants.CENTER);
-        button.addActionListener(e -> dateField.setText(
-            MekHQ.getMHQOptions().getDisplayFormattedDate(
-                LocalDate.of(eraYears.get(era), 1, 1))));
+        button.addActionListener(e -> {
+            setDate(LocalDate.of(eraYears.get(era), 1, 1));
+            dispose();});
 
-        // Return the list of buttons
+        // Return the button
         return button;
     }
 }
