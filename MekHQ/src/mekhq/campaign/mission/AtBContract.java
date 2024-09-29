@@ -1717,7 +1717,7 @@ public class AtBContract extends Contract {
 
         // Load and scale the image
         ImageIcon imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_orange.png");
-        if (difficulty < 0 && difficulty != ERROR) {
+        if (difficulty < 1 && difficulty != ERROR) {
             imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_green.png");
         } else if (difficulty > 0) {
             imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_red.png");
@@ -1728,10 +1728,10 @@ public class AtBContract extends Contract {
 
         int iterations = difficulty;
 
-        if (difficulty == 0 || difficulty == ERROR) {
+        if (difficulty == ERROR) {
             iterations = 1;
-        } else if (difficulty < 0) {
-            iterations = -difficulty;
+        } else if (difficulty < 1) {
+            iterations = -difficulty + 1;
         }
 
         for (int i = 0; i < iterations; i++) {

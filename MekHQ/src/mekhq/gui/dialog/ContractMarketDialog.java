@@ -512,11 +512,11 @@ public class ContractMarketDialog extends JDialog {
         String message = "";
         if (difficulty == -99) {
             message = String.format(resourceMap.getString("messageChallengeUnknown.text"));
-        } else if (difficulty == -5) {
+        } else if (difficulty < -4) {
             message = String.format(resourceMap.getString("messageChallengeVeryEasy.text"));
         } else if (difficulty <= -3) {
             message = String.format(resourceMap.getString("messageChallengeEasy.text"));
-        } else if (difficulty == 5) {
+        } else if (difficulty > 4) {
             message = String.format(resourceMap.getString("messageChallengeVeryHard.text"));
         } else if (difficulty >= 3) {
             message = String.format(resourceMap.getString("messageChallengeHard.text"));
