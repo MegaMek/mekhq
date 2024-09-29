@@ -200,18 +200,6 @@ public class SkillPerquisite {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("skill")) {
                     String skillName = wn2.getTextContent();
-
-                    // <50.01 compatibility handlers
-                    skillName = skillName.replaceAll("Piloting/Mech::", "Piloting/Mek::");
-                    skillName = skillName.replaceAll("Gunnery/Mech::", "Gunnery/Mek::");
-                    skillName = skillName.replaceAll("Gunnery/Battlesuit::", "Gunnery/BattleArmor::");
-                    skillName = skillName.replaceAll("Gunnery/ProtoMech::", "Gunnery/ProtoMek::");
-                    skillName = skillName.replaceAll("Anti-Mech::", "Anti-Mek::");
-                    skillName = skillName.replaceAll("Tech/Mech::", "Tech/Mek::");
-                    skillName = skillName.replaceAll("Tech/BA::", "Tech/BattleArmor::");
-                    skillName = skillName.replaceAll("Medtech::", "MedTech::");
-                    // end compatibility handlers
-
                     int level = 0;
                     if (skillName.contains("::")) {
                         level = parseStringForLevel(skillName);
