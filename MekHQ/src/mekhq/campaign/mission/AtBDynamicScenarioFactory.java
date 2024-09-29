@@ -21,7 +21,7 @@ package mekhq.campaign.mission;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.*;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
-import megamek.client.generator.skillGenerators.StratConSkillGenerator;
+import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
@@ -2223,7 +2223,19 @@ public class AtBDynamicScenarioFactory {
         innerMap.put(Crew.MAP_GIVEN_NAME, crewNameArray[0]);
         innerMap.put(Crew.MAP_SURNAME, crewNameArray[1]);
 
-        final AbstractSkillGenerator skillGenerator = new StratConSkillGenerator();
+        final AbstractSkillGenerator skillGenerator = new ModifiedConstantSkillGenerator();
+
+        int skillValue = skill.ordinal();
+        int skillRoll = Compute.d6(1);
+
+        if (skillRoll == 1) {
+            skillValue = Math.max(1, skillValue - 1);
+        } else if (skillRoll == 6) {
+            skillValue = Math.min(7, skillValue + 1);
+        }
+
+        skill = SkillLevel.parseFromInteger(skillValue);
+
         skillGenerator.setLevel(skill);
         int[] skills = skillGenerator.generateRandomSkills(en);
 
