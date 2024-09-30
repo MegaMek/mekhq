@@ -460,7 +460,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         double multiplier = 1.0;
         // IntOps reputation factor then Dragoons rating
         if (campaign.getCampaignOptions().getUnitRatingMethod().isCampaignOperations()) {
-            multiplier *= campaign.getReputationFactor();
+            multiplier *= (unitRatingMod * 0.2) + 0.5;
         } else {
             if (unitRatingMod >= IUnitRating.DRAGOON_A) {
                 multiplier *= 2.0;
