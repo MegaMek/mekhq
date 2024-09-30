@@ -4,7 +4,8 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
-import mekhq.gui.panes.campaignOptions.panes.GeneralTab;
+import mekhq.gui.panes.campaignOptions.tabs.GeneralTab;
+import mekhq.gui.panes.campaignOptions.tabs.RepairAndMaintenanceTab;
 
 import javax.swing.*;
 import java.awt.*;
@@ -211,6 +212,45 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
         }
 
         panel.setName(name);
+
+        return panel;
+    }
+
+
+    /**
+     * Creates a {@link JPanel} consisting of a {@link JLabel} above an image.
+     *
+     * @param name           the name of the header panel.
+     *                      The {@link JLabel} will have 'lbl' appended. This will be appended with
+     *                      '.text' to fetch the label contents from the resource bundle.
+     *                      The {@link JPanel} is appended with 'txt'.
+     * @param imageAddress   the file path of the image to be displayed in the panel
+     * @param customWrapSize the maximum number of characters (including whitespaces) on each line
+     *                       of the tooltip; defaults to 100 if {@code null}
+     * @param includeBorder  whether the panel should have a border
+     * @param borderTitle    the title of the border; can be empty for an untitled border
+     * @return a JPanel representing the header panel
+     */
+    public static JPanel createHeaderPanel(String name, String imageAddress, Integer customWrapSize,
+                                     boolean includeBorder, String borderTitle) {
+        ImageIcon imageIcon = new ImageIcon(imageAddress);
+        JLabel imageLabel = new JLabel(imageIcon);
+
+        final JLabel lblWelcome = createLabel("lbl" + name, customWrapSize);
+
+        final JPanel panel = createStandardPanel("pnl" + name, includeBorder, borderTitle);
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(lblWelcome)
+                .addComponent(imageLabel));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addComponent(lblWelcome)
+                .addComponent(imageLabel));
 
         return panel;
     }

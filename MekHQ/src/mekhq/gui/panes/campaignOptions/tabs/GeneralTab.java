@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions.panes;
+package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
@@ -40,7 +40,6 @@ public class GeneralTab extends AbstractMHQTabbedPane {
     private JTextField txtName;
     private JButton btnNameGenerator;
     private JLabel lblFaction;
-    private DefaultComboBoxModel<FactionDisplay> factionModel;
     private MMComboBox<FactionDisplay> comboFaction;
     private JLabel lblReputation;
     private MMComboBox<UnitRatingMethod> unitRatingMethodCombo;
@@ -74,7 +73,8 @@ public class GeneralTab extends AbstractMHQTabbedPane {
      */
     public AbstractMHQScrollablePanel createGeneralTab() {
         // Promotional Image
-        JPanel imagePanel = createImagePanel();
+        JPanel imagePanel = createHeaderPanel("General", "data/images/misc/MekHQ.png",
+            null, false, "");
 
         // Campaign name
         Map<JLabel, JTextField> nameFields = createLabeledTextField("Name", null,
@@ -202,7 +202,12 @@ public class GeneralTab extends AbstractMHQTabbedPane {
         return generalPanel;
     }
 
-    public JPanel createImagePanel() {
+    /**
+     * Creates a header panel with an image and a label.
+     *
+     * @return the created header panel as a {@link JPanel}
+     */
+    private JPanel () {
         ImageIcon imageIcon = new ImageIcon("data/images/misc/MekHQ.png");
         JLabel imageLabel = new JLabel(imageIcon);
 
@@ -215,12 +220,12 @@ public class GeneralTab extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
             layout.createSequentialGroup()
                 .addComponent(lblWelcome)
-                .addComponent(imageLabel));   // Added imageLabel instead
+                .addComponent(imageLabel));
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
                 .addComponent(lblWelcome)
-                .addComponent(imageLabel));   // Added imageLabel instead
+                .addComponent(imageLabel));
 
         return panel;
     }
@@ -233,7 +238,7 @@ public class GeneralTab extends AbstractMHQTabbedPane {
         btnNameGenerator = new JButton();
 
         lblFaction = new JLabel();
-        factionModel = new DefaultComboBoxModel<>();
+        DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(
             Factions.getInstance().getChoosableFactions(), campaign.getLocalDate()));
         comboFaction = new MMComboBox<>("comboFaction", factionModel);
@@ -271,7 +276,7 @@ public class GeneralTab extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Sets the date for the {@link GeneralTab}.
+     * Sets the date for the {@link RepairAndMaintenanceTab}.
      * This method is called when the "btnDate" button is clicked.
      * It shows a date chooser dialog and sets the selected date if the user chooses a date.
      *
