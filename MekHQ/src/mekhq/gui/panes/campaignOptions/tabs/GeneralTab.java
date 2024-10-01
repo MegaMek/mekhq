@@ -74,7 +74,7 @@ public class GeneralTab extends AbstractMHQTabbedPane {
     public AbstractMHQScrollablePanel createGeneralTab() {
         // Promotional Image
         JPanel imagePanel = createHeaderPanel("General", "data/images/misc/MekHQ.png",
-            null, false, "");
+            false, "", false);
 
         // Campaign name
         Map<JLabel, JTextField> nameFields = createLabeledTextField("Name", null,
@@ -94,11 +94,14 @@ public class GeneralTab extends AbstractMHQTabbedPane {
         // Campaign faction
         lblFaction = createLabel("lblFaction", null);
         comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), campaign.getLocalDate()));
-        comboFaction.setMinimumSize(new Dimension(200, 30));
-        comboFaction.setPreferredSize(new Dimension(200, 30));
+        comboFaction.setMinimumSize(new Dimension(275, 30));
+        comboFaction.setMaximumSize(new Dimension(275, 30));
 
         // Reputation
         lblReputation = createLabel("lblReputation", null);
+        unitRatingMethodCombo.setMinimumSize(new Dimension(150, 30));
+        unitRatingMethodCombo.setMaximumSize(new Dimension(150, 30));
+
         Map<JLabel, JSpinner> manualReputationModifierFields = createLabeledSpinner(
             "ManualUnitRatingModifier", null, 0, -200,
             200, 1);
@@ -110,22 +113,20 @@ public class GeneralTab extends AbstractMHQTabbedPane {
         // Date
         lblDate = createLabel("lblDate", null);
         btnDate.setName("btnDate");
-        btnDate.setMinimumSize(new Dimension(200, 30));
-        btnDate.setPreferredSize(new Dimension(200, 30));
+        btnDate.setMinimumSize(new Dimension(100, 30));
+        btnDate.setMaximumSize(new Dimension(100, 30));
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Camouflage
         lblCamo = createLabel("lblCamo", null);
         btnCamo.setName("btnCamo");
         btnCamo.setMinimumSize(new Dimension(84, 72));
-        btnCamo.setPreferredSize(new Dimension(84, 72));
         btnCamo.setMaximumSize(new Dimension(84, 72));
         btnCamo.addActionListener(this::btnCamoActionPerformed);
 
         // Unit icon
         lblIcon = createLabel("lblIcon", null);
         btnIcon.setMinimumSize(new Dimension(84, 72));
-        btnIcon.setPreferredSize(new Dimension(84, 72));
         btnIcon.setMaximumSize(new Dimension(84, 72));
         btnIcon.addActionListener(evt -> {
             final UnitIconDialog unitIconDialog = new UnitIconDialog(getFrame(), unitIcon);
@@ -165,15 +166,14 @@ public class GeneralTab extends AbstractMHQTabbedPane {
                     .addComponent(btnDate, Alignment.LEADING))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblCamo)
-                    .addComponent(btnCamo, Alignment.LEADING)
+                    .addComponent(btnCamo, Alignment.LEADING))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblIcon)
                     .addComponent(btnIcon, Alignment.LEADING)));
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(125)
-                    .addComponent(imagePanel))
+                .addComponent(imagePanel)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblName)
                     .addComponent(txtName)
@@ -192,42 +192,14 @@ public class GeneralTab extends AbstractMHQTabbedPane {
                     .addComponent(btnDate))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblCamo)
-                    .addComponent(btnCamo)
-                    .addGap(100)
+                    .addComponent(btnCamo))
+                .addGroup(layout.createSequentialGroup()
                     .addComponent(lblIcon)
                     .addComponent(btnIcon)));
 
         generalPanel.add(panel);
 
         return generalPanel;
-    }
-
-    /**
-     * Creates a header panel with an image and a label.
-     *
-     * @return the created header panel as a {@link JPanel}
-     */
-    private JPanel () {
-        ImageIcon imageIcon = new ImageIcon("data/images/misc/MekHQ.png");
-        JLabel imageLabel = new JLabel(imageIcon);
-
-        final JLabel lblWelcome = createLabel("lblWelcome", null);
-
-        final JPanel panel = createStandardPanel("imagePanel", false, "");
-        final GroupLayout layout = createStandardLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(lblWelcome)
-                .addComponent(imageLabel));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(lblWelcome)
-                .addComponent(imageLabel));
-
-        return panel;
     }
 
     @Override

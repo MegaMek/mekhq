@@ -8,7 +8,10 @@ import mekhq.gui.panes.campaignOptions.tabs.GeneralTab;
 import mekhq.gui.panes.campaignOptions.tabs.RepairAndMaintenanceTab;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -20,8 +23,9 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     private final Campaign campaign;
+    final static int WIDTH_MULTIPLIER = 3; // This seems to be the sweet spot
 
-    public CampaignOptionsDialogController(final JFrame frame, final Campaign campaign, final boolean startup) {
+    public CampaignOptionsDialogController(final JFrame frame, final Campaign campaign) {
         super(frame, resources, "campaignOptionsDialog");
         this.campaign = campaign;
 
@@ -30,11 +34,19 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
 
     @Override
     protected void initialize() {
+        // General
         GeneralTab generalTab = new GeneralTab(campaign, getFrame(), "generalTab");
-        addTab(String.format("<html><b>%s</html></b>", resources.getString("generalPanel.title")),
-            generalTab.createGeneralTab());
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("generalPanel.title")), generalTab.createGeneralTab());
 
-        setPreferences();
+        // Repair and Maintenance
+        RepairAndMaintenanceTab repairAndMaintenanceTab = new RepairAndMaintenanceTab(getFrame(),
+            "repairAndMaintenanceTab");
+        JTabbedPane repairAndMaintenanceContentTabs = createSubTabs(Map.of(
+            "repairTab", repairAndMaintenanceTab.createRepairTab(),
+            "maintenanceTab", repairAndMaintenanceTab.createMaintenanceTab()));
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("RepairAndMaintenancePanel.title")), repairAndMaintenanceContentTabs);
     }
 
     private void setOptions() {
@@ -61,7 +73,7 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
     public static JCheckBox createCheckBox(String name, @Nullable Integer customWrapSize) {
         customWrapSize = processWrapSize(customWrapSize);
 
-        JCheckBox checkBox = new JCheckBox(String.format("<html><b>%s</html></b>",
+        JCheckBox checkBox = new JCheckBox(String.format("<html><b>%s</b></html>",
             resources.getString(name + ".text")));
         checkBox.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
         checkBox.setName(name);
@@ -93,7 +105,7 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
                                                       double maximum, double stepSize) {
         customWrapSize = processWrapSize(customWrapSize);
 
-        final JLabel jLabel = new JLabel(String.format("<html><b>%s</html></b>",
+        final JLabel jLabel = new JLabel(String.format("<html><b>%s</b></html>",
             resources.getString(name + ".text")));
         jLabel.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
         jLabel.setName("lbl" + name);
@@ -101,6 +113,13 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
         JSpinner jSpinner = new JSpinner(new SpinnerNumberModel(defaultValue, minimum, maximum, stepSize));
         jSpinner.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
         jSpinner.setName("spn" + name);
+
+        FontMetrics fontMetrics = jSpinner.getFontMetrics(jSpinner.getFont());
+        int width = fontMetrics.stringWidth(Double.toString(maximum));
+        width = width * WIDTH_MULTIPLIER;
+
+        jSpinner.setMaximumSize(new Dimension(width, 30));
+        jSpinner.setMinimumSize(new Dimension(width, 30));
 
         return Map.of(jLabel, jSpinner);
     }
@@ -121,7 +140,7 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
     public static JLabel createLabel(String name, @Nullable Integer customWrapSize) {
         customWrapSize = processWrapSize(customWrapSize);
 
-        JLabel jLabel = new JLabel(String.format("<html><b>%s</html></b>",
+        JLabel jLabel = new JLabel(String.format("<html>%s</html>",
             resources.getString(name + ".text")));
         jLabel.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
         jLabel.setName(name);
@@ -157,7 +176,7 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
                                                 @Nullable Integer maximumSizeHeight) {
         customWrapSize = processWrapSize(customWrapSize);
 
-        JLabel jLabel = new JLabel(String.format("<html><b>%s</html></b>",
+        JLabel jLabel = new JLabel(String.format("<html><b>%s</b></html>",
             resources.getString(name + ".text")));
         jLabel.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
         jLabel.setName("lbl" + name);
@@ -208,7 +227,7 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
 
         if (includeBorder) {
             panel.setBorder(BorderFactory.createTitledBorder(
-                String.format(String.format("<html><b>%s</html></b>", borderTitle))));
+                String.format(String.format("<html><b>%s</b></html>", borderTitle))));
         }
 
         panel.setName(name);
@@ -216,27 +235,36 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
         return panel;
     }
 
-
     /**
      * Creates a {@link JPanel} consisting of a {@link JLabel} above an image.
+     * If {@code includeBodyText} is {@code true} a second {@link JLabel} is placed after the first.
      *
      * @param name           the name of the header panel.
      *                      The {@link JLabel} will have 'lbl' appended. This will be appended with
      *                      '.text' to fetch the label contents from the resource bundle.
      *                      The {@link JPanel} is appended with 'txt'.
      * @param imageAddress   the file path of the image to be displayed in the panel
-     * @param customWrapSize the maximum number of characters (including whitespaces) on each line
-     *                       of the tooltip; defaults to 100 if {@code null}
      * @param includeBorder  whether the panel should have a border
      * @param borderTitle    the title of the border; can be empty for an untitled border
+     * @param includeBodyText    if {@code true}, include a second {@link JLabel} named {@code name + "Body"}.
+     *                          The resource bundle reference is {@code name + "Body.text"}
      * @return a JPanel representing the header panel
      */
-    public static JPanel createHeaderPanel(String name, String imageAddress, Integer customWrapSize,
-                                     boolean includeBorder, String borderTitle) {
+    public static JPanel createHeaderPanel(String name, String imageAddress, boolean includeBorder,
+                                           String borderTitle, boolean includeBodyText) {
         ImageIcon imageIcon = new ImageIcon(imageAddress);
         JLabel imageLabel = new JLabel(imageIcon);
 
-        final JLabel lblWelcome = createLabel("lbl" + name, customWrapSize);
+        final JLabel lblHeader = new JLabel(String.format("<html>%s</html>",
+            resources.getString("lbl" + name + ".text")), SwingConstants.CENTER);
+        lblHeader.setName("lbl" + name);
+
+        JLabel lblBody = new JLabel();
+        if (includeBodyText) {
+            lblBody = new JLabel(String.format("<html>%s</html>",
+                resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
+            lblHeader.setName("lbl" + name);
+        }
 
         final JPanel panel = createStandardPanel("pnl" + name, includeBorder, borderTitle);
         final GroupLayout layout = createStandardLayout(panel);
@@ -244,12 +272,14 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
             layout.createSequentialGroup()
-                .addComponent(lblWelcome)
+                .addComponent(lblHeader)
+                .addComponent(lblBody)
                 .addComponent(imageLabel));
 
         layout.setHorizontalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addComponent(lblWelcome)
+            layout.createParallelGroup(Alignment.CENTER)
+                .addComponent(lblHeader)
+                .addComponent(lblBody)
                 .addComponent(imageLabel));
 
         return panel;
@@ -269,5 +299,55 @@ public class CampaignOptionsDialogController extends AbstractMHQTabbedPane {
         layout.setAutoCreateContainerGaps(true);
 
         return layout;
+    }
+    /**
+     * Creates a parent panel for the provided {@link JPanel} with a specified name, maximum width,
+     * and maximum height.
+     *
+     * @param panel the panel to be added to the parent panel
+     * @param name the name of the parent panel
+     * @param maximumWidth the maximum width of the parent panel
+     * @param maximumHeight the maximum height of the parent panel
+     * @return the created {@link JPanel}
+     */
+    public static JPanel createParentPanel(JPanel panel, String name, int maximumWidth, int maximumHeight) {
+        final JPanel parentPanel = createStandardPanel(name, true, "");
+        final GroupLayout parentLayout = createStandardLayout(parentPanel);
+        Dimension preferredSize = new Dimension(maximumWidth, maximumHeight);
+        panel.setMaximumSize(preferredSize);
+        parentPanel.setLayout(parentLayout);
+
+        parentLayout.setVerticalGroup(
+            parentLayout.createSequentialGroup()
+                .addComponent(panel));
+
+        parentLayout.setHorizontalGroup(
+            parentLayout.createParallelGroup(Alignment.LEADING)
+                .addComponent(panel));
+
+        return parentPanel;
+    }
+
+    /**
+     * Creates a new instance of {@link JTabbedPane} with the supplied panels as tabs.
+     *
+     * @param panels a map containing the names of the panels as keys and the corresponding
+     *              {@link JPanel} objects as values
+     * @return a {@link JTabbedPane} with the supplied panels as tabs
+     */
+    public static JTabbedPane createSubTabs(Map<String, JPanel> panels) {
+        // We use a list here to ensure that the tabs always display in the same order,
+        // and that order might as well be alphabetic.
+        List<String> tabNames = new ArrayList<>(panels.keySet());
+        tabNames.sort(String.CASE_INSENSITIVE_ORDER);
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        for (String tabName : tabNames) {
+            JPanel panel = panels.get(tabName);
+            tabbedPane.addTab(resources.getString(panel.getName() + ".title"), panel);
+        }
+
+        return tabbedPane;
     }
 }
