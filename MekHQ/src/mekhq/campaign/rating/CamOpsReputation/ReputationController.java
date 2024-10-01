@@ -139,7 +139,6 @@ public class ReputationController {
         transportationValues = rawTransportationData.get(2);
 
         transportationRating = transportationCapacities.get("total");
-        transportationCapacities.remove("total");
 
         // step five: support rating
         Map<String, Map<String, ?>> rawSupportData = calculateSupportRating(campaign, transportationRequirements);
