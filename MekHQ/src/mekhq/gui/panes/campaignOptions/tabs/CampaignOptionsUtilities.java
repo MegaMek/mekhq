@@ -2,7 +2,6 @@ package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.gui.panes.campaignOptions.CampaignOptionsPane;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;

@@ -1,10 +1,8 @@
-package mekhq.gui.panes.campaignOptions;
+package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
-import mekhq.gui.panes.campaignOptions.tabs.GeneralTab;
-import mekhq.gui.panes.campaignOptions.tabs.RepairAndMaintenanceTab;
 
 import javax.swing.*;
 import java.util.Map;
@@ -18,7 +16,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     private final Campaign campaign;
-    final static int WIDTH_MULTIPLIER = 3; // This seems to be the sweet spot
 
     public CampaignOptionsPane(final JFrame frame, final Campaign campaign) {
         super(frame, resources, "campaignOptionsDialog");

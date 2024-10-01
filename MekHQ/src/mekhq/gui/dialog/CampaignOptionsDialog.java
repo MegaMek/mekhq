@@ -27,7 +27,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignPreset;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
-import mekhq.gui.panes.campaignOptions.CampaignOptionsPane;
+import mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsPane;
 
 import javax.swing.*;
 import java.awt.*;
