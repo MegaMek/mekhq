@@ -28,6 +28,10 @@ import java.util.ResourceBundle;
 
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsDialogController.*;
 
+/**
+ * Represents a tab that allows the user to configure general settings for a campaign.
+ * Extends the {@link AbstractMHQTabbedPane} class.
+ */
 public class GeneralTab extends AbstractMHQTabbedPane {
     // region Variable Declarations
     private static String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
@@ -55,6 +59,13 @@ public class GeneralTab extends AbstractMHQTabbedPane {
     private JButton btnIcon;
     private StandardForceIcon unitIcon;
 
+    /**
+     * Constructs a new {@link GeneralTab} object.
+     *
+     * @param campaign the campaign object associated with the tab
+     * @param frame the {@link JFrame} object that contains the tab
+     * @param name the name of the tab
+     */
     public GeneralTab(Campaign campaign, JFrame frame, String name) {
         super(frame, name);
 

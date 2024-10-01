@@ -27,7 +27,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignPreset;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
-import mekhq.gui.panes.CampaignOptionsPane;
+import mekhq.gui.panes.campaignOptions.CampaignOptionsDialogController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,7 +42,7 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private final Campaign campaign;
     private final boolean startup;
-    private CampaignOptionsPane campaignOptionsPane;
+    private CampaignOptionsDialogController campaignOptionsPane;
     //endregion Variable Declarations
 
     //region Constructors
@@ -77,11 +77,11 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
         return startup;
     }
 
-    public CampaignOptionsPane getCampaignOptionsPane() {
+    public CampaignOptionsDialogController getCampaignOptionsPane() {
         return campaignOptionsPane;
     }
 
-    public void setCampaignOptionsPane(final CampaignOptionsPane campaignOptionsPane) {
+    public void setCampaignOptionsPane(final CampaignOptionsDialogController campaignOptionsPane) {
         this.campaignOptionsPane = campaignOptionsPane;
     }
     //endregion Getters/Setters
@@ -89,7 +89,7 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        setCampaignOptionsPane(new CampaignOptionsPane(getFrame(), getCampaign(), isStartup()));
+        setCampaignOptionsPane(new CampaignOptionsDialogController(getFrame(), getCampaign()));
         return getCampaignOptionsPane();
     }
 
@@ -168,8 +168,8 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
 
     @Override
     protected void finalizeInitialization() throws Exception {
-        getCampaignOptionsPane().setOptions(getCampaign().getCampaignOptions(),
-                getCampaign().getRandomSkillPreferences());
+//        getCampaignOptionsPane().setOptions(getCampaign().getCampaignOptions(),
+//                getCampaign().getRandomSkillPreferences());
         super.finalizeInitialization();
     }
     //endregion Initialization
@@ -177,19 +177,20 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Button Actions
     @Override
     protected void okAction() {
-        getCampaignOptionsPane().updateOptions();
+//        getCampaignOptionsPane().updateOptions();
     }
 
     @Override
     protected ValidationState validateAction(final boolean display) {
-        return getCampaignOptionsPane().validateOptions(display);
+//        return getCampaignOptionsPane().validateOptions(display);
+        return null;
     }
 
     private void btnSaveActionPerformed() {
         if (validateAction(true).isFailure()) {
             return;
         }
-        getCampaignOptionsPane().updateOptions();
+//        getCampaignOptionsPane().updateOptions();
         setResult(DialogResult.CONFIRMED);
 
         final CreateCampaignPresetDialog createCampaignPresetDialog
@@ -210,6 +211,6 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //endregion Button Actions
 
     public void applyPreset(final @Nullable CampaignPreset preset) {
-        getCampaignOptionsPane().applyPreset(preset);
+//        getCampaignOptionsPane().applyPreset(preset);
     }
 }
