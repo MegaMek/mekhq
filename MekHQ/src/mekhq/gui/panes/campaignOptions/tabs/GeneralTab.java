@@ -26,17 +26,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
 /**
  * Represents a tab that allows the user to configure general settings for a campaign.
  * Extends the {@link AbstractMHQTabbedPane} class.
  */
-public class GeneralTab extends AbstractMHQTabbedPane {
+public class GeneralTab {
     // region Variable Declarations
     private static String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
         MekHQ.getMHQOptions().getLocale());
+
+    JFrame frame;
+    String name;
 
     private final Campaign campaign;
 
@@ -67,8 +70,8 @@ public class GeneralTab extends AbstractMHQTabbedPane {
      * @param name the name of the tab
      */
     public GeneralTab(Campaign campaign, JFrame frame, String name) {
-        super(frame, name);
-
+        this.frame = frame;
+        this.name = name;
         this.campaign = campaign;
         this.date = campaign.getLocalDate();
         this.camouflage = campaign.getCamouflage();
@@ -140,7 +143,7 @@ public class GeneralTab extends AbstractMHQTabbedPane {
         btnIcon.setMinimumSize(new Dimension(84, 72));
         btnIcon.setMaximumSize(new Dimension(84, 72));
         btnIcon.addActionListener(evt -> {
-            final UnitIconDialog unitIconDialog = new UnitIconDialog(getFrame(), unitIcon);
+            final UnitIconDialog unitIconDialog = new UnitIconDialog(frame, unitIcon);
             if (unitIconDialog.showDialog().isConfirmed() && (unitIconDialog.getSelectedItem() != null)) {
                 unitIcon = unitIconDialog.getSelectedItem();
                 btnIcon.setIcon(unitIcon.getImageIcon(75));
@@ -148,7 +151,7 @@ public class GeneralTab extends AbstractMHQTabbedPane {
         });
 
         // Initialize the parent panel
-        AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(getFrame(), "generalPanel",
+        AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame, "generalPanel",
             new GridBagLayout());
 
         // Layout the Panel
@@ -213,7 +216,9 @@ public class GeneralTab extends AbstractMHQTabbedPane {
         return generalPanel;
     }
 
-    @Override
+    /**
+     * Initialize the components of the {@link GeneralTab} class.
+     */
     protected void initialize() {
         lblName = new JLabel();
         txtName = new JTextField();
@@ -242,7 +247,6 @@ public class GeneralTab extends AbstractMHQTabbedPane {
         btnIcon = new JButton();
     }
 
-
     /**
      * This method is called when the "btnDate" button is clicked.
      * It shows a date chooser dialog and sets the selected date if the user chooses a date.
@@ -251,7 +255,7 @@ public class GeneralTab extends AbstractMHQTabbedPane {
      */
     private void btnDateActionPerformed(ActionEvent actionEvent) {
         // show the date chooser
-        DateChooser dateChooser = new DateChooser(getFrame(), date);
+        DateChooser dateChooser = new DateChooser(frame, date);
         // user can either choose a date or cancel by closing
         if (dateChooser.showDateChooser() == DateChooser.OK_OPTION) {
             setDate(dateChooser.getDate());
@@ -288,7 +292,7 @@ public class GeneralTab extends AbstractMHQTabbedPane {
      * @param actionEvent The action event that triggered this method.
      */
     private void btnCamoActionPerformed(ActionEvent actionEvent) {
-        CamoChooserDialog camoChooserDialog = new CamoChooserDialog(getFrame(), camouflage);
+        CamoChooserDialog camoChooserDialog = new CamoChooserDialog(frame, camouflage);
         if (camoChooserDialog.showDialog().isConfirmed()) {
             camouflage = camoChooserDialog.getSelectedItem();
             btnCamo.setIcon(camouflage.getImageIcon());

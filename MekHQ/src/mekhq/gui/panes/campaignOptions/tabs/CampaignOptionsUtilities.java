@@ -1,7 +1,8 @@
-package mekhq.gui.panes.campaignOptions;
+package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.gui.panes.campaignOptions.CampaignOptionsPane;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -33,7 +34,7 @@ public class CampaignOptionsUtilities {
      *                         line of the tooltip (or 100, if {@code null}).
      * @return a new {@link JCheckBox} object with the specified name, label, and tooltip
      */
-    public static JCheckBox createCheckBox(String name, @Nullable Integer customWrapSize) {
+    static JCheckBox createCheckBox(String name, @Nullable Integer customWrapSize) {
         customWrapSize = processWrapSize(customWrapSize);
 
         JCheckBox checkBox = new JCheckBox(String.format("<html><b>%s</b></html>",
@@ -63,7 +64,7 @@ public class CampaignOptionsUtilities {
      * @param stepSize         a double representing the step size of the spinner
      * @return a map containing a {@link JLabel} key and a {@link JSpinner} value.
      */
-    public static Map<JLabel, JSpinner> createLabeledSpinner(String name, @Nullable Integer customWrapSize,
+    static Map<JLabel, JSpinner> createLabeledSpinner(String name, @Nullable Integer customWrapSize,
                                                              double defaultValue, double minimum,
                                                              double maximum, double stepSize) {
         customWrapSize = processWrapSize(customWrapSize);
@@ -100,7 +101,7 @@ public class CampaignOptionsUtilities {
      *                        of the tooltip; defaults to 100 if {@code null}
      * @return a new {@link JLabel} object
      */
-    public static JLabel createLabel(String name, @Nullable Integer customWrapSize) {
+    static JLabel createLabel(String name, @Nullable Integer customWrapSize) {
         customWrapSize = processWrapSize(customWrapSize);
 
         JLabel jLabel = new JLabel(String.format("<html>%s</html>",
@@ -133,7 +134,7 @@ public class CampaignOptionsUtilities {
      *                            If {@code null}, the minimum size height is used.
      * @return a map containing a {@link JLabel} key and a {@link JTextField} value.
      */
-    public static Map<JLabel, JTextField> createLabeledTextField(String name,
+    static Map<JLabel, JTextField> createLabeledTextField(String name,
                                                                  @Nullable Integer customWrapSize, int minimumSizeWidth,
                                                                  int minimumSizeHeight, @Nullable Integer maximumSizeWidth,
                                                                  @Nullable Integer maximumSizeHeight) {
@@ -183,7 +184,7 @@ public class CampaignOptionsUtilities {
      *
      * @return a JPanel with a titled border and GroupLayout as its layout manager
      */
-    public static JPanel createStandardPanel(String name, boolean includeBorder, String borderTitle) {
+    static JPanel createStandardPanel(String name, boolean includeBorder, String borderTitle) {
         borderTitle = borderTitle.isBlank() ? "" : resources.getString(borderTitle);
 
         JPanel panel = new JPanel();
@@ -213,7 +214,7 @@ public class CampaignOptionsUtilities {
      *                          The resource bundle reference is {@code name + "Body.text"}
      * @return a JPanel representing the header panel
      */
-    public static JPanel createHeaderPanel(String name, String imageAddress, boolean includeBorder,
+    static JPanel createHeaderPanel(String name, String imageAddress, boolean includeBorder,
                                            String borderTitle, boolean includeBodyText) {
         ImageIcon imageIcon = new ImageIcon(imageAddress);
         JLabel imageLabel = new JLabel(imageIcon);
@@ -256,7 +257,7 @@ public class CampaignOptionsUtilities {
      * @param panel the {@link JPanel} for which the {@link GroupLayout} is created
      * @return the created {@link GroupLayout} object
      */
-    public static GroupLayout createStandardLayout(JPanel panel) {
+    static GroupLayout createStandardLayout(JPanel panel) {
         final GroupLayout layout = new GroupLayout(panel);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
@@ -273,7 +274,7 @@ public class CampaignOptionsUtilities {
      * @param maximumHeight the maximum height of the parent panel
      * @return the created {@link JPanel}
      */
-    public static JPanel createParentPanel(JPanel panel, String name, int maximumWidth, int maximumHeight) {
+    static JPanel createParentPanel(JPanel panel, String name, int maximumWidth, int maximumHeight) {
         final JPanel parentPanel = createStandardPanel(name, true, "");
         final GroupLayout parentLayout = createStandardLayout(parentPanel);
         Dimension preferredSize = new Dimension(maximumWidth, maximumHeight);
@@ -298,7 +299,7 @@ public class CampaignOptionsUtilities {
      *              {@link JPanel} objects as values
      * @return a {@link JTabbedPane} with the supplied panels as tabs
      */
-    public static JTabbedPane createSubTabs(Map<String, JPanel> panels) {
+    static JTabbedPane createSubTabs(Map<String, JPanel> panels) {
         // We use a list here to ensure that the tabs always display in the same order,
         // and that order might as well be alphabetic.
         List<String> tabNames = new ArrayList<>(panels.keySet());

@@ -10,7 +10,7 @@ import javax.swing.*;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createSubTabs;
+import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.createSubTabs;
 
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final MMLogger logger = MMLogger.create(CampaignOptionsPane.class);

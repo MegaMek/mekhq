@@ -1,22 +1,17 @@
 package mekhq.gui.panes.campaignOptions.tabs;
 
-import mekhq.MekHQ;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
-import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
+import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
-public class RepairAndMaintenanceTab extends AbstractMHQTabbedPane {
-    // region Variable Declarations
-    private static String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
-        MekHQ.getMHQOptions().getLocale());
+public class RepairAndMaintenanceTab {
+    JFrame frame;
+    String name;
 
     //start Repair Tab
     private JCheckBox useEraModsCheckBox;
@@ -47,8 +42,12 @@ public class RepairAndMaintenanceTab extends AbstractMHQTabbedPane {
     private JCheckBox logMaintenance;
     //end Maintenance Tab
 
+    /**
+     * Represents a tab for repair and maintenance in an application.
+     */
     public RepairAndMaintenanceTab(JFrame frame, String name) {
-        super(frame, name);
+        this.frame = frame;
+        this.name = name;
 
         initialize();
     }
@@ -262,7 +261,9 @@ public class RepairAndMaintenanceTab extends AbstractMHQTabbedPane {
         // TODO handle this
     }
 
-    @Override
+    /**
+     * Initializes the repair and maintenance tab by creating and initializing various UI components.
+     */
     protected void initialize() {
         initializeRepairTab();
         initializeMaintenanceTab();
