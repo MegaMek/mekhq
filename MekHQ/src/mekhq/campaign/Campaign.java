@@ -6851,16 +6851,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves the unit rating modifier as described in Campaign Operations. This value is equal
-     * to the total reputation score divided by ten, rounded down to the nearest whole number.
-     *
-     * @return The unit rating modifier as described in Campaign Operations.
-     */
-    public int getCamOpsUnitRatingMod() {
-        return getReputation().getReputationRating() / 10;
-    }
-
-    /**
      * Retrieves the unit reputation factor based on the rating method defined in the Campaign Options.
      *
      * @return the reputation factor for the selected unit rating method.
@@ -6869,7 +6859,7 @@ public class Campaign implements ITechManager {
         return switch (campaignOptions.getUnitRatingMethod()) {
             case NONE -> 5;
             case FLD_MAN_MERCS_REV -> getAtBUnitRatingMod() * 2;
-            case CAMPAIGN_OPS -> (int) ((getCamOpsUnitRatingMod() * 0.2) + 0.5);
+            case CAMPAIGN_OPS -> (int) ((getReputation().getReputationModifier() * 0.2) + 0.5);
         };
     }
 
