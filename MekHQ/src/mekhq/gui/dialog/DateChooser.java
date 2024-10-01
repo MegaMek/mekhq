@@ -248,8 +248,9 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         JPanel confirmPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton confirmButton = new JButton(resources.getString("confirmDate.text"));
         confirmButton.addActionListener(e -> {
-            updateDateFromDateField();
-            dispose();
+            if (updateDateFromDateField()) {
+                dispose();
+            }
         });
         confirmPanel.add(confirmButton);
 
@@ -508,17 +509,8 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         }
     }
 
-    /**
-     * Update the date picker controls when the date field looses focus.
-     *
-     * @param event FocusEvent
-     */
     @Override
-    public void focusLost(FocusEvent event) {
-        if (dateField.equals(event.getSource())) {
-            updateDateFromDateField();
-        }
-    }
+    public void focusLost(FocusEvent event) {}
 
     /**
      * Parse the passed date string and return a Date object.
@@ -566,34 +558,26 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     @Override
     public void keyPressed(KeyEvent event) {}
 
-    /**
-     * Update the date chooser controls when the Enter key is pressed while the date
-     * field has the focus.
-     * Then close the dialog.
-     *
-     * @param event KeyEvent
-     */
     @Override
-    public void keyReleased(KeyEvent event) {
-        if (dateField.equals(event.getSource())) {
-            if (KeyEvent.VK_ENTER == event.getKeyCode()) {
-                updateDateFromDateField();
-                setVisible(false);
-            }
-        }
-    }
+    public void keyReleased(KeyEvent event) {}
 
     /**
-     * Sets the dialog's date based on the value in the date field.
+     * Updates the date of the {@link DateChooser} instance based on the value in the dateField.
+     * If the new date is valid, the dialog's controls are updated with the new date.
+     *
+     * @return {@link true} if the update is successful, {@link false} otherwise.
      */
-    private void updateDateFromDateField() {
+    private boolean updateDateFromDateField() {
         LocalDate newDate = parseDate(dateField.getText());
         if (newDate == null) {
-            JOptionPane.showMessageDialog(this, "Invalid Date Format\nTry: yyyy-MM-dd", "Date Format",
+            JOptionPane.showMessageDialog(this,
+                "Invalid Date Format\nTry: yyyy-MM-dd", "Date Format",
                     JOptionPane.WARNING_MESSAGE);
-            return;
+            return false;
         }
+
         setDate(newDate);
+        return true;
     }
 
     /**
@@ -616,7 +600,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * @return The created JButton object representing the specified era.
      */
     private JButton createEraButton(int era) {
-        final List<Integer> eraYears = List.of(2400, 2571, 2781,  2901, 3020, 3050, 3062,
+        final List<Integer> eraYears = List.of(2475, 2571, 2781,  2901, 3020, 3050, 3062,
             3068, 3081, 3101, 3131, 3151);
 
         final String ERA_AGE_OF_WAR_LABEL = resources.getString("eraAgeOfWar.text");
