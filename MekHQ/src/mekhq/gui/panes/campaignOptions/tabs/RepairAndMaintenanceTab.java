@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsDialogController.*;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 public class RepairAndMaintenanceTab extends AbstractMHQTabbedPane {
     // region Variable Declarations

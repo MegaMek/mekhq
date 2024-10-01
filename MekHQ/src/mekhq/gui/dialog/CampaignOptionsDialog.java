@@ -27,7 +27,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignPreset;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
-import mekhq.gui.panes.campaignOptions.CampaignOptionsDialogController;
+import mekhq.gui.panes.campaignOptions.CampaignOptionsPane;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,7 +42,7 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Variable Declarations
     private final Campaign campaign;
     private final boolean startup;
-    private CampaignOptionsDialogController campaignOptionsPane;
+    private CampaignOptionsPane campaignOptionsPane;
     //endregion Variable Declarations
 
     //region Constructors
@@ -77,11 +77,11 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
         return startup;
     }
 
-    public CampaignOptionsDialogController getCampaignOptionsPane() {
+    public CampaignOptionsPane getCampaignOptionsPane() {
         return campaignOptionsPane;
     }
 
-    public void setCampaignOptionsPane(final CampaignOptionsDialogController campaignOptionsPane) {
+    public void setCampaignOptionsPane(final CampaignOptionsPane campaignOptionsPane) {
         this.campaignOptionsPane = campaignOptionsPane;
     }
     //endregion Getters/Setters
@@ -89,7 +89,7 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        setCampaignOptionsPane(new CampaignOptionsDialogController(getFrame(), getCampaign()));
+        setCampaignOptionsPane(new CampaignOptionsPane(getFrame(), getCampaign()));
         return getCampaignOptionsPane();
     }
 

@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsDialogController.*;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * Represents a tab that allows the user to configure general settings for a campaign.
