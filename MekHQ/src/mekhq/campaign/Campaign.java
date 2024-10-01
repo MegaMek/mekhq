@@ -6859,7 +6859,7 @@ public class Campaign implements ITechManager {
         return switch (campaignOptions.getUnitRatingMethod()) {
             case NONE -> 5;
             case FLD_MAN_MERCS_REV -> getAtBUnitRatingMod() * 2;
-            case CAMPAIGN_OPS -> (int) ((getReputation().getReputationModifier() * 0.2) + 0.5);
+            case CAMPAIGN_OPS -> (int) (getReputation().getReputationModifier() * 0.2 + 0.5);
         };
     }
 
