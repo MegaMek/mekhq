@@ -2232,6 +2232,18 @@ public class AtBDynamicScenarioFactory {
         innerMap.put(Crew.MAP_SURNAME, crewNameArray[1]);
 
         final AbstractSkillGenerator skillGenerator = new ModifiedConstantSkillGenerator();
+
+        int skillValue = skill.ordinal();
+        int skillRoll = Compute.d6(1);
+
+        if (skillRoll == 1) {
+            skillValue = Math.max(1, skillValue - 1);
+        } else if (skillRoll == 6) {
+            skillValue = Math.min(7, skillValue + 1);
+        }
+
+        skill = SkillLevel.parseFromInteger(skillValue);
+
         skillGenerator.setLevel(skill);
         int[] skills = skillGenerator.generateRandomSkills(en);
 
