@@ -91,9 +91,9 @@ public class RandomMarriageMethodTest {
 
     @Test
     public void testToStringOverride() {
-        assertEquals(wordWrap(resources.getString("RandomMarriageMethod.NONE.text")).trim(),
+        assertEquals(resources.getString("RandomMarriageMethod.NONE.text").trim(),
                 RandomMarriageMethod.NONE.toString().trim());
-        assertEquals(wordWrap(resources.getString("RandomMarriageMethod.DICE_ROLL.text")).trim(),
+        assertEquals(resources.getString("RandomMarriageMethod.DICE_ROLL.text").trim(),
                 RandomMarriageMethod.DICE_ROLL.toString().trim());
     }
 }

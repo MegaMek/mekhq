@@ -26,8 +26,6 @@ import mekhq.campaign.personnel.divorce.RandomDivorce;
 
 import java.util.ResourceBundle;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-
 /**
  * An enumeration representing the available random divorce methods.
  * <p>
@@ -60,7 +58,7 @@ public enum RandomDivorceMethod {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.toolTipText = wordWrap(resources.getString(toolTipText));
+        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
 
