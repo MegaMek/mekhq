@@ -18,8 +18,6 @@
  */
 package mekhq.campaign.rating.CamOpsReputation;
 
-import java.util.function.Consumer;
-
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
 import megamek.common.Entity;
@@ -70,13 +68,13 @@ public class AverageExperienceRating {
     }
 
     /**
-     * Retrieves the reputation modifier.
+     * Retrieves the average experience level of the campaign. Useful for AtB Systems.
      *
-     * @param averageSkillLevel the average skill level to calculate the reputation
-     *                          modifier for
+     * @param averageSkillLevel the average skill level for which to calculate the reputation
+     *                          modifier
      * @return the reputation modifier for the camera operator
      */
-    protected static int getReputationModifier(SkillLevel averageSkillLevel) {
+    protected static int getAverageExperienceModifier(SkillLevel averageSkillLevel) {
         int modifier = switch (averageSkillLevel) {
             case NONE, ULTRA_GREEN, GREEN -> 5;
             case REGULAR -> 10;
@@ -85,8 +83,8 @@ public class AverageExperienceRating {
         };
 
         logger.debug("Reputation Rating = {}, +{}",
-                averageSkillLevel.toString(),
-                modifier);
+            averageSkillLevel.toString(),
+            modifier);
 
         return modifier;
     }
