@@ -22,9 +22,6 @@ import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.ResourceBundle;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
@@ -34,10 +31,6 @@ import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
  */
 public class GeneralTab {
     // region Variable Declarations
-    private static String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
-        MekHQ.getMHQOptions().getLocale());
-
     JFrame frame;
     String name;
 
@@ -91,51 +84,27 @@ public class GeneralTab {
             false, "", false);
 
         // Campaign name
-        Map<JLabel, JTextField> nameFields = createLabeledTextField("Name", null,
-            300, 30, null, null);
-        for (Entry<JLabel, JTextField> entry : nameFields.entrySet()) {
-            lblName = entry.getKey();
-            txtName = entry.getValue();
-        }
+        lblName = createLabel("Name", null);
+        txtName = createTextField("Name", null, 300, 45);
 
         // Generate new random campaign name
-        btnNameGenerator = new JButton(resources.getString("lblNameGenerator.text"));
-        btnNameGenerator.setToolTipText(resources.getString("lblNameGenerator.tooltip"));
-        btnNameGenerator.setName("btnNameGenerator");
-        int btnNameGeneratorWidth = getDimensionWidthForButton(btnNameGenerator);
-        btnNameGenerator.setMinimumSize(new Dimension(btnNameGeneratorWidth, 30));
-        btnNameGenerator.setMaximumSize(new Dimension(btnNameGeneratorWidth, 30));
+        btnNameGenerator = createButton("NameGenerator");
         btnNameGenerator.addActionListener(e -> txtName.setText(BackgroundsController
                 .randomMercenaryCompanyNameGenerator(campaign.getFlaggedCommander())));
 
         // Campaign faction
         lblFaction = createLabel("Faction", null);
         comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), campaign.getLocalDate()));
-        int comboFactionWidth = getDimensionWidthForComboBox(comboFaction);
-        comboFaction.setMinimumSize(new Dimension(comboFactionWidth, 30));
-        comboFaction.setMaximumSize(new Dimension(comboFactionWidth, 30));
 
         // Reputation
         lblReputation = createLabel("Reputation", null);
-        int unitRatingMethodComboWidth = getDimensionWidthForComboBox(unitRatingMethodCombo);
-        unitRatingMethodCombo.setMinimumSize(new Dimension(unitRatingMethodComboWidth, 30));
-        unitRatingMethodCombo.setMaximumSize(new Dimension(unitRatingMethodComboWidth, 30));
-
-        Map<JLabel, JSpinner> manualReputationModifierFields = createLabeledSpinner(
-            "ManualUnitRatingModifier", null, 0, -200,
-            200, 1);
-        for (Entry<JLabel, JSpinner> entry : manualReputationModifierFields.entrySet()) {
-            lblManualUnitRatingModifier = entry.getKey();
-            manualUnitRatingModifier = entry.getValue();
-        }
+        lblManualUnitRatingModifier = createLabel("ManualUnitRatingModifier", null);
+        manualUnitRatingModifier = createSpinner("ManualUnitRatingModifier", null,
+            0, -200, 200, 1);
 
         // Date
         lblDate = createLabel("Date", null);
-        btnDate.setName("btnDate");
-
-        int btnDateWidth = getDimensionWidthForButton(btnNameGenerator);
-        btnDate.setMinimumSize(new Dimension(btnDateWidth, 30));
-        btnDate.setMaximumSize(new Dimension(btnDateWidth, 30));
+        btnDate = createButton("Date");
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Camouflage

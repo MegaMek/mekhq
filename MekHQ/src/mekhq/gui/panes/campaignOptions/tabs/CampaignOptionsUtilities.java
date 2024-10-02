@@ -17,8 +17,6 @@ public class CampaignOptionsUtilities {
     private static final MMLogger logger = MMLogger.create(CampaignOptionsPane.class);
     private static final String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
-
-    final static int WIDTH_MULTIPLIER_NUMBER = 3; // This seems to be the sweet spot
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
 
     /**
@@ -29,12 +27,10 @@ public class CampaignOptionsUtilities {
     }
 
     /**
-     * Returns a new {@link JCheckBox} object with the specified name, label, and tooltip.
+     * Returns a new {@link JCheckBox} object.
      * <p>
-     * Please note that 'name' is also used to fetch the resources associated with this object.
-     * For the label text 'name' is appended by '.text'.
-     * For the tooltip 'name' is appended with '.tooltip'.
-     * These values must exist in the resource bundle otherwise an error will be thrown.
+     * The {@link JCheckBox} will be named {@code "chk" + name}, and use the following resource bundle references:
+     * {@code "lbl" + name + ".text"} and {@code "lbl" + name + ".tooltip"}.
      *
      * @param name    the name of the checkbox
      * @param customWrapSize    the maximum number of characters (including whitespaces) on each
@@ -53,42 +49,35 @@ public class CampaignOptionsUtilities {
     }
 
     /**
-     * Creates a map containing a {@link JLabel} and a {@link JSpinner} object.
+     * Creates a {@link JSpinner} object.
      * <p>
-     * Please note that 'name' is also used to fetch the resources associated with these objects.
-     * For the label text 'name' is appended by '.text'.
-     * For the tooltips 'name' is appended with '.tooltip'.
-     * These values must exist in the resource bundle otherwise an error will be thrown.
+     * The name of the {@link JSpinner} will be {@code "spn" + name},
+     * and it will use the {@code "lbl" + name + ".tooltip"} resource bundle item
      *
      * @param name             a string representing the name of the objects.
-     *                        The {@link JLabel} will have 'lbl' appended.
-     *                        The {@link JSpinner} is appended with 'spn'.
      * @param customWrapSize   the maximum number of characters (including whitespaces) on each
      *                        line of the tooltip (or 100, if {@code null}).
-     * @param defaultValue     a double representing the default value of the spinner
-     * @param minimum          a double representing the minimum value of the spinner
-     * @param maximum          a double representing the maximum value of the spinner
-     * @param stepSize         a double representing the step size of the spinner
-     * @return a map containing a {@link JLabel} key and a {@link JSpinner} value.
+     * @param defaultValue     The default value of the spinner
+     * @param minimum          The minimum value of the spinner
+     * @param maximum          The maximum value of the spinner
+     * @param stepSize         The step size of the spinner
+     * @return The created {@link JSpinner}.
      */
-    static Map<JLabel, JSpinner> createLabeledSpinner(String name, @Nullable Integer customWrapSize,
+    static JSpinner createSpinner(String name, @Nullable Integer customWrapSize,
                                                              double defaultValue, double minimum,
                                                              double maximum, double stepSize) {
         customWrapSize = processWrapSize(customWrapSize);
-        final JLabel jLabel = createLabel(name, customWrapSize);
 
-        JSpinner jSpinner = new JSpinner(new SpinnerNumberModel(defaultValue, minimum, maximum, stepSize));
+        JSpinner jSpinner = new JSpinner();
+        jSpinner.setModel(new SpinnerNumberModel(defaultValue, minimum, maximum, stepSize));
         jSpinner.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jSpinner.setName("spn" + name);
 
-        FontMetrics fontMetrics = jSpinner.getFontMetrics(jSpinner.getFont());
-        int width = fontMetrics.stringWidth(Double.toString(maximum));
-        width = width * WIDTH_MULTIPLIER_NUMBER;
+        Dimension size = jSpinner.getPreferredSize();
+        jSpinner.setMaximumSize(size);
+        jSpinner.setMinimumSize(size);
 
-        jSpinner.setMaximumSize(new Dimension(width, 30));
-        jSpinner.setMinimumSize(new Dimension(width, 30));
-
-        return Map.of(jLabel, jSpinner);
+        return jSpinner;
     }
 
     /**
@@ -112,92 +101,38 @@ public class CampaignOptionsUtilities {
         jLabel.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jLabel.setName("lbl" + name);
 
-        FontMetrics fontMetrics = jLabel.getFontMetrics(jLabel.getFont());
-        // The whitespaces create a consistent buffer that will scale with different fonts.
-        int width = fontMetrics.stringWidth(removeHtmlTags(jLabel.getText()) + "     ");
-
-        jLabel.setMinimumSize(new Dimension(width, 30));
-        jLabel.setMaximumSize(new Dimension(width, 30));
+        Dimension size = jLabel.getPreferredSize();
+        jLabel.setMinimumSize(size);
+        jLabel.setMaximumSize(size);
 
         return jLabel;
     }
 
     /**
-     * Calculates the optimal width for a {@link JComboBox} based on the text of its items.
-     *
-     * @param comboBox the {@link JComboBox} for which to calculate the width of each item's text
-     * @return the width of the widest item's text in the {@link JComboBox}, including a buffer space
-     */
-    static int getDimensionWidthForComboBox(JComboBox<?> comboBox) {
-        int width = 0;
-
-        FontMetrics fontMetrics = comboBox.getFontMetrics(comboBox.getFont());
-
-        for (int i = 0; i < comboBox.getItemCount(); i++) {
-            String itemText = comboBox.getItemAt(i).toString();
-            int workingWidth = fontMetrics.stringWidth(itemText);
-
-            if (workingWidth > width) {
-                width = workingWidth;
-            }
-        }
-
-        return (int) (width * 1.25);
-    }
-
-    /**
-     * Calculates the width of the text on a {@link JButton}.
-     *
-     * @param jButton the {@link JButton} to calculate the width for
-     * @return the adjusted width of the button text
-     */
-    static int getDimensionWidthForButton(JButton jButton) {
-        FontMetrics fontMetrics = jButton.getFontMetrics(jButton.getFont());
-
-        // The whitespaces create a consistent buffer that will scale with different fonts.
-        return fontMetrics.stringWidth(removeHtmlTags("     " + jButton.getText() + "     "));
-    }
-
-    /**
-     * Creates a map containing a {@link JLabel} and a {@link JTextField} object.
+     * Creates a {@link JTextField} object.
      * <p>
-     * Please note that 'name' is also used to fetch the resources associated with these objects.
-     * For the label text 'name' is appended by '.text'.
-     * For the tooltips 'name' is appended with '.tooltip'.
-     * These values must exist in the resource bundle otherwise an error will be thrown.
+     * The name of the {@link JTextField} will be {@code}, and it will use the following resource bundle reference:
+     * {@code "lbl" + name + ".tooltip"}.
      *
-     * @param name                 the name of the objects.
-     *                            The {@link JLabel} will have 'lbl' appended.
-     *                            The {@link JTextField} is appended with 'txt'.
-     * @param customWrapSize       the maximum number of characters (including whitespaces) on each
+     * @param name                the name of the object.
+     * @param customWrapSize      the maximum number of characters (including whitespaces) on each
      *                            line of the tooltip.
      *                            If {@code null}, the default wrap size of 100 is used.
-     * @param minimumSizeWidth     the minimum width of the {@link JTextField}.
-     * @param minimumSizeHeight    the minimum height of the {@link JTextField}.
-     * @param maximumSizeWidth     the maximum width of the {@link JTextField}.
-     *                            If {@code null}, the minimum size width is used.
-     * @param maximumSizeHeight    the maximum height of the {@link JTextField}.
-     *                            If {@code null}, the minimum size height is used.
+     * @param width               The width of the {@link JTextField}.
+     * @param height              The height of the {@link JTextField}.
      * @return a map containing a {@link JLabel} key and a {@link JTextField} value.
      */
-    static Map<JLabel, JTextField> createLabeledTextField(String name,
-                                                                 @Nullable Integer customWrapSize, int minimumSizeWidth,
-                                                                 int minimumSizeHeight, @Nullable Integer maximumSizeWidth,
-                                                                 @Nullable Integer maximumSizeHeight) {
+    static JTextField createTextField(String name, @Nullable Integer customWrapSize, int width, int height) {
         customWrapSize = processWrapSize(customWrapSize);
-        JLabel jLabel = createLabel(name, customWrapSize);
 
         JTextField jTextField = new JTextField();
         jTextField.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jTextField.setName("txt" + name);
 
-        jTextField.setMinimumSize(new Dimension(minimumSizeWidth, minimumSizeHeight));
+        jTextField.setMinimumSize(new Dimension(width, height));
+        jTextField.setMaximumSize(new Dimension(width, height));
 
-        maximumSizeWidth = maximumSizeWidth == null ? minimumSizeWidth : maximumSizeWidth;
-        maximumSizeHeight = maximumSizeHeight == null ? minimumSizeHeight : maximumSizeHeight;
-        jTextField.setMaximumSize(new Dimension(maximumSizeWidth, maximumSizeHeight));
-
-        return Map.of(jLabel, jTextField);
+        return jTextField;
     }
 
     /**
@@ -218,13 +153,16 @@ public class CampaignOptionsUtilities {
      * <p>
      * {@code createStandardLayout} should also be called and the resulting {@link GroupLayout}
      * assigned to the panel via {@code setLayout}.
+     * <p>
+     * If {@code borderTitle} isn't empty the resource bundle reference, used to fetch the border's
+     * title, will be {@code "lbl" + borderTitle + ".text"}
      *
      * @param name         the name of the panel.
      * @param includeBorder whether the panel should have a border.
      * @param borderTitle  The resource string that should be used as the title of the border.
      *                    Can be empty to generate an untitled border.
      *
-     * @return a JPanel with a titled border and GroupLayout as its layout manager
+     * @return a {@link JPanel} with a titled border and {@link GroupLayout} as its layout manager
      */
     static JPanel createStandardPanel(String name, boolean includeBorder, String borderTitle) {
         borderTitle = borderTitle.isBlank() ? "" : resources.getString("lbl" + borderTitle + ".text");
@@ -244,17 +182,18 @@ public class CampaignOptionsUtilities {
     /**
      * Creates a {@link JPanel} consisting of a {@link JLabel} above an image.
      * If {@code includeBodyText} is {@code true} a second {@link JLabel} is placed after the first.
+     * <p>
+     * The {@link JPanel} will be named {@code "pnl" + name + "HeaderPanel"}.
+     * The resource bundle references for the first {@link JLabel} will be {@code "lbl" + name + ".text"}.
+     * The optional second {@link JLabel} is assigned the name {@code ""lbl" + name + "HeaderBody"}
+     * and uses the following resource bundle reference: {@code "lbl" + name + "Body.text"}.
      *
      * @param name           the name of the header panel.
-     *                      The {@link JLabel} will have 'lbl' appended. This will be appended with
-     *                      '.text' to fetch the label contents from the resource bundle.
-     *                      The {@link JPanel} is appended with 'pnl'.
      * @param imageAddress   the file path of the image to be displayed in the panel
      * @param includeBorder  whether the panel should have a border
      * @param borderTitle    the title of the border; can be empty for an untitled border
-     * @param includeBodyText    if {@code true}, include a second {@link JLabel} named {@code name + "Body"}.
-     *                          The resource bundle reference is {@code name + "Body.text"}
-     * @return a JPanel representing the header panel
+     * @param includeBodyText    if {@code true}, include a second {@link JLabel}.
+     * @return a {@link JPanel} representing the header panel
      */
     static JPanel createHeaderPanel(String name, String imageAddress, boolean includeBorder,
                                            String borderTitle, boolean includeBodyText) {
@@ -269,10 +208,12 @@ public class CampaignOptionsUtilities {
         if (includeBodyText) {
             lblBody = new JLabel(String.format("<html>%s</html>",
                 resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
-            lblHeader.setName("lbl" + name);
+            lblBody.setName("lbl" + name + "HeaderBody");
+            Dimension size = lblBody.getPreferredSize();
+            lblBody.setMaximumSize(new Dimension(500, size.height));
         }
 
-        final JPanel panel = createStandardPanel("pnl" + name, includeBorder, borderTitle);
+        final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", includeBorder, borderTitle);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -307,12 +248,11 @@ public class CampaignOptionsUtilities {
         return layout;
     }
     /**
-     * Creates a parent panel for the provided {@link JPanel} with a specified name, maximum width,
-     * and maximum height.
+     * Creates a parent panel for the provided {@link JPanel}.
      *
      * @param panel the panel to be added to the parent panel
      * @param name the name of the parent panel
-     * @param maximumWidth the maximum width of the parent panel
+     * @param width the maximum width of the parent panel
      * @return the created {@link JPanel}
      */
     static JPanel createParentPanel(JPanel panel, String name, int maximumWidth) {
@@ -337,8 +277,36 @@ public class CampaignOptionsUtilities {
         return parentPanel;
     }
 
+    public static List<Integer> getPanelSizeValues(JPanel panel) {
+        List<Integer> sizeValues = new ArrayList<>();
+
+        int width = 0;
+        int height = 0;
+
+        for (Component component : panel.getComponents()) {
+            String componentName = component.getName();
+            logger.info(componentName);
+
+            if (componentName != null && componentName.contains("HeaderPanel")) {
+                continue;
+            }
+
+            Dimension componentSize = component.getPreferredSize();
+
+            width += componentSize.width;
+            height += componentSize.height;
+        }
+
+        sizeValues.add(width);
+        sizeValues.add(height);
+
+        return sizeValues;
+    }
+
     /**
      * Creates a new instance of {@link JTabbedPane} with the supplied panels as tabs.
+     * <p>
+     * The resource bundle reference for the individual tabs will be {@code panel.getName() + ".title"}
      *
      * @param panels a map containing the names of the panels as keys and the corresponding
      *              {@link JPanel} objects as values
@@ -361,12 +329,24 @@ public class CampaignOptionsUtilities {
     }
 
     /**
-     * Removes HTML tags from the given string.
+     * Creates a new {@link JButton}.
+     * <p>
+     * The name of the created {@link JButton} is {@code "btn" + name}
+     * The resource bundle references for the created {@link JButton} are {@code "lbl" + name + ".text"}
+     * and {@code "lbl" + name + ".tooltip"}.
      *
-     * @param htmlString the string containing HTML tags
-     * @return the string without HTML tags
+     * @param name the name of the button, used to generate the button's name and resource bundle references
+     * @return a new {@link JButton} object
      */
-    private static String removeHtmlTags(String htmlString) {
-        return htmlString.replaceAll("\\<.*?\\>", "");
+    static JButton createButton(String name) {
+        JButton jButton = new JButton(resources.getString("lbl" + name + ".text"));
+        jButton.setToolTipText(resources.getString("lbl" + name + ".tooltip"));
+        jButton.setName("btn" + name);
+
+        Dimension size = jButton.getPreferredSize();
+        jButton.setMinimumSize(size);
+        jButton.setMaximumSize(size);
+
+        return jButton;
     }
 }

@@ -2,8 +2,6 @@ package mekhq.gui.panes.campaignOptions.tabs;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
@@ -77,20 +75,15 @@ public class RepairAndMaintenanceTab {
         // Damage by Margin
         useDamageMargin = createCheckBox("UseDamageMargin", null);
         useDamageMargin.addActionListener(evt -> spnDamageMargin.setEnabled(useDamageMargin.isSelected()));
-        Map<JLabel, JSpinner> damageMarginFields = createLabeledSpinner("DamageMargin",
-            null, 1, 1, 20, 1);
-        for (Entry<JLabel, JSpinner> entry : damageMarginFields.entrySet()) {
-            lblDamageMargin = entry.getKey();
-            spnDamageMargin = entry.getValue();
-        }
+
+        lblDamageMargin = createLabel("DamageMargin", null);
+        spnDamageMargin = createSpinner("DamageMargin", null,
+            1, 1, 20, 1);
 
         // Equipment Survival
-        Map<JLabel, JSpinner> DestroyPartTargetFields = createLabeledSpinner("DestroyPartTarget",
-            null, 2, 2, 13, 1);
-        for (Entry<JLabel, JSpinner> entry : DestroyPartTargetFields.entrySet()) {
-            lblDestroyPartTarget = entry.getKey();
-            spnDestroyPartTarget = entry.getValue();
-        }
+        lblDestroyPartTarget = createLabel("DestroyPartTarget", null);
+        spnDestroyPartTarget = createSpinner("DestroyPartTarget", null,
+            2, 2, 13, 1);
         JLabel lblDestroyPartTargetPost = new JLabel("<html><b>+</b></html>");
 
         // Layout the Panel
@@ -153,28 +146,19 @@ public class RepairAndMaintenanceTab {
         checkMaintenance = createCheckBox("CheckMaintenance", null);
 
         // Maintenance Cycle Duration
-        Map<JLabel, JSpinner> maintenanceDaysFields = createLabeledSpinner("MaintenanceDays",
-            null, 7, 1, 365, 1);
-        for (Entry<JLabel, JSpinner> entry : maintenanceDaysFields.entrySet()) {
-            lblMaintenanceDays = entry.getKey();
-            spnMaintenanceDays = entry.getValue();
-        }
+        lblMaintenanceDays = createLabel("MaintenanceDays", null);
+        spnDamageMargin = createSpinner("MaintenanceDays", null,
+            7, 1, 365, 1);
 
         // Maintenance Bonus
-        Map<JLabel, JSpinner> maintenanceBonusFields = createLabeledSpinner("MaintenanceBonus",
-            null, 0, -13, 13, 1);
-        for (Entry<JLabel, JSpinner> entry : maintenanceBonusFields.entrySet()) {
-            lblMaintenanceBonus = entry.getKey();
-            spnMaintenanceBonus = entry.getValue();
-        }
+        lblMaintenanceBonus = createLabel("MaintenanceBonus", null);
+        spnMaintenanceBonus = createSpinner("MaintenanceBonus", null,
+            0, -13, 13, 1);
 
         // Default Maintenance Time
-        Map<JLabel, JSpinner> defaultMaintenanceTimeFields = createLabeledSpinner("DefaultMaintenanceTime",
-            null, 1, 1, 4, 1);
-        for (Entry<JLabel, JSpinner> entry : defaultMaintenanceTimeFields.entrySet()) {
-            lblDefaultMaintenanceTime = entry.getKey();
-            spnDefaultMaintenanceTime = entry.getValue();
-        }
+        lblDefaultMaintenanceTime = createLabel("DefaultMaintenanceTime", null);
+        spnDefaultMaintenanceTime = createSpinner("DefaultMaintenanceTime", null,
+            1, 1, 4, 1);
 
         // Use Quality Modifiers
         useQualityMaintenance = createCheckBox("UseQualityMaintenance", null);

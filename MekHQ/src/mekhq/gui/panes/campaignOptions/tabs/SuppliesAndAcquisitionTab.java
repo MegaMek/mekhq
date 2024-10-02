@@ -10,8 +10,6 @@ import mekhq.campaign.personnel.SkillType;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
@@ -96,44 +94,29 @@ public class SuppliesAndAcquisitionTab {
 
         // Acquisitions skill
         lblChoiceAcquireSkill = createLabel("ChoiceAcquireSkill", null);
-        int choiceAcquireSkillWidth = getDimensionWidthForComboBox(choiceAcquireSkill);
-        choiceAcquireSkill.setMinimumSize(new Dimension(choiceAcquireSkillWidth, 30));
-        choiceAcquireSkill.setMaximumSize(new Dimension(choiceAcquireSkillWidth , 30));
 
         // Support personnel only
         chkSupportStaffOnly = createCheckBox("SupportStaffOnly", null);
 
         // Clan Acquisition penalty
-        Map<JLabel, JSpinner> acquireClanPenaltyFields = createLabeledSpinner("AcquireClanPenalty",
-            null, 0, 0, 13, 1);
-        for (Entry<JLabel, JSpinner> entry : acquireClanPenaltyFields.entrySet()) {
-            lblAcquireClanPenalty = entry.getKey();
-            spnAcquireClanPenalty = entry.getValue();
-        }
+        lblAcquireClanPenalty = createLabel("AcquireClanPenalty", null);
+        spnAcquireClanPenalty = createSpinner("AcquireClanPenalty", null,
+            0, 0, 13, 1);
 
         // IS Acquisition penalty
-        Map<JLabel, JSpinner> acquireIsPenaltyFields = createLabeledSpinner("AcquireISPenalty",
-            null, 0, 0, 13, 1);
-        for (Entry<JLabel, JSpinner> entry : acquireIsPenaltyFields.entrySet()) {
-            lblAcquireIsPenalty = entry.getKey();
-            spnAcquireIsPenalty = entry.getValue();
-        }
+        lblAcquireIsPenalty = createLabel("AcquireISPenalty", null);
+        spnAcquireIsPenalty = createSpinner("AcquireISPenalty", null,
+            0, 0, 13, 1);
 
         // Waiting Period
-        Map<JLabel, JSpinner> acquireWaitingPeriodFields = createLabeledSpinner("AcquireWaitingPeriod",
-            null, 1, 1, 365, 1);
-        for (Entry<JLabel, JSpinner> entry : acquireWaitingPeriodFields.entrySet()) {
-            lblAcquireWaitingPeriod = entry.getKey();
-            spnAcquireWaitingPeriod = entry.getValue();
-        }
+        lblAcquireWaitingPeriod = createLabel("AcquireWaitingPeriod", null);
+        spnAcquireWaitingPeriod = createSpinner("AcquireWaitingPeriod", null,
+            1, 1, 365, 1);
 
         // Maximum Acquisitions
-        Map<JLabel, JSpinner> maxAcquisitionsFields = createLabeledSpinner("MaxAcquisitions",
-            null, 0,0, 100, 1);
-        for (Entry<JLabel, JSpinner> entry : maxAcquisitionsFields.entrySet()) {
-            lblMaxAcquisitions = entry.getKey();
-            spnMaxAcquisitions = entry.getValue();
-        }
+        lblMaxAcquisitions = createLabel("MaxAcquisitions", null);
+        spnMaxAcquisitions = createSpinner("MaxAcquisitions", null,
+            0,0, 100, 1);
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("acquisitionTab", true, "");
@@ -234,21 +217,12 @@ public class SuppliesAndAcquisitionTab {
         usePlanetaryAcquisitions = createCheckBox("UsePlanetaryAcquisitions", null);
 
         // Max Jump Distance
-        Map<JLabel, JSpinner> maxJumpPlanetaryAcquisitionsFields = createLabeledSpinner(
-            "MaxJumpPlanetaryAcquisitions", null, 2, 0,
-            5, 1);
-        for (Entry<JLabel, JSpinner> entry : maxJumpPlanetaryAcquisitionsFields.entrySet()) {
-            lblMaxJumpPlanetaryAcquisitions = entry.getKey();
-            spnMaxJumpPlanetaryAcquisitions = entry.getValue();
-        }
+        lblMaxJumpPlanetaryAcquisitions = createLabel("MaxJumpPlanetaryAcquisitions", null);
+        spnMaxJumpPlanetaryAcquisitions = createSpinner("MaxJumpPlanetaryAcquisitions", null,
+            2, 0, 5, 1);
 
         // Faction Limits
         lblPlanetaryAcquisitionsFactionLimits = createLabel("PlanetaryAcquisitionsFactionLimits", null);
-        int comboPlanetaryAcquisitionsFactionLimitsWidth = getDimensionWidthForComboBox(comboPlanetaryAcquisitionsFactionLimits);
-        comboPlanetaryAcquisitionsFactionLimits.setMinimumSize(new Dimension(comboPlanetaryAcquisitionsFactionLimitsWidth,
-            30));
-        comboPlanetaryAcquisitionsFactionLimits.setMaximumSize(new Dimension(comboPlanetaryAcquisitionsFactionLimitsWidth,
-            30));
 
         // Disallow Resource Sharing (Inner Sphere)
         disallowPlanetaryAcquisitionClanCrossover = createCheckBox("DisallowPlanetaryAcquisitionClanCrossover", null);
@@ -257,13 +231,9 @@ public class SuppliesAndAcquisitionTab {
         disallowClanPartsFromIS = createCheckBox("DisallowClanPartsFromIS", null);
 
         // Acquisition Penalty
-        Map<JLabel, JSpinner> penaltyClanPartsFromISFields = createLabeledSpinner(
-            "PenaltyClanPartsFromIS", null, 0, 0, 12,
-            1);
-        for (Entry<JLabel, JSpinner> entry : penaltyClanPartsFromISFields.entrySet()) {
-            lblPenaltyClanPartsFromIS = entry.getKey();
-            spnPenaltyClanPartsFromIS = entry.getValue();
-        }
+        lblPenaltyClanPartsFromIS = createLabel("PenaltyClanPartsFromIS", null);
+        spnPenaltyClanPartsFromIS = createSpinner("PenaltyClanPartsFromIS", null,
+            0, 0, 12, 1);
 
         // Verbose Reporting
         usePlanetaryAcquisitionsVerbose = createCheckBox("UsePlanetaryAcquisitionsVerbose", null);
@@ -464,12 +434,9 @@ public class SuppliesAndAcquisitionTab {
      * @param spinner the {@link JSpinner} to set the width for
      */
     private void setSpinnerWidth(JSpinner spinner) {
-        FontMetrics fontMetrics = spinner.getFontMetrics(spinner.getFont());
-        int width = fontMetrics.stringWidth(Double.toString(12));
-        width = width * WIDTH_MULTIPLIER_NUMBER;
-
-        spinner.setMaximumSize(new Dimension(width, 30));
-        spinner.setMinimumSize(new Dimension(width, 30));
+        Dimension size = spinner.getPreferredSize();
+        spinner.setMaximumSize(size);
+        spinner.setMinimumSize(size);
     }
 
     /**
@@ -502,45 +469,23 @@ public class SuppliesAndAcquisitionTab {
             "", true);
 
         // Delivery Time
-        Map<JLabel, JSpinner> nDiceTransitTimeFields = createLabeledSpinner("NDiceTransitTime",
-            null, 0, 0, 365, 1);
-        for (Entry<JLabel, JSpinner> entry : nDiceTransitTimeFields.entrySet()) {
-            lblNDiceTransitTime = entry.getKey();
-            spnNDiceTransitTime = entry.getValue();
-        }
+        lblNDiceTransitTime = createLabel("NDiceTransitTime", null);
+        spnNDiceTransitTime = createSpinner("NDiceTransitTime", null, 0,
+            0, 365, 1);
 
-        Map<JLabel, JSpinner> constantTransitTimeFields = createLabeledSpinner("ConstantTransitTime",
-            null, 0, 0, 365, 1);
-        for (Entry<JLabel, JSpinner> entry : constantTransitTimeFields.entrySet()) {
-            lblConstantTransitTime = entry.getKey();
-            spnConstantTransitTime = entry.getValue();
-        }
-
-        int choiceTimeUnitsWidth = getDimensionWidthForComboBox(choiceTransitTimeUnits);
-        choiceTransitTimeUnits.setMinimumSize(new Dimension(choiceTimeUnitsWidth, 30));
-        choiceTransitTimeUnits.setMaximumSize(new Dimension(choiceTimeUnitsWidth, 30));
+        lblConstantTransitTime = createLabel("ConstantTransitTime", null);
+        spnConstantTransitTime = createSpinner("ConstantTransitTime", null,
+            0, 0, 365, 1);
 
         // Margin of Success Reductions
-        Map<JLabel, JSpinner> acquireMosBonusFields = createLabeledSpinner("AcquireMosBonus",
+        lblAcquireMosBonus = createLabel("AcquireMosBonus", null);
+        spnAcquireMosBonus = createSpinner("AcquireMosBonus",
             null, 0, 0, 365, 1);
-        for (Entry<JLabel, JSpinner> entry : acquireMosBonusFields.entrySet()) {
-            lblAcquireMosBonus = entry.getKey();
-            spnAcquireMosBonus = entry.getValue();
-        }
-
-        choiceAcquireMosUnits.setMinimumSize(new Dimension(choiceTimeUnitsWidth, 30));
-        choiceAcquireMosUnits.setMaximumSize(new Dimension(choiceTimeUnitsWidth, 30));
 
         // Minimum Transit Time
-        Map<JLabel, JSpinner> acquireMinimumFields = createLabeledSpinner("AcquireMinimum",
+        lblAcquireMinimum = createLabel("AcquireMinimum", null);
+        spnAcquireMinimum = createSpinner("AcquireMinimum",
             null, 0, 0, 365, 1);
-        for (Entry<JLabel, JSpinner> entry : acquireMinimumFields.entrySet()) {
-            lblAcquireMinimum = entry.getKey();
-            spnAcquireMinimum = entry.getValue();
-        }
-
-        choiceAcquireMinimumUnit.setMinimumSize(new Dimension(choiceTimeUnitsWidth, 30));
-        choiceAcquireMinimumUnit.setMaximumSize(new Dimension(choiceTimeUnitsWidth, 30));
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("deliveryTab", true, "");
