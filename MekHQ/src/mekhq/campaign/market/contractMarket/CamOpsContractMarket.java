@@ -168,10 +168,6 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return Optional.of(contract);
     }
 
-    private int getReputationScore(Campaign campaign) {
-        return campaign.getReputation().getReputationRating();
-    }
-
     private Faction determineEmployer(Campaign campaign, int ratingMod) {
         Collection<Tag> employerTags;
         int roll = Compute.d6(2) + ratingMod + contractMods.employersMod;
