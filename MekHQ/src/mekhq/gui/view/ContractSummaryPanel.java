@@ -158,6 +158,20 @@ public class ContractSummaryPanel extends JPanel {
         gridBagConstraintsText.gridy = y;
         mainPanel.add(txtName, gridBagConstraintsText);
 
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            if (contract instanceof AtBContract) {
+                JLabel lblChallenge = new JLabel(resourceMap.getString("lblChallenge.text"));
+                lblChallenge.setName("lblChallenge");
+                gridBagConstraintsLabels.gridy = ++y;
+                mainPanel.add(lblChallenge, gridBagConstraintsLabels);
+
+                JPanel txtChallenge = ((AtBContract) contract).getContractDifficultyStars(campaign);
+                txtChallenge.setName("txtChallenge");
+                gridBagConstraintsText.gridy = y;
+                mainPanel.add(txtChallenge, gridBagConstraintsText);
+            }
+        }
+
         JLabel lblEmployer = new JLabel(resourceMap.getString("lblEmployer.text"));
         lblEmployer.setName("lblEmployer");
         gridBagConstraintsLabels.gridy = ++y;
