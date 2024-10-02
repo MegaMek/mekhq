@@ -21,19 +21,24 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ratgenerator.FactionRecord;
+import megamek.client.ratgenerator.RATGenerator;
+import megamek.client.ratgenerator.UnitTable;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.*;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.UnitType;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -41,6 +46,7 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
@@ -65,7 +71,21 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
 
+import static java.lang.Math.round;
+import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
+import static megamek.client.ratgenerator.UnitTable.findTable;
+import static megamek.common.UnitType.MEK;
+import static megamek.common.enums.SkillLevel.ELITE;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.enums.SkillLevel.parseFromInteger;
+import static megamek.common.enums.SkillLevel.parseFromString;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
+import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
+import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
+import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollAdvantages;
+import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollLoyalty;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -664,7 +684,7 @@ public class AtBContract extends Contract {
                 break;
             case 6:
                 campaign.addReport("Bonus: Unit");
-                addBonusUnit(campaign, UnitType.MEK);
+                addBonusUnit(campaign, MEK);
                 break;
             default:
                 throw new IllegalStateException(
@@ -705,7 +725,7 @@ public class AtBContract extends Contract {
             quality = enemyQuality;
         }
 
-        Entity newUnit = getEntity(faction, SkillLevel.REGULAR, quality, unitType,
+        Entity newUnit = getEntity(faction, REGULAR, quality, unitType,
             UNIT_WEIGHT_UNSPECIFIED, null, campaign);
         campaign.addNewUnit(newUnit, false, 0);
     }
