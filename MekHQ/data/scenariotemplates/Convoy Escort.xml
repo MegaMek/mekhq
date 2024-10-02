@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
     <name>Convoy Escort</name>
-    <shortBriefing>Protect an allied supply convoy.</shortBriefing>
-    <detailedBriefing>Escort the allied convoy across the map or rout the attacking force.</detailedBriefing>
+    <shortBriefing>Escort supply convoy or defeat attackers.</shortBriefing>
+    <detailedBriefing>An allied convoy carrying standard supplies must be escorted through hostile territory. Ensure that at least 50% of the convoy reaches its destination. Crippled units only count if the enemy force is routed. Alternatively, destroy 50% of enemy forces while preserving 50% of friendly forces.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
@@ -47,7 +47,7 @@
             </value>
         </entry>
         <entry>
-            <key>Primary Opfor</key>
+            <key>OpFor</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -63,7 +63,7 @@
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary Opfor</forceName>
+                <forceName>OpFor</forceName>
                 <generationMethod>1</generationMethod>
                 <generationOrder>5</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
@@ -81,7 +81,7 @@
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
-                <allowedUnitType>-1</allowedUnitType>
+                <allowedUnitType>-2</allowedUnitType>
                 <arrivalTurn>0</arrivalTurn>
                 <canReinforceLinked>false</canReinforceLinked>
                 <contributesToBV>true</contributesToBV>
@@ -97,7 +97,7 @@
                 <destinationZone>6</destinationZone>
                 <fixedUnitCount>0</fixedUnitCount>
                 <forceAlignment>1</forceAlignment>
-                <forceMultiplier>1.0</forceMultiplier>
+                <forceMultiplier>0.5</forceMultiplier>
                 <forceName>Convoy</forceName>
                 <generationMethod>2</generationMethod>
                 <generationOrder>4</generationOrder>
@@ -108,6 +108,12 @@
                 <startingAltitude>0</startingAltitude>
                 <syncDeploymentType>None</syncDeploymentType>
                 <useArtillery>false</useArtillery>
+                <roleChoices>
+                    <forceRole>CIVILIAN</forceRole>
+                    <forceRole>CARGO</forceRole>
+                    <forceRole>SUPPORT</forceRole>
+                    <forceRole>APC</forceRole>
+                </roleChoices>
             </value>
         </entry>
     </scenarioForces>
@@ -128,7 +134,7 @@
                 <failureEffect>
                     <effectType>ScenarioDefeat</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
+                    <howMuch>2</howMuch>
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
@@ -166,14 +172,14 @@
         </scenarioObjective>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>Primary Opfor</associatedForceName>
+                <associatedForceName>OpFor</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
                 <successEffect>
                     <effectType>ScenarioVictory</effectType>
                     <effectScaling>Fixed</effectScaling>
-                    <howMuch>2</howMuch>
+                    <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
             <failureEffects>
@@ -189,6 +195,33 @@
             <objectiveCriterion>ForceWithdraw</objectiveCriterion>
             <percentage>50</percentage>
             <timeLimit>0</timeLimit>
+            <timeLimitAtMost>true</timeLimitAtMost>
+            <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+            <associatedForceNames>
+                <associatedForceName>Player</associatedForceName>
+            </associatedForceNames>
+            <associatedUnitIDs />
+            <successEffects>
+                <successEffect>
+                    <effectType>ScenarioVictory</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </successEffect>
+            </successEffects>
+            <failureEffects>
+                <failureEffect>
+                    <effectType>ScenarioDefeat</effectType>
+                    <effectScaling>Fixed</effectScaling>
+                    <howMuch>1</howMuch>
+                </failureEffect>
+            </failureEffects>
+            <additionalDetails />
+            <description>Preserve 50% of the following force(s) and unit(s):</description>
+            <destinationEdge>NONE</destinationEdge>
+            <objectiveCriterion>Preserve</objectiveCriterion>
+            <percentage>50</percentage>
             <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </scenarioObjective>

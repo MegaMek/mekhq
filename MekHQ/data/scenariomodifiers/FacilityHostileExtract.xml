@@ -12,36 +12,24 @@
     <objectives>
         <objective>
             <associatedForceNames>
-                <associatedForceName>Base Turrets</associatedForceName>
+                <associatedForceName>Base Defenses</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
                 <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
+                    <effectType>SupportPointUpdate</effectType>
+                    <effectScaling>Linear</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>
             </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails>
-                <additionalDetail>Extraction can be carried out by a unit with at least one free
-                    hand actuator, infantry or battle armor.</additionalDetail>
-                <additionalDetail>Extraction cannot be performed from destroyed buildings.</additionalDetail>
-                <additionalDetail>The extracting units may flee the battlefield; alternately, the
-                    objective is automatically completed when routing the opposing force.</additionalDetail>
-            </additionalDetails>
-            <description>Extract assets from 75% of the buildings designated by turrets.</description>
+            <failureEffects />
+            <additionalDetails />
+            <description>Capture intact units from the following force(s) for additional support points:</description>
             <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Custom</objectiveCriterion>
-            <percentage>75</percentage>
-            <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitScaleFactor>2</timeLimitScaleFactor>
+            <fixedAmount>1</fixedAmount>
+            <objectiveCriterion>Capture</objectiveCriterion>
+            <percentage>1</percentage>
+            <timeLimitAtMost>true</timeLimitAtMost>
             <timeLimitType>None</timeLimitType>
         </objective>
     </objectives>

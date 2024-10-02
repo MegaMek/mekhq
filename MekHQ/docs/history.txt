@@ -74,6 +74,8 @@ MEKHQ VERSION HISTORY:
 + PR #4903: Implement dynamic hiring halls
 + FIX #4845: Refactored DropShip Salvage Handling
 + PR #4924: Refactored Batchall Logic and Enhanced Bidding Report
++ FIX #4952: Fix AtBMonthlyContractMarket payment multiplier
++ PR #4961: Remove hiring halls from clan worlds
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing

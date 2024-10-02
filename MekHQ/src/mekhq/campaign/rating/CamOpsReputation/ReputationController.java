@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getAtBModifier;
-import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getReputationModifier;
+import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getAverageExperienceModifier;
 import static mekhq.campaign.rating.CamOpsReputation.AverageExperienceRating.getSkillLevel;
 import static mekhq.campaign.rating.CamOpsReputation.CombatRecordRating.calculateCombatRecordRating;
 import static mekhq.campaign.rating.CamOpsReputation.CommandRating.calculateCommanderRating;
@@ -120,7 +120,7 @@ public class ReputationController {
     public void initializeReputation(Campaign campaign) {
         // step one: calculate average experience rating
         averageSkillLevel = getSkillLevel(campaign, true);
-        averageExperienceRating = getReputationModifier(averageSkillLevel);
+        averageExperienceRating = getAverageExperienceModifier(averageSkillLevel);
         atbModifier = getAtBModifier(campaign);
 
         // step two: calculate command rating
@@ -139,7 +139,6 @@ public class ReputationController {
         transportationValues = rawTransportationData.get(2);
 
         transportationRating = transportationCapacities.get("total");
-        transportationCapacities.remove("total");
 
         // step five: support rating
         Map<String, Map<String, ?>> rawSupportData = calculateSupportRating(campaign, transportationRequirements);
@@ -181,6 +180,16 @@ public class ReputationController {
         reputationRating += financialRating;
         reputationRating += crimeRating;
         reputationRating += otherModifiers;
+    }
+
+    /**
+     * Retrieves the unit rating modifier as described in Campaign Operations. This value is equal
+     * to the total reputation score divided by ten, rounded down to the nearest whole number.
+     *
+     * @return The unit rating modifier as described in Campaign Operations.
+     */
+    public int getReputationModifier() {
+        return reputationRating / 10;
     }
 
     /**
