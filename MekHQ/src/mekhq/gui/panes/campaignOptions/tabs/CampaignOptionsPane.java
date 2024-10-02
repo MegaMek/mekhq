@@ -34,11 +34,25 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Repair and Maintenance
         RepairAndMaintenanceTab repairAndMaintenanceTab = new RepairAndMaintenanceTab(getFrame(),
             "repairAndMaintenanceTab");
+
         JTabbedPane repairAndMaintenanceContentTabs = createSubTabs(Map.of(
             "repairTab", repairAndMaintenanceTab.createRepairTab(),
             "maintenanceTab", repairAndMaintenanceTab.createMaintenanceTab()));
+
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("RepairAndMaintenancePanel.title")), repairAndMaintenanceContentTabs);
+            resources.getString("repairAndMaintenanceContentTabs.title")), repairAndMaintenanceContentTabs);
+
+        // Supplies and Acquisition
+        SuppliesAndAcquisitionTab suppliesAndAcquisitionTab = new SuppliesAndAcquisitionTab(getFrame(),
+            "suppliesAndAcquisitionTab");
+
+        JTabbedPane suppliesAndAcquisitionContentTabs = createSubTabs(Map.of(
+            "acquisitionTab", suppliesAndAcquisitionTab.createAcquisitionTab(),
+            "deliveryTab", suppliesAndAcquisitionTab.createDeliveryTab(),
+            "planetaryAcquisitionTab", suppliesAndAcquisitionTab.createPlanetaryAcquisitionTab()));
+
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("suppliesAndAcquisitionTab.title")), suppliesAndAcquisitionContentTabs);
     }
 
     private void setOptions() {

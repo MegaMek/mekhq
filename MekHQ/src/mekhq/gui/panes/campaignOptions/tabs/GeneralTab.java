@@ -99,22 +99,27 @@ public class GeneralTab {
         }
 
         // Generate new random campaign name
-        btnNameGenerator = new JButton(resources.getString("btnNameGenerator.text"));
-        btnNameGenerator.setToolTipText(resources.getString("btnNameGenerator.tooltip"));
+        btnNameGenerator = new JButton(resources.getString("lblNameGenerator.text"));
+        btnNameGenerator.setToolTipText(resources.getString("lblNameGenerator.tooltip"));
         btnNameGenerator.setName("btnNameGenerator");
+        int btnNameGeneratorWidth = getDimensionWidthForButton(btnNameGenerator);
+        btnNameGenerator.setMinimumSize(new Dimension(btnNameGeneratorWidth, 30));
+        btnNameGenerator.setMaximumSize(new Dimension(btnNameGeneratorWidth, 30));
         btnNameGenerator.addActionListener(e -> txtName.setText(BackgroundsController
                 .randomMercenaryCompanyNameGenerator(campaign.getFlaggedCommander())));
 
         // Campaign faction
-        lblFaction = createLabel("lblFaction", null);
+        lblFaction = createLabel("Faction", null);
         comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), campaign.getLocalDate()));
-        comboFaction.setMinimumSize(new Dimension(275, 30));
-        comboFaction.setMaximumSize(new Dimension(275, 30));
+        int comboFactionWidth = getDimensionWidthForComboBox(comboFaction);
+        comboFaction.setMinimumSize(new Dimension(comboFactionWidth, 30));
+        comboFaction.setMaximumSize(new Dimension(comboFactionWidth, 30));
 
         // Reputation
-        lblReputation = createLabel("lblReputation", null);
-        unitRatingMethodCombo.setMinimumSize(new Dimension(150, 30));
-        unitRatingMethodCombo.setMaximumSize(new Dimension(150, 30));
+        lblReputation = createLabel("Reputation", null);
+        int unitRatingMethodComboWidth = getDimensionWidthForComboBox(unitRatingMethodCombo);
+        unitRatingMethodCombo.setMinimumSize(new Dimension(unitRatingMethodComboWidth, 30));
+        unitRatingMethodCombo.setMaximumSize(new Dimension(unitRatingMethodComboWidth, 30));
 
         Map<JLabel, JSpinner> manualReputationModifierFields = createLabeledSpinner(
             "ManualUnitRatingModifier", null, 0, -200,
@@ -125,23 +130,26 @@ public class GeneralTab {
         }
 
         // Date
-        lblDate = createLabel("lblDate", null);
+        lblDate = createLabel("Date", null);
         btnDate.setName("btnDate");
-        btnDate.setMinimumSize(new Dimension(100, 30));
-        btnDate.setMaximumSize(new Dimension(100, 30));
+
+        int btnDateWidth = getDimensionWidthForButton(btnNameGenerator);
+        btnDate.setMinimumSize(new Dimension(btnDateWidth, 30));
+        btnDate.setMaximumSize(new Dimension(btnDateWidth, 30));
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Camouflage
-        lblCamo = createLabel("lblCamo", null);
+        lblCamo = createLabel("Camo", null);
         btnCamo.setName("btnCamo");
-        btnCamo.setMinimumSize(new Dimension(84, 72));
-        btnCamo.setMaximumSize(new Dimension(84, 72));
+        btnCamo.setMinimumSize(new Dimension(100, 100));
+        btnCamo.setMaximumSize(new Dimension(100, 100));
         btnCamo.addActionListener(this::btnCamoActionPerformed);
 
         // Unit icon
-        lblIcon = createLabel("lblIcon", null);
-        btnIcon.setMinimumSize(new Dimension(84, 72));
-        btnIcon.setMaximumSize(new Dimension(84, 72));
+        lblIcon = createLabel("Icon", null);
+        btnIcon.setName("btnIcon");
+        btnIcon.setMinimumSize(new Dimension(100,  100));
+        btnIcon.setMaximumSize(new Dimension(100, 100));
         btnIcon.addActionListener(evt -> {
             final UnitIconDialog unitIconDialog = new UnitIconDialog(frame, unitIcon);
             if (unitIconDialog.showDialog().isConfirmed() && (unitIconDialog.getSelectedItem() != null)) {
@@ -164,26 +172,25 @@ public class GeneralTab {
                 .addComponent(imagePanel)
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblName)
-                    .addComponent(txtName, Alignment.LEADING)
+                    .addComponent(txtName)
                     .addComponent(btnNameGenerator))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblFaction)
-                    .addComponent(comboFaction, Alignment.LEADING))
+                    .addComponent(comboFaction))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblReputation)
-                    .addComponent(unitRatingMethodCombo, Alignment.LEADING))
+                    .addComponent(unitRatingMethodCombo))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblManualUnitRatingModifier)
-                    .addComponent(manualUnitRatingModifier, Alignment.LEADING))
+                    .addComponent(manualUnitRatingModifier))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblDate)
-                    .addComponent(btnDate, Alignment.LEADING))
+                    .addComponent(btnDate))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblCamo)
-                    .addComponent(btnCamo, Alignment.LEADING))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(btnCamo)
                     .addComponent(lblIcon)
-                    .addComponent(btnIcon, Alignment.LEADING)));
+                    .addComponent(btnIcon)));
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
@@ -191,25 +198,31 @@ public class GeneralTab {
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblName)
                     .addComponent(txtName)
-                    .addComponent(btnNameGenerator))
+                    .addComponent(btnNameGenerator)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblFaction)
-                    .addComponent(comboFaction))
+                    .addComponent(comboFaction)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblReputation)
-                    .addComponent(unitRatingMethodCombo))
+                    .addComponent(unitRatingMethodCombo)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblManualUnitRatingModifier)
-                    .addComponent(manualUnitRatingModifier))
+                    .addComponent(manualUnitRatingModifier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblDate)
-                    .addComponent(btnDate))
+                    .addComponent(btnDate)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblCamo)
-                    .addComponent(btnCamo))
-                .addGroup(layout.createSequentialGroup()
+                    .addComponent(btnCamo)
+                    .addGap(50)
                     .addComponent(lblIcon)
-                    .addComponent(btnIcon)));
+                    .addComponent(btnIcon)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
 
         generalPanel.add(panel);
 
@@ -226,10 +239,7 @@ public class GeneralTab {
         btnNameGenerator = new JButton();
 
         lblFaction = new JLabel();
-        DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
-        factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(
-            Factions.getInstance().getChoosableFactions(), campaign.getLocalDate()));
-        comboFaction = new MMComboBox<>("comboFaction", factionModel);
+        comboFaction = new MMComboBox<>("comboFaction", buildFactionDisplayOptions());
 
         lblReputation = new JLabel();
         unitRatingMethodCombo = new MMComboBox<>("unitRatingMethodCombo", UnitRatingMethod.values());
@@ -245,6 +255,18 @@ public class GeneralTab {
 
         lblIcon = new JLabel();
         btnIcon = new JButton();
+    }
+
+    /**
+     * Builds a {@link DefaultComboBoxModel} of {@link FactionDisplay} options.
+     */
+    private DefaultComboBoxModel<FactionDisplay> buildFactionDisplayOptions() {
+        DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
+
+        factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(
+            Factions.getInstance().getChoosableFactions(), campaign.getLocalDate()));
+
+        return factionModel;
     }
 
     /**

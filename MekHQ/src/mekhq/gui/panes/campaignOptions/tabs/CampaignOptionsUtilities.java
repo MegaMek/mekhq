@@ -18,7 +18,15 @@ public class CampaignOptionsUtilities {
     private static final String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
-    final static int WIDTH_MULTIPLIER = 3; // This seems to be the sweet spot
+    final static int WIDTH_MULTIPLIER_NUMBER = 3; // This seems to be the sweet spot
+    final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
+
+    /**
+     * @return the image directory
+     */
+    static String getImageDirectory() {
+        return IMAGE_DIRECTORY;
+    }
 
     /**
      * Returns a new {@link JCheckBox} object with the specified name, label, and tooltip.
@@ -37,9 +45,9 @@ public class CampaignOptionsUtilities {
         customWrapSize = processWrapSize(customWrapSize);
 
         JCheckBox checkBox = new JCheckBox(String.format("<html><b>%s</b></html>",
-            resources.getString(name + ".text")));
-        checkBox.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
-        checkBox.setName(name);
+            resources.getString("lbl" + name + ".text")));
+        checkBox.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
+        checkBox.setName("chk" + name);
 
         return checkBox;
     }
@@ -67,19 +75,15 @@ public class CampaignOptionsUtilities {
                                                              double defaultValue, double minimum,
                                                              double maximum, double stepSize) {
         customWrapSize = processWrapSize(customWrapSize);
-
-        final JLabel jLabel = new JLabel(String.format("<html><b>%s</b></html>",
-            resources.getString(name + ".text")));
-        jLabel.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
-        jLabel.setName("lbl" + name);
+        final JLabel jLabel = createLabel(name, customWrapSize);
 
         JSpinner jSpinner = new JSpinner(new SpinnerNumberModel(defaultValue, minimum, maximum, stepSize));
-        jSpinner.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
+        jSpinner.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jSpinner.setName("spn" + name);
 
         FontMetrics fontMetrics = jSpinner.getFontMetrics(jSpinner.getFont());
         int width = fontMetrics.stringWidth(Double.toString(maximum));
-        width = width * WIDTH_MULTIPLIER;
+        width = width * WIDTH_MULTIPLIER_NUMBER;
 
         jSpinner.setMaximumSize(new Dimension(width, 30));
         jSpinner.setMinimumSize(new Dimension(width, 30));
@@ -104,11 +108,54 @@ public class CampaignOptionsUtilities {
         customWrapSize = processWrapSize(customWrapSize);
 
         JLabel jLabel = new JLabel(String.format("<html>%s</html>",
-            resources.getString(name + ".text")));
-        jLabel.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
-        jLabel.setName(name);
+            resources.getString("lbl" + name + ".text")));
+        jLabel.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
+        jLabel.setName("lbl" + name);
+
+        FontMetrics fontMetrics = jLabel.getFontMetrics(jLabel.getFont());
+        // The whitespaces create a consistent buffer that will scale with different fonts.
+        int width = fontMetrics.stringWidth(removeHtmlTags(jLabel.getText()) + "     ");
+
+        jLabel.setMinimumSize(new Dimension(width, 30));
+        jLabel.setMaximumSize(new Dimension(width, 30));
 
         return jLabel;
+    }
+
+    /**
+     * Calculates the optimal width for a {@link JComboBox} based on the text of its items.
+     *
+     * @param comboBox the {@link JComboBox} for which to calculate the width of each item's text
+     * @return the width of the widest item's text in the {@link JComboBox}, including a buffer space
+     */
+    static int getDimensionWidthForComboBox(JComboBox<?> comboBox) {
+        int width = 0;
+
+        FontMetrics fontMetrics = comboBox.getFontMetrics(comboBox.getFont());
+
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            String itemText = comboBox.getItemAt(i).toString();
+            int workingWidth = fontMetrics.stringWidth(itemText);
+
+            if (workingWidth > width) {
+                width = workingWidth;
+            }
+        }
+
+        return (int) (width * 1.25);
+    }
+
+    /**
+     * Calculates the width of the text on a {@link JButton}.
+     *
+     * @param jButton the {@link JButton} to calculate the width for
+     * @return the adjusted width of the button text
+     */
+    static int getDimensionWidthForButton(JButton jButton) {
+        FontMetrics fontMetrics = jButton.getFontMetrics(jButton.getFont());
+
+        // The whitespaces create a consistent buffer that will scale with different fonts.
+        return fontMetrics.stringWidth(removeHtmlTags("     " + jButton.getText() + "     "));
     }
 
     /**
@@ -138,21 +185,17 @@ public class CampaignOptionsUtilities {
                                                                  int minimumSizeHeight, @Nullable Integer maximumSizeWidth,
                                                                  @Nullable Integer maximumSizeHeight) {
         customWrapSize = processWrapSize(customWrapSize);
-
-        JLabel jLabel = new JLabel(String.format("<html><b>%s</b></html>",
-            resources.getString(name + ".text")));
-        jLabel.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
-        jLabel.setName("lbl" + name);
+        JLabel jLabel = createLabel(name, customWrapSize);
 
         JTextField jTextField = new JTextField();
-        jTextField.setToolTipText(wordWrap(resources.getString(name + ".tooltip"), customWrapSize));
+        jTextField.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jTextField.setName("txt" + name);
 
         jTextField.setMinimumSize(new Dimension(minimumSizeWidth, minimumSizeHeight));
 
         maximumSizeWidth = maximumSizeWidth == null ? minimumSizeWidth : maximumSizeWidth;
         maximumSizeHeight = maximumSizeHeight == null ? minimumSizeHeight : maximumSizeHeight;
-        jTextField.setPreferredSize(new Dimension(maximumSizeWidth, maximumSizeHeight));
+        jTextField.setMaximumSize(new Dimension(maximumSizeWidth, maximumSizeHeight));
 
         return Map.of(jLabel, jTextField);
     }
@@ -184,7 +227,7 @@ public class CampaignOptionsUtilities {
      * @return a JPanel with a titled border and GroupLayout as its layout manager
      */
     static JPanel createStandardPanel(String name, boolean includeBorder, String borderTitle) {
-        borderTitle = borderTitle.isBlank() ? "" : resources.getString(borderTitle);
+        borderTitle = borderTitle.isBlank() ? "" : resources.getString("lbl" + borderTitle + ".text");
 
         JPanel panel = new JPanel();
 
@@ -205,7 +248,7 @@ public class CampaignOptionsUtilities {
      * @param name           the name of the header panel.
      *                      The {@link JLabel} will have 'lbl' appended. This will be appended with
      *                      '.text' to fetch the label contents from the resource bundle.
-     *                      The {@link JPanel} is appended with 'txt'.
+     *                      The {@link JPanel} is appended with 'pnl'.
      * @param imageAddress   the file path of the image to be displayed in the panel
      * @param includeBorder  whether the panel should have a border
      * @param borderTitle    the title of the border; can be empty for an untitled border
@@ -270,14 +313,17 @@ public class CampaignOptionsUtilities {
      * @param panel the panel to be added to the parent panel
      * @param name the name of the parent panel
      * @param maximumWidth the maximum width of the parent panel
-     * @param maximumHeight the maximum height of the parent panel
      * @return the created {@link JPanel}
      */
-    static JPanel createParentPanel(JPanel panel, String name, int maximumWidth, int maximumHeight) {
+    static JPanel createParentPanel(JPanel panel, String name, int maximumWidth) {
         final JPanel parentPanel = createStandardPanel(name, true, "");
         final GroupLayout parentLayout = createStandardLayout(parentPanel);
-        Dimension preferredSize = new Dimension(maximumWidth, maximumHeight);
-        panel.setMaximumSize(preferredSize);
+
+        int preferredHeight = (int) (panel.getPreferredSize().height * 1.25);
+        Dimension size = new Dimension(maximumWidth, preferredHeight);
+        panel.setMinimumSize(size);
+        panel.setMaximumSize(size);
+
         parentPanel.setLayout(parentLayout);
 
         parentLayout.setVerticalGroup(
@@ -312,5 +358,15 @@ public class CampaignOptionsUtilities {
         }
 
         return tabbedPane;
+    }
+
+    /**
+     * Removes HTML tags from the given string.
+     *
+     * @param htmlString the string containing HTML tags
+     * @return the string without HTML tags
+     */
+    private static String removeHtmlTags(String htmlString) {
+        return htmlString.replaceAll("\\<.*?\\>", "");
     }
 }

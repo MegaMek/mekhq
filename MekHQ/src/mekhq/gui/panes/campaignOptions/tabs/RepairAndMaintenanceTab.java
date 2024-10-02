@@ -1,7 +1,5 @@
 package mekhq.gui.panes.campaignOptions.tabs;
 
-import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
-
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.util.Map;
@@ -53,23 +51,6 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
-     * Creates the general tab.
-     *
-     * @return the created general tab as an {@link AbstractMHQScrollablePanel}
-     */
-    public JTabbedPane createRepairAndMaintenanceTab() {
-        JTabbedPane tabbedPane = new JTabbedPane();
-
-        JPanel repairPanel = createRepairTab();
-        tabbedPane.addTab("Repair", repairPanel);
-
-        JPanel maintenancePanel = createMaintenanceTab();
-        tabbedPane.addTab("Maintenance", maintenancePanel);
-
-        return tabbedPane;
-    }
-
-    /**
      * Creates the repair tab panel.
      *
      * @return the created repair tab panel as a {@link JPanel}
@@ -77,24 +58,24 @@ public class RepairAndMaintenanceTab {
     public JPanel createRepairTab() {
         // Header
         JPanel imagePanel = createHeaderPanel("RepairTab",
-            "data/images/universe/factions/logo_aurigan_coalition.png", false,
+            getImageDirectory() + "logo_aurigan_coalition.png", false,
             "", true);
 
         // Era Mods
-        useEraModsCheckBox = createCheckBox("useEraModsCheckBox", null);
+        useEraModsCheckBox = createCheckBox("UseEraModsCheckBox", null);
 
         // Tech Placement
-        assignedTechFirstCheckBox = createCheckBox("assignedTechFirstCheckBox", null);
-        resetToFirstTechCheckBox = createCheckBox("resetToFirstTechCheckBox", null);
+        assignedTechFirstCheckBox = createCheckBox("AssignedTechFirstCheckBox", null);
+        resetToFirstTechCheckBox = createCheckBox("ResetToFirstTechCheckBox", null);
 
         // Use Quirks
-        useQuirksBox = createCheckBox("useQuirksBox", null);
+        useQuirksBox = createCheckBox("UseQuirksBox", null);
 
         // Aero System Damage
-        useAeroSystemHitsBox = createCheckBox("useAeroSystemHitsBox", null);
+        useAeroSystemHitsBox = createCheckBox("UseAeroSystemHitsBox", null);
 
         // Damage by Margin
-        useDamageMargin = createCheckBox("useDamageMargin", null);
+        useDamageMargin = createCheckBox("UseDamageMargin", null);
         useDamageMargin.addActionListener(evt -> spnDamageMargin.setEnabled(useDamageMargin.isSelected()));
         Map<JLabel, JSpinner> damageMarginFields = createLabeledSpinner("DamageMargin",
             null, 1, 1, 20, 1);
@@ -110,6 +91,7 @@ public class RepairAndMaintenanceTab {
             lblDestroyPartTarget = entry.getKey();
             spnDestroyPartTarget = entry.getValue();
         }
+        JLabel lblDestroyPartTargetPost = new JLabel("<html><b>+</b></html>");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("repairTab", true, "");
@@ -126,11 +108,12 @@ public class RepairAndMaintenanceTab {
                 .addComponent(useAeroSystemHitsBox)
                 .addComponent(useDamageMargin)
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(spnDamageMargin)
-                    .addComponent(lblDamageMargin, Alignment.LEADING))
+                    .addComponent(lblDamageMargin)
+                    .addComponent(spnDamageMargin))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblDestroyPartTarget)
                     .addComponent(spnDestroyPartTarget)
-                    .addComponent(lblDestroyPartTarget, Alignment.LEADING)));
+                    .addComponent(lblDestroyPartTargetPost)));
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
@@ -142,14 +125,17 @@ public class RepairAndMaintenanceTab {
                 .addComponent(useAeroSystemHitsBox)
                 .addComponent(useDamageMargin)
                 .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblDamageMargin)
                     .addComponent(spnDamageMargin)
-                    .addComponent(lblDamageMargin))
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                 .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblDestroyPartTarget)
                     .addComponent(spnDestroyPartTarget)
-                    .addComponent(lblDestroyPartTarget)));
+                    .addComponent(lblDestroyPartTargetPost)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "repairTab", 500, 500);
+        return createParentPanel(panel, "repairTab", 500);
     }
 
     /**
@@ -160,11 +146,11 @@ public class RepairAndMaintenanceTab {
     public JPanel createMaintenanceTab() {
         // Promotional Image
         JPanel imagePanel = createHeaderPanel("MaintenanceTab",
-            "data/images/universe/factions/logo_clan_blood_spirit.png",
+            getImageDirectory() + "logo_clan_blood_spirit.png",
             false, "", true);
 
         // Check Maintenance
-        checkMaintenance = createCheckBox("checkMaintenance", null);
+        checkMaintenance = createCheckBox("CheckMaintenance", null);
 
         // Maintenance Cycle Duration
         Map<JLabel, JSpinner> maintenanceDaysFields = createLabeledSpinner("MaintenanceDays",
@@ -191,22 +177,22 @@ public class RepairAndMaintenanceTab {
         }
 
         // Use Quality Modifiers
-        useQualityMaintenance = createCheckBox("useQualityMaintenance", null);
+        useQualityMaintenance = createCheckBox("UseQualityMaintenance", null);
 
         // Reverse Quality names
-        reverseQualityNames = createCheckBox("reverseQualityNames", null);
+        reverseQualityNames = createCheckBox("ReverseQualityNames", null);
 
         // Use Random Unit Qualities
-        chkUseRandomUnitQualities = createCheckBox("chkUseRandomUnitQualities", null);
+        chkUseRandomUnitQualities = createCheckBox("UseRandomUnitQualities", null);
 
         // Use Planetary Modifiers
-        chkUsePlanetaryModifiers = createCheckBox("chkUsePlanetaryModifiers", null);
+        chkUsePlanetaryModifiers = createCheckBox("UsePlanetaryModifiers", null);
 
         // Only Damage F-Rated Equipment
-        useUnofficialMaintenance = createCheckBox("useUnofficialMaintenance", null);
+        useUnofficialMaintenance = createCheckBox("UseUnofficialMaintenance", null);
 
         // Report Maintenance checks to Log
-        logMaintenance = createCheckBox("logMaintenance", null);
+        logMaintenance = createCheckBox("LogMaintenance", null);
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("repairTab", true, "");
@@ -218,14 +204,14 @@ public class RepairAndMaintenanceTab {
                 .addComponent(imagePanel)
                 .addComponent(checkMaintenance)
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(spnMaintenanceDays)
-                    .addComponent(lblMaintenanceDays, Alignment.LEADING))
+                    .addComponent(lblMaintenanceDays)
+                    .addComponent(spnMaintenanceDays))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(spnMaintenanceBonus)
-                    .addComponent(lblMaintenanceBonus, Alignment.LEADING))
+                    .addComponent(lblMaintenanceBonus)
+                    .addComponent(spnMaintenanceBonus))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(spnDefaultMaintenanceTime)
-                    .addComponent(lblDefaultMaintenanceTime, Alignment.LEADING))
+                    .addComponent(lblDefaultMaintenanceTime)
+                    .addComponent(spnDefaultMaintenanceTime))
                 .addComponent(useQualityMaintenance)
                 .addComponent(reverseQualityNames)
                 .addComponent(chkUseRandomUnitQualities)
@@ -238,14 +224,17 @@ public class RepairAndMaintenanceTab {
                 .addComponent(imagePanel)
                 .addComponent(checkMaintenance)
                 .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblMaintenanceDays)
                     .addComponent(spnMaintenanceDays)
-                    .addComponent(lblMaintenanceDays))
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                 .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblMaintenanceBonus)
                     .addComponent(spnMaintenanceBonus)
-                    .addComponent(lblMaintenanceBonus))
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                 .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblDefaultMaintenanceTime)
                     .addComponent(spnDefaultMaintenanceTime)
-                    .addComponent(lblDefaultMaintenanceTime))
+                .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                 .addComponent(useQualityMaintenance)
                 .addComponent(reverseQualityNames)
                 .addComponent(chkUseRandomUnitQualities)
@@ -254,7 +243,7 @@ public class RepairAndMaintenanceTab {
                 .addComponent(logMaintenance));
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "maintenanceTab", 500, 500);
+        return createParentPanel(panel, "maintenanceTab", 500);
     }
 
     private void recreateFinancesPanel(boolean isReversingQualityNames) {
