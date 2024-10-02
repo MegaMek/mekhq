@@ -21,17 +21,18 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ratgenerator.UnitTable;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.*;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.UnitType;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -45,6 +46,7 @@ import mekhq.campaign.mission.enums.AtBMoraleLevel;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
@@ -77,8 +79,13 @@ import static megamek.common.enums.SkillLevel.ELITE;
 import static megamek.common.enums.SkillLevel.REGULAR;
 import static megamek.common.enums.SkillLevel.parseFromInteger;
 import static megamek.common.enums.SkillLevel.parseFromString;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
+import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
 import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
+import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
+import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollAdvantages;
+import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollLoyalty;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -643,77 +650,84 @@ public class AtBContract extends Contract {
         return contractScoreArbitraryModifier;
     }
 
-    public void doBonusRoll(Campaign c) {
+    public void doBonusRoll(Campaign campaign) {
         int number;
-        String rat = null;
         int roll = Compute.d6();
+
         switch (roll) {
             case 1: /* 1d6 dependents */
-                if (c.getCampaignOptions().isUseRandomDependentAddition()) {
+                if (campaign.getCampaignOptions().isUseRandomDependentAddition()) {
                     number = Compute.d6();
-                    c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
+                    campaign.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
 
                     for (int i = 0; i < number; i++) {
-                        Person p = c.newDependent(false, Gender.RANDOMIZE);
-                        c.recruitPerson(p);
+                        Person p = campaign.newDependent(false, Gender.RANDOMIZE);
+                        campaign.recruitPerson(p);
                     }
                 }
                 break;
-            case 2: /* Recruit (choose) */
-                c.addReport("Bonus: hire one recruit of your choice.");
+            case 2:
+                campaign.addReport("Bonus: Ronin");
+                recruitRonin(campaign);
                 break;
-            case 3: /* 1d6 parts */
-                number = Compute.d6();
-                numBonusParts += number;
-                c.addReport("Bonus: " + number + " part" + ((number > 1) ? "s" : ""));
+            case 3:
+                numBonusParts++;
+                campaign.addReport("Bonus: Part");
                 break;
-            case 4: /* civilian vehicle */
-                rat = "CivilianUnits_CivVeh";
-                c.addReport("Bonus: civilian vehicle");
+            case 4:
+                campaign.addReport("Bonus: Unit");
+                addBonusUnit(campaign, UnitType.TANK);
                 break;
-            case 5: /* APC */
-                rat = "CivilianUnits_APC";
-                c.addReport("Bonus: civilian APC");
+            case 5:
+                campaign.addReport("Bonus: Unit");
+                addBonusUnit(campaign, UnitType.AEROSPACEFIGHTER);
                 break;
-            case 6: /* civilian 'Mek */
-                rat = "CivilianUnits_PrimMek";
-                c.addReport("Bonus: civilian Mek");
+            case 6:
+                campaign.addReport("Bonus: Unit");
+                addBonusUnit(campaign, MEK);
                 break;
             default:
                 throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
+                    "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
+        }
+    }
+
+    /**
+     * Generates a Ronin and adds them to the personnel roster.
+     *
+     * @param campaign the current campaign.
+     */
+    private static void recruitRonin(Campaign campaign) {
+        Person ronin = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+
+        overrideSkills(campaign, ronin, PersonnelRole.MEKWARRIOR,
+            Objects.requireNonNull(SkillLevel.VETERAN).ordinal());
+
+        reRollLoyalty(ronin, ronin.getExperienceLevel(campaign, false));
+        reRollAdvantages(campaign, ronin, ronin.getExperienceLevel(campaign, false));
+        ronin.setCallsign(RandomCallsignGenerator.getInstance().generate());
+
+        campaign.recruitPerson(ronin, true);
+    }
+
+    /**
+     * Generates a bonus unit for a given campaign and unit type.
+     *
+     * @param campaign  the campaign object to add the bonus unit to
+     * @param unitType  the type of unit for the bonus
+     */
+    private void addBonusUnit(Campaign campaign, int unitType) {
+        String faction = employerCode;
+        int quality = allyQuality;
+
+        if (Compute.randomInt(2) > 0) {
+            faction = enemyCode;
+            quality = enemyQuality;
         }
 
-        if (null != rat) {
-            Entity en = null;
-            RandomUnitGenerator.getInstance().setChosenRAT(rat);
-            ArrayList<MekSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-
-            int quality = 3;
-
-            if (c.getCampaignOptions().isUseRandomUnitQualities()) {
-                quality = Unit.getRandomUnitQuality(0);
-            }
-
-            if (!msl.isEmpty() && (msl.get(0) != null)) {
-                try {
-                    en = new MekFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
-                } catch (EntityLoadingException ex) {
-                    logger.error("Unable to load entity: {}: {}: {}",
-                            msl.get(0).getSourceFile(),
-                            msl.get(0).getEntryName(),
-                            ex.getMessage(),
-                            ex);
-                }
-            }
-
-            if (null != en) {
-                c.addNewUnit(en, false, 0, quality);
-            } else {
-                c.addReport("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'>Could not load unit</font></html>");
-            }
-        }
+        Entity newUnit = getEntity(faction, REGULAR, quality, unitType,
+            UNIT_WEIGHT_UNSPECIFIED, null, campaign);
+        campaign.addNewUnit(newUnit, false, 0);
     }
 
     public boolean isSubcontract() {
