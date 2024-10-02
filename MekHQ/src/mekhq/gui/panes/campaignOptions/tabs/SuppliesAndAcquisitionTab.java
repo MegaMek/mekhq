@@ -169,7 +169,7 @@ public class SuppliesAndAcquisitionTab {
                     .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "acquisitionsTab", 500);
+        return createParentPanel(panel, "acquisitionsTab");
     }
 
     public JPanel createPlanetaryAcquisitionTab() {
@@ -203,7 +203,7 @@ public class SuppliesAndAcquisitionTab {
                     .addComponent(modifiers)));
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "PlanetaryAcquisitionTab", 800);
+        return createParentPanel(panel, "PlanetaryAcquisitionTab");
     }
 
 
@@ -532,7 +532,7 @@ public class SuppliesAndAcquisitionTab {
                     .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "deliveryTab", 600);
+        return createParentPanel(panel, "deliveryTab");
     }
 
     /**

@@ -128,7 +128,7 @@ public class RepairAndMaintenanceTab {
                     .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "repairTab", 500);
+        return createParentPanel(panel, "repairTab");
     }
 
     /**
@@ -227,7 +227,7 @@ public class RepairAndMaintenanceTab {
                 .addComponent(logMaintenance));
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "maintenanceTab", 500);
+        return createParentPanel(panel, "maintenanceTab");
     }
 
     private void recreateFinancesPanel(boolean isReversingQualityNames) {

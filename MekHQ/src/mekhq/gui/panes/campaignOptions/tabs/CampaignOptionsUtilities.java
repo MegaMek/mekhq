@@ -247,23 +247,33 @@ public class CampaignOptionsUtilities {
 
         return layout;
     }
+
     /**
      * Creates a parent panel for the provided {@link JPanel}.
      *
      * @param panel the panel to be added to the parent panel
      * @param name the name of the parent panel
-     * @param width the maximum width of the parent panel
      * @return the created {@link JPanel}
      */
-    static JPanel createParentPanel(JPanel panel, String name, int maximumWidth) {
+    static JPanel createParentPanel(JPanel panel, String name) {
+        // Create Panel
         final JPanel parentPanel = createStandardPanel(name, true, "");
         final GroupLayout parentLayout = createStandardLayout(parentPanel);
 
-        int preferredHeight = (int) (panel.getPreferredSize().height * 1.25);
-        Dimension size = new Dimension(maximumWidth, preferredHeight);
+        // Set Dimensions
+        int widthNew = panel.getMinimumSize().width;
+
+        if (widthNew < 500) {
+            widthNew = 500;
+        }
+
+        // I don't know why 1.25 works, it just does, and I've given up questioning it.
+        int height = (int) (panel.getPreferredSize().height * 1.25);
+        Dimension size = new Dimension(widthNew, height);
         panel.setMinimumSize(size);
         panel.setMaximumSize(size);
 
+        // Layout
         parentPanel.setLayout(parentLayout);
 
         parentLayout.setVerticalGroup(
@@ -275,32 +285,6 @@ public class CampaignOptionsUtilities {
                 .addComponent(panel));
 
         return parentPanel;
-    }
-
-    public static List<Integer> getPanelSizeValues(JPanel panel) {
-        List<Integer> sizeValues = new ArrayList<>();
-
-        int width = 0;
-        int height = 0;
-
-        for (Component component : panel.getComponents()) {
-            String componentName = component.getName();
-            logger.info(componentName);
-
-            if (componentName != null && componentName.contains("HeaderPanel")) {
-                continue;
-            }
-
-            Dimension componentSize = component.getPreferredSize();
-
-            width += componentSize.width;
-            height += componentSize.height;
-        }
-
-        sizeValues.add(width);
-        sizeValues.add(height);
-
-        return sizeValues;
     }
 
     /**
