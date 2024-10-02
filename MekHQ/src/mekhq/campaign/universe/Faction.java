@@ -247,6 +247,11 @@ public class Faction {
         return isRebel() || isPirate();
     }
 
+    public boolean isGovernment() {
+        return !isClan() && (isComStar() || isISMajorOrSuperPower() || isMinorPower()
+            || isPlanetaryGovt() || isIndependent());
+    }
+
     public boolean isComStar() {
         return "CS".equals(getShortName());
     }
