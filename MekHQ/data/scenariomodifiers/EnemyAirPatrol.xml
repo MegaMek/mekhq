@@ -26,12 +26,12 @@
 		<fixedUnitCount>2</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Recon Aircraft</forceName>
+		<forceName>Recon Aircraft</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>5</generationOrder>
 		<maxWeightClass>1</maxWeightClass>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>5</startingAltitude>

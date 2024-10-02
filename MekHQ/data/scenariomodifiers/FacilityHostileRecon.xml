@@ -12,7 +12,7 @@
     <objectives>
         <objective>
             <associatedForceNames>
-                <associatedForceName>Base Turrets</associatedForceName>
+                <associatedForceName>Base Defenses</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
             <successEffects>
@@ -29,21 +29,14 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
             </failureEffects>
-            <additionalDetails>
-                <additionalDetail>Scans may be conducted by moving a unit within three hexes of the
-                    target and foregoing all attacks.</additionalDetail>
-                <additionalDetail>Any kind of probe, improved sensors quirk or sensor geek SPA
-                    extends the range to five hexes, and the unit may attack as normal.</additionalDetail>
-                <additionalDetail>Scans cannot be conducted on destroyed buildings.</additionalDetail>
-                <additionalDetail>Note: This objective needs to be tracked outside of MegaMek.</additionalDetail>
-            </additionalDetails>
-            <description>Scan the buildings designated by placed turrets.</description>
+            <additionalDetails />
+            <description>Scan the hostile base by engaging the base for the specified duration.</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Custom</objectiveCriterion>
             <percentage>1</percentage>
             <timeLimitAtMost>false</timeLimitAtMost>
-            <timeLimitScaleFactor>2</timeLimitScaleFactor>
-            <timeLimitType>None</timeLimitType>
+            <timeLimitScaleFactor>3</timeLimitScaleFactor>
+            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </objective>
     </objectives>
 </AtBScenarioModifier>

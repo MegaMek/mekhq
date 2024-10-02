@@ -26,5 +26,20 @@
 				<objectiveScenarioModifier>OverwhelmingEnemyAirReinforcements.xml</objectiveScenarioModifier>
 			</objectiveScenarioModifiers>
 		</objectiveParameter>
+        <objectiveParameter>
+            <objectiveCount>-0.5</objectiveCount>
+            <objectiveType>AnyScenarioVictory</objectiveType>
+            <objectiveScenarios>
+                <objectiveScenario>Convoy Interdiction.xml</objectiveScenario>
+                <objectiveScenario>Convoy Raid.xml</objectiveScenario>
+                <objectiveScenario>Frontier Assassination.xml</objectiveScenario>
+                <objectiveScenario>Heavy Recon Evasion.xml</objectiveScenario>
+                <objectiveScenario>Intercept Engagement.xml</objectiveScenario>
+                <objectiveScenario>Recon Evasion.xml</objectiveScenario>
+                <objectiveScenario>Remote VIP Capture.xml</objectiveScenario>
+                <objectiveScenario>Skirmish.xml</objectiveScenario>
+                <objectiveScenario>Tactical Withdrawal.xml</objectiveScenario>
+            </objectiveScenarios>
+        </objectiveParameter>
 	</objectiveParameters>
 </ScenarioTemplate>

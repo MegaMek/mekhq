@@ -29,6 +29,12 @@
         <startingAltitude>0</startingAltitude>
         <syncDeploymentType>None</syncDeploymentType>
         <useArtillery>false</useArtillery>
+        <roleChoices>
+            <forceRole>CIVILIAN</forceRole>
+            <forceRole>CARGO</forceRole>
+            <forceRole>SUPPORT</forceRole>
+            <forceRole>APC</forceRole>
+        </roleChoices>
     </forceDefinition>
     <objectives>
         <objective>
