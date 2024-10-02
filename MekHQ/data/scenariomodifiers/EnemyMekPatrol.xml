@@ -30,14 +30,14 @@
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>2</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
-		<forceName>Opfor Recon Meks</forceName>
+		<forceName>Recon Meks</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>6</generationOrder>
 		<maxWeightClass>1</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<syncDeploymentType>None</syncDeploymentType>
 		<useArtillery>false</useArtillery>

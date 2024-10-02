@@ -23,7 +23,7 @@
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Artillery</forceName>
+		<forceName>Artillery</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>

@@ -50,17 +50,17 @@
 			HostileBVBudgetIncrease.xml
 		</modifier>
 		<!--modifier>
-			Need ability to allow player to specifically deploy dropships
+			Need ability to allow player to specifically deploy DropShips
 			HotDrop.xml
 		</modifier-->
 		<modifier>
 			EnemyHotDrop.xml
 		</modifier>
 		<modifier>
-			EnemyDropship.xml
+			EnemyDropShip.xml
 		</modifier>
 		<modifier>
-			GroundedEnemyDropship.xml
+			GroundedEnemyDropShip.xml
 		</modifier>
 		<modifier>
 			GoodIntel.xml
@@ -119,7 +119,7 @@
 		</modifier>
 		<!--modifier>
 			Need campaign state
-			Need way to change rat for opfor
+			Need way to change rat for OpFor
 			AlliedTreachery.xml
 		</modifier-->
 		<modifier>
@@ -132,9 +132,6 @@
 			Need planetary condition adjustments
 			OffworldOperation.xml
 		</modifier-->
-		<modifier>
-			SearchAndRescue.xml
-		</modifier>
 		<modifier>
 			AlliedTraineesGround.xml
 		</modifier>

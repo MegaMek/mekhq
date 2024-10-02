@@ -69,9 +69,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.lang.Math.round;
-import static megamek.client.ratgenerator.MissionRole.CIVILIAN;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
-import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
 
 /**
@@ -2229,7 +2227,7 @@ public class AtBDynamicScenarioFactory {
         innerMap.put(Crew.MAP_GIVEN_NAME, crewNameArray[0]);
         innerMap.put(Crew.MAP_SURNAME, crewNameArray[1]);
 
-        final AbstractSkillGenerator skillGenerator = new StratConSkillGenerator();
+        final AbstractSkillGenerator skillGenerator = new ModifiedConstantSkillGenerator();
         skillGenerator.setLevel(skill);
         int[] skills = skillGenerator.generateRandomSkills(en);
 
@@ -2988,7 +2986,7 @@ public class AtBDynamicScenarioFactory {
      *
      * @return a new instance of Entity with the specified parameters
      */
-    public static Entity getNewEntity(String faction, SkillLevel skill, int quality,
+    private static Entity getNewEntity(String faction, SkillLevel skill, int quality,
                                        List<Integer> unitTypes, String weights,
                                        @Nullable Map<Integer, Collection<MissionRole>> rolesByType,
                                        Campaign campaign, int i) {

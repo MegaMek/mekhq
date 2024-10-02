@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An overwhelming enemy aerospace force has been detected approaching the
-		area.</additionalBriefingText>
+	<additionalBriefingText>An overwhelming enemy aerospace force has been detected approaching the area.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>Space</allowedMapLocation>
 		<allowedMapLocation>LowAtmosphere</allowedMapLocation>
@@ -31,13 +30,13 @@
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Aerospace Reinforcements</forceName>
+		<forceName>Aerospace Reinforcements</forceName>
 		<generationMethod>1</generationMethod>
 		<generationOrder>5</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>None</syncDeploymentType>

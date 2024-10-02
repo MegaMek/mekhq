@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An active enemy dropship has been detected in the area.</additionalBriefingText>
+	<additionalBriefingText>An active enemy DropShip has been detected in the area.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<forceDefinition>
@@ -17,17 +17,26 @@
 		<fixedUnitCount>1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Active Dropship</forceName>
-		<generationMethod>3</generationMethod>
+		<forceName>DropShip</forceName>
+		<generationMethod>2</generationMethod>
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>5</startingAltitude>
 		<syncDeploymentType>SameEdge</syncDeploymentType>
-		<syncedForceName>Primary Opfor</syncedForceName>
+		<syncedForceName>OpFor</syncedForceName>
 		<useArtillery>false</useArtillery>
+        <roleChoices>
+            <forceRole>MEK_CARRIER</forceRole>
+            <forceRole>MEK_CARRIER</forceRole>
+            <forceRole>ASF_CARRIER</forceRole>
+            <forceRole>VEE_CARRIER</forceRole>
+            <forceRole>INFANTRY_CARRIER</forceRole>
+            <forceRole>TROOP_CARRIER</forceRole>
+            <forceRole>CIVILIAN</forceRole>
+        </roleChoices>
 	</forceDefinition>
 </AtBScenarioModifier>

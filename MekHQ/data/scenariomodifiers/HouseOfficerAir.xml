@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-    <additionalBriefingText>Your force will be deployed under the command of a house officer. Keep
-        them alive. Additionally, allied command will dictate retreat conditions.</additionalBriefingText>
+    <additionalBriefingText>Your employer is dispatching a force to assist with this objective.</additionalBriefingText>
     <benefitsPlayer>true</benefitsPlayer>
     <eventTiming>PreForceGeneration</eventTiming>
     <forceDefinition>
@@ -9,83 +8,27 @@
         <allowedUnitType>9</allowedUnitType>
         <arrivalTurn>0</arrivalTurn>
         <canReinforceLinked>false</canReinforceLinked>
-        <contributesToBV>true</contributesToBV>
+        <contributesToBV>false</contributesToBV>
         <contributesToMapSize>true</contributesToMapSize>
-        <contributesToUnitCount>true</contributesToUnitCount>
+        <contributesToUnitCount>false</contributesToUnitCount>
         <deployOffboard>false</deployOffboard>
         <deploymentZones />
         <destinationZone>5</destinationZone>
-        <fixedUnitCount>1</fixedUnitCount>
+        <fixedUnitCount>0</fixedUnitCount>
         <forceAlignment>1</forceAlignment>
         <forceMultiplier>1.0</forceMultiplier>
-        <forceName>House Officer</forceName>
-        <generationMethod>3</generationMethod>
-        <generationOrder>3</generationOrder>
+        <forceName>Joint Force</forceName>
+        <generationMethod>2</generationMethod>
+        <generationOrder>1</generationOrder>
         <maxWeightClass>4</maxWeightClass>
-        <retreatThreshold>50</retreatThreshold>
+        <minWeightClass>2</minWeightClass>
+        <retreatThreshold>0</retreatThreshold>
         <startingAltitude>5</startingAltitude>
+        <objectiveLinkedForces>
+            <objectiveLinkedForce>Player</objectiveLinkedForce>
+        </objectiveLinkedForces>
         <syncDeploymentType>SameEdge</syncDeploymentType>
         <syncedForceName>Player</syncedForceName>
         <useArtillery>false</useArtillery>
     </forceDefinition>
-
-    <objectives>
-        <objective>
-            <associatedForceNames>
-                <associatedForceName>House Officer</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <description>Preserve 100% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>100</percentage>
-            <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </objective>
-        <objective>
-            <associatedForceNames>
-                <associatedForceName>House Officer</associatedForceName>
-                <associatedForceName>Player</associatedForceName>
-                <associatedForceName>Allied Force</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Preserve 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Preserve</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimit>0</timeLimit>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </objective>
-    </objectives>
 </AtBScenarioModifier>

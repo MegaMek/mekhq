@@ -7,15 +7,10 @@
 	<objectives>
 		<objective>
 			<associatedForceNames>
-				<associatedForceName>Base Turrets</associatedForceName>
+				<associatedForceName>Base Defenses</associatedForceName>
 			</associatedForceNames>
 			<associatedUnitIDs />
 			<successEffects>
-				<successEffect>
-					<effectType>ScenarioVictory</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>2</howMuch>
-				</successEffect>
 				<successEffect>
 					<effectType>FacilityCaptured</effectType>
 					<effectScaling>Fixed</effectScaling>
@@ -23,11 +18,6 @@
 				</successEffect>
 			</successEffects>
 			<failureEffects>
-				<failureEffect>
-					<effectType>ScenarioDefeat</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>1</howMuch>
-				</failureEffect>
 				<failureEffect>
 					<effectType>FacilityRemains</effectType>
 					<effectScaling>Fixed</effectScaling>
@@ -48,16 +38,10 @@
 		</objective>
 		<objective>
 			<associatedForceNames>
-				<associatedForceName>Primary Opfor</associatedForceName>
-				<associatedForceName>Base Turrets</associatedForceName>
+				<associatedForceName>OpFor</associatedForceName>
 			</associatedForceNames>
 			<associatedUnitIDs />
 			<successEffects>
-				<successEffect>
-					<effectType>ScenarioVictory</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>2</howMuch>
-				</successEffect>
 				<successEffect>
 					<effectType>FacilityCaptured</effectType>
 					<effectScaling>Fixed</effectScaling>
@@ -65,11 +49,6 @@
 				</successEffect>
 			</successEffects>
 			<failureEffects>
-				<failureEffect>
-					<effectType>ScenarioDefeat</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>1</howMuch>
-				</failureEffect>
 				<failureEffect>
 					<effectType>FacilityRemains</effectType>
 					<effectScaling>Fixed</effectScaling>

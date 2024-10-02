@@ -284,8 +284,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private boolean canReinforceLinked;
 
     /**
-     * Whether this force contributes to the BV budget if the generation method is
-     * BV Scaled
+     * Whether this force contributes to the OpFor BV budget if the generation method is BV Scaled
      */
     private boolean contributesToBV;
 
@@ -583,7 +582,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
 
     /**
      * Deserialization support for roles that could be applied to this force
-     * 
+     *
      * @return
      */
     @XmlElementWrapper(name = "roleChoices")
@@ -598,7 +597,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      * are provided, returns an empty set.
      * FIXME: placeholder function. Needs to be properly tied into the UI and file
      * read/write.
-     * 
+     *
      * @return
      */
     public Collection<MissionRole> getRequiredRoles() {
@@ -716,7 +715,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      * Adds a set of roles required for this formation. Duplicates are ignored.
      * FIXME: placeholder function. Needs to be properly tied into the UI and file
      * read/write.
-     * 
+     *
      * @param newRoles
      */
     public void addRequiredRoles(Collection<ModelRecord> newRoles) {
@@ -767,7 +766,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
 
     /**
      * Whether this force is bot-controlled and allied to the player
-     * 
+     *
      * @return
      */
     public boolean isAlliedBotForce() {
@@ -786,7 +785,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     /**
      * Convenience function that returns the displayable name of the selected unit
      * type.
-     * 
+     *
      * @return
      */
     public String getAllowedUnitTypeName() {
@@ -800,7 +799,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     /**
      * Attempt to deserialize an instance of a ScenarioForceTemplate from the
      * passed-in XML Node
-     * 
+     *
      * @param xmlNode The source file
      * @return Possibly an instance of a ScenarioForceTemplate
      */

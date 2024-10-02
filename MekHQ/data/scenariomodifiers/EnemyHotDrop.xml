@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Enemy dropship has been detected in the area. Telemetry indicates it's at
+	<additionalBriefingText>Enemy DropShip has been detected in the area. Telemetry indicates it's at
 		least partially loaded. Expect additional hostile units to be deployed via airdrop.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
@@ -23,13 +23,13 @@
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Hot Drop</forceName>
+		<forceName>Hot Drop</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>2</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<syncDeploymentType>None</syncDeploymentType>
 		<startingAltitude>3</startingAltitude>

@@ -23,14 +23,14 @@
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Mek Garrison</forceName>
+		<forceName>Mek Garrison</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>5</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<syncDeploymentType>None</syncDeploymentType>
 		<useArtillery>false</useArtillery>

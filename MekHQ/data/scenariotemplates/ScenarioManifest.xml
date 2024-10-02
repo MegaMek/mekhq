@@ -1,164 +1,184 @@
 <scenarioManifest>
 	<scenarioFileNames>
-		<entry>
-			<key>0</key>
-			<value>Battle.xml</value>
-		</entry>
-		<entry>
-			<key>1</key>
-			<value>Capture.xml</value>
-		</entry>
-		<entry>
-			<key>2</key>
-			<value>Assassinate.xml</value>
-		</entry>
-		<entry>
-			<key>3</key>
-			<value>Convoy Attack.xml</value>
-		</entry>
-		<entry>
-			<key>4</key>
-			<value>Recon.xml</value>
-		</entry>
-		<entry>
-			<key>5</key>
-			<value>Engage.xml</value>
-		</entry>
-		<entry>
-			<key>6</key>
-			<value>Diversion.xml</value>
-		</entry>
-		<entry>
-			<key>7</key>
-			<value>Prevent Recon.xml</value>
-		</entry>
-		<entry>
-			<key>8</key>
-			<value>Breakthrough.xml</value>
-		</entry>
-		<entry>
-			<key>9</key>
-			<value>Pursuit.xml</value>
-		</entry>
-		<entry>
-			<key>10</key>
-			<value>Prevent Breakthrough.xml</value>
-		</entry>
-		<entry>
-			<key>11</key>
-			<value>Harass.xml</value>
-		</entry>
-		<entry>
-			<key>12</key>
-			<value>Convoy Escort.xml</value>
-		</entry>
-		<entry>
-			<key>13</key>
-			<value>Irregular Forces.xml</value>
-		</entry>
-		<entry>
-			<key>14</key>
-			<value>Defend Grounded Dropship.xml</value>
-		</entry>
-		<entry>
-			<key>15</key>
-			<value>Destroy Grounded Dropship.xml</value>
-		</entry>
-		<entry>
-			<key>16</key>
-			<value>Hostile Facility.xml</value>
-		</entry>
-		<entry>
-			<key>17</key>
-			<value>Allied Facility.xml</value>
-		</entry>
-		<entry>
-			<key>18</key>
-			<value>Low Atmo - Interception.xml</value>
-		</entry>
-		<entry>
-			<key>19</key>
-			<value>Low Atmo - Escort.xml</value>
-		</entry>
-		<entry>
-			<key>20</key>
-			<value>Low Atmo - Destroy Dropship.xml</value>
-		</entry>
-		<entry>
-			<key>21</key>
-			<value>Air Support.xml</value>
-		</entry>
-		<entry>
-			<key>22</key>
-			<value>Space - Interception.xml</value>
-		</entry>
-		<entry>
-			<key>23</key>
-			<value>Space - Blockade Run Escort.xml</value>
-		</entry>
-		<entry>
-			<key>24</key>
-			<value>Space - Blockade Run.xml</value>
-		</entry>
-		<entry>
-			<key>25</key>
-			<value>Allied Facility - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>26</key>
-			<value>Assassinate - Assault.xml</value>
-		</entry>
-		<entry>
-			<key>27</key>
-			<value>Battle - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>28</key>
-			<value>Breakthrough - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>29</key>
-			<value>Capture - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>30</key>
-			<value>Convoy Attack - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>31</key>
-			<value>Convoy Escort - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>32</key>
-			<value>Defend Grounded Dropship - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>33</key>
-			<value>Destroy Grounded Dropship - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>34</key>
-			<value>Diversion - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>35</key>
-			<value>Engage - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>36</key>
-			<value>Harass - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>37</key>
-			<value>Hostile Facility - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>38</key>
-			<value>Irregular Forces - Heavy.xml</value>
-		</entry>
-		<entry>
-			<key>39</key>
-			<value>Recon - Heavy.xml</value>
-		</entry>
-	</scenarioFileNames>
+        <entry>
+            <key>0</key>
+            <value>Annihilation.xml</value>
+        </entry>
+        <entry>
+            <key>1</key>
+            <value>Assassination.xml</value>
+        </entry>
+        <entry>
+            <key>2</key>
+            <value>Base Defense.xml</value>
+        </entry>
+        <entry>
+            <key>3</key>
+            <value>Breakthrough.xml</value>
+        </entry>
+        <entry>
+            <key>4</key>
+            <value>Close Air Support.xml</value>
+        </entry>
+        <entry>
+            <key>5</key>
+            <value>Convoy Escort.xml</value>
+        </entry>
+        <entry>
+            <key>6</key>
+            <value>Convoy Interdiction.xml</value>
+        </entry>
+        <entry>
+            <key>7</key>
+            <value>Convoy Raid.xml</value>
+        </entry>
+        <entry>
+            <key>8</key>
+            <value>Covert Strike.xml</value>
+        </entry>
+        <entry>
+            <key>9</key>
+            <value>Critical Convoy Escort.xml</value>
+        </entry>
+        <entry>
+            <key>10</key>
+            <value>Decoy Engagement.xml</value>
+        </entry>
+        <entry>
+            <key>11</key>
+            <value>Decoy Interception.xml</value>
+        </entry>
+        <entry>
+            <key>12</key>
+            <value>Deep Raid.xml</value>
+        </entry>
+        <entry>
+            <key>13</key>
+            <value>Deep Raid Defense.xml</value>
+        </entry>
+        <entry>
+            <key>14</key>
+            <value>Diversion Engagement.xml</value>
+        </entry>
+        <entry>
+            <key>15</key>
+            <value>DropShip Raid.xml</value>
+        </entry>
+        <entry>
+            <key>16</key>
+            <value>Frontier Assassination.xml</value>
+        </entry>
+        <entry>
+            <key>17</key>
+            <value>Frontline Breakthrough.xml</value>
+        </entry>
+        <entry>
+            <key>18</key>
+            <value>Frontline Disruption.xml</value>
+        </entry>
+        <entry>
+            <key>19</key>
+            <value>Frontline Engagement.xml</value>
+        </entry>
+        <entry>
+            <key>20</key>
+            <value>Frontline VIP Capture.xml</value>
+        </entry>
+        <entry>
+            <key>21</key>
+            <value>Heavy Recon Evasion.xml</value>
+        </entry>
+        <entry>
+            <key>22</key>
+            <value>Hostile Facility.xml</value>
+        </entry>
+        <entry>
+            <key>23</key>
+            <value>Intercept Engagement.xml</value>
+        </entry>
+        <entry>
+            <key>24</key>
+            <value>Interception Defense.xml</value>
+        </entry>
+        <entry>
+            <key>25</key>
+            <value>Irregular Force Assault.xml</value>
+        </entry>
+        <entry>
+            <key>26</key>
+            <value>Irregular Force Suppression.xml</value>
+        </entry>
+        <entry>
+            <key>27</key>
+            <value>Isolated DropShip Defense.xml</value>
+        </entry>
+        <entry>
+            <key>28</key>
+            <value>Low-Atmosphere Air Intercept.xml</value>
+        </entry>
+        <entry>
+            <key>29</key>
+            <value>Low-Atmosphere DropShip Assault.xml</value>
+        </entry>
+        <entry>
+            <key>30</key>
+            <value>Low-Atmosphere DropShip Escort.xml</value>
+        </entry>
+        <entry>
+            <key>31</key>
+            <value>Minor Engagement.xml</value>
+        </entry>
+        <entry>
+            <key>32</key>
+            <value>Picket Line Breakthrough.xml</value>
+        </entry>
+        <entry>
+            <key>33</key>
+            <value>Pivotal Battle.xml</value>
+        </entry>
+        <entry>
+            <key>34</key>
+            <value>Recon Evasion.xml</value>
+        </entry>
+        <entry>
+            <key>35</key>
+            <value>Reconnaissance Interdiction.xml</value>
+        </entry>
+        <entry>
+            <key>36</key>
+            <value>Remote VIP Capture.xml</value>
+        </entry>
+        <entry>
+            <key>37</key>
+            <value>Skirmish.xml</value>
+        </entry>
+        <entry>
+            <key>38</key>
+            <value>Skirmish Disruption.xml</value>
+        </entry>
+        <entry>
+            <key>39</key>
+            <value>Space Aerospace Intercept.xml</value>
+        </entry>
+        <entry>
+            <key>40</key>
+            <value>Space Blockade Run.xml</value>
+        </entry>
+        <entry>
+            <key>41</key>
+            <value>Space DropShip Intercept.xml</value>
+        </entry>
+        <entry>
+            <key>42</key>
+            <value>Tactical Withdrawal.xml</value>
+        </entry>
+        <entry>
+            <key>43</key>
+            <value>VIP Capture.xml</value>
+        </entry>
+        <entry>
+            <key>44</key>
+            <value>VIP Defense.xml</value>
+        </entry>
+    </scenarioFileNames>
 </scenarioManifest>
