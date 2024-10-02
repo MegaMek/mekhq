@@ -5,7 +5,6 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
@@ -39,7 +38,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         if (contractMods == null) {
             contractMods = generateContractModifiers(campaign);
         }
-        Optional<AtBContract> c = generateContract(campaign);
+        int ratingMod = campaign.getReputation().getReputationModifier();
+        Optional<AtBContract> c = generateContract(campaign, ratingMod);
         if (c.isPresent()) {
             AtBContract atbContract = c.get();
             contracts.add(atbContract);
@@ -60,7 +60,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         //}
         // TODO: CamopsMarket: allow players to choose negotiators and send them out, removing them
         // from other tasks they're doing. For now just use the highest negotiation skill on the force.
-        int ratingMod = getReputationModifier(campaign);
+        int ratingMod = campaign.getReputation().getReputationModifier();
         contractMods = generateContractModifiers(campaign);
         int negotiationSkill = findNegotiationSkill(campaign);
         int numOffers = getNumberOfOffers(
@@ -128,17 +128,17 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private Optional<AtBContract> generateContract(Campaign campaign) {
+    private Optional<AtBContract> generateContract(Campaign campaign, int ratingMod) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
         contract.setId(lastId);
         contractIds.put(lastId, contract);
-        Faction employer = determineEmployer(campaign);
+        Faction employer = determineEmployer(campaign, ratingMod);
         contract.setEmployerCode(employer.getShortName(), campaign.getLocalDate());
         if (employer.isMercenary()) {
             contract.setMercSubcontract(true);
         }
-        contract.setContractType(determineMission(campaign, employer));
+        contract.setContractType(determineMission(campaign, employer, ratingMod));
         setEnemyCode(contract);
         setIsRiotDuty(contract);
         setAttacker(contract);
@@ -168,20 +168,16 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return Optional.of(contract);
     }
 
-    private int getReputationModifier(Campaign campaign) {
-        return getReputationScore(campaign) / 10;
-    }
-
     private int getReputationScore(Campaign campaign) {
         return campaign.getReputation().getReputationRating();
     }
 
-    private Faction determineEmployer(Campaign campaign) {
+    private Faction determineEmployer(Campaign campaign, int ratingMod) {
         Collection<Tag> employerTags;
-        int roll = Compute.d6(2) + getReputationModifier(campaign) + contractMods.employersMod;
+        int roll = Compute.d6(2) + ratingMod + contractMods.employersMod;
         if (roll < 6) {
             // Roll again on the independent employers column
-            roll = Compute.d6(2) + getReputationModifier(campaign) + contractMods.employersMod;
+            roll = Compute.d6(2) + ratingMod + contractMods.employersMod;
             employerTags = getEmployerTags(campaign, roll, true);
         } else {
             employerTags = getEmployerTags(campaign, roll, false);
@@ -253,7 +249,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return tags;
     }
 
-    private AtBContractType determineMission(Campaign campaign, Faction employer) {
+    private AtBContractType determineMission(Campaign campaign, Faction employer, int ratingMod) {
         int roll = Compute.d6(2);
         if (campaign.getFaction().isPirate()) {
             if (roll < 6) {
@@ -262,7 +258,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
                 return AtBContractType.OBJECTIVE_RAID;
             }
         }
-        return findMissionType(getReputationModifier(campaign), employer.isISMajorOrSuperPower());
+        return findMissionType(ratingMod, employer.isISMajorOrSuperPower());
     }
 
     private void setContractClauses(AtBContract contract, Campaign campaign) {
