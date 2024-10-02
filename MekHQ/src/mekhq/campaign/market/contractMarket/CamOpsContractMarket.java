@@ -69,14 +69,14 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     @Override
-    public void addFollowup(Campaign campaign, AtBContract contract) {
-        //TODO: add logic if we decide followup contracts should be allow in CamOps
-    }
-
-    @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
         //TODO: add logic from camops 4th printing
         return 1.0;
+    }
+
+    @Override
+    public void checkForFollowup(Campaign campaign, AtBContract contract) {
+
     }
 
     private ContractModifiers getContractModifiers(Campaign campaign) {
