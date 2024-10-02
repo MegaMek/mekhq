@@ -1449,7 +1449,9 @@ public class PersonViewPanel extends JScrollablePanel {
                 IOption option = i.nextElement();
                 if (option.booleanValue()) {
                     JLabel lblAbility2 = new JLabel(Utilities.getOptionDisplayName(option));
-                    lblAbility2.setToolTipText(option.getDescription());
+                    lblAbility2.setToolTipText(wordWrap("<html>"
+                        + option.getDescription().replaceAll("\\n", "<br>")
+                        + "</html>"));
                     lblAbility2.setName("lblAbility2");
                     lblAbility2.getAccessibleContext().getAccessibleRelationSet().add(
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAbility1));
@@ -1480,7 +1482,9 @@ public class PersonViewPanel extends JScrollablePanel {
 
                 if (option.booleanValue()) {
                     JLabel lblImplants2 = new JLabel(Utilities.getOptionDisplayName(option));
-                    lblImplants2.setToolTipText(option.getDescription());
+                    lblImplants2.setToolTipText(wordWrap("<html>"
+                        + option.getDescription().replaceAll("\\n", "<br>")
+                        + "</html>"));
                     lblImplants2.setName("lblImplants2");
                     lblImplants2.getAccessibleContext().getAccessibleRelationSet().add(
                             new AccessibleRelation(AccessibleRelation.LABELED_BY, lblImplants1));

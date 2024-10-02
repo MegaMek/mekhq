@@ -346,296 +346,288 @@ public class AutoAwardsController {
         String[] filterList = campaign.getCampaignOptions().getAwardSetFilterList().split(",");
 
         // we start by building a primary list of all awards
-        if (!allSetNames.isEmpty()) {
-            logger.info("Getting all Award Sets");
+        logger.info("Getting all Award Sets");
 
-            for (String setName : allSetNames) {
-                if (!allSetNames.isEmpty()) {
-                    if (Arrays.asList(filterList).contains(setName)) {
-                        logger.info("'{}' was found in the list of sets to be ignored. Ignoring it.", setName);
-                        continue;
-                    }
+        for (String setName : allSetNames) {
+            if (Arrays.asList(filterList).contains(setName)) {
+                logger.info("'{}' was found in the list of sets to be ignored. Ignoring it.", setName);
+                continue;
+            }
 
-                    logger.info("Getting all awards from set: {}", setName);
+            logger.info("Getting all awards from set: {}", setName);
 
-                    awards.addAll(AwardsFactory.getInstance().getAllAwardsForSet(setName));
+            awards.addAll(AwardsFactory.getInstance().getAllAwardsForSet(setName));
+        }
 
-                    // next, we begin to filter the awards into discrete lists
-                    switch (awardListCase) {
-                        // Manual
-                        case 0:
-                            for (Award award : awards) {
-                                switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
-                                    case "group":
-                                        break;
-                                    case "ignore":
-                                    case "contract":
-                                    case "factionhunter":
-                                    case "injury":
-                                    case "theatreofwar":
-                                        ignoredAwards.add(award);
-                                        break;
-                                    case "kill":
-                                        if ((!award.getRange().equalsIgnoreCase("scenario"))
-                                                && (!award.getRange().equalsIgnoreCase("mission"))) {
-                                            if (campaign.getCampaignOptions().isEnableFormationKillAwards()) {
-                                                killAwards.add(award);
-                                            } else {
-                                                ignoredAwards.add(award);
-                                            }
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "misc":
-                                        if (campaign.getCampaignOptions().isEnableMiscAwards()) {
-                                            miscAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "rank":
-                                        if (campaign.getCampaignOptions().isEnableRankAwards()) {
-                                            rankAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "scenario":
-                                        if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
-                                            scenarioAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "skill":
-                                        if (campaign.getCampaignOptions().isEnableSkillAwards()) {
-                                            skillAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "time":
-                                        if (campaign.getCampaignOptions().isEnableTimeAwards()) {
-                                            timeAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "training":
-                                        trainingAwards.add(award);
-                                        break;
-                                    default:
-                                        // if autoAwards doesn't know what to do with an Award, it ignores it
-                                        ignoredAwards.add(award);
-                                }
-                            }
-                            // These logs help users double-check that the number of awards found matches their records
-                            logger.info("autoAwards found {} Kill Awards (excluding Mission & Scenario Kill Awards)", killAwards.size());
-                            logger.info("autoAwards found {} Rank Awards", rankAwards.size());
-                            logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
-                            logger.info("autoAwards found {} Skill Awards", skillAwards.size());
-                            logger.info("autoAwards found {} Time Awards", timeAwards.size());
-                            logger.info("autoAwards found {} Training Awards", trainingAwards.size());
-                            logger.info("autoAwards found {} Misc Awards", miscAwards.size());
-                            logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
-
+        // next, we begin to filter the awards into discrete lists
+        switch (awardListCase) {
+            // Manual
+            case 0:
+                for (Award award : awards) {
+                    switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                        case "group":
                             break;
-                        // post-mission
-                        case 1:
-                            for (Award award : awards) {
-                                switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
-                                    case "ignore":
-                                        ignoredAwards.add(award);
-                                        break;
-                                    case "divider":
-                                        break;
-                                    case "contract":
-                                        if (campaign.getCampaignOptions().isEnableContractAwards()) {
-                                            contractAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "factionhunter":
-                                        if (campaign.getCampaignOptions().isEnableFactionHunterAwards()) {
-                                            factionHunterAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    // Injury Awards are handled by the post-scenario controller
-                                    case "injury":
-                                        ignoredAwards.add(award);
-                                        break;
-                                    case "kill":
-                                        // Scenario Kill Awards are handled by the post-scenario controller
-                                        if (!award.getRange().equalsIgnoreCase("scenario")) {
-                                            if ((campaign.getCampaignOptions().isEnableIndividualKillAwards())
-                                                    || (campaign.getCampaignOptions().isEnableFormationKillAwards())) {
-                                                killAwards.add(award);
-                                            } else {
-                                                ignoredAwards.add(award);
-                                            }
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "misc":
-                                        if (campaign.getCampaignOptions().isEnableMiscAwards()) {
-                                            miscAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "rank":
-                                        if (campaign.getCampaignOptions().isEnableRankAwards()) {
-                                            rankAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "scenario":
-                                        if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
-                                            scenarioAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "skill":
-                                        if (campaign.getCampaignOptions().isEnableSkillAwards()) {
-                                            skillAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "theatreofwar":
-                                        if (campaign.getCampaignOptions().isEnableTheatreOfWarAwards()) {
-                                            theatreOfWarAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "time":
-                                        if (campaign.getCampaignOptions().isEnableTimeAwards()) {
-                                            timeAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "training":
-                                        trainingAwards.add(award);
-                                        break;
-                                    default:
-                                        // if autoAwards doesn't know what to do with an Award, it ignores it
-                                        ignoredAwards.add(award);
-                                }
-                            }
-                            // These logs help users double-check that the number of awards found matches their records
-                            logger.info("autoAwards found {} Kill Awards (excluding Scenario Kill Awards)", killAwards.size());
-                            logger.info("autoAwards found {} Contract Awards", contractAwards.size());
-                            logger.info("autoAwards found {} Rank Awards", rankAwards.size());
-                            logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
-                            logger.info("autoAwards found {} Skill Awards", skillAwards.size());
-                            logger.info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());
-                            logger.info("autoAwards found {} Time Awards", timeAwards.size());
-                            logger.info("autoAwards found {} Misc Awards", miscAwards.size());
-                            logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
-
+                        case "ignore":
+                        case "contract":
+                        case "factionhunter":
+                        case "injury":
+                        case "theatreofwar":
+                            ignoredAwards.add(award);
                             break;
-                        // post-scenario
-                        case 2:
-                            for (Award award : awards) {
-                                switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
-                                    case "divider":
-                                        break;
-                                    case "kill":
-                                        if ((campaign.getCampaignOptions().isEnableIndividualKillAwards()) && (award.getRange().equalsIgnoreCase("scenario"))) {
-
-                                            killAwards.add(award);
-                                        }
-                                        break;
-                                    case "injury":
-                                        if (campaign.getCampaignOptions().isEnableInjuryAwards()) {
-
-                                            injuryAwards.add(award);
-                                        }
-                                        break;
-                                    case "misc":
-                                        if (campaign.getCampaignOptions().isEnableMiscAwards()) {
-                                            miscAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    case "scenario":
-                                        if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
-                                            scenarioAwards.add(award);
-                                        } else {
-                                            ignoredAwards.add(award);
-                                        }
-                                        break;
-                                    default:
-                                        ignoredAwards.add(award);
+                        case "kill":
+                            if ((!award.getRange().equalsIgnoreCase("scenario"))
+                                    && (!award.getRange().equalsIgnoreCase("mission"))) {
+                                if (campaign.getCampaignOptions().isEnableFormationKillAwards()) {
+                                    killAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
                                 }
+                            } else {
+                                ignoredAwards.add(award);
                             }
-
-                            logger.info("autoAwards found {} Scenario Kill Awards (excluding Mission & Lifetime Kill Awards)", killAwards.size());
-                            logger.info("autoAwards found {} Injury Awards", injuryAwards.size());
-                            logger.info("autoAwards found {} Misc Awards", miscAwards.size());
-                            logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
-                            logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
-
                             break;
-                        // post-graduation
-                        case 3:
-                            for (Award award : awards) {
-                                switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
-                                    case "divider":
-                                        break;
-                                    case "training":
-                                        if (campaign.getCampaignOptions().isEnableTrainingAwards()) {
-                                            trainingAwards.add(award);
-                                        }
-                                        break;
-                                    default:
-                                        ignoredAwards.add(award);
-                                }
+                        case "misc":
+                            if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                                miscAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
                             }
-
-                            logger.info("autoAwards found {} Training Awards", trainingAwards.size());
-                            logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
-
                             break;
-                        // post-promotion
-                        case 4:
-                            for (Award award : awards) {
-                                switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
-                                    case "divider":
-                                        break;
-                                    case "rank":
-                                        if (campaign.getCampaignOptions().isEnableRankAwards()) {
-                                            rankAwards.add(award);
-                                        }
-                                        break;
-                                    default:
-                                        ignoredAwards.add(award);
-                                }
+                        case "rank":
+                            if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                                rankAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
                             }
-
-                            logger.info("autoAwards found {} Training Awards", rankAwards.size());
-                            logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
-
+                            break;
+                        case "scenario":
+                            if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                                scenarioAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "skill":
+                            if (campaign.getCampaignOptions().isEnableSkillAwards()) {
+                                skillAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "time":
+                            if (campaign.getCampaignOptions().isEnableTimeAwards()) {
+                                timeAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "training":
+                            trainingAwards.add(award);
                             break;
                         default:
-                            throw new IllegalStateException("Unexpected awardListCase: " + awardListCase);
+                            // if autoAwards doesn't know what to do with an Award, it ignores it
+                            ignoredAwards.add(award);
                     }
-                } else {
-                    logger.info("autoAwards failed to find any awards in set {}", setName);
                 }
-            }
-        } else {
-            logger.info("AutoAwards failed to find any award sets");
+                // These logs help users double-check that the number of awards found matches their records
+                logger.info("autoAwards found {} Kill Awards (excluding Mission & Scenario Kill Awards)", killAwards.size());
+                logger.info("autoAwards found {} Rank Awards", rankAwards.size());
+                logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
+                logger.info("autoAwards found {} Skill Awards", skillAwards.size());
+                logger.info("autoAwards found {} Time Awards", timeAwards.size());
+                logger.info("autoAwards found {} Training Awards", trainingAwards.size());
+                logger.info("autoAwards found {} Misc Awards", miscAwards.size());
+                logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+
+                break;
+            // post-mission
+            case 1:
+                for (Award award : awards) {
+                    switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                        case "ignore":
+                            ignoredAwards.add(award);
+                            break;
+                        case "divider":
+                            break;
+                        case "contract":
+                            if (campaign.getCampaignOptions().isEnableContractAwards()) {
+                                contractAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "factionhunter":
+                            if (campaign.getCampaignOptions().isEnableFactionHunterAwards()) {
+                                factionHunterAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        // Injury Awards are handled by the post-scenario controller
+                        case "injury":
+                            ignoredAwards.add(award);
+                            break;
+                        case "kill":
+                            // Scenario Kill Awards are handled by the post-scenario controller
+                            if (!award.getRange().equalsIgnoreCase("scenario")) {
+                                if ((campaign.getCampaignOptions().isEnableIndividualKillAwards())
+                                        || (campaign.getCampaignOptions().isEnableFormationKillAwards())) {
+                                    killAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "misc":
+                            if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                                miscAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "rank":
+                            if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                                rankAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "scenario":
+                            if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                                scenarioAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "skill":
+                            if (campaign.getCampaignOptions().isEnableSkillAwards()) {
+                                skillAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "theatreofwar":
+                            if (campaign.getCampaignOptions().isEnableTheatreOfWarAwards()) {
+                                theatreOfWarAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "time":
+                            if (campaign.getCampaignOptions().isEnableTimeAwards()) {
+                                timeAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "training":
+                            trainingAwards.add(award);
+                            break;
+                        default:
+                            // if autoAwards doesn't know what to do with an Award, it ignores it
+                            ignoredAwards.add(award);
+                    }
+                }
+                // These logs help users double-check that the number of awards found matches their records
+                logger.info("autoAwards found {} Kill Awards (excluding Scenario Kill Awards)", killAwards.size());
+                logger.info("autoAwards found {} Contract Awards", contractAwards.size());
+                logger.info("autoAwards found {} Rank Awards", rankAwards.size());
+                logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
+                logger.info("autoAwards found {} Skill Awards", skillAwards.size());
+                logger.info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());
+                logger.info("autoAwards found {} Time Awards", timeAwards.size());
+                logger.info("autoAwards found {} Misc Awards", miscAwards.size());
+                logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+
+                break;
+            // post-scenario
+            case 2:
+                for (Award award : awards) {
+                    switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                        case "divider":
+                            break;
+                        case "kill":
+                            if ((campaign.getCampaignOptions().isEnableIndividualKillAwards()) && (award.getRange().equalsIgnoreCase("scenario"))) {
+
+                                killAwards.add(award);
+                            }
+                            break;
+                        case "injury":
+                            if (campaign.getCampaignOptions().isEnableInjuryAwards()) {
+
+                                injuryAwards.add(award);
+                            }
+                            break;
+                        case "misc":
+                            if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                                miscAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        case "scenario":
+                            if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                                scenarioAwards.add(award);
+                            } else {
+                                ignoredAwards.add(award);
+                            }
+                            break;
+                        default:
+                            ignoredAwards.add(award);
+                    }
+                }
+
+                logger.info("autoAwards found {} Scenario Kill Awards (excluding Mission & Lifetime Kill Awards)", killAwards.size());
+                logger.info("autoAwards found {} Injury Awards", injuryAwards.size());
+                logger.info("autoAwards found {} Misc Awards", miscAwards.size());
+                logger.info("autoAwards found {} Scenario Awards", scenarioAwards.size());
+                logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+
+                break;
+            // post-graduation
+            case 3:
+                for (Award award : awards) {
+                    switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                        case "divider":
+                            break;
+                        case "training":
+                            if (campaign.getCampaignOptions().isEnableTrainingAwards()) {
+                                trainingAwards.add(award);
+                            }
+                            break;
+                        default:
+                            ignoredAwards.add(award);
+                    }
+                }
+
+                logger.info("autoAwards found {} Training Awards", trainingAwards.size());
+                logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+
+                break;
+            // post-promotion
+            case 4:
+                for (Award award : awards) {
+                    switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                        case "divider":
+                            break;
+                        case "rank":
+                            if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                                rankAwards.add(award);
+                            }
+                            break;
+                        default:
+                            ignoredAwards.add(award);
+                    }
+                }
+
+                logger.info("autoAwards found {} Training Awards", rankAwards.size());
+                logger.info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+
+                break;
+            default:
+                throw new IllegalStateException("Unexpected awardListCase: " + awardListCase);
         }
     }
 

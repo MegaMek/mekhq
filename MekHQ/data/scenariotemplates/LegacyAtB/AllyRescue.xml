@@ -88,7 +88,7 @@
             </value>
         </entry>
         <entry>
-            <key>Primary Opfor</key>
+            <key>OpFor</key>
             <value>
                 <actualDeploymentZone>-1</actualDeploymentZone>
                 <allowAeroBombs>false</allowAeroBombs>
@@ -104,7 +104,7 @@
                 <fixedUnitCount>12</fixedUnitCount>
                 <forceAlignment>2</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
-                <forceName>Primary Opfor</forceName>
+                <forceName>OpFor</forceName>
                 <generationMethod>3</generationMethod>
                 <generationOrder>1</generationOrder>
                 <maxWeightClass>4</maxWeightClass>

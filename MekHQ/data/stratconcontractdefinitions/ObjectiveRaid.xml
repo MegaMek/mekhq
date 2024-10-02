@@ -25,8 +25,12 @@
 			<objectiveType>SpecificScenarioVictory</objectiveType>
 			<objectiveCount>-0.5</objectiveCount>
 			<objectiveScenarios>
-				<objectiveScenario>Assassinate.xml</objectiveScenario>
-				<objectiveScenario>Convoy Attack.xml</objectiveScenario>
+				<objectiveScenario>Frontier Assassination.xml</objectiveScenario>
+				<objectiveScenario>Assassination.xml</objectiveScenario>
+				<objectiveScenario>Covert Strike.xml</objectiveScenario>
+				<objectiveScenario>Convoy Interdiction.xml</objectiveScenario>
+				<objectiveScenario>Convoy Raid.xml</objectiveScenario>
+				<objectiveScenario>Deep Raid.xml</objectiveScenario>
 			</objectiveScenarios>
 		</objectiveParameter>
 	</objectiveParameters>
