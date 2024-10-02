@@ -61,7 +61,7 @@ class ReputationControllerTest {
             AverageExperienceRating.getSkillLevel(campaign, true))
             .thenReturn(SkillLevel.VETERAN);
         averageExperienceRating.when(() ->
-            AverageExperienceRating.getReputationModifier(SkillLevel.VETERAN))
+            AverageExperienceRating.getAverageExperienceModifier(SkillLevel.VETERAN))
             .thenReturn(20);
         averageExperienceRating.when(() ->
             AverageExperienceRating.getAtBModifier(campaign))
@@ -101,7 +101,7 @@ class ReputationControllerTest {
 
         reputation.initializeReputation(campaign);
         assertEquals(41, reputation.getReputationRating());
-        //assertEquals(4, reputation.getReputationModifier());
+        assertEquals(4, reputation.getReputationModifier());
     }
 
     @Test
@@ -110,7 +110,7 @@ class ReputationControllerTest {
                 AverageExperienceRating.getSkillLevel(campaign, true))
             .thenReturn(SkillLevel.ULTRA_GREEN);
         averageExperienceRating.when(() ->
-                AverageExperienceRating.getReputationModifier(SkillLevel.ULTRA_GREEN))
+                AverageExperienceRating.getAverageExperienceModifier(SkillLevel.ULTRA_GREEN))
             .thenReturn(5);
         averageExperienceRating.when(() ->
                 AverageExperienceRating.getAtBModifier(campaign))
@@ -150,6 +150,6 @@ class ReputationControllerTest {
 
         reputation.initializeReputation(campaign);
         assertEquals(5, reputation.getReputationRating());
-        //assertEquals(0, reputation.getReputationModifier());
+        assertEquals(0, reputation.getReputationModifier());
     }
 }
