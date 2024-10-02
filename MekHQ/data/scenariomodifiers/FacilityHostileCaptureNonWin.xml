@@ -7,7 +7,7 @@
 	<objectives>
 		<objective>
 			<associatedForceNames>
-				<associatedForceName>Base Turrets</associatedForceName>
+				<associatedForceName>Base Defenses</associatedForceName>
 			</associatedForceNames>
 			<associatedUnitIDs />
 			<successEffects>
@@ -38,8 +38,7 @@
 		</objective>
 		<objective>
 			<associatedForceNames>
-				<associatedForceName>Primary Opfor</associatedForceName>
-				<associatedForceName>Base Turrets</associatedForceName>
+				<associatedForceName>OpFor</associatedForceName>
 			</associatedForceNames>
 			<associatedUnitIDs />
 			<successEffects>

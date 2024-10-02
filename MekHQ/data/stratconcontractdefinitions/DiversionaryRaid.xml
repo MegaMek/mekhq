@@ -18,9 +18,19 @@
 		<deploymentTimes>3</deploymentTimes>
 	</deploymentTimes>
 	<objectiveParameters>
-		<objectiveParameter>
-			<objectiveCount>-1</objectiveCount>
-			<objectiveType>AnyScenarioVictory</objectiveType>
-		</objectiveParameter>
+        <objectiveParameter>
+            <objectiveCount>-1.0</objectiveCount>
+            <objectiveType>AnyScenarioVictory</objectiveType>
+            <objectiveScenarios>
+                <objectiveScenario>Assassination.xml</objectiveScenario>
+                <objectiveScenario>Convoy Interdiction.xml</objectiveScenario>
+                <objectiveScenario>Convoy Raid.xml</objectiveScenario>
+                <objectiveScenario>Covert Strike.xml</objectiveScenario>
+                <objectiveScenario>Decoy Engagement.xml</objectiveScenario>
+                <objectiveScenario>Frontier Assassination.xml</objectiveScenario>
+                <objectiveScenario>Frontline Disruption.xml</objectiveScenario>
+                <objectiveScenario>Tactical Withdrawal.xml</objectiveScenario>
+            </objectiveScenarios>
+        </objectiveParameter>
 	</objectiveParameters>
 </ScenarioTemplate>

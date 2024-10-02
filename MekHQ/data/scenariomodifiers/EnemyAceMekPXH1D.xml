@@ -28,10 +28,10 @@
 		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<syncDeploymentType>SameEdge</syncDeploymentType>
-		<syncedForceName>Primary Opfor</syncedForceName>
+		<syncedForceName>OpFor</syncedForceName>
 		<useArtillery>false</useArtillery>
 	</forceDefinition>
 </AtBScenarioModifier>

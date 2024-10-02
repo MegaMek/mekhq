@@ -22,5 +22,15 @@
 			<objectiveType>AlliedFacilityControl</objectiveType>
 			<objectiveCount>-1</objectiveCount>
 		</objectiveParameter>
+        <objectiveParameter>
+            <objectiveCount>-0.5</objectiveCount>
+            <objectiveType>SpecificScenarioVictory</objectiveType>
+            <objectiveScenarios>
+                <objectiveScenario>Convoy Escort.xml</objectiveScenario>
+                <objectiveScenario>Critical Convoy Escort.xml</objectiveScenario>
+                <objectiveScenario>Reconnaissance Interdiction.xml</objectiveScenario>
+                <objectiveScenario>VIP Defense.xml</objectiveScenario>
+            </objectiveScenarios>
+        </objectiveParameter>
 	</objectiveParameters>
 </ScenarioTemplate>

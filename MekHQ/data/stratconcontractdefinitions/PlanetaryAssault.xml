@@ -21,5 +21,24 @@
 			<objectiveType>FacilityDestruction</objectiveType>
 			<objectiveCount>-1</objectiveCount>
 		</objectiveParameter>
+        <objectiveParameter>
+            <objectiveCount>-0.5</objectiveCount>
+            <objectiveType>AnyScenarioVictory</objectiveType>
+            <objectiveScenarios>
+                <objectiveScenario>Annihilation.xml</objectiveScenario>
+                <objectiveScenario>Breakthrough.xml</objectiveScenario>
+                <objectiveScenario>Decoy Engagement.xml</objectiveScenario>
+                <objectiveScenario>Decoy Interception.xml</objectiveScenario>
+                <objectiveScenario>Deep Raid.xml</objectiveScenario>
+                <objectiveScenario>Deep Raid Defense.xml</objectiveScenario>
+                <objectiveScenario>Frontline Breakthrough.xml</objectiveScenario>
+                <objectiveScenario>Frontline Disruption.xml</objectiveScenario>
+                <objectiveScenario>Frontline Engagement.xml</objectiveScenario>
+                <objectiveScenario>Intercept Engagement.xml</objectiveScenario>
+                <objectiveScenario>Interception Defense.xml</objectiveScenario>
+                <objectiveScenario>Picket Line Breakthrough.xml</objectiveScenario>
+                <objectiveScenario>Pivotal Battle.xml</objectiveScenario>
+            </objectiveScenarios>
+        </objectiveParameter>
 	</objectiveParameters>
 </ScenarioTemplate>

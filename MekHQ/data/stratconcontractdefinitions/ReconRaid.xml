@@ -31,7 +31,9 @@
 			<objectiveType>SpecificScenarioVictory</objectiveType>
 			<objectiveCount>-0.5</objectiveCount>
 			<objectiveScenarios>
-				<objectiveScenario>Recon.xml</objectiveScenario>
+				<objectiveScenario>Recon Evasion.xml</objectiveScenario>
+				<objectiveScenario>Heavy Recon Evasion.xml</objectiveScenario>
+				<objectiveScenario>Remote VIP Capture.xml</objectiveScenario>
 			</objectiveScenarios>
 		</objectiveParameter>
 	</objectiveParameters>
