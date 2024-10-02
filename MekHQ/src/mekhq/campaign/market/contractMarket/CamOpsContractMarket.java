@@ -126,12 +126,12 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private Optional<AtBContract> generateContract(Campaign campaign, int ratingMod, HiringHallModifiers hiringHallModifierss) {
+    private Optional<AtBContract> generateContract(Campaign campaign, int ratingMod, HiringHallModifiers hiringHallModifiers) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
         contract.setId(lastId);
         contractIds.put(lastId, contract);
-        Faction employer = determineEmployer(campaign, ratingMod, hiringHallModifierss);
+        Faction employer = determineEmployer(campaign, ratingMod, hiringHallModifiers);
         contract.setEmployerCode(employer.getShortName(), campaign.getLocalDate());
         if (employer.isMercenary()) {
             contract.setMercSubcontract(true);
