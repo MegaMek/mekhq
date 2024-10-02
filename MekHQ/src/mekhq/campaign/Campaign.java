@@ -107,6 +107,7 @@ import mekhq.campaign.unit.*;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
@@ -415,6 +416,16 @@ public class Campaign implements ITechManager {
 
     public PlanetarySystem getCurrentSystem() {
         return location.getCurrentSystem();
+    }
+
+    /**
+     * Returns the Hiring Hall level from the force's current system on the current date. If there
+     * is no hiring hall present, the level is HiringHallLevel.NONE.
+     *
+     * @return The Hiring Hall level of the current system at the present date.
+     */
+    public HiringHallLevel getSystemHiringHallLevel() {
+        return getCurrentSystem().getHiringHallLevel(getLocalDate());
     }
 
     public Money getFunds() {
