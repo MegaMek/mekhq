@@ -472,7 +472,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
-        multiplier *= contract.getContractType().getPaymentMultiplier();
+        multiplier *= contract.getContractType().getOperationsTempoMultiplier();
 
         final Faction employer = Factions.getInstance().getFaction(contract.getEmployerCode());
         final Faction enemy = contract.getEnemy();
