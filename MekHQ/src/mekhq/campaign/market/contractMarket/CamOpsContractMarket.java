@@ -27,19 +27,15 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     private static int BASE_NEGOTIATION_TARGET = 8;
     private static int EMPLOYER_NEGOTIATION_SKILL_LEVEL = 5;
 
-    private ContractModifiers contractMods = null;
-
     public CamOpsContractMarket() {
         super(ContractMarketMethod.CAM_OPS);
     }
 
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
-        if (contractMods == null) {
-            contractMods = generateContractModifiers(campaign);
-        }
+        ContractModifiers contractMods = getContractModifiers(campaign);
         int ratingMod = campaign.getReputation().getReputationModifier();
-        Optional<AtBContract> c = generateContract(campaign, ratingMod);
+        Optional<AtBContract> c = generateContract(campaign, ratingMod, contractMods);
         if (c.isPresent()) {
             AtBContract atbContract = c.get();
             contracts.add(atbContract);
@@ -61,7 +57,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // TODO: CamopsMarket: allow players to choose negotiators and send them out, removing them
         // from other tasks they're doing. For now just use the highest negotiation skill on the force.
         int ratingMod = campaign.getReputation().getReputationModifier();
-        contractMods = generateContractModifiers(campaign);
+        ContractModifiers contractMods = getContractModifiers(campaign);
         int negotiationSkill = findNegotiationSkill(campaign);
         int numOffers = getNumberOfOffers(
             rollNegotiation(negotiationSkill, ratingMod + contractMods.offersMod) - BASE_NEGOTIATION_TARGET);
@@ -83,14 +79,16 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return 1.0;
     }
 
-    private ContractModifiers generateContractModifiers(Campaign campaign) {
+    private ContractModifiers getContractModifiers(Campaign campaign) {
+        ContractModifiers modifiers;
         if (campaign.getFaction().isMercenary()) {
-            return new ContractModifiers(campaign.getCurrentSystem().getHiringHallLevel(campaign.getLocalDate()));
-        } else if (campaign.getFaction().isRebelOrPirate()) {
-            return new ContractModifiers(HiringHallLevel.NONE);
+            modifiers = new ContractModifiers(campaign.getSystemHiringHallLevel());
+        } else if (campaign.getFaction().isGovernment()) {
+            modifiers = new ContractModifiers(HiringHallLevel.GREAT);
         } else {
-            return new ContractModifiers(HiringHallLevel.GREAT);
+            modifiers = new ContractModifiers(HiringHallLevel.NONE);
         }
+        return modifiers;
     }
 
     private int findNegotiationSkill(Campaign campaign) {
@@ -128,12 +126,12 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private Optional<AtBContract> generateContract(Campaign campaign, int ratingMod) {
+    private Optional<AtBContract> generateContract(Campaign campaign, int ratingMod, ContractModifiers contractMods) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
         contract.setId(lastId);
         contractIds.put(lastId, contract);
-        Faction employer = determineEmployer(campaign, ratingMod);
+        Faction employer = determineEmployer(campaign, ratingMod, contractMods);
         contract.setEmployerCode(employer.getShortName(), campaign.getLocalDate());
         if (employer.isMercenary()) {
             contract.setMercSubcontract(true);
@@ -168,7 +166,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return Optional.of(contract);
     }
 
-    private Faction determineEmployer(Campaign campaign, int ratingMod) {
+    private Faction determineEmployer(Campaign campaign, int ratingMod, ContractModifiers contractMods) {
         Collection<Tag> employerTags;
         int roll = Compute.d6(2) + ratingMod + contractMods.employersMod;
         if (roll < 6) {
@@ -261,7 +259,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // TODO: add logic to determine initial contract clauses from CamOps 4th printing.
     }
 
-    private class ContractModifiers {
+    private static class ContractModifiers {
         protected int offersMod;
         protected int employersMod;
         protected int missionsMod;
