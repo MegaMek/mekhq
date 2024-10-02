@@ -20,16 +20,15 @@
  */
 package mekhq.campaign.personnel;
 
-import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * This object tracks a specific skill prerequisite for a special ability. This
@@ -166,14 +165,14 @@ public class SkillPerquisite {
             int lvl = skillSet.get(key);
             String skillLvl = "";
             if (lvl >= SkillType.EXP_GREEN) {
-                skillLvl = SkillType.getExperienceLevelName(lvl) + " ";
+                skillLvl = SkillType.getExperienceLevelName(lvl) + ' ';
             }
             toReturn += skillLvl + SkillType.getType(key).getName();
             if (enumKeys.hasMoreElements()) {
                 toReturn += "<br>OR ";
             }
         }
-        return "{" + toReturn + "}";
+        return '{' + toReturn + '}';
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
