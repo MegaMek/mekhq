@@ -33,9 +33,9 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
-        ContractModifiers contractMods = getContractModifiers(campaign);
+        HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
         int ratingMod = campaign.getReputation().getReputationModifier();
-        Optional<AtBContract> c = generateContract(campaign, ratingMod, contractMods);
+        Optional<AtBContract> c = generateContract(campaign, ratingMod, hiringHallModifiers);
         if (c.isPresent()) {
             AtBContract atbContract = c.get();
             contracts.add(atbContract);
@@ -57,10 +57,10 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // TODO: CamopsMarket: allow players to choose negotiators and send them out, removing them
         // from other tasks they're doing. For now just use the highest negotiation skill on the force.
         int ratingMod = campaign.getReputation().getReputationModifier();
-        ContractModifiers contractMods = getContractModifiers(campaign);
+        HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
         int negotiationSkill = findNegotiationSkill(campaign);
         int numOffers = getNumberOfOffers(
-            rollNegotiation(negotiationSkill, ratingMod + contractMods.offersMod) - BASE_NEGOTIATION_TARGET);
+            rollNegotiation(negotiationSkill, ratingMod + hiringHallModifiers.offersMod) - BASE_NEGOTIATION_TARGET);
 
         for (int i = 0; i < numOffers; i++) {
             addAtBContract(campaign);
@@ -79,14 +79,14 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     }
 
-    private ContractModifiers getContractModifiers(Campaign campaign) {
-        ContractModifiers modifiers;
+    private HiringHallModifiers getHiringHallModifiers(Campaign campaign) {
+        HiringHallModifiers modifiers;
         if (campaign.getFaction().isMercenary()) {
-            modifiers = new ContractModifiers(campaign.getSystemHiringHallLevel());
+            modifiers = new HiringHallModifiers(campaign.getSystemHiringHallLevel());
         } else if (campaign.getFaction().isGovernment()) {
-            modifiers = new ContractModifiers(HiringHallLevel.GREAT);
+            modifiers = new HiringHallModifiers(HiringHallLevel.GREAT);
         } else {
-            modifiers = new ContractModifiers(HiringHallLevel.NONE);
+            modifiers = new HiringHallModifiers(HiringHallLevel.NONE);
         }
         return modifiers;
     }
@@ -126,12 +126,12 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private Optional<AtBContract> generateContract(Campaign campaign, int ratingMod, ContractModifiers contractMods) {
+    private Optional<AtBContract> generateContract(Campaign campaign, int ratingMod, HiringHallModifiers hiringHallModifierss) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
         contract.setId(lastId);
         contractIds.put(lastId, contract);
-        Faction employer = determineEmployer(campaign, ratingMod, contractMods);
+        Faction employer = determineEmployer(campaign, ratingMod, hiringHallModifierss);
         contract.setEmployerCode(employer.getShortName(), campaign.getLocalDate());
         if (employer.isMercenary()) {
             contract.setMercSubcontract(true);
@@ -166,12 +166,12 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         return Optional.of(contract);
     }
 
-    private Faction determineEmployer(Campaign campaign, int ratingMod, ContractModifiers contractMods) {
+    private Faction determineEmployer(Campaign campaign, int ratingMod, HiringHallModifiers hiringHallModifiers) {
         Collection<Tag> employerTags;
-        int roll = Compute.d6(2) + ratingMod + contractMods.employersMod;
+        int roll = Compute.d6(2) + ratingMod + hiringHallModifiers.employersMod;
         if (roll < 6) {
             // Roll again on the independent employers column
-            roll = Compute.d6(2) + ratingMod + contractMods.employersMod;
+            roll = Compute.d6(2) + ratingMod + hiringHallModifiers.employersMod;
             employerTags = getEmployerTags(campaign, roll, true);
         } else {
             employerTags = getEmployerTags(campaign, roll, false);
@@ -259,12 +259,12 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         // TODO: add logic to determine initial contract clauses from CamOps 4th printing.
     }
 
-    private static class ContractModifiers {
+    private static class HiringHallModifiers {
         protected int offersMod;
         protected int employersMod;
         protected int missionsMod;
 
-        protected ContractModifiers(HiringHallLevel level) {
+        protected HiringHallModifiers(HiringHallLevel level) {
             switch (level) {
                 case NONE -> {
                     offersMod = -3;
