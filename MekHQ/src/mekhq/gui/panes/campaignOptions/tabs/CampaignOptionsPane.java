@@ -53,35 +53,37 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
 
-
     private JTabbedPane createCombatReadinessParentTab() {
-        // TODO Combat Readiness
         // Tech Limits
         // Rulesets
         // Random Assignment Tables
+
+        // Parent Tab
         JTabbedPane combatReadinessParentTab = new JTabbedPane();
 
         return combatReadinessParentTab;
     }
 
     private JTabbedPane createHumanResourcesParentTab() {
-        //    TODO Human Resources
         //    Personnel
         //    Life Paths
         //    Turnover and Retention
         //    Name and Portrait Generation
         //    Rank Systems
+
+        // Parent Tab
         JTabbedPane humanResourcesParentTab = new JTabbedPane();
 
         return humanResourcesParentTab;
     }
 
     private JTabbedPane createUnitDevelopmentParentTab() {
-        //    TODO Unit Development
         //    Experience
         //    Skills
         //    Skill Randomization
         //    SPAs
+
+        // Parent Tab
         JTabbedPane unitDevelopmentParentTab = new JTabbedPane();
 
         return unitDevelopmentParentTab;
@@ -126,10 +128,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JTabbedPane createStrategicOperationsParentTab() {
-        //    TODO Strategic Operations
         //    Finances
         //    Mercenary
         //    Markets
+
         // Parent Tab
         JTabbedPane strategicOperationsParentTab = new JTabbedPane();
 
