@@ -651,7 +651,8 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         for (int index = 1; index <= turningPointData.turningPoints().size(); index++) {
             JButton eraButtonN = new JButton(String.format("<html><center><b>" + resources.getString(turningPointData.turningPoints().get(index - 1) + ".text")
                 + "</b><br>(" + finalTurningPointDates.get(index - 1).toString() + ")</center></html>"));
-            eraButtonN.setToolTipText(String.format(resources.getString(turningPointData.turningPoints().get(index - 1) + ".tooltip")));
+            eraButtonN.setToolTipText(wordWrap(String.format(
+                resources.getString(turningPointData.turningPoints().get(index - 1) + ".tooltip"))));
 
             final int finalIndex = index - 1;
             eraButtonN.addActionListener(e -> {
