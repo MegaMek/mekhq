@@ -60,6 +60,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+        // Increase vertical scroll speed
+        int verticalScrollSpeed = 20;
+        tabScrollPane.getVerticalScrollBar().setUnitIncrement(verticalScrollSpeed);
+
+        // Increase horizontal scroll speed
+        int horizontalScrollSpeed = 20;
+        tabScrollPane.getHorizontalScrollBar().setUnitIncrement(horizontalScrollSpeed);
+
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 5,
             resources.getString(resourceName + ".title")), tabScrollPane);
     }
@@ -72,11 +80,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JScrollPane createGeneralTab() {
         GeneralTab generalTab = new GeneralTab(campaign, getFrame(), "generalTab");
         JPanel createdGeneralTab = generalTab.createGeneralTab();
-
-        // Add a titled border
-        String borderTitle = String.format("<html><i>%s</i></html>",
-            resources.getString("generalPanel.border"));
-        createdGeneralTab.setBorder(BorderFactory.createTitledBorder(borderTitle));
 
         return new JScrollPane(createdGeneralTab,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,

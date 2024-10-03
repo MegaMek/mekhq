@@ -16,7 +16,7 @@ import static megamek.client.ui.WrapLayout.wordWrap;
 public class CampaignOptionsUtilities {
     private static final MMLogger logger = MMLogger.create(CampaignOptionsPane.class);
     private static final String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
-    private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
+    static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
 
     /**
@@ -119,18 +119,18 @@ public class CampaignOptionsUtilities {
      *                            line of the tooltip.
      *                            If {@code null}, the default wrap size of 100 is used.
      * @param width               The width of the {@link JTextField}.
-     * @param height              The height of the {@link JTextField}.
      * @return a map containing a {@link JLabel} key and a {@link JTextField} value.
      */
-    static JTextField createTextField(String name, @Nullable Integer customWrapSize, int width, int height) {
+    static JTextField createTextField(String name, @Nullable Integer customWrapSize, int width) {
         customWrapSize = processWrapSize(customWrapSize);
 
         JTextField jTextField = new JTextField();
         jTextField.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jTextField.setName("txt" + name);
 
-        jTextField.setMinimumSize(new Dimension(width, height));
-        jTextField.setMaximumSize(new Dimension(width, height));
+        int preferredHeight = jTextField.getPreferredSize().height;
+        jTextField.setMinimumSize(new Dimension(width, preferredHeight));
+        jTextField.setMaximumSize(new Dimension(width, preferredHeight));
 
         return jTextField;
     }
@@ -305,7 +305,20 @@ public class CampaignOptionsUtilities {
         JTabbedPane tabbedPane = new JTabbedPane();
 
         for (String tabName : tabNames) {
-            JPanel panel = panels.get(tabName);
+            JPanel mainPanel = panels.get(tabName);
+
+            // Create a panel for the quote
+            JPanel quotePanel = new JPanel();
+            JLabel quote = new JLabel(String.format("<html><i><center>%s</i></center></html>",
+                resources.getString(tabName + ".border")));
+            quotePanel.add(mainPanel);
+            quotePanel.add(quote);
+
+            // Reorganize mainPanel to include quotePanel at bottom
+            JPanel contentPanel = new JPanel(new BorderLayout());
+            contentPanel.setName(tabName);
+            contentPanel.add(mainPanel, BorderLayout.CENTER);
+            contentPanel.add(quotePanel, BorderLayout.SOUTH);
 
             // Create a wrapper panel for its easy alignment controls
             JPanel wrapperPanel = new JPanel(new GridBagLayout());
@@ -314,14 +327,9 @@ public class CampaignOptionsUtilities {
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
 
-            wrapperPanel.add(panel, gbc);
+            wrapperPanel.add(contentPanel, gbc);
 
-            // Set a titled border on the wrapper panel
-            String borderTitle = String.format("<html><i>%s</i></html>",
-                resources.getString(panel.getName() + ".border"));
-            wrapperPanel.setBorder(BorderFactory.createTitledBorder(borderTitle));
-
-            tabbedPane.addTab(resources.getString(panel.getName() + ".title"), wrapperPanel);
+            tabbedPane.addTab(resources.getString(tabName + ".title"), wrapperPanel);
         }
 
         return tabbedPane;

@@ -80,12 +80,11 @@ public class GeneralTab {
      */
     public AbstractMHQScrollablePanel createGeneralTab() {
         // Promotional Image
-        JPanel imagePanel = createHeaderPanel("General", "data/images/misc/MekHQ.png",
-            false, "", false);
+        JPanel imagePanel = createGeneralHeader();
 
         // Campaign name
         lblName = createLabel("Name", null);
-        txtName = createTextField("Name", null, 300, 45);
+        txtName = createTextField("Name", null, 300);
 
         // Generate new random campaign name
         btnNameGenerator = createButton("NameGenerator");
@@ -196,6 +195,45 @@ public class GeneralTab {
         generalPanel.add(panel);
 
         return generalPanel;
+    }
+
+    /**
+     * Creates a {@link JPanel} with a header containing an image, title, and body text.
+     *
+     * @return the created {@link JPanel} with the header
+     */
+    private static JPanel createGeneralHeader() {
+        ImageIcon imageIcon = new ImageIcon("data/images/misc/MekHQ.png");
+        JLabel imageLabel = new JLabel(imageIcon);
+
+        final JLabel lblHeader = new JLabel(String.format("<html>%s</html>",
+            resources.getString("lblGeneral.text")), SwingConstants.CENTER);
+        lblHeader.setName("lblGeneral");
+
+        JLabel lblBody = new JLabel(String.format("<html>%s</html>",
+            resources.getString("lblGeneralBody.text")), SwingConstants.CENTER);
+        lblBody.setName("lblGeneralHeaderBody");
+        Dimension size = lblBody.getPreferredSize();
+        lblBody.setMaximumSize(new Dimension(500, size.height));
+
+        final JPanel panel = createStandardPanel("pnlGeneralHeaderPanel", false, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(lblHeader)
+                .addComponent(imageLabel)
+                .addComponent(lblBody)
+                .addGap(20));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.CENTER)
+                .addComponent(lblHeader)
+                .addComponent(imageLabel)
+                .addComponent(lblBody));
+
+        return panel;
     }
 
     /**
