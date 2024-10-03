@@ -3,6 +3,9 @@ package mekhq.campaign.market.contractMarket;
 import megamek.common.Compute;
 import mekhq.campaign.mission.enums.AtBContractType;
 
+/**
+ * Utility class that implements the mission tables as described in CamOps (4th printing).
+ */
 public class MissionSelector {
     public static AtBContractType getInnerSphereClanMission(int roll, int margin, boolean isClan) {
         if (isClan) {
