@@ -93,17 +93,6 @@ public class MissionSelector {
         }
     }
 
-    public static AtBContractType getSpecialMission(int roll, int margin) {
-        roll += margin;
-        if (roll < 3) {
-
-        }
-    }
-
-    public static AtBContractType getCovertMission(int roll, int margin) {
-        roll += margin;
-    }
-
     public static AtBContractType getPirateMission(int roll, int margin) {
         roll += margin;
         if (roll < 6) {
@@ -111,5 +100,40 @@ public class MissionSelector {
         } else {
             return AtBContractType.OBJECTIVE_RAID;
         }
+    }
+
+    private static AtBContractType getSpecialMission(int roll, int margin) {
+        roll += margin;
+        if (roll < 3) {
+            return getCovertMission(Compute.d6(2), margin);
+        } else if (roll < 5) {
+            // TODO: figure out how to offer planetary assault followup contracts
+            return AtBContractType.GUERRILLA_WARFARE;
+        } else if (roll == 5 || roll == 8) {
+            // TODO: figure out how to offer planetary assault followup contracts
+            return AtBContractType.RECON_RAID;
+        } else if (roll == 6) {
+            return AtBContractType.EXTRACTION_RAID;
+        } else if (roll == 7) {
+            // TODO: change this to RETAINER if/when that is implemented
+            return AtBContractType.GARRISON_DUTY;
+        } else if (roll == 9) {
+            return AtBContractType.RELIEF_DUTY;
+        } else if (roll == 10) {
+            // TODO: figure out how to offer planetary assault followup contracts
+            return AtBContractType.DIVERSIONARY_RAID;
+        } else if (roll == 11) {
+            //  // TODO: determine which is the higher paying between riot/garrison and return that
+            return AtBContractType.RIOT_DUTY;
+        } else {
+            // TODO: determine which is the higher paying between cadre/garrison and return that
+            return AtBContractType.CADRE_DUTY;
+        }
+    }
+
+    private static AtBContractType getCovertMission(int roll, int margin) {
+        // TODO: most of the covert mission types are not implemented in MekHQ at the time of writing,
+        //  so just use the special missions table for now.
+        return getSpecialMission(Compute.d6(2), margin);
     }
 }
