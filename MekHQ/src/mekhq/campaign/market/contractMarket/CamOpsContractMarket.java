@@ -10,6 +10,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.rating.CamOpsReputation.ReputationController;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
@@ -34,8 +35,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     @Override
     public AtBContract addAtBContract(Campaign campaign) {
         HiringHallModifiers hiringHallModifiers = getHiringHallModifiers(campaign);
-        int ratingMod = campaign.getReputation().getReputationModifier();
-        Optional<AtBContract> c = generateContract(campaign, ratingMod, hiringHallModifiers);
+        ReputationController reputation = campaign.getReputation();
+        Optional<AtBContract> c = generateContract(campaign, reputation, hiringHallModifiers);
         if (c.isPresent()) {
             AtBContract atbContract = c.get();
             contracts.add(atbContract);
@@ -126,19 +127,19 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private Optional<AtBContract> generateContract(Campaign campaign, int ratingMod, HiringHallModifiers hiringHallModifiers) {
+    private Optional<AtBContract> generateContract(Campaign campaign, ReputationController reputation, HiringHallModifiers hiringHallModifiers) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
         contract.setId(lastId);
         contractIds.put(lastId, contract);
-        Faction employer = determineEmployer(campaign, ratingMod, hiringHallModifiers);
+        Faction employer = determineEmployer(campaign, reputation.getReputationModifier(), hiringHallModifiers);
         contract.setEmployerCode(employer.getShortName(), campaign.getLocalDate());
         if (employer.isMercenary()) {
             contract.setMercSubcontract(true);
         }
-        contract.setContractType(determineMission(campaign, employer, ratingMod));
+        contract.setContractType(determineMission(campaign, employer, reputation.getReputationModifier()));
         ContractTerms contractTerms = new ContractTerms(contract.getContractType(),
-            employer, ratingMod, campaign.getLocalDate());
+            employer, reputation.getReputationFactor(), campaign.getLocalDate());
         setEnemyCode(contract);
         setIsRiotDuty(contract);
         setAttacker(contract);
@@ -246,15 +247,22 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private AtBContractType determineMission(Campaign campaign, Faction employer, int ratingMod) {
-        int roll = Compute.d6(2);
         if (campaign.getFaction().isPirate()) {
-            if (roll < 6) {
-                return AtBContractType.RECON_RAID;
-            } else {
-                return AtBContractType.OBJECTIVE_RAID;
-            }
+            return MissionSelector.getPirateMission(Compute.d6(2), 0);
         }
-        return findMissionType(ratingMod, employer.isISMajorOrSuperPower());
+        int margin = rollNegotiation(findNegotiationSkill(campaign),
+            ratingMod + getHiringHallModifiers(campaign).missionsMod) - BASE_NEGOTIATION_TARGET;
+        boolean isClan = campaign.getFaction().isClan();
+        if (employer.isInnerSphere() || employer.isClan()) {
+            return MissionSelector.getInnerSphereClanMission(Compute.d6(2), margin, isClan);
+        } else if (employer.isIndependent() || employer.isPlanetaryGovt()) {
+            return MissionSelector.getIndependentMission(Compute.d6(2), margin, isClan);
+        } else if (employer.isCorporation()) {
+            return MissionSelector.getCorporationMission(Compute.d6(2), margin, isClan);
+        } else {
+            logger.warn("No matching employer on Missions table; defaulting to IS/Clan");
+            return MissionSelector.getInnerSphereClanMission(Compute.d6(2), margin, isClan);
+        }
     }
 
     private void setContractClauses(AtBContract contract, ContractTerms terms) {
