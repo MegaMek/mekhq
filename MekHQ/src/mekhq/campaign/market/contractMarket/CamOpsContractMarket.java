@@ -71,8 +71,11 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
-        //TODO: add logic from camops 4th printing
-        return 1.0;
+        Faction employer = contract.getEmployerFaction();
+        int reputationFactor = campaign.getReputation().getReputationFactor();
+        ContractTerms terms = new ContractTerms(contract.getContractType(), employer,
+            reputationFactor, campaign.getLocalDate());
+        return terms.getEmploymentMultiplier() * terms.getOperationsTempoMultiplier() * reputationFactor;
     }
 
     @Override
@@ -127,7 +130,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private Optional<AtBContract> generateContract(Campaign campaign, ReputationController reputation, HiringHallModifiers hiringHallModifiers) {
+    private Optional<AtBContract> generateContract(Campaign campaign, ReputationController reputation,
+                                                   HiringHallModifiers hiringHallModifiers) {
         AtBContract contract = new AtBContract("UnnamedContract");
         lastId++;
         contract.setId(lastId);
