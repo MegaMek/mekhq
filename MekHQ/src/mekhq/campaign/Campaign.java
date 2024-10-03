@@ -6862,19 +6862,6 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves the unit reputation factor based on the rating method defined in the Campaign Options.
-     *
-     * @return the reputation factor for the selected unit rating method.
-     */
-    public int getReputationFactor() {
-        return switch (campaignOptions.getUnitRatingMethod()) {
-            case NONE -> 5;
-            case FLD_MAN_MERCS_REV -> getAtBUnitRatingMod() * 2;
-            case CAMPAIGN_OPS -> (int) (getReputation().getReputationModifier() * 0.2 + 0.5);
-        };
-    }
-
-    /**
      * Returns the Strategy skill of the designated commander in the campaign.
      *
      * @return The value of the commander's strategy skill if a commander exists, otherwise 0.
