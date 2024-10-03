@@ -7,6 +7,7 @@ import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import javax.swing.*;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.createSubTabs;
 
@@ -27,31 +28,60 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     @Override
     protected void initialize() {
         // General
-        GeneralTab generalTab = new GeneralTab(campaign, getFrame(), "generalTab");
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("generalPanel.title")), generalTab.createGeneralTab());
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 5,
+            resources.getString("generalPanel.title")), createGeneralTab());
 
         // Combat Readiness
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("combatReadinessParentTab.title")), createCombatReadinessParentTab());
+        createTab("combatReadinessParentTab", this::createCombatReadinessParentTab);
 
         // Human Resources
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("humanResourcesParentTab.title")), createHumanResourcesParentTab());
+        createTab("humanResourcesParentTab", this::createHumanResourcesParentTab);
 
         // Unit Development
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("unitDevelopmentParentTab.title")), createUnitDevelopmentParentTab());
+        createTab("unitDevelopmentParentTab", this::createUnitDevelopmentParentTab);
 
         // Logistics and Maintenance
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("logisticsAndMaintenanceParentTab.title")), createLogisticsAndMaintenanceParentTab());
+        createTab("logisticsAndMaintenanceParentTab", this::createLogisticsAndMaintenanceParentTab);
 
         // Strategic Operations
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("strategicOperationsParentTab.title")), createStrategicOperationsParentTab());
+        createTab("strategicOperationsParentTab", this::createStrategicOperationsParentTab);
     }
 
+    /**
+     * Creates a tab and adds it to the {@link TabbedPane}.
+     *
+     * @param resourceName the name of the resource used to create the tab's title
+     * @param tabCreator   a supplier that creates the {@link TabbedPane} for the tab
+     */
+    private void createTab(String resourceName, Supplier<JTabbedPane> tabCreator) {
+        JTabbedPane createdTab = tabCreator.get();
+
+        JScrollPane tabScrollPane = new JScrollPane(createdTab,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 5,
+            resources.getString(resourceName + ".title")), tabScrollPane);
+    }
+
+    /**
+     * Creates the General tab.
+     *
+     * @return a {@link JScrollPane} containing the General tab
+     */
+    private JScrollPane createGeneralTab() {
+        GeneralTab generalTab = new GeneralTab(campaign, getFrame(), "generalTab");
+        JPanel createdGeneralTab = generalTab.createGeneralTab();
+
+        // Add a titled border
+        String borderTitle = String.format("<html><i>%s</i></html>",
+            resources.getString("generalPanel.border"));
+        createdGeneralTab.setBorder(BorderFactory.createTitledBorder(borderTitle));
+
+        return new JScrollPane(createdGeneralTab,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    }
 
     private JTabbedPane createCombatReadinessParentTab() {
         // Tech Limits
@@ -89,6 +119,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return unitDevelopmentParentTab;
     }
 
+    /**
+     * Creates the Logistics and Maintenance parent tab for the Campaign Options Pane.
+     *
+     * @return the created {@link JTabbedPane} representing the Logistics and Maintenance parent tab
+     */
     private JTabbedPane createLogisticsAndMaintenanceParentTab() {
         // Parent Tab
         JTabbedPane logisticsAndMaintenanceParentTab = new JTabbedPane();
@@ -113,13 +148,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "deliveryTab", suppliesAndAcquisitionTab.createDeliveryTab(),
             "planetaryAcquisitionTab", suppliesAndAcquisitionTab.createPlanetaryAcquisitionTab()));
 
+        // Add tabs
         logisticsAndMaintenanceParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("suppliesAndAcquisitionTab.title")), suppliesAndAcquisitionContentTabs);
         logisticsAndMaintenanceParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("repairAndMaintenanceContentTabs.title")), repairAndMaintenanceContentTabs);
-
-        logisticsAndMaintenanceParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("suppliesAndAcquisitionTab.title")), suppliesAndAcquisitionContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("logisticsAndMaintenanceParentTab.title")), logisticsAndMaintenanceParentTab);

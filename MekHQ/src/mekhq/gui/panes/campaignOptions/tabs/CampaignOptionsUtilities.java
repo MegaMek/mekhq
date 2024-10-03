@@ -306,7 +306,22 @@ public class CampaignOptionsUtilities {
 
         for (String tabName : tabNames) {
             JPanel panel = panels.get(tabName);
-            tabbedPane.addTab(resources.getString(panel.getName() + ".title"), panel);
+
+            // Create a wrapper panel for its easy alignment controls
+            JPanel wrapperPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.anchor = GridBagConstraints.NORTH;
+            gbc.weightx = 1.0;
+            gbc.weighty = 1.0;
+
+            wrapperPanel.add(panel, gbc);
+
+            // Set a titled border on the wrapper panel
+            String borderTitle = String.format("<html><i>%s</i></html>",
+                resources.getString(panel.getName() + ".border"));
+            wrapperPanel.setBorder(BorderFactory.createTitledBorder(borderTitle));
+
+            tabbedPane.addTab(resources.getString(panel.getName() + ".title"), wrapperPanel);
         }
 
         return tabbedPane;
