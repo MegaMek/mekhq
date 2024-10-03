@@ -30,7 +30,7 @@ import mekhq.campaign.universe.enums.EraFlag;
 
 public enum AtBContractType {
     // TODO: Missing Camops Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
-    //  RETAINER, SABOTAGE, TERRORISM, HIGH_RISK, COVERT
+    //  RETAINER, SABOTAGE, TERRORISM, HIGH_RISK
     // region Enum Declarations
     GARRISON_DUTY("AtBContractType.GARRISON_DUTY.text", "AtBContractType.GARRISON_DUTY.toolTipText", 18, 1.0),
     CADRE_DUTY("AtBContractType.CADRE_DUTY.text", "AtBContractType.CADRE_DUTY.toolTipText", 12, 0.8),
