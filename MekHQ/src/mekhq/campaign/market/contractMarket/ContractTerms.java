@@ -19,12 +19,12 @@ public class ContractTerms {
     private int supportModifier;
     private int transportModifier;
 
-    public ContractTerms(AtBContractType mission, Faction employer, int reputationRating, LocalDate date) {
+    public ContractTerms(AtBContractType mission, Faction employer, int reputationMod, LocalDate date) {
         operationsTempoMultiplier = mission.getOperationsTempoMultiplier();
         baseLength = mission.getConstantLength();
         addMissionTypeModifiers(mission);
         addEmployerModifiers(employer, date);
-        addUnitReputationModifiers(reputationRating);
+        addUnitReputationModifiers(reputationMod);
     }
 
     public double getOperationsTempoMultiplier() {
@@ -202,25 +202,25 @@ public class ContractTerms {
     }
 
     private void addEmployerModifiers(Faction employer, LocalDate date) {
+        employmentMultiplier = 1.0;
         if (employer.isSuperPower()) {
-            employmentMultiplier += 1.3;
+            employmentMultiplier += 0.3;
             supportModifier += 1;
             transportModifier += 2;
         } else if (employer.isMajorPower()) {
-            employmentMultiplier += 1.2;
+            employmentMultiplier += 0.2;
             salvageModifier += -1;
             transportModifier += 1;
         } else if (employer.isMinorPower()) {
-            employmentMultiplier += 1.1;
+            employmentMultiplier += 0.1;
             salvageModifier += -2;
         } else if (employer.isCorporation() || employer.isMercenary()) {
-            employmentMultiplier += 1.1;
+            employmentMultiplier += 0.1;
             commandModifier += -1;
             salvageModifier += 2;
             supportModifier += 1;
             transportModifier += 1;
         } else if (employer.isIndependent() || employer.isPlanetaryGovt()) {
-            employmentMultiplier += 1.0;
             salvageModifier += -1;
             supportModifier += -1;
         }
@@ -249,33 +249,33 @@ public class ContractTerms {
         }
     }
 
-    private void addUnitReputationModifiers(int reputationRating) {
-        if (reputationRating <= 0) {
+    private void addUnitReputationModifiers(int reputationMod) {
+        if (reputationMod <= 0) {
             commandModifier += -2;
             salvageModifier += -1;
             supportModifier += -1;
             transportModifier += -3;
-        } else if (reputationRating == 1) {
+        } else if (reputationMod == 1) {
             commandModifier += -1;
             salvageModifier += -1;
             supportModifier += -1;
             transportModifier += -2;
-        } else if (reputationRating == 2) {
+        } else if (reputationMod == 2) {
             commandModifier += -1;
             transportModifier += -2;
-        } else if (reputationRating == 3) {
+        } else if (reputationMod == 3) {
             commandModifier += -1;
             transportModifier += -1;
-        } else if (reputationRating == 4) {
+        } else if (reputationMod == 4) {
             transportModifier += -1;
-        } else if (reputationRating == 6 || reputationRating == 7) {
+        } else if (reputationMod == 6 || reputationMod == 7) {
             commandModifier += 1;
             salvageModifier += 1;
-        } else if (reputationRating == 8) {
+        } else if (reputationMod == 8) {
             commandModifier += 1;
             salvageModifier += 1;
             supportModifier += 1;
-        } else if (reputationRating == 9) {
+        } else if (reputationMod == 9) {
             commandModifier += 2;
             salvageModifier += 2;
             supportModifier += 1;
