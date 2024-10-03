@@ -137,9 +137,6 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         this.date = date;
         workingDate = this.date;
 
-        // Ensure the dialog isn't hidden
-        setAlwaysOnTop(true);
-
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
 
@@ -271,7 +268,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         // setResizable(false);
         ready = false;
         pack();
-        setMinimumSize(new Dimension(700, 300));
+        setMinimumSize(new Dimension(750, 550));
 
         // center this dialog over the owner
         setLocationRelativeTo(owner);
@@ -600,99 +597,211 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      * @return The created JButton object representing the specified era.
      */
     private JButton createEraButton(int era) {
-        final List<Integer> eraYears = List.of(2475, 2571, 2781,  2901, 3020, 3050, 3062,
-            3068, 3081, 3101, 3131, 3151);
+          String reference = switch (era) {
+            case 0 -> "eraAgeOfWar";
+            case 1 -> "eraStarLeague";
+            case 2 -> "eraEarlySuccessionWar";
+            case 3 -> "eraLateSuccessionWarLosTech";
+            case 4 -> "eraLateSuccessionWarRenaissance";
+            case 5 -> "eraClanInvasion";
+            case 6 -> "eraCivilWar";
+            case 7 -> "eraJihad";
+            case 8 -> "eraEarlyRepublic";
+            case 9 -> "eraLateRepublic";
+            case 10 -> "eraDarkAge";
+            case 11 -> "eraIlClan";
+              default -> throw new IllegalStateException("Unexpected value mekhq/gui/dialog/DateChooser.java/createEraButton: "
+                  + era);
+          };
 
-        final String ERA_AGE_OF_WAR_LABEL = resources.getString("eraAgeOfWar.text");
-        final String ERA_AGE_OF_WAR_TOOLTIP = resources.getString("eraAgeOfWar.tooltip");
-        final String ERA_STAR_LEAGUE_LABEL = resources.getString("eraStarLeague.text");
-        final String ERA_STAR_LEAGUE_TOOLTIP = resources.getString("eraStarLeague.tooltip");
-        final String ERA_EARLY_SUCCESSION_WAR_LABEL = resources.getString("eraEarlySuccessionWar.text");
-        final String ERA_EARLY_SUCCESSION_WAR_TOOLTIP = resources.getString("eraEarlySuccessionWar.tooltip");
-        final String ERA_LATE_SUCCESSION_WAR_LOSTECH_LABEL = resources.getString("eraLateSuccessionWarLosTech.text");
-        final String ERA_LATE_SUCCESSION_WAR_LOSTECH_TOOLTIP = resources.getString("eraLateSuccessionWarLosTech.tooltip");
-        final String ERA_LATE_SUCCESSION_WAR_RENAISSANCE_LABEL = resources.getString("eraLateSuccessionWarRenaissance.text");
-        final String ERA_LATE_SUCCESSION_WAR_RENAISSANCE_TOOLTIP = resources.getString("eraLateSuccessionWarRenaissance.tooltip");
-        final String ERA_CLAN_INVASION_LABEL = resources.getString("eraClanInvasion.text");
-        final String ERA_CLAN_INVASION_TOOLTIP = resources.getString("eraClanInvasion.tooltip");
-        final String ERA_CIVIL_WAR_LABEL = resources.getString("eraCivilWar.text");
-        final String ERA_CIVIL_WAR_TOOLTIP = resources.getString("eraCivilWar.tooltip");
-        final String ERA_JIHAD_LABEL = resources.getString("eraJihad.text");
-        final String ERA_JIHAD_TOOLTIP = resources.getString("eraJihad.tooltip");
-        final String ERA_EARLY_REPUBLIC_LABEL = resources.getString("eraEarlyRepublic.text");
-        final String ERA_EARLY_REPUBLIC_TOOLTIP = resources.getString("eraEarlyRepublic.tooltip");
-        final String ERA_LATE_REPUBLIC_LABEL = resources.getString("eraLateRepublic.text");
-        final String ERA_LATE_REPUBLIC_TOOLTIP = resources.getString("eraLateRepublic.tooltip");
-        final String ERA_DARK_AGE_LABEL = resources.getString("eraDarkAge.text");
-        final String ERA_DARK_AGE_TOOLTIP = resources.getString("eraDarkAge.tooltip");
-        final String ERA_ILCLAN_LABEL = resources.getString("eraIlClan.text");
-        final String ERA_ILCLAN_TOOLTIP = resources.getString("eraIlClan.tooltip");
-
-          String eraLabel;
-          String eraTooltip;
-          switch (era) {
-            case 0 -> {
-                eraLabel = ERA_AGE_OF_WAR_LABEL;
-                eraTooltip = ERA_AGE_OF_WAR_TOOLTIP;
-            }
-            case 1 -> {
-                eraLabel = ERA_STAR_LEAGUE_LABEL;
-                eraTooltip = ERA_STAR_LEAGUE_TOOLTIP;
-            }
-            case 2 -> {
-                eraLabel = ERA_EARLY_SUCCESSION_WAR_LABEL;
-                eraTooltip = ERA_EARLY_SUCCESSION_WAR_TOOLTIP;
-            }
-            case 3 -> {
-                eraLabel = ERA_LATE_SUCCESSION_WAR_LOSTECH_LABEL;
-                eraTooltip = ERA_LATE_SUCCESSION_WAR_LOSTECH_TOOLTIP;
-            }
-            case 4 -> {
-                eraLabel = ERA_LATE_SUCCESSION_WAR_RENAISSANCE_LABEL;
-                eraTooltip = ERA_LATE_SUCCESSION_WAR_RENAISSANCE_TOOLTIP;
-            }
-            case 5 -> {
-                eraLabel = ERA_CLAN_INVASION_LABEL;
-                eraTooltip = ERA_CLAN_INVASION_TOOLTIP;
-            }
-            case 6 -> {
-                eraLabel = ERA_CIVIL_WAR_LABEL;
-                eraTooltip = ERA_CIVIL_WAR_TOOLTIP;
-            }
-            case 7 -> {
-                eraLabel = ERA_JIHAD_LABEL;
-                eraTooltip = ERA_JIHAD_TOOLTIP;
-            }
-            case 8 -> {
-                eraLabel = ERA_EARLY_REPUBLIC_LABEL;
-                eraTooltip = ERA_EARLY_REPUBLIC_TOOLTIP;
-            }
-            case 9 -> {
-                eraLabel = ERA_LATE_REPUBLIC_LABEL;
-                eraTooltip = ERA_LATE_REPUBLIC_TOOLTIP;
-            }
-            case 10 -> {
-                eraLabel = ERA_DARK_AGE_LABEL;
-                eraTooltip = ERA_DARK_AGE_TOOLTIP;
-            }
-            case 11 -> {
-                eraLabel = ERA_ILCLAN_LABEL;
-                eraTooltip = ERA_ILCLAN_TOOLTIP;
-            }
-            default -> {
-                eraLabel = "ERROR";
-                eraTooltip = "ERROR";
-            }
-          }
-
-        String label = String.format("<html><center>%s</center></html>", eraLabel);
+        String label = String.format("<html><center>%s%s</center></html>",
+            resources.getString(reference + ".text"),
+            resources.getString(reference + ".year"));
 
         JButton button = new JButton(label);
-        button.setToolTipText(wordWrap(eraTooltip));
+        button.setToolTipText(wordWrap(resources.getString(reference + ".tooltip")));
         button.setHorizontalAlignment(SwingConstants.CENTER);
-        button.addActionListener(e -> setDate(LocalDate.of(eraYears.get(era), 1, 1)));
+        button.addActionListener(e -> turningPointsDialog(era, reference));
 
-        // Return the button
         return button;
     }
+
+    /**
+     * Displays a dialog window with buttons representing turning points in history based on the era provided.
+     *
+     * @param era an integer value specifying the era of turning points to display
+     */
+    private void turningPointsDialog(int era, String reference) {
+        TurningPoints turningPointData = getTurningPoints(era);
+
+        JPanel panelDescriptionContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JLabel panelDescription = new JLabel(String.format(
+            "<html><div style='width:500px;'><center><font size='6'>%s</font></center><justify>%s</justify></div></html>",
+            resources.getString(reference + ".text"),
+            resources.getString(reference + ".tooltip")));
+        panelDescriptionContainer.add(panelDescription);
+
+        JDialog turningPointsDialog = new JDialog();
+        turningPointsDialog.setTitle(resources.getString("turningPoints.title"));
+        turningPointsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
+
+        JPanel buttonPanel = new JPanel();
+        final List<LocalDate> finalTurningPointDates = turningPointData.turningPointDates();
+
+        for (int index = 1; index <= turningPointData.turningPoints().size(); index++) {
+            JButton eraButtonN = new JButton(String.format("<html><center><b>" + resources.getString(turningPointData.turningPoints().get(index - 1) + ".text")
+                + "</b><br>(" + finalTurningPointDates.get(index - 1).toString() + ")</center></html>"));
+            eraButtonN.setToolTipText(String.format(resources.getString(turningPointData.turningPoints().get(index - 1) + ".tooltip")));
+
+            final int finalIndex = index - 1;
+            eraButtonN.addActionListener(e -> {
+                setDate(finalTurningPointDates.get(finalIndex));
+                turningPointsDialog.dispose();
+            });
+
+            buttonPanel.add(eraButtonN);
+        }
+
+        JLabel eraLogoLabel = new JLabel();
+        eraLogoLabel.setIcon(turningPointData.eraLogo());
+        eraLogoLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        // Create a JPanel to hold the description and buttons, then add to the center of the dialog
+        JPanel descriptionAndButtonsPanel = new JPanel(new BorderLayout());
+        descriptionAndButtonsPanel.add(panelDescriptionContainer, BorderLayout.NORTH);
+        descriptionAndButtonsPanel.add(buttonPanel, BorderLayout.CENTER);
+
+        turningPointsDialog.getContentPane().add(eraLogoLabel, BorderLayout.PAGE_START);
+        turningPointsDialog.getContentPane().add(descriptionAndButtonsPanel, BorderLayout.CENTER);
+
+        // set turningPointsDialog size and location, and make it visible
+        setResizable(false);
+        turningPointsDialog.pack();
+        turningPointsDialog.setMinimumSize(turningPointsDialog.getSize());
+        turningPointsDialog.setLocationRelativeTo(null);
+        turningPointsDialog.setVisible(true);
+    }
+
+    /**
+     * Retrieves turning points based on the given era.
+     *
+     * @param era the era for which turning points are requested
+     * @return {@link TurningPoints} object containing the turning points, their dates, and era logo
+     */
+    private static TurningPoints getTurningPoints(int era) {
+        final String LOGO_DIRECTORY = "data/images/universe/";
+        final String LOGO_FILE_TYPE = ".png";
+
+        List<String> turningPoints;
+        List<LocalDate> turningPointDates;
+        ImageIcon eraLogo;
+
+        switch (era) {
+            case 0 -> {
+                turningPoints = List.of("TerranHegemonyFounded", "RiseOfTheBattleMek");
+                turningPointDates = List.of(
+                    LocalDate.of(2315, 6, 2),
+                    LocalDate.of(2475, 1, 1));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_starleague" + LOGO_FILE_TYPE);
+            }
+            case 1 -> {
+                turningPoints = List.of("ReunificationWar", "FirstHiddenWar", "SecondHiddenWar",
+                    "ThirdHiddenWar", "AmarisCivilWar");
+                turningPointDates = List.of(
+                    LocalDate.of(2571, 1, 1),
+                    LocalDate.of(2681, 1, 1),
+                    LocalDate.of(2725, 1, 1),
+                    LocalDate.of(2741, 1, 1),
+                    LocalDate.of(2766, 11, 26));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_starleague" + LOGO_FILE_TYPE);
+            }
+            case 2 -> {
+                turningPoints = List.of("OperationExodus", "OperationKlondike", "SecondSuccessionWar",
+                    "ThirdSuccessionWar");
+                turningPointDates = List.of(
+                    LocalDate.of(2784, 2, 14),
+                    LocalDate.of(2821, 7, 2),
+                    LocalDate.of(2830, 1, 1),
+                    LocalDate.of(2866, 1, 1));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
+            }
+            case 3 -> {
+                turningPoints = List.of("OperationFreedom");
+                turningPointDates = List.of(LocalDate.of(2866, 1, 1));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
+            }
+            case 4 -> {
+                turningPoints = List.of("ThirdSuccessionWarEnds", "ForthSuccessionWar", "FRRFounded",
+                    "WarOf3039");
+                turningPointDates = List.of(
+                    LocalDate.of(3025, 1, 1),
+                    LocalDate.of(3028, 8, 20),
+                    LocalDate.of(3034, 3, 13),
+                    LocalDate.of(3039, 4, 16));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
+            }
+            case 5 -> {
+                turningPoints = List.of("FirstContact", "YearOfPeace", "Tukayyid", "RefusalWar",
+                    "OperationBulldog");
+                turningPointDates = List.of(
+                    LocalDate.of(3049, 1, 1),
+                    LocalDate.of(3050, 10, 31),
+                    LocalDate.of(3052, 5, 1),
+                    LocalDate.of(3057, 9, 1),
+                    LocalDate.of(3059, 5, 1));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_claninvasion" + LOGO_FILE_TYPE);
+            }
+            case 6 -> {
+                turningPoints = List.of("FCCWStarts", "JadeFalconOffensive");
+                turningPointDates = List.of(
+                    LocalDate.of(3062, 11, 16),
+                    LocalDate.of(3064, 5, 10));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_civilwar" + LOGO_FILE_TYPE);
+            }
+            case 7 -> {
+                turningPoints = List.of("FirstBattleOfHarlech", "WarsOfReaving", "OperationScour");
+                turningPointDates = List.of(
+                    LocalDate.of(3067, 10, 15),
+                    LocalDate.of(3071, 12, 1),
+                    LocalDate.of(3077, 1, 10));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_jihad" + LOGO_FILE_TYPE);
+            }
+            case 8 -> {
+                turningPoints = List.of("RepublicFounded", "OperationGoldenDawn");
+                turningPointDates = List.of(
+                    LocalDate.of(3081, 3, 7),
+                    LocalDate.of(3081, 4, 3));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
+            }
+            case 9 -> {
+                turningPoints = List.of("SecondCombineDominionWar", "VictoriaWar", "CapellanCrusades");
+                turningPointDates = List.of(
+                    LocalDate.of(3098, 9, 14),
+                    LocalDate.of(3103, 9, 7),
+                    LocalDate.of(3111, 10, 11));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
+            }
+            case 10 -> {
+                turningPoints = List.of("GreyMonday");
+                turningPointDates = List.of(LocalDate.of(3132, 8, 7));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
+            }
+            case 11 -> {
+                turningPoints = List.of("BattleOfTerra");
+                turningPointDates = List.of(LocalDate.of(3151, 1, 1));
+                eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_ilclan" + LOGO_FILE_TYPE);
+            }
+            default -> throw new IllegalStateException(
+                "Unexpected value mekhq/gui/turningPointsDialog/DateChooser.java/turningPointsDialog: "
+                + era);
+        }
+
+        return new TurningPoints(turningPoints, turningPointDates, eraLogo);
+    }
+
+    /**
+     * Represents a record for storing turning points in history.
+     * Contains lists of turning point names, their corresponding dates, and an {@link ImageIcon} of the era logo.
+     */
+    private record TurningPoints(List<String> turningPoints, List<LocalDate> turningPointDates, ImageIcon eraLogo) {}
 }
