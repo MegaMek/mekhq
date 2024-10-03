@@ -132,33 +132,43 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         lastId++;
         contract.setId(lastId);
         contractIds.put(lastId, contract);
+        // Step 1: Determine Employer
         Faction employer = determineEmployer(campaign, reputation.getReputationModifier(), hiringHallModifiers);
         contract.setEmployerCode(employer.getShortName(), campaign.getLocalDate());
         if (employer.isMercenary()) {
             contract.setMercSubcontract(true);
         }
+        // Step 2: Determine the mission type
         contract.setContractType(determineMission(campaign, employer, reputation.getReputationModifier()));
         ContractTerms contractTerms = new ContractTerms(contract.getContractType(),
             employer, reputation.getReputationFactor(), campaign.getLocalDate());
         setEnemyCode(contract);
-        setIsRiotDuty(contract);
         setAttacker(contract);
+        // Step 3: Set the system location
         try {
             setSystemId(contract);
         } catch (NoContractLocationFoundException ex) {
             return Optional.empty();
         }
+        // Step 4: Populate some information about enemies and allies
         setAllyRating(contract, campaign.getGameYear());
         setEnemyRating(contract, campaign.getGameYear());
         if (contract.getContractType().isCadreDuty()) {
             contract.setAllySkill(SkillLevel.GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
+        // Step 5: Determine the contract length (Not CamOps RAW)
         contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
+        // Step 6: Determine the initial contract clauses
         setContractClauses(contract, contractTerms);
+        // Step 7: Determine the number of required lances (Not CamOps RAW)
         contract.setRequiredLances(calculateRequiredLances(campaign, contract));
+        // Step 8: Calculate the payment
         contract.setMultiplier(calculatePaymentMultiplier(campaign, contract));
+        // Step 9: Determine parts availability
+        // TODO: Rewrite this to be CamOps-compliant
         contract.setPartsAvailabilityLevel(contract.getContractType().calculatePartsAvailabilityLevel());
+        // Step 10: Finish up contract initialization
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
         contract.setName(String.format("%s - %s - %s %s",
