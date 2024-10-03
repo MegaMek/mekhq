@@ -19,12 +19,12 @@ public class ContractTerms {
     private int supportModifier;
     private int transportModifier;
 
-    public ContractTerms(AtBContractType mission, Faction employer, int reputationMod, LocalDate date) {
+    public ContractTerms(AtBContractType mission, Faction employer, int reputationFactor, LocalDate date) {
         operationsTempoMultiplier = mission.getOperationsTempoMultiplier();
         baseLength = mission.getConstantLength();
         addMissionTypeModifiers(mission);
         addEmployerModifiers(employer, date);
-        addUnitReputationModifiers(reputationMod);
+        addUnitReputationModifiers(reputationFactor);
     }
 
     public double getOperationsTempoMultiplier() {
@@ -249,33 +249,33 @@ public class ContractTerms {
         }
     }
 
-    private void addUnitReputationModifiers(int reputationMod) {
-        if (reputationMod <= 0) {
+    private void addUnitReputationModifiers(int reputationFactor) {
+        if (reputationFactor <= 0) {
             commandModifier += -2;
             salvageModifier += -1;
             supportModifier += -1;
             transportModifier += -3;
-        } else if (reputationMod == 1) {
+        } else if (reputationFactor == 1) {
             commandModifier += -1;
             salvageModifier += -1;
             supportModifier += -1;
             transportModifier += -2;
-        } else if (reputationMod == 2) {
+        } else if (reputationFactor == 2) {
             commandModifier += -1;
             transportModifier += -2;
-        } else if (reputationMod == 3) {
+        } else if (reputationFactor == 3) {
             commandModifier += -1;
             transportModifier += -1;
-        } else if (reputationMod == 4) {
+        } else if (reputationFactor == 4) {
             transportModifier += -1;
-        } else if (reputationMod == 6 || reputationMod == 7) {
+        } else if (reputationFactor == 6 || reputationFactor == 7) {
             commandModifier += 1;
             salvageModifier += 1;
-        } else if (reputationMod == 8) {
+        } else if (reputationFactor == 8) {
             commandModifier += 1;
             salvageModifier += 1;
             supportModifier += 1;
-        } else if (reputationMod == 9) {
+        } else if (reputationFactor == 9) {
             commandModifier += 2;
             salvageModifier += 2;
             supportModifier += 1;
