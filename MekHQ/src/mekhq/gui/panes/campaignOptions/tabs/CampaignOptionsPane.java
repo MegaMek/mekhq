@@ -48,10 +48,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Creates a tab and adds it to the {@link TabbedPane}.
+     * Creates a tab and adds it to the TabbedPane.
      *
      * @param resourceName the name of the resource used to create the tab's title
-     * @param tabCreator   a supplier that creates the {@link TabbedPane} for the tab
+     * @param tabCreator   a supplier that creates the TabbedPane for the tab
      */
     private void createTab(String resourceName, Supplier<JTabbedPane> tabCreator) {
         JTabbedPane createdTab = tabCreator.get();
