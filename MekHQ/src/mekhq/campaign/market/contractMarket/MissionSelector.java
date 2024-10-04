@@ -1,5 +1,24 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.market.contractMarket;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import mekhq.campaign.mission.enums.AtBContractType;
 
@@ -15,26 +34,17 @@ public class MissionSelector {
                 return getInnerSphereClanMission(Compute.d6(2), margin, true);
             }
         }
-        roll += margin;
-        if (roll < 3) {
-            return getCovertMission(Compute.d6(2), margin);
-        } else if (roll == 3 || roll > 11) {
-            return getSpecialMission(Compute.d6(2), margin);
-        } else if (roll == 4) {
-            return AtBContractType.PIRATE_HUNTING;
-        } else if (roll == 5) {
-            return AtBContractType.PLANETARY_ASSAULT;
-        } else if (roll == 6 || roll == 7) {
-            return AtBContractType.RECON_RAID;
-        } else if (roll == 8) {
-            return AtBContractType.EXTRACTION_RAID;
-        } else if (roll == 9) {
-            return AtBContractType.EXTRACTION_RAID;
-        } else if (roll == 10) {
-            return AtBContractType.GARRISON_DUTY;
-        } else {
-            return AtBContractType.CADRE_DUTY;
-        }
+        return switch(MathUtility.clamp(roll + margin, 2, 12)) {
+            case 2 -> getCovertMission(Compute.d6(2), margin);
+            case 3, 12 -> getSpecialMission(Compute.d6(2), margin);
+            case 4 -> AtBContractType.PIRATE_HUNTING;
+            case 5 -> AtBContractType.PLANETARY_ASSAULT;
+            case 6, 7 -> AtBContractType.OBJECTIVE_RAID;
+            case 8 -> AtBContractType.EXTRACTION_RAID;
+            case 9 -> AtBContractType.RECON_RAID;
+            case 10 -> AtBContractType.GARRISON_DUTY;
+            default -> AtBContractType.CADRE_DUTY;
+        };
     }
 
     public static AtBContractType getIndependentMission(int roll, int margin, boolean isClan) {
@@ -45,26 +55,17 @@ public class MissionSelector {
                 return getInnerSphereClanMission(Compute.d6(2), margin, true);
             }
         }
-        roll += margin;
-        if (roll < 3) {
-            return getCovertMission(Compute.d6(2), margin);
-        } else if (roll == 3 || roll > 11) {
-            return getSpecialMission(Compute.d6(2), margin);
-        } else if (roll == 4) {
-            return AtBContractType.PLANETARY_ASSAULT;
-        } else if (roll == 5 || roll == 9) {
-            return AtBContractType.OBJECTIVE_RAID;
-        } else if (roll == 6) {
-            return AtBContractType.EXTRACTION_RAID;
-        } else if (roll == 7) {
-            return AtBContractType.PIRATE_HUNTING;
-        } else if (roll == 8) {
-            return AtBContractType.SECURITY_DUTY;
-        } else if (roll == 10) {
-            return AtBContractType.GARRISON_DUTY;
-        } else {
-            return AtBContractType.CADRE_DUTY;
-        }
+        return switch(MathUtility.clamp(roll + margin, 2, 12)) {
+            case 2 -> getCovertMission(Compute.d6(2), margin);
+            case 3, 12 -> getSpecialMission(Compute.d6(2), margin);
+            case 4 -> AtBContractType.PLANETARY_ASSAULT;
+            case 5, 9 -> AtBContractType.OBJECTIVE_RAID;
+            case 6 -> AtBContractType.EXTRACTION_RAID;
+            case 7 -> AtBContractType.PIRATE_HUNTING;
+            case 8 -> AtBContractType.SECURITY_DUTY;
+            case 10 -> AtBContractType.GARRISON_DUTY;
+            default -> AtBContractType.CADRE_DUTY;
+        };
     }
 
     public static AtBContractType getCorporationMission(int roll, int margin, boolean isClan) {
@@ -75,25 +76,17 @@ public class MissionSelector {
                 return getInnerSphereClanMission(Compute.d6(2), margin, true);
             }
         }
-        roll += margin;
-        if (roll < 4) {
-            return getCovertMission(Compute.d6(2), margin);
-        } else if (roll == 4 || roll > 11) {
-            return getSpecialMission(Compute.d6(2), margin);
-        } else if (roll == 5 || roll == 8) {
-            return AtBContractType.OBJECTIVE_RAID;
-        } else if (roll == 6) {
-            return AtBContractType.EXTRACTION_RAID;
-        } else if (roll == 7) {
-            return AtBContractType.RECON_RAID;
-        } else if (roll == 9) {
-            return AtBContractType.SECURITY_DUTY;
-        } else if (roll == 10) {
-            return AtBContractType.GARRISON_DUTY;
-        } else {
+        return switch(MathUtility.clamp(roll + margin, 2, 12)) {
+            case 2, 3 -> getCovertMission(Compute.d6(2), margin);
+            case 4, 12 -> getSpecialMission(Compute.d6(2), margin);
+            case 5, 8 -> AtBContractType.OBJECTIVE_RAID;
+            case 6 -> AtBContractType.EXTRACTION_RAID;
+            case 7 -> AtBContractType.RECON_RAID;
+            case 9 -> AtBContractType.SECURITY_DUTY;
+            case 10 -> AtBContractType.GARRISON_DUTY;
             // TODO: determine which is the higher paying between cadre/garrison and return that
-            return AtBContractType.CADRE_DUTY;
-        }
+            default -> AtBContractType.CADRE_DUTY;
+        };
     }
 
     public static AtBContractType getPirateMission(int roll, int margin) {
@@ -106,32 +99,23 @@ public class MissionSelector {
     }
 
     private static AtBContractType getSpecialMission(int roll, int margin) {
-        roll += margin;
-        if (roll < 3) {
-            return getCovertMission(Compute.d6(2), margin);
-        } else if (roll < 5) {
+        return switch(MathUtility.clamp(roll + margin, 2, 12)) {
+            case 2 -> getCovertMission(Compute.d6(2), margin);
             // TODO: figure out how to offer planetary assault followup contracts
-            return AtBContractType.GUERRILLA_WARFARE;
-        } else if (roll == 5 || roll == 8) {
+            case 3, 4 -> AtBContractType.GUERRILLA_WARFARE;
             // TODO: figure out how to offer planetary assault followup contracts
-            return AtBContractType.RECON_RAID;
-        } else if (roll == 6) {
-            return AtBContractType.EXTRACTION_RAID;
-        } else if (roll == 7) {
+            case 5, 8 -> AtBContractType.RECON_RAID;
+            case 6 -> AtBContractType.EXTRACTION_RAID;
             // TODO: change this to RETAINER if/when that is implemented
-            return AtBContractType.GARRISON_DUTY;
-        } else if (roll == 9) {
-            return AtBContractType.RELIEF_DUTY;
-        } else if (roll == 10) {
+            case 7 -> AtBContractType.GARRISON_DUTY;
+            case 9 -> AtBContractType.RELIEF_DUTY;
             // TODO: figure out how to offer planetary assault followup contracts
-            return AtBContractType.DIVERSIONARY_RAID;
-        } else if (roll == 11) {
-            //  // TODO: determine which is the higher paying between riot/garrison and return that
-            return AtBContractType.RIOT_DUTY;
-        } else {
+            case 10 -> AtBContractType.DIVERSIONARY_RAID;
+            // TODO: determine which is the higher paying between riot/garrison and return that
+            case 11 -> AtBContractType.RIOT_DUTY;
             // TODO: determine which is the higher paying between cadre/garrison and return that
-            return AtBContractType.CADRE_DUTY;
-        }
+            default -> AtBContractType.CADRE_DUTY;
+        };
     }
 
     private static AtBContractType getCovertMission(int roll, int margin) {
