@@ -25,6 +25,7 @@ import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
@@ -1251,14 +1252,16 @@ public class CampaignGUI extends JPanel {
         menuThemes.removeAll();
         JCheckBoxMenuItem miPlaf;
         for (LookAndFeelInfo laf : UIManager.getInstalledLookAndFeels()) {
-            miPlaf = new JCheckBoxMenuItem(laf.getName());
-            if (laf.getClassName().equalsIgnoreCase(MekHQ.getSelectedTheme().getValue())) {
-                miPlaf.setSelected(true);
-            }
+            if (GUIPreferences.isSupportedLookAndFeel(laf)) {
+                miPlaf = new JCheckBoxMenuItem(laf.getName());
+                if (laf.getClassName().equalsIgnoreCase(MekHQ.getSelectedTheme().getValue())) {
+                    miPlaf.setSelected(true);
+                }
 
-            menuThemes.add(miPlaf);
-            miPlaf.setActionCommand(laf.getClassName());
-            miPlaf.addActionListener(this::changeTheme);
+                menuThemes.add(miPlaf);
+                miPlaf.setActionCommand(laf.getClassName());
+                miPlaf.addActionListener(this::changeTheme);
+            }
         }
     }
 
@@ -1545,7 +1548,7 @@ public class CampaignGUI extends JPanel {
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
             miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         }
-        
+
         AbstractContractMarket contractMarket = getCampaign().getContractMarket();
         if (contractMarket.getMethod() != newOptions.getContractMarketMethod()) {
             getCampaign().setContractMarket(newOptions.getContractMarketMethod().getContractMarket());
