@@ -34,7 +34,6 @@ import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.swing.util.UIUtil.*;
-import static megamek.client.ui.swing.util.UIUtil.guiScaledFontHTML;
 
 public class EditDeploymentDialog extends JDialog {
 
@@ -154,7 +153,7 @@ public class EditDeploymentDialog extends JDialog {
             butText[i].append(IStartingPositions.START_LOCATION_NAMES[i]).append("</FONT><BR>");
         }
 
-        butText[currentStartPos].append(guiScaledFontHTML(uiGreen()));
+        butText[currentStartPos].append(colorHTML(uiGreen()));
         butText[currentStartPos].append("\u2B24</FONT>");
 
         for (int i = 0; i < 11; i++) {
