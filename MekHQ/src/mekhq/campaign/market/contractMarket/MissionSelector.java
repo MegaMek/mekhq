@@ -26,6 +26,16 @@ import mekhq.campaign.mission.enums.AtBContractType;
  * Utility class that implements the mission tables as described in CamOps (4th printing).
  */
 public class MissionSelector {
+    /**
+     * Determines the mission from the Inner Sphere/Clan column of the Missions Table on page 40
+     * in CamOps, 4th printing. Certain rolls generate missions from other columns, i.e. Special
+     * and Covert.
+     *
+     * @param roll The result of a 2d6 roll
+     * @param margin The margin of success from a Negotiation check
+     * @param isClan Whether the player unit is a Clan faction
+     * @return The AtBContractType representing the type of mission for the contract
+     */
     public static AtBContractType getInnerSphereClanMission(int roll, int margin, boolean isClan) {
         if (isClan) {
             int result = roll + margin;
@@ -47,6 +57,16 @@ public class MissionSelector {
         };
     }
 
+    /**
+     * Determines the mission from the Independent column of the Missions Table on page 40 in
+     * CamOps, 4th printing. Certain rolls generate missions from other columns, i.e. Special
+     * and Covert.
+     *
+     * @param roll The result of a 2d6 roll
+     * @param margin The margin of success from a Negotiation check
+     * @param isClan Whether the player unit is a Clan faction
+     * @return The AtBContractType representing the type of mission for the contract
+     */
     public static AtBContractType getIndependentMission(int roll, int margin, boolean isClan) {
         if (isClan) {
             int result = roll + margin;
@@ -68,6 +88,16 @@ public class MissionSelector {
         };
     }
 
+    /**
+     * Determines the mission from the Corporation column of the Missions Table on page 40 in
+     * CamOps, 4th printing. Certain rolls generate missions from other columns, i.e. Special
+     * and Covert.
+     *
+     * @param roll The result of a 2d6 roll
+     * @param margin The margin of success from a Negotiation check
+     * @param isClan Whether the player unit is a Clan faction
+     * @return The AtBContractType representing the type of mission for the contract
+     */
     public static AtBContractType getCorporationMission(int roll, int margin, boolean isClan) {
         if (isClan) {
             int result = roll + margin;
@@ -89,6 +119,14 @@ public class MissionSelector {
         };
     }
 
+    /**
+     * Determines the mission from the Pirate column of the Missions Table on page 40 in CamOps,
+     * 4th printing.
+     *
+     * @param roll The result of a 2d6 roll
+     * @param margin The margin of success from a Negotiation check
+     * @return The AtBContractType representing the type of mission for the contract
+     */
     public static AtBContractType getPirateMission(int roll, int margin) {
         roll += margin;
         if (roll < 6) {
