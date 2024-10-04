@@ -28,11 +28,14 @@ import mekhq.campaign.CampaignPreset;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.panes.CampaignOptionsPane;
+import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
+
+import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com) (Original Version, now largely CampaignOptionsPane)
@@ -105,8 +108,9 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
 
         panel.add(new MMButton("btnLoadPreset", resources, "btnLoadPreset.text",
                 "btnLoadPreset.toolTipText", evt -> {
-            final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(getFrame());
-            if (presetSelectionDialog.showDialog().isConfirmed()) {
+            final SelectPresetDialog presetSelectionDialog =
+                new SelectPresetDialog(getFrame(), true, false);
+            if (presetSelectionDialog.getReturnState() != PRESET_SELECTION_CANCELLED) {
                 applyPreset(presetSelectionDialog.getSelectedPreset());
             }
         }));
