@@ -27,7 +27,7 @@ import java.time.LocalDate;
 
 /**
  * Structure that resolves and stores modifiers and contract terms as shown in the Master Contract
- * Terms Table on page 42 of CamOps (4th printing).
+ * Terms Table on page 42 and Supplemental Contract Terms Table on page 43 of CamOps (4th printing).
  */
 public class ContractTerms {
     private double operationsTempoMultiplier;
@@ -58,9 +58,16 @@ public class ContractTerms {
         return employmentMultiplier;
     }
 
+    /**
+     * Determines the command rights based on a roll and the current CamOps command modifier.
+     *
+     * @param roll the result of a 2d6 roll
+     * @return the type of Command rights (Integrated, House, Liaison, or Independent) after
+     *         all applicable modifiers
+     */
     public ContractCommandRights getCommandRights(int roll) {
         roll += commandModifier;
-        ContractCommandRights commandRights;
+        ContractCommandRights commandRights; // defaults to integrated
         if (roll > 2 && roll < 8) {
             commandRights = ContractCommandRights.HOUSE;
         } else if (roll < 12) {
@@ -71,11 +78,26 @@ public class ContractTerms {
         return commandRights;
     }
 
+    /**
+     * Determines whether the salvage rights being offered are Exchange based on a 2d6 roll and
+     * the current salvage modifier for the contract.
+     *
+     * @param roll The result of a 2d6 roll
+     * @return boolean representing whether the salvage type is exchange
+     */
     public boolean isSalvageExchange(int roll) {
         roll += salvageModifier;
         return roll == 2 || roll == 3;
     }
 
+    /**
+     * Determines the percentage of salvage being offered as part of the salvage terms of a
+     * contract, based on the results of a 2d6 roll and the current salvage modifier for the
+     * contract.
+     *
+     * @param roll The result of a 2d6 roll
+     * @return the salvage percentage being offered
+     */
     public int getSalvagePercentage(int roll) {
         roll += salvageModifier;
         return switch (MathUtility.clamp(roll, 3, 13)) {
@@ -93,6 +115,14 @@ public class ContractTerms {
         };
     }
 
+    /**
+     * Determines the support percentage being offered as part of the support terms of a
+     * contract, based on the results of a 2d6 roll and the current support modifier for the
+     * contract.
+     *
+     * @param roll The result of a 2d6 roll
+     * @return the support percentage being offered
+     */
     public int getSupportPercentage(int roll) {
         roll += supportModifier;
         return switch(MathUtility.clamp(roll, 2, 13)) {
@@ -106,16 +136,39 @@ public class ContractTerms {
         };
     }
 
+    /**
+     * Determines whether straight support is being offered based on a 2d6 roll and
+     * the current support modifier for the contract.
+     *
+     * @param roll The result of a 2d6 roll
+     * @return boolean representing whether the Straight support type is being offered
+     */
     public boolean isStraightSupport(int roll) {
         roll += supportModifier;
         return roll > 2 && roll < 8;
     }
 
+    /**
+     * Determines whether Battle Loss Compensation is being offered based on a 2d6 roll and
+     * the current support modifier for the contract.
+     *
+     * @param roll The result of a 2d6 roll
+     * @return boolean representing whether the Battle Loss Compensation support type is
+     *         being offered
+     */
     public boolean isBattleLossComp(int roll) {
         roll += supportModifier;
         return roll > 7;
     }
 
+    /**
+     * Determines the transport cost percentage being offered as part of the transport terms of a
+     * contract, based on the results of a 2d6 roll and the current transport modifier for the
+     * contract.
+     *
+     * @param roll The result of a 2d6 roll
+     * @return the transport percentage being offered
+     */
     public int getTransportTerms(int roll) {
         roll += transportModifier;
         return switch (MathUtility.clamp(roll, 1, 10)) {
