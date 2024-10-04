@@ -3870,6 +3870,10 @@ public class Campaign implements ITechManager {
      * @param person The person for whom to process monthly idle XP.
      */
     private void processMonthlyIdleXP(Person person) {
+        if (!person.getStatus().isActive()) {
+            return;
+        }
+
         if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
                 && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
             person.setIdleMonths(person.getIdleMonths() + 1);
