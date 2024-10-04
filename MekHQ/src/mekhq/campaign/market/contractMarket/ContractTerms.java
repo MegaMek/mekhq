@@ -225,8 +225,7 @@ public class ContractTerms {
             salvageModifier += -1;
             supportModifier += -1;
             transportModifier += -1;
-        }
-        if (employer.isGenerous()) {
+        } else if (employer.isGenerous()) {
             employmentMultiplier += 0.2;
             salvageModifier += 1;
             supportModifier += 2;
@@ -235,8 +234,7 @@ public class ContractTerms {
         if (employer.isControlling()) {
             commandModifier += -2;
             salvageModifier += -1;
-        }
-        if (employer.isLenient()) {
+        } else if (employer.isLenient()) {
             commandModifier += 1;
             salvageModifier += 1;
         }
