@@ -25,6 +25,7 @@ import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
 import megamek.client.ui.swing.ColourSelectorButton;
 import megamek.client.ui.swing.CommonSettingsDialog;
+import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.HelpDialog;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
@@ -45,6 +46,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Hashtable;
 import java.util.Objects;
 
 /**
@@ -72,6 +74,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private JCheckBox optionHistoricalDailyLog;
         private JCheckBox chkCompanyGeneratorStartup;
         private JCheckBox chkShowCompanyGenerator;
+        private final JSlider guiScale = new JSlider();
 
         // region Command Center Tab
         private JCheckBox optionCommandCenterUseUnitMarket;
@@ -221,6 +224,25 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         private JPanel createDisplayTab() {
+            guiScale.setMajorTickSpacing(3);
+            guiScale.setMinimum(7);
+            guiScale.setMaximum(24);
+            Hashtable<Integer, JComponent> table = new Hashtable<>();
+            table.put(7, new JLabel("70%"));
+            table.put(10, new JLabel("100%"));
+            table.put(16, new JLabel("160%"));
+            table.put(22, new JLabel("220%"));
+            guiScale.setLabelTable(table);
+            guiScale.setPaintTicks(true);
+            guiScale.setPaintLabels(true);
+            guiScale.setValue((int) (GUIPreferences.getInstance().getGUIScale() * 10));
+            guiScale.setToolTipText(Messages.getString("CommonSettingsDialog.guiScaleTT"));
+            JLabel guiScaleLabel = new JLabel(Messages.getString("CommonSettingsDialog.guiScale"));
+            JPanel scaleLine = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            scaleLine.add(guiScaleLabel);
+            scaleLine.add(Box.createHorizontalStrut(5));
+            scaleLine.add(guiScale);
+
                 // Initialize Components Used in ActionListeners
                 final JLabel lblInterstellarMapShowJumpRadiusMinimumZoom = new JLabel();
                 final JLabel lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom = new JLabel();
@@ -410,6 +432,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                                 .addComponent(optionLongDisplayDateFormat)
                                                                 .addComponent(labelLongDisplayDateFormatExample,
                                                                                 Alignment.TRAILING))
+                                    .addComponent(scaleLine)
                                                 .addComponent(optionHistoricalDailyLog)
                                                 .addComponent(chkCompanyGeneratorStartup)
                                                 .addComponent(chkShowCompanyGenerator)
@@ -449,6 +472,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                                 .addComponent(labelLongDisplayDateFormat)
                                                                 .addComponent(optionLongDisplayDateFormat)
                                                                 .addComponent(labelLongDisplayDateFormatExample))
+                                    .addComponent(scaleLine)
                                                 .addComponent(optionHistoricalDailyLog)
                                                 .addComponent(chkCompanyGeneratorStartup)
                                                 .addComponent(chkShowCompanyGenerator)
@@ -1256,6 +1280,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         @Override
         protected void okAction() {
+            GUIPreferences.getInstance().setValue(GUIPreferences.GUI_SCALE, 0.1 * guiScale.getValue());
+            MekHQ.updateGuiScaling();
                 if (validateDateFormat(optionDisplayDateFormat.getText())) {
                         MekHQ.getMHQOptions().setDisplayDateFormat(optionDisplayDateFormat.getText());
                 }
@@ -1401,6 +1427,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         private void setInitialState() {
+            guiScale.setValue((int) (GUIPreferences.getInstance().getGUIScale() * 10));
                 optionDisplayDateFormat.setText(MekHQ.getMHQOptions().getDisplayDateFormat());
                 optionLongDisplayDateFormat.setText(MekHQ.getMHQOptions().getLongDisplayDateFormat());
                 optionHistoricalDailyLog.setSelected(MekHQ.getMHQOptions().getHistoricalDailyLog());
