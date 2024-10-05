@@ -89,6 +89,9 @@ MEKHQ VERSION HISTORY:
 + FIX #4918: Updated OpFor Skill Generator and Added Skilled Level Parser
 + FIX #4929: Prevent Battle Armor allocation in TORNADO_F4 wind scenarios
 + PR #4931: Reworked AtB Bonus Rolls, Fixed Bug in Bulk Hire
++ PR #4981: Implemented Campaign Options IIC Preset Picker #4981
++ PR #4984: Refactored Daily Personnel Processing Logic.
++ PR #4989: Adaptation to MM #6068 Replace Manual GUI scaling with FlatLaf Scaling
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
