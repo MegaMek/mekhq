@@ -1252,6 +1252,8 @@ public class CampaignGUI extends JPanel {
         menuThemes.removeAll();
         JCheckBoxMenuItem miPlaf;
         for (LookAndFeelInfo laf : UIManager.getInstalledLookAndFeels()) {
+            // intentionally only limits the themes in the menu; as a last resort for GUI problems, other laf can be used by
+            // hand-editing mhq.preferences
             if (GUIPreferences.isSupportedLookAndFeel(laf)) {
                 miPlaf = new JCheckBoxMenuItem(laf.getName());
                 if (laf.getClassName().equalsIgnoreCase(MekHQ.getSelectedTheme().getValue())) {
