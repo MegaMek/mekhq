@@ -381,7 +381,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                             Entity refitEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName())
                                     .getEntity();
                             if (refitEntity != null) {
-                                Refit refit = new Refit(unit, refitEntity, false, false);
+                                Refit refit = new Refit(unit, refitEntity, crd.isCustomize(), false);
                                 if (refit.checkFixable() == null) {
                                     gui.refitUnit(refit, false);
                                 }
@@ -850,7 +850,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                                 || (unit.getEntity() instanceof Aero)
                                 || ((unit.getEntity() instanceof Infantry)))) {
                     menuItem = new JMenuItem(unit.getEntity().isOmni() ? "Choose configuration..."
-                            : "Choose Refit Kit...");
+                            : "Refit/Customize...");
                     menuItem.setActionCommand(COMMAND_REFIT_KIT);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
