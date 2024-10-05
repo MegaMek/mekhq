@@ -39,6 +39,7 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptionsChangedEvent;
@@ -297,7 +298,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 ? PersonnelTabView.GENERAL
                 : choicePersonView.getSelectedItem();
         final XTableColumnModel columnModel = (XTableColumnModel) getPersonnelTable().getColumnModel();
-        getPersonnelTable().setRowHeight(15);
+        getPersonnelTable().setRowHeight(UIUtil.scaleForGUI(15));
 
         // set the renderer
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {

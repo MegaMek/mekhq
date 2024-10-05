@@ -22,6 +22,7 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
@@ -291,7 +292,7 @@ public final class HangarTab extends CampaignGuiTab {
     public void changeUnitView() {
         int view = choiceUnitView.getSelectedIndex();
         XTableColumnModel columnModel = (XTableColumnModel) unitTable.getColumnModel();
-        unitTable.setRowHeight(15);
+        unitTable.setRowHeight(UIUtil.scaleForGUI(15));
 
         // set the renderer
         TableColumn column;
@@ -311,7 +312,7 @@ public final class HangarTab extends CampaignGuiTab {
         }
 
         if (view == UV_GRAPHIC) {
-            unitTable.setRowHeight(80);
+            unitTable.setRowHeight(UIUtil.scaleForGUI(80));
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
