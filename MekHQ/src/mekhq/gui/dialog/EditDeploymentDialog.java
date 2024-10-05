@@ -19,6 +19,7 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.GBC;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.client.ui.swing.util.UIUtil.TipButton;
 import megamek.common.IStartingPositions;
 import megamek.common.Player;
@@ -153,7 +154,7 @@ public class EditDeploymentDialog extends JDialog {
             butText[i].append(IStartingPositions.START_LOCATION_NAMES[i]).append("</FONT><BR>");
         }
 
-        butText[currentStartPos].append(colorHTML(uiGreen()));
+        butText[currentStartPos].append(UIUtil.fontHTML(uiGreen()));
         butText[currentStartPos].append("\u2B24</FONT>");
 
         for (int i = 0; i < 11; i++) {
