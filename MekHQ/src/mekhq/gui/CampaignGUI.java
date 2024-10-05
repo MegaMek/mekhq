@@ -75,6 +75,7 @@ import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
@@ -95,6 +96,8 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
+
+import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 /**
  * The application's main frame.
@@ -308,7 +311,7 @@ public class CampaignGUI extends JPanel {
      * as they are both accessed through the same GUI page.
      * The following mnemonic keys are being used as of 30-MAR-2020:
      * A, B, C, E, F, H, I, L, M, N, O, P, R, S, T, V, W, /
-     *
+     * <p>
      * Note 1: the slash is used for the help, as it is normally the same key as the
      * ?
      * Note 2: the A mnemonic is used for the Advance Day button
@@ -377,9 +380,9 @@ public class CampaignGUI extends JPanel {
         miImportCampaignPreset.setMnemonic(KeyEvent.VK_C);
         miImportCampaignPreset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK));
         miImportCampaignPreset.addActionListener(evt -> {
-            final CampaignPresetSelectionDialog campaignPresetSelectionDialog = new CampaignPresetSelectionDialog(
-                    getFrame());
-            if (!campaignPresetSelectionDialog.showDialog().isConfirmed()) {
+            final SelectPresetDialog campaignPresetSelectionDialog =
+                new SelectPresetDialog(getFrame(), true, false);
+            if (campaignPresetSelectionDialog.getReturnState() == PRESET_SELECTION_CANCELLED) {
                 return;
             }
             final CampaignPreset preset = campaignPresetSelectionDialog.getSelectedPreset();

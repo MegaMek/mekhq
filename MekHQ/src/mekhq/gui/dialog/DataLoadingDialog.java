@@ -18,23 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.time.LocalDate;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
-import javax.swing.SwingWorker;
-
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
@@ -66,6 +49,21 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.gui.baseComponents.AbstractMHQDialog;
+import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
+
+import javax.swing.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.time.LocalDate;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+
+import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
+import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CUSTOMIZE;
+import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_SELECT;
 
 public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChangeListener {
     private static final MMLogger logger = MMLogger.create(DataLoadingDialog.class);
@@ -290,12 +288,23 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 campaign = new Campaign();
 
                 // Campaign Preset
-                final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(dialog,
-                        getFrame());
-                if (presetSelectionDialog.showDialog().isCancelled()) {
-                    return null;
+                final SelectPresetDialog presetSelectionDialog =
+                    new SelectPresetDialog(getFrame(), true, true);
+                CampaignPreset preset;
+                boolean isSelect = false;
+
+                switch (presetSelectionDialog.getReturnState()) {
+                    case PRESET_SELECTION_CANCELLED -> {
+                        return null;
+                    }
+                    case PRESET_SELECTION_SELECT -> {
+                        preset = presetSelectionDialog.getSelectedPreset();
+                        isSelect = true;
+                    }
+                    case PRESET_SELECTION_CUSTOMIZE -> preset = presetSelectionDialog.getSelectedPreset();
+                    default -> throw new IllegalStateException("Unexpected value in mekhq/gui/dialog/DataLoadingDialog.java/Step 6: "
+                        + presetSelectionDialog.getReturnState());
                 }
-                final CampaignPreset preset = presetSelectionDialog.getSelectedPreset();
 
                 // Date
                 final LocalDate date = ((preset == null) || (preset.getDate() == null))
@@ -319,11 +328,15 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 setVisible(false);
 
                 // Campaign Options
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(dialog, getFrame(), campaign, true);
-                optionsDialog.setLocationRelativeTo(getFrame());
-                optionsDialog.applyPreset(preset);
-                if (optionsDialog.showDialog().isCancelled()) {
-                    return null;
+                if (isSelect && preset != null) {
+                    preset.applyContinuousToCampaign(campaign);
+                } else {
+                    CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(dialog, getFrame(), campaign, true);
+                    optionsDialog.setLocationRelativeTo(getFrame());
+                    optionsDialog.applyPreset(preset);
+                    if (optionsDialog.showDialog().isCancelled()) {
+                        return null;
+                    }
                 }
 
                 // initialize reputation

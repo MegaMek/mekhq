@@ -151,8 +151,12 @@ public class PersonnelMarket {
                 stringBuilder.append(':');
                 Person person = personnel.get(0);
                 String expLevel = SkillType.getExperienceLevelName(person.getExperienceLevel(campaign, false));
-                stringBuilder.append("<br>A ")
-                    .append("<b> ")
+                if (expLevel.equals("Elite") || expLevel.equals("Ultra-Green")) {
+                    stringBuilder.append("<br>An ");
+                } else {
+                    stringBuilder.append("<br>A ");
+                }
+                stringBuilder.append("<b> ")
                     .append(expLevel)
                     .append(' ')
                     .append(person.getPrimaryRole().toString())

@@ -18,33 +18,6 @@
  */
 package mekhq.campaign;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
@@ -64,15 +37,26 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This is an object which holds a set of objects that collectively define the
  * initial options setup for a campaign.
- *
+ * <p>
  * It includes both startup values, which are only used on initial startup (the
  * date, starting planet, and rank system), and continuous options, which can be
  * applied at any time (campaign options, skills, SPAs).
- *
+ * <p>
  * It also includes a short title and description that allows one to create and
  * save different presets. The goal is to allow users to create and load various
  * different presets.
@@ -160,6 +144,13 @@ public class CampaignPreset {
     // region Getters/Setters
     public boolean isUserData() {
         return userData;
+    }
+
+    /**
+     * @return the title of the {@link CampaignPreset}
+     */
+    public String getTitle() {
+        return title;
     }
 
     public void setTitle(final String title) {
