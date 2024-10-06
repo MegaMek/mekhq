@@ -22,10 +22,12 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
+import megamek.common.preference.IPreferenceChangeListener;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -72,6 +74,8 @@ public final class HangarTab extends CampaignGuiTab {
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
+    private final IPreferenceChangeListener scalingChangeListener = e -> changeUnitView();
+
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
             MekHQ.getMHQOptions().getLocale());
 
@@ -80,6 +84,7 @@ public final class HangarTab extends CampaignGuiTab {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
     }
     // endregion Constructors
 
@@ -403,6 +408,12 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
         }
+    }
+
+    @Override
+    public void disposeTab() {
+        super.disposeTab();
+        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
     }
 
     public void focusOnUnit(UUID id) {
