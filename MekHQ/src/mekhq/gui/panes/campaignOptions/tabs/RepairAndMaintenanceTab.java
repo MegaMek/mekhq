@@ -140,7 +140,7 @@ public class RepairAndMaintenanceTab {
      * @return The created maintenance tab panel as a {@link JPanel}.
      */
     public JPanel createMaintenanceTab() {
-        // Promotional Image
+        // Header
         JPanel imagePanel = createHeaderPanel("MaintenanceTab",
             getImageDirectory() + "logo_clan_blood_spirit.png",
             false, "", true);
@@ -221,7 +221,7 @@ public class RepairAndMaintenanceTab {
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblDefaultMaintenanceTime)
                     .addComponent(spnDefaultMaintenanceTime)
-                .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                 .addComponent(useQualityMaintenance)
                 .addComponent(reverseQualityNames)
                 .addComponent(chkUseRandomUnitQualities)

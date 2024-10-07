@@ -79,7 +79,7 @@ public class GeneralTab {
      * @return the created general tab as an AbstractMHQScrollablePanel
      */
     public AbstractMHQScrollablePanel createGeneralTab() {
-        // Promotional Image
+        // Header
         JPanel imagePanel = createGeneralHeader();
 
         // Campaign name
