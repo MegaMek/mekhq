@@ -21,7 +21,7 @@ package mekhq.gui.panels;
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignPreset;
+import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQPanel;
 import mekhq.gui.dialog.CreateCampaignPresetDialog;
 

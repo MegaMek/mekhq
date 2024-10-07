@@ -30,9 +30,9 @@ import megamek.common.options.GameOptions;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.campaignOptions.CampaignPreset;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -47,6 +47,7 @@ import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -538,32 +539,32 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyDate())
-                                .addComponent(btnDate, GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnDate, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyFaction())
-                                .addComponent(getComboFaction(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getComboFaction(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyPlanet())
-                                .addComponent(getChkStartingSystemFactionSpecific(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getChkStartingSystemFactionSpecific(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getComboStartingSystem())
-                                .addComponent(getComboStartingPlanet(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getComboStartingPlanet(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyRankSystem())
-                                .addComponent(getComboRankSystem(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getComboRankSystem(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblContractCount)
-                                .addComponent(getSpnContractCount(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getSpnContractCount(), Alignment.LEADING))
                         .addComponent(getChkGM())
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyCompanyGenerationOptions())
-                                .addComponent(btnCompanyGenerationOptions, GroupLayout.Alignment.LEADING))
+                                .addComponent(btnCompanyGenerationOptions, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkSpecifyDate())
                                 .addComponent(btnDate))
@@ -623,14 +624,14 @@ public class CreateCampaignPresetDialog extends AbstractMHQValidationButtonDialo
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkSpecifyGameOptions())
-                                .addComponent(btnGameOptions, GroupLayout.Alignment.LEADING))
+                                .addComponent(btnGameOptions, Alignment.LEADING))
                         .addComponent(getChkSpecifyCampaignOptions())
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkSpecifyGameOptions())
                                 .addComponent(btnGameOptions))

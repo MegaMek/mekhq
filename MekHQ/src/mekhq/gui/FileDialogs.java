@@ -21,7 +21,7 @@ package mekhq.gui;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignPreset;
+import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.io.FileType;

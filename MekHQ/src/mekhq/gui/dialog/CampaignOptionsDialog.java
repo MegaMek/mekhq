@@ -28,11 +28,14 @@ import mekhq.campaign.CampaignPreset;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
 import mekhq.gui.panes.CampaignOptionsPane;
+import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
+
+import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com) (Original Version, now largely CampaignOptionsPane)
@@ -89,7 +92,7 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Initialization
     @Override
     protected Container createCenterPane() {
-        setCampaignOptionsPane(new CampaignOptionsPane(getFrame(), getCampaign()));
+        setCampaignOptionsPane(new CampaignOptionsPane(getFrame(), getCampaign(), isStartup()));
         return getCampaignOptionsPane();
     }
 
@@ -169,8 +172,8 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
 
     @Override
     protected void finalizeInitialization() throws Exception {
-//        getCampaignOptionsPane().setOptions(getCampaign().getCampaignOptions(),
-//                getCampaign().getRandomSkillPreferences());
+        getCampaignOptionsPane().setOptions(getCampaign().getCampaignOptions(),
+                getCampaign().getRandomSkillPreferences());
         super.finalizeInitialization();
     }
     //endregion Initialization
@@ -178,20 +181,19 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //region Button Actions
     @Override
     protected void okAction() {
-//        getCampaignOptionsPane().updateOptions();
+        getCampaignOptionsPane().updateOptions();
     }
 
     @Override
     protected ValidationState validateAction(final boolean display) {
-//        return getCampaignOptionsPane().validateOptions(display);
-        return null;
+        return getCampaignOptionsPane().validateOptions(display);
     }
 
     private void btnSaveActionPerformed() {
         if (validateAction(true).isFailure()) {
             return;
         }
-//        getCampaignOptionsPane().updateOptions();
+        getCampaignOptionsPane().updateOptions();
         setResult(DialogResult.CONFIRMED);
 
         final CreateCampaignPresetDialog createCampaignPresetDialog
@@ -212,6 +214,6 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
     //endregion Button Actions
 
     public void applyPreset(final @Nullable CampaignPreset preset) {
-//        getCampaignOptionsPane().applyPreset(preset);
+        getCampaignOptionsPane().applyPreset(preset);
     }
 }
