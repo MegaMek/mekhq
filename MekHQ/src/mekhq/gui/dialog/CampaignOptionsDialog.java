@@ -24,10 +24,10 @@ import megamek.client.ui.enums.ValidationState;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignPreset;
+import mekhq.campaign.CampaignPreset;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQValidationButtonDialog;
-import mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsPane;
+import mekhq.gui.panes.CampaignOptionsPane;
 
 import javax.swing.*;
 import java.awt.*;
@@ -105,8 +105,9 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
 
         panel.add(new MMButton("btnLoadPreset", resources, "btnLoadPreset.text",
                 "btnLoadPreset.toolTipText", evt -> {
-            final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(getFrame());
-            if (presetSelectionDialog.showDialog().isConfirmed()) {
+            final SelectPresetDialog presetSelectionDialog =
+                new SelectPresetDialog(getFrame(), true, false);
+            if (presetSelectionDialog.getReturnState() != PRESET_SELECTION_CANCELLED) {
                 applyPreset(presetSelectionDialog.getSelectedPreset());
             }
         }));

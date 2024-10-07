@@ -1,8 +1,26 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.panes.campaignOptions;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.campaignOptions.CampaignPreset;
+import mekhq.campaign.CampaignPreset;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -12,10 +30,11 @@ import java.util.ResourceBundle;
 import static megamek.client.ui.WrapLayout.wordWrap;
 
 /**
- * A dialog for selecting campaign presets.
+ * A dialog for selecting campaign presets. Extends {@link JDialog}.
+ * Keeps track of the selected preset and return state.
+ * Provides options to select a preset, customize a preset, or cancel the operation.
  */
 public class SelectPresetDialog extends JDialog {
-    // region Variable Declarations
     private static String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
         MekHQ.getMHQOptions().getLocale());
@@ -25,17 +44,42 @@ public class SelectPresetDialog extends JDialog {
     final static String OPTION_CANCEL = resources.getString("presetDialogCancel.name");
 
     private static final MMLogger logger = MMLogger.create(SelectPresetDialog.class);
-    // endregion Variable Declarations
 
-    // region Constructors
+    private int returnState;
+    public static final int PRESET_SELECTION_CANCELLED = 0;
+    public static final int PRESET_SELECTION_SELECT = 1;
+    public static final int PRESET_SELECTION_CUSTOMIZE = 2;
+    private CampaignPreset selectedPreset;
 
     /**
-     * A dialog for selecting campaign presets.
+     * Returns the current return state of the dialog.
+     * <p>{@code PRESET_SELECTION_CANCELLED} = 0
+     * <p>{@code PRESET_SELECTION_SELECT} = 1
+     * <p>{@code PRESET_SELECTION_CUSTOMIZE} = 2
      *
-     * @param frame The parent {@link JFrame}.
+     * @return An integer representing the return state of the dialog.
      */
-    private SelectPresetDialog(JFrame frame) {
-        super(frame, resources.getString("presetDialog.title"), true); // make the dialog modal
+    public int getReturnState() {
+        return returnState;
+    }
+
+    /**
+     * @return The {@link CampaignPreset} that was selected.
+     */
+    public CampaignPreset getSelectedPreset() {
+        return selectedPreset;
+    }
+
+    /**
+     * Constructs a dialog window for selecting a campaign preset.
+     *
+     * @param frame                     the parent {@link JFrame} for the dialog
+     * @param includePresetSelectOption whether to include the option to select a preset
+     * @param includeCustomizePresetOption whether to include the option to customize a preset
+     */
+    public SelectPresetDialog(JFrame frame, boolean includePresetSelectOption, boolean includeCustomizePresetOption) {
+        super(frame, resources.getString("presetDialog.title"), true);
+        returnState = PRESET_SELECTION_CANCELLED;
 
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
@@ -49,7 +93,9 @@ public class SelectPresetDialog extends JDialog {
         layout.setAutoCreateContainerGaps(true);
         centerPanel.setLayout(layout);
 
-        JLabel descriptionLabel = new JLabel(resources.getString("presetDialog.description"));
+        JLabel descriptionLabel = new JLabel(String.format(
+            "<html><body><div style='width:400px;'><center>%s</center></div></body></html>",
+            resources.getString("presetDialog.description")));
 
         final DefaultListModel<CampaignPreset> campaignPresets = new DefaultListModel<>();
         campaignPresets.addAll(CampaignPreset.getCampaignPresets());
@@ -67,11 +113,10 @@ public class SelectPresetDialog extends JDialog {
                                                           int index, boolean isSelected,
                                                           boolean cellHasFocus) {
                 if (value instanceof CampaignPreset preset) {
-                    setText(preset.getTitle());  // Set the name as the display text
-                    setToolTipText(wordWrap(preset.getDescription())); // Set the description as the tooltip
+                    setText(preset.getTitle());
+                    setToolTipText(wordWrap(preset.getDescription()));
                 }
 
-                // Align the text to the center
                 setHorizontalAlignment(JLabel.CENTER);
 
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -95,31 +140,41 @@ public class SelectPresetDialog extends JDialog {
         add(centerPanel, BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel();
 
-        JButton button1 = new JButton(OPTION_SELECT_PRESET);
-        button1.setToolTipText(resources.getString("presetDialogSelect.tooltip"));
-        button1.addActionListener(e -> {
-            applyPreset((CampaignPreset) comboBox.getSelectedItem());
+        JButton buttonSelect = new JButton(OPTION_SELECT_PRESET);
+        buttonSelect.setToolTipText(resources.getString("presetDialogSelect.tooltip"));
+        buttonSelect.addActionListener(e -> {
+            selectedPreset = (CampaignPreset) comboBox.getSelectedItem();
+            returnState = PRESET_SELECTION_SELECT;
             dispose();
         });
-        buttonPanel.add(button1);
+        buttonSelect.setEnabled(includePresetSelectOption);
+        buttonPanel.add(buttonSelect);
 
-        JButton button2 = new JButton(OPTION_CUSTOMIZE_PRESET);
-        button2.setToolTipText(resources.getString("presetDialogCustomize.tooltip"));
-        button2.addActionListener(e -> {
-            // handle button 2 click
-            // TODO initialize campaign options dialog
+        JButton buttonCustomize = new JButton(OPTION_CUSTOMIZE_PRESET);
+        buttonCustomize.setToolTipText(resources.getString("presetDialogCustomize.tooltip"));
+        buttonCustomize.addActionListener(e -> {
+            selectedPreset = (CampaignPreset) comboBox.getSelectedItem();
+            returnState = PRESET_SELECTION_CUSTOMIZE;
             dispose();
         });
-        buttonPanel.add(button2);
+        buttonCustomize.setEnabled(includeCustomizePresetOption);
+        buttonPanel.add(buttonCustomize);
 
-        JButton button3 = new JButton(OPTION_CANCEL);
-        button3.setToolTipText(resources.getString("presetDialogCancel.tooltip"));
-        button3.addActionListener(e -> dispose());
-        buttonPanel.add(button3);
+        JButton buttonCancel = new JButton(OPTION_CANCEL);
+        buttonCancel.setToolTipText(resources.getString("presetDialogCancel.tooltip"));
+        buttonCancel.addActionListener(e -> {
+            returnState = PRESET_SELECTION_CANCELLED;
+            dispose();
+        });
+        buttonPanel.add(buttonCancel);
 
         add(buttonPanel, BorderLayout.PAGE_END);
 
         pack();
+        setAlwaysOnTop(true);
+        setResizable(false);
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     /**
@@ -130,6 +185,7 @@ public class SelectPresetDialog extends JDialog {
      */
     private DefaultComboBoxModel<CampaignPreset> convertPresetListModelToComboBoxModel(
         DefaultListModel<CampaignPreset> listModel) {
+
         // Create a new DefaultComboBoxModel
         DefaultComboBoxModel<CampaignPreset> comboBoxModel = new DefaultComboBoxModel<>();
 
@@ -139,24 +195,5 @@ public class SelectPresetDialog extends JDialog {
         }
 
         return comboBoxModel;
-    }
-
-    /**
-     * Displays the dialog for selecting campaign presets.
-     */
-    public static void displayPresetDialog() {
-        JFrame frame = new JFrame();
-        SelectPresetDialog dialog = new SelectPresetDialog(frame);
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
-    }
-
-    /**
-     * Applies the chosen preset to the campaign.
-     *
-     * @param preset The {@link CampaignPreset} to apply.
-     */
-    public void applyPreset(final CampaignPreset preset) {
-        // TODO: apply chosen preset
     }
 }

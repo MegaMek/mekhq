@@ -26,8 +26,6 @@ import mekhq.campaign.personnel.procreation.RandomProcreation;
 
 import java.util.ResourceBundle;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
-
 /**
  * The {@link RandomProcreationMethod} enum represents different methods of getting random procreation.
  * <p>
@@ -58,7 +56,7 @@ public enum RandomProcreationMethod {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.toolTipText = wordWrap(resources.getString(toolTipText));
+        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
 

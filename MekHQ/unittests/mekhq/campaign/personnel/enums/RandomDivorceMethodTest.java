@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ResourceBundle;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -45,8 +44,8 @@ public class RandomDivorceMethodTest {
     //region Getters
     @Test
     public void testGetToolTipText() {
-        String expected = wordWrap(resources.getString("RandomDivorceMethod.NONE.toolTipText")).replaceAll("\\s", "");
-        String actual = wordWrap(RandomDivorceMethod.NONE.getToolTipText().trim()).replaceAll("\\s", "");
+        String expected = resources.getString("RandomDivorceMethod.NONE.toolTipText").replaceAll("\\s", "");
+        String actual = RandomDivorceMethod.NONE.getToolTipText().trim().replaceAll("\\s", "");
 
         assertEquals(expected, actual);
     }

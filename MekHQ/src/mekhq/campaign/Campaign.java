@@ -3751,9 +3751,9 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Processes the new day for all active personnel.
+     * Processes the new day for all personnel present in the campaign.
      * <p>
-     * This method loops through all active personnel and performs the necessary actions
+     * This method loops through all personnel present and performs the necessary actions
      * for each person for a new day.
      * <p>
      * The following tasks are performed for each person:
@@ -3779,9 +3779,15 @@ public class Campaign implements ITechManager {
      * Note: This method uses several other methods to perform the specific actions for each task.
      */
     public void processNewDayPersonnel() {
-        // This MUST use getActivePersonnel as we only want to process active personnel, and
-        //  furthermore, this allows us to add and remove personnel without issue
-        for (Person person : getActivePersonnel()) {
+        List<Person> personnelForRelationshipProcessing = new ArrayList<>();
+
+        for (Person person : getPersonnel()) {
+            if (person.getStatus().isDepartedUnit()) {
+                continue;
+            }
+
+            personnelForRelationshipProcessing.add(person);
+
             // Death
             if (getDeath().processNewDay(this, getLocalDate(), person)) {
                 // The person has died, so don't continue to process the dead
@@ -3791,146 +3797,227 @@ public class Campaign implements ITechManager {
             person.resetMinutesLeft();
             // Reset acquisitions made to 0
             person.setAcquisition(0);
-            if (person.needsFixing() && !getCampaignOptions().isUseAdvancedMedical()) {
-                person.decrementDaysToWaitForHealing();
-                Person doctor = getPerson(person.getDoctorId());
-                if ((doctor != null) && doctor.isDoctor()) {
-                    if (person.getDaysToWaitForHealing() <= 0) {
-                        addReport(healPerson(person, doctor));
-                    }
-                } else if (person.checkNaturalHealing(15)) {
-                    addReport(person.getHyperlinkedFullTitle() + " heals naturally!");
-                    Unit u = person.getUnit();
-                    if (u != null) {
-                        u.resetPilotAndEntity();
-                    }
-                }
-            }
-            // TODO Advanced Medical needs to go away from here later on
-            if (getCampaignOptions().isUseAdvancedMedical()) {
-                InjuryUtil.resolveDailyHealing(this, person);
-                Unit u = person.getUnit();
-                if (u != null) {
-                    u.resetPilotAndEntity();
-                }
-            }
 
-            // TODO : Reset this based on hasSupportRole(false) instead of checking for each type
-            // TODO : person.isEngineer will need to stay, however
+            processAdvancedMedicalEvents(person);
+
             // Reset edge points to the purchased value each week. This should only
             // apply for support personnel - combat troops reset with each new mm game
-            if ((person.isAdministrator() || person.isDoctor() || person.isEngineer() || person.isTech())
-                    && (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
-                person.resetCurrentEdge();
-            }
+            processWeeklyEdgeResets(person);
 
-            if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
-                    && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
-                person.setIdleMonths(person.getIdleMonths() + 1);
-                if (person.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
-                    if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-                        person.awardXP(this, getCampaignOptions().getIdleXP());
-                        addReport(person.getHyperlinkedFullTitle() + " has gained "
-                                + getCampaignOptions().getIdleXP() + " XP");
-                    }
-                    person.setIdleMonths(0);
-                }
-            }
-
-            // Divorce, Marriage, & Procreation
-            if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                getDivorce().processNewWeek(this, getLocalDate(), person, false);
-                getMarriage().processNewWeek(this, getLocalDate(), person);
-                getProcreation().processNewWeek(this, getLocalDate(), person);
-
-                if (person.getGender().isFemale()) {
-                    if (campaignOptions.isUseMaternityLeave()) {
-                        if ((person.isPregnant())
-                                && (person.getStatus().isActive())
-                                && (person.getDueDate().minusWeeks(20).isEqual(getLocalDate()))) {
-
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.ON_MATERNITY_LEAVE);
-                        }
-
-                        List<Person> children = person.getGenealogy().getChildren();
-
-                        if ((person.getStatus().isOnMaternityLeave()) && (!children.isEmpty())) {
-
-                            children.sort(Comparator.comparing(Person::getDateOfBirth).reversed());
-
-                            if (getLocalDate().isAfter(children.get(0).getDateOfBirth().plusDays(41))) {
-                                person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
-                            }
-                        }
-                    }
-                }
-            }
+            processMonthlyIdleXP(person);
 
             // Anniversaries
-            if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-                if ((person.getBirthday(getGameYear()).isEqual(getLocalDate()))
-                    && (campaignOptions.isAnnounceBirthdays())) {
-                    addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        person.getAge(getLocalDate()),
-                        CLOSING_SPAN_TAG));
-                }
-
-                LocalDate recruitmentDate = person.getRecruitment();
-                if (recruitmentDate != null) {
-                    LocalDate recruitmentAnniversary = recruitmentDate.withYear(getGameYear());
-                    int yearsOfEmployment = (int) ChronoUnit.YEARS.between(recruitmentDate, currentDay);
-
-                    if ((recruitmentAnniversary.isEqual(getLocalDate()))
-                        && (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
-                        addReport(String.format(resources.getString("anniversaryRecruitment.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            yearsOfEmployment, CLOSING_SPAN_TAG, name));
-                    }
-                }
-            } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-                if (person.getBirthday(getGameYear()).isEqual(getLocalDate())) {
-                    addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        person.getAge(getLocalDate()),
-                        CLOSING_SPAN_TAG));
-                }
-            }
+            processAnniversaries(person);
 
             // autoAwards
-            if (getLocalDate().getDayOfMonth() == 1) {
-                double multiplier = 0;
+            processMonthlyAutoAwards(person);
+        }
 
-                int score = 0;
+        // Divorce, Marriage
+        // This has to be processed separately to avoid a ConcurrentModificationException
+        for (Person person : personnelForRelationshipProcessing) {
+            processWeeklyRelationshipEvents(person);
+        }
+    }
 
-                if (person.getPrimaryRole().isSupport(true)) {
-                    int dice = person.getExperienceLevel(this, false);
-
-                    if (dice > 0) {
-                        score = Compute.d6(dice);
-                    }
-
-                    multiplier += 0.5;
+    /**
+     * Processes advanced medical events for a person.
+     *
+     * @param person the {@link Person} to process advanced medical events for
+     */
+    private void processAdvancedMedicalEvents(Person person) {
+        if (person.needsFixing() && !getCampaignOptions().isUseAdvancedMedical()) {
+            person.decrementDaysToWaitForHealing();
+            Person doctor = getPerson(person.getDoctorId());
+            if ((doctor != null) && doctor.isDoctor()) {
+                if (person.getDaysToWaitForHealing() <= 0) {
+                    addReport(healPerson(person, doctor));
                 }
-
-                if (person.getSecondaryRole().isSupport(true)) {
-                    int dice = person.getExperienceLevel(this, true);
-
-                    if (dice > 0) {
-                        score += Compute.d6(dice);
-                    }
-
-                    multiplier += 0.5;
-                } else if (person.getSecondaryRole().isNone()) {
-                    multiplier += 0.5;
+            } else if (person.checkNaturalHealing(15)) {
+                addReport(person.getHyperlinkedFullTitle() + " heals naturally!");
+                Unit unit = person.getUnit();
+                if (unit != null) {
+                    unit.resetPilotAndEntity();
                 }
-
-                person.changeAutoAwardSupportPoints((int) (score * multiplier));
             }
         }
+        // TODO Advanced Medical needs to go away from here later on
+        if (getCampaignOptions().isUseAdvancedMedical()) {
+            InjuryUtil.resolveDailyHealing(this, person);
+            Unit unit = person.getUnit();
+            if (unit != null) {
+                unit.resetPilotAndEntity();
+            }
+        }
+    }
+
+    /**
+     * Process weekly Edge resets for a given person.
+     *
+     * @param person the person for whom weekly Edge resets will be processed
+     */
+    private void processWeeklyEdgeResets(Person person) {
+        if ((person.hasSupportRole(true) || person.isEngineer())
+                && (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
+            person.resetCurrentEdge();
+        }
+    }
+
+    /**
+     * Process monthly idle XP for a given person.
+     * This method checks if the person is eligible to gain idle XP based on campaign options and current status.
+     * If the person meets the criteria, they may gain XP and an associated report will be added.
+     *
+     * @param person The person for whom to process monthly idle XP.
+     */
+    private void processMonthlyIdleXP(Person person) {
+        if (!person.getStatus().isActive()) {
+            return;
+        }
+
+        if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
+                && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
+            person.setIdleMonths(person.getIdleMonths() + 1);
+            if (person.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
+                if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
+                    person.awardXP(this, getCampaignOptions().getIdleXP());
+                    addReport(person.getHyperlinkedFullTitle() + " has gained "
+                            + getCampaignOptions().getIdleXP() + " XP");
+                }
+                person.setIdleMonths(0);
+            }
+        }
+    }
+
+    /**
+     * Process weekly relationship events for a given {@link Person} on Monday.
+     * This method triggers specific events related to divorce, marriage, procreation, and maternity leave.
+     *
+     * @param person The {@link Person} for which to process weekly relationship events
+     */
+    private void processWeeklyRelationshipEvents(Person person) {
+        if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+            getDivorce().processNewWeek(this, getLocalDate(), person, false);
+            getMarriage().processNewWeek(this, getLocalDate(), person);
+            getProcreation().processNewWeek(this, getLocalDate(), person);
+
+            if (person.getGender().isFemale()) {
+                if (campaignOptions.isUseMaternityLeave()) {
+                    if ((person.isPregnant())
+                            && (person.getStatus().isActive())
+                            && (person.getDueDate().minusWeeks(20).isEqual(getLocalDate()))) {
+
+                        person.changeStatus(this, getLocalDate(), PersonnelStatus.ON_MATERNITY_LEAVE);
+                    }
+
+                    List<Person> children = person.getGenealogy().getChildren();
+
+                    if ((person.getStatus().isOnMaternityLeave()) && (!children.isEmpty())) {
+                        LocalDate lastChildBirthDate = getYoungestChildDateOfBirth(children);
+
+                        if (currentDay.isAfter(lastChildBirthDate)) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Process anniversaries for a given person, including birthdays and recruitment anniversaries.
+     *
+     * @param person The {@link Person} for whom the anniversaries will be processed
+     */
+    private void processAnniversaries(Person person) {
+        if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
+            if ((person.getBirthday(getGameYear()).isEqual(getLocalDate()))
+                && (campaignOptions.isAnnounceBirthdays())) {
+                addReport(String.format(resources.getString("anniversaryBirthday.text"),
+                    person.getHyperlinkedFullTitle(),
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                    person.getAge(getLocalDate()),
+                    CLOSING_SPAN_TAG));
+            }
+
+            LocalDate recruitmentDate = person.getRecruitment();
+            if (recruitmentDate != null) {
+                LocalDate recruitmentAnniversary = recruitmentDate.withYear(getGameYear());
+                int yearsOfEmployment = (int) ChronoUnit.YEARS.between(recruitmentDate, currentDay);
+
+                if ((recruitmentAnniversary.isEqual(getLocalDate()))
+                    && (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
+                    addReport(String.format(resources.getString("anniversaryRecruitment.text"),
+                        person.getHyperlinkedFullTitle(),
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        yearsOfEmployment, CLOSING_SPAN_TAG, name));
+                }
+            }
+        } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
+            if (person.getBirthday(getGameYear()).isEqual(getLocalDate())) {
+                addReport(String.format(resources.getString("anniversaryBirthday.text"),
+                    person.getHyperlinkedFullTitle(),
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                    person.getAge(getLocalDate()),
+                    CLOSING_SPAN_TAG));
+            }
+        }
+    }
+
+    /**
+     * Process monthly auto awards for a given person based on their roles and experience level.
+     *
+     * @param person the person for whom the monthly auto awards are being processed
+     */
+    private void processMonthlyAutoAwards(Person person) {
+        if (getLocalDate().getDayOfMonth() == 1) {
+            double multiplier = 0;
+
+            int score = 0;
+
+            if (person.getPrimaryRole().isSupport(true)) {
+                int dice = person.getExperienceLevel(this, false);
+
+                if (dice > 0) {
+                    score = Compute.d6(dice);
+                }
+
+                multiplier += 0.5;
+            }
+
+            if (person.getSecondaryRole().isSupport(true)) {
+                int dice = person.getExperienceLevel(this, true);
+
+                if (dice > 0) {
+                    score += Compute.d6(dice);
+                }
+
+                multiplier += 0.5;
+            } else if (person.getSecondaryRole().isNone()) {
+                multiplier += 0.5;
+            }
+
+            person.changeAutoAwardSupportPoints((int) (score * multiplier));
+        }
+    }
+
+    /**
+     * Retrieves the date of birth of the youngest child among the provided list of children.
+     *
+     * @param children the list children
+     * @return the date of birth of the youngest child
+     */
+    private LocalDate getYoungestChildDateOfBirth(List<Person> children) {
+        LocalDate youngestChildBirthDate = LocalDate.MIN;
+
+        for (Person child : children) {
+            LocalDate dateOfBirth = child.getDateOfBirth();
+            if (dateOfBirth.isAfter(youngestChildBirthDate)) {
+                youngestChildBirthDate = dateOfBirth;
+            }
+        }
+
+        return youngestChildBirthDate;
     }
 
     public void processNewDayUnits() {
