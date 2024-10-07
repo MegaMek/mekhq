@@ -88,8 +88,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JTabbedPane createCombatReadinessParentTab() {
         // Tech Limits
-        // Rulesets
         // Random Assignment Tables
+        // Rulesets
 
         // Parent Tab
         JTabbedPane combatReadinessParentTab = new JTabbedPane();
