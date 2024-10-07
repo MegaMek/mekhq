@@ -5,6 +5,9 @@ import javax.swing.GroupLayout.Alignment;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
+/**
+ * This class represents the tab for repair and maintenance settings.
+ */
 public class RepairAndMaintenanceTab {
     JFrame frame;
     String name;

@@ -94,6 +94,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Parent Tab
         JTabbedPane combatReadinessParentTab = new JTabbedPane();
 
+        TechLimitsTab techLimitsTab = new TechLimitsTab(getFrame(),
+            "techLimitsTab");
+
+        combatReadinessParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("TechLimitsParentTab.title")), techLimitsTab.createTechLimitsTab());
+
         return combatReadinessParentTab;
     }
 

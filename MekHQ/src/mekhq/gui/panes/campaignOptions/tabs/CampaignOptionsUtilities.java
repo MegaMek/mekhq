@@ -185,7 +185,7 @@ public class CampaignOptionsUtilities {
      * <p>
      * The {@link JPanel} will be named {@code "pnl" + name + "HeaderPanel"}.
      * The resource bundle references for the first {@link JLabel} will be {@code "lbl" + name + ".text"}.
-     * The optional second {@link JLabel} is assigned the name {@code ""lbl" + name + "HeaderBody"}
+     * The optional second {@link JLabel} is assigned the name {@code ""lbl" + name + "Body"}
      * and uses the following resource bundle reference: {@code "lbl" + name + "Body.text"}.
      *
      * @param name           the name of the header panel.
@@ -208,7 +208,7 @@ public class CampaignOptionsUtilities {
         if (includeBodyText) {
             lblBody = new JLabel(String.format("<html>%s</html>",
                 resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
-            lblBody.setName("lbl" + name + "HeaderBody");
+            lblBody.setName("lbl" + name + "Body");
             Dimension size = lblBody.getPreferredSize();
             lblBody.setMaximumSize(new Dimension(500, size.height));
         }
