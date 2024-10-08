@@ -183,7 +183,10 @@ public class PersonnelMarketDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panelFilterBtns.add(comboPersonType, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().isUseAtB() && !campaign.hasActiveContract()) {
+        boolean ATBoutofContract = campaign.getCampaignOptions().isUseAtB() && !campaign.hasActiveContract();
+        boolean usingCamOpsMarkets = campaign.getCampaignOptions().getPersonnelMarketName().equals("Campaign Ops");
+        if (ATBoutofContract && !usingCamOpsMarkets) {
+            // Paid recruitment is available
             radioNormalRoll.setText("Make normal roll next week");
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 1;
@@ -229,6 +232,10 @@ public class PersonnelMarketDialog extends JDialog {
             } else {
                 radioNormalRoll.setSelected(true);
             }
+        } else {
+            // Turn off paid recruitment if it's not available
+            radioNormalRoll.setSelected(true);
+            personnelMarket.setPaidRecruitment(false);
         }
 
         scrollTablePersonnel.setMinimumSize(new Dimension(500, 400));
