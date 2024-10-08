@@ -1125,7 +1125,13 @@ public class StratconRulesManager {
                 continue;
             }
 
+            //checks if force is flagged as combat in TOE
             if (!force.isCombatForce()) {
+                continue;
+            }
+
+            //checks if force is not top level (suggested by Illiani)
+            if (force.getFormationLevel().getDepth() != 0) {
                 continue;
             }
 
