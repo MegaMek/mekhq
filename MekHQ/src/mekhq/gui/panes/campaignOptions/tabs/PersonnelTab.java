@@ -162,7 +162,7 @@ public class PersonnelTab {
      * This method initializes the various checkboxes, labels, spinners, combo boxes, panels, and
      * other GUI components for different tabs.
      * It sets up the components for the General Tab, Personnel Logs Tab, Personnel Information Tab,
-     * Administrators Tab, Awards Tab, Medical Tab, Prisoners & Dependents Tab, and the Salaries Tab.
+     * Administrators Tab, Awards Tab, Medical Tab, Prisoners and Dependents Tab, and the Salaries Tab.
      */
     protected void initialize() {
         //start General Tab
