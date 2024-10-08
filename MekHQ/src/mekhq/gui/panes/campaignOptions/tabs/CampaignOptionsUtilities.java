@@ -306,6 +306,12 @@ public class CampaignOptionsUtilities {
         List<String> tabNames = new ArrayList<>(panels.keySet());
         tabNames.sort(String.CASE_INSENSITIVE_ORDER);
 
+        // This is a special case handler to ensure 'general options' tabs always appear first
+        if (tabNames.contains("generalTab")) {
+            tabNames.remove("generalTab");
+            tabNames.add(0, "generalTab");
+        }
+
         JTabbedPane tabbedPane = new JTabbedPane();
 
         for (String tabName : tabNames) {
