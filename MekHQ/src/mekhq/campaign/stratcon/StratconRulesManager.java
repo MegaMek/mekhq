@@ -1125,6 +1125,10 @@ public class StratconRulesManager {
                 continue;
             }
 
+            if (!force.isCombatForce()) {
+                continue;
+            }
+
             int primaryUnitType = force.getPrimaryUnitType(campaign);
             boolean noReinforcementRestriction = !reinforcements || (reinforcements
                     && (getReinforcementType(force.getId(), currentTrack, campaign,
