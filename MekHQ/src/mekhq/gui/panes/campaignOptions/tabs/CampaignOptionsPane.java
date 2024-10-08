@@ -104,14 +104,33 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JTabbedPane createHumanResourcesParentTab() {
-        //    Personnel
-        //    Life Paths
-        //    Turnover and Retention
-        //    Name and Portrait Generation
-        //    Rank Systems
-
         // Parent Tab
         JTabbedPane humanResourcesParentTab = new JTabbedPane();
+
+        // Personnel
+        PersonnelTab personnelTab = new PersonnelTab(getFrame(), "personnelTab");
+
+        JTabbedPane personnelContentTabs = createSubTabs(Map.of(
+            "generalTab", personnelTab.createGeneralTab(),
+            "personnelLogsTab", personnelTab.createPersonnelLogsTab(),
+            "personnelInformationTab", personnelTab.createPersonnelInformationTab(),
+            "administratorsTab", personnelTab.createAdministratorsTab(),
+            "awardsTab", personnelTab.createAwardsTab(),
+            "prisonersAndDependentsTab", personnelTab.createPrisonersAndDependentsTab(),
+            "medicalTab", personnelTab.createMedicalTab(),
+            "salariesTab", personnelTab.createSalariesTab()));
+
+        // Life Paths
+        // Turnover and Retention
+        // Name and Portrait Generation
+        // Rank Systems
+
+        // Add Tabs
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("personnelContentTabs.title")), personnelContentTabs);
+
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("humanResourcesParentTab.title")), humanResourcesParentTab);
 
         return humanResourcesParentTab;
     }
@@ -144,9 +163,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane repairAndMaintenanceContentTabs = createSubTabs(Map.of(
             "repairTab", repairAndMaintenanceTab.createRepairTab(),
             "maintenanceTab", repairAndMaintenanceTab.createMaintenanceTab()));
-
-        logisticsAndMaintenanceParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("repairAndMaintenanceContentTabs.title")), repairAndMaintenanceContentTabs);
 
         // Supplies and Acquisition
         SuppliesAndAcquisitionTab suppliesAndAcquisitionTab = new SuppliesAndAcquisitionTab(getFrame(),

@@ -45,6 +45,10 @@ public class CampaignOptionsUtilities {
         checkBox.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         checkBox.setName("chk" + name);
 
+        Dimension size = checkBox.getPreferredSize();
+        checkBox.setMaximumSize(size);
+        checkBox.setMinimumSize(size);
+
         return checkBox;
     }
 

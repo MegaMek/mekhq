@@ -1,6 +1,8 @@
 package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.common.enums.SkillLevel;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
@@ -9,6 +11,8 @@ import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
@@ -93,6 +97,17 @@ public class PersonnelTab {
     //end Awards Tab
 
     //start Medical Tab
+    private JCheckBox chkUseAdvancedMedical;
+    private JLabel lblHealWaitingPeriod;
+    private JSpinner spnHealWaitingPeriod;
+    private JLabel lblNaturalHealWaitingPeriod;
+    private JSpinner spnNaturalHealWaitingPeriod;
+    private JLabel lblMinimumHitsForVehicles;
+    private JSpinner spnMinimumHitsForVehicles;
+    private JCheckBox chkUseRandomHitsForVehicles;
+    private JCheckBox chkUseTougherHealing;
+    private JLabel lblMaximumPatients;
+    private JSpinner spnMaximumPatients;
     //end Medical Tab
 
     //start Prisoners & Dependents Tab
@@ -111,12 +126,23 @@ public class PersonnelTab {
     //end Prisoners & Dependents Tab
 
     //start Salaries Tab
+    private JCheckBox chkDisableSecondaryRoleSalary;
+
+    private JPanel pnlSalaryMultipliersPanel;
+    private JLabel lblAntiMekSalary;
+    private JSpinner spnAntiMekSalary;
+    private JLabel lblSpecialistInfantrySalary;
+    private JSpinner spnSpecialistInfantrySalary;
+
+    private JPanel pnlSalaryExperienceMultipliersPanel;
+    private Map<SkillLevel, JLabel> lblSalaryExperienceMultipliers;
+    private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
     //end Salaries Tab
 
     /**
      * Represents a tab for repair and maintenance in an application.
      */
-    private PersonnelTab(JFrame frame, String name) {
+    PersonnelTab(JFrame frame, String name) {
         this.frame = frame;
         this.name = name;
 
@@ -206,6 +232,22 @@ public class PersonnelTab {
         //end Awards Tab
 
         //start Medical Tab
+        chkUseAdvancedMedical = new JCheckBox();
+
+        lblHealWaitingPeriod = new JLabel();
+        spnHealWaitingPeriod = new JSpinner();
+
+        lblNaturalHealWaitingPeriod = new JLabel();
+        spnNaturalHealWaitingPeriod = new JSpinner();
+
+        lblMinimumHitsForVehicles = new JLabel();
+        spnMinimumHitsForVehicles = new JSpinner();
+
+        chkUseRandomHitsForVehicles = new JCheckBox();
+        chkUseTougherHealing = new JCheckBox();
+
+        lblMaximumPatients = new JLabel();
+        spnMaximumPatients = new JSpinner();
         //end Medical Tab
 
         //start Prisoners & Dependents Tab
@@ -228,6 +270,19 @@ public class PersonnelTab {
         //end Prisoners & Dependents Tab
 
         //start Salaries Tab
+        chkDisableSecondaryRoleSalary = new JCheckBox();
+
+        pnlSalaryMultipliersPanel = new JPanel();
+
+        lblAntiMekSalary = new JLabel();
+        spnAntiMekSalary = new JSpinner();
+
+        lblSpecialistInfantrySalary = new JLabel();
+        spnSpecialistInfantrySalary = new JSpinner();
+
+        pnlSalaryExperienceMultipliersPanel = new JPanel();
+        lblSalaryExperienceMultipliers = new HashMap<>();
+        spnSalaryExperienceMultipliers = new HashMap<>();
         //end Salaries Tab
     }
 
@@ -244,7 +299,7 @@ public class PersonnelTab {
         return prisonerStatusModel;
     }
 
-    private JPanel createGeneralTab() {
+    JPanel createGeneralTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("GeneralTab",
             getImageDirectory() + "logo_circinus_federation.png",
@@ -318,8 +373,8 @@ public class PersonnelTab {
         chkUseRemovalExemptRetirees = createCheckBox("UseRemovalExemptRetirees", null);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PersonnelCleanUpPanel", true, "");
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("PersonnelCleanUpPanel.title")));
+        final JPanel panel = createStandardPanel("PersonnelCleanUpPanel", true,
+            "PersonnelCleanUpPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -339,7 +394,7 @@ public class PersonnelTab {
         return createParentPanel(panel, "PersonnelCleanUpPanel");
     }
 
-    private JPanel createPersonnelLogsTab() {
+    JPanel createPersonnelLogsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("PersonnelLogsTab",
             getImageDirectory() + "logo_clan_coyote.png",
@@ -388,7 +443,7 @@ public class PersonnelTab {
         return createParentPanel(panel, "PersonnelLogsTab");
     }
 
-    private JPanel createPersonnelInformationTab() {
+    JPanel createPersonnelInformationTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("PersonnelInformation",
             getImageDirectory() + "logo_comstar.png",
@@ -444,7 +499,7 @@ public class PersonnelTab {
         return createParentPanel(panel, "PersonnelInformation");
     }
 
-    private JPanel createAdministratorsTab() {
+    JPanel createAdministratorsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("AdministratorsTab",
             getImageDirectory() + "logo_clan_diamond_sharks.png",
@@ -481,7 +536,7 @@ public class PersonnelTab {
         return createParentPanel(panel, "AdministratorsTab");
     }
 
-    private JPanel createAwardsTab() {
+    JPanel createAwardsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("AwardsTab",
             getImageDirectory() + "logo_draconis_combine.png",
@@ -502,7 +557,7 @@ public class PersonnelTab {
             }
         });
 
-        lblAwardTierSize = createLabel("", null);
+        lblAwardTierSize = createLabel("AwardTierSize", null);
         spnAwardTierSize = createSpinner("AwardTierSize", null,
             5, 1, 100, 1);
 
@@ -521,7 +576,7 @@ public class PersonnelTab {
         txtAwardSetFilterList.setLineWrap(true);
         txtAwardSetFilterList.setWrapStyleWord(true);
         txtAwardSetFilterList.setToolTipText(
-            wordWrap(resources.getString("lblAwardSetFilterList.toolTipText")));
+            wordWrap(resources.getString("lblAwardSetFilterList.tooltip")));
         txtAwardSetFilterList.setName("txtAwardSetFilterList");
         txtAwardSetFilterList.setText("");
         JScrollPane scrollAwardSetFilterList = new JScrollPane(txtAwardSetFilterList);
@@ -600,8 +655,7 @@ public class PersonnelTab {
         chkEnableMiscAwards = createCheckBox("EnableMiscAwards", null);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AutoAwardsFilterPanel", true, "");
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("autoAwardsFilterPanel.title")));
+        final JPanel panel = createStandardPanel("AutoAwardsFilterPanel", true, "AutoAwardsFilterPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -641,11 +695,10 @@ public class PersonnelTab {
                     .addComponent(chkEnableTrainingAwards)
                     .addComponent(chkEnableMiscAwards)));
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "AutoAwardsFilterPanel");
+        return panel;
     }
 
-    private JPanel createPrisonersAndDependentsTab() {
+    JPanel createPrisonersAndDependentsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("PrisonersAndDependentsTab",
             getImageDirectory() + "logo_clan_fire_mandrills.png",
@@ -702,8 +755,7 @@ public class PersonnelTab {
         chkAtBPrisonerRansom = createCheckBox("AtBPrisonerRansom", null);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PrisonersPanel", true, "");
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("PrisonersPanel.title")));
+        final JPanel panel = createStandardPanel("PrisonersPanel", true, "PrisonersPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -733,8 +785,7 @@ public class PersonnelTab {
                 .addComponent(chkAtBPrisonerDefection)
                 .addComponent(chkAtBPrisonerRansom));
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "PrisonersPanel");
+        return panel;
     }
 
     /**
@@ -748,8 +799,7 @@ public class PersonnelTab {
         chkUseRandomDependentRemoval = createCheckBox("UseRandomDependentRemoval", null);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("DependentsPanel", true, "");
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("DependentsPanel.title")));
+        final JPanel panel = createStandardPanel("DependentsPanel", true, "DependentsPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -763,7 +813,229 @@ public class PersonnelTab {
                 .addComponent(chkUseRandomDependentAddition)
                 .addComponent(chkUseRandomDependentRemoval));
 
+        return panel;
+    }
+
+    JPanel createMedicalTab() {
+        // Header
+        JPanel headerPanel = createHeaderPanel("MedicalTab",
+            getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
+            false, "", true);
+
+        // Contents
+        chkUseAdvancedMedical = createCheckBox("UseAdvancedMedical", null);
+
+        lblHealWaitingPeriod = createLabel("HealWaitingPeriod", null);
+        spnHealWaitingPeriod = createSpinner("HealWaitingPeriod", null,
+            1, 1, 30, 1);
+
+        lblNaturalHealWaitingPeriod = createLabel("NaturalHealWaitingPeriod", null);
+        spnNaturalHealWaitingPeriod = createSpinner("NaturalHealWaitingPeriod", null,
+            1, 1, 365, 1);
+
+        lblMinimumHitsForVehicles = createLabel("MinimumHitsForVehicles", null);
+        spnMinimumHitsForVehicles = createSpinner("MinimumHitsForVehicles", null,
+            1, 1, 5, 1);
+
+        chkUseRandomHitsForVehicles = createCheckBox("UseRandomHitsForVehicles", null);
+
+        chkUseTougherHealing = createCheckBox("UseTougherHealing", null);
+
+        lblMaximumPatients = createLabel("MaximumPatients", null);
+        spnMaximumPatients = createSpinner("MaximumPatients", null,
+            25, 1, 100, 1);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("MedicalTab", true, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(headerPanel)
+                .addComponent(chkUseAdvancedMedical)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblHealWaitingPeriod)
+                    .addComponent(spnHealWaitingPeriod))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblNaturalHealWaitingPeriod)
+                    .addComponent(spnNaturalHealWaitingPeriod))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblMinimumHitsForVehicles)
+                    .addComponent(spnMinimumHitsForVehicles))
+                .addComponent(chkUseRandomHitsForVehicles)
+                .addComponent(chkUseTougherHealing)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblMaximumPatients)
+                    .addComponent(spnMaximumPatients)));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addComponent(headerPanel)
+                .addComponent(chkUseAdvancedMedical)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblHealWaitingPeriod)
+                    .addComponent(spnHealWaitingPeriod)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblNaturalHealWaitingPeriod)
+                    .addComponent(spnNaturalHealWaitingPeriod)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblMinimumHitsForVehicles)
+                    .addComponent(spnMinimumHitsForVehicles)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addComponent(chkUseRandomHitsForVehicles)
+                .addComponent(chkUseTougherHealing)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblMaximumPatients)
+                    .addComponent(spnMaximumPatients)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+
         // Create Parent Panel and return
-        return createParentPanel(panel, "DependentsPanel");
+        return createParentPanel(panel, "MedicalTab");
+    }
+
+    JPanel createSalariesTab() {
+        // Header
+        JPanel headerPanel = createHeaderPanel("SalariesTab",
+            getImageDirectory() + "logo_clan_ghost_bear.png",
+            false, "", true);
+
+        // Contents
+        chkDisableSecondaryRoleSalary = createCheckBox("DisableSecondaryRoleSalary", null);
+        pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
+        pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("SalariesTab", true, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(headerPanel)
+                .addComponent(chkDisableSecondaryRoleSalary)
+                .addComponent(pnlSalaryMultipliersPanel)
+                .addComponent(pnlSalaryExperienceMultipliersPanel));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addComponent(headerPanel)
+                .addComponent(chkDisableSecondaryRoleSalary)
+                .addComponent(pnlSalaryMultipliersPanel)
+                .addComponent(pnlSalaryExperienceMultipliersPanel));
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "SalariesTab");
+    }
+
+    private JPanel createSalaryMultipliersPanel() {
+        // Contents
+        lblAntiMekSalary = createLabel("AntiMekSalary", null);
+        spnAntiMekSalary = createSpinner("AntiMekSalary", null,
+            0, 0, 100, 0.05);
+
+        lblSpecialistInfantrySalary = createLabel("SpecialistInfantrySalary", null);
+        spnSpecialistInfantrySalary = createSpinner("SpecialistInfantrySalary", null,
+            0, 0, 100, 0.05);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("SalaryMultipliersPanel", true,
+            "SalaryMultipliersPanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblAntiMekSalary)
+                    .addComponent(spnAntiMekSalary)
+                    .addComponent(lblSpecialistInfantrySalary)
+                    .addComponent(spnSpecialistInfantrySalary)));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblAntiMekSalary)
+                    .addComponent(spnAntiMekSalary)
+                    .addComponent(lblSpecialistInfantrySalary)
+                    .addComponent(spnSpecialistInfantrySalary)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+
+        return panel;
+    }
+
+    private JPanel createExperienceMultipliersPanel() {
+        // Contents
+        lblAntiMekSalary = createLabel("AntiMekSalary", null);
+        spnAntiMekSalary = createSpinner("AntiMekSalary", null,
+            0, 0, 100, 0.05);
+
+        lblSpecialistInfantrySalary = createLabel("SpecialistInfantrySalary", null);
+        spnSpecialistInfantrySalary = createSpinner("SpecialistInfantrySalary", null,
+            0, 0, 100, 0.05);
+
+        for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
+            final JLabel label = createLabel("SkillLevel" + skillLevel.toString(), null);
+            lblSalaryExperienceMultipliers.put(skillLevel, label);
+
+            final JSpinner spinner = createSpinner("SkillLevel" + skillLevel, null,
+                0, 0, 10, 0.05);
+            spnSalaryExperienceMultipliers.put(skillLevel, spinner);
+
+        }
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("ExperienceMultipliersPanel", true,
+            "ExperienceMultipliersPanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.NONE))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.NONE))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.ULTRA_GREEN))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.ULTRA_GREEN))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.GREEN))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.GREEN))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.REGULAR))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.REGULAR)))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.VETERAN))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.VETERAN))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.ELITE))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.ELITE))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.HEROIC))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.HEROIC))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.LEGENDARY))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.LEGENDARY))));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.NONE))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.NONE))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.ULTRA_GREEN))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.ULTRA_GREEN))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.GREEN))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.GREEN))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.REGULAR))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.REGULAR))
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.VETERAN))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.VETERAN))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.ELITE))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.ELITE))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.HEROIC))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.HEROIC))
+                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.LEGENDARY))
+                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.LEGENDARY))
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+
+        return panel;
     }
 }
