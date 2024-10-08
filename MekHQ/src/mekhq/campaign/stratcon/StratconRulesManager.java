@@ -1087,6 +1087,7 @@ public class StratconRulesManager {
                 .mapToInt(key -> key)
                 .mapToObj(campaign::getForce).filter(force -> (force != null)
                         && !force.isDeployed()
+                        && force.isCombatForce()
                         && !forcesInTracks.contains(force.getId()))
                 .map(Force::getId)
                 .collect(Collectors.toList());
@@ -1122,16 +1123,6 @@ public class StratconRulesManager {
             Force force = campaign.getForce(key);
 
             if (force == null) {
-                continue;
-            }
-
-            //checks if force is flagged as combat in TOE
-            if (!force.isCombatForce()) {
-                continue;
-            }
-
-            //checks if force is not top level (suggested by Illiani)
-            if (force.getFormationLevel().getDepth() != 0) {
                 continue;
             }
 
