@@ -441,7 +441,7 @@ public abstract class Part implements IPartWork, ITechnology {
         toReturn += "<b>" + action + getName();
 
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-            toReturn += " - <b><span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+            toReturn += " - <b><span color='" + SkillType.getExperienceLevelColor(getSkillMin()) + "'>"
                     + SkillType.getExperienceLevelName(getSkillMin()) + '+'
                     + "</span></b></b><br/>";
         } else {
@@ -477,7 +477,7 @@ public abstract class Part implements IPartWork, ITechnology {
             toReturn += getTimeLeft() + " minutes" + scheduled;
 
             if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-                toReturn += ", <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+                toReturn += ", <span color='" + SkillType.getExperienceLevelColor(getSkillMin()) + "'>"
                         + SkillType.getExperienceLevelName(getSkillMin()) + '+'
                         + ReportingUtilities.CLOSING_SPAN_TAG;
             }

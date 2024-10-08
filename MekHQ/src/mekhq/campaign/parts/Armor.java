@@ -137,7 +137,7 @@ public class Armor extends Part implements IAcquisitionWork {
         toReturn += "<b>Replace " + getName();
 
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-            toReturn += " - <b><span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+            toReturn += " - <b><span color='" + SkillType.getExperienceLevelColor(getSkillMin()) + "'>"
                     + SkillType.getExperienceLevelName(getSkillMin()) + '+'
                     + "</span></b></b><br/>";
         } else {

@@ -883,7 +883,7 @@ public class MekLocation extends Part {
             toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
                     + "'>Impossible</b></span>";
         } else {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
+            toReturn += " - <span color='" + SkillType.getExperienceLevelColor(getSkillMin()) + "'>"
                     + SkillType.getExperienceLevelName(getSkillMin()) + '+'
                     + "</span></b></b><br/>";
         }
