@@ -22,6 +22,7 @@ package mekhq.campaign.personnel;
 
 import megamek.common.*;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -125,6 +126,10 @@ public class SkillType {
     public static final int EXP_VETERAN = 3;
     public static final int EXP_ELITE = 4;
 
+    /**
+     * @param level - skill level to get name of
+     * @return String skill name
+     */
     public static String getExperienceLevelName(int level) {
         switch (level) {
             case EXP_ULTRA_GREEN:
@@ -142,6 +147,48 @@ public class SkillType {
             default:
                 return "Impossible";
         }
+    }
+
+    /**
+     * @param level - skill level to get color for
+     * @return String hex code for a font tag
+     */
+
+    public static String getExperienceLevelColor(int level) {
+        switch (level) {
+            case EXP_ULTRA_GREEN:
+                return MekHQ.getMHQOptions().getFontColorSkillUltraGreenHexColor();
+            case EXP_GREEN:
+                return MekHQ.getMHQOptions().getFontColorSkillGreenHexColor();
+            case EXP_REGULAR:
+                return MekHQ.getMHQOptions().getFontColorSkillRegularHexColor();
+            case EXP_VETERAN:
+                return MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
+            case EXP_ELITE:
+                return MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+            case -1:
+                return "";
+            default:
+                return "";
+        }
+    }
+
+    /**
+     * @param level - skill level to get tagged name for
+     * @return String "<font color="X">SkillName</font>" or "Skillname" if no color exists
+    */
+    public static String getColoredExperienceLevelName(int level) {
+        if (getExperienceLevelColor(level) == "") {
+            return getExperienceLevelName(level);
+        }
+
+        StringBuilder toReturn = new StringBuilder(64);
+        toReturn.append("<font color='");
+        toReturn.append(getExperienceLevelColor(level));
+        toReturn.append("'>");
+        toReturn.append(getExperienceLevelName(level));
+        toReturn.append("</font>");
+        return toReturn.toString();
     }
 
     private String name;

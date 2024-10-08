@@ -546,6 +546,88 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_WARNING, value.getRGB());
     }
 
+
+    public Color getFontColorSkillUltraGreen() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN,
+                0x33ff33));
+    }
+
+    /**
+     * @return the hexadecimal color code for the ultra green skill.
+     */
+    public String getFontColorSkillUltraGreenHexColor() {
+        return convertFontColorToHexColor(getFontColorSkillUltraGreen());
+    }
+
+    public void setFontColorSkillUltraGreen(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN, value.getRGB());
+    }
+
+    public Color getFontColorSkillGreen() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_GREEN,
+                0x00ff00));
+    }
+
+    /**
+     * @return the hexadecimal color code for the green skill.
+     */
+    public String getFontColorSkillGreenHexColor() {
+        return convertFontColorToHexColor(getFontColorSkillGreen());
+    }
+
+    public void setFontColorSkillGreen(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_GREEN, value.getRGB());
+    }
+
+    public Color getFontColorSkillRegular() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_REGULAR,
+                0x997755));
+    }
+
+    /**
+     * @return the hexadecimal color code for the regular skill.
+     */
+    public String getFontColorSkillRegularHexColor() {
+        return convertFontColorToHexColor(getFontColorSkillRegular());
+    }
+
+    public void setFontColorSkillRegular(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_REGULAR, value.getRGB());
+    }
+
+    public Color getFontColorSkillVeteran() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_VETERAN,
+                0xff0000));
+    }
+
+    /**
+     * @return the hexadecimal color code for the veteran skill.
+     */
+    public String getFontColorSkillVeteranHexColor() {
+        return convertFontColorToHexColor(getFontColorSkillVeteran());
+    }
+
+    public void setFontColorSkillVeteran(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_VETERAN, value.getRGB());
+    }
+
+    public Color getFontColorSkillElite() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_ELITE,
+                0xdd33dd));
+    }
+
+    /**
+     * @return the hexadecimal color code for the elite skill.
+     */
+    public String getFontColorSkillEliteHexColor() {
+        return convertFontColorToHexColor(getFontColorSkillElite());
+    }
+
+    public void setFontColorSkillElite(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_ELITE, value.getRGB());
+    }
+
+
     /**
      * Converts the font color to a hexadecimal color representation.
      *
