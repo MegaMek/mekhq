@@ -288,7 +288,7 @@ public class MekLabTab extends CampaignGuiTab {
         if (null == entity) {
             return;
         }
-        refit = new Refit(unit, entity, true, false);
+        refit = new Refit(unit, entity, true, false, true);
         testEntity = null;
         if (entity instanceof SmallCraft) {
             testEntity = new TestSmallCraft((SmallCraft) entity, entityVerifier.aeroOption, null);
