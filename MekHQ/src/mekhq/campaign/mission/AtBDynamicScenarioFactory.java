@@ -213,7 +213,7 @@ public class AtBDynamicScenarioFactory {
         // approximate estimate, anyway.
         scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
         setScenarioMapSize(scenario);
-        setScenarioMap(scenario, campaign.getCampaignOptions().getFixedMapChance());
+        scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
         setDeploymentZones(scenario);
         setDestinationZones(scenario);
 
@@ -1385,38 +1385,6 @@ public class AtBDynamicScenarioFactory {
 
         scenario.setMapSizeX(mapSizeX);
         scenario.setMapSizeY(mapSizeY);
-    }
-
-    /**
-     * If there are maps of the appropriate size available and we roll higher than
-     * the given threshold, replace the scenario's generated map with a fixed map
-     * from data/boards
-     */
-    private static void setScenarioMap(AtBDynamicScenario scenario, int mapChance) {
-        if (scenario.getBoardType() != Scenario.T_SPACE
-                && scenario.getTerrainType().equals("Space")
-                && (scenario.getMapSizeX() > 0)
-                && (scenario.getMapSizeY() > 0)
-                && (Compute.randomInt(100) <= mapChance)) {
-            BoardClassifier bc = BoardClassifier.getInstance();
-            List<String> maps = bc.getMatchingBoards(scenario.getMapSizeX(), scenario.getMapSizeY(), 5, 5,
-                    new ArrayList<>());
-
-            if (!maps.isEmpty()) {
-                String mapPath = ObjectUtility.getRandomItem(maps);
-                MegaMekFile mapFile = new MegaMekFile(mapPath);
-                BoardDimensions dimensions = Board.getSize(mapFile.getFile());
-
-                scenario.setMap(bc.getBoardPaths().get(mapPath));
-                scenario.setMapSizeX(dimensions.width());
-                scenario.setMapSizeY(dimensions.height());
-                scenario.setUsingFixedMap(true);
-                return;
-            }
-        }
-
-        scenario.setUsingFixedMap(false);
-        scenario.setMapFile();
     }
 
     /**
