@@ -120,7 +120,7 @@ public class TechTableModel extends DataTableModel {
                 toReturn.append("; ");
             }
 
-            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()));
+            toReturn.append(SkillType.getColoredExperienceLevelName(skill.getExperienceLevel()));
             toReturn.append(' ').append(skillName);
             first = false;
         }
