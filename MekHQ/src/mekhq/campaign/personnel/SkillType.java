@@ -128,7 +128,7 @@ public class SkillType {
     public static final int EXP_ELITE = 4;
 
     /**
-     * @param level - skill level to get name of
+     * @param level skill level integer to get name for
      * @return String skill name
      */
     public static String getExperienceLevelName(int level) {
@@ -151,7 +151,7 @@ public class SkillType {
     }
 
     /**
-     * @param level - skill level to get color for
+     * @param level skill level integer to get color for
      * @return String hex code for a font tag
      */
     public static String getExperienceLevelColor(int level) {
@@ -174,7 +174,7 @@ public class SkillType {
     }
 
      /**
-     * @param level - SkillLevel to get color for
+     * @param level SkillLevel enum to get color for
      * @return String hex code for a font tag
      */
     public static String getExperienceLevelColor(SkillLevel level) {
@@ -199,7 +199,7 @@ public class SkillType {
     }
 
     /**
-     * @param level - skill level to get tagged name for
+     * @param level - skill level integer to get tagged name for
      * @return String "<font color="X">SkillName</font>" or "Skillname" if no color exists
     */
     public static String getColoredExperienceLevelName(int level) {
@@ -208,32 +208,29 @@ public class SkillType {
         }
 
         StringBuilder toReturn = new StringBuilder(64);
-        toReturn.append("<font color='");
-        toReturn.append(getExperienceLevelColor(level));
-        toReturn.append("'>");
-        toReturn.append(getExperienceLevelName(level));
-        toReturn.append("</font>");
+        toReturn.append("<font color='")
+            .append(getExperienceLevelColor(level))
+            .append("'>")
+            .append(getExperienceLevelName(level))
+            .append("</font>");
         return toReturn.toString();
     }
 
     /**
-     * @param level - SkillLevel to get tagged name for
+     * @param level - SkillLevel enum to get tagged name for
      * @return String "<font color="X">SkillName</font>" or "Skillname" if no color exists
     */
     public static String getColoredExperienceLevelName(SkillLevel level) {
-        logger.info(level);
-        logger.info(level.toString());
-        logger.info(getExperienceLevelColor(level));
         if (getExperienceLevelColor(level) == "") {
             return level.toString();
         }
 
         StringBuilder toReturn = new StringBuilder(64);
-        toReturn.append("<font color='");
-        toReturn.append(getExperienceLevelColor(level));
-        toReturn.append("'>");
-        toReturn.append(level.toString());
-        toReturn.append("</font>");
+        toReturn.append("<font color='")
+            .append(getExperienceLevelColor(level))
+            .append("'>")
+            .append(level.toString())
+            .append("</font>");
         return toReturn.toString();
     }
     
