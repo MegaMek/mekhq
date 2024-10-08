@@ -157,7 +157,7 @@ public class PersonnelMarket {
                     stringBuilder.append("<br>A ");
                 }
                 stringBuilder.append("<b> ")
-                    .append(expLevel)
+                    .append(SkillType.getColoredExperienceLevelName(person.getExperienceLevel(campaign, false)))
                     .append(' ')
                     .append(person.getPrimaryRole().toString())
                     .append("</b>")
