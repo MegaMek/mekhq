@@ -555,6 +555,9 @@ public class PersonnelMarketDialog extends JDialog {
     @Override
     public void setVisible(boolean visible) {
         filterPersonnel();
+        if (tablePersonnel.getRowCount() != 0) {
+            tablePersonnel.setRowSelectionInterval(0,0);
+        }
         super.setVisible(visible);
     }
 
