@@ -3,13 +3,14 @@ package mekhq.gui.panes.campaignOptions.tabs;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Skills;
-import mekhq.campaign.personnel.enums.AwardBonus;
-import mekhq.campaign.personnel.enums.PrisonerCaptureStyle;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
+import mekhq.campaign.personnel.enums.*;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout.Group;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,9 @@ import java.util.Map;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
+/**
+ * Handles the Personnel tab of campaign options
+ */
 public class PersonnelTab {
     JFrame frame;
     String name;
@@ -137,6 +141,10 @@ public class PersonnelTab {
     private JPanel pnlSalaryExperienceMultipliersPanel;
     private Map<SkillLevel, JLabel> lblSalaryExperienceMultipliers;
     private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
+
+    private JPanel pnlSalaryBaseSalaryPanel;
+    private JLabel[] lblBaseSalary;
+    private JSpinner[] spnBaseSalary;
     //end Salaries Tab
 
     /**
@@ -149,6 +157,13 @@ public class PersonnelTab {
         initialize();
     }
 
+
+    /**
+     * This method initializes the various checkboxes, labels, spinners, combo boxes, panels, and
+     * other GUI components for different tabs.
+     * It sets up the components for the General Tab, Personnel Logs Tab, Personnel Information Tab,
+     * Administrators Tab, Awards Tab, Medical Tab, Prisoners & Dependents Tab, and the Salaries Tab.
+     */
     protected void initialize() {
         //start General Tab
         chkUseTactics = new JCheckBox();
@@ -227,6 +242,7 @@ public class PersonnelTab {
         chkEnableTrainingAwards = new JCheckBox();
         chkEnableMiscAwards = new JCheckBox();
 
+        autoAwardsFilterPanel = new JPanel();
         lblAwardSetFilterList = new JLabel();
         txtAwardSetFilterList = new JTextArea();
         //end Awards Tab
@@ -283,6 +299,10 @@ public class PersonnelTab {
         pnlSalaryExperienceMultipliersPanel = new JPanel();
         lblSalaryExperienceMultipliers = new HashMap<>();
         spnSalaryExperienceMultipliers = new HashMap<>();
+
+        pnlSalaryBaseSalaryPanel = new JPanel();
+        lblBaseSalary = new JLabel[29];
+        spnBaseSalary = new JSpinner[29];
         //end Salaries Tab
     }
 
@@ -394,6 +414,11 @@ public class PersonnelTab {
         return createParentPanel(panel, "PersonnelCleanUpPanel");
     }
 
+    /**
+     * Creates a tab for managing personnel logs.
+     *
+     * @return a {@link JPanel} representing the Personnel Logs Tab panel
+     */
     JPanel createPersonnelLogsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("PersonnelLogsTab",
@@ -443,6 +468,11 @@ public class PersonnelTab {
         return createParentPanel(panel, "PersonnelLogsTab");
     }
 
+    /**
+     * Creates a panel for the Personnel Information Tab in the application.
+     *
+     * @return a {@link JPanel} representing the Personnel Information Tab panel
+     */
     JPanel createPersonnelInformationTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("PersonnelInformation",
@@ -499,6 +529,14 @@ public class PersonnelTab {
         return createParentPanel(panel, "PersonnelInformation");
     }
 
+    /**
+     * Creates a panel for the Administrators Tab in the application.
+     * <p>
+     * This method constructs the header panel and checkbox components for administrator settings
+     * including negotiation and scrounging options.
+     *
+     * @return a {@link JPanel} representing the Administrators Tab panel
+     */
     JPanel createAdministratorsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("AdministratorsTab",
@@ -536,6 +574,11 @@ public class PersonnelTab {
         return createParentPanel(panel, "AdministratorsTab");
     }
 
+    /**
+     * Creates the Awards Tab panel with various components like labels, checkboxes, and filter options.
+     *
+     * @return the {@link JPanel} representing the Awards Tab panel
+     */
     JPanel createAwardsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("AwardsTab",
@@ -698,6 +741,16 @@ public class PersonnelTab {
         return panel;
     }
 
+    /**
+     * Creates a panel for configuring settings related to prisoners and dependents.
+     * <p>
+     * This method constructs a panel with different components such as header, prisoners panel, and
+     * dependents panel.
+     * The layout is set up with the header on top followed by the prisoners and dependents panels
+     * side by side.
+     *
+     * @return a {@link JPanel} representing the prisoners and dependents configuration settings
+     */
     JPanel createPrisonersAndDependentsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("PrisonersAndDependentsTab",
@@ -709,7 +762,8 @@ public class PersonnelTab {
         dependentsPanel = createDependentsPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PrisonersAndDependentsTab", true, "");
+        final JPanel panel = createStandardPanel("PrisonersAndDependentsTab", true,
+            "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -732,6 +786,13 @@ public class PersonnelTab {
         return createParentPanel(panel, "PrisonersAndDependentsTab");
     }
 
+    /**
+     * Creates a panel for configuring settings related to prisoners in the application.
+     * <p>
+     * This method sets up various components such as prisoner capture style, status, and related checkboxes.
+     *
+     * @return a {@link JPanel} containing the prisoner configuration settings
+     */
     private JPanel createPrisonersPanel() {
         // Contents
         lblPrisonerCaptureStyle = createLabel("PrisonerCaptureStyle", null);
@@ -816,6 +877,11 @@ public class PersonnelTab {
         return panel;
     }
 
+    /**
+     * Creates a panel for the Medical Tab in the application.
+     *
+     * @return a {@link JPanel} representing the Medical Tab containing settings for medical options.
+     */
     JPanel createMedicalTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("MedicalTab",
@@ -896,6 +962,11 @@ public class PersonnelTab {
         return createParentPanel(panel, "MedicalTab");
     }
 
+    /**
+     * Creates a salary configuration tab for managing salary settings such as multipliers and base salaries.
+     *
+     * @return a {@link JPanel} representing the salary tab
+     */
     JPanel createSalariesTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("SalariesTab",
@@ -906,6 +977,7 @@ public class PersonnelTab {
         chkDisableSecondaryRoleSalary = createCheckBox("DisableSecondaryRoleSalary", null);
         pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
         pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
+        pnlSalaryBaseSalaryPanel = createBaseSalariesPanel();
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("SalariesTab", true, "");
@@ -917,19 +989,26 @@ public class PersonnelTab {
                 .addComponent(headerPanel)
                 .addComponent(chkDisableSecondaryRoleSalary)
                 .addComponent(pnlSalaryMultipliersPanel)
-                .addComponent(pnlSalaryExperienceMultipliersPanel));
+                .addComponent(pnlSalaryExperienceMultipliersPanel)
+                .addComponent(pnlSalaryBaseSalaryPanel));
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
                 .addComponent(headerPanel)
                 .addComponent(chkDisableSecondaryRoleSalary)
                 .addComponent(pnlSalaryMultipliersPanel)
-                .addComponent(pnlSalaryExperienceMultipliersPanel));
+                .addComponent(pnlSalaryExperienceMultipliersPanel)
+                .addComponent(pnlSalaryBaseSalaryPanel));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "SalariesTab");
     }
 
+    /**
+     * Creates a panel for configuring salary multipliers for different personnel roles.
+     *
+     * @return a {@link JPanel} containing the salary multipliers configuration panel
+     */
     private JPanel createSalaryMultipliersPanel() {
         // Contents
         lblAntiMekSalary = createLabel("AntiMekSalary", null);
@@ -966,16 +1045,17 @@ public class PersonnelTab {
         return panel;
     }
 
+    /**
+     * Creates a panel for configuring experience multipliers for different skill levels.
+     * <p>
+     * This method dynamically generates labels and spinners for each skill level based on the values
+     * in the {@link SkillLevel} enum.
+     * </p>
+     *
+     * @return a {@link JPanel} containing the experience multipliers configuration panel
+     */
     private JPanel createExperienceMultipliersPanel() {
         // Contents
-        lblAntiMekSalary = createLabel("AntiMekSalary", null);
-        spnAntiMekSalary = createSpinner("AntiMekSalary", null,
-            0, 0, 100, 0.05);
-
-        lblSpecialistInfantrySalary = createLabel("SpecialistInfantrySalary", null);
-        spnSpecialistInfantrySalary = createSpinner("SpecialistInfantrySalary", null,
-            0, 0, 100, 0.05);
-
         for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
             final JLabel label = createLabel("SkillLevel" + skillLevel.toString(), null);
             lblSalaryExperienceMultipliers.put(skillLevel, label);
@@ -992,49 +1072,123 @@ public class PersonnelTab {
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.NONE))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.NONE))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.ULTRA_GREEN))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.ULTRA_GREEN))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.GREEN))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.GREEN))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.REGULAR))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.REGULAR)))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.VETERAN))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.VETERAN))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.ELITE))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.ELITE))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.HEROIC))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.HEROIC))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.LEGENDARY))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.LEGENDARY))));
+        SkillLevel[] skillLevels = SkillLevel.values();
+        int rows = 2;
+        int columns = 4;
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.NONE))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.NONE))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.ULTRA_GREEN))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.ULTRA_GREEN))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.GREEN))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.GREEN))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.REGULAR))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.REGULAR))
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.VETERAN))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.VETERAN))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.ELITE))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.ELITE))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.HEROIC))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.HEROIC))
-                    .addComponent(lblSalaryExperienceMultipliers.get(SkillLevel.LEGENDARY))
-                    .addComponent(spnSalaryExperienceMultipliers.get(SkillLevel.LEGENDARY))
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+        SequentialGroup horizontalGroups = layout.createSequentialGroup();
+        ParallelGroup[] verticalGroups = new ParallelGroup[rows];
+
+        for (int j = 0; j < rows; j++) {
+            verticalGroups[j] = layout.createParallelGroup(Alignment.BASELINE);
+        }
+
+        for (int i = 0; i < columns; i++) {
+            ParallelGroup horizontalParallelGroup = layout.createParallelGroup();
+
+            for (int j = 0; j < rows; j++) {
+                int index = i * rows + j;
+
+                SequentialGroup horizontalSequentialGroup = layout.createSequentialGroup();
+                horizontalSequentialGroup.addComponent(lblSalaryExperienceMultipliers.get(skillLevels[index]));
+                horizontalSequentialGroup.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE);
+                horizontalSequentialGroup.addComponent(spnSalaryExperienceMultipliers.get(skillLevels[index]));
+                if (i != (columns - 1)) {
+                    horizontalSequentialGroup.addGap(200);
+                }
+
+                horizontalParallelGroup.addGroup(horizontalSequentialGroup);
+                verticalGroups[j].addComponent(lblSalaryExperienceMultipliers.get(skillLevels[index]));
+                verticalGroups[j].addComponent(spnSalaryExperienceMultipliers.get(skillLevels[index]));
+            }
+
+            horizontalGroups.addGroup(horizontalParallelGroup);
+        }
+
+        layout.setHorizontalGroup(horizontalGroups);
+        SequentialGroup verticalGroup = layout.createSequentialGroup();
+        for (Group group: verticalGroups) {
+            verticalGroup.addGroup(group);
+        }
+        layout.setVerticalGroup(verticalGroup);
+
+        return panel;
+    }
+
+    /**
+     * Creates a panel for configuring base salaries for different personnel roles.
+     * <p>
+     * This method dynamically generates labels and spinners for each personnel role
+     * based on the values in the PersonnelRole enum.
+     *
+     * @return a {@link JPanel} containing the base salaries configuration panel
+     */
+    private JPanel createBaseSalariesPanel() {
+        // Contents
+        for (final PersonnelRole personnelRole : PersonnelRole.values()) {
+            String componentName = "BaseSalary" + personnelRole.toString();
+            componentName = componentName.replaceAll(" ", "");
+
+            final JLabel label = createLabel(componentName, null);
+
+            final JSpinner spinner = createSpinner(componentName, null,
+                0.0, 0.0, 1000000, 10.0);
+
+            // Component Tracking Assignment
+            lblBaseSalary[personnelRole.ordinal()] = label;
+            spnBaseSalary[personnelRole.ordinal()] = spinner;
+        }
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("BaseSalariesPanel", true,
+            "BaseSalariesPanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        SequentialGroup mainHorizontalGroup = layout.createSequentialGroup();
+        SequentialGroup mainVerticalGroup = layout.createSequentialGroup();
+
+        int columns = 3;
+        int rows = (int) Math.ceil((double) lblBaseSalary.length / columns);
+
+        // Create an array to store ParallelGroups for each column
+        ParallelGroup[] columnGroups = new ParallelGroup[columns];
+        for (int i = 0; i < columns; i++) {
+            columnGroups[i] = layout.createParallelGroup();
+        }
+
+        for (int j = 0; j < rows; j++) {
+            ParallelGroup verticalGroup = layout.createParallelGroup(Alignment.BASELINE);
+
+            for (int i = 0; i < columns; i++) {
+                int index = i * rows + j;
+
+                if (index < lblBaseSalary.length) {
+                    // Create a SequentialGroup for the label and spinner
+                    SequentialGroup horizontalSequentialGroup = layout.createSequentialGroup();
+
+                    horizontalSequentialGroup.addComponent(lblBaseSalary[index]);
+                    horizontalSequentialGroup.addPreferredGap(ComponentPlacement.RELATED, Short.MAX_VALUE, Short.MAX_VALUE);
+                    horizontalSequentialGroup.addComponent(spnBaseSalary[index]);
+                    if (i != (columns - 1)) {
+                        horizontalSequentialGroup.addGap(100);
+                    }
+
+                    // Add the SequentialGroup to the column's ParallelGroup
+                    columnGroups[i].addGroup(horizontalSequentialGroup);
+
+                    verticalGroup.addComponent(lblBaseSalary[index]);
+                    verticalGroup.addComponent(spnBaseSalary[index]);
+                }
+            }
+            mainVerticalGroup.addGroup(verticalGroup);
+        }
+        for (ParallelGroup columnGroup : columnGroups) {
+            mainHorizontalGroup.addGroup(columnGroup);
+        }
+
+        layout.setHorizontalGroup(mainHorizontalGroup);
+        layout.setVerticalGroup(mainVerticalGroup);
 
         return panel;
     }

@@ -67,9 +67,8 @@ public class CampaignOptionsUtilities {
      * @param stepSize         The step size of the spinner
      * @return The created {@link JSpinner}.
      */
-    static JSpinner createSpinner(String name, @Nullable Integer customWrapSize,
-                                                             double defaultValue, double minimum,
-                                                             double maximum, double stepSize) {
+    static JSpinner createSpinner(String name, @Nullable Integer customWrapSize, double defaultValue,
+                                  double minimum, double maximum, double stepSize) {
         customWrapSize = processWrapSize(customWrapSize);
 
         JSpinner jSpinner = new JSpinner();
