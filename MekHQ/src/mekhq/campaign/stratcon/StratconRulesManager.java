@@ -1087,6 +1087,7 @@ public class StratconRulesManager {
                 .mapToInt(key -> key)
                 .mapToObj(campaign::getForce).filter(force -> (force != null)
                         && !force.isDeployed()
+                        && force.isCombatForce()
                         && !forcesInTracks.contains(force.getId()))
                 .map(Force::getId)
                 .collect(Collectors.toList());
