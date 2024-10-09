@@ -34,6 +34,7 @@ import javax.swing.table.TableRowSorter;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
@@ -273,7 +274,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
-        techTable.setRowHeight(60);
+        techTable.setRowHeight(UIUtil.scaleForGUI(60));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(ev -> updateTechTarget());
         techSorter = new TableRowSorter<>(techsModel);

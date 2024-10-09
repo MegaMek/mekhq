@@ -126,7 +126,7 @@ public class Armor extends Part implements IAcquisitionWork {
         if (getAllMods(null).getValue() > -1) {
             bonus = '+' + bonus;
         }
-        String toReturn = "<html><font size='3'";
+        String toReturn = "<html><font";
 
         String scheduled = "";
         if (getTech() != null) {
@@ -474,7 +474,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String getAcquisitionDesc() {
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font";
 
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";

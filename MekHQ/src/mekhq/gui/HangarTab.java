@@ -22,9 +22,12 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.GUIPreferences;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
+import megamek.common.preference.IPreferenceChangeListener;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -71,6 +74,8 @@ public final class HangarTab extends CampaignGuiTab {
     private UnitTableModel unitModel;
     private TableRowSorter<UnitTableModel> unitSorter;
 
+    private final IPreferenceChangeListener scalingChangeListener = e -> changeUnitView();
+
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
             MekHQ.getMHQOptions().getLocale());
 
@@ -79,6 +84,7 @@ public final class HangarTab extends CampaignGuiTab {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
     }
     // endregion Constructors
 
@@ -291,7 +297,7 @@ public final class HangarTab extends CampaignGuiTab {
     public void changeUnitView() {
         int view = choiceUnitView.getSelectedIndex();
         XTableColumnModel columnModel = (XTableColumnModel) unitTable.getColumnModel();
-        unitTable.setRowHeight(15);
+        unitTable.setRowHeight(UIUtil.scaleForGUI(15));
 
         // set the renderer
         TableColumn column;
@@ -311,7 +317,7 @@ public final class HangarTab extends CampaignGuiTab {
         }
 
         if (view == UV_GRAPHIC) {
-            unitTable.setRowHeight(80);
+            unitTable.setRowHeight(UIUtil.scaleForGUI(60));
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
@@ -402,6 +408,12 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
         }
+    }
+
+    @Override
+    public void disposeTab() {
+        super.disposeTab();
+        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
     }
 
     public void focusOnUnit(UUID id) {

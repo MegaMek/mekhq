@@ -488,7 +488,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         if (isSalvaging()) {
             return super.getDesc();
         }
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font";
         String scheduled = "";
         if (getTech() != null) {
             scheduled = " (scheduled) ";
@@ -557,7 +557,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String getAcquisitionDesc() {
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font";
 
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";

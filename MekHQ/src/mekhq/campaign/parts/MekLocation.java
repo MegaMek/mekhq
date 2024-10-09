@@ -864,7 +864,7 @@ public class MekLocation extends Part {
         if ((!isBreached() && !isBlownOff()) || isSalvaging()) {
             return super.getDesc();
         }
-        String toReturn = "<html><font size='3'";
+        String toReturn = "<html><font";
         String scheduled = "";
         if (getTech() != null) {
             scheduled = " (scheduled) ";

@@ -194,7 +194,7 @@ public class AcquisitionsDialog extends JDialog {
 
     private String generateSummaryText() {
         StringBuilder sbText = new StringBuilder();
-        sbText.append("<html><font size='3'>");
+        sbText.append("<html><font>");
 
         sbText.append("Required: ");
         sbText.append(PartsAcquisitionService.getRequiredCount());
@@ -337,7 +337,7 @@ public class AcquisitionsDialog extends JDialog {
 
         private String generateText() {
             StringBuilder sbText = new StringBuilder();
-            sbText.append("<html><font size='3'>");
+            sbText.append("<html><font>");
 
             sbText.append("<b>");
             sbText.append(targetWork.getAcquisitionDisplayName());

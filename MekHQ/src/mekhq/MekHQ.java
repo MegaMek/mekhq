@@ -39,6 +39,7 @@ import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalwarfare.TWGameManager;
 import megameklab.MegaMekLab;
+import megameklab.util.CConfig;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.Kill;
@@ -173,6 +174,8 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
+        updateGuiScaling(); // also sets the look-and-feel
+
         // Setup user preferences
         MegaMek.getMMPreferences().loadFromFile(SuiteConstants.MM_PREFERENCES_FILE);
         MegaMekLab.getMMLPreferences().loadFromFile(SuiteConstants.MML_PREFERENCES_FILE);
@@ -667,19 +670,32 @@ public class MekHQ implements GameListener {
                     addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
                 }
 
-                for (final Frame frame : Frame.getFrames()) {
-                    SwingUtilities.updateComponentTreeUI(frame);
-                }
-
-                for (Window window : Window.getWindows()) {
-                    SwingUtilities.updateComponentTreeUI(window);
-                }
+                updateAfterUiChange();
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                     | UnsupportedLookAndFeelException e) {
                 logger.error(e, "setLookAndFeel()");
             }
         };
         SwingUtilities.invokeLater(runnable);
+    }
+
+    public static void updateGuiScaling() {
+        System.setProperty("flatlaf.uiScale", Double.toString(GUIPreferences.getInstance().getGUIScale()));
+        setLookAndFeel(GUIPreferences.getInstance().getUITheme());
+        updateAfterUiChange();
+    }
+
+    /**
+     * Updates all existing windows and frames. Use after a gui scale change or look-and-feel change.
+     */
+    public static void updateAfterUiChange() {
+        for (Window window : Window.getWindows()) {
+            SwingUtilities.updateComponentTreeUI(window);
+            window.pack();
+            window.invalidate();
+            window.validate();
+            window.repaint();
+        }
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {

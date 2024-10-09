@@ -379,7 +379,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         if (shotsNeeded >= 0) {
             return super.getDesc();
         }
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font";
         String scheduled = "";
         if (getTech() != null) {
             scheduled = " (scheduled) ";

@@ -18,6 +18,7 @@
  */
 package mekhq.gui;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
@@ -79,7 +80,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
         doctorsModel = new DocTableModel(getCampaign());
         docTable = new JTable(doctorsModel);
-        docTable.setRowHeight(60);
+        docTable.setRowHeight(UIUtil.scaleForGUI(60));
         docTable.getColumnModel().getColumn(0).setCellRenderer(doctorsModel.getRenderer());
         docTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
         docTable.setOpaque(false);

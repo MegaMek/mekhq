@@ -303,7 +303,7 @@ public class TankLocation extends Part {
         if (!isBreached() || isSalvaging()) {
             return super.getDesc();
         }
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font";
         String scheduled = "";
         if (getTech() != null) {
             scheduled = " (scheduled) ";

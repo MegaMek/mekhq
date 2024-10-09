@@ -25,6 +25,7 @@ import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
@@ -1061,7 +1062,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -1072,14 +1073,11 @@ public class CampaignGUI extends JPanel {
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
-        btnGMMode.setMinimumSize(new Dimension(150, 25));
-        btnGMMode.setPreferredSize(new Dimension(150, 25));
-        btnGMMode.setMaximumSize(new Dimension(150, 25));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
@@ -1088,25 +1086,22 @@ public class CampaignGUI extends JPanel {
         btnOvertime = new JToggleButton(resourceMap.getString("btnOvertime.text"));
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
-        btnOvertime.setMinimumSize(new Dimension(150, 25));
-        btnOvertime.setPreferredSize(new Dimension(150, 25));
-        btnOvertime.setMaximumSize(new Dimension(150, 25));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         btnPanel.add(btnOvertime, gridBagConstraints);
 
         // This button uses a mnemonic that is unique and listed in the initMenu JavaDoc
-        JButton btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text"));
+        String padding = "       ";
+        JButton btnAdvanceDay = new JButton(padding + resourceMap.getString("btnAdvanceDay.text") + padding);
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
         btnAdvanceDay.addActionListener(evt -> getCampaignController().advanceDay());
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
-        btnAdvanceDay.setPreferredSize(new Dimension(250, 50));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -1254,14 +1249,18 @@ public class CampaignGUI extends JPanel {
         menuThemes.removeAll();
         JCheckBoxMenuItem miPlaf;
         for (LookAndFeelInfo laf : UIManager.getInstalledLookAndFeels()) {
-            miPlaf = new JCheckBoxMenuItem(laf.getName());
-            if (laf.getClassName().equalsIgnoreCase(MekHQ.getSelectedTheme().getValue())) {
-                miPlaf.setSelected(true);
-            }
+            // intentionally only limits the themes in the menu; as a last resort for GUI problems, other laf can be used by
+            // hand-editing mhq.preferences
+            if (GUIPreferences.isSupportedLookAndFeel(laf)) {
+                miPlaf = new JCheckBoxMenuItem(laf.getName());
+                if (laf.getClassName().equalsIgnoreCase(MekHQ.getSelectedTheme().getValue())) {
+                    miPlaf.setSelected(true);
+                }
 
-            menuThemes.add(miPlaf);
-            miPlaf.setActionCommand(laf.getClassName());
-            miPlaf.addActionListener(this::changeTheme);
+                menuThemes.add(miPlaf);
+                miPlaf.setActionCommand(laf.getClassName());
+                miPlaf.addActionListener(this::changeTheme);
+            }
         }
     }
 

@@ -81,7 +81,7 @@ public class RepairTaskInfo extends JPanel {
     }
 
     public void setText(String s) {
-        lblImage.setText("<html><font size='2'>" + s + "</font></html>");
+        lblImage.setText("<html><font>" + s + "</font></html>");
     }
 
     public void highlightBorder() {
