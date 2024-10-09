@@ -549,7 +549,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getFontColorSkillUltraGreen() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN,
-                0x33ff33));
+                0x42DFDF));
     }
 
     /**
@@ -565,7 +565,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getFontColorSkillGreen() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_GREEN,
-                0x00ff00));
+                0x43CF43));
     }
 
     /**
@@ -581,7 +581,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getFontColorSkillRegular() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_REGULAR,
-                0x997755));
+                0xCF9F43));
     }
 
     /**
@@ -597,7 +597,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getFontColorSkillVeteran() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_VETERAN,
-                0xff0000));
+                0xE85C5C));
     }
 
     /**
@@ -613,7 +613,7 @@ public final class MHQOptions extends SuiteOptions {
 
     public Color getFontColorSkillElite() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_ELITE,
-                0xdd33dd));
+                0xC344C3));
     }
 
     /**
