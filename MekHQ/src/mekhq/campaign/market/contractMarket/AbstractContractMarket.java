@@ -78,11 +78,13 @@ public abstract class AbstractContractMarket {
     abstract public void generateContractOffers(Campaign campaign, boolean newCampaign);
 
     /**
-     * Add a followup contract to an existing contract.
-     * @param campaign
-     * @param contract
+     * Generate followup contracts and add them to the market if the currently selected market type
+     * supports them.
+     *
+     * @param campaign The current campaign.
+     * @param contract The AtBContract being completed and used as a basis for followup missions
      */
-    abstract public void addFollowup(Campaign campaign, AtBContract contract);
+    abstract public void checkForFollowup(Campaign campaign, AtBContract contract);
 
     /**
      * Calculate the total payment modifier for the contract based on the configured market method

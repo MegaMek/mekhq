@@ -29,6 +29,8 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.universe.enums.EraFlag;
 
 public enum AtBContractType {
+    // TODO: Missing Camops Mission Types: ASSASSINATION, ESPIONAGE, MOLE_HUNTING, OBSERVATION_RAID,
+    //  RETAINER, SABOTAGE, TERRORISM, HIGH_RISK
     // region Enum Declarations
     GARRISON_DUTY("AtBContractType.GARRISON_DUTY.text", "AtBContractType.GARRISON_DUTY.toolTipText", 18, 1.0),
     CADRE_DUTY("AtBContractType.CADRE_DUTY.text", "AtBContractType.CADRE_DUTY.toolTipText", 12, 0.8),
@@ -51,18 +53,18 @@ public enum AtBContractType {
     private final String name;
     private final String toolTipText;
     private final int constantLength;
-    private final double paymentMultiplier;
+    private final double operationsTempoMultiplier;
     // endregion Variable Declarations
 
     // region Constructors
     AtBContractType(final String name, final String toolTipText, final int constantLength,
-            final double paymentMultiplier) {
+            final double operationsTempoMultiplier) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.constantLength = constantLength;
-        this.paymentMultiplier = paymentMultiplier;
+        this.operationsTempoMultiplier = operationsTempoMultiplier;
     }
     // endregion Constructors
 
@@ -75,8 +77,8 @@ public enum AtBContractType {
         return constantLength;
     }
 
-    public double getPaymentMultiplier() {
-        return paymentMultiplier;
+    public double getOperationsTempoMultiplier() {
+        return operationsTempoMultiplier;
     }
     // endregion Getters
 

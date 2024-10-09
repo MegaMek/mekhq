@@ -473,7 +473,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // resolve bonus parts exchange
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
-            ((AtBContract) mission).checkForFollowup(getCampaign());
+            getCampaign().getContractMarket().checkForFollowup(getCampaign(), (AtBContract) mission);
             bonusPartExchange((AtBContract) mission);
         }
 

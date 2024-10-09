@@ -409,8 +409,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         return contract;
     }
 
-    @Override
-    public void addFollowup(Campaign campaign,
+    private void addFollowup(Campaign campaign,
             AtBContract contract) {
         if (followupContracts.containsValue(contract.getId())) {
             return;
@@ -473,7 +472,7 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
             }
         }
 
-        multiplier *= contract.getContractType().getPaymentMultiplier();
+        multiplier *= contract.getContractType().getOperationsTempoMultiplier();
 
         final Faction employer = Factions.getInstance().getFaction(contract.getEmployerCode());
         final Faction enemy = contract.getEnemy();
@@ -496,6 +495,20 @@ public class AtbMonthlyContractMarket extends AbstractContractMarket {
         }
 
         return multiplier;
+    }
+
+    @Override
+    public void checkForFollowup(Campaign campaign, AtBContract contract) {
+        AtBContractType type = contract.getContractType();
+        if (type.isDiversionaryRaid() || type.isReconRaid()
+            || type.isRiotDuty()) {
+            int roll = Compute.d6();
+            if (roll == 6) {
+                addFollowup(campaign, contract);
+                campaign.addReport(
+                    "Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
+            }
+        }
     }
 
     private void setContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
