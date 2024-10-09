@@ -111,7 +111,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         PersonnelTab personnelTab = new PersonnelTab(getFrame(), "personnelTab");
 
         JTabbedPane personnelContentTabs = createSubTabs(Map.of(
-            "generalTab", personnelTab.createGeneralTab(),
+            "personnelGeneralTab", personnelTab.createGeneralTab(),
             "personnelLogsTab", personnelTab.createPersonnelLogsTab(),
             "personnelInformationTab", personnelTab.createPersonnelInformationTab(),
             "administratorsTab", personnelTab.createAdministratorsTab(),
@@ -121,6 +121,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "salariesTab", personnelTab.createSalariesTab()));
 
         // Life Paths
+        LifePathsTab lifePathsTab = new LifePathsTab(campaign, getFrame(), "lifePathsTab");
+
+        JTabbedPane lifePathsContentTabs = createSubTabs(Map.of(
+            "lifePathsGeneralTab", lifePathsTab.createGeneralTab(),
+            "backgroundsTab", lifePathsTab.createBackgroundsTab()));
+
         // Turnover and Retention
         // Name and Portrait Generation
         // Rank Systems
@@ -128,6 +134,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Add Tabs
         humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("personnelContentTabs.title")), personnelContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("lifePathsContentTabs.title")), lifePathsContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("humanResourcesParentTab.title")), humanResourcesParentTab);

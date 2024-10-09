@@ -321,7 +321,7 @@ public class PersonnelTab {
 
     JPanel createGeneralTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("GeneralTab",
+        JPanel headerPanel = createHeaderPanel("PersonnelGeneralTab",
             getImageDirectory() + "logo_circinus_federation.png",
             false, "", true);
 
@@ -340,7 +340,7 @@ public class PersonnelTab {
         personnelCleanUpPanel = createPersonnelCleanUpPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("GeneralTab", true, "");
+        final JPanel panel = createStandardPanel("PersonnelGeneralTab", true, "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -377,7 +377,7 @@ public class PersonnelTab {
         );
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "GeneralTab");
+        return createParentPanel(panel, "PersonnelGeneralTab");
     }
 
     /**
