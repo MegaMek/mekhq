@@ -489,7 +489,11 @@ public enum PersonnelTableModelColumn {
             case GENDER:
                 return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
-                return person.getSkillLevel(campaign, false).toString();
+                StringBuilder levelName = new StringBuilder(64);
+                levelName.append("<html>")
+                    .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
+                    .append("</html>");
+                return levelName.toString();
             case PERSONNEL_ROLE:
                 return person.getRoleDesc();
             case UNIT_ASSIGNMENT: {
