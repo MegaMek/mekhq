@@ -214,7 +214,6 @@ public class Utilities {
     }
 
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
-        CampaignOptions options = campaign.getCampaignOptions();
         ArrayList<String> variants = new ArrayList<>();
 
         for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
@@ -235,11 +234,6 @@ public class Utilities {
                 if (summary.getTons() != en.getWeight()) {
                     continue;
                 }
-            }
-
-            // If we only allow canon units and this isn't canon we continue
-            if (!summary.isCanon() && options.isAllowCanonRefitOnly()) {
-                continue;
             }
 
             // If the unit doesn't meet the tech filter criteria we continue

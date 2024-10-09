@@ -26,6 +26,9 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 
+import megamek.common.*;
+import megamek.common.util.fileUtils.MegaMekFile;
+import megamek.utilities.BoardClassifier;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -33,14 +36,6 @@ import org.w3c.dom.NodeList;
 import megamek.Version;
 import megamek.client.generator.TeamLoadOutGenerator;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.Infantry;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
-import megamek.common.WeatherRestriction;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
@@ -490,6 +485,38 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setMapFile() {
         setMapFile(getTerrainType());
+    }
+
+    /**
+     * If there are maps of the appropriate size available and we roll higher than
+     * the given threshold, replace the scenario's generated map with a fixed map
+     * from data/boards
+     */
+    public void setScenarioMap(int mapChance) {
+        if (getBoardType() != Scenario.T_SPACE
+            && !getTerrainType().equals("Space")
+            && (getMapSizeX() > 0)
+            && (getMapSizeY() > 0)
+            && (Compute.randomInt(100) <= mapChance)) {
+            BoardClassifier bc = BoardClassifier.getInstance();
+            List<String> maps = bc.getMatchingBoards(getMapSizeX(), getMapSizeY(), 7, 7,
+                new ArrayList<>());
+
+            if (!maps.isEmpty()) {
+                String mapPath = ObjectUtility.getRandomItem(maps);
+                MegaMekFile mapFile = new MegaMekFile(mapPath);
+                BoardDimensions dimensions = Board.getSize(mapFile.getFile());
+
+                setMap(bc.getBoardPaths().get(mapPath));
+                setMapSizeX(dimensions.width());
+                setMapSizeY(dimensions.height());
+                setUsingFixedMap(true);
+                return;
+            }
+        }
+
+        setUsingFixedMap(false);
+        setMapFile();
     }
 
     public boolean canRerollTerrain() {

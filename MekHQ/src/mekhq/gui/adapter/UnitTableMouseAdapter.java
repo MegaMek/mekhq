@@ -365,7 +365,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().succeed());
         } else if (command.equals(COMMAND_REFURBISH)) {
             for (Unit unit : units) {
-                Refit refit = new Refit(unit, unit.getEntity(), false, true);
+                Refit refit = new Refit(unit, unit.getEntity(), false, true, false);
                 gui.refitUnit(refit, false);
             }
         } else if (command.equals(COMMAND_REFIT_KIT)) { // Single Unit or Multiple of Units of the same type only
@@ -381,7 +381,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                             Entity refitEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName())
                                     .getEntity();
                             if (refitEntity != null) {
-                                Refit refit = new Refit(unit, refitEntity, false, false);
+                                Refit refit = new Refit(unit, refitEntity, crd.isCustomize(), false, false);
                                 if (refit.checkFixable() == null) {
                                     gui.refitUnit(refit, false);
                                 }
@@ -850,7 +850,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                                 || (unit.getEntity() instanceof Aero)
                                 || ((unit.getEntity() instanceof Infantry)))) {
                     menuItem = new JMenuItem(unit.getEntity().isOmni() ? "Choose configuration..."
-                            : "Choose Refit Kit...");
+                            : "Refit/Customize...");
                     menuItem.setActionCommand(COMMAND_REFIT_KIT);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
