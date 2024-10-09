@@ -145,7 +145,7 @@ public class SuppliesAndAcquisitionTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblChoiceAcquireSkill)
                     .addComponent(choiceAcquireSkill)
@@ -197,7 +197,7 @@ public class SuppliesAndAcquisitionTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(options)
                     .addComponent(modifiers)));
@@ -512,7 +512,7 @@ public class SuppliesAndAcquisitionTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblNDiceTransitTime)
                     .addComponent(spnNDiceTransitTime)

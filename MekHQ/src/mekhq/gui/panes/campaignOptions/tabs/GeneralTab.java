@@ -80,7 +80,7 @@ public class GeneralTab {
      */
     public AbstractMHQScrollablePanel createGeneralTab() {
         // Header
-        JPanel imagePanel = createGeneralHeader();
+        JPanel headerPanel = createGeneralHeader();
 
         // Campaign name
         lblName = createLabel("Name", null);
@@ -137,7 +137,7 @@ public class GeneralTab {
 
         layout.setVerticalGroup(
             layout.createSequentialGroup()
-                .addComponent(imagePanel)
+                .addComponent(headerPanel)
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblName)
                     .addComponent(txtName)
@@ -162,7 +162,7 @@ public class GeneralTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(imagePanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblName)
                     .addComponent(txtName)

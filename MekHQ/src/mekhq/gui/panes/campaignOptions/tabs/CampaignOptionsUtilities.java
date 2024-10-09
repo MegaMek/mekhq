@@ -179,6 +179,20 @@ public class CampaignOptionsUtilities {
 
         panel.setName(name);
 
+        Dimension size = panel.getPreferredSize();
+        int sizeHeight = size.height;
+        int sizeWidth = size.width;
+        for (Component component : panel.getComponents()) {
+            sizeHeight += component.getPreferredSize().height;
+            sizeWidth += component.getPreferredSize().width;
+        }
+
+        if (sizeWidth < 500) {
+            sizeWidth = 500;
+        }
+
+        panel.setMaximumSize(new Dimension(sizeWidth, sizeHeight));
+
         return panel;
     }
 
@@ -217,6 +231,9 @@ public class CampaignOptionsUtilities {
         }
 
         final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", includeBorder, borderTitle);
+        Dimension size = panel.getPreferredSize();
+        panel.setPreferredSize(new Dimension(500, size.height));
+
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -260,21 +277,27 @@ public class CampaignOptionsUtilities {
      */
     static JPanel createParentPanel(JPanel panel, String name) {
         // Create Panel
-        final JPanel parentPanel = createStandardPanel(name, true, "");
+        final JPanel parentPanel = createStandardPanel(name, false, "");
         final GroupLayout parentLayout = createStandardLayout(parentPanel);
 
         // Set Dimensions
-        int widthNew = panel.getMinimumSize().width;
+        int widthNew = parentPanel.getMinimumSize().width;
 
         if (widthNew < 500) {
             widthNew = 500;
         }
 
         // I don't know why 1.25 works, it just does, and I've given up questioning it.
-        int height = (int) (panel.getPreferredSize().height * 1.25);
+        int height = parentPanel.getPreferredSize().height;
+        for (Component component : panel.getComponents()) {
+            if (component instanceof JPanel) {
+                height += component.getPreferredSize().height;
+            }
+        }
+
         Dimension size = new Dimension(widthNew, height);
-        panel.setMinimumSize(size);
-        panel.setMaximumSize(size);
+        parentPanel.setMinimumSize(size);
+        parentPanel.setMaximumSize(size);
 
         // Layout
         parentPanel.setLayout(parentLayout);
@@ -284,7 +307,7 @@ public class CampaignOptionsUtilities {
                 .addComponent(panel));
 
         parentLayout.setHorizontalGroup(
-            parentLayout.createParallelGroup(Alignment.LEADING)
+            parentLayout.createParallelGroup(Alignment.CENTER)
                 .addComponent(panel));
 
         return parentPanel;
@@ -317,16 +340,26 @@ public class CampaignOptionsUtilities {
             JPanel mainPanel = panels.get(tabName);
 
             // Create a panel for the quote
-            JPanel quotePanel = new JPanel();
+            JPanel quotePanel = new JPanel(new GridBagLayout());
             JLabel quote = new JLabel(String.format("<html><i><center>%s</i></center></html>",
                 resources.getString(tabName + ".border")));
-            quotePanel.add(mainPanel);
-            quotePanel.add(quote);
+
+            GridBagConstraints quoteConstraints = new GridBagConstraints();
+            quoteConstraints.gridx = GridBagConstraints.RELATIVE;
+            quoteConstraints.gridy = GridBagConstraints.RELATIVE;
+            quotePanel.add(quote, quoteConstraints);
+
+            // Create a BorderLayout panel for mainPanel
+            JPanel mainPanelHolder = new JPanel(new GridBagLayout());
+            GridBagConstraints mainConstraints = new GridBagConstraints();
+            mainConstraints.gridx = GridBagConstraints.RELATIVE;
+            mainConstraints.gridy = GridBagConstraints.RELATIVE;
+            mainPanelHolder.add(mainPanel, mainConstraints);
 
             // Reorganize mainPanel to include quotePanel at bottom
             JPanel contentPanel = new JPanel(new BorderLayout());
             contentPanel.setName(tabName);
-            contentPanel.add(mainPanel, BorderLayout.CENTER);
+            contentPanel.add(mainPanelHolder, BorderLayout.CENTER);
             contentPanel.add(quotePanel, BorderLayout.SOUTH);
 
             // Create a wrapper panel for its easy alignment controls

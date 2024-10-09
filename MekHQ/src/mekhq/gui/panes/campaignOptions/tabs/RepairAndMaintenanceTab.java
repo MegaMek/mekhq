@@ -58,7 +58,7 @@ public class RepairAndMaintenanceTab {
      */
     public JPanel createRepairTab() {
         // Header
-        JPanel imagePanel = createHeaderPanel("RepairTab",
+        JPanel headerPanel = createHeaderPanel("RepairTab",
             getImageDirectory() + "logo_aurigan_coalition.png", false,
             "", true);
 
@@ -96,7 +96,7 @@ public class RepairAndMaintenanceTab {
 
         layout.setVerticalGroup(
             layout.createSequentialGroup()
-                .addComponent(imagePanel)
+                .addComponent(headerPanel)
                 .addComponent(useEraModsCheckBox)
                 .addComponent(assignedTechFirstCheckBox)
                 .addComponent(resetToFirstTechCheckBox)
@@ -113,7 +113,7 @@ public class RepairAndMaintenanceTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(imagePanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addComponent(useEraModsCheckBox)
                 .addComponent(assignedTechFirstCheckBox)
                 .addComponent(resetToFirstTechCheckBox)
@@ -141,7 +141,7 @@ public class RepairAndMaintenanceTab {
      */
     public JPanel createMaintenanceTab() {
         // Header
-        JPanel imagePanel = createHeaderPanel("MaintenanceTab",
+        JPanel headerPanel = createHeaderPanel("MaintenanceTab",
             getImageDirectory() + "logo_clan_blood_spirit.png",
             false, "", true);
 
@@ -188,7 +188,7 @@ public class RepairAndMaintenanceTab {
 
         layout.setVerticalGroup(
             layout.createSequentialGroup()
-                .addComponent(imagePanel)
+                .addComponent(headerPanel)
                 .addComponent(checkMaintenance)
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblMaintenanceDays)
@@ -208,7 +208,7 @@ public class RepairAndMaintenanceTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(imagePanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addComponent(checkMaintenance)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblMaintenanceDays)

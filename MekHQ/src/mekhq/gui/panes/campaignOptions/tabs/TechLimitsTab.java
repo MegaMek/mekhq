@@ -98,7 +98,7 @@ public class TechLimitsTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addComponent(limitByYearBox)
                 .addComponent(disallowExtinctStuffBox)
                 .addComponent(allowClanPurchasesBox)

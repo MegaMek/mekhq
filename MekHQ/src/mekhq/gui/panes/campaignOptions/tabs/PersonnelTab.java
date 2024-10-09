@@ -360,19 +360,21 @@ public class PersonnelTab {
                 .addComponent(personnelCleanUpPanel));
 
         layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
-                .addComponent(chkUseTactics)
-                .addComponent(chkUseInitiativeBonus)
-                .addComponent(chkUseToughness)
-                .addComponent(chkUseRandomToughness)
-                .addComponent(chkUseArtillery)
-                .addComponent(chkUseAbilities)
-                .addComponent(chkUseEdge)
-                .addComponent(chkUseSupportEdge)
-                .addComponent(chkUseImplants)
-                .addComponent(chkUseAlternativeQualityAveraging)
-                .addComponent(personnelCleanUpPanel));
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(headerPanel, Alignment.CENTER)
+                    .addComponent(chkUseTactics)
+                    .addComponent(chkUseInitiativeBonus)
+                    .addComponent(chkUseToughness)
+                    .addComponent(chkUseRandomToughness)
+                    .addComponent(chkUseArtillery)
+                    .addComponent(chkUseAbilities)
+                    .addComponent(chkUseEdge)
+                    .addComponent(chkUseSupportEdge)
+                    .addComponent(chkUseImplants)
+                    .addComponent(chkUseAlternativeQualityAveraging)
+                    .addComponent(personnelCleanUpPanel))
+        );
 
         // Create Parent Panel and return
         return createParentPanel(panel, "GeneralTab");
@@ -410,8 +412,7 @@ public class PersonnelTab {
                 .addComponent(chkUseRemovalExemptCemetery)
                 .addComponent(chkUseRemovalExemptRetirees));
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "PersonnelCleanUpPanel");
+        return panel;
     }
 
     /**
@@ -454,7 +455,7 @@ public class PersonnelTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addComponent(chkUseTransfers)
                 .addComponent(chkUseExtendedTOEForceName)
                 .addComponent(chkPersonnelLogSkillGain)
@@ -462,7 +463,8 @@ public class PersonnelTab {
                 .addComponent(chkPersonnelLogEdgeGain)
                 .addComponent(chkDisplayPersonnelLog)
                 .addComponent(chkDisplayScenarioLog)
-                .addComponent(chkDisplayKillRecord));
+                .addComponent(chkDisplayKillRecord)
+        );
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PersonnelLogsTab");
@@ -510,7 +512,7 @@ public class PersonnelTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addComponent(chkUseTimeInService)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblTimeInServiceDisplayFormat)
@@ -564,7 +566,7 @@ public class PersonnelTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addComponent(chkAdminsHaveNegotiation)
                 .addComponent(chkAdminExperienceLevelIncludeNegotiation)
                 .addComponent(chkAdminsHaveScrounge)
@@ -652,7 +654,7 @@ public class PersonnelTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblAwardBonusStyle)
                     .addComponent(comboAwardBonusStyle)
@@ -776,7 +778,7 @@ public class PersonnelTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(prisonerPanel)
                     .addComponent(dependentsPanel)
@@ -937,7 +939,7 @@ public class PersonnelTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addComponent(chkUseAdvancedMedical)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblHealWaitingPeriod)
@@ -994,7 +996,7 @@ public class PersonnelTab {
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel)
+                .addComponent(headerPanel, Alignment.CENTER)
                 .addComponent(chkDisableSecondaryRoleSalary)
                 .addComponent(pnlSalaryMultipliersPanel)
                 .addComponent(pnlSalaryExperienceMultipliersPanel)
@@ -1094,7 +1096,7 @@ public class PersonnelTab {
                 horizontalSequentialGroup.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE);
                 horizontalSequentialGroup.addComponent(spnSalaryExperienceMultipliers.get(skillLevels[index]));
                 if (i != (columns - 1)) {
-                    horizontalSequentialGroup.addGap(200);
+                    horizontalSequentialGroup.addGap(10);
                 }
 
                 horizontalParallelGroup.addGroup(horizontalSequentialGroup);
@@ -1171,7 +1173,7 @@ public class PersonnelTab {
                     horizontalSequentialGroup.addPreferredGap(ComponentPlacement.RELATED, Short.MAX_VALUE, Short.MAX_VALUE);
                     horizontalSequentialGroup.addComponent(spnBaseSalary[index]);
                     if (i != (columns - 1)) {
-                        horizontalSequentialGroup.addGap(100);
+                        horizontalSequentialGroup.addGap(10);
                     }
 
                     // Add the SequentialGroup to the column's ParallelGroup
