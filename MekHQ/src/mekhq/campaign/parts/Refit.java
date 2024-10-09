@@ -96,6 +96,7 @@ public class Refit extends Part implements IAcquisitionWork {
     private boolean failedCheck;
     private boolean customJob;
     private boolean isRefurbishing;
+    private boolean isSavingFile;
     private boolean kitFound;
     private boolean replacingLocations;
     private String fixableString;
@@ -128,10 +129,11 @@ public class Refit extends Part implements IAcquisitionWork {
         cost = Money.zero();
     }
 
-    public Refit(Unit oUnit, Entity newEn, boolean custom, boolean refurbish) {
+    public Refit(Unit oUnit, Entity newEn, boolean custom, boolean refurbish, boolean saveFile) {
         this();
         isRefurbishing = refurbish;
         customJob = custom;
+        isSavingFile = saveFile;
         oldUnit = oUnit;
         newEntity = newEn;
         newEntity.setOwner(oldUnit.getEntity().getOwner());
@@ -1044,7 +1046,7 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     public void begin() throws EntityLoadingException, IOException {
-        if (customJob) {
+        if (customJob && isSavingFile) {
             saveCustomization();
         }
         oldUnit.setRefit(this);

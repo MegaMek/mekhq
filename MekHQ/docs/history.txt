@@ -92,6 +92,8 @@ MEKHQ VERSION HISTORY:
 + PR #4981: Implemented Campaign Options IIC Preset Picker #4981
 + PR #4984: Refactored Daily Personnel Processing Logic.
 + PR #4989: Adaptation to MM #6068 Replace Manual GUI scaling with FlatLaf Scaling
++ PR #5002: Correct issues with fixed map generation #5002
++ PR #4992: Add Customization Option to Refit Dialog
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
