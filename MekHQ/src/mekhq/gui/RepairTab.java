@@ -266,7 +266,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
-        techTable.setRowHeight(60);
+        techTable.setRowHeight(UIUtil.scaleForGUI(60));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(this::techTableValueChanged);
         techSorter = new TableRowSorter<>(techsModel);
@@ -383,7 +383,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         taskModel = new TaskTableModel(getCampaignGui(), this);
         taskTable = new JTable(taskModel);
-        taskTable.setRowHeight(70);
+        taskTable.setRowHeight(UIUtil.scaleForGUI(70));
         taskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer(getIconPackage()));
         taskTable.getSelectionModel().addListSelectionListener(ev -> taskTableValueChanged());
         taskSorter = new TableRowSorter<>(taskModel);

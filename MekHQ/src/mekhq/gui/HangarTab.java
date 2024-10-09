@@ -317,7 +317,7 @@ public final class HangarTab extends CampaignGuiTab {
         }
 
         if (view == UV_GRAPHIC) {
-            unitTable.setRowHeight(UIUtil.scaleForGUI(80));
+            unitTable.setRowHeight(UIUtil.scaleForGUI(60));
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);

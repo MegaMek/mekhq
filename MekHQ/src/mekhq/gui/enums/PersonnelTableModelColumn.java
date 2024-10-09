@@ -807,7 +807,7 @@ public enum PersonnelTableModelColumn {
             final JTable table) {
         return switch (view) {
             case GRAPHIC -> {
-                table.setRowHeight(UIUtil.scaleForGUI(80));
+                table.setRowHeight(UIUtil.scaleForGUI(60));
                 yield switch (this) {
                     case PERSON, UNIT_ASSIGNMENT, FORCE -> true;
                     default -> false;
