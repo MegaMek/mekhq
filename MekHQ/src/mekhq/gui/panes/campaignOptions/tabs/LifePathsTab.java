@@ -5,6 +5,7 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
+import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
@@ -88,6 +89,23 @@ public class LifePathsTab {
     private JSpinner spnRandomNewDependentMarriage;
     //end Marriage Tab
 
+    //start Divorce Tab
+    private JCheckBox chkUseManualDivorce;
+    private JCheckBox chkUseClanPersonnelDivorce;
+    private JCheckBox chkUsePrisonerDivorce;
+
+    private JPanel pnlRandomDivorce;
+
+    private JLabel lblRandomDivorceMethod;
+    private MMComboBox<RandomDivorceMethod> comboRandomDivorceMethod;
+    private JCheckBox chkUseRandomOppositeSexDivorce;
+    private JCheckBox chkUseRandomSameSexDivorce;
+    private JCheckBox chkUseRandomClanPersonnelDivorce;
+    private JCheckBox chkUseRandomPrisonerDivorce;
+    private JLabel lblRandomDivorceDiceSize;
+    private JSpinner spnRandomDivorceDiceSize;
+    //end Divorce Tab
+
     /**
      * Represents a tab for repair and maintenance in an application.
      */
@@ -169,6 +187,21 @@ public class LifePathsTab {
         spnRandomSameSexMarriageDiceSize = new JSpinner();
         lblRandomNewDependentMarriage = new JLabel();
         spnRandomNewDependentMarriage = new JSpinner();
+
+        // Divorce Tab
+        chkUseManualDivorce = new JCheckBox();
+        chkUseClanPersonnelDivorce = new JCheckBox();
+        chkUsePrisonerDivorce = new JCheckBox();
+
+        pnlRandomDivorce = new JPanel();
+        lblRandomDivorceMethod = new JLabel();
+        comboRandomDivorceMethod = new MMComboBox<>("comboRandomDivorceMethod", RandomDivorceMethod.values());
+        chkUseRandomOppositeSexDivorce = new JCheckBox();
+        chkUseRandomSameSexDivorce = new JCheckBox();
+        chkUseRandomClanPersonnelDivorce = new JCheckBox();
+        chkUseRandomPrisonerDivorce = new JCheckBox();
+        lblRandomDivorceDiceSize = new JLabel();
+        spnRandomDivorceDiceSize = new JSpinner();
     }
 
     /**
@@ -179,7 +212,7 @@ public class LifePathsTab {
     JPanel createGeneralTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("LifePathsGeneralTab",
-            getImageDirectory() + "logo_escorpion_imperio.png",
+            getImageDirectory() + "logo_federated_suns.png",
             false, "", true);
 
         // Contents
@@ -541,7 +574,11 @@ public class LifePathsTab {
         return createParentPanel(panel, "MarriageTab");
     }
 
-
+    /**
+     * Creates a panel for general marriage options with checkboxes and input components.
+     *
+     * @return a {@link JPanel} representing the general marriage options panel
+     */
     JPanel createMarriageGeneralOptionsPanel() {
         // Contents
         chkUseManualMarriages = createCheckBox("UseManualMarriages", null);
@@ -719,6 +756,120 @@ public class LifePathsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomNewDependentMarriage)
                         .addComponent(spnRandomNewDependentMarriage)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+
+        return panel;
+    }
+
+    /**
+     * Creates a tab for divorce settings with various checkboxes and panels for manual, clan personnel,
+     * and prisoner divorces.
+     *
+     * @return a {@link JPanel} representing the Divorce tab with checkboxes for manual divorce,
+     * clan personnel divorce, prisoner divorce, and a panel for configuring random divorce settings.
+     */
+    JPanel createDivorceTab() {
+        // Header
+        JPanel headerPanel = createHeaderPanel("DivorceTab",
+            getImageDirectory() + "logo_clan_hells_horses.png",
+            false, "", true);
+
+        // Contents
+        chkUseManualDivorce = createCheckBox("UseManualDivorce", null);
+        chkUseClanPersonnelDivorce = createCheckBox("UseClanPersonnelDivorce", null);
+        chkUsePrisonerDivorce = createCheckBox("UsePrisonerDivorce", null);
+
+        pnlRandomDivorce = createRandomDivorcePanel();
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("DivorceTab", true, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(headerPanel)
+                .addComponent(chkUseManualDivorce)
+                .addComponent(chkUseClanPersonnelDivorce)
+                .addComponent(chkUsePrisonerDivorce)
+                .addComponent(pnlRandomDivorce));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(headerPanel, Alignment.CENTER)
+                        .addComponent(chkUseManualDivorce)
+                        .addComponent(chkUseClanPersonnelDivorce)
+                        .addComponent(chkUsePrisonerDivorce)
+                        .addComponent(pnlRandomDivorce)));
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "DivorceTab");
+    }
+
+    /**
+     * Creates a panel for the Divorce tab with checkboxes for manual divorce, clan personnel divorce,
+     * prisoner divorce, and a panel for configuring random divorce settings.
+     *
+     * @return a {@link JPanel} representing the Divorce tab with various components for configuring divorce settings
+     */
+    JPanel createRandomDivorcePanel() {
+        // Contents
+        lblRandomDivorceMethod = createLabel("RandomDivorceMethod", null);
+        comboRandomDivorceMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomDivorceMethod) {
+                    list.setToolTipText(((RandomDivorceMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
+        chkUseRandomOppositeSexDivorce = createCheckBox("UseRandomOppositeSexDivorce", null);
+        chkUseRandomSameSexDivorce = createCheckBox("UseRandomSameSexDivorce", null);
+        chkUseRandomClanPersonnelDivorce = createCheckBox("UseRandomClanPersonnelDivorce", null);
+        chkUseRandomPrisonerDivorce = createCheckBox("UseRandomPrisonerDivorce", null);
+
+        lblRandomDivorceDiceSize = createLabel("RandomDivorceDiceSize", null);
+        spnRandomDivorceDiceSize = createSpinner("RandomDivorceDiceSize", null,
+            900, 0, 100000, 1);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("RandomDivorcePanel", true, "RandomDivorcePanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblRandomDivorceMethod)
+                    .addComponent(comboRandomDivorceMethod))
+                .addComponent(chkUseRandomOppositeSexDivorce)
+                .addComponent(chkUseRandomSameSexDivorce)
+                .addComponent(chkUseRandomClanPersonnelDivorce)
+                .addComponent(chkUseRandomPrisonerDivorce)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblRandomDivorceDiceSize)
+                    .addComponent(spnRandomDivorceDiceSize)));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblRandomDivorceMethod)
+                        .addComponent(comboRandomDivorceMethod)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(chkUseRandomOppositeSexDivorce)
+                    .addComponent(chkUseRandomSameSexDivorce)
+                    .addComponent(chkUseRandomClanPersonnelDivorce)
+                    .addComponent(chkUseRandomPrisonerDivorce)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblRandomDivorceDiceSize)
+                        .addComponent(spnRandomDivorceDiceSize)
                         .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
 
         return panel;
