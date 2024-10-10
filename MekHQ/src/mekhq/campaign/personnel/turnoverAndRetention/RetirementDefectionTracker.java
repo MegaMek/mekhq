@@ -180,7 +180,7 @@ public class RetirementDefectionTracker {
                 long monthsBetween = ChronoUnit.MONTHS.between(lastPromotionDate, today);
 
                 if (monthsBetween <= 6) {
-                    targetNumber.addModifier(- 1, resources.getString("recentpromotion.text"))
+                    targetNumber.addModifier(- 1, resources.getString("recentpromotion.text"));
                 }
             }
 
