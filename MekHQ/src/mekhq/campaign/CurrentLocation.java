@@ -156,7 +156,7 @@ public class CurrentLocation {
                         .append("% charged)");
             }
         } else {
-            if(currentSystem == jumpPath.getLastSystem()) {
+            if((null != jumpPath) && (currentSystem == jumpPath.getLastSystem())) {
                 sb.append(String.format(Locale.ROOT, "%.2f", getTransitTime()))
                     .append(" days from planet");
             } else {
