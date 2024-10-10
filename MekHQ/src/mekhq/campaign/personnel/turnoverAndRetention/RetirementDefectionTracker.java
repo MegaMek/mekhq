@@ -172,6 +172,18 @@ public class RetirementDefectionTracker {
                         resources.getString("desirability.text"));
             }
 
+            // Recent Promotion Modifier
+            if (campaign.getCampaignOptions().isUseSkillModifiers()) {
+                LocalDate today = campaign.getLocalDate();
+                LocalDate lastPromotionDate = person.getLastRankChangeDate();
+
+                long monthsBetween = ChronoUnit.MONTHS.between(lastPromotionDate, today);
+
+                if (monthsBetween <= 6) {
+                    targetNumber.addModifier(- 1, resources.getString("recentpromotion.text"));
+                }
+            }
+
             // Fatigue modifier
             if ((campaign.getCampaignOptions().isUseFatigue())
                     && (campaign.getCampaignOptions().isUseFatigueModifiers())) {
