@@ -288,12 +288,14 @@ public class ChooseRefitDialog extends JDialog {
         List<Refit> refits = new ArrayList<>();
         Entity e = unit.getEntity();
         for (String model : Utilities.getAllVariants(e, campaign)) {
-            MekSummary summary = MekSummaryCache.getInstance().getMek(e.getFullChassis() + " " + model);
+            model = ((model == null) || model.isBlank()) ? "" : " " + model;
+            MekSummary summary = MekSummaryCache.getInstance().getMek(e.getFullChassis() + model);
             if (null == summary) {
                 // Attempt to deal with new naming scheme directly
                 summary = MekSummaryCache.getInstance()
-                        .getMek(e.getChassis() + " (" + e.getClanChassisName() + ") " + model);
+                        .getMek(e.getChassis() + " (" + e.getClanChassisName() + ")" + model);
                 if (null == summary) {
+                    // We should REALLY be throwing an exception here.
                     continue;
                 }
             }
