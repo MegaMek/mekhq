@@ -4,9 +4,7 @@ import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
-import mekhq.campaign.personnel.enums.RandomDivorceMethod;
-import mekhq.campaign.personnel.enums.RandomMarriageMethod;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -106,6 +104,36 @@ public class LifePathsTab {
     private JSpinner spnRandomDivorceDiceSize;
     //end Divorce Tab
 
+    //start Procreation Tab
+    private JCheckBox chkUseManualProcreation;
+    private JCheckBox chkUseClanPersonnelProcreation;
+    private JCheckBox chkUsePrisonerProcreation;
+    private JLabel lblMultiplePregnancyOccurrences;
+    private JSpinner spnMultiplePregnancyOccurrences;
+    private JLabel lblBabySurnameStyle;
+    private MMComboBox<BabySurnameStyle> comboBabySurnameStyle;
+    private JCheckBox chkAssignNonPrisonerBabiesFounderTag;
+    private JCheckBox chkAssignChildrenOfFoundersFounderTag;
+    private JCheckBox chkDetermineFatherAtBirth;
+    private JCheckBox chkDisplayTrueDueDate;
+    private JLabel lblNoInterestInChildrenDiceSize;
+    private JSpinner spnNoInterestInChildrenDiceSize;
+    private JCheckBox chkUseMaternityLeave;
+    private JCheckBox chkLogProcreation;
+
+    private JPanel pnlProcreationGeneralOptionsPanel;
+    private JPanel pnlRandomProcreationPanel;
+    private JLabel lblRandomProcreationMethod;
+    private MMComboBox<RandomProcreationMethod> comboRandomProcreationMethod;
+    private JCheckBox chkUseRelationshiplessRandomProcreation;
+    private JCheckBox chkUseRandomClanPersonnelProcreation;
+    private JCheckBox chkUseRandomPrisonerProcreation;
+    private JLabel lblRandomProcreationRelationshipDiceSize;
+    private JSpinner spnRandomProcreationRelationshipDiceSize;
+    private JLabel lblRandomProcreationRelationshiplessDiceSize;
+    private JSpinner spnRandomProcreationRelationshiplessDiceSize;
+    //end Procreation Tab
+
     /**
      * Represents a tab for repair and maintenance in an application.
      */
@@ -202,6 +230,36 @@ public class LifePathsTab {
         chkUseRandomPrisonerDivorce = new JCheckBox();
         lblRandomDivorceDiceSize = new JLabel();
         spnRandomDivorceDiceSize = new JSpinner();
+
+        // Procreation Tab
+        pnlProcreationGeneralOptionsPanel = new JPanel();
+        chkUseManualProcreation = new JCheckBox();
+        chkUseClanPersonnelProcreation = new JCheckBox();
+        chkUsePrisonerProcreation = new JCheckBox();
+        lblMultiplePregnancyOccurrences = new JLabel();
+        spnMultiplePregnancyOccurrences = new JSpinner();
+        lblBabySurnameStyle = new JLabel();
+        comboBabySurnameStyle = new MMComboBox<>("comboBabySurnameStyle", BabySurnameStyle.values());
+        chkAssignNonPrisonerBabiesFounderTag = new JCheckBox();
+        chkAssignChildrenOfFoundersFounderTag = new JCheckBox();
+        chkDetermineFatherAtBirth = new JCheckBox();
+        chkDisplayTrueDueDate = new JCheckBox();
+        lblNoInterestInChildrenDiceSize = new JLabel();
+        spnNoInterestInChildrenDiceSize = new JSpinner();
+        chkUseMaternityLeave = new JCheckBox();
+        chkLogProcreation = new JCheckBox();
+
+        pnlRandomProcreationPanel = new JPanel();
+        lblRandomProcreationMethod = new JLabel();
+        comboRandomProcreationMethod = new MMComboBox<>("comboRandomProcreationMethod",
+            RandomProcreationMethod.values());
+        chkUseRelationshiplessRandomProcreation = new JCheckBox();
+        chkUseRandomClanPersonnelProcreation = new JCheckBox();
+        chkUseRandomPrisonerProcreation = new JCheckBox();
+        lblRandomProcreationRelationshipDiceSize = new JLabel();
+        spnRandomProcreationRelationshipDiceSize = new JSpinner();
+        lblRandomProcreationRelationshiplessDiceSize = new JLabel();
+        spnRandomProcreationRelationshiplessDiceSize = new JSpinner();
     }
 
     /**
@@ -568,7 +626,8 @@ public class LifePathsTab {
                     .addComponent(headerPanel, Alignment.CENTER)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(pnlMarriageGeneralOptions)
-                        .addComponent(pnlRandomMarriage))));
+                        .addComponent(pnlRandomMarriage)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "MarriageTab");
@@ -875,6 +934,12 @@ public class LifePathsTab {
         return panel;
     }
 
+    /**
+     * Creates a panel for the Procreation tab with header, general options panel, and random procreation panel.
+     *
+     * @return a {@link JPanel} representing the Procreation tab with header, general options panel,
+     * and random procreation panel
+     */
     JPanel createProcreationTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("ProcreationTab",
@@ -882,35 +947,207 @@ public class LifePathsTab {
             false, "", true);
 
         // Contents
-        chkUseManualDivorce = createCheckBox("UseManualDivorce", null);
-        chkUseClanPersonnelDivorce = createCheckBox("UseClanPersonnelDivorce", null);
-        chkUsePrisonerDivorce = createCheckBox("UsePrisonerDivorce", null);
-
-        pnlRandomDivorce = createRandomDivorcePanel();
+        pnlProcreationGeneralOptionsPanel = createProcreationGeneralOptionsPanel();
+        pnlRandomProcreationPanel = createRandomProcreationPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("DivorceTab", true, "");
+        final JPanel panel = createStandardPanel("ProcreationTab", true, "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
             layout.createSequentialGroup()
                 .addComponent(headerPanel)
-                .addComponent(chkUseManualDivorce)
-                .addComponent(chkUseClanPersonnelDivorce)
-                .addComponent(chkUsePrisonerDivorce)
-                .addComponent(pnlRandomDivorce));
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(pnlProcreationGeneralOptionsPanel)
+                    .addComponent(pnlRandomProcreationPanel)));
 
         layout.setHorizontalGroup(
             layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
                     .addComponent(headerPanel, Alignment.CENTER)
-                        .addComponent(chkUseManualDivorce)
-                        .addComponent(chkUseClanPersonnelDivorce)
-                        .addComponent(chkUsePrisonerDivorce)
-                        .addComponent(pnlRandomDivorce)));
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(pnlProcreationGeneralOptionsPanel)
+                        .addComponent(pnlRandomProcreationPanel)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "DivorceTab");
+        return createParentPanel(panel, "ProcreationTab");
+    }
+
+    /**
+     * @return the {@link JPanel} containing the procreation settings components
+     */
+    JPanel createProcreationGeneralOptionsPanel() {
+        // Contents
+        chkUseManualProcreation = createCheckBox("UseManualProcreation", null);
+        chkUseClanPersonnelProcreation = createCheckBox("UseClanPersonnelProcreation", null);
+        chkUsePrisonerProcreation = createCheckBox("UsePrisonerProcreation", null);
+
+        lblMultiplePregnancyOccurrences = createLabel("MultiplePregnancyOccurrences", null);
+        spnMultiplePregnancyOccurrences = createSpinner("MultiplePregnancyOccurrences", null,
+            50, 1, 1000, 1);
+
+        lblBabySurnameStyle = createLabel("BabySurnameStyle", null);
+        comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof BabySurnameStyle) {
+                    list.setToolTipText(((BabySurnameStyle) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
+        chkAssignNonPrisonerBabiesFounderTag = createCheckBox("AssignNonPrisonerBabiesFounderTag",
+            null);
+        chkAssignChildrenOfFoundersFounderTag = createCheckBox("AssignChildrenOfFoundersFounderTag",
+            null);
+        chkDetermineFatherAtBirth = createCheckBox("DetermineFatherAtBirth", null);
+        chkDisplayTrueDueDate = createCheckBox("DisplayTrueDueDate", null);
+
+        lblNoInterestInChildrenDiceSize = createLabel("NoInterestInChildrenDiceSize", null);
+        spnNoInterestInChildrenDiceSize = createSpinner("NoInterestInChildrenDiceSize", null,
+            3, 1, 100000, 1);
+
+        chkUseMaternityLeave = createCheckBox("UseMaternityLeave", null);
+        chkLogProcreation = createCheckBox("LogProcreation", null);
+
+        pnlRandomProcreationPanel = createRandomProcreationPanel();
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("ProcreationGeneralOptionsPanel",
+            false, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(chkUseManualProcreation)
+                .addComponent(chkUseClanPersonnelProcreation)
+                .addComponent(chkUsePrisonerProcreation)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblMultiplePregnancyOccurrences)
+                    .addComponent(spnMultiplePregnancyOccurrences))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblBabySurnameStyle)
+                    .addComponent(comboBabySurnameStyle))
+                .addComponent(chkAssignNonPrisonerBabiesFounderTag)
+                .addComponent(chkAssignChildrenOfFoundersFounderTag)
+                .addComponent(chkDetermineFatherAtBirth)
+                .addComponent(chkDisplayTrueDueDate)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblNoInterestInChildrenDiceSize)
+                    .addComponent(spnNoInterestInChildrenDiceSize))
+                .addComponent(chkUseMaternityLeave)
+                .addComponent(chkLogProcreation));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(chkUseManualProcreation)
+                    .addComponent(chkUseClanPersonnelProcreation)
+                    .addComponent(chkUsePrisonerProcreation)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblMultiplePregnancyOccurrences)
+                        .addComponent(spnMultiplePregnancyOccurrences)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblBabySurnameStyle)
+                        .addComponent(comboBabySurnameStyle)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(chkAssignNonPrisonerBabiesFounderTag)
+                    .addComponent(chkAssignChildrenOfFoundersFounderTag)
+                    .addComponent(chkDetermineFatherAtBirth)
+                    .addComponent(chkDisplayTrueDueDate)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(lblNoInterestInChildrenDiceSize)
+                            .addComponent(spnNoInterestInChildrenDiceSize)
+                            .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        .addComponent(chkUseMaternityLeave)
+                        .addComponent(chkLogProcreation)));
+
+        return panel;
+    }
+
+    /**
+     * @return a {@link JPanel} containing the configured components for random procreation settings
+     */
+    JPanel createRandomProcreationPanel() {
+        // Contents
+        lblRandomProcreationMethod = createLabel("RandomProcreationMethod", null);
+        comboRandomProcreationMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomProcreationMethod) {
+                    list.setToolTipText(((RandomProcreationMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
+        chkUseRelationshiplessRandomProcreation =createCheckBox("UseRelationshiplessRandomProcreation",
+            null);
+        chkUseRandomClanPersonnelProcreation = createCheckBox("UseRandomClanPersonnelProcreation",
+            null);
+        chkUseRandomPrisonerProcreation = createCheckBox("UseRandomPrisonerProcreation", null);
+
+        lblRandomProcreationRelationshipDiceSize = createLabel("RandomProcreationRelationshipDiceSize",
+            null);
+        spnRandomProcreationRelationshipDiceSize = createSpinner("RandomProcreationRelationshipDiceSize",
+            null, 621, 0, 100000, 1);
+
+        lblRandomProcreationRelationshiplessDiceSize = createLabel("RandomProcreationRelationshiplessDiceSize",
+            null);
+        spnRandomProcreationRelationshiplessDiceSize = createSpinner("RandomProcreationRelationshiplessDiceSize",
+            null, 1861, 0, 100000, 1);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("RandomProcreationPanel", true,
+            "RandomProcreationPanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblRandomProcreationMethod)
+                    .addComponent(comboRandomProcreationMethod))
+                .addComponent(chkUseRelationshiplessRandomProcreation)
+                .addComponent(chkUseRandomClanPersonnelProcreation)
+                .addComponent(chkUseRandomPrisonerProcreation)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblRandomProcreationRelationshipDiceSize)
+                    .addComponent(spnRandomProcreationRelationshipDiceSize))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblRandomProcreationRelationshiplessDiceSize)
+                    .addComponent(spnRandomProcreationRelationshiplessDiceSize)));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblRandomProcreationMethod)
+                        .addComponent(comboRandomProcreationMethod)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(chkUseRelationshiplessRandomProcreation)
+                    .addComponent(chkUseRandomClanPersonnelProcreation)
+                    .addComponent(chkUseRandomPrisonerProcreation)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblRandomProcreationRelationshipDiceSize)
+                        .addComponent(spnRandomProcreationRelationshipDiceSize)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblRandomProcreationRelationshiplessDiceSize)
+                        .addComponent(spnRandomProcreationRelationshiplessDiceSize)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+
+        return panel;
     }
 }
