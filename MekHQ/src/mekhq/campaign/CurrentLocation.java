@@ -138,26 +138,55 @@ public class CurrentLocation {
     public String getReport(LocalDate date) {
         StringBuilder sb = new StringBuilder();
         sb.append("<html><b>Current Location</b><br>")
-                .append(currentSystem.getPrintableName(date)).append("<br>");
-        if ((null != jumpPath) && !jumpPath.isEmpty()) {
-            sb.append("In transit to ").append(jumpPath.getLastSystem().getPrintableName(date)).append(" ");
-        }
+
+        // First Line
+            .append("In ")
+            .append(currentSystem.getPrintableName(date))
+            .append(' ');
 
         if (isOnPlanet()) {
-            sb.append("<i>on planet</i>");
+            sb.append("on planet ")
+            .append(getPlanet().getPrintableName(date));
         } else if (isAtJumpPoint()) {
-            sb.append("<i>at jump point</i>");
+            sb.append("at jump point");
+            if (!Double.isInfinite(currentSystem.getRechargeTime(date))) {
+                sb.append(" (Jumpship ")
+                        .append(String.format(Locale.ROOT, "%.0f",
+                                (100.0 * rechargeTime) / currentSystem.getRechargeTime(date)))
+                        .append("% charged)");
+            }
         } else {
-            sb.append("<i>").append(String.format(Locale.ROOT, "%.2f", getTransitTime()))
-                    .append(" days out </i>");
+            if(currentSystem == jumpPath.getLastSystem()) {
+                sb.append(String.format(Locale.ROOT, "%.2f", getTransitTime()))
+                    .append(" days from planet");
+            } else {
+                double timeToJP = currentSystem.getTimeToJumpPoint(1.0) - getTransitTime();
+                sb.append(String.format(Locale.ROOT, "%.2f", timeToJP))
+                    .append(" days from jump point");
+            }
+
         }
-        if (!Double.isInfinite(currentSystem.getRechargeTime(date))) {
-            sb.append(", <i>")
-                    .append(String.format(Locale.ROOT, "%.0f",
-                            (100.0 * rechargeTime) / currentSystem.getRechargeTime(date)))
-                    .append("% charged </i>");
+        
+        sb.append("<br/>");
+
+        // Second Line
+
+        if ((null != jumpPath) && !jumpPath.isEmpty()) {
+            sb.append("Traveling to ")
+                .append(jumpPath.getLastSystem().getPrintableName(date))
+                .append(": ");
+                if(jumpPath.getJumps() > 0) {
+                    sb.append(jumpPath.getJumps())
+                        .append(jumpPath.getJumps() == 1 ? " jump remaining" : " jumps remaining");
+                } else {
+                    sb.append("In destination system");
+                }
+        } else {
+            sb.append("Not traveling");
         }
-        return sb.append("</html>").toString();
+
+        sb.append("</html>");
+        return sb.toString();
     }
 
     public JumpPath getJumpPath() {
