@@ -5,6 +5,7 @@ import megamek.logging.MMLogger;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JSpinner.DefaultEditor;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +76,9 @@ public class CampaignOptionsUtilities {
         jSpinner.setModel(new SpinnerNumberModel(defaultValue, minimum, maximum, stepSize));
         jSpinner.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jSpinner.setName("spn" + name);
+
+        DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
+        editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
 
         Dimension size = jSpinner.getPreferredSize();
         jSpinner.setMaximumSize(size);
