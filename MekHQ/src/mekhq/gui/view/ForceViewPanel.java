@@ -30,7 +30,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
-import mekhq.utilities.ReportingUtilities.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,7 +43,6 @@ import java.util.UUID;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceViewPanel extends JScrollablePanel {
-    private static final MMLogger logger = MMLogger.create(ForceViewPanel.class);
     private final Force force;
     private final Campaign campaign;
 
@@ -480,7 +478,7 @@ public class ForceViewPanel extends JScrollablePanel {
             if(unit.getEntity().getCrew().getHits() != 1) {
                 hitsMessage.append('s');
             }
-            toReturn.append(messageSurroundedBySpanWithColor(
+            toReturn.append(mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor(
                 MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage.toString()));
         }
         toReturn.append("</font></html>");
