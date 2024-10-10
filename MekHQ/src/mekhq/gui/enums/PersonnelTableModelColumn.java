@@ -667,7 +667,7 @@ public enum PersonnelTableModelColumn {
                         : "-";
             case INJURIES:
                 if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
-                    return Integer.toString(person.getInjuries().size())
+                    return Integer.toString(person.getInjuries().size());
                 } else { 
                     return Integer.toString(person.getHits());
                 }

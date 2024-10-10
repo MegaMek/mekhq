@@ -458,14 +458,45 @@ public class ForceViewPanel extends JScrollablePanel {
     }
 
     public String getForceSummary(Person person, Unit unit) {
-        String toReturn = "<html><font size='3'><b>" + person.getFullTitle() + "</b><br/>";
-        toReturn += person.getSkillLevel(campaign, false) + " " + person.getRoleDesc();
-        if (null != unit && null != unit.getEntity()
-                && null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
-            toReturn += "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><font size='3'><b>")
+            .append(person.getFullTitle())
+            .append("</b><br/>")
+            .append(person.getSkillLevel(campaign, false))
+            .append(' ')
+            .append(person.getRoleDesc());
+        
+        if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+            if (person.hasInjuries(true)) {
+                
+                int injuryCount = person.getInjuries().size();
+
+                StringBuilder injuriesMessage = new StringBuilder(16);
+                injuriesMessage.append(' ')
+                    .append(injuryCount)
+                    .append(injuryCount == 1 ? " injury" : " injuries");
+                
+                toReturn.append(mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), injuriesMessage.toString()));
+            }
+
+        } else {
+            if (null != unit && null != unit.getEntity() && null != unit.getEntity().getCrew()
+                    && unit.getEntity().getCrew().getHits() > 0) {
+                
+                int hitCount = unit.getEntity().getCrew().getHits();
+
+                StringBuilder hitsMessage = new StringBuilder(16);
+                hitsMessage.append(' ')
+                    .append(hitCount)
+                    .append(hitCount == 1 ? " hit" : " hits");
+
+                toReturn.append(mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage.toString()));
+            }
         }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</font></html>");
+        return toReturn.toString();
     }
 
     public String getForceSummary(Unit unit) {
