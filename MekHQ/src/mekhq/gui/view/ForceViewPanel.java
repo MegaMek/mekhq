@@ -26,9 +26,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.utilities.ReportingUtilities.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,6 +44,7 @@ import java.util.UUID;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class ForceViewPanel extends JScrollablePanel {
+    private static final MMLogger logger = MMLogger.create(ForceViewPanel.class);
     private final Force force;
     private final Campaign campaign;
 
@@ -458,14 +461,30 @@ public class ForceViewPanel extends JScrollablePanel {
     }
 
     public String getForceSummary(Person person, Unit unit) {
-        String toReturn = "<html><font size='3'><b>" + person.getFullTitle() + "</b><br/>";
-        toReturn += person.getSkillLevel(campaign, false) + " " + person.getRoleDesc();
-        if (null != unit && null != unit.getEntity()
-                && null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
-            toReturn += "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><font size='3'><b>")
+            .append(person.getFullTitle())
+            .append("</b><br/><b>")
+            .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
+            .append("</b> ")
+            .append(person.getRoleDesc());
+
+        if (null != unit && null != unit.getEntity() && null != unit.getEntity().getCrew()
+                && unit.getEntity().getCrew().getHits() > 0) {
+            // TODO: Make work for advanced medical system.
+            toReturn.append(' ');
+            
+            StringBuilder hitsMessage = new StringBuilder(16);
+            hitsMessage.append(unit.getEntity().getCrew().getHits())
+                .append(" hit");
+            if(unit.getEntity().getCrew().getHits() != 1) {
+                hitsMessage.append('s');
+            }
+            toReturn.append(messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage.toString()));
         }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</font></html>");
+        return toReturn.toString();
     }
 
     public String getForceSummary(Unit unit) {
