@@ -127,7 +127,7 @@ public class RefitTest {
                 oldUnit.initializeParts(false);
 
                 // Create the Refit
-                Refit refit = new Refit(oldUnit, newEntity, false, false);
+                Refit refit = new Refit(oldUnit, newEntity, false, false, false);
                 assertEquals(mockCampaign, refit.getCampaign());
 
                 // Should be old parts...
@@ -157,7 +157,7 @@ public class RefitTest {
                 oldUnit.initializeParts(false);
 
                 // Create the Refit
-                Refit refit = new Refit(oldUnit, newEntity, false, false);
+                Refit refit = new Refit(oldUnit, newEntity, false, false, false);
                 assertEquals(mockCampaign, refit.getCampaign());
 
                 //
@@ -239,7 +239,7 @@ public class RefitTest {
                 }
 
                 // Create the Refit
-                Refit refit = new Refit(oldUnit, newEntity, false, false);
+                Refit refit = new Refit(oldUnit, newEntity, false, false, false);
 
                 // Write the Refit XML
                 StringWriter sw = new StringWriter();
@@ -346,7 +346,7 @@ public class RefitTest {
                 oldUnit.initializeParts(false);
 
                 // Create the Refit
-                Refit refit = new Refit(oldUnit, newEntity, false, false);
+                Refit refit = new Refit(oldUnit, newEntity, false, false, false);
                 assertEquals(mockCampaign, refit.getCampaign());
 
                 //
@@ -429,7 +429,7 @@ public class RefitTest {
                 }
 
                 // Create the Refit
-                Refit refit = new Refit(oldUnit, newEntity, false, false);
+                Refit refit = new Refit(oldUnit, newEntity, false, false, false);
                 refit.setTech(mockTech);
                 refit.addTimeSpent(60); // 1 hour of work!
 
@@ -538,7 +538,7 @@ public class RefitTest {
                 oldUnit.initializeParts(false);
 
                 // Create the Refit
-                Refit refit = new Refit(oldUnit, newEntity, false, false);
+                Refit refit = new Refit(oldUnit, newEntity, false, false, false);
                 assertEquals(mockCampaign, refit.getCampaign());
 
                 //
@@ -648,7 +648,7 @@ public class RefitTest {
                 }
 
                 // Create the Refit
-                Refit refit = new Refit(oldUnit, newEntity, false, false);
+                Refit refit = new Refit(oldUnit, newEntity, false, false, false);
                 refit.setTech(mockTech);
                 refit.addTimeSpent(60); // 1 hour of work!
 
@@ -769,7 +769,7 @@ public class RefitTest {
                 oldUnit.initializeParts(false);
 
                 // Create the Refit
-                Refit refit = new Refit(oldUnit, newEntity, false, false);
+                Refit refit = new Refit(oldUnit, newEntity, false, false, false);
                 assertEquals(mockCampaign, refit.getCampaign());
 
                 // We're removing 4 Machine Guns and a Full Bin of Machine Gun Ammo
@@ -820,7 +820,7 @@ public class RefitTest {
                 oldUnit.initializeParts(false);
 
                 // Create the Refit
-                Refit refit = new Refit(oldUnit, newEntity, false, false);
+                Refit refit = new Refit(oldUnit, newEntity, false, false, false);
                 assertEquals(mockCampaign, refit.getCampaign());
 
                 // Omni reconfiguration

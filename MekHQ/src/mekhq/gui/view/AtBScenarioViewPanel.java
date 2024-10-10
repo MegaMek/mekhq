@@ -797,22 +797,26 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private void rerollBattleConditions() {
         if (chkReroll[REROLL_TERRAIN] != null && chkReroll[REROLL_TERRAIN].isSelected()) {
             scenario.setTerrain();
-            scenario.setMapFile();
+            scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
             scenario.useReroll();
             chkReroll[REROLL_TERRAIN].setSelected(false);
             lblTerrainDesc.setText(scenario.getTerrainType());
-            lblMapDesc.setText(scenario.getMap());
+            lblMapDesc.setText(scenario.getMapForDisplay());
+            lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
         if (chkReroll[REROLL_MAP] != null && chkReroll[REROLL_MAP].isSelected()) {
-            scenario.setMapFile();
+            scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
             scenario.useReroll();
             chkReroll[REROLL_MAP].setSelected(false);
-            lblMapDesc.setText(scenario.getMap());
+            lblMapDesc.setText(scenario.getMapForDisplay());
+            lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
         if (chkReroll[REROLL_MAPSIZE] != null && chkReroll[REROLL_MAPSIZE].isSelected()) {
             scenario.setMapSize();
+            scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
             scenario.useReroll();
             chkReroll[REROLL_MAPSIZE].setSelected(false);
+            lblMapDesc.setText(scenario.getMapForDisplay());
             lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
         if (chkReroll[REROLL_LIGHT] != null && chkReroll[REROLL_LIGHT].isSelected()) {
