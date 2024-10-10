@@ -14,6 +14,8 @@ import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
@@ -133,6 +135,20 @@ public class LifePathsTab {
     private JLabel lblRandomProcreationRelationshiplessDiceSize;
     private JSpinner spnRandomProcreationRelationshiplessDiceSize;
     //end Procreation Tab
+
+    //start Death Tab
+    private JCheckBox chkKeepMarriedNameUponSpouseDeath;
+    private JLabel lblRandomDeathMethod;
+    private MMComboBox<RandomDeathMethod> comboRandomDeathMethod;
+    private JCheckBox chkUseRandomClanPersonnelDeath;
+    private JCheckBox chkUseRandomPrisonerDeath;
+    private JCheckBox chkUseRandomDeathSuicideCause;
+    private JLabel lblPercentageRandomDeathChance;
+    private JSpinner spnPercentageRandomDeathChance;
+
+    private JPanel pnlDeathAgeGroup;
+    private Map<AgeGroup, JCheckBox> chkEnabledRandomDeathAgeGroups;
+    //end Death Tab
 
     /**
      * Represents a tab for repair and maintenance in an application.
@@ -260,6 +276,19 @@ public class LifePathsTab {
         spnRandomProcreationRelationshipDiceSize = new JSpinner();
         lblRandomProcreationRelationshiplessDiceSize = new JLabel();
         spnRandomProcreationRelationshiplessDiceSize = new JSpinner();
+
+        // Death Tab
+        chkKeepMarriedNameUponSpouseDeath = new JCheckBox();
+        lblRandomDeathMethod = new JLabel();
+        comboRandomDeathMethod = new MMComboBox<>("comboRandomDeathMethod", RandomDeathMethod.values());
+        chkUseRandomClanPersonnelDeath = new JCheckBox();
+        chkUseRandomPrisonerDeath = new JCheckBox();
+        chkUseRandomDeathSuicideCause = new JCheckBox();
+        lblPercentageRandomDeathChance = new JLabel();
+        spnPercentageRandomDeathChance = new JSpinner();
+
+        pnlDeathAgeGroup = new JPanel();
+        chkEnabledRandomDeathAgeGroups = new HashMap<>();
     }
 
     /**
@@ -1147,6 +1176,115 @@ public class LifePathsTab {
                         .addComponent(lblRandomProcreationRelationshiplessDiceSize)
                         .addComponent(spnRandomProcreationRelationshiplessDiceSize)
                         .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+
+        return panel;
+    }
+
+    /**
+     * Creates and returns a {@link JPanel} for the Death Tab.
+     * The panel includes header, various checkboxes, labels, spinners, and a custom combo box.
+     *
+     * @return {@link JPanel} representing the Death Tab with all its components
+     */
+    JPanel createDeathTab() {
+        // Header
+        JPanel headerPanel = createHeaderPanel("DeathTab",
+            getImageDirectory() + "logo_filtvelt_coalition.png",
+            false, "", true);
+
+        // Contents
+        chkKeepMarriedNameUponSpouseDeath = createCheckBox("KeepMarriedNameUponSpouseDeath",
+            null);
+
+        lblRandomDeathMethod = createLabel("RandomDeathMethod", null);
+        comboRandomDeathMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof RandomDeathMethod) {
+                    list.setToolTipText(((RandomDeathMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
+        chkUseRandomClanPersonnelDeath = createCheckBox("UseRandomClanPersonnelDeath",
+            null);
+        chkUseRandomPrisonerDeath = createCheckBox("UseRandomPrisonerDeath", null);
+        chkUseRandomDeathSuicideCause = createCheckBox("UseRandomDeathSuicideCause", null);
+
+        pnlDeathAgeGroup = createDeathAgeGroupsPanel();
+
+        lblPercentageRandomDeathChance = createLabel("PercentageRandomDeathChance", null);
+        spnPercentageRandomDeathChance = createSpinner("PercentageRandomDeathChance", null,
+            0, 0, 100, 0.000001);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("DeathTab", true, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(headerPanel)
+                .addComponent(chkKeepMarriedNameUponSpouseDeath)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblRandomDeathMethod)
+                    .addComponent(comboRandomDeathMethod))
+                .addComponent(chkUseRandomClanPersonnelDeath)
+                .addComponent(chkUseRandomPrisonerDeath)
+                .addComponent(chkUseRandomDeathSuicideCause)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPercentageRandomDeathChance)
+                    .addComponent(spnPercentageRandomDeathChance))
+                .addComponent(pnlDeathAgeGroup));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(headerPanel, Alignment.CENTER)
+                    .addComponent(chkKeepMarriedNameUponSpouseDeath)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblRandomDeathMethod)
+                        .addComponent(comboRandomDeathMethod)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(chkUseRandomClanPersonnelDeath)
+                    .addComponent(chkUseRandomPrisonerDeath)
+                    .addComponent(chkUseRandomDeathSuicideCause)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(lblPercentageRandomDeathChance)
+                            .addComponent(spnPercentageRandomDeathChance)
+                            .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        .addComponent(pnlDeathAgeGroup)));
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "DeathTab");
+    }
+
+    /**
+     * Creates a panel for the Death Age Groups tab with checkboxes for different age groups
+     *
+     * @return a {@link JPanel} representing the Death Age Groups tab with checkboxes for each age group
+     */
+    JPanel createDeathAgeGroupsPanel() {
+        final AgeGroup[] ageGroups = AgeGroup.values();
+
+        // Create the Panel
+        final JPanel panel = createStandardPanel("DeathAgeGroupsPanel", true,
+            "DeathAgeGroupsPanel");
+        panel.setLayout(new GridLayout(1, ageGroups.length));
+
+        // Contents
+        for (final AgeGroup ageGroup : ageGroups) {
+            final JCheckBox checkBox = new JCheckBox(ageGroup.toString());
+            checkBox.setToolTipText(ageGroup.getToolTipText());
+            checkBox.setName("chk" + ageGroup);
+
+            panel.add(checkBox);
+            chkEnabledRandomDeathAgeGroups.put(ageGroup, checkBox);
+        }
 
         return panel;
     }

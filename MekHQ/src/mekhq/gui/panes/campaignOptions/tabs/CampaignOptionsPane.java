@@ -128,7 +128,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "backgroundsTab", lifePathsTab.createBackgroundsTab(),
             "marriageTab", lifePathsTab.createMarriageTab(),
             "divorceTab", lifePathsTab.createDivorceTab(),
-            "procreationTab", lifePathsTab.createProcreationTab()));
+            "procreationTab", lifePathsTab.createProcreationTab(),
+            "deathTab", lifePathsTab.createDeathTab()));
 
         // Turnover and Retention
         // Name and Portrait Generation
