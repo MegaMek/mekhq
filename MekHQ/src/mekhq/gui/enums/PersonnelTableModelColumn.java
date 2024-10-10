@@ -666,7 +666,11 @@ public enum PersonnelTableModelColumn {
                         ? Integer.toString(person.getSkill(SkillType.S_SCROUNGE).getFinalSkillValue())
                         : "-";
             case INJURIES:
-                return Integer.toString(person.getHits());
+                if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+                    return Integer.toString(person.getInjuries().size())
+                } else { 
+                    return Integer.toString(person.getHits());
+                }
             case KILLS:
                 return Integer.toString(campaign.getKillsFor(person.getId()).size());
             case SALARY:
