@@ -874,4 +874,43 @@ public class LifePathsTab {
 
         return panel;
     }
+
+    JPanel createProcreationTab() {
+        // Header
+        JPanel headerPanel = createHeaderPanel("ProcreationTab",
+            getImageDirectory() + "logo_clan_ice_hellion.png",
+            false, "", true);
+
+        // Contents
+        chkUseManualDivorce = createCheckBox("UseManualDivorce", null);
+        chkUseClanPersonnelDivorce = createCheckBox("UseClanPersonnelDivorce", null);
+        chkUsePrisonerDivorce = createCheckBox("UsePrisonerDivorce", null);
+
+        pnlRandomDivorce = createRandomDivorcePanel();
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("DivorceTab", true, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(headerPanel)
+                .addComponent(chkUseManualDivorce)
+                .addComponent(chkUseClanPersonnelDivorce)
+                .addComponent(chkUsePrisonerDivorce)
+                .addComponent(pnlRandomDivorce));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(headerPanel, Alignment.CENTER)
+                        .addComponent(chkUseManualDivorce)
+                        .addComponent(chkUseClanPersonnelDivorce)
+                        .addComponent(chkUsePrisonerDivorce)
+                        .addComponent(pnlRandomDivorce)));
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "DivorceTab");
+    }
 }
