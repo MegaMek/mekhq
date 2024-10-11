@@ -72,6 +72,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private JCheckBox optionHistoricalDailyLog;
         private JCheckBox chkCompanyGeneratorStartup;
         private JCheckBox chkShowCompanyGenerator;
+        private JCheckBox chkShowUnitPicturesOnTOE;
 
         // region Command Center Tab
         private JCheckBox optionCommandCenterUseUnitMarket;
@@ -258,6 +259,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 chkShowCompanyGenerator.setToolTipText(resources.getString("chkShowCompanyGenerator.toolTipText"));
                 chkShowCompanyGenerator.setName("chkShowCompanyGenerator");
 
+                chkShowUnitPicturesOnTOE = new JCheckBox(resources.getString("chkShowUnitPicturesOnTOE.text"));
+                chkShowUnitPicturesOnTOE.setToolTipText(resources.getString("chkShowUnitPicturesOnTOE.toolTipText"));
+                chkShowUnitPicturesOnTOE.setName("chkShowUnitPicturesOnTOE");
+                
                 // region Command Center Tab
                 JLabel labelCommandCenterDisplay = new JLabel(resources.getString("labelCommandCenterDisplay.text"));
 
@@ -413,6 +418,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addComponent(optionHistoricalDailyLog)
                                                 .addComponent(chkCompanyGeneratorStartup)
                                                 .addComponent(chkShowCompanyGenerator)
+                                                .addComponent(chkShowUnitPicturesOnTOE)
                                                 .addComponent(labelCommandCenterDisplay)
                                                 .addComponent(optionCommandCenterUseUnitMarket)
                                                 .addComponent(optionCommandCenterMRMS)
@@ -452,6 +458,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addComponent(optionHistoricalDailyLog)
                                                 .addComponent(chkCompanyGeneratorStartup)
                                                 .addComponent(chkShowCompanyGenerator)
+                                                .addComponent(chkShowUnitPicturesOnTOE)
                                                 .addComponent(labelCommandCenterDisplay)
                                                 .addComponent(optionCommandCenterUseUnitMarket)
                                                 .addComponent(optionCommandCenterMRMS)
@@ -1266,6 +1273,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 MekHQ.getMHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
                 MekHQ.getMHQOptions().setCompanyGeneratorStartup(chkCompanyGeneratorStartup.isSelected());
                 MekHQ.getMHQOptions().setShowCompanyGenerator(chkShowCompanyGenerator.isSelected());
+                MekHQ.getMHQOptions().setShowUnitPicturesOnTOE(chkShowUnitPicturesOnTOE.isSelected());
 
                 // Command Center Tab
                 MekHQ.getMHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
@@ -1406,6 +1414,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 optionHistoricalDailyLog.setSelected(MekHQ.getMHQOptions().getHistoricalDailyLog());
                 chkCompanyGeneratorStartup.setSelected(MekHQ.getMHQOptions().getCompanyGeneratorStartup());
                 chkShowCompanyGenerator.setSelected(MekHQ.getMHQOptions().getShowCompanyGenerator());
+                chkShowUnitPicturesOnTOE.setSelected(MekHQ.getMHQOptions().getShowUnitPicturesOnTOE());
 
                 // Command Center Tab
                 optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMHQOptions().getCommandCenterUseUnitMarket());
