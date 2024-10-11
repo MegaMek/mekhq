@@ -121,7 +121,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "salariesTab", personnelTab.createSalariesTab()));
 
         // Biography
-        biographyTab biographyTab = new biographyTab(campaign, getFrame(), "biographyTab");
+        BiographyTab biographyTab = new BiographyTab(campaign, getFrame(), "biographyTab");
 
         JTabbedPane biographyContentTabs = createSubTabs(Map.of(
             "biographyGeneralTab", biographyTab.createGeneralTab(),

@@ -24,7 +24,27 @@ import java.util.Map;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
-public class biographyTab {
+/**
+ * The `BiographyTab` class represents the biography settings tab in campaign options.
+ * It is responsible for maintaining and allowing updates to the settings related to biographies
+ * in a campaign. This includes general settings, name and portrait settings, rank settings,
+ * background settings, death settings, and education settings.
+ * <p>
+ * Each area of settings is initialized and managed in its own tab, which allows for organization
+ * and easy navigation settings related to biographic information.
+ * <p>
+ * The class also has a set of fields that dictate the state of the individual settings.
+ * <p>
+ * Some of the key settings managed by this tab include:
+ * - Random XP: a setting that controls the use of Dylan's random XP.
+ * - Gender settings: a set of settings that controls the gender ratio and non-binary dice size.
+ * - Name and portrait settings: a set of settings to control the use of origin factions for names,
+ *   and the behavior of random portraits.
+ * - Education settings: a set of settings to control the usage and specifics of the educational module.
+ * <p>
+ * And many more settings are controlled within this class.
+ */
+public class BiographyTab {
     Campaign campaign;
     JFrame frame;
     String name;
@@ -132,13 +152,13 @@ public class biographyTab {
     //end Rank Tab
 
     /**
-     * Initializes a new {@link biographyTab} with the specified campaign, frame, and name.
+     * Initializes a new {@link BiographyTab} with the specified campaign, frame, and name.
      *
-     * @param campaign the campaign associated with the {@link biographyTab}
-     * @param frame the {@link JFrame} used for displaying the {@link biographyTab}
-     * @param name the name of the {@link biographyTab}
+     * @param campaign the campaign associated with the {@link BiographyTab}
+     * @param frame the {@link JFrame} used for displaying the {@link BiographyTab}
+     * @param name the name of the {@link BiographyTab}
      */
-    biographyTab(Campaign campaign, JFrame frame, String name) {
+    BiographyTab(Campaign campaign, JFrame frame, String name) {
         this.campaign = campaign;
         this.frame = frame;
         this.name = name;
