@@ -260,7 +260,8 @@ public class AtBContract extends Contract {
             Path randomPath = allPaths.get(new Random().nextInt(allPaths.size()));
 
             String fileName = randomPath.getFileName().toString();
-            String fileCategory = randomPath.getParent().toString(); // randomFile.getParent().replaceAll("\\\\", "/");
+            String fileCategory = randomPath.getParent().toString()
+                .replaceAll("\\\\", "/"); // Is this necessary on windows machines?
             fileCategory = fileCategory.replaceAll(ROOT_DIRECTORY, "");
 
             return new Camouflage(fileCategory, fileName);
