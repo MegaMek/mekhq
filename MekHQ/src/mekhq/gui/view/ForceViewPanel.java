@@ -471,8 +471,7 @@ public class ForceViewPanel extends JScrollablePanel {
             .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
             .append("</b> ")
             .append(person.getRoleDesc());
-            .append(person.getRoleDesc());
-        
+                    
         toReturn.append("<br>");
 
         boolean isInjured = false;
