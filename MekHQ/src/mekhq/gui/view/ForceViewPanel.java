@@ -29,6 +29,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.utilities.ReportingUtilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -458,6 +459,10 @@ public class ForceViewPanel extends JScrollablePanel {
     }
 
     public String getForceSummary(Person person, Unit unit) {
+        if(null == person) {
+            return "";
+        }
+
         StringBuilder toReturn = new StringBuilder();
         toReturn.append("<html><font size='3'><b>")
             .append(person.getFullTitle())
@@ -466,9 +471,11 @@ public class ForceViewPanel extends JScrollablePanel {
             .append(' ')
             .append(person.getRoleDesc());
         
+        boolean isInjured = false;
+
         if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
             if (person.hasInjuries(true)) {
-                
+                isInjured = true;
                 int injuryCount = person.getInjuries().size();
 
                 StringBuilder injuriesMessage = new StringBuilder(16);
@@ -476,14 +483,14 @@ public class ForceViewPanel extends JScrollablePanel {
                     .append(injuryCount)
                     .append(injuryCount == 1 ? " injury" : " injuries");
                 
-                toReturn.append(mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor(
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorNegativeHexColor(), injuriesMessage.toString()));
             }
 
         } else {
             if (null != unit && null != unit.getEntity() && null != unit.getEntity().getCrew()
                     && unit.getEntity().getCrew().getHits() > 0) {
-                
+                isInjured = true;
                 int hitCount = unit.getEntity().getCrew().getHits();
 
                 StringBuilder hitsMessage = new StringBuilder(16);
@@ -491,9 +498,23 @@ public class ForceViewPanel extends JScrollablePanel {
                     .append(hitCount)
                     .append(hitCount == 1 ? " hit" : " hits");
 
-                toReturn.append(mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor(
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage.toString()));
             }
+        }
+        if (campaign.getCampaignOptions().isUseFatigue() && (person.getEffectiveFatigue(campaign) > 0)) {
+            if (isInjured) {
+                toReturn.append(',');
+            }
+            toReturn.append(' ');
+
+            StringBuilder fatigueMessage = new StringBuilder(16);
+
+            fatigueMessage.append(person.getEffectiveFatigue(campaign));
+            fatigueMessage.append(" fatigue");
+
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage.toString()));
         }
         toReturn.append("</font></html>");
         return toReturn.toString();
