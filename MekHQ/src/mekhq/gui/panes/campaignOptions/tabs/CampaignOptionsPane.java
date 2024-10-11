@@ -132,6 +132,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "deathTab", lifePathsTab.createDeathTab()));
 
         // Turnover and Retention
+        TurnoverAndRetentionTab turnoverAndRetentionTab = new TurnoverAndRetentionTab(getFrame(),
+            "turnoverAndRetentionTab");
+
+        JTabbedPane turnoverAndRetentionContentTabs = createSubTabs(Map.of(
+            "turnoverTab", turnoverAndRetentionTab.createTurnoverTab(),
+            "fatigueTab", turnoverAndRetentionTab.createFatigueTab()));
         // Name and Portrait Generation
         // Rank Systems
 
@@ -140,6 +146,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             resources.getString("personnelContentTabs.title")), personnelContentTabs);
         humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("lifePathsContentTabs.title")), lifePathsContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("turnoverAndRetentionContentTabs.title")), turnoverAndRetentionContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("humanResourcesParentTab.title")), humanResourcesParentTab);

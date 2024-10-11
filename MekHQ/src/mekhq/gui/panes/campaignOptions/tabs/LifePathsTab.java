@@ -151,7 +151,11 @@ public class LifePathsTab {
     //end Death Tab
 
     /**
-     * Represents a tab for repair and maintenance in an application.
+     * Initializes a new {@link LifePathsTab} with the specified campaign, frame, and name.
+     *
+     * @param campaign the campaign associated with the {@link LifePathsTab}
+     * @param frame the {@link JFrame} used for displaying the {@link LifePathsTab}
+     * @param name the name of the {@link LifePathsTab}
      */
     LifePathsTab(Campaign campaign, JFrame frame, String name) {
         this.campaign = campaign;
@@ -161,6 +165,15 @@ public class LifePathsTab {
         initialize();
     }
 
+    /**
+     * Initializes the state and the UI components for the settings panels.
+     * This includes General, Backgrounds, Marriage, Divorce, Procreation, and Death panels.
+     * Each panel contains multiple aspects of settings such as Randomization, Dice Size, Display of
+     * Anniversaries, Handling of Origin Options, Marriage & Divorce parameters, Probabilities related
+     * to Procreation, and settings for Death scenarios among others.
+     * {@link JCheckBox}, {@link JLabel}, {@link JSlider}, {@link JSpinner} and {@link MMComboBox}
+     * components are thoroughly initialized in this method for handling various settings options.
+     */
     protected void initialize() {
         // General Tab
         chkUseDylansRandomXP = new JCheckBox();
