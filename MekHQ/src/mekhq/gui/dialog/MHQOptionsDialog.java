@@ -129,6 +129,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private ColourSelectorButton optionHealedInjuriesBackground;
         private ColourSelectorButton optionPregnantForeground;
         private ColourSelectorButton optionPregnantBackground;
+        private ColourSelectorButton optionGoneForeground;
+        private ColourSelectorButton optionGoneBackground;
+        private ColourSelectorButton optionAbsentForeground;
+        private ColourSelectorButton optionAbsentBackground;
+        private ColourSelectorButton optionFatiguedForeground;
+        private ColourSelectorButton optionFatiguedBackground;
         private ColourSelectorButton optionStratConHexCoordForeground;
         private ColourSelectorButton optionFontColorNegative;
         private ColourSelectorButton optionFontColorWarning;
@@ -591,6 +597,24 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 optionPregnantBackground = new ColourSelectorButton(
                                 resources.getString("optionPregnantBackground.text"));
 
+                optionGoneForeground = new ColourSelectorButton(
+                                resources.getString("optionGoneForeground.text"));
+
+                optionGoneBackground = new ColourSelectorButton(
+                                resources.getString("optionGoneBackground.text"));
+
+                optionAbsentForeground = new ColourSelectorButton(
+                                resources.getString("optionAbsentForeground.text"));
+                
+                optionAbsentBackground = new ColourSelectorButton(
+                                resources.getString("optionAbsentBackground.text"));
+
+                optionFatiguedForeground = new ColourSelectorButton(
+                                resources.getString("optionFatiguedForeground.text"));
+        
+                optionFatiguedBackground = new ColourSelectorButton(
+                                resources.getString("optionFatiguedBackground.text"));
+
                 optionStratConHexCoordForeground = new ColourSelectorButton(
                                 resources.getString("optionStratConHexCoordForeground.text"));
 
@@ -673,6 +697,18 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                                 .addComponent(optionPregnantBackground,
                                                                                 Alignment.TRAILING))
                                                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                                .addComponent(optionGoneForeground)
+                                                                .addComponent(optionGoneBackground,
+                                                                                Alignment.TRAILING))
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                                .addComponent(optionAbsentForeground)
+                                                                .addComponent(optionAbsentBackground,
+                                                                                Alignment.TRAILING))
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                                .addComponent(optionFatiguedForeground)
+                                                                .addComponent(optionFatiguedBackground,
+                                                                                Alignment.TRAILING))
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                                 .addComponent(optionStratConHexCoordForeground))
                                                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                                 .addComponent(optionFontColorNegative)
@@ -728,6 +764,15 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                 .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(optionPregnantForeground)
                                                                 .addComponent(optionPregnantBackground))
+                                                .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(optionGoneForeground)
+                                                                .addComponent(optionGoneBackground))
+                                                .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(optionAbsentForeground)
+                                                                .addComponent(optionAbsentBackground))
+                                                .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(optionFatiguedForeground)
+                                                                .addComponent(optionFatiguedBackground))                                             
                                                 .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(optionStratConHexCoordForeground))
                                                 .addGroup(layout.createSequentialGroup()
@@ -1352,6 +1397,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 MekHQ.getMHQOptions().setHealedInjuriesBackground(optionHealedInjuriesBackground.getColour());
                 MekHQ.getMHQOptions().setPregnantForeground(optionPregnantForeground.getColour());
                 MekHQ.getMHQOptions().setPregnantBackground(optionPregnantBackground.getColour());
+                MekHQ.getMHQOptions().setGoneForeground(optionGoneForeground.getColour());
+                MekHQ.getMHQOptions().setGoneBackground(optionGoneBackground.getColour());
+                MekHQ.getMHQOptions().setAbsentForeground(optionAbsentForeground.getColour());
+                MekHQ.getMHQOptions().setAbsentBackground(optionAbsentBackground.getColour());
+                MekHQ.getMHQOptions().setFatiguedForeground(optionFatiguedForeground.getColour());
+                MekHQ.getMHQOptions().setFatiguedBackground(optionFatiguedBackground.getColour());
                 MekHQ.getMHQOptions().setStratConHexCoordForeground(optionStratConHexCoordForeground.getColour());
                 MekHQ.getMHQOptions().setFontColorNegative(optionFontColorNegative.getColour());
                 MekHQ.getMHQOptions().setFontColorWarning(optionFontColorWarning.getColour());
@@ -1499,6 +1550,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 optionHealedInjuriesBackground.setColour(MekHQ.getMHQOptions().getHealedInjuriesBackground());
                 optionPregnantForeground.setColour(MekHQ.getMHQOptions().getPregnantForeground());
                 optionPregnantBackground.setColour(MekHQ.getMHQOptions().getPregnantBackground());
+                optionGoneForeground.setColour(MekHQ.getMHQOptions().getGoneForeground());
+                optionGoneBackground.setColour(MekHQ.getMHQOptions().getGoneBackground());
+                optionAbsentForeground.setColour(MekHQ.getMHQOptions().getAbsentForeground());
+                optionAbsentBackground.setColour(MekHQ.getMHQOptions().getAbsentBackground());
+                optionFatiguedForeground.setColour(MekHQ.getMHQOptions().getFatiguedForeground());
+                optionFatiguedBackground.setColour(MekHQ.getMHQOptions().getFatiguedBackground());
                 optionStratConHexCoordForeground.setColour(MekHQ.getMHQOptions().getStratConHexCoordForeground());
                 optionFontColorNegative.setColour(MekHQ.getMHQOptions().getFontColorNegative());
                 optionFontColorWarning.setColour(MekHQ.getMHQOptions().getFontColorWarning());

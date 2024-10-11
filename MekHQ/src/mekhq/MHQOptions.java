@@ -488,6 +488,60 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PREGNANT_BACKGROUND, value.getRGB());
     }
 
+    public Color getGoneForeground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.GONE_FOREGROUND, 0xffffff));
+    }
+
+    public void setGoneForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.GONE_FOREGROUND, value.getRGB());
+    }
+
+    public Color getGoneBackground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.GONE_BACKGROUND, 0x222222));
+    }
+
+    public void setGoneBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.GONE_BACKGROUND, value.getRGB());
+    }
+
+    public Color getAbsentForeground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.ABSENT_FOREGROUND, 0x000000));
+    }
+
+    public void setAbsentForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.ABSENT_FOREGROUND, value.getRGB());
+    }
+
+    public Color getAbsentBackground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.ABSENT_BACKGROUND, 0xffffff));
+    }
+
+    public void setAbsentBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.ABSENT_BACKGROUND, value.getRGB());
+    }
+
+    public Color getFatiguedForeground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FATIGUED_FOREGROUND, 0x000000));
+    }
+
+    public void setFatiguedForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FATIGUED_FOREGROUND, value.getRGB());
+    }
+
+    public Color getFatiguedBackground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FATIGUED_BACKGROUND, 0xeeee00));
+    }
+
+    public void setFatiguedBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FATIGUED_BACKGROUND, value.getRGB());
+    }
+
     public Color getStratConHexCoordForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                 .getInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
