@@ -294,7 +294,6 @@ public class CampaignOptionsUtilities {
             widthNew = UIUtil.scaleForGUI(750);
         }
 
-        // I don't know why 1.25 works, it just does, and I've given up questioning it.
         int height = parentPanel.getPreferredSize().height;
         for (Component component : panel.getComponents()) {
             if (component instanceof JPanel) {

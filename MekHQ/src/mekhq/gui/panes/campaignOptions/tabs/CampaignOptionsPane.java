@@ -49,9 +49,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
      * @param tab          the tab to be added
      */
     private void createTab(String resourceName, JTabbedPane tab) {
-        JScrollPane tabScrollPane = new JScrollPane(tab,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane tabScrollPane = new JScrollPane(tab);
 
         // Increase scroll speed
         tabScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
@@ -74,9 +72,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         GeneralTab generalTab = new GeneralTab(campaign, getFrame(), "generalTab");
         JPanel createdGeneralTab = generalTab.createGeneralTab();
 
-        return new JScrollPane(createdGeneralTab,
-            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        return new JScrollPane(createdGeneralTab);
     }
 
     private JTabbedPane createCombatReadinessParentTab() {
