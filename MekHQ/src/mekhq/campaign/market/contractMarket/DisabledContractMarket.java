@@ -20,7 +20,7 @@ public class DisabledContractMarket extends AbstractContractMarket {
     }
 
     @Override
-    public void addFollowup(Campaign campaign, AtBContract contract) {
+    public void checkForFollowup(Campaign campaign, AtBContract contract) {
 
     }
 

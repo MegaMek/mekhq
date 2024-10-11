@@ -369,7 +369,7 @@ public class PodSpace implements IPartWork {
         if (getAllMods(null).getValue() > -1) {
             bonus = '+' + bonus;
         }
-        String toReturn = "<html><font size='3'";
+        String toReturn = "<html><font";
         String action = "Replace ";
         if (isSalvaging()) {
             action = "Salvage ";

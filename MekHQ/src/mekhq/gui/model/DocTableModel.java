@@ -50,7 +50,7 @@ public class DocTableModel extends DataTableModel {
 
     private String getDocDesc(Person doc) {
         StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font size='2'><b>").append(doc.getFullTitle()).append("</b><br/>");
+        toReturn.append("<html><font><b>").append(doc.getFullTitle()).append("</b><br/>");
 
         Skill skill = doc.getSkill(SkillType.S_DOCTOR);
         if (null != skill) {
@@ -62,10 +62,10 @@ public class DocTableModel extends DataTableModel {
         toReturn.append(String.format(" (%d XP)", doc.getXP()));
 
         if (campaign.requiresAdditionalMedics()) {
-            toReturn.append("</font><font size='2' color='")
+            toReturn.append("</font><font color='")
                     .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>, ")
                     .append(campaign.getMedicsPerDoctor())
-                    .append(" medics</font><font size='2'><br/>");
+                    .append(" medics</font><font><br/>");
         } else {
             toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
         }

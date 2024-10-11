@@ -45,7 +45,7 @@ import mekhq.utilities.MHQXMLUtility;
  * This will be a special type of part that will only exist as spares
  * It will determine the amount of ammo of a particular type that
  * is available
- * 
+ *
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
@@ -130,7 +130,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     /**
      * Gets a value indicating whether or an {@code AmmoType} is
      * the same as this instance's ammo.
-     * 
+     *
      * @param otherAmmoType The other {@code AmmoType}.
      */
     public boolean isSameAmmoType(AmmoType otherAmmoType) {
@@ -142,7 +142,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     /**
      * Gets a value indicating whether or not an {@code AmmoType}
      * is compatible with this instance's ammo.
-     * 
+     *
      * @param otherAmmoType The other {@code AmmoType}.
      */
     public boolean isCompatibleAmmo(AmmoType otherAmmoType) {
@@ -229,7 +229,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String getDesc() {
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font";
         String scheduled = "";
         if (getTech() != null) {
             scheduled = " (scheduled) ";
@@ -284,7 +284,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String getAcquisitionDesc() {
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font";
 
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
