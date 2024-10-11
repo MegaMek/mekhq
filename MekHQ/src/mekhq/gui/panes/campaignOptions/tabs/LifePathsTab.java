@@ -150,6 +150,40 @@ public class LifePathsTab {
     private Map<AgeGroup, JCheckBox> chkEnabledRandomDeathAgeGroups;
     //end Death Tab
 
+    //start Education Tab
+    private JCheckBox chkUseEducationModule;
+    private JLabel lblCurriculumXpRate;
+    private JSpinner spnCurriculumXpRate;
+    private JLabel lblMaximumJumpCount;
+    private JSpinner spnMaximumJumpCount;
+    private JCheckBox chkUseReeducationCamps;
+    private JCheckBox chkEnableOverrideRequirements;
+    private JCheckBox chkShowIneligibleAcademies;
+    private JLabel lblEntranceExamBaseTargetNumber;
+    private JSpinner spnEntranceExamBaseTargetNumber;
+
+    private JPanel pnlEnableStandardSets;
+    private JCheckBox chkEnableLocalAcademies;
+    private JCheckBox chkEnablePrestigiousAcademies;
+    private JCheckBox chkEnableUnitEducation;
+
+    private JPanel pnlXpAndSkillBonuses;
+    private JCheckBox chkEnableBonuses;
+    private JLabel lblFacultyXpMultiplier;
+    private JSpinner spnFacultyXpMultiplier;
+
+    private JPanel pnlDropoutChance;
+    private JLabel lblAdultDropoutChance;
+    private JSpinner spnAdultDropoutChance;
+    private JLabel lblChildrenDropoutChance;
+    private JSpinner spnChildrenDropoutChance;
+
+    private JPanel pnlAccidentsAndEvents;
+    private JCheckBox chkAllAges;
+    private JLabel lblMilitaryAcademyAccidents;
+    private JSpinner spnMilitaryAcademyAccidents;
+    //end Education Tab
+
     /**
      * Initializes a new {@link LifePathsTab} with the specified campaign, frame, and name.
      *
@@ -302,6 +336,39 @@ public class LifePathsTab {
 
         pnlDeathAgeGroup = new JPanel();
         chkEnabledRandomDeathAgeGroups = new HashMap<>();
+
+        // Education Tab
+        chkUseEducationModule = new JCheckBox();
+        lblCurriculumXpRate = new JLabel();
+        spnCurriculumXpRate = new JSpinner();
+        lblMaximumJumpCount = new JLabel();
+        spnMaximumJumpCount = new JSpinner();
+        chkUseReeducationCamps = new JCheckBox();
+        chkEnableOverrideRequirements = new JCheckBox();
+        chkShowIneligibleAcademies = new JCheckBox();
+        lblEntranceExamBaseTargetNumber = new JLabel();
+        spnEntranceExamBaseTargetNumber = new JSpinner();
+
+        pnlEnableStandardSets = new JPanel();
+        chkEnableLocalAcademies = new JCheckBox();
+        chkEnablePrestigiousAcademies = new JCheckBox();
+        chkEnableUnitEducation = new JCheckBox();
+
+        pnlXpAndSkillBonuses = new JPanel();
+        chkEnableBonuses = new JCheckBox();
+        lblFacultyXpMultiplier = new JLabel();
+        spnFacultyXpMultiplier = new JSpinner();
+
+        pnlDropoutChance = new JPanel();
+        lblAdultDropoutChance = new JLabel();
+        spnAdultDropoutChance = new JSpinner();
+        lblChildrenDropoutChance = new JLabel();
+        spnChildrenDropoutChance = new JSpinner();
+
+        pnlAccidentsAndEvents = new JPanel();
+        chkAllAges = new JCheckBox();
+        lblMilitaryAcademyAccidents = new JLabel();
+        spnMilitaryAcademyAccidents = new JSpinner();
     }
 
     /**
@@ -1298,6 +1365,291 @@ public class LifePathsTab {
             panel.add(checkBox);
             chkEnabledRandomDeathAgeGroups.put(ageGroup, checkBox);
         }
+
+        return panel;
+    }
+
+    /**
+     * Constructs and configures an "Education" {@link JPanel}.
+     * The panel includes various controls related to education settings,
+     * including checkboxes for enabling specific modules and settings,
+     * spinners for configuring values such as XP rate and jump count,
+     * and separate panels for managing standard sets, XP and skill bonuses,
+     * dropout chances, accidents, and events.
+     * <p>
+     * The JPanel configuration is done using a {@link GroupLayout}, setting up
+     * the components in a structured layout with optimized vertical and
+     * horizontal alignments.
+     *
+     * @return {@link JPanel} The newly created and configured parent JPanel for
+     * the Education tab, containing all the educational settings controls.
+     */
+    JPanel createEducationTab() {
+        // Header
+        JPanel headerPanel = createHeaderPanel("EducationTab",
+            getImageDirectory() + "logo_free_worlds_league.png",
+            false, "", true);
+
+        // Contents
+        chkUseEducationModule = createCheckBox("UseEducationModule", null);
+
+        lblCurriculumXpRate = createLabel("CurriculumXpRate", null);
+        spnCurriculumXpRate = createSpinner("CurriculumXpRate", null,
+            3, 1, 10, 1);
+
+        lblMaximumJumpCount = createLabel("MaximumJumpCount", null);
+        spnMaximumJumpCount = createSpinner("MaximumJumpCount", null,
+            5, 1, 200, 1);
+
+        chkUseReeducationCamps = createCheckBox("UseReeducationCamps", null);
+
+        pnlEnableStandardSets = createEnableStandardSetsPanel();
+
+        chkEnableOverrideRequirements = createCheckBox("EnableOverrideRequirements", null);
+
+        chkShowIneligibleAcademies = createCheckBox("ShowIneligibleAcademies", null);
+
+        lblEntranceExamBaseTargetNumber = createLabel("EntranceExamBaseTargetNumber", null);
+        spnEntranceExamBaseTargetNumber = createSpinner("EntranceExamBaseTargetNumber", null,
+            14, 0, 20, 1);
+
+        pnlXpAndSkillBonuses = createXpAndSkillBonusesPanel();
+
+        pnlDropoutChance = createDropoutChancePanel();
+
+        pnlAccidentsAndEvents = createAccidentsAndEventsPanel();
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("EducationTab", true, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(headerPanel)
+                .addComponent(chkUseEducationModule)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblCurriculumXpRate)
+                    .addComponent(spnCurriculumXpRate)
+                    .addComponent(lblMaximumJumpCount)
+                    .addComponent(spnMaximumJumpCount))
+                .addComponent(chkUseReeducationCamps)
+                .addComponent(pnlEnableStandardSets)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(chkShowIneligibleAcademies)
+                    .addComponent(chkEnableOverrideRequirements))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblEntranceExamBaseTargetNumber)
+                    .addComponent(spnEntranceExamBaseTargetNumber))
+                .addComponent(pnlXpAndSkillBonuses)
+                .addComponent(pnlDropoutChance)
+                .addComponent(pnlAccidentsAndEvents));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(headerPanel, Alignment.CENTER)
+                    .addComponent(chkUseEducationModule)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblCurriculumXpRate)
+                        .addComponent(spnCurriculumXpRate)
+                        .addComponent(lblMaximumJumpCount)
+                        .addComponent(spnMaximumJumpCount)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(chkUseReeducationCamps)
+                    .addComponent(pnlEnableStandardSets)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(chkShowIneligibleAcademies)
+                        .addComponent(chkEnableOverrideRequirements)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblEntranceExamBaseTargetNumber)
+                        .addComponent(spnEntranceExamBaseTargetNumber)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(pnlXpAndSkillBonuses)
+                    .addComponent(pnlDropoutChance)
+                    .addComponent(pnlAccidentsAndEvents)));
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "EducationTab");
+    }
+
+    /**
+     * Constructs and configures an "Enable Standard Sets" {@link JPanel}.
+     * The panel consists of three checkboxes: to enable local academies,
+     * prestigious academies, and unit education.
+     * <p>
+     * A {@link GroupLayout} is used to arrange these components in an
+     * optimal manner, ensuring good readability and usability in both
+     * vertical and horizontal alignments.
+     *
+     * @return {@link JPanel} The newly constructed and configured JPanel for
+     * Enable Standard Sets settings.
+     */
+    JPanel createEnableStandardSetsPanel() {
+        // Contents
+        chkEnableLocalAcademies = createCheckBox("EnableLocalAcademies", null);
+        chkEnablePrestigiousAcademies = createCheckBox("EnablePrestigiousAcademies", null);
+        chkEnableUnitEducation = createCheckBox("EnableUnitEducation", null);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("EnableStandardSetsPanel", true,
+            "EnableStandardSetsPanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(chkEnableLocalAcademies)
+                    .addComponent(chkEnablePrestigiousAcademies)
+                    .addComponent(chkEnableUnitEducation)));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(chkEnableLocalAcademies)
+                        .addComponent(chkEnablePrestigiousAcademies)
+                        .addComponent(chkEnableUnitEducation)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+
+        return panel;
+    }
+
+    /**
+     * Constructs and configures an "XP and Skill Bonuses" {@link JPanel}.
+     * The panel includes a checkbox to enable or disable bonuses, a label
+     * for faculty XP multiplier, and a spinner to adjust the faculty XP multiplier value.
+     * <p>
+     * The layout of the panel is set up with a {@link GroupLayout}, arranging
+     * the checkbox, label, and spinner for optimal vertical and horizontal alignment.
+     *
+     * @return {@link JPanel} The newly created and configured JPanel
+     * containing the XP and Skill Bonuses settings.
+     */
+    JPanel createXpAndSkillBonusesPanel() {
+        // Contents
+        chkEnableBonuses = createCheckBox("EnableBonuses", null);
+        lblFacultyXpMultiplier = createLabel("FacultyXpMultiplier", null);
+        spnFacultyXpMultiplier = createSpinner("FacultyXpMultiplier", null,
+            1.00, 0.00, 10.00, 0.01);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("XpAndSkillBonusesPanel", true,
+            "XpAndSkillBonusesPanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(chkEnableBonuses)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblFacultyXpMultiplier)
+                    .addComponent(spnFacultyXpMultiplier)));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(chkEnableBonuses)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblFacultyXpMultiplier)
+                        .addComponent(spnFacultyXpMultiplier)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+
+        return panel;
+    }
+
+    /**
+     * Constructs and configures a "Dropout Chance" {@link JPanel}.
+     * The created panel includes two labels and spinners: one set for adult dropout chances,
+     * and the other for child dropout chances.
+     * <p>
+     * The JPanel layout is arranged using a {@link GroupLayout}, positioning the labels and spinners
+     * in a way that optimizes horizontal and vertical alignments.
+     *
+     * @return {@link JPanel} The newly constructed and configured JPanel that contains the Dropout Chance settings.
+     */
+    JPanel createDropoutChancePanel() {
+        // Contents
+        lblAdultDropoutChance = createLabel("AdultDropoutChance", null);
+        spnAdultDropoutChance = createSpinner("AdultDropoutChance", null,
+            1000, 0, 100000, 1);
+        lblChildrenDropoutChance = createLabel("ChildrenDropoutChance", null);
+        spnChildrenDropoutChance = createSpinner("ChildrenDropoutChance", null,
+            10000, 0, 100000, 1);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("DropoutChancePanel", true,
+            "DropoutChancePanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblAdultDropoutChance)
+                    .addComponent(spnAdultDropoutChance))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblChildrenDropoutChance)
+                    .addComponent(spnChildrenDropoutChance)));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblAdultDropoutChance)
+                        .addComponent(spnAdultDropoutChance)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblChildrenDropoutChance)
+                        .addComponent(spnChildrenDropoutChance)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+
+        return panel;
+    }
+
+    /**
+     * Constructs and configures an "Accidents and Events" {@link JPanel}.
+     * The panel includes a checkbox indicating whether to include all ages,
+     * a label for military academy accidents, and also a spinner for adjusting
+     * the count of military academy accidents.
+     * <p>
+     * The layout of the panel is configured with a {@link GroupLayout},
+     * organizing the checkbox and other components for optimized alignments
+     * in vertical and horizontal layouts.
+     *
+     * @return {@link JPanel} The constructed, configured JPanel containing
+     * "Accidents and Events" settings
+     */
+    JPanel createAccidentsAndEventsPanel() {
+        // Contents
+        chkAllAges = createCheckBox("AllAges", null);
+        lblMilitaryAcademyAccidents = createLabel("MilitaryAcademyAccidents", null);
+        spnMilitaryAcademyAccidents = createSpinner("MilitaryAcademyAccidents", null,
+            10000, 0, 100000, 1);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("AccidentsAndEventsPanel", true,
+            "AccidentsAndEventsPanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(chkAllAges)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblMilitaryAcademyAccidents)
+                    .addComponent(spnMilitaryAcademyAccidents)));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(chkAllAges)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblMilitaryAcademyAccidents)
+                        .addComponent(spnMilitaryAcademyAccidents)
+                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
 
         return panel;
     }

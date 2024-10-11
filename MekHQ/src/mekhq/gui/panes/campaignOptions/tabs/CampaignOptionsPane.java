@@ -126,10 +126,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane lifePathsContentTabs = createSubTabs(Map.of(
             "lifePathsGeneralTab", lifePathsTab.createGeneralTab(),
             "backgroundsTab", lifePathsTab.createBackgroundsTab(),
-            "marriageTab", lifePathsTab.createMarriageTab(),
-            "divorceTab", lifePathsTab.createDivorceTab(),
-            "procreationTab", lifePathsTab.createProcreationTab(),
-            "deathTab", lifePathsTab.createDeathTab()));
+            "relationshipsMarriageTab", lifePathsTab.createMarriageTab(),
+            "relationshipsDivorceTab", lifePathsTab.createDivorceTab(),
+            "relationshipsProcreationTab", lifePathsTab.createProcreationTab(),
+            "deathTab", lifePathsTab.createDeathTab(),
+            "educationTab", lifePathsTab.createEducationTab()));
 
         // Turnover and Retention
         TurnoverAndRetentionTab turnoverAndRetentionTab = new TurnoverAndRetentionTab(getFrame(),
