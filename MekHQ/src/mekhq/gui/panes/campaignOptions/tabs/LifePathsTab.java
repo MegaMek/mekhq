@@ -161,6 +161,7 @@ public class LifePathsTab {
     private JCheckBox chkShowIneligibleAcademies;
     private JLabel lblEntranceExamBaseTargetNumber;
     private JSpinner spnEntranceExamBaseTargetNumber;
+    private JLabel lblEntranceExamBaseTargetNumberPost;
 
     private JPanel pnlEnableStandardSets;
     private JCheckBox chkEnableLocalAcademies;
@@ -348,6 +349,7 @@ public class LifePathsTab {
         chkShowIneligibleAcademies = new JCheckBox();
         lblEntranceExamBaseTargetNumber = new JLabel();
         spnEntranceExamBaseTargetNumber = new JSpinner();
+        lblEntranceExamBaseTargetNumberPost = new JLabel();
 
         pnlEnableStandardSets = new JPanel();
         chkEnableLocalAcademies = new JCheckBox();
@@ -1412,6 +1414,7 @@ public class LifePathsTab {
         lblEntranceExamBaseTargetNumber = createLabel("EntranceExamBaseTargetNumber", null);
         spnEntranceExamBaseTargetNumber = createSpinner("EntranceExamBaseTargetNumber", null,
             14, 0, 20, 1);
+        lblEntranceExamBaseTargetNumberPost = createLabel("EntranceExamBaseTargetNumberPost", null);
 
         pnlXpAndSkillBonuses = createXpAndSkillBonusesPanel();
 
@@ -1440,7 +1443,8 @@ public class LifePathsTab {
                     .addComponent(chkEnableOverrideRequirements))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblEntranceExamBaseTargetNumber)
-                    .addComponent(spnEntranceExamBaseTargetNumber))
+                    .addComponent(spnEntranceExamBaseTargetNumber)
+                    .addComponent(lblEntranceExamBaseTargetNumberPost))
                 .addComponent(pnlXpAndSkillBonuses)
                 .addComponent(pnlDropoutChance)
                 .addComponent(pnlAccidentsAndEvents));
@@ -1465,6 +1469,7 @@ public class LifePathsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblEntranceExamBaseTargetNumber)
                         .addComponent(spnEntranceExamBaseTargetNumber)
+                        .addComponent(lblEntranceExamBaseTargetNumberPost)
                         .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
                     .addComponent(pnlXpAndSkillBonuses)
                     .addComponent(pnlDropoutChance)
