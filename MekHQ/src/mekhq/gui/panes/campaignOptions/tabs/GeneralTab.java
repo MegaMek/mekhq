@@ -2,8 +2,11 @@ package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
+import megamek.client.ui.swing.util.FlatLafStyleBuilder;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -206,15 +209,15 @@ public class GeneralTab {
         ImageIcon imageIcon = new ImageIcon("data/images/misc/MekHQ.png");
         JLabel imageLabel = new JLabel(imageIcon);
 
-        final JLabel lblHeader = new JLabel(String.format("<html>%s</html>",
-            resources.getString("lblGeneral.text")), SwingConstants.CENTER);
+        final JLabel lblHeader = new JLabel(resources.getString("lblGeneral.text"), SwingConstants.CENTER);
+        new FlatLafStyleBuilder().font(MHQConstants.PROJECT_NAME).bold().size(3).apply(lblHeader);
         lblHeader.setName("lblGeneral");
 
         JLabel lblBody = new JLabel(String.format("<html>%s</html>",
             resources.getString("lblGeneralBody.text")), SwingConstants.CENTER);
         lblBody.setName("lblGeneralHeaderBody");
         Dimension size = lblBody.getPreferredSize();
-        lblBody.setMaximumSize(new Dimension(750, size.height));
+        lblBody.setMaximumSize(new Dimension(UIUtil.scaleForGUI(750), size.height));
 
         final JPanel panel = createStandardPanel("pnlGeneralHeaderPanel", false, "");
         final GroupLayout layout = createStandardLayout(panel);
@@ -225,7 +228,7 @@ public class GeneralTab {
                 .addComponent(lblHeader)
                 .addComponent(imageLabel)
                 .addComponent(lblBody)
-                .addGap(20));
+                .addGap(UIUtil.scaleForGUI(20)));
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.CENTER)

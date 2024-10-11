@@ -66,10 +66,16 @@ public class SuppliesAndAcquisitionTab {
     private JLabel lblPenaltyClanPartsFromIS;
     private JSpinner spnPenaltyClanPartsFromIS;
     private JCheckBox usePlanetaryAcquisitionsVerbose;
+
+    private JPanel pnlTechModifiers;
     private JLabel[] lblPlanetAcquireTechBonus;
     private JSpinner[] spnPlanetAcquireTechBonus;
+
+    private JPanel pnlIndustryModifiers;
     private JLabel[] lblPlanetAcquireIndustryBonus;
     private JSpinner[] spnPlanetAcquireIndustryBonus;
+
+    private JPanel pnlOutputModifiers;
     private JLabel[] lblPlanetAcquireOutputBonus;
     private JSpinner[] spnPlanetAcquireOutputBonus;
     //end Planetary Acquisition Tab
@@ -115,12 +121,15 @@ public class SuppliesAndAcquisitionTab {
         usePlanetaryAcquisitionsVerbose = new JCheckBox();
 
         // Modifiers
+        pnlTechModifiers = new JPanel();
         lblPlanetAcquireTechBonus = new JLabel[6];
         spnPlanetAcquireTechBonus = new JSpinner[6];
 
+        pnlIndustryModifiers = new JPanel();
         lblPlanetAcquireIndustryBonus = new JLabel[6];
         spnPlanetAcquireIndustryBonus = new JSpinner[6];
 
+        pnlOutputModifiers = new JPanel();
         lblPlanetAcquireOutputBonus = new JLabel[6];
         spnPlanetAcquireOutputBonus = new JSpinner[6];
     }
@@ -375,32 +384,33 @@ public class SuppliesAndAcquisitionTab {
      * @return the created tab panel as a {@link JPanel}
      */
     private JPanel createModifiersPanel() {
-        JLabel techLabel = createLabel("TechLabel", null);
-        JLabel industryLabel = createLabel("IndustryLabel", null);
-        JLabel outputLabel = createLabel("OutputLabel", null);
-
         // Modifier Spinners
         for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
             String modifierLabel = getModifierLabel(i);
 
-            lblPlanetAcquireTechBonus[i] = new JLabel(String.format("<html><b>%s</b></html>",
+            lblPlanetAcquireTechBonus[i] = new JLabel(String.format("<html>%s</html>",
                 modifierLabel));
             spnPlanetAcquireTechBonus[i] = new JSpinner(new SpinnerNumberModel(
                 0, -12, 12, 1));
             setSpinnerWidth(spnPlanetAcquireTechBonus[i]);
 
-            lblPlanetAcquireIndustryBonus[i] = new JLabel(String.format("<html><b>%s</b></html>",
+            lblPlanetAcquireIndustryBonus[i] = new JLabel(String.format("<html>%s</html>",
                 modifierLabel));
             spnPlanetAcquireIndustryBonus[i] = new JSpinner(new SpinnerNumberModel(
                 0, -12, 12, 1));
             setSpinnerWidth(spnPlanetAcquireIndustryBonus[i]);
 
-            lblPlanetAcquireOutputBonus[i] = new JLabel(String.format("<html><b>%s</b></html>",
+            lblPlanetAcquireOutputBonus[i] = new JLabel(String.format("<html>%s</html>",
                 modifierLabel));
             spnPlanetAcquireOutputBonus[i] = new JSpinner(new SpinnerNumberModel(
                 0, -12, 12, 1));
             setSpinnerWidth(spnPlanetAcquireOutputBonus[i]);
         }
+
+        // Panels
+        pnlIndustryModifiers = createIndustryModifiersPanel();
+        pnlTechModifiers = createTechModifiersPanel();
+        pnlOutputModifiers = createOutputModifiersPanel();
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("PlanetaryAcquisitionTabModifiers",
@@ -411,103 +421,193 @@ public class SuppliesAndAcquisitionTab {
         layout.setVerticalGroup(
             layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(techLabel)
-                    .addComponent(industryLabel)
-                    .addComponent(outputLabel))
-                // There has to be a better way of doing this, but I couldn't fathom it
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[0])
-                    .addComponent(spnPlanetAcquireTechBonus[0])
-                    .addComponent(lblPlanetAcquireIndustryBonus[0])
-                    .addComponent(spnPlanetAcquireIndustryBonus[0])
-                    .addComponent(lblPlanetAcquireOutputBonus[0])
-                    .addComponent(spnPlanetAcquireOutputBonus[0]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[1])
-                    .addComponent(spnPlanetAcquireTechBonus[1])
-                    .addComponent(lblPlanetAcquireIndustryBonus[1])
-                    .addComponent(spnPlanetAcquireIndustryBonus[1])
-                    .addComponent(lblPlanetAcquireOutputBonus[1])
-                    .addComponent(spnPlanetAcquireOutputBonus[1]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[2])
-                    .addComponent(spnPlanetAcquireTechBonus[2])
-                    .addComponent(lblPlanetAcquireIndustryBonus[2])
-                    .addComponent(spnPlanetAcquireIndustryBonus[2])
-                    .addComponent(lblPlanetAcquireOutputBonus[2])
-                    .addComponent(spnPlanetAcquireOutputBonus[2]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[3])
-                    .addComponent(spnPlanetAcquireTechBonus[3])
-                    .addComponent(lblPlanetAcquireIndustryBonus[3])
-                    .addComponent(spnPlanetAcquireIndustryBonus[3])
-                    .addComponent(lblPlanetAcquireOutputBonus[3])
-                    .addComponent(spnPlanetAcquireOutputBonus[3]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[4])
-                    .addComponent(spnPlanetAcquireTechBonus[4])
-                    .addComponent(lblPlanetAcquireIndustryBonus[4])
-                    .addComponent(spnPlanetAcquireIndustryBonus[4])
-                    .addComponent(lblPlanetAcquireOutputBonus[4])
-                    .addComponent(spnPlanetAcquireOutputBonus[4]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[5])
-                    .addComponent(spnPlanetAcquireTechBonus[5])
-                    .addComponent(lblPlanetAcquireIndustryBonus[5])
-                    .addComponent(spnPlanetAcquireIndustryBonus[5])
-                    .addComponent(lblPlanetAcquireOutputBonus[5])
-                    .addComponent(spnPlanetAcquireOutputBonus[5])));
-
+                    .addComponent(pnlIndustryModifiers)
+                    .addComponent(pnlTechModifiers)
+                    .addComponent(pnlOutputModifiers)));
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
-                    .addGap(35)
-                    .addComponent(techLabel)
-                    .addGap(40)
-                    .addComponent(industryLabel)
-                    .addGap(40)
-                    .addComponent(outputLabel))
+                    .addComponent(pnlIndustryModifiers)
+                    .addComponent(pnlTechModifiers)
+                    .addComponent(pnlOutputModifiers)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+
+        return panel;
+    }
+
+    /**
+     * Creates the planetary acquisition modifiers panel.
+     *
+     * @return the created tab panel as a {@link JPanel}
+     */
+    private JPanel createTechModifiersPanel() {
+        JLabel techLabel = createLabel("TechLabel", null);
+        techLabel.setName(String.format("<html><center>%s</center></html", techLabel.getText()));
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("createTechModifiersPanel", false, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(techLabel)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireTechBonus[0])
+                    .addComponent(spnPlanetAcquireTechBonus[0]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireTechBonus[1])
+                    .addComponent(spnPlanetAcquireTechBonus[1]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireTechBonus[2])
+                    .addComponent(spnPlanetAcquireTechBonus[2]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireTechBonus[3])
+                    .addComponent(spnPlanetAcquireTechBonus[3]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireTechBonus[4])
+                    .addComponent(spnPlanetAcquireTechBonus[4]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireTechBonus[5])
+                    .addComponent(spnPlanetAcquireTechBonus[5])));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addComponent(techLabel)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblPlanetAcquireTechBonus[0])
-                    .addComponent(spnPlanetAcquireTechBonus[0])
+                    .addComponent(spnPlanetAcquireTechBonus[0]))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireTechBonus[1])
+                    .addComponent(spnPlanetAcquireTechBonus[1]))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireTechBonus[2])
+                    .addComponent(spnPlanetAcquireTechBonus[2]))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireTechBonus[3])
+                    .addComponent(spnPlanetAcquireTechBonus[3]))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireTechBonus[4])
+                    .addComponent(spnPlanetAcquireTechBonus[4]))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireTechBonus[5])
+                    .addComponent(spnPlanetAcquireTechBonus[5])));
+
+        return panel;
+    }
+
+    /**
+     * Creates the planetary acquisition modifiers panel.
+     *
+     * @return the created tab panel as a {@link JPanel}
+     */
+    private JPanel createIndustryModifiersPanel() {
+        JLabel industryLabel = createLabel("IndustryLabel", null);
+        industryLabel.setName(String.format("<html><center>%s</center></html", industryLabel.getText()));
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("IndustryModifiersPanel", false, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(industryLabel)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblPlanetAcquireIndustryBonus[0])
-                    .addComponent(spnPlanetAcquireIndustryBonus[0])
+                    .addComponent(spnPlanetAcquireIndustryBonus[0]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireIndustryBonus[1])
+                    .addComponent(spnPlanetAcquireIndustryBonus[1]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireIndustryBonus[2])
+                    .addComponent(spnPlanetAcquireIndustryBonus[2]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireIndustryBonus[3])
+                    .addComponent(spnPlanetAcquireIndustryBonus[3]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireIndustryBonus[4])
+                    .addComponent(spnPlanetAcquireIndustryBonus[4]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireIndustryBonus[5])
+                    .addComponent(spnPlanetAcquireIndustryBonus[5])));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addComponent(industryLabel)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireIndustryBonus[0])
+                    .addComponent(spnPlanetAcquireIndustryBonus[0]))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireIndustryBonus[1])
+                    .addComponent(spnPlanetAcquireIndustryBonus[1]))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireIndustryBonus[2])
+                    .addComponent(spnPlanetAcquireIndustryBonus[2]))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireIndustryBonus[3])
+                    .addComponent(spnPlanetAcquireIndustryBonus[3]))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireIndustryBonus[4])
+                    .addComponent(spnPlanetAcquireIndustryBonus[4]))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblPlanetAcquireIndustryBonus[5])
+                    .addComponent(spnPlanetAcquireIndustryBonus[5])));
+
+        return panel;
+    }
+
+    private JPanel createOutputModifiersPanel() {
+        JLabel outputLabel = createLabel("OutputLabel", null);
+        outputLabel.setName(String.format("<html><center>%s</center></html", outputLabel.getText()));
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("OutputModifiersPanel", false, "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(outputLabel)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireOutputBonus[0])
+                    .addComponent(spnPlanetAcquireOutputBonus[0]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireOutputBonus[1])
+                    .addComponent(spnPlanetAcquireOutputBonus[1]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireOutputBonus[2])
+                    .addComponent(spnPlanetAcquireOutputBonus[2]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireOutputBonus[3])
+                    .addComponent(spnPlanetAcquireOutputBonus[3]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireOutputBonus[4])
+                    .addComponent(spnPlanetAcquireOutputBonus[4]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPlanetAcquireOutputBonus[5])
+                    .addComponent(spnPlanetAcquireOutputBonus[5])));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addComponent(outputLabel)
+                .addGroup(layout.createSequentialGroup()
                     .addComponent(lblPlanetAcquireOutputBonus[0])
                     .addComponent(spnPlanetAcquireOutputBonus[0]))
                 .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[1])
-                    .addComponent(spnPlanetAcquireTechBonus[1])
-                    .addComponent(lblPlanetAcquireIndustryBonus[1])
-                    .addComponent(spnPlanetAcquireIndustryBonus[1])
                     .addComponent(lblPlanetAcquireOutputBonus[1])
                     .addComponent(spnPlanetAcquireOutputBonus[1]))
                 .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[2])
-                    .addComponent(spnPlanetAcquireTechBonus[2])
-                    .addComponent(lblPlanetAcquireIndustryBonus[2])
-                    .addComponent(spnPlanetAcquireIndustryBonus[2])
                     .addComponent(lblPlanetAcquireOutputBonus[2])
                     .addComponent(spnPlanetAcquireOutputBonus[2]))
                 .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[3])
-                    .addComponent(spnPlanetAcquireTechBonus[3])
-                    .addComponent(lblPlanetAcquireIndustryBonus[3])
-                    .addComponent(spnPlanetAcquireIndustryBonus[3])
                     .addComponent(lblPlanetAcquireOutputBonus[3])
                     .addComponent(spnPlanetAcquireOutputBonus[3]))
                 .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[4])
-                    .addComponent(spnPlanetAcquireTechBonus[4])
-                    .addComponent(lblPlanetAcquireIndustryBonus[4])
-                    .addComponent(spnPlanetAcquireIndustryBonus[4])
                     .addComponent(lblPlanetAcquireOutputBonus[4])
                     .addComponent(spnPlanetAcquireOutputBonus[4]))
                 .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[5])
-                    .addComponent(spnPlanetAcquireTechBonus[5])
-                    .addComponent(lblPlanetAcquireIndustryBonus[5])
-                    .addComponent(spnPlanetAcquireIndustryBonus[5])
                     .addComponent(lblPlanetAcquireOutputBonus[5])
                     .addComponent(spnPlanetAcquireOutputBonus[5])));
 

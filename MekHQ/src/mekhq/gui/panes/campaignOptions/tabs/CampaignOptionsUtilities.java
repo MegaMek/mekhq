@@ -1,7 +1,10 @@
 package mekhq.gui.panes.campaignOptions.tabs;
 
+import megamek.client.ui.swing.util.FlatLafStyleBuilder;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -191,8 +194,8 @@ public class CampaignOptionsUtilities {
             sizeWidth += component.getPreferredSize().width;
         }
 
-        if (sizeWidth < 750) {
-            sizeWidth = 750;
+        if (sizeWidth < UIUtil.scaleForGUI(750)) {
+            sizeWidth = UIUtil.scaleForGUI(750);
         }
 
         panel.setMaximumSize(new Dimension(sizeWidth, sizeHeight));
@@ -221,8 +224,8 @@ public class CampaignOptionsUtilities {
         ImageIcon imageIcon = new ImageIcon(imageAddress);
         JLabel imageLabel = new JLabel(imageIcon);
 
-        final JLabel lblHeader = new JLabel(String.format("<html>%s</html>",
-            resources.getString("lbl" + name + ".text")), SwingConstants.CENTER);
+        final JLabel lblHeader = new JLabel(resources.getString("lbl" + name + ".text"), SwingConstants.CENTER);
+        new FlatLafStyleBuilder().font(MHQConstants.PROJECT_NAME).bold().size(3).apply(lblHeader);
         lblHeader.setName("lbl" + name);
 
         JLabel lblBody = new JLabel();
@@ -231,12 +234,12 @@ public class CampaignOptionsUtilities {
                 resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
             lblBody.setName("lbl" + name + "Body");
             Dimension size = lblBody.getPreferredSize();
-            lblBody.setMaximumSize(new Dimension(750, size.height));
+            lblBody.setMaximumSize(new Dimension(UIUtil.scaleForGUI(750), size.height));
         }
 
         final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", includeBorder, borderTitle);
         Dimension size = panel.getPreferredSize();
-        panel.setPreferredSize(new Dimension(750, size.height));
+        panel.setPreferredSize(new Dimension(UIUtil.scaleForGUI(750), size.height));
 
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -287,8 +290,8 @@ public class CampaignOptionsUtilities {
         // Set Dimensions
         int widthNew = parentPanel.getMinimumSize().width;
 
-        if (widthNew < 750) {
-            widthNew = 750;
+        if (widthNew < UIUtil.scaleForGUI(750)) {
+            widthNew = UIUtil.scaleForGUI(750);
         }
 
         // I don't know why 1.25 works, it just does, and I've given up questioning it.

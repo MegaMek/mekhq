@@ -145,7 +145,7 @@ public class RepairAndMaintenanceTab {
         lblDestroyPartTarget = createLabel("DestroyPartTarget", null);
         spnDestroyPartTarget = createSpinner("DestroyPartTarget", null,
             2, 2, 13, 1);
-        JLabel lblDestroyPartTargetPost = new JLabel("<html><b>+</b></html>");
+        JLabel lblDestroyPartTargetPost = new JLabel("<html>+</html>");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("repairTab", true, "");
