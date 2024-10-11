@@ -27,6 +27,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.GameOptionsDialog;
+import megamek.client.ui.swing.MMToggleButton;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.client.ui.swing.util.UIUtil;
@@ -145,8 +146,8 @@ public class CampaignGUI extends JPanel {
 
     /* for the top button panel */
     private JPanel btnPanel;
-    private JToggleButton btnGMMode;
-    private JToggleButton btnOvertime;
+    private final JToggleButton btnGMMode = new MMToggleButton(resourceMap.getString("btnGMMode.text"));
+    private final JToggleButton btnOvertime = new MMToggleButton(resourceMap.getString("btnOvertime.text"));
 
     ReportHyperlinkListener reportHLL;
 
@@ -1069,7 +1070,6 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new Insets(3, 10, 3, 3);
         btnPanel.add(lblLocation, gridBagConstraints);
 
-        btnGMMode = new JToggleButton(resourceMap.getString("btnGMMode.text"));
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
@@ -1083,7 +1083,6 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         btnPanel.add(btnGMMode, gridBagConstraints);
 
-        btnOvertime = new JToggleButton(resourceMap.getString("btnOvertime.text"));
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
         gridBagConstraints = new GridBagConstraints();
