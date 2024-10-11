@@ -82,6 +82,93 @@ public class SuppliesAndAcquisitionTab {
     }
 
     /**
+     * Calls the initialization methods for all the tab panels.
+     */
+    void initialize() {
+        initializeAcquisitionTab();
+        initializeDelivery();
+        initializePlanetaryAcquisitionsTab();
+    }
+
+    /**
+     * Initializes the components of the ProcreationTab.
+     * The panel contains settings related to character procreation in the simulation.
+     */
+    private void initializePlanetaryAcquisitionsTab() {
+        // Options
+        usePlanetaryAcquisitions = new JCheckBox();
+
+        lblMaxJumpPlanetaryAcquisitions = new JLabel();
+        spnMaxJumpPlanetaryAcquisitions = new JSpinner();
+
+        lblPlanetaryAcquisitionsFactionLimits = new JLabel();
+        comboPlanetaryAcquisitionsFactionLimits = new MMComboBox<>("comboPlanetaryAcquisitionsFactionLimits",
+            PlanetaryAcquisitionFactionLimit.values());
+
+        disallowPlanetaryAcquisitionClanCrossover = new JCheckBox();
+
+        disallowClanPartsFromIS = new JCheckBox();
+
+        lblPenaltyClanPartsFromIS = new JLabel();
+        spnPenaltyClanPartsFromIS = new JSpinner();
+
+        usePlanetaryAcquisitionsVerbose = new JCheckBox();
+
+        // Modifiers
+        lblPlanetAcquireTechBonus = new JLabel[6];
+        spnPlanetAcquireTechBonus = new JSpinner[6];
+
+        lblPlanetAcquireIndustryBonus = new JLabel[6];
+        spnPlanetAcquireIndustryBonus = new JSpinner[6];
+
+        lblPlanetAcquireOutputBonus = new JLabel[6];
+        spnPlanetAcquireOutputBonus = new JSpinner[6];
+    }
+
+    /**
+     * Initializes the components of the DivorceTab.
+     * The panel contains settings related to divorce mechanics within the simulation.
+     */
+    private void initializeDelivery() {
+        lblNDiceTransitTime = new JLabel();
+        spnNDiceTransitTime = new JSpinner();
+        lblConstantTransitTime = new JLabel();
+        spnConstantTransitTime = new JSpinner();
+        choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", getTransitUnitOptions());
+
+        lblAcquireMosBonus = new JLabel();
+        spnAcquireMosBonus = new JSpinner();
+        choiceAcquireMosUnits = new MMComboBox<>("choiceAcquireMosUnits", getTransitUnitOptions());
+
+        lblAcquireMinimum = new JLabel();
+        spnAcquireMinimum = new JSpinner();
+        choiceAcquireMinimumUnit = new MMComboBox<>("choiceAcquireMinimumUnit", getTransitUnitOptions());
+    }
+
+    /**
+     * Initializes the components of the MarriageTab.
+     * The panel contains various settings related to marriage mechanics within the simulation.
+     */
+    private void initializeAcquisitionTab() {
+        lblChoiceAcquireSkill = new JLabel();
+        choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", buildAcquireSkillComboOptions());
+
+        chkSupportStaffOnly = new JCheckBox();
+
+        lblAcquireClanPenalty = new JLabel();
+        spnAcquireClanPenalty = new JSpinner();
+
+        lblAcquireIsPenalty = new JLabel();
+        spnAcquireIsPenalty = new JSpinner();
+
+        lblAcquireWaitingPeriod = new JLabel();
+        spnAcquireWaitingPeriod = new JSpinner();
+
+        lblMaxAcquisitions = new JLabel();
+        spnMaxAcquisitions = new JSpinner();
+    }
+
+    /**
      * Creates the acquisition tab panel.
      *
      * @return the created tab panel as a {@link JPanel}
@@ -580,70 +667,5 @@ public class SuppliesAndAcquisitionTab {
         acquireSkillModel.addElement(CampaignOptions.S_AUTO);
 
         return acquireSkillModel;
-    }
-
-    void initialize() {
-        // Acquisition Tab
-        lblChoiceAcquireSkill = new JLabel();
-        choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", buildAcquireSkillComboOptions());
-
-        chkSupportStaffOnly = new JCheckBox();
-
-        lblAcquireClanPenalty = new JLabel();
-        spnAcquireClanPenalty = new JSpinner();
-
-        lblAcquireIsPenalty = new JLabel();
-        spnAcquireIsPenalty = new JSpinner();
-
-        lblAcquireWaitingPeriod = new JLabel();
-        spnAcquireWaitingPeriod = new JSpinner();
-
-        lblMaxAcquisitions = new JLabel();
-        spnMaxAcquisitions = new JSpinner();
-
-        // Delivery Tab
-        lblNDiceTransitTime = new JLabel();
-        spnNDiceTransitTime = new JSpinner();
-        lblConstantTransitTime = new JLabel();
-        spnConstantTransitTime = new JSpinner();
-        choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", getTransitUnitOptions());
-
-        lblAcquireMosBonus = new JLabel();
-        spnAcquireMosBonus = new JSpinner();
-        choiceAcquireMosUnits = new MMComboBox<>("choiceAcquireMosUnits", getTransitUnitOptions());
-
-        lblAcquireMinimum = new JLabel();
-        spnAcquireMinimum = new JSpinner();
-        choiceAcquireMinimumUnit = new MMComboBox<>("choiceAcquireMinimumUnit", getTransitUnitOptions());
-
-        // Planetary Acquisition Tab
-        // Options
-        usePlanetaryAcquisitions = new JCheckBox();
-
-        lblMaxJumpPlanetaryAcquisitions = new JLabel();
-        spnMaxJumpPlanetaryAcquisitions = new JSpinner();
-
-        lblPlanetaryAcquisitionsFactionLimits = new JLabel();
-        comboPlanetaryAcquisitionsFactionLimits = new MMComboBox<>("comboPlanetaryAcquisitionsFactionLimits",
-            PlanetaryAcquisitionFactionLimit.values());
-
-        disallowPlanetaryAcquisitionClanCrossover = new JCheckBox();
-
-        disallowClanPartsFromIS = new JCheckBox();
-
-        lblPenaltyClanPartsFromIS = new JLabel();
-        spnPenaltyClanPartsFromIS = new JSpinner();
-
-        usePlanetaryAcquisitionsVerbose = new JCheckBox();
-
-        // Modifiers
-        lblPlanetAcquireTechBonus = new JLabel[6];
-        spnPlanetAcquireTechBonus = new JSpinner[6];
-
-        lblPlanetAcquireIndustryBonus = new JLabel[6];
-        spnPlanetAcquireIndustryBonus = new JSpinner[6];
-
-        lblPlanetAcquireOutputBonus = new JLabel[6];
-        spnPlanetAcquireOutputBonus = new JSpinner[6];
     }
 }

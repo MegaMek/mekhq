@@ -158,69 +158,95 @@ public class PersonnelTab {
         initialize();
     }
 
-
     /**
-     * This method initializes the various checkboxes, labels, spinners, combo boxes, panels, and
-     * other GUI components for different tabs.
-     * It sets up the components for the General Tab, Personnel Logs Tab, Personnel Information Tab,
-     * Administrators Tab, Awards Tab, Medical Tab, Prisoners and Dependents Tab, and the Salaries Tab.
+     * Initializes the components of all tabs within the frame.
      */
     protected void initialize() {
-        //start General Tab
-        chkUseTactics = new JCheckBox();
-        chkUseInitiativeBonus = new JCheckBox();
-        chkUseToughness = new JCheckBox();
-        chkUseRandomToughness = new JCheckBox();
-        chkUseArtillery = new JCheckBox();
-        chkUseAbilities = new JCheckBox();
-        chkUseEdge = new JCheckBox();
-        chkUseSupportEdge = new JCheckBox();
-        chkUseImplants = new JCheckBox();
-        chkUseAlternativeQualityAveraging = new JCheckBox();
+        initializeGeneralTab();
+        initializePersonnelLogsTab();
+        initializePersonnelInformationTab();
+        initializeAdministratorsTab();
+        initializeAwardsTab();
+        initializeMedicalTab();
+        initializePrisonersAndDependentsTab();
+        initializeSalariesTab();
+    }
 
-        personnelCleanUpPanel = new JPanel();
-        chkUsePersonnelRemoval = new JCheckBox();
-        chkUseRemovalExemptCemetery = new JCheckBox();
-        chkUseRemovalExemptRetirees = new JCheckBox();
-        //end General Tab
+    /**
+     * Initializes the components of the SalariesTab.
+     * The panel contains settings related to personnel salaries.
+     */
+    private void initializeSalariesTab() {
+        chkDisableSecondaryRoleSalary = new JCheckBox();
 
-        //start Personnel Logs Tab
-        chkUseTransfers = new JCheckBox();
-        chkUseExtendedTOEForceName = new JCheckBox();
-        chkPersonnelLogSkillGain = new JCheckBox();
-        chkPersonnelLogAbilityGain = new JCheckBox();
-        chkPersonnelLogEdgeGain = new JCheckBox();
-        chkDisplayPersonnelLog = new JCheckBox();
-        chkDisplayScenarioLog = new JCheckBox();
-        chkDisplayKillRecord = new JCheckBox();
-        //end Personnel Logs Tab
+        pnlSalaryMultipliersPanel = new JPanel();
 
-        //start Personnel Information Tab
-        chkUseTimeInService = new JCheckBox();
+        lblAntiMekSalary = new JLabel();
+        spnAntiMekSalary = new JSpinner();
 
-        lblTimeInServiceDisplayFormat = new JLabel();
-        comboTimeInServiceDisplayFormat = new MMComboBox<>("comboTimeInServiceDisplayFormat",
-            TimeInDisplayFormat.values());
+        lblSpecialistInfantrySalary = new JLabel();
+        spnSpecialistInfantrySalary = new JSpinner();
 
-        chkUseTimeInRank = new JCheckBox();
+        pnlSalaryExperienceMultipliersPanel = new JPanel();
+        lblSalaryExperienceMultipliers = new HashMap<>();
+        spnSalaryExperienceMultipliers = new HashMap<>();
 
-        lblTimeInRankDisplayFormat = new JLabel();
-        comboTimeInRankDisplayFormat = new MMComboBox<>("comboTimeInRankDisplayFormat",
-            TimeInDisplayFormat.values());
+        pnlSalaryBaseSalaryPanel = new JPanel();
+        lblBaseSalary = new JLabel[29];
+        spnBaseSalary = new JSpinner[29];
+    }
 
-        chkTrackTotalEarnings = new JCheckBox();
-        chkTrackTotalXPEarnings = new JCheckBox();
-        chkShowOriginFaction = new JCheckBox();
-        //end Personnel Information Tab
+    /**
+     * Initializes the components of the PrisonersAndDependentsTab.
+     * The panel contains settings related to prisoners and dependents.
+     */
+    private void initializePrisonersAndDependentsTab() {
+        prisonerPanel = new JPanel();
+        lblPrisonerCaptureStyle = new JLabel();
+        comboPrisonerCaptureStyle = new MMComboBox<>("comboPrisonerCaptureStyle",
+            PrisonerCaptureStyle.values());
 
-        //start Administrators Tab
-        chkAdminsHaveNegotiation = new JCheckBox();
-        chkAdminExperienceLevelIncludeNegotiation = new JCheckBox();
-        chkAdminsHaveScrounge = new JCheckBox();
-        chkAdminExperienceLevelIncludeScrounge = new JCheckBox();
-        //end Administrators Tab
+        lblPrisonerStatus = new JLabel();
+        comboPrisonerStatus = new MMComboBox<>("comboPrisonerStatus",
+            getPrisonerStatusOptions());
 
-        //start Awards Tab
+        chkPrisonerBabyStatus = new JCheckBox();
+        chkAtBPrisonerDefection = new JCheckBox();
+        chkAtBPrisonerRansom = new JCheckBox();
+
+        dependentsPanel = new JPanel();
+        chkUseRandomDependentAddition = new JCheckBox();
+        chkUseRandomDependentRemoval = new JCheckBox();
+    }
+
+    /**
+     * Initializes the components of the MedicalTab.
+     * The panel contains settings related to medical recovery and checks.
+     */
+    private void initializeMedicalTab() {
+        chkUseAdvancedMedical = new JCheckBox();
+
+        lblHealWaitingPeriod = new JLabel();
+        spnHealWaitingPeriod = new JSpinner();
+
+        lblNaturalHealWaitingPeriod = new JLabel();
+        spnNaturalHealWaitingPeriod = new JSpinner();
+
+        lblMinimumHitsForVehicles = new JLabel();
+        spnMinimumHitsForVehicles = new JSpinner();
+
+        chkUseRandomHitsForVehicles = new JCheckBox();
+        chkUseTougherHealing = new JCheckBox();
+
+        lblMaximumPatients = new JLabel();
+        spnMaximumPatients = new JSpinner();
+    }
+
+    /**
+     * Initializes the components of the AwardsTab.
+     * The panel contains settings related to award allocation.
+     */
+    private void initializeAwardsTab() {
         lblAwardBonusStyle = new JLabel();
         comboAwardBonusStyle = new MMComboBox<>("comboAwardBonusStyle", AwardBonus.values());
 
@@ -246,65 +272,76 @@ public class PersonnelTab {
         autoAwardsFilterPanel = new JPanel();
         lblAwardSetFilterList = new JLabel();
         txtAwardSetFilterList = new JTextArea();
-        //end Awards Tab
+    }
 
-        //start Medical Tab
-        chkUseAdvancedMedical = new JCheckBox();
+    /**
+     * Initializes the components of the AdministratorsTab.
+     * The panel contains settings related to administrator abilities.
+     */
+    private void initializeAdministratorsTab() {
+        chkAdminsHaveNegotiation = new JCheckBox();
+        chkAdminExperienceLevelIncludeNegotiation = new JCheckBox();
+        chkAdminsHaveScrounge = new JCheckBox();
+        chkAdminExperienceLevelIncludeScrounge = new JCheckBox();
+    }
 
-        lblHealWaitingPeriod = new JLabel();
-        spnHealWaitingPeriod = new JSpinner();
+    /**
+     * Initializes the components of the PersonnelInformationTab.
+     * The panel contains settings related to personnel information display.
+     */
+    private void initializePersonnelInformationTab() {
+        chkUseTimeInService = new JCheckBox();
 
-        lblNaturalHealWaitingPeriod = new JLabel();
-        spnNaturalHealWaitingPeriod = new JSpinner();
+        lblTimeInServiceDisplayFormat = new JLabel();
+        comboTimeInServiceDisplayFormat = new MMComboBox<>("comboTimeInServiceDisplayFormat",
+            TimeInDisplayFormat.values());
 
-        lblMinimumHitsForVehicles = new JLabel();
-        spnMinimumHitsForVehicles = new JSpinner();
+        chkUseTimeInRank = new JCheckBox();
 
-        chkUseRandomHitsForVehicles = new JCheckBox();
-        chkUseTougherHealing = new JCheckBox();
+        lblTimeInRankDisplayFormat = new JLabel();
+        comboTimeInRankDisplayFormat = new MMComboBox<>("comboTimeInRankDisplayFormat",
+            TimeInDisplayFormat.values());
 
-        lblMaximumPatients = new JLabel();
-        spnMaximumPatients = new JSpinner();
-        //end Medical Tab
+        chkTrackTotalEarnings = new JCheckBox();
+        chkTrackTotalXPEarnings = new JCheckBox();
+        chkShowOriginFaction = new JCheckBox();
+    }
 
-        //start Prisoners & Dependents Tab
-        prisonerPanel = new JPanel();
-        lblPrisonerCaptureStyle = new JLabel();
-        comboPrisonerCaptureStyle = new MMComboBox<>("comboPrisonerCaptureStyle",
-            PrisonerCaptureStyle.values());
+    /**
+     * Initializes components of the PersonnelLogsTab.
+     * Panel consists of settings related to personnel log keeping.
+     */
+    private void initializePersonnelLogsTab() {
+        chkUseTransfers = new JCheckBox();
+        chkUseExtendedTOEForceName = new JCheckBox();
+        chkPersonnelLogSkillGain = new JCheckBox();
+        chkPersonnelLogAbilityGain = new JCheckBox();
+        chkPersonnelLogEdgeGain = new JCheckBox();
+        chkDisplayPersonnelLog = new JCheckBox();
+        chkDisplayScenarioLog = new JCheckBox();
+        chkDisplayKillRecord = new JCheckBox();
+    }
 
-        lblPrisonerStatus = new JLabel();
-        comboPrisonerStatus = new MMComboBox<>("comboPrisonerStatus",
-            getPrisonerStatusOptions());
+    /**
+     * Initializes components of the GeneralTab.
+     * The panel contains general settings.
+     */
+    private void initializeGeneralTab() {
+        chkUseTactics = new JCheckBox();
+        chkUseInitiativeBonus = new JCheckBox();
+        chkUseToughness = new JCheckBox();
+        chkUseRandomToughness = new JCheckBox();
+        chkUseArtillery = new JCheckBox();
+        chkUseAbilities = new JCheckBox();
+        chkUseEdge = new JCheckBox();
+        chkUseSupportEdge = new JCheckBox();
+        chkUseImplants = new JCheckBox();
+        chkUseAlternativeQualityAveraging = new JCheckBox();
 
-        chkPrisonerBabyStatus = new JCheckBox();
-        chkAtBPrisonerDefection = new JCheckBox();
-        chkAtBPrisonerRansom = new JCheckBox();
-
-        dependentsPanel = new JPanel();
-        chkUseRandomDependentAddition = new JCheckBox();
-        chkUseRandomDependentRemoval = new JCheckBox();
-        //end Prisoners & Dependents Tab
-
-        //start Salaries Tab
-        chkDisableSecondaryRoleSalary = new JCheckBox();
-
-        pnlSalaryMultipliersPanel = new JPanel();
-
-        lblAntiMekSalary = new JLabel();
-        spnAntiMekSalary = new JSpinner();
-
-        lblSpecialistInfantrySalary = new JLabel();
-        spnSpecialistInfantrySalary = new JSpinner();
-
-        pnlSalaryExperienceMultipliersPanel = new JPanel();
-        lblSalaryExperienceMultipliers = new HashMap<>();
-        spnSalaryExperienceMultipliers = new HashMap<>();
-
-        pnlSalaryBaseSalaryPanel = new JPanel();
-        lblBaseSalary = new JLabel[29];
-        spnBaseSalary = new JSpinner[29];
-        //end Salaries Tab
+        personnelCleanUpPanel = new JPanel();
+        chkUsePersonnelRemoval = new JCheckBox();
+        chkUseRemovalExemptCemetery = new JCheckBox();
+        chkUseRemovalExemptRetirees = new JCheckBox();
     }
 
     /**

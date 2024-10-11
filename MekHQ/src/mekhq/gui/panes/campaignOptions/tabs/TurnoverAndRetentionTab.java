@@ -123,14 +123,34 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
-     * Initializes and configures the components that will be used in the Turnover and Fatigue tabs.
-     * <p>
-     * Components initialized include various check boxes, labels, spinners and panels necessary for
-     * the configuration of these tab panels. Almost all components necessary in these tabs are
-     * initialized here.
+     * Initializes all tab components.
      */
     protected void initialize() {
-        // Turnover Tab
+        initializeTurnoverTab();
+        initializeFatigueTab();
+    }
+
+    /**
+     * Initializes the components for the FatigueTab panel.
+     * This panel contains settings related to fatigue mechanics in the game.
+     */
+    private void initializeFatigueTab() {
+        chkUseFatigue = new JCheckBox();
+        lblFatigueRate = new JLabel();
+        spnFatigueRate = new JSpinner();
+        chkUseInjuryFatigue = new JCheckBox();
+        lblFieldKitchenCapacity = new JLabel();
+        spnFieldKitchenCapacity = new JSpinner();
+        chkFieldKitchenIgnoreNonCombatants = new JCheckBox();
+        lblFatigueLeaveThreshold = new JLabel();
+        spnFatigueLeaveThreshold = new JSpinner();
+    }
+
+    /**
+     * Initializes the components for the TurnoverTab panel.
+     * This panel contains various settings influencing unit turnover in the game.
+     */
+    private void initializeTurnoverTab() {
         chkUseRandomRetirement = new JCheckBox();
 
         pnlSettings = new JPanel();
@@ -193,17 +213,6 @@ public class TurnoverAndRetentionTab {
         chkUseCommanderLeadershipOnly = new JCheckBox();
         lblManagementSkillPenalty = new JLabel();
         spnManagementSkillPenalty = new JSpinner();
-
-        // Fatigue Tab
-        chkUseFatigue = new JCheckBox();
-        lblFatigueRate = new JLabel();
-        spnFatigueRate = new JSpinner();
-        chkUseInjuryFatigue = new JCheckBox();
-        lblFieldKitchenCapacity = new JLabel();
-        spnFieldKitchenCapacity = new JSpinner();
-        chkFieldKitchenIgnoreNonCombatants = new JCheckBox();
-        lblFatigueLeaveThreshold = new JLabel();
-        spnFatigueLeaveThreshold = new JSpinner();
     }
 
     /**

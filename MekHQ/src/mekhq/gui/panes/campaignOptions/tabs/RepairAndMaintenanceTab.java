@@ -52,6 +52,64 @@ public class RepairAndMaintenanceTab {
     }
 
     /**
+     * Initializes the repair and maintenance tab by creating and initializing various UI components.
+     */
+    void initialize() {
+        initializeRepairTab();
+        initializeMaintenanceTab();
+    }
+
+    /**
+     * Initializes the repair tab by creating and initializing various UI components.
+     */
+    private void initializeRepairTab() {
+        useEraModsCheckBox = new JCheckBox();
+
+        assignedTechFirstCheckBox = new JCheckBox();
+
+        resetToFirstTechCheckBox = new JCheckBox();
+
+        useQuirksBox = new JCheckBox();
+
+        useAeroSystemHitsBox = new JCheckBox();
+
+        useDamageMargin = new JCheckBox();
+        lblDamageMargin = new JLabel();
+        spnDamageMargin = new JSpinner();
+
+        lblDestroyPartTarget = new JLabel();
+        spnDestroyPartTarget = new JSpinner();
+    }
+
+    /**
+     * Initializes the maintenance tab by creating and initializing various UI components.
+     */
+    private void initializeMaintenanceTab() {
+        checkMaintenance = new JCheckBox();
+
+        lblMaintenanceDays = new JLabel();
+        spnMaintenanceDays = new JSpinner();
+
+        lblMaintenanceBonus = new JLabel();
+        spnMaintenanceBonus = new JSpinner();
+
+        lblDefaultMaintenanceTime = new JLabel();
+        spnDefaultMaintenanceTime = new JSpinner();
+
+        useQualityMaintenance = new JCheckBox();
+
+        reverseQualityNames = new JCheckBox();
+
+        chkUseRandomUnitQualities = new JCheckBox();
+
+        chkUsePlanetaryModifiers = new JCheckBox();
+
+        useUnofficialMaintenance = new JCheckBox();
+
+        logMaintenance = new JCheckBox();
+    }
+
+    /**
      * Creates the repair tab panel.
      *
      * @return the created repair tab panel as a {@link JPanel}
@@ -235,63 +293,5 @@ public class RepairAndMaintenanceTab {
 
     private void recreateFinancesPanel(boolean isReversingQualityNames) {
         // TODO handle this
-    }
-
-    /**
-     * Initializes the repair and maintenance tab by creating and initializing various UI components.
-     */
-    void initialize() {
-        initializeRepairTab();
-        initializeMaintenanceTab();
-    }
-
-    /**
-     * Initializes the repair tab by creating and initializing various UI components.
-     */
-    private void initializeRepairTab() {
-        useEraModsCheckBox = new JCheckBox();
-
-        assignedTechFirstCheckBox = new JCheckBox();
-
-        resetToFirstTechCheckBox = new JCheckBox();
-
-        useQuirksBox = new JCheckBox();
-
-        useAeroSystemHitsBox = new JCheckBox();
-
-        useDamageMargin = new JCheckBox();
-        lblDamageMargin = new JLabel();
-        spnDamageMargin = new JSpinner();
-
-        lblDestroyPartTarget = new JLabel();
-        spnDestroyPartTarget = new JSpinner();
-    }
-
-    /**
-     * Initializes the maintenance tab by creating and initializing various UI components.
-     */
-    private void initializeMaintenanceTab() {
-        checkMaintenance = new JCheckBox();
-
-        lblMaintenanceDays = new JLabel();
-        spnMaintenanceDays = new JSpinner();
-
-        lblMaintenanceBonus = new JLabel();
-        spnMaintenanceBonus = new JSpinner();
-
-        lblDefaultMaintenanceTime = new JLabel();
-        spnDefaultMaintenanceTime = new JSpinner();
-
-        useQualityMaintenance = new JCheckBox();
-
-        reverseQualityNames = new JCheckBox();
-
-        chkUseRandomUnitQualities = new JCheckBox();
-
-        chkUsePlanetaryModifiers = new JCheckBox();
-
-        useUnofficialMaintenance = new JCheckBox();
-
-        logMaintenance = new JCheckBox();
     }
 }

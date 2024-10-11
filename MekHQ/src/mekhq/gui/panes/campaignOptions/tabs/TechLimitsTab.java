@@ -40,6 +40,46 @@ public class TechLimitsTab {
     }
 
     /**
+     * Calls the initialization methods for the different tabs.
+     */
+    void initialize() {
+        initializeTechLimitsTab();
+        initializeRandomAssignmentTablesTab();
+        initializeCustomRulesetsTab();
+    }
+
+    /**
+     * Initializes the components of the TechLimitsTab.
+     * This panel contains various controls for setting technological limits.
+     */
+    private void initializeTechLimitsTab() {
+        limitByYearBox = new JCheckBox();
+        disallowExtinctStuffBox = new JCheckBox();
+        allowClanPurchasesBox = new JCheckBox();
+        allowISPurchasesBox = new JCheckBox();
+        allowCanonOnlyBox = new JCheckBox();
+        allowCanonRefitOnlyBox = new JCheckBox();
+        lblChoiceTechLevel = new JLabel();
+        choiceTechLevel = new MMComboBox<>("choiceTechLevel", getMaximumTechLevelOptions());
+        variableTechLevelBox = new JCheckBox();
+        useAmmoByTypeBox = new JCheckBox();
+    }
+
+    /**
+     * Initializes the components of the RandomAssignmentTablesTab.
+     * This panel would typically contain controls related to random assignment tables.
+     */
+    private void initializeRandomAssignmentTablesTab() {
+    }
+
+    /**
+     * Initializes the components of the CustomRulesetsTab.
+     * This panel would typically contain controls related to custom rulesets.
+     */
+    private void initializeCustomRulesetsTab() {
+    }
+
+    /**
      * Creates a {@link JPanel} representing the tech limits tab.
      * This method constructs various components including checkboxes, labels, and combo boxes
      * to customize the tech limit settings.
@@ -138,24 +178,6 @@ public class TechLimitsTab {
         wrapperPanel.add(contentPanel, gbc);
 
         return wrapperPanel;
-    }
-
-    void initialize() {
-        // Tech Limits Tab
-        limitByYearBox = new JCheckBox();
-        disallowExtinctStuffBox = new JCheckBox();
-        allowClanPurchasesBox = new JCheckBox();
-        allowISPurchasesBox = new JCheckBox();
-        allowCanonOnlyBox = new JCheckBox();
-        allowCanonRefitOnlyBox = new JCheckBox();
-        lblChoiceTechLevel = new JLabel();
-        choiceTechLevel = new MMComboBox<>("choiceTechLevel", getMaximumTechLevelOptions());
-        variableTechLevelBox = new JCheckBox();
-        useAmmoByTypeBox = new JCheckBox();
-
-        // Random Assignment Tables Tab
-
-        // Rulesets Tab
     }
 
     /**

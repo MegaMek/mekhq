@@ -98,8 +98,75 @@ public class RelationshipsTab {
         initialize();
     }
 
+    /**
+     * Calls the initialization methods for all the tab panels.
+     */
     protected void initialize() {
-        // Marriage Tab
+        initializeMarriageTab();
+        initializeDivorceTab();
+        initializeProcreationTab();
+    }
+
+    /**
+     * Initializes the components of the ProcreationTab.
+     * The panel contains settings related to character procreation in the simulation.
+     */
+    private void initializeProcreationTab() {
+        pnlProcreationGeneralOptionsPanel = new JPanel();
+        chkUseManualProcreation = new JCheckBox();
+        chkUseClanPersonnelProcreation = new JCheckBox();
+        chkUsePrisonerProcreation = new JCheckBox();
+        lblMultiplePregnancyOccurrences = new JLabel();
+        spnMultiplePregnancyOccurrences = new JSpinner();
+        lblBabySurnameStyle = new JLabel();
+        comboBabySurnameStyle = new MMComboBox<>("comboBabySurnameStyle", BabySurnameStyle.values());
+        chkAssignNonPrisonerBabiesFounderTag = new JCheckBox();
+        chkAssignChildrenOfFoundersFounderTag = new JCheckBox();
+        chkDetermineFatherAtBirth = new JCheckBox();
+        chkDisplayTrueDueDate = new JCheckBox();
+        lblNoInterestInChildrenDiceSize = new JLabel();
+        spnNoInterestInChildrenDiceSize = new JSpinner();
+        chkUseMaternityLeave = new JCheckBox();
+        chkLogProcreation = new JCheckBox();
+
+        pnlRandomProcreationPanel = new JPanel();
+        lblRandomProcreationMethod = new JLabel();
+        comboRandomProcreationMethod = new MMComboBox<>("comboRandomProcreationMethod",
+            RandomProcreationMethod.values());
+        chkUseRelationshiplessRandomProcreation = new JCheckBox();
+        chkUseRandomClanPersonnelProcreation = new JCheckBox();
+        chkUseRandomPrisonerProcreation = new JCheckBox();
+        lblRandomProcreationRelationshipDiceSize = new JLabel();
+        spnRandomProcreationRelationshipDiceSize = new JSpinner();
+        lblRandomProcreationRelationshiplessDiceSize = new JLabel();
+        spnRandomProcreationRelationshiplessDiceSize = new JSpinner();
+    }
+
+    /**
+     * Initializes the components of the DivorceTab.
+     * The panel contains settings related to divorce mechanics within the simulation.
+     */
+    private void initializeDivorceTab() {
+        chkUseManualDivorce = new JCheckBox();
+        chkUseClanPersonnelDivorce = new JCheckBox();
+        chkUsePrisonerDivorce = new JCheckBox();
+
+        pnlRandomDivorce = new JPanel();
+        lblRandomDivorceMethod = new JLabel();
+        comboRandomDivorceMethod = new MMComboBox<>("comboRandomDivorceMethod", RandomDivorceMethod.values());
+        chkUseRandomOppositeSexDivorce = new JCheckBox();
+        chkUseRandomSameSexDivorce = new JCheckBox();
+        chkUseRandomClanPersonnelDivorce = new JCheckBox();
+        chkUseRandomPrisonerDivorce = new JCheckBox();
+        lblRandomDivorceDiceSize = new JLabel();
+        spnRandomDivorceDiceSize = new JSpinner();
+    }
+
+    /**
+     * Initializes the components of the MarriageTab.
+     * The panel contains various settings related to marriage mechanics within the simulation.
+     */
+    private void initializeMarriageTab() {
         pnlMarriageGeneralOptions = new JPanel();
         chkUseManualMarriages = new JCheckBox();
         chkUseClanPersonnelMarriages = new JCheckBox();
@@ -130,52 +197,9 @@ public class RelationshipsTab {
         spnRandomSameSexMarriageDiceSize = new JSpinner();
         lblRandomNewDependentMarriage = new JLabel();
         spnRandomNewDependentMarriage = new JSpinner();
+    }
 
-        // Divorce Tab
-        chkUseManualDivorce = new JCheckBox();
-        chkUseClanPersonnelDivorce = new JCheckBox();
-        chkUsePrisonerDivorce = new JCheckBox();
-
-        pnlRandomDivorce = new JPanel();
-        lblRandomDivorceMethod = new JLabel();
-        comboRandomDivorceMethod = new MMComboBox<>("comboRandomDivorceMethod", RandomDivorceMethod.values());
-        chkUseRandomOppositeSexDivorce = new JCheckBox();
-        chkUseRandomSameSexDivorce = new JCheckBox();
-        chkUseRandomClanPersonnelDivorce = new JCheckBox();
-        chkUseRandomPrisonerDivorce = new JCheckBox();
-        lblRandomDivorceDiceSize = new JLabel();
-        spnRandomDivorceDiceSize = new JSpinner();
-
-        // Procreation Tab
-        pnlProcreationGeneralOptionsPanel = new JPanel();
-        chkUseManualProcreation = new JCheckBox();
-        chkUseClanPersonnelProcreation = new JCheckBox();
-        chkUsePrisonerProcreation = new JCheckBox();
-        lblMultiplePregnancyOccurrences = new JLabel();
-        spnMultiplePregnancyOccurrences = new JSpinner();
-        lblBabySurnameStyle = new JLabel();
-        comboBabySurnameStyle = new MMComboBox<>("comboBabySurnameStyle", BabySurnameStyle.values());
-        chkAssignNonPrisonerBabiesFounderTag = new JCheckBox();
-        chkAssignChildrenOfFoundersFounderTag = new JCheckBox();
-        chkDetermineFatherAtBirth = new JCheckBox();
-        chkDisplayTrueDueDate = new JCheckBox();
-        lblNoInterestInChildrenDiceSize = new JLabel();
-        spnNoInterestInChildrenDiceSize = new JSpinner();
-        chkUseMaternityLeave = new JCheckBox();
-        chkLogProcreation = new JCheckBox();
-
-        pnlRandomProcreationPanel = new JPanel();
-        lblRandomProcreationMethod = new JLabel();
-        comboRandomProcreationMethod = new MMComboBox<>("comboRandomProcreationMethod",
-            RandomProcreationMethod.values());
-        chkUseRelationshiplessRandomProcreation = new JCheckBox();
-        chkUseRandomClanPersonnelProcreation = new JCheckBox();
-        chkUseRandomPrisonerProcreation = new JCheckBox();
-        lblRandomProcreationRelationshipDiceSize = new JLabel();
-        spnRandomProcreationRelationshipDiceSize = new JSpinner();
-        lblRandomProcreationRelationshiplessDiceSize = new JLabel();
-        spnRandomProcreationRelationshiplessDiceSize = new JSpinner();
-    }/**
+    /**
      * Creates a panel for the Marriage tab with various input components and panels related to marriage settings.
      *
      * @return a {@link} representing the Marriage tab with checkboxes for manual, clan personnel,

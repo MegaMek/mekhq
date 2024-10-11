@@ -147,67 +147,38 @@ public class biographyTab {
     }
 
     /**
-     * Initializes the state and the UI components for the settings panels.
-     * This includes General, Backgrounds, Marriage, Divorce, Procreation, and Death panels.
-     * Each panel contains multiple aspects of settings such as Randomization, Dice Size, Display of
-     * Anniversaries, Handling of Origin Options, Marriage & Divorce parameters, Probabilities related
-     * to Procreation, and settings for Death scenarios among others.
-     * {@link JCheckBox}, {@link JLabel}, {@link JSlider}, {@link JSpinner} and {@link MMComboBox}
-     * components are thoroughly initialized in this method for handling various settings options.
+     * Initializes the components for the NameAndPortraitTab panel.
+     * The panel contains various settings related to names and portraits.
      */
     protected void initialize() {
-        // General Tab
-        chkUseDylansRandomXP = new JCheckBox();
-        lblGender = new JLabel();
-        sldGender = new JSlider();
-        lblNonBinaryDiceSize = new JLabel();
-        spnNonBinaryDiceSize = new JSpinner();
-        lblFamilyDisplayLevel = new JLabel();
-        comboFamilyDisplayLevel = new MMComboBox<>("comboFamilyDisplayLevel",
-            FamilialRelationshipDisplayLevel.values());
+        initializeGeneralTab();
+        initializeBackgroundsTab();
+        initializeDeathTab();
+        initializeEducationTab();
+        initializeNameAndPortraitTab();
+    }
 
-        pnlAnniversariesPanel = new JPanel();
-        chkAnnounceOfficersOnly = new JCheckBox();
-        chkAnnounceBirthdays = new JCheckBox();
-        chkAnnounceChildBirthdays = new JCheckBox();
-        chkAnnounceRecruitmentAnniversaries = new JCheckBox();
+    /**
+     * Initializes the components for the EducationTab panel.
+     * The panel contains various settings related to the educational module.
+     */
+    private void initializeNameAndPortraitTab() {
+        chkUseOriginFactionForNames = new JCheckBox();
+        lblFactionNames = new JLabel();
+        comboFactionNames = new MMComboBox<>("comboFactionNames", getFactionNamesModel());
+        chkAssignPortraitOnRoleChange = new JCheckBox();
 
-        // Backgrounds Tab
-        chkUseRandomPersonalities = new JCheckBox();
-        chkUseRandomPersonalityReputation = new JCheckBox();
-        chkUseIntelligenceXpMultiplier = new JCheckBox();
-        chkUseSimulatedRelationships = new JCheckBox();
+        pnlRandomPortrait = new JPanel();
+        chkUsePortrait = new JCheckBox[1]; // We're going to properly initialize this later
+        allPortraitsBox = new JCheckBox();
+        noPortraitsBox = new JCheckBox();
+    }
 
-        pnlRandomOriginOptions = new JPanel();
-        chkRandomizeOrigin = new JCheckBox();
-        chkRandomizeDependentsOrigin = new JCheckBox();
-        chkRandomizeAroundSpecifiedPlanet = new JCheckBox();
-        chkSpecifiedSystemFactionSpecific = new JCheckBox();
-        lblSpecifiedSystem = new JLabel();
-        comboSpecifiedSystem = new MMComboBox<>("comboSpecifiedSystem");
-        lblSpecifiedPlanet = new JLabel();
-        comboSpecifiedPlanet = new MMComboBox<>("comboSpecifiedPlanet");
-        lblOriginSearchRadius = new JLabel();
-        spnOriginSearchRadius = new JSpinner();
-        lblOriginDistanceScale = new JLabel();
-        spnOriginDistanceScale = new JSpinner();
-        chkAllowClanOrigins = new JCheckBox();
-        chkExtraRandomOrigin = new JCheckBox();
-
-        // Death Tab
-        chkKeepMarriedNameUponSpouseDeath = new JCheckBox();
-        lblRandomDeathMethod = new JLabel();
-        comboRandomDeathMethod = new MMComboBox<>("comboRandomDeathMethod", RandomDeathMethod.values());
-        chkUseRandomClanPersonnelDeath = new JCheckBox();
-        chkUseRandomPrisonerDeath = new JCheckBox();
-        chkUseRandomDeathSuicideCause = new JCheckBox();
-        lblPercentageRandomDeathChance = new JLabel();
-        spnPercentageRandomDeathChance = new JSpinner();
-
-        pnlDeathAgeGroup = new JPanel();
-        chkEnabledRandomDeathAgeGroups = new HashMap<>();
-
-        // Education Tab
+    /**
+     * Initializes the components for the DeathTab panel.
+     * The panel deals with various settings related to in-game character death.
+     */
+    private void initializeEducationTab() {
         chkUseEducationModule = new JCheckBox();
         lblCurriculumXpRate = new JLabel();
         spnCurriculumXpRate = new JSpinner();
@@ -240,17 +211,72 @@ public class biographyTab {
         chkAllAges = new JCheckBox();
         lblMilitaryAcademyAccidents = new JLabel();
         spnMilitaryAcademyAccidents = new JSpinner();
+    }
 
-        // Name and Portrait Generation
-        chkUseOriginFactionForNames = new JCheckBox();
-        lblFactionNames = new JLabel();
-        comboFactionNames = new MMComboBox<>("comboFactionNames", getFactionNamesModel());
-        chkAssignPortraitOnRoleChange = new JCheckBox();
+    /**
+     * Initializes the components for the BackgroundsTab panel.
+     * The panel contains various settings related to backgrounds and origins.
+     */
+    private void initializeDeathTab() {
+        chkKeepMarriedNameUponSpouseDeath = new JCheckBox();
+        lblRandomDeathMethod = new JLabel();
+        comboRandomDeathMethod = new MMComboBox<>("comboRandomDeathMethod", RandomDeathMethod.values());
+        chkUseRandomClanPersonnelDeath = new JCheckBox();
+        chkUseRandomPrisonerDeath = new JCheckBox();
+        chkUseRandomDeathSuicideCause = new JCheckBox();
+        lblPercentageRandomDeathChance = new JLabel();
+        spnPercentageRandomDeathChance = new JSpinner();
 
-        pnlRandomPortrait = new JPanel();
-        chkUsePortrait = new JCheckBox[1]; // We're going to properly initialize this later
-        allPortraitsBox = new JCheckBox();
-        noPortraitsBox = new JCheckBox();
+        pnlDeathAgeGroup = new JPanel();
+        chkEnabledRandomDeathAgeGroups = new HashMap<>();
+    }
+
+    /**
+     * Initializes the components for the GeneralTab panel.
+     * The panel contains various general settings.
+     */
+    private void initializeBackgroundsTab() {
+        chkUseRandomPersonalities = new JCheckBox();
+        chkUseRandomPersonalityReputation = new JCheckBox();
+        chkUseIntelligenceXpMultiplier = new JCheckBox();
+        chkUseSimulatedRelationships = new JCheckBox();
+
+        pnlRandomOriginOptions = new JPanel();
+        chkRandomizeOrigin = new JCheckBox();
+        chkRandomizeDependentsOrigin = new JCheckBox();
+        chkRandomizeAroundSpecifiedPlanet = new JCheckBox();
+        chkSpecifiedSystemFactionSpecific = new JCheckBox();
+        lblSpecifiedSystem = new JLabel();
+        comboSpecifiedSystem = new MMComboBox<>("comboSpecifiedSystem");
+        lblSpecifiedPlanet = new JLabel();
+        comboSpecifiedPlanet = new MMComboBox<>("comboSpecifiedPlanet");
+        lblOriginSearchRadius = new JLabel();
+        spnOriginSearchRadius = new JSpinner();
+        lblOriginDistanceScale = new JLabel();
+        spnOriginDistanceScale = new JSpinner();
+        chkAllowClanOrigins = new JCheckBox();
+        chkExtraRandomOrigin = new JCheckBox();
+    }
+
+    /**
+     * Initializes components of the GeneralTab.
+     * The panel contains general settings.
+     */
+    private void initializeGeneralTab() {
+        chkUseDylansRandomXP = new JCheckBox();
+        lblGender = new JLabel();
+        sldGender = new JSlider();
+        lblNonBinaryDiceSize = new JLabel();
+        spnNonBinaryDiceSize = new JSpinner();
+        lblFamilyDisplayLevel = new JLabel();
+        comboFamilyDisplayLevel = new MMComboBox<>("comboFamilyDisplayLevel",
+            FamilialRelationshipDisplayLevel.values());
+
+        pnlAnniversariesPanel = new JPanel();
+        chkAnnounceOfficersOnly = new JCheckBox();
+        chkAnnounceBirthdays = new JCheckBox();
+        chkAnnounceChildBirthdays = new JCheckBox();
+        chkAnnounceRecruitmentAnniversaries = new JCheckBox();
     }
 
     /**
