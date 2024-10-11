@@ -41,7 +41,7 @@ public class CampaignOptionsUtilities {
     static JCheckBox createCheckBox(String name, @Nullable Integer customWrapSize) {
         customWrapSize = processWrapSize(customWrapSize);
 
-        JCheckBox checkBox = new JCheckBox(String.format("<html><b>%s</b></html>",
+        JCheckBox checkBox = new JCheckBox(String.format("<html>%s</html>",
             resources.getString("lbl" + name + ".text")));
         checkBox.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         checkBox.setName("chk" + name);
@@ -178,7 +178,7 @@ public class CampaignOptionsUtilities {
 
         if (includeBorder) {
             panel.setBorder(BorderFactory.createTitledBorder(
-                String.format(String.format("<html><b>%s</b></html>", borderTitle))));
+                String.format(String.format("<html>%s</html>", borderTitle))));
         }
 
         panel.setName(name);

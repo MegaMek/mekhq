@@ -10,6 +10,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.*;
 import java.util.HashMap;
@@ -1128,17 +1129,31 @@ public class PersonnelTab {
     private JPanel createBaseSalariesPanel() {
         // Contents
         for (final PersonnelRole personnelRole : PersonnelRole.values()) {
-            String componentName = "BaseSalary" + personnelRole.toString();
-            componentName = componentName.replaceAll(" ", "");
+            String componentName = personnelRole.toString().replaceAll(" ", "");
 
-            final JLabel label = createLabel(componentName, null);
+            // JLabel
+            JLabel jLabel = new JLabel(personnelRole.toString());
+            jLabel.setName("lbl" + componentName);
 
-            final JSpinner spinner = createSpinner(componentName, null,
-                0.0, 0.0, 1000000, 10.0);
+            Dimension labelSize = jLabel.getPreferredSize();
+            jLabel.setMinimumSize(labelSize);
+            jLabel.setMaximumSize(labelSize);
+
+            // JSpinner
+            JSpinner jSpinner = new JSpinner();
+            jSpinner.setModel(new SpinnerNumberModel(0.0, 0.0, 1000000, 10.0));
+            jSpinner.setName("spn" + componentName);
+
+            DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
+            editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+
+            Dimension spinnerSize = jSpinner.getPreferredSize();
+            jSpinner.setMaximumSize(spinnerSize);
+            jSpinner.setMinimumSize(spinnerSize);
 
             // Component Tracking Assignment
-            lblBaseSalary[personnelRole.ordinal()] = label;
-            spnBaseSalary[personnelRole.ordinal()] = spinner;
+            lblBaseSalary[personnelRole.ordinal()] = jLabel;
+            spnBaseSalary[personnelRole.ordinal()] = jSpinner;
         }
 
         // Layout the Panel
