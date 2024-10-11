@@ -29,6 +29,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.utilities.ReportingUtilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -458,14 +459,75 @@ public class ForceViewPanel extends JScrollablePanel {
     }
 
     public String getForceSummary(Person person, Unit unit) {
-        String toReturn = "<html><font><b>" + person.getFullTitle() + "</b><br/>";
-        toReturn += person.getSkillLevel(campaign, false) + " " + person.getRoleDesc();
-        if (null != unit && null != unit.getEntity()
-                && null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
-            toReturn += "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
+        if(null == person) {
+            return "";
         }
-        toReturn += "</font></html>";
-        return toReturn;
+
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><nobr><font size='3'><b>")
+            .append(person.getFullTitle())
+            .append("</b><br/>")
+            .append(person.getSkillLevel(campaign, false))
+            .append(' ')
+            .append(person.getRoleDesc());
+        
+        toReturn.append("<br>");
+
+        boolean isInjured = false;
+        boolean isFatigued = false;
+
+        if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+            if (person.hasInjuries(true)) {
+                isInjured = true;
+                int injuryCount = person.getInjuries().size();
+
+                StringBuilder injuriesMessage = new StringBuilder(16);
+                injuriesMessage.append(' ')
+                    .append(injuryCount)
+                    .append(injuryCount == 1 ? " injury" : " injuries");
+                
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), injuriesMessage.toString()));
+            }
+
+        } else {
+            if (null != unit && null != unit.getEntity() && null != unit.getEntity().getCrew()
+                    && unit.getEntity().getCrew().getHits() > 0) {
+                isInjured = true;
+                int hitCount = unit.getEntity().getCrew().getHits();
+
+                StringBuilder hitsMessage = new StringBuilder(16);
+                hitsMessage.append(' ')
+                    .append(hitCount)
+                    .append(hitCount == 1 ? " hit" : " hits");
+
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage.toString()));
+            }
+        }
+   
+        if (campaign.getCampaignOptions().isUseFatigue() && (person.getEffectiveFatigue(campaign) > 0)) {
+            isFatigued = true;
+            if (isInjured) {
+                toReturn.append(',');
+            }
+            toReturn.append(' ');
+
+            StringBuilder fatigueMessage = new StringBuilder(16);
+
+            fatigueMessage.append(person.getEffectiveFatigue(campaign));
+            fatigueMessage.append(" fatigue");
+
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage.toString()));
+        }
+        
+        if (!(isInjured || isFatigued)) {
+            toReturn.append("&nbsp;");
+        }
+
+        toReturn.append("</font></nobr></html>");
+        return toReturn.toString();
     }
 
     public String getForceSummary(Unit unit) {

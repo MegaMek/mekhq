@@ -965,18 +965,6 @@ public class AtBContract extends Contract {
                 .dividedBy(getLength());
     }
 
-    public void checkForFollowup(Campaign campaign) {
-        if (getContractType().isDiversionaryRaid() || getContractType().isReconRaid()
-                || getContractType().isRiotDuty()) {
-            int roll = Compute.d6();
-            if (roll == 6) {
-                campaign.getContractMarket().addFollowup(campaign, this);
-                campaign.addReport(
-                        "Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
-            }
-        }
-    }
-
     @Override
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         indent = super.writeToXMLBegin(pw, indent);

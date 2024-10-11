@@ -90,6 +90,14 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, value);
     }
 
+    public boolean getShowUnitPicturesOnTOE() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_UNIT_PICTURES_ON_TOE, true);
+    }
+
+    public void setShowUnitPicturesOnTOE(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_UNIT_PICTURES_ON_TOE, value);
+    }
+
     // region Command Center Tab
     public boolean getCommandCenterUseUnitMarket() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET,

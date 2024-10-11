@@ -21,6 +21,7 @@ package mekhq.gui;
 import java.awt.Component;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
@@ -160,8 +161,12 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
 
     protected Icon getIcon(Object node) {
         if (node instanceof Unit) {
-            final Person person = ((Unit) node).getCommander();
-            return (person == null) ? null : person.getPortrait().getImageIcon(58);
+            if (MekHQ.getMHQOptions().getShowUnitPicturesOnTOE()) {
+                return new ImageIcon(((Unit) node).getImage(this));
+            } else {
+                final Person person = ((Unit) node).getCommander();
+                return (person == null) ? null : person.getPortrait().getImageIcon(58);
+            }
         } else if (node instanceof Force) {
             return ((Force) node).getForceIcon().getImageIcon(58);
         } else {
