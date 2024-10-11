@@ -1280,8 +1280,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         @Override
         protected void okAction() {
-            GUIPreferences.getInstance().setValue(GUIPreferences.GUI_SCALE, 0.1 * guiScale.getValue());
-            MekHQ.updateGuiScaling();
+            if (GUIPreferences.getInstance().getGUIScale() * 10 != guiScale.getValue()) {
+                GUIPreferences.getInstance().setValue(GUIPreferences.GUI_SCALE, 0.1 * guiScale.getValue());
+                MekHQ.updateGuiScaling();
+            }
                 if (validateDateFormat(optionDisplayDateFormat.getText())) {
                         MekHQ.getMHQOptions().setDisplayDateFormat(optionDisplayDateFormat.getText());
                 }
