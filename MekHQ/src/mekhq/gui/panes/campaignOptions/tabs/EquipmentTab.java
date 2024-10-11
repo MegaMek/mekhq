@@ -5,11 +5,10 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
-import java.awt.*;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
-public class TechLimitsTab {
+public class EquipmentTab {
     JFrame frame;
     String name;
 
@@ -32,7 +31,7 @@ public class TechLimitsTab {
     //start Rulesets Tab
     //end Rulesets Tab
 
-    public TechLimitsTab(JFrame frame, String name) {
+    public EquipmentTab(JFrame frame, String name) {
         this.frame = frame;
         this.name = name;
 
@@ -45,7 +44,6 @@ public class TechLimitsTab {
     void initialize() {
         initializeTechLimitsTab();
         initializeRandomAssignmentTablesTab();
-        initializeCustomRulesetsTab();
     }
 
     /**
@@ -70,13 +68,6 @@ public class TechLimitsTab {
      * This panel would typically contain controls related to random assignment tables.
      */
     private void initializeRandomAssignmentTablesTab() {
-    }
-
-    /**
-     * Initializes the components of the CustomRulesetsTab.
-     * This panel would typically contain controls related to custom rulesets.
-     */
-    private void initializeCustomRulesetsTab() {
     }
 
     /**
@@ -153,31 +144,7 @@ public class TechLimitsTab {
                 .addComponent(useAmmoByTypeBox));
 
         // Create Parent Panel and return
-        JPanel parentPanel = createParentPanel(panel, "TechLimitsTab");
-
-        // Create a panel for the quote
-        JPanel quotePanel = new JPanel();
-        JLabel quote = new JLabel(String.format("<html><i><center>%s</i></center></html>",
-            resources.getString("TechLimitsTab.border")));
-        quotePanel.add(parentPanel);
-        quotePanel.add(quote);
-
-        // Reorganize mainPanel to include quotePanel at bottom
-        JPanel contentPanel = new JPanel(new BorderLayout());
-        contentPanel.setName("TechLimitsTab");
-        contentPanel.add(parentPanel, BorderLayout.CENTER);
-        contentPanel.add(quotePanel, BorderLayout.SOUTH);
-
-        // Create a wrapper panel for its easy alignment controls
-        JPanel wrapperPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTH;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-
-        wrapperPanel.add(contentPanel, gbc);
-
-        return wrapperPanel;
+        return createParentPanel(panel, "TechLimitsTab");
     }
 
     /**

@@ -38,10 +38,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", round(HEADER_FONT_SIZE * uiScale),
             resources.getString("generalPanel.title")), createGeneralTab());
 
-        createTab("combatReadinessParentTab", createCombatReadinessParentTab());
         createTab("humanResourcesParentTab", createHumanResourcesParentTab());
         createTab("unitDevelopmentParentTab", createUnitDevelopmentParentTab());
-        createTab("logisticsAndMaintenanceParentTab", createLogisticsAndMaintenanceParentTab());
+        createTab("logisticsAndMaintenanceParentTab", createEquipmentAndSuppliesParentTab());
         createTab("strategicOperationsParentTab", createStrategicOperationsParentTab());
     }
 
@@ -79,23 +78,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JPanel createdGeneralTab = generalTab.createGeneralTab();
 
         return new JScrollPane(createdGeneralTab);
-    }
-
-    private JTabbedPane createCombatReadinessParentTab() {
-        // Tech Limits
-        // Random Assignment Tables
-        // Rulesets
-
-        // Parent Tab
-        JTabbedPane combatReadinessParentTab = new JTabbedPane();
-
-        TechLimitsTab techLimitsTab = new TechLimitsTab(getFrame(),
-            "techLimitsTab");
-
-        combatReadinessParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("TechLimitsParentTab.title")), techLimitsTab.createTechLimitsTab());
-
-        return combatReadinessParentTab;
     }
 
     /**
@@ -181,25 +163,25 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * This `createLogisticsAndMaintenanceParentTab` method creates and returns a `JTabbedPane` object.
+     * This `createEquipmentAndSuppliesParentTab` method creates and returns a `JTabbedPane` object.
      * This represents the "Logistics and Maintenance" parent tab in the user interface.
      *
      * @return JTabbedPane representing the "Logistics and Maintenance" tab.
      */
-    private JTabbedPane createLogisticsAndMaintenanceParentTab() {
+    private JTabbedPane createEquipmentAndSuppliesParentTab() {
         // Parent Tab
-        JTabbedPane logisticsAndMaintenanceParentTab = new JTabbedPane();
+        JTabbedPane equipmentAndSuppliesParentTab = new JTabbedPane();
 
         // Repair and Maintenance
         RepairAndMaintenanceTab repairAndMaintenanceTab = new RepairAndMaintenanceTab(getFrame(),
             "repairAndMaintenanceTab");
 
-        JTabbedPane repairAndMaintenanceContentTabs = createSubTabs(Map.of(
+        JTabbedPane repairsAndMaintenanceContentTabs = createSubTabs(Map.of(
             "repairTab", repairAndMaintenanceTab.createRepairTab(),
             "maintenanceTab", repairAndMaintenanceTab.createMaintenanceTab()));
 
         // Supplies and Acquisition
-        SuppliesAndAcquisitionTab suppliesAndAcquisitionTab = new SuppliesAndAcquisitionTab(getFrame(),
+        EquipmentAndSuppliesTab suppliesAndAcquisitionTab = new EquipmentAndSuppliesTab(getFrame(),
             "suppliesAndAcquisitionTab");
 
         JTabbedPane suppliesAndAcquisitionContentTabs = createSubTabs(Map.of(
@@ -207,22 +189,31 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "deliveryTab", suppliesAndAcquisitionTab.createDeliveryTab(),
             "planetaryAcquisitionTab", suppliesAndAcquisitionTab.createPlanetaryAcquisitionTab()));
 
+        // Equipment
+        EquipmentTab equipmentTab = new EquipmentTab(getFrame(), "equipmentTab");
+
+        JTabbedPane equipmentContentTabs = createSubTabs(Map.of(
+            "techLimitsTab", equipmentTab.createTechLimitsTab()));
+
         // Add tabs
-        logisticsAndMaintenanceParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+        equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("suppliesAndAcquisitionTab.title")), suppliesAndAcquisitionContentTabs);
-        logisticsAndMaintenanceParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("repairAndMaintenanceContentTabs.title")), repairAndMaintenanceContentTabs);
+        equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("repairsAndMaintenanceContentTabs.title")), repairsAndMaintenanceContentTabs);
+        equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("equipmentContentTabs.title")), equipmentContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("logisticsAndMaintenanceParentTab.title")), logisticsAndMaintenanceParentTab);
+            resources.getString("logisticsAndMaintenanceParentTab.title")), equipmentAndSuppliesParentTab);
 
-        return logisticsAndMaintenanceParentTab;
+        return equipmentAndSuppliesParentTab;
     }
 
     private JTabbedPane createStrategicOperationsParentTab() {
         //    Finances
         //    Mercenary
         //    Markets
+        // Rulesets
 
         // Parent Tab
         JTabbedPane strategicOperationsParentTab = new JTabbedPane();

@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
-public class SuppliesAndAcquisitionTab {
+public class EquipmentAndSuppliesTab {
     // region Variable Declarations
     private static String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
@@ -80,7 +80,7 @@ public class SuppliesAndAcquisitionTab {
     private JSpinner[] spnPlanetAcquireOutputBonus;
     //end Planetary Acquisition Tab
 
-    public SuppliesAndAcquisitionTab(JFrame frame, String name) {
+    public EquipmentAndSuppliesTab(JFrame frame, String name) {
         this.frame = frame;
         this.name = name;
 
