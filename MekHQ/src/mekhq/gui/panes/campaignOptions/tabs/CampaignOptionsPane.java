@@ -17,6 +17,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
 
     private static final int SCROLL_SPEED = 16;
+    private static final int HEADER_FONT_SIZE = 5;
 
     private final Campaign campaign;
 
@@ -29,10 +30,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     @Override
     protected void initialize() {
-        int fontSize = 5;
-        double uiScale = Double.parseDouble(System.getProperty("flatlaf.uiScale"));
+        double uiScale = 1;
+        try {
+            uiScale = Double.parseDouble(System.getProperty("flatlaf.uiScale"));
+        } catch (Exception ignored) {}
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", round(fontSize * uiScale),
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", round(HEADER_FONT_SIZE * uiScale),
             resources.getString("generalPanel.title")), createGeneralTab());
 
         createTab("combatReadinessParentTab", createCombatReadinessParentTab());
@@ -56,10 +59,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         tabScrollPane.getHorizontalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
         // Dynamically adjust font size based on the GUI scale
-        int fontSize = 5;
-        double uiScale = Double.parseDouble(System.getProperty("flatlaf.uiScale"));
+        double uiScale = 1;
+        try {
+            uiScale = Double.parseDouble(System.getProperty("flatlaf.uiScale"));
+        } catch (Exception ignored) {}
 
-        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", round(fontSize * uiScale),
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>",
+            round(HEADER_FONT_SIZE * uiScale),
             resources.getString(resourceName + ".title")), tabScrollPane);
     }
 
