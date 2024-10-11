@@ -120,17 +120,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "medicalTab", personnelTab.createMedicalTab(),
             "salariesTab", personnelTab.createSalariesTab()));
 
-        // Life Paths
-        LifePathsTab lifePathsTab = new LifePathsTab(campaign, getFrame(), "lifePathsTab");
+        // Biography
+        biographyTab biographyTab = new biographyTab(campaign, getFrame(), "biographyTab");
 
-        JTabbedPane lifePathsContentTabs = createSubTabs(Map.of(
-            "lifePathsGeneralTab", lifePathsTab.createGeneralTab(),
-            "backgroundsTab", lifePathsTab.createBackgroundsTab(),
-            "relationshipsMarriageTab", lifePathsTab.createMarriageTab(),
-            "relationshipsDivorceTab", lifePathsTab.createDivorceTab(),
-            "relationshipsProcreationTab", lifePathsTab.createProcreationTab(),
-            "deathTab", lifePathsTab.createDeathTab(),
-            "educationTab", lifePathsTab.createEducationTab()));
+        JTabbedPane biographyContentTabs = createSubTabs(Map.of(
+            "biographyGeneralTab", biographyTab.createGeneralTab(),
+            "backgroundsTab", biographyTab.createBackgroundsTab(),
+            "deathTab", biographyTab.createDeathTab(),
+            "educationTab", biographyTab.createEducationTab()));
+
+        // Relationships
+        RelationshipsTab relationshipsTab = new RelationshipsTab(getFrame(), "relationshipsTab");
+
+        JTabbedPane relationshipsContentTabs = createSubTabs(Map.of(
+            "marriageTab", relationshipsTab.createMarriageTab(),
+            "divorceTab", relationshipsTab.createDivorceTab(),
+            "procreationTab", relationshipsTab.createProcreationTab()));
 
         // Turnover and Retention
         TurnoverAndRetentionTab turnoverAndRetentionTab = new TurnoverAndRetentionTab(getFrame(),
@@ -139,14 +144,18 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane turnoverAndRetentionContentTabs = createSubTabs(Map.of(
             "turnoverTab", turnoverAndRetentionTab.createTurnoverTab(),
             "fatigueTab", turnoverAndRetentionTab.createFatigueTab()));
+
         // Name and Portrait Generation
+
         // Rank Systems
 
         // Add Tabs
         humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("personnelContentTabs.title")), personnelContentTabs);
         humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("lifePathsContentTabs.title")), lifePathsContentTabs);
+            resources.getString("biographyContentTabs.title")), biographyContentTabs);
+        humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("relationshipsContentTabs.title")), relationshipsContentTabs);
         humanResourcesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("turnoverAndRetentionContentTabs.title")), turnoverAndRetentionContentTabs);
 
