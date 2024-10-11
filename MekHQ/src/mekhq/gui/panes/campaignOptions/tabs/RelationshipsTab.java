@@ -222,7 +222,7 @@ public class RelationshipsTab {
      *
      * @return a {@link JPanel} representing the general marriage options panel
      */
-    JPanel createMarriageGeneralOptionsPanel() {
+    private JPanel createMarriageGeneralOptionsPanel() {
         // Contents
         chkUseManualMarriages = createCheckBox("UseManualMarriages", null);
         chkUseClanPersonnelMarriages = createCheckBox("UseClanPersonnelMarriages", null);
@@ -284,7 +284,7 @@ public class RelationshipsTab {
      * @return a {@link JPanel} representing the random marriage panel with various input components
      * and panels for configuring random marriage settings
      */
-    JPanel createRandomMarriagePanel() {
+    private JPanel createRandomMarriagePanel() {
         // Contents
         lblRandomMarriageMethod = createLabel("RandomMarriageMethod", null);
         comboRandomMarriageMethod.setRenderer(new DefaultListCellRenderer() {
@@ -352,7 +352,7 @@ public class RelationshipsTab {
      * for setting opposite-sex marriage dice size, same-sex marriage dice size, and new dependent
      * marriage dice size
      */
-    JPanel createPercentageRandomMarriagePanel() {
+    private JPanel createPercentageRandomMarriagePanel() {
         // Contents
         lblRandomMarriageOppositeSexDiceSize = createLabel("RandomMarriageOppositeSexDiceSize",
             null);
@@ -456,7 +456,7 @@ public class RelationshipsTab {
      *
      * @return a {@link JPanel} representing the Divorce tab with various components for configuring divorce settings
      */
-    JPanel createRandomDivorcePanel() {
+    private JPanel createRandomDivorcePanel() {
         // Contents
         lblRandomDivorceMethod = createLabel("RandomDivorceMethod", null);
         comboRandomDivorceMethod.setRenderer(new DefaultListCellRenderer() {
@@ -562,7 +562,7 @@ public class RelationshipsTab {
     /**
      * @return the {@link JPanel} containing the procreation settings components
      */
-    JPanel createProcreationGeneralOptionsPanel() {
+    private JPanel createProcreationGeneralOptionsPanel() {
         // Contents
         chkUseManualProcreation = createCheckBox("UseManualProcreation", null);
         chkUseClanPersonnelProcreation = createCheckBox("UseClanPersonnelProcreation", null);
@@ -660,7 +660,7 @@ public class RelationshipsTab {
     /**
      * @return a {@link JPanel} containing the configured components for random procreation settings
      */
-    JPanel createRandomProcreationPanel() {
+    private JPanel createRandomProcreationPanel() {
         // Contents
         lblRandomProcreationMethod = createLabel("RandomProcreationMethod", null);
         comboRandomProcreationMethod.setRenderer(new DefaultListCellRenderer() {

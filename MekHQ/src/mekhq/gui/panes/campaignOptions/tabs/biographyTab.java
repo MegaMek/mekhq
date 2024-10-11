@@ -640,7 +640,7 @@ public class biographyTab {
      *
      * @return a {@link JPanel} representing the Death Age Groups tab with checkboxes for each age group
      */
-    JPanel createDeathAgeGroupsPanel() {
+    private JPanel createDeathAgeGroupsPanel() {
         final AgeGroup[] ageGroups = AgeGroup.values();
 
         // Create the Panel
@@ -781,7 +781,7 @@ public class biographyTab {
      * @return {@link JPanel} The newly constructed and configured JPanel for
      * Enable Standard Sets settings.
      */
-    JPanel createEnableStandardSetsPanel() {
+    private JPanel createEnableStandardSetsPanel() {
         // Contents
         chkEnableLocalAcademies = createCheckBox("EnableLocalAcademies", null);
         chkEnablePrestigiousAcademies = createCheckBox("EnablePrestigiousAcademies", null);
@@ -823,7 +823,7 @@ public class biographyTab {
      * @return {@link JPanel} The newly created and configured JPanel
      * containing the XP and Skill Bonuses settings.
      */
-    JPanel createXpAndSkillBonusesPanel() {
+    private JPanel createXpAndSkillBonusesPanel() {
         // Contents
         chkEnableBonuses = createCheckBox("EnableBonuses", null);
         lblFacultyXpMultiplier = createLabel("FacultyXpMultiplier", null);
@@ -865,7 +865,7 @@ public class biographyTab {
      *
      * @return {@link JPanel} The newly constructed and configured JPanel that contains the Dropout Chance settings.
      */
-    JPanel createDropoutChancePanel() {
+    private JPanel createDropoutChancePanel() {
         // Contents
         lblAdultDropoutChance = createLabel("AdultDropoutChance", null);
         spnAdultDropoutChance = createSpinner("AdultDropoutChance", null,
@@ -917,7 +917,7 @@ public class biographyTab {
      * @return {@link JPanel} The constructed, configured JPanel containing
      * "Accidents and Events" settings
      */
-    JPanel createAccidentsAndEventsPanel() {
+    private JPanel createAccidentsAndEventsPanel() {
         // Contents
         chkAllAges = createCheckBox("AllAges", null);
         lblMilitaryAcademyAccidents = createLabel("MilitaryAcademyAccidents", null);

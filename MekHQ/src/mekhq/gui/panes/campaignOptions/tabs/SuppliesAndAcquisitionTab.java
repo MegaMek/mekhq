@@ -86,7 +86,7 @@ public class SuppliesAndAcquisitionTab {
      *
      * @return the created tab panel as a {@link JPanel}
      */
-    public JPanel createAcquisitionTab() {
+    JPanel createAcquisitionTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("AcquisitionTab",
             getImageDirectory() + "logo_calderon_protectorate.png", false,
@@ -172,7 +172,7 @@ public class SuppliesAndAcquisitionTab {
         return createParentPanel(panel, "acquisitionsTab");
     }
 
-    public JPanel createPlanetaryAcquisitionTab() {
+    JPanel createPlanetaryAcquisitionTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("PlanetaryAcquisitionTab",
             getImageDirectory() + "logo_capellan_confederation.png", false,
@@ -462,7 +462,7 @@ public class SuppliesAndAcquisitionTab {
      *
      * @return the created tab panel as a {@link JPanel}
      */
-    public JPanel createDeliveryTab() {
+    JPanel createDeliveryTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("DeliveryTab",
             getImageDirectory() + "logo_clan_burrock.png", false,
@@ -582,7 +582,7 @@ public class SuppliesAndAcquisitionTab {
         return acquireSkillModel;
     }
 
-    protected void initialize() {
+    void initialize() {
         // Acquisition Tab
         lblChoiceAcquireSkill = new JLabel();
         choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", buildAcquireSkillComboOptions());

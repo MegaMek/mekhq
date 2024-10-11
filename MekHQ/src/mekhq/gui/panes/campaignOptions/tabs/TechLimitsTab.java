@@ -140,7 +140,7 @@ public class TechLimitsTab {
         return wrapperPanel;
     }
 
-    protected void initialize() {
+    void initialize() {
         // Tech Limits Tab
         limitByYearBox = new JCheckBox();
         disallowExtinctStuffBox = new JCheckBox();

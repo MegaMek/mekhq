@@ -56,7 +56,7 @@ public class RepairAndMaintenanceTab {
      *
      * @return the created repair tab panel as a {@link JPanel}
      */
-    public JPanel createRepairTab() {
+    JPanel createRepairTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("RepairTab",
             getImageDirectory() + "logo_aurigan_coalition.png", false,
@@ -139,7 +139,7 @@ public class RepairAndMaintenanceTab {
      *
      * @return The created maintenance tab panel as a {@link JPanel}.
      */
-    public JPanel createMaintenanceTab() {
+    JPanel createMaintenanceTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("MaintenanceTab",
             getImageDirectory() + "logo_clan_blood_spirit.png",
@@ -240,7 +240,7 @@ public class RepairAndMaintenanceTab {
     /**
      * Initializes the repair and maintenance tab by creating and initializing various UI components.
      */
-    protected void initialize() {
+    void initialize() {
         initializeRepairTab();
         initializeMaintenanceTab();
     }

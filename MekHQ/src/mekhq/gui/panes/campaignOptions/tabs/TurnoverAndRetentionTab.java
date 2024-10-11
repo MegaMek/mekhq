@@ -274,7 +274,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return panel the configured {@link JPanel} with various turnover settings
      */
-    JPanel createSettingsPanel() {
+    private JPanel createSettingsPanel() {
         // Contents
         lblTurnoverFixedTargetNumber = createLabel("TurnoverFixedTargetNumber", null);
         spnTurnoverFixedTargetNumber = createSpinner("TurnoverFixedTargetNumber", null,
@@ -394,7 +394,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return panel the configured {@link JPanel} with modifier settings
      */
-    JPanel createModifiersPanel() {
+    private JPanel createModifiersPanel() {
         // Contents
         chkUseCustomRetirementModifiers = createCheckBox("UseCustomRetirementModifiers", null);
         chkUseFatigueModifiers = createCheckBox("UseFatigueModifiers", null);
@@ -461,7 +461,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return panel the configured {@link JPanel} with payout settings
      */
-    JPanel createPayoutsPanel() {
+    private JPanel createPayoutsPanel() {
         // Contents
         lblPayoutRateOfficer = createLabel("PayoutRateOfficer", null);
         spnPayoutRateOfficer = createSpinner("PayoutRateOfficer", null,
@@ -537,7 +537,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return panel the configured {@link JPanel} with unit cohesion settings
      */
-    JPanel createUnitCohesionPanel() {
+    private JPanel createUnitCohesionPanel() {
         // Contents
         pnlAdministrativeStrainWrapper = createAdministrativeStrainWrapperPanel();
         pnlManagementSkillWrapper = createManagementSkillWrapperPanel();
@@ -575,7 +575,7 @@ public class TurnoverAndRetentionTab {
      * @return {@link JPanel} The newly created and configured JPanel containing administrative strain
      * settings
      */
-    JPanel createAdministrativeStrainWrapperPanel() {
+    private JPanel createAdministrativeStrainWrapperPanel() {
         // Contents
         chkUseAdministrativeStrain = createCheckBox("UseAdministrativeStrain", null);
         pnlAdministrativeStrain = createAdministrativeStrainPanel();
@@ -611,7 +611,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return panel the configured {@link JPanel} with administrative strain settings
      */
-    JPanel createAdministrativeStrainPanel() {
+    private JPanel createAdministrativeStrainPanel() {
         // Contents
         lblAdministrativeCapacity = createLabel("AdministrativeCapacity", null);
         spnAdministrativeCapacity = createSpinner("AdministrativeCapacity", null,
@@ -662,10 +662,10 @@ public class TurnoverAndRetentionTab {
      *
      * @return {@link JPanel} The constructed and configured jPanel containing the management skill settings
      */
-    JPanel createManagementSkillWrapperPanel() {
+    private JPanel createManagementSkillWrapperPanel() {
         // Contents
         chkUseManagementSkill = createCheckBox("UseManagementSkill", null);
-        pnlManagementSkill = createManagementSkill();
+        pnlManagementSkill = createManagementSkillPanel();
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("UnitCohesionPanel", false, "");
@@ -699,7 +699,7 @@ public class TurnoverAndRetentionTab {
      *
      * @return panel the configured {@link JPanel} with management skill settings
      */
-    JPanel createManagementSkill() {
+    private JPanel createManagementSkillPanel() {
         // Contents
         chkUseCommanderLeadershipOnly = createCheckBox("UseCommanderLeadershipOnly", null);
 
