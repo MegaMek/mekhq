@@ -187,21 +187,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane suppliesAndAcquisitionContentTabs = createSubTabs(Map.of(
             "acquisitionTab", suppliesAndAcquisitionTab.createAcquisitionTab(),
             "deliveryTab", suppliesAndAcquisitionTab.createDeliveryTab(),
-            "planetaryAcquisitionTab", suppliesAndAcquisitionTab.createPlanetaryAcquisitionTab()));
-
-        // Equipment
-        EquipmentTab equipmentTab = new EquipmentTab(getFrame(), "equipmentTab");
-
-        JTabbedPane equipmentContentTabs = createSubTabs(Map.of(
-            "techLimitsTab", equipmentTab.createTechLimitsTab()));
+            "planetaryAcquisitionTab", suppliesAndAcquisitionTab.createPlanetaryAcquisitionTab(),
+            "techLimitsTab", suppliesAndAcquisitionTab.createTechLimitsTab()));
 
         // Add tabs
         equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("suppliesAndAcquisitionTab.title")), suppliesAndAcquisitionContentTabs);
         equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("repairsAndMaintenanceContentTabs.title")), repairsAndMaintenanceContentTabs);
-        equipmentAndSuppliesParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
-            resources.getString("equipmentContentTabs.title")), equipmentContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("logisticsAndMaintenanceParentTab.title")), equipmentAndSuppliesParentTab);
