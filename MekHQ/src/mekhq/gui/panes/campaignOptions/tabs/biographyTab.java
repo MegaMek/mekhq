@@ -1120,7 +1120,22 @@ public class biographyTab {
         return panel;
     }
 
-
+    /**
+     * This method is responsible for creating and setting up the RankTab
+     * and its components.
+     *
+     * <p>The method creates a header panel with a specified logo and then initializes
+     * {@code rankSystemsPane} with a {@code RankSystemsPane} object. The preferred size of the
+     * {@code rankSystemsPane} is set as its minimum and maximum size.
+     *
+     * <p>The layout is created with a vertical and horizontal group,
+     * to which the components are added sequentially. The {@code headerPanel} and
+     * the view-port component of {@code rankSystemsPane} are added to both layout groups.
+     *
+     * <p>Finally, the layout components are added to a parent panel which is then returned.
+     *
+     * @return JPanel The parent panel with all the layout components added.
+     */
     JPanel createRankTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("RankTab",
@@ -1129,11 +1144,7 @@ public class biographyTab {
 
         // Contents
         rankSystemsPane = new RankSystemsPane(frame, campaign);
-        Component component = rankSystemsPane.getViewport().getView();
-
-        Dimension size = rankSystemsPane.getPreferredSize();
-        rankSystemsPane.setMinimumSize(size);
-        rankSystemsPane.setMaximumSize(size);
+        Component rankSystemsViewport = rankSystemsPane.getViewport().getView();
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("RankTab", true,
@@ -1144,13 +1155,13 @@ public class biographyTab {
         layout.setVerticalGroup(
             layout.createSequentialGroup()
                 .addComponent(headerPanel)
-                .addComponent(component));
+                .addComponent(rankSystemsViewport));
 
         layout.setHorizontalGroup(
             layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
                     .addComponent(headerPanel, Alignment.CENTER)
-                    .addComponent(component)));
+                    .addComponent(rankSystemsViewport)));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "RankTab");
