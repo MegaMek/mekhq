@@ -45,6 +45,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.MekView;
 import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
@@ -265,7 +266,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
-        techTable.setRowHeight(60);
+        techTable.setRowHeight(UIUtil.scaleForGUI(60));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(this::techTableValueChanged);
         techSorter = new TableRowSorter<>(techsModel);
@@ -279,9 +280,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         scrollTechTable.setPreferredSize(new Dimension(300, 300));
 
         panDoTask = new JPanel(new GridBagLayout());
-        panDoTask.setMinimumSize(new Dimension(100, 100));
+        panDoTask.setMinimumSize(UIUtil.scaleForGUI(100, 100));
         panDoTask.setName("panelDoTask");
-        panDoTask.setPreferredSize(new Dimension(100, 100));
+        panDoTask.setPreferredSize(UIUtil.scaleForGUI(100, 100));
 
         btnDoTask = new JButton(resourceMap.getString("btnDoTask.text"));
         btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText"));
@@ -382,7 +383,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
         taskModel = new TaskTableModel(getCampaignGui(), this);
         taskTable = new JTable(taskModel);
-        taskTable.setRowHeight(70);
+        taskTable.setRowHeight(UIUtil.scaleForGUI(70));
         taskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer(getIconPackage()));
         taskTable.getSelectionModel().addListSelectionListener(ev -> taskTableValueChanged());
         taskSorter = new TableRowSorter<>(taskModel);
@@ -744,7 +745,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     /**
      * Focuses on the unit with the given ID if it exists.
-     * 
+     *
      * @param id The unique identifier of the unit.
      * @return A value indicating whether or not the unit was focused.
      */

@@ -18,29 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Checkbox;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.*;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -51,6 +28,15 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.AutoAwardsTableModel;
 import mekhq.gui.sorter.PersonRankStringSorter;
+
+import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.List;
+import java.util.*;
 
 public class AutoAwardsDialog extends JDialog {
     private static final MMLogger logger = MMLogger.create(AutoAwardsDialog.class);
@@ -110,8 +96,8 @@ public class AutoAwardsDialog extends JDialog {
         // right below the title, but above the instructions
         JPanel imageAndInstructionsPanel = new JPanel(new BorderLayout());
 
-        Image image = new ImageIcon("data/images/awards/awardceremony.png")
-                .getImage().getScaledInstance(screenWidth, (screenHeight / 7), Image.SCALE_FAST);
+        Image image = new ImageIcon("data/images/awards/awardceremony.jpg")
+                .getImage().getScaledInstance(screenWidth, (screenHeight / 4), Image.SCALE_FAST);
         JLabel lblImage = new JLabel(new ImageIcon(image));
         imageAndInstructionsPanel.add(lblImage, BorderLayout.CENTER);
 
