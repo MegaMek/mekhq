@@ -66,7 +66,8 @@ public class ChooseRefitDialog extends JDialog {
     private RefitTableModel refitModel;
 
     private JButton btnClose;
-    private JButton btnOK;
+    private JButton btnRefit;
+    private JButton btnCustomize;
     private JTable refitTable;
     private JScrollPane scrRefitTable;
     private JList<String> lstShopping;
@@ -77,6 +78,7 @@ public class ChooseRefitDialog extends JDialog {
     private JScrollPane scrNewUnit;
 
     private boolean confirmed = false;
+    private boolean customize = false;
     // endregion Variable Declarations
 
     // region Constructors
@@ -162,7 +164,7 @@ public class ChooseRefitDialog extends JDialog {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -182,28 +184,20 @@ public class ChooseRefitDialog extends JDialog {
         getContentPane().add(scrNewUnit, gridBagConstraints);
 
         JPanel panBtn = new JPanel(new GridBagLayout());
-        btnOK = new JButton(resourceMap.getString("btnOK.text"));
-        btnOK.setEnabled(false);
-        btnOK.addActionListener(evt -> confirm());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.EAST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panBtn.add(btnOK, gridBagConstraints);
+
+        btnRefit = new JButton(resourceMap.getString("btnRefit.text"));
+        btnRefit.setEnabled(false);
+        btnRefit.addActionListener(evt -> confirmRefit());
+        panBtn.add(btnRefit, new GridBagConstraints());
+
+        btnCustomize = new JButton(resourceMap.getString("btnCustomize.text"));
+        btnCustomize.setEnabled(false);
+        btnCustomize.addActionListener(evt -> confirmCustomize());
+        panBtn.add(btnCustomize, new GridBagConstraints());
 
         btnClose = new JButton(resourceMap.getString("btnClose.text"));
         btnClose.addActionListener(evt -> cancel());
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panBtn.add(btnClose, gridBagConstraints);
+        panBtn.add(btnClose, new GridBagConstraints());
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -231,8 +225,15 @@ public class ChooseRefitDialog extends JDialog {
     }
     // endregion Initialization
 
-    private void confirm() {
+    private void confirmRefit() {
         confirmed = getSelectedRefit() != null;
+        customize = false;
+        setVisible(false);
+    }
+
+    private void confirmCustomize() {
+        confirmed = getSelectedRefit() != null;
+        customize = true;
         setVisible(false);
     }
 
@@ -243,6 +244,11 @@ public class ChooseRefitDialog extends JDialog {
     public boolean isConfirmed() {
         return confirmed;
     }
+
+    public boolean isCustomize() {
+        return customize;
+    }
+
 
     public Refit getSelectedRefit() {
         int selectedRow = refitTable.getSelectedRow();
@@ -257,10 +263,20 @@ public class ChooseRefitDialog extends JDialog {
         if (null == r) {
             scrShoppingList.setViewportView(null);
             txtNewUnit.setText("");
-            btnOK.setEnabled(false);
+            btnRefit.setEnabled(false);
+            btnCustomize.setEnabled(false);
             return;
         }
-        btnOK.setEnabled(true);
+
+        if (!campaign.getCampaignOptions().isAllowCanonRefitOnly() || r.getNewEntity().isCanon()) {
+            btnRefit.setEnabled(true);
+        } else {
+            btnRefit.setEnabled(false);
+        }
+        btnCustomize.setEnabled(true);
+
+
+
         lstShopping = new JList<>(r.getShoppingListDescription());
         scrShoppingList.setViewportView(lstShopping);
         MekView mv = new MekView(r.getNewEntity(), false, true);
@@ -284,7 +300,7 @@ public class ChooseRefitDialog extends JDialog {
             try {
                 Entity refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 if (null != refitEn) {
-                    Refit r = new Refit(unit, refitEn, false, false);
+                    Refit r = new Refit(unit, refitEn, false, false, false);
                     if (null == r.checkFixable()) {
                         refits.add(r);
                     }

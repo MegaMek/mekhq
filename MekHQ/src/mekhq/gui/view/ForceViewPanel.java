@@ -501,7 +501,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
     public String getForceSummary(Unit unit) {
         String toReturn = "<html><font size='4'><b>" + unit.getName() + "</b></font><br/>";
-        toReturn += "<font size='3'><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
+        toReturn += "<font><b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
         if (entity.hasNavalC3()) {
@@ -597,7 +597,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
         StringBuilder summary = new StringBuilder();
         summary.append("<html><font size='4'><b>").append(force.getName()).append("</b> (").append(commander).append(")</font><br/>");
-        summary.append("<font size='3'>");
+        summary.append("<font>");
         appendSummary(summary, "Number of Units", number);
         appendSummary(summary, "BV", battleValue);
         appendSummary(summary, "Tonnage", DecimalFormat.getInstance().format(tonnage));
