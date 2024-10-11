@@ -464,14 +464,17 @@ public class ForceViewPanel extends JScrollablePanel {
         }
 
         StringBuilder toReturn = new StringBuilder();
-        toReturn.append("<html><font size='3'><b>")
+        toReturn.append("<html><nobr><font size='3'><b>")
             .append(person.getFullTitle())
             .append("</b><br/>")
             .append(person.getSkillLevel(campaign, false))
             .append(' ')
             .append(person.getRoleDesc());
         
+        toReturn.append("<br>");
+
         boolean isInjured = false;
+        boolean isFatigued = false;
 
         if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
             if (person.hasInjuries(true)) {
@@ -502,7 +505,9 @@ public class ForceViewPanel extends JScrollablePanel {
                     MekHQ.getMHQOptions().getFontColorNegativeHexColor(), hitsMessage.toString()));
             }
         }
+   
         if (campaign.getCampaignOptions().isUseFatigue() && (person.getEffectiveFatigue(campaign) > 0)) {
+            isFatigued = true;
             if (isInjured) {
                 toReturn.append(',');
             }
@@ -516,7 +521,12 @@ public class ForceViewPanel extends JScrollablePanel {
             toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
                 MekHQ.getMHQOptions().getFontColorWarningHexColor(), fatigueMessage.toString()));
         }
-        toReturn.append("</font></html>");
+        
+        if (!(isInjured || isFatigued)) {
+            toReturn.append("&nbsp;");
+        }
+
+        toReturn.append("</font></nobr></html>");
         return toReturn.toString();
     }
 
