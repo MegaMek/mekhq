@@ -128,7 +128,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "backgroundsTab", biographyTab.createBackgroundsTab(),
             "deathTab", biographyTab.createDeathTab(),
             "educationTab", biographyTab.createEducationTab(),
-            "nameAndPortraitGenerationTab", biographyTab.createNameAndPortraitGenerationTab()));
+            "nameAndPortraitGenerationTab", biographyTab.createNameAndPortraitGenerationTab(),
+            "rankTab", biographyTab.createRankTab()));
 
         // Relationships
         RelationshipsTab relationshipsTab = new RelationshipsTab(getFrame(), "relationshipsTab");

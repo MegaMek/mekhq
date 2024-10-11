@@ -12,6 +12,7 @@ import mekhq.campaign.personnel.enums.RandomDeathMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.panes.RankSystemsPane;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -125,6 +126,10 @@ public class biographyTab {
     private JCheckBox noPortraitsBox;
     private JCheckBox chkAssignPortraitOnRoleChange;
     //end Name and Portrait Tab
+
+    //start Rank Tab
+    private RankSystemsPane rankSystemsPane;
+    //end Rank Tab
 
     /**
      * Initializes a new {@link biographyTab} with the specified campaign, frame, and name.
@@ -1113,5 +1118,41 @@ public class biographyTab {
         }
 
         return panel;
+    }
+
+
+    JPanel createRankTab() {
+        // Header
+        JPanel headerPanel = createHeaderPanel("RankTab",
+            getImageDirectory() + "logo_hanseatic_league.png",
+            false, "", true);
+
+        // Contents
+        rankSystemsPane = new RankSystemsPane(frame, campaign);
+        Component component = rankSystemsPane.getViewport().getView();
+
+        Dimension size = rankSystemsPane.getPreferredSize();
+        rankSystemsPane.setMinimumSize(size);
+        rankSystemsPane.setMaximumSize(size);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("RankTab", true,
+            "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(headerPanel)
+                .addComponent(component));
+
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(headerPanel, Alignment.CENTER)
+                    .addComponent(component)));
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "RankTab");
     }
 }

@@ -191,8 +191,8 @@ public class CampaignOptionsUtilities {
             sizeWidth += component.getPreferredSize().width;
         }
 
-        if (sizeWidth < 500) {
-            sizeWidth = 500;
+        if (sizeWidth < 750) {
+            sizeWidth = 750;
         }
 
         panel.setMaximumSize(new Dimension(sizeWidth, sizeHeight));
@@ -227,16 +227,16 @@ public class CampaignOptionsUtilities {
 
         JLabel lblBody = new JLabel();
         if (includeBodyText) {
-            lblBody = new JLabel(String.format("<html>%s</html>",
+            lblBody = new JLabel(String.format("<html><p align='justify'>%s</p></html>",
                 resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
             lblBody.setName("lbl" + name + "Body");
             Dimension size = lblBody.getPreferredSize();
-            lblBody.setMaximumSize(new Dimension(500, size.height));
+            lblBody.setMaximumSize(new Dimension(750, size.height));
         }
 
         final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", includeBorder, borderTitle);
         Dimension size = panel.getPreferredSize();
-        panel.setPreferredSize(new Dimension(500, size.height));
+        panel.setPreferredSize(new Dimension(750, size.height));
 
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -287,8 +287,8 @@ public class CampaignOptionsUtilities {
         // Set Dimensions
         int widthNew = parentPanel.getMinimumSize().width;
 
-        if (widthNew < 500) {
-            widthNew = 500;
+        if (widthNew < 750) {
+            widthNew = 750;
         }
 
         // I don't know why 1.25 works, it just does, and I've given up questioning it.

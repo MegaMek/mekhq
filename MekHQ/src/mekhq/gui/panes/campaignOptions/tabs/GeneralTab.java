@@ -214,7 +214,7 @@ public class GeneralTab {
             resources.getString("lblGeneralBody.text")), SwingConstants.CENTER);
         lblBody.setName("lblGeneralHeaderBody");
         Dimension size = lblBody.getPreferredSize();
-        lblBody.setMaximumSize(new Dimension(500, size.height));
+        lblBody.setMaximumSize(new Dimension(750, size.height));
 
         final JPanel panel = createStandardPanel("pnlGeneralHeaderPanel", false, "");
         final GroupLayout layout = createStandardLayout(panel);
