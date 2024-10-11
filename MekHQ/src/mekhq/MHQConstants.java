@@ -60,6 +60,7 @@ public final class MHQConstants extends SuiteConstants {
                                                            // also used as a limit in the UI
     public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
+    public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
 
     // region Command Center Tab
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
