@@ -128,7 +128,7 @@ public class CrewListModel extends AbstractListModel<Person> {
             Person p = getElementAt(index);
             String gunSkill = SkillType.getGunnerySkillFor(unit.getEntity());
             String driveSkill = SkillType.getDrivingSkillFor(unit.getEntity());
-            String sb = "<html><font size='2'><b>" + p.getFullTitle() + "</b><br/>"
+            String sb = "<html><font><b>" + p.getFullTitle() + "</b><br/>"
                     + CrewRole.getCrewRole(p, unit).getDisplayName()
                     + " ("
                     + (p.hasSkill(gunSkill) ? p.getSkill(gunSkill).getFinalSkillValue() : "-")
