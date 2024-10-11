@@ -151,10 +151,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JTabbedPane createUnitDevelopmentParentTab() {
-        //    Experience
-        //    Skills
-        //    Skill Randomization
-        //    SPAs
+        // Experience
+        // Skills
+        // Skill Randomization
+        // SPAs
 
         // Parent Tab
         JTabbedPane unitDevelopmentParentTab = new JTabbedPane();
@@ -203,9 +203,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JTabbedPane createStrategicOperationsParentTab() {
-        //    Finances
-        //    Mercenary
-        //    Markets
+        // Finances
+        // Mercenary
+        // Markets
         // Rulesets
 
         // Parent Tab
