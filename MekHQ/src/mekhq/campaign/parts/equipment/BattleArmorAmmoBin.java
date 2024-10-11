@@ -192,7 +192,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
     @Override
     public String getAcquisitionDesc() {
-        String toReturn = "<html><font size='2'";
+        String toReturn = "<html><font";
 
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
