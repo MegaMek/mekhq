@@ -1331,23 +1331,21 @@ public class Utilities {
      * @throws EntityLoadingException
      */
     public static MekSummary retrieveOriginalUnit(Entity newE) throws EntityLoadingException {
-        MekSummaryCache cacheInstance = MekSummaryCache.getInstance();
-        cacheInstance.loadMekData();
-
+        // this might be better with refreshUnitData() and/or elsewhere
+        MekSummaryCache.getInstance().loadMekData();
+        
         // I need to change the new entity to the one from the mtf file now, so that
         // equipment numbers will match
-        MekSummary summary = cacheInstance.getMek(newE.getFullChassis() + ' ' + newE.getModel());
-
-        if (null == summary) {
-            // Attempt to deal with new naming convention directly
-            summary = cacheInstance.getMek(
-                    newE.getChassis() + " (" + newE.getClanChassisName() + ") " + newE.getModel());
-        }
+        return retrieveUnit(newE.getShortNameRaw());
+    }
+    
+    public static MekSummary retrieveUnit(String shortNameRaw) throws EntityLoadingException {
+        MekSummary summary = MekSummaryCache.getInstance().getMek(shortNameRaw);
 
         // If we got this far with no summary loaded, give up
         if (null == summary) {
-            throw new EntityLoadingException(String.format("Could not load %s %s from the mek cache",
-                    newE.getChassis(), newE.getModel()));
+            throw new EntityLoadingException(String.format("Could not load %s from the mek cache",
+                    shortNameRaw));
         }
 
         return summary;
