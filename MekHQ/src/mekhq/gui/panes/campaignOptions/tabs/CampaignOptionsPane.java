@@ -213,6 +213,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "financesGeneralTab", financesTab.createFinancesGeneralOptionsTab(),
             "priceMultipliersTab", financesTab.createPriceMultipliersTab()));
 
+        // Markets
+        MarketsTab marketsTab = new MarketsTab(getFrame(), "marketsTab");
+
+        JTabbedPane marketsContentTabs = createSubTabs(Map.of(
+            "personnelMarketTab", marketsTab.createPersonnelMarketTab()));
+
         // Markets + Mercenary (don't forget useInfantryDoseNotCountBox)
 
         // Rulesets
@@ -220,6 +226,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Add tabs
         strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("financesContentTabs.title")), financesContentTabs);
+        strategicOperationsParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("marketsContentTabs.title")), marketsContentTabs);
 
         addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
             resources.getString("strategicOperationsParentTab.title")), strategicOperationsParentTab);
