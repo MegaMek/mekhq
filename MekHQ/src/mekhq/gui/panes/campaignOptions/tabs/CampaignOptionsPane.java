@@ -217,7 +217,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         MarketsTab marketsTab = new MarketsTab(getFrame(), "marketsTab");
 
         JTabbedPane marketsContentTabs = createSubTabs(Map.of(
-            "personnelMarketTab", marketsTab.createPersonnelMarketTab()));
+            "personnelMarketTab", marketsTab.createPersonnelMarketTab(),
+            "unitMarketTab", marketsTab.createUnitMarketTab()));
 
         // Markets + Mercenary (don't forget useInfantryDoseNotCountBox)
 

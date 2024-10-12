@@ -122,12 +122,12 @@ public class MarketsTab {
 
     private JPanel createPersonnelMarketGeneralOptionsPanel() {
         // Contents
-        lblPersonnelMarketType = createLabel("PersonnelMarketType", null);
+        lblPersonnelMarketType = createLabel("PersonnelMarketType");
         comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType",
             getPersonnelMarketTypeOptions());
 
-        lblPersonnelMarketDylansWeight = createLabel("PersonnelMarketDylansWeight", null);
-        spnPersonnelMarketDylansWeight = createSpinner("PersonnelMarketDylansWeight", null,
+        lblPersonnelMarketDylansWeight = createLabel("PersonnelMarketDylansWeight");
+        spnPersonnelMarketDylansWeight = createSpinner("PersonnelMarketDylansWeight",
             0.3, 0, 1, 0.1);
 
         chkPersonnelMarketReportRefresh = createCheckBox("PersonnelMarketReportRefresh");
@@ -299,20 +299,22 @@ public class MarketsTab {
             false, "", true);
 
         // Contents
-        lblUnitMarketMethod = createLabel("UnitMarketMethod", null);
+        lblUnitMarketMethod = createLabel("UnitMarketMethod");
         comboUnitMarketMethod = new MMComboBox<>("comboUnitMarketMethod", UnitMarketMethod.values());
 
         chkUnitMarketRegionalMekVariations = createCheckBox("UnitMarketRegionalMekVariations");
 
-        lblUnitMarketSpecialUnitChance = createLabel("UnitMarketSpecialUnitChance", null);
-        spnUnitMarketSpecialUnitChance = new JSpinner();
+        lblUnitMarketSpecialUnitChance = createLabel("UnitMarketSpecialUnitChance");
+        spnUnitMarketSpecialUnitChance = createSpinner("UnitMarketSpecialUnitChance",
+            30, 0, 100, 1);
 
-        lblUnitMarketRarityModifier = createLabel("UnitMarketRarityModifier", null);
-        spnUnitMarketRarityModifier = new JSpinner();
+        lblUnitMarketRarityModifier = createLabel("UnitMarketRarityModifier");
+        spnUnitMarketRarityModifier = createSpinner("UnitMarketRarityModifier",
+            0, -10, 10, 1);
 
-        chkInstantUnitMarketDelivery = new JCheckBox();
+        chkInstantUnitMarketDelivery = createCheckBox("InstantUnitMarketDelivery");
 
-        chkUnitMarketReportRefresh = new JCheckBox();
+        chkUnitMarketReportRefresh = createCheckBox("UnitMarketReportRefresh");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("UnitMarketTab", true,
@@ -324,16 +326,36 @@ public class MarketsTab {
             layout.createSequentialGroup()
                 .addComponent(headerPanel)
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlPersonnelMarketGeneralOptions)
-                    .addComponent(pnlRemovalTargets)));
+                    .addComponent(lblUnitMarketMethod)
+                    .addComponent(comboUnitMarketMethod))
+                .addComponent(chkUnitMarketRegionalMekVariations)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblUnitMarketSpecialUnitChance)
+                    .addComponent(spnUnitMarketSpecialUnitChance))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblUnitMarketRarityModifier)
+                    .addComponent(spnUnitMarketRarityModifier))
+                .addComponent(chkInstantUnitMarketDelivery)
+                .addComponent(chkUnitMarketReportRefresh));
 
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
                 .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
-                    .addComponent(pnlPersonnelMarketGeneralOptions)
-                    .addComponent(pnlRemovalTargets)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(lblUnitMarketMethod)
+                    .addComponent(comboUnitMarketMethod)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addComponent(chkUnitMarketRegionalMekVariations)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblUnitMarketSpecialUnitChance)
+                    .addComponent(spnUnitMarketSpecialUnitChance)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblUnitMarketRarityModifier)
+                    .addComponent(spnUnitMarketRarityModifier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addComponent(chkInstantUnitMarketDelivery)
+                .addComponent(chkUnitMarketReportRefresh));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "UnitMarketTab");
