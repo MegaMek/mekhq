@@ -170,7 +170,7 @@ public class BiographyTab {
      * Initializes the components for the NameAndPortraitTab panel.
      * The panel contains various settings related to names and portraits.
      */
-    protected void initialize() {
+    private void initialize() {
         initializeGeneralTab();
         initializeBackgroundsTab();
         initializeDeathTab();

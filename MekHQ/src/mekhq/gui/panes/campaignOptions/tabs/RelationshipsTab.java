@@ -101,7 +101,7 @@ public class RelationshipsTab {
     /**
      * Calls the initialization methods for all the tab panels.
      */
-    protected void initialize() {
+    private void initialize() {
         initializeMarriageTab();
         initializeDivorceTab();
         initializeProcreationTab();

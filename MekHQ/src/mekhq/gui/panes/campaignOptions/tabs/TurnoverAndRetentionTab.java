@@ -125,7 +125,7 @@ public class TurnoverAndRetentionTab {
     /**
      * Initializes all tab components.
      */
-    protected void initialize() {
+    private void initialize() {
         initializeTurnoverTab();
         initializeFatigueTab();
     }

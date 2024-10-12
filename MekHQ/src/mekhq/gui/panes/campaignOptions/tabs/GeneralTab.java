@@ -242,7 +242,7 @@ public class GeneralTab {
     /**
      * Initialize the components of the {@link GeneralTab} class.
      */
-    protected void initialize() {
+    private void initialize() {
         lblName = new JLabel();
         txtName = new JTextField();
 

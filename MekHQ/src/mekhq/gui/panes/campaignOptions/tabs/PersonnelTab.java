@@ -161,7 +161,7 @@ public class PersonnelTab {
     /**
      * Initializes the components of all tabs within the frame.
      */
-    protected void initialize() {
+    private void initialize() {
         initializeGeneralTab();
         initializePersonnelLogsTab();
         initializePersonnelInformationTab();
