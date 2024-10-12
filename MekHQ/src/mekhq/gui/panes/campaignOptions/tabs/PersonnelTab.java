@@ -364,16 +364,16 @@ public class PersonnelTab {
             false, "", true);
 
         // Contents
-        chkUseTactics = createCheckBox("UseTactics", null);
-        chkUseInitiativeBonus = createCheckBox("UseInitiativeBonus", null);
-        chkUseToughness = createCheckBox("UseToughness", null);
-        chkUseRandomToughness = createCheckBox("UseRandomToughness", null);
-        chkUseArtillery = createCheckBox("UseArtillery", null);
-        chkUseAbilities = createCheckBox("UseAbilities", null);
-        chkUseEdge = createCheckBox("UseEdge", null);
-        chkUseSupportEdge = createCheckBox("UseSupportEdge", null);
-        chkUseImplants = createCheckBox("UseImplants", null);
-        chkUseAlternativeQualityAveraging = createCheckBox("UseAlternativeQualityAveraging", null);
+        chkUseTactics = createCheckBox("UseTactics");
+        chkUseInitiativeBonus = createCheckBox("UseInitiativeBonus");
+        chkUseToughness = createCheckBox("UseToughness");
+        chkUseRandomToughness = createCheckBox("UseRandomToughness");
+        chkUseArtillery = createCheckBox("UseArtillery");
+        chkUseAbilities = createCheckBox("UseAbilities");
+        chkUseEdge = createCheckBox("UseEdge");
+        chkUseSupportEdge = createCheckBox("UseSupportEdge");
+        chkUseImplants = createCheckBox("UseImplants");
+        chkUseAlternativeQualityAveraging = createCheckBox("UseAlternativeQualityAveraging");
 
         personnelCleanUpPanel = createPersonnelCleanUpPanel();
 
@@ -428,9 +428,9 @@ public class PersonnelTab {
      */
     private JPanel createPersonnelCleanUpPanel() {
         // Contents
-        chkUsePersonnelRemoval = createCheckBox("UsePersonnelRemoval", null);
-        chkUseRemovalExemptCemetery = createCheckBox("UseRemovalExemptCemetery", null);
-        chkUseRemovalExemptRetirees = createCheckBox("UseRemovalExemptRetirees", null);
+        chkUsePersonnelRemoval = createCheckBox("UsePersonnelRemoval");
+        chkUseRemovalExemptCemetery = createCheckBox("UseRemovalExemptCemetery");
+        chkUseRemovalExemptRetirees = createCheckBox("UseRemovalExemptRetirees");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("PersonnelCleanUpPanel", true,
@@ -465,14 +465,14 @@ public class PersonnelTab {
             false, "", true);
 
         // Contents
-        chkUseTransfers = createCheckBox("UseTransfers", null);
-        chkUseExtendedTOEForceName = createCheckBox("UseExtendedTOEForceName", null);
-        chkPersonnelLogSkillGain = createCheckBox("PersonnelLogSkillGain", null);
-        chkPersonnelLogAbilityGain = createCheckBox("PersonnelLogAbilityGain", null);
-        chkPersonnelLogEdgeGain = createCheckBox("PersonnelLogEdgeGain", null);
-        chkDisplayPersonnelLog = createCheckBox("DisplayPersonnelLog", null);
-        chkDisplayScenarioLog = createCheckBox("DisplayScenarioLog", null);
-        chkDisplayKillRecord = createCheckBox("DisplayKillRecord", null);
+        chkUseTransfers = createCheckBox("UseTransfers");
+        chkUseExtendedTOEForceName = createCheckBox("UseExtendedTOEForceName");
+        chkPersonnelLogSkillGain = createCheckBox("PersonnelLogSkillGain");
+        chkPersonnelLogAbilityGain = createCheckBox("PersonnelLogAbilityGain");
+        chkPersonnelLogEdgeGain = createCheckBox("PersonnelLogEdgeGain");
+        chkDisplayPersonnelLog = createCheckBox("DisplayPersonnelLog");
+        chkDisplayScenarioLog = createCheckBox("DisplayScenarioLog");
+        chkDisplayKillRecord = createCheckBox("DisplayKillRecord");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("PersonnelLogsTab", true, "");
@@ -520,13 +520,13 @@ public class PersonnelTab {
             false, "", true);
 
         // Contents
-        chkUseTimeInService = createCheckBox("UseTimeInService", null);
-        lblTimeInServiceDisplayFormat = createLabel("TimeInServiceDisplayFormat", null);
-        chkUseTimeInRank = createCheckBox("UseTimeInRank", null);
-        lblTimeInRankDisplayFormat = createLabel("TimeInRankDisplayFormat", null);
-        chkTrackTotalEarnings = createCheckBox("TrackTotalEarnings", null);
-        chkTrackTotalXPEarnings = createCheckBox("TrackTotalXPEarnings", null);
-        chkShowOriginFaction = createCheckBox("ShowOriginFaction", null);
+        chkUseTimeInService = createCheckBox("UseTimeInService");
+        lblTimeInServiceDisplayFormat = createLabel("TimeInServiceDisplayFormat");
+        chkUseTimeInRank = createCheckBox("UseTimeInRank");
+        lblTimeInRankDisplayFormat = createLabel("TimeInRankDisplayFormat");
+        chkTrackTotalEarnings = createCheckBox("TrackTotalEarnings");
+        chkTrackTotalXPEarnings = createCheckBox("TrackTotalXPEarnings");
+        chkShowOriginFaction = createCheckBox("ShowOriginFaction");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("PersonnelInformation", true, "");
@@ -584,10 +584,10 @@ public class PersonnelTab {
             false, "", true);
 
         // Contents
-        chkAdminsHaveNegotiation = createCheckBox("AdminsHaveNegotiation", null);
-        chkAdminExperienceLevelIncludeNegotiation = createCheckBox("AdminExperienceLevelIncludeNegotiation", null);
-        chkAdminsHaveScrounge = createCheckBox("AdminsHaveScrounge", null);
-        chkAdminExperienceLevelIncludeScrounge = createCheckBox("AdminExperienceLevelIncludeScrounge", null);
+        chkAdminsHaveNegotiation = createCheckBox("AdminsHaveNegotiation");
+        chkAdminExperienceLevelIncludeNegotiation = createCheckBox("AdminExperienceLevelIncludeNegotiation");
+        chkAdminsHaveScrounge = createCheckBox("AdminsHaveScrounge");
+        chkAdminExperienceLevelIncludeScrounge = createCheckBox("AdminExperienceLevelIncludeScrounge");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("AdministratorsTab", true, "");
@@ -626,7 +626,7 @@ public class PersonnelTab {
             false, "", true);
 
         // Contents
-        lblAwardBonusStyle = createLabel("AwardBonusStyle", null);
+        lblAwardBonusStyle = createLabel("AwardBonusStyle");
         comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -640,21 +640,21 @@ public class PersonnelTab {
             }
         });
 
-        lblAwardTierSize = createLabel("AwardTierSize", null);
-        spnAwardTierSize = createSpinner("AwardTierSize", null,
+        lblAwardTierSize = createLabel("AwardTierSize");
+        spnAwardTierSize = createSpinner("AwardTierSize",
             5, 1, 100, 1);
 
-        chkEnableAutoAwards = createCheckBox("EnableAutoAwards", null);
+        chkEnableAutoAwards = createCheckBox("EnableAutoAwards");
 
-        chkIssuePosthumousAwards = createCheckBox("IssuePosthumousAwards", null);
+        chkIssuePosthumousAwards = createCheckBox("IssuePosthumousAwards");
 
-        chkIssueBestAwardOnly = createCheckBox("IssueBestAwardOnly", null);
+        chkIssueBestAwardOnly = createCheckBox("IssueBestAwardOnly");
 
-        chkIgnoreStandardSet = createCheckBox("IgnoreStandardSet", null);
+        chkIgnoreStandardSet = createCheckBox("IgnoreStandardSet");
 
         autoAwardsFilterPanel = createAutoAwardsFilterPanel();
 
-        lblAwardSetFilterList = createLabel("AwardSetFilterList", null);
+        lblAwardSetFilterList = createLabel("AwardSetFilterList");
         txtAwardSetFilterList = new JTextArea(5, 20);
         txtAwardSetFilterList.setLineWrap(true);
         txtAwardSetFilterList.setWrapStyleWord(true);
@@ -724,18 +724,18 @@ public class PersonnelTab {
      */
     private JPanel createAutoAwardsFilterPanel() {
         // Contents
-        chkEnableContractAwards = createCheckBox("EnableContractAwards", null);
-        chkEnableFactionHunterAwards = createCheckBox("EnableFactionHunterAwards", null);
-        chkEnableInjuryAwards = createCheckBox("EnableInjuryAwards", null);
-        chkEnableIndividualKillAwards = createCheckBox("EnableIndividualKillAwards", null);
-        chkEnableFormationKillAwards = createCheckBox("EnableFormationKillAwards", null);
-        chkEnableRankAwards = createCheckBox("EnableRankAwards", null);
-        chkEnableScenarioAwards = createCheckBox("EnableScenarioAwards", null);
-        chkEnableSkillAwards = createCheckBox("EnableSkillAwards", null);
-        chkEnableTheatreOfWarAwards = createCheckBox("EnableTheatreOfWarAwards", null);
-        chkEnableTimeAwards = createCheckBox("EnableTimeAwards", null);
-        chkEnableTrainingAwards = createCheckBox("EnableTrainingAwards", null);
-        chkEnableMiscAwards = createCheckBox("EnableMiscAwards", null);
+        chkEnableContractAwards = createCheckBox("EnableContractAwards");
+        chkEnableFactionHunterAwards = createCheckBox("EnableFactionHunterAwards");
+        chkEnableInjuryAwards = createCheckBox("EnableInjuryAwards");
+        chkEnableIndividualKillAwards = createCheckBox("EnableIndividualKillAwards");
+        chkEnableFormationKillAwards = createCheckBox("EnableFormationKillAwards");
+        chkEnableRankAwards = createCheckBox("EnableRankAwards");
+        chkEnableScenarioAwards = createCheckBox("EnableScenarioAwards");
+        chkEnableSkillAwards = createCheckBox("EnableSkillAwards");
+        chkEnableTheatreOfWarAwards = createCheckBox("EnableTheatreOfWarAwards");
+        chkEnableTimeAwards = createCheckBox("EnableTimeAwards");
+        chkEnableTrainingAwards = createCheckBox("EnableTrainingAwards");
+        chkEnableMiscAwards = createCheckBox("EnableMiscAwards");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("AutoAwardsFilterPanel", true, "AutoAwardsFilterPanel");
@@ -835,7 +835,7 @@ public class PersonnelTab {
      */
     private JPanel createPrisonersPanel() {
         // Contents
-        lblPrisonerCaptureStyle = createLabel("PrisonerCaptureStyle", null);
+        lblPrisonerCaptureStyle = createLabel("PrisonerCaptureStyle");
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -849,11 +849,11 @@ public class PersonnelTab {
             }
         });
 
-        lblPrisonerStatus = createLabel("PrisonerStatus", null);
+        lblPrisonerStatus = createLabel("PrisonerStatus");
 
-        chkPrisonerBabyStatus = createCheckBox("PrisonerBabyStatus", null);
-        chkAtBPrisonerDefection = createCheckBox("AtBPrisonerDefection", null);
-        chkAtBPrisonerRansom = createCheckBox("AtBPrisonerRansom", null);
+        chkPrisonerBabyStatus = createCheckBox("PrisonerBabyStatus");
+        chkAtBPrisonerDefection = createCheckBox("AtBPrisonerDefection");
+        chkAtBPrisonerRansom = createCheckBox("AtBPrisonerRansom");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("PrisonersPanel", true, "PrisonersPanel");
@@ -896,8 +896,8 @@ public class PersonnelTab {
      */
     private JPanel createDependentsPanel() {
         // Contents
-        chkUseRandomDependentAddition = createCheckBox("UseRandomDependentAddition", null);
-        chkUseRandomDependentRemoval = createCheckBox("UseRandomDependentRemoval", null);
+        chkUseRandomDependentAddition = createCheckBox("UseRandomDependentAddition");
+        chkUseRandomDependentRemoval = createCheckBox("UseRandomDependentRemoval");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("DependentsPanel", true, "DependentsPanel");
@@ -929,26 +929,26 @@ public class PersonnelTab {
             false, "", true);
 
         // Contents
-        chkUseAdvancedMedical = createCheckBox("UseAdvancedMedical", null);
+        chkUseAdvancedMedical = createCheckBox("UseAdvancedMedical");
 
-        lblHealWaitingPeriod = createLabel("HealWaitingPeriod", null);
-        spnHealWaitingPeriod = createSpinner("HealWaitingPeriod", null,
+        lblHealWaitingPeriod = createLabel("HealWaitingPeriod");
+        spnHealWaitingPeriod = createSpinner("HealWaitingPeriod",
             1, 1, 30, 1);
 
-        lblNaturalHealWaitingPeriod = createLabel("NaturalHealWaitingPeriod", null);
-        spnNaturalHealWaitingPeriod = createSpinner("NaturalHealWaitingPeriod", null,
+        lblNaturalHealWaitingPeriod = createLabel("NaturalHealWaitingPeriod");
+        spnNaturalHealWaitingPeriod = createSpinner("NaturalHealWaitingPeriod",
             1, 1, 365, 1);
 
-        lblMinimumHitsForVehicles = createLabel("MinimumHitsForVehicles", null);
-        spnMinimumHitsForVehicles = createSpinner("MinimumHitsForVehicles", null,
+        lblMinimumHitsForVehicles = createLabel("MinimumHitsForVehicles");
+        spnMinimumHitsForVehicles = createSpinner("MinimumHitsForVehicles",
             1, 1, 5, 1);
 
-        chkUseRandomHitsForVehicles = createCheckBox("UseRandomHitsForVehicles", null);
+        chkUseRandomHitsForVehicles = createCheckBox("UseRandomHitsForVehicles");
 
-        chkUseTougherHealing = createCheckBox("UseTougherHealing", null);
+        chkUseTougherHealing = createCheckBox("UseTougherHealing");
 
-        lblMaximumPatients = createLabel("MaximumPatients", null);
-        spnMaximumPatients = createSpinner("MaximumPatients", null,
+        lblMaximumPatients = createLabel("MaximumPatients");
+        spnMaximumPatients = createSpinner("MaximumPatients",
             25, 1, 100, 1);
 
         // Layout the Panel
@@ -1014,7 +1014,7 @@ public class PersonnelTab {
             false, "", true);
 
         // Contents
-        chkDisableSecondaryRoleSalary = createCheckBox("DisableSecondaryRoleSalary", null);
+        chkDisableSecondaryRoleSalary = createCheckBox("DisableSecondaryRoleSalary");
         pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
         pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
         pnlSalaryBaseSalaryPanel = createBaseSalariesPanel();
@@ -1047,16 +1047,16 @@ public class PersonnelTab {
     /**
      * Creates a panel for configuring salary multipliers for different personnel roles.
      *
-     * @return a {@link JPanel} containing the salary multipliers configuration panel
+     * @return a {@link JPanel} containing the salary multiplier configuration panel
      */
     private JPanel createSalaryMultipliersPanel() {
         // Contents
-        lblAntiMekSalary = createLabel("AntiMekSalary", null);
-        spnAntiMekSalary = createSpinner("AntiMekSalary", null,
+        lblAntiMekSalary = createLabel("AntiMekSalary");
+        spnAntiMekSalary = createSpinner("AntiMekSalary",
             0, 0, 100, 0.05);
 
-        lblSpecialistInfantrySalary = createLabel("SpecialistInfantrySalary", null);
-        spnSpecialistInfantrySalary = createSpinner("SpecialistInfantrySalary", null,
+        lblSpecialistInfantrySalary = createLabel("SpecialistInfantrySalary");
+        spnSpecialistInfantrySalary = createSpinner("SpecialistInfantrySalary",
             0, 0, 100, 0.05);
 
         // Layout the Panel
@@ -1097,10 +1097,10 @@ public class PersonnelTab {
     private JPanel createExperienceMultipliersPanel() {
         // Contents
         for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
-            final JLabel label = createLabel("SkillLevel" + skillLevel.toString(), null);
+            final JLabel label = createLabel("SkillLevel" + skillLevel.toString());
             lblSalaryExperienceMultipliers.put(skillLevel, label);
 
-            final JSpinner spinner = createSpinner("SkillLevel" + skillLevel, null,
+            final JSpinner spinner = createSpinner("SkillLevel" + skillLevel,
                 0, 0, 10, 0.05);
             spnSalaryExperienceMultipliers.put(skillLevel, spinner);
 

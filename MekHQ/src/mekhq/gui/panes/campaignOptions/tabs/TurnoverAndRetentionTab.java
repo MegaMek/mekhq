@@ -232,7 +232,7 @@ public class TurnoverAndRetentionTab {
             false, "", true);
 
         // Contents
-        chkUseRandomRetirement = createCheckBox("UseRandomRetirement", null);
+        chkUseRandomRetirement = createCheckBox("UseRandomRetirement");
         pnlSettings = createSettingsPanel();
         pnlModifiers = createModifiersPanel();
         pnlPayout = createPayoutsPanel();
@@ -285,11 +285,11 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createSettingsPanel() {
         // Contents
-        lblTurnoverFixedTargetNumber = createLabel("TurnoverFixedTargetNumber", null);
-        spnTurnoverFixedTargetNumber = createSpinner("TurnoverFixedTargetNumber", null,
+        lblTurnoverFixedTargetNumber = createLabel("TurnoverFixedTargetNumber");
+        spnTurnoverFixedTargetNumber = createSpinner("TurnoverFixedTargetNumber",
             3, 0, 10, 1);
 
-        lblTurnoverFrequency = createLabel("TurnoverFrequency", null);
+        lblTurnoverFrequency = createLabel("TurnoverFrequency");
         comboTurnoverFrequency.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -304,28 +304,28 @@ public class TurnoverAndRetentionTab {
         });
 
         chkUseContractCompletionRandomRetirement = createCheckBox(
-            "UseContractCompletionRandomRetirement", null);
+            "UseContractCompletionRandomRetirement");
 
-        chkUseRandomFounderTurnover = createCheckBox("UseRandomFounderTurnover", null);
+        chkUseRandomFounderTurnover = createCheckBox("UseRandomFounderTurnover");
 
-        chkTrackOriginalUnit = createCheckBox("TrackOriginalUnit", null);
+        chkTrackOriginalUnit = createCheckBox("TrackOriginalUnit");
 
-        chkAeroRecruitsHaveUnits = createCheckBox("AeroRecruitsHaveUnits", null);
+        chkAeroRecruitsHaveUnits = createCheckBox("AeroRecruitsHaveUnits");
 
-        chkUseSubContractSoldiers = createCheckBox("UseSubContractSoldiers", null);
+        chkUseSubContractSoldiers = createCheckBox("UseSubContractSoldiers");
 
-        lblServiceContractDuration = createLabel("ServiceContractDuration", null);
-        spnServiceContractDuration = createSpinner("ServiceContractDuration", null,
+        lblServiceContractDuration = createLabel("ServiceContractDuration");
+        spnServiceContractDuration = createSpinner("ServiceContractDuration",
             36, 0, 120, 1);
 
-        lblServiceContractModifier = createLabel("ServiceContractModifier", null);
-        spnServiceContractModifier = createSpinner("ServiceContractModifier", null,
+        lblServiceContractModifier = createLabel("ServiceContractModifier");
+        spnServiceContractModifier = createSpinner("ServiceContractModifier",
             3, 0, 10, 1);
 
-        chkPayBonusDefault = createCheckBox("PayBonusDefault", null);
+        chkPayBonusDefault = createCheckBox("PayBonusDefault");
 
-        lblPayBonusDefaultThreshold = createLabel("PayBonusDefaultThreshold", null);
-        spnPayBonusDefaultThreshold = createSpinner("PayBonusDefaultThreshold", null,
+        lblPayBonusDefaultThreshold = createLabel("PayBonusDefaultThreshold");
+        spnPayBonusDefaultThreshold = createSpinner("PayBonusDefaultThreshold",
             3, 0, 12, 1);
 
         // Layout the Panel
@@ -405,17 +405,17 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createModifiersPanel() {
         // Contents
-        chkUseCustomRetirementModifiers = createCheckBox("UseCustomRetirementModifiers", null);
-        chkUseFatigueModifiers = createCheckBox("UseFatigueModifiers", null);
-        chkUseSkillModifiers = createCheckBox("UseSkillModifiers", null);
-        chkUseAgeModifiers = createCheckBox("UseAgeModifiers", null);
-        chkUseUnitRatingModifiers = createCheckBox("UseUnitRatingModifiers", null);
-        chkUseFactionModifiers = createCheckBox("UseFactionModifiers", null);
-        chkUseMissionStatusModifiers = createCheckBox("UseMissionStatusModifiers", null);
-        chkUseHostileTerritoryModifiers = createCheckBox("UseHostileTerritoryModifiers", null);
-        chkUseFamilyModifiers = createCheckBox("UseFamilyModifiers", null);
-        chkUseLoyaltyModifiers = createCheckBox("UseLoyaltyModifiers", null);
-        chkUseHideLoyalty = createCheckBox("UseHideLoyalty", null);
+        chkUseCustomRetirementModifiers = createCheckBox("UseCustomRetirementModifiers");
+        chkUseFatigueModifiers = createCheckBox("UseFatigueModifiers");
+        chkUseSkillModifiers = createCheckBox("UseSkillModifiers");
+        chkUseAgeModifiers = createCheckBox("UseAgeModifiers");
+        chkUseUnitRatingModifiers = createCheckBox("UseUnitRatingModifiers");
+        chkUseFactionModifiers = createCheckBox("UseFactionModifiers");
+        chkUseMissionStatusModifiers = createCheckBox("UseMissionStatusModifiers");
+        chkUseHostileTerritoryModifiers = createCheckBox("UseHostileTerritoryModifiers");
+        chkUseFamilyModifiers = createCheckBox("UseFamilyModifiers");
+        chkUseLoyaltyModifiers = createCheckBox("UseLoyaltyModifiers");
+        chkUseHideLoyalty = createCheckBox("UseHideLoyalty");
 
 
         // Layout the Panel
@@ -472,22 +472,22 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createPayoutsPanel() {
         // Contents
-        lblPayoutRateOfficer = createLabel("PayoutRateOfficer", null);
-        spnPayoutRateOfficer = createSpinner("PayoutRateOfficer", null,
+        lblPayoutRateOfficer = createLabel("PayoutRateOfficer");
+        spnPayoutRateOfficer = createSpinner("PayoutRateOfficer",
             3, 0, 12, 1);
 
-        lblPayoutRateEnlisted = createLabel("PayoutRateEnlisted", null);
-        spnPayoutRateEnlisted = createSpinner("PayoutRateEnlisted", null,
+        lblPayoutRateEnlisted = createLabel("PayoutRateEnlisted");
+        spnPayoutRateEnlisted = createSpinner("PayoutRateEnlisted",
             3, 0, 12, 1);
 
-        lblPayoutRetirementMultiplier = createLabel("PayoutRetirementMultiplier", null);
-        spnPayoutRetirementMultiplier = createSpinner("PayoutRetirementMultiplier", null,
+        lblPayoutRetirementMultiplier = createLabel("PayoutRetirementMultiplier");
+        spnPayoutRetirementMultiplier = createSpinner("PayoutRetirementMultiplier",
             24, 1, 120, 1);
 
-        chkUsePayoutServiceBonus = createCheckBox("UsePayoutServiceBonus", null);
+        chkUsePayoutServiceBonus = createCheckBox("UsePayoutServiceBonus");
 
-        lblPayoutServiceBonusRate = createLabel("PayoutServiceBonusRate", null);
-        spnPayoutServiceBonusRate = createSpinner("PayoutServiceBonusRate", null,
+        lblPayoutServiceBonusRate = createLabel("PayoutServiceBonusRate");
+        spnPayoutServiceBonusRate = createSpinner("PayoutServiceBonusRate",
             10, 1, 100, 1);
 
         // Layout the Panel
@@ -586,7 +586,7 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createAdministrativeStrainWrapperPanel() {
         // Contents
-        chkUseAdministrativeStrain = createCheckBox("UseAdministrativeStrain", null);
+        chkUseAdministrativeStrain = createCheckBox("UseAdministrativeStrain");
         pnlAdministrativeStrain = createAdministrativeStrainPanel();
 
         // Layout the Panel
@@ -622,12 +622,12 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createAdministrativeStrainPanel() {
         // Contents
-        lblAdministrativeCapacity = createLabel("AdministrativeCapacity", null);
-        spnAdministrativeCapacity = createSpinner("AdministrativeCapacity", null,
+        lblAdministrativeCapacity = createLabel("AdministrativeCapacity");
+        spnAdministrativeCapacity = createSpinner("AdministrativeCapacity",
             10, 1, 30, 1);
 
-        lblMultiCrewStrainDivider = createLabel("MultiCrewStrainDivider", null);
-        spnMultiCrewStrainDivider = createSpinner("MultiCrewStrainDivider", null,
+        lblMultiCrewStrainDivider = createLabel("MultiCrewStrainDivider");
+        spnMultiCrewStrainDivider = createSpinner("MultiCrewStrainDivider",
             5, 1, 25, 1);
 
         // Layout the Panel
@@ -673,7 +673,7 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createManagementSkillWrapperPanel() {
         // Contents
-        chkUseManagementSkill = createCheckBox("UseManagementSkill", null);
+        chkUseManagementSkill = createCheckBox("UseManagementSkill");
         pnlManagementSkill = createManagementSkillPanel();
 
         // Layout the Panel
@@ -710,10 +710,10 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createManagementSkillPanel() {
         // Contents
-        chkUseCommanderLeadershipOnly = createCheckBox("UseCommanderLeadershipOnly", null);
+        chkUseCommanderLeadershipOnly = createCheckBox("UseCommanderLeadershipOnly");
 
-        lblManagementSkillPenalty = createLabel("ManagementSkillPenalty", null);
-        spnManagementSkillPenalty = createSpinner("ManagementSkillPenalty", null,
+        lblManagementSkillPenalty = createLabel("ManagementSkillPenalty");
+        spnManagementSkillPenalty = createSpinner("ManagementSkillPenalty",
             0, -10, 10, 1);
 
         // Layout the Panel
@@ -760,22 +760,22 @@ public class TurnoverAndRetentionTab {
             false, "", true);
 
         // Contents
-        chkUseFatigue = createCheckBox("UseFatigue", null);
+        chkUseFatigue = createCheckBox("UseFatigue");
 
-        lblFatigueRate = createLabel("FatigueRate", null);
-        spnFatigueRate = createSpinner("FatigueRate", null,
+        lblFatigueRate = createLabel("FatigueRate");
+        spnFatigueRate = createSpinner("FatigueRate",
             1, 1, 10, 1);
 
-        chkUseInjuryFatigue = createCheckBox("UseInjuryFatigue", null);
+        chkUseInjuryFatigue = createCheckBox("UseInjuryFatigue");
 
-        lblFieldKitchenCapacity = createLabel("FieldKitchenCapacity", null);
-        spnFieldKitchenCapacity = createSpinner("FieldKitchenCapacity", null,
+        lblFieldKitchenCapacity = createLabel("FieldKitchenCapacity");
+        spnFieldKitchenCapacity = createSpinner("FieldKitchenCapacity",
             150, 0, 450, 1);
 
-        chkFieldKitchenIgnoreNonCombatants = createCheckBox("FieldKitchenIgnoreNonCombatants", null);
+        chkFieldKitchenIgnoreNonCombatants = createCheckBox("FieldKitchenIgnoreNonCombatants");
 
-        lblFatigueLeaveThreshold = createLabel("FatigueLeaveThreshold", null);
-        spnFatigueLeaveThreshold = createSpinner("FatigueLeaveThreshold", null,
+        lblFatigueLeaveThreshold = createLabel("FatigueLeaveThreshold");
+        spnFatigueLeaveThreshold = createSpinner("FatigueLeaveThreshold",
             13, 0, 17, 1);
 
         // Layout the Panel

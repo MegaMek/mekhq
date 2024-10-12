@@ -219,29 +219,29 @@ public class EquipmentAndSuppliesTab {
             "", true);
 
         // Acquisitions skill
-        lblChoiceAcquireSkill = createLabel("ChoiceAcquireSkill", null);
+        lblChoiceAcquireSkill = createLabel("ChoiceAcquireSkill");
 
         // Support personnel only
-        chkSupportStaffOnly = createCheckBox("SupportStaffOnly", null);
+        chkSupportStaffOnly = createCheckBox("SupportStaffOnly");
 
         // Clan Acquisition penalty
-        lblAcquireClanPenalty = createLabel("AcquireClanPenalty", null);
-        spnAcquireClanPenalty = createSpinner("AcquireClanPenalty", null,
+        lblAcquireClanPenalty = createLabel("AcquireClanPenalty");
+        spnAcquireClanPenalty = createSpinner("AcquireClanPenalty",
             0, 0, 13, 1);
 
         // IS Acquisition penalty
-        lblAcquireIsPenalty = createLabel("AcquireISPenalty", null);
-        spnAcquireIsPenalty = createSpinner("AcquireISPenalty", null,
+        lblAcquireIsPenalty = createLabel("AcquireISPenalty");
+        spnAcquireIsPenalty = createSpinner("AcquireISPenalty",
             0, 0, 13, 1);
 
         // Waiting Period
-        lblAcquireWaitingPeriod = createLabel("AcquireWaitingPeriod", null);
-        spnAcquireWaitingPeriod = createSpinner("AcquireWaitingPeriod", null,
+        lblAcquireWaitingPeriod = createLabel("AcquireWaitingPeriod");
+        spnAcquireWaitingPeriod = createSpinner("AcquireWaitingPeriod",
             1, 1, 365, 1);
 
         // Maximum Acquisitions
-        lblMaxAcquisitions = createLabel("MaxAcquisitions", null);
-        spnMaxAcquisitions = createSpinner("MaxAcquisitions", null,
+        lblMaxAcquisitions = createLabel("MaxAcquisitions");
+        spnMaxAcquisitions = createSpinner("MaxAcquisitions",
             0,0, 100, 1);
 
         // Layout the Panel
@@ -340,29 +340,29 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createOptionsPanel() {
         // Use Planetary Acquisitions
-        usePlanetaryAcquisitions = createCheckBox("UsePlanetaryAcquisitions", null);
+        usePlanetaryAcquisitions = createCheckBox("UsePlanetaryAcquisitions");
 
         // Max Jump Distance
-        lblMaxJumpPlanetaryAcquisitions = createLabel("MaxJumpPlanetaryAcquisitions", null);
-        spnMaxJumpPlanetaryAcquisitions = createSpinner("MaxJumpPlanetaryAcquisitions", null,
+        lblMaxJumpPlanetaryAcquisitions = createLabel("MaxJumpPlanetaryAcquisitions");
+        spnMaxJumpPlanetaryAcquisitions = createSpinner("MaxJumpPlanetaryAcquisitions",
             2, 0, 5, 1);
 
         // Faction Limits
-        lblPlanetaryAcquisitionsFactionLimits = createLabel("PlanetaryAcquisitionsFactionLimits", null);
+        lblPlanetaryAcquisitionsFactionLimits = createLabel("PlanetaryAcquisitionsFactionLimits");
 
         // Disallow Resource Sharing (Inner Sphere)
-        disallowPlanetaryAcquisitionClanCrossover = createCheckBox("DisallowPlanetaryAcquisitionClanCrossover", null);
+        disallowPlanetaryAcquisitionClanCrossover = createCheckBox("DisallowPlanetaryAcquisitionClanCrossover");
 
         // Disallow Resource Sharing (Clans)
-        disallowClanPartsFromIS = createCheckBox("DisallowClanPartsFromIS", null);
+        disallowClanPartsFromIS = createCheckBox("DisallowClanPartsFromIS");
 
         // Acquisition Penalty
-        lblPenaltyClanPartsFromIS = createLabel("PenaltyClanPartsFromIS", null);
-        spnPenaltyClanPartsFromIS = createSpinner("PenaltyClanPartsFromIS", null,
+        lblPenaltyClanPartsFromIS = createLabel("PenaltyClanPartsFromIS");
+        spnPenaltyClanPartsFromIS = createSpinner("PenaltyClanPartsFromIS",
             0, 0, 12, 1);
 
         // Verbose Reporting
-        usePlanetaryAcquisitionsVerbose = createCheckBox("UsePlanetaryAcquisitionsVerbose", null);
+        usePlanetaryAcquisitionsVerbose = createCheckBox("UsePlanetaryAcquisitionsVerbose");
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -472,7 +472,7 @@ public class EquipmentAndSuppliesTab {
      * @return the created tab panel as a {@link JPanel}
      */
     private JPanel createTechModifiersPanel() {
-        JLabel techLabel = createLabel("TechLabel", null);
+        JLabel techLabel = createLabel("TechLabel");
         techLabel.setName(String.format("<html><center>%s</center></html", techLabel.getText()));
 
         // Layout the Panel
@@ -533,7 +533,7 @@ public class EquipmentAndSuppliesTab {
      * @return the created tab panel as a {@link JPanel}
      */
     private JPanel createIndustryModifiersPanel() {
-        JLabel industryLabel = createLabel("IndustryLabel", null);
+        JLabel industryLabel = createLabel("IndustryLabel");
         industryLabel.setName(String.format("<html><center>%s</center></html", industryLabel.getText()));
 
         // Layout the Panel
@@ -589,7 +589,7 @@ public class EquipmentAndSuppliesTab {
     }
 
     private JPanel createOutputModifiersPanel() {
-        JLabel outputLabel = createLabel("OutputLabel", null);
+        JLabel outputLabel = createLabel("OutputLabel");
         outputLabel.setName(String.format("<html><center>%s</center></html", outputLabel.getText()));
 
         // Layout the Panel
@@ -686,21 +686,21 @@ public class EquipmentAndSuppliesTab {
             "", true);
 
         // Delivery Time
-        lblNDiceTransitTime = createLabel("NDiceTransitTime", null);
-        spnNDiceTransitTime = createSpinner("NDiceTransitTime", null, 0,
+        lblNDiceTransitTime = createLabel("NDiceTransitTime");
+        spnNDiceTransitTime = createSpinner("NDiceTransitTime", 0,
             0, 365, 1);
 
-        lblConstantTransitTime = createLabel("ConstantTransitTime", null);
-        spnConstantTransitTime = createSpinner("ConstantTransitTime", null,
+        lblConstantTransitTime = createLabel("ConstantTransitTime");
+        spnConstantTransitTime = createSpinner("ConstantTransitTime",
             0, 0, 365, 1);
 
         // Margin of Success Reductions
-        lblAcquireMosBonus = createLabel("AcquireMosBonus", null);
+        lblAcquireMosBonus = createLabel("AcquireMosBonus");
         spnAcquireMosBonus = createSpinner("AcquireMosBonus",
             null, 0, 0, 365, 1);
 
         // Minimum Transit Time
-        lblAcquireMinimum = createLabel("AcquireMinimum", null);
+        lblAcquireMinimum = createLabel("AcquireMinimum");
         spnAcquireMinimum = createSpinner("AcquireMinimum",
             null, 0, 0, 365, 1);
 
@@ -813,28 +813,28 @@ public class EquipmentAndSuppliesTab {
             "", true);
 
         // Limit Parts/Units by Year
-        limitByYearBox = createCheckBox("LimitByYearBox", null);
+        limitByYearBox = createCheckBox("LimitByYearBox");
 
         // Disallow Extinct Units/Parts
-        disallowExtinctStuffBox = createCheckBox("DisallowExtinctStuffBox", null);
+        disallowExtinctStuffBox = createCheckBox("DisallowExtinctStuffBox");
 
         // Allow Clan/Inner Sphere Purchases
-        allowClanPurchasesBox = createCheckBox("AllowClanPurchasesBox", null);
-        allowISPurchasesBox = createCheckBox("AllowISPurchasesBox", null);
+        allowClanPurchasesBox = createCheckBox("AllowClanPurchasesBox");
+        allowISPurchasesBox = createCheckBox("AllowISPurchasesBox");
 
         // Canon Purchases/Refits
-        allowCanonOnlyBox = createCheckBox("AllowCanonOnlyBox", null);
-        allowCanonRefitOnlyBox = createCheckBox("AllowCanonRefitOnlyBox", null);
+        allowCanonOnlyBox = createCheckBox("AllowCanonOnlyBox");
+        allowCanonRefitOnlyBox = createCheckBox("AllowCanonRefitOnlyBox");
 
         // Maximum Tech Level
-        lblChoiceTechLevel = createLabel("ChoiceTechLevel", null);
+        lblChoiceTechLevel = createLabel("ChoiceTechLevel");
         choiceTechLevel = new MMComboBox<>("choiceTechLevel", getMaximumTechLevelOptions());
 
         // Variable Tech Level
-        variableTechLevelBox = createCheckBox("VariableTechLevelBox", null);
+        variableTechLevelBox = createCheckBox("VariableTechLevelBox");
 
         // Ammo by Type
-        useAmmoByTypeBox = createCheckBox("UseAmmoByTypeBox", null);
+        useAmmoByTypeBox = createCheckBox("UseAmmoByTypeBox");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("TechLimitsTab", true, "");

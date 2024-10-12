@@ -231,14 +231,14 @@ public class FinancesTab {
      */
     private JPanel createPaymentsPanel() {
         // Contents
-        payForPartsBox = createCheckBox("PayForPartsBox", null);
-        payForRepairsBox = createCheckBox("PayForRepairsBox", null);
-        payForUnitsBox = createCheckBox("PayForUnitsBox", null);
-        payForSalariesBox = createCheckBox("PayForSalariesBox", null);
-        payForOverheadBox = createCheckBox("PayForOverheadBox", null);
-        payForMaintainBox = createCheckBox("PayForMaintainBox", null);
-        payForTransportBox = createCheckBox("PayForTransportBox", null);
-        payForRecruitmentBox = createCheckBox("PayForRecruitmentBox", null);
+        payForPartsBox = createCheckBox("PayForPartsBox");
+        payForRepairsBox = createCheckBox("PayForRepairsBox");
+        payForUnitsBox = createCheckBox("PayForUnitsBox");
+        payForSalariesBox = createCheckBox("PayForSalariesBox");
+        payForOverheadBox = createCheckBox("PayForOverheadBox");
+        payForMaintainBox = createCheckBox("PayForMaintainBox");
+        payForTransportBox = createCheckBox("PayForTransportBox");
+        payForRecruitmentBox = createCheckBox("PayForRecruitmentBox");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("PaymentsPanel", true,
@@ -323,16 +323,15 @@ public class FinancesTab {
      */
     private JPanel createGeneralOptionsPanel() {
         // Contents
-        useLoanLimitsBox = createCheckBox("UseLoanLimitsBox", null);
-        usePercentageMaintenanceBox = createCheckBox("UsePercentageMaintenanceBox", null);
-        useExtendedPartsModifierBox = createCheckBox("UseExtendedPartsModifierBox", null);
-        usePeacetimeCostBox = createCheckBox("UsePeacetimeCostBox", null);
-        showPeacetimeCostBox = createCheckBox("ShowPeacetimeCostBox", null);
+        useLoanLimitsBox = createCheckBox("UseLoanLimitsBox");
+        usePercentageMaintenanceBox = createCheckBox("UsePercentageMaintenanceBox");
+        useExtendedPartsModifierBox = createCheckBox("UseExtendedPartsModifierBox");
+        usePeacetimeCostBox = createCheckBox("UsePeacetimeCostBox");
+        showPeacetimeCostBox = createCheckBox("ShowPeacetimeCostBox");
 
         lblFinancialYearDuration = createLabel("FinancialYearDuration", null);
 
-        newFinancialYearFinancesToCSVExportBox = createCheckBox("NewFinancialYearFinancesToCSVExportBox",
-            null);
+        newFinancialYearFinancesToCSVExportBox = createCheckBox("NewFinancialYearFinancesToCSVExportBox");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("GeneralOptionsPanel", false, "");
@@ -376,8 +375,8 @@ public class FinancesTab {
      */
     private JPanel createSalesPanel() {
         // Contents
-        sellUnitsBox = createCheckBox("SellUnitsBox", null);
-        sellPartsBox = createCheckBox("SellPartsBox", null);
+        sellUnitsBox = createCheckBox("SellUnitsBox");
+        sellPartsBox = createCheckBox("SellPartsBox");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("SalesPanel", true,
@@ -412,7 +411,7 @@ public class FinancesTab {
      */
     private JPanel createTaxesPanel() {
         // Contents
-        chkUseTaxes = createCheckBox("UseTaxesBox", null);
+        chkUseTaxes = createCheckBox("UseTaxesBox");
 
         lblTaxesPercentage = createLabel("TaxesPercentage", null);
         spnTaxesPercentage = createSpinner("TaxesPercentage", null,
@@ -451,8 +450,8 @@ public class FinancesTab {
      */
     private JPanel createSharesPanel() {
         // Contents
-        chkUseShareSystem = createCheckBox("UseShareSystem", null);
-        chkSharesForAll = createCheckBox("SharesForAll", null);
+        chkUseShareSystem = createCheckBox("UseShareSystem");
+        chkSharesForAll = createCheckBox("SharesForAll");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("SharesPanel", true,

@@ -248,19 +248,19 @@ public class RelationshipsTab {
      */
     private JPanel createMarriageGeneralOptionsPanel() {
         // Contents
-        chkUseManualMarriages = createCheckBox("UseManualMarriages", null);
-        chkUseClanPersonnelMarriages = createCheckBox("UseClanPersonnelMarriages", null);
-        chkUsePrisonerMarriages = createCheckBox("UsePrisonerMarriages", null);
+        chkUseManualMarriages = createCheckBox("UseManualMarriages");
+        chkUseClanPersonnelMarriages = createCheckBox("UseClanPersonnelMarriages");
+        chkUsePrisonerMarriages = createCheckBox("UsePrisonerMarriages");
 
-        lblNoInterestInMarriageDiceSize = createLabel("NoInterestInMarriageDiceSize", null);
-        spnNoInterestInMarriageDiceSize = createSpinner("NoInterestInMarriageDiceSize", null,
+        lblNoInterestInMarriageDiceSize = createLabel("NoInterestInMarriageDiceSize");
+        spnNoInterestInMarriageDiceSize = createSpinner("NoInterestInMarriageDiceSize",
             10, 1, 100000, 1);
 
-        lblCheckMutualAncestorsDepth = createLabel("CheckMutualAncestorsDepth", null);
-        spnCheckMutualAncestorsDepth = createSpinner("CheckMutualAncestorsDepth", null,
+        lblCheckMutualAncestorsDepth = createLabel("CheckMutualAncestorsDepth");
+        spnCheckMutualAncestorsDepth = createSpinner("CheckMutualAncestorsDepth",
             4, 0, 20, 1);
 
-        chkLogMarriageNameChanges = createCheckBox("LogMarriageNameChanges", null);
+        chkLogMarriageNameChanges = createCheckBox("LogMarriageNameChanges");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("MarriageGeneralOptionsPanel",
@@ -310,7 +310,7 @@ public class RelationshipsTab {
      */
     private JPanel createRandomMarriagePanel() {
         // Contents
-        lblRandomMarriageMethod = createLabel("RandomMarriageMethod", null);
+        lblRandomMarriageMethod = createLabel("RandomMarriageMethod");
         comboRandomMarriageMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -324,11 +324,11 @@ public class RelationshipsTab {
             }
         });
 
-        chkUseRandomClanPersonnelMarriages = createCheckBox("UseRandomClanPersonnelMarriages", null);
-        chkUseRandomPrisonerMarriages = createCheckBox("UseRandomPrisonerMarriages", null);
+        chkUseRandomClanPersonnelMarriages = createCheckBox("UseRandomClanPersonnelMarriages");
+        chkUseRandomPrisonerMarriages = createCheckBox("UseRandomPrisonerMarriages");
 
-        lblRandomMarriageAgeRange = createLabel("RandomMarriageAgeRange", null);
-        spnRandomMarriageAgeRange = createSpinner("RandomMarriageAgeRange", null,
+        lblRandomMarriageAgeRange = createLabel("RandomMarriageAgeRange");
+        spnRandomMarriageAgeRange = createSpinner("RandomMarriageAgeRange",
             10, 0, 100, 1.0);
 
         pnlPercentageRandomMarriage = createPercentageRandomMarriagePanel();
@@ -383,11 +383,11 @@ public class RelationshipsTab {
         spnRandomMarriageDiceSize = createSpinner("RandomMarriageOppositeSexDiceSize",
             null, 5000, 0, 100000, 1);
 
-        lblRandomSameSexMarriageDiceSize = createLabel("RandomSameSexMarriageDiceSize", null);
+        lblRandomSameSexMarriageDiceSize = createLabel("RandomSameSexMarriageDiceSize");
         spnRandomSameSexMarriageDiceSize = createSpinner("RandomSameSexMarriageDiceSize",
             null, 14, 0, 100000, 1);
 
-        lblRandomNewDependentMarriage = createLabel("RandomNewDependentMarriage", null);
+        lblRandomNewDependentMarriage = createLabel("RandomNewDependentMarriage");
         spnRandomNewDependentMarriage = createSpinner("RandomSameSexMarriageDiceSize",
             null, 20, 0, 100000, 1);
 
@@ -442,9 +442,9 @@ public class RelationshipsTab {
             false, "", true);
 
         // Contents
-        chkUseManualDivorce = createCheckBox("UseManualDivorce", null);
-        chkUseClanPersonnelDivorce = createCheckBox("UseClanPersonnelDivorce", null);
-        chkUsePrisonerDivorce = createCheckBox("UsePrisonerDivorce", null);
+        chkUseManualDivorce = createCheckBox("UseManualDivorce");
+        chkUseClanPersonnelDivorce = createCheckBox("UseClanPersonnelDivorce");
+        chkUsePrisonerDivorce = createCheckBox("UsePrisonerDivorce");
 
         pnlRandomDivorce = createRandomDivorcePanel();
 
@@ -482,7 +482,7 @@ public class RelationshipsTab {
      */
     private JPanel createRandomDivorcePanel() {
         // Contents
-        lblRandomDivorceMethod = createLabel("RandomDivorceMethod", null);
+        lblRandomDivorceMethod = createLabel("RandomDivorceMethod");
         comboRandomDivorceMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -496,13 +496,13 @@ public class RelationshipsTab {
             }
         });
 
-        chkUseRandomOppositeSexDivorce = createCheckBox("UseRandomOppositeSexDivorce", null);
-        chkUseRandomSameSexDivorce = createCheckBox("UseRandomSameSexDivorce", null);
-        chkUseRandomClanPersonnelDivorce = createCheckBox("UseRandomClanPersonnelDivorce", null);
-        chkUseRandomPrisonerDivorce = createCheckBox("UseRandomPrisonerDivorce", null);
+        chkUseRandomOppositeSexDivorce = createCheckBox("UseRandomOppositeSexDivorce");
+        chkUseRandomSameSexDivorce = createCheckBox("UseRandomSameSexDivorce");
+        chkUseRandomClanPersonnelDivorce = createCheckBox("UseRandomClanPersonnelDivorce");
+        chkUseRandomPrisonerDivorce = createCheckBox("UseRandomPrisonerDivorce");
 
-        lblRandomDivorceDiceSize = createLabel("RandomDivorceDiceSize", null);
-        spnRandomDivorceDiceSize = createSpinner("RandomDivorceDiceSize", null,
+        lblRandomDivorceDiceSize = createLabel("RandomDivorceDiceSize");
+        spnRandomDivorceDiceSize = createSpinner("RandomDivorceDiceSize",
             900, 0, 100000, 1);
 
         // Layout the Panel
@@ -588,15 +588,15 @@ public class RelationshipsTab {
      */
     private JPanel createProcreationGeneralOptionsPanel() {
         // Contents
-        chkUseManualProcreation = createCheckBox("UseManualProcreation", null);
-        chkUseClanPersonnelProcreation = createCheckBox("UseClanPersonnelProcreation", null);
-        chkUsePrisonerProcreation = createCheckBox("UsePrisonerProcreation", null);
+        chkUseManualProcreation = createCheckBox("UseManualProcreation");
+        chkUseClanPersonnelProcreation = createCheckBox("UseClanPersonnelProcreation");
+        chkUsePrisonerProcreation = createCheckBox("UsePrisonerProcreation");
 
-        lblMultiplePregnancyOccurrences = createLabel("MultiplePregnancyOccurrences", null);
-        spnMultiplePregnancyOccurrences = createSpinner("MultiplePregnancyOccurrences", null,
+        lblMultiplePregnancyOccurrences = createLabel("MultiplePregnancyOccurrences");
+        spnMultiplePregnancyOccurrences = createSpinner("MultiplePregnancyOccurrences",
             50, 1, 1000, 1);
 
-        lblBabySurnameStyle = createLabel("BabySurnameStyle", null);
+        lblBabySurnameStyle = createLabel("BabySurnameStyle");
         comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -614,15 +614,15 @@ public class RelationshipsTab {
             null);
         chkAssignChildrenOfFoundersFounderTag = createCheckBox("AssignChildrenOfFoundersFounderTag",
             null);
-        chkDetermineFatherAtBirth = createCheckBox("DetermineFatherAtBirth", null);
-        chkDisplayTrueDueDate = createCheckBox("DisplayTrueDueDate", null);
+        chkDetermineFatherAtBirth = createCheckBox("DetermineFatherAtBirth");
+        chkDisplayTrueDueDate = createCheckBox("DisplayTrueDueDate");
 
-        lblNoInterestInChildrenDiceSize = createLabel("NoInterestInChildrenDiceSize", null);
-        spnNoInterestInChildrenDiceSize = createSpinner("NoInterestInChildrenDiceSize", null,
+        lblNoInterestInChildrenDiceSize = createLabel("NoInterestInChildrenDiceSize");
+        spnNoInterestInChildrenDiceSize = createSpinner("NoInterestInChildrenDiceSize",
             3, 1, 100000, 1);
 
-        chkUseMaternityLeave = createCheckBox("UseMaternityLeave", null);
-        chkLogProcreation = createCheckBox("LogProcreation", null);
+        chkUseMaternityLeave = createCheckBox("UseMaternityLeave");
+        chkLogProcreation = createCheckBox("LogProcreation");
 
         pnlRandomProcreationPanel = createRandomProcreationPanel();
 
@@ -686,7 +686,7 @@ public class RelationshipsTab {
      */
     private JPanel createRandomProcreationPanel() {
         // Contents
-        lblRandomProcreationMethod = createLabel("RandomProcreationMethod", null);
+        lblRandomProcreationMethod = createLabel("RandomProcreationMethod");
         comboRandomProcreationMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -704,7 +704,7 @@ public class RelationshipsTab {
             null);
         chkUseRandomClanPersonnelProcreation = createCheckBox("UseRandomClanPersonnelProcreation",
             null);
-        chkUseRandomPrisonerProcreation = createCheckBox("UseRandomPrisonerProcreation", null);
+        chkUseRandomPrisonerProcreation = createCheckBox("UseRandomPrisonerProcreation");
 
         lblRandomProcreationRelationshipDiceSize = createLabel("RandomProcreationRelationshipDiceSize",
             null);

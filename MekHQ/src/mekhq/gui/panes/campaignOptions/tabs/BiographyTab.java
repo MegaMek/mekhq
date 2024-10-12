@@ -326,19 +326,19 @@ public class BiographyTab {
             false, "", true);
 
         // Contents
-        chkUseDylansRandomXP = createCheckBox("UseDylansRandomXP", null);
+        chkUseDylansRandomXP = createCheckBox("UseDylansRandomXP");
 
-        lblGender = createLabel("Gender", null);
+        lblGender = createLabel("Gender");
         sldGender = new JSlider(SwingConstants.HORIZONTAL, 0, 100, RandomGenderGenerator.getPercentFemale());
         sldGender.setMajorTickSpacing(25);
         sldGender.setPaintTicks(true);
         sldGender.setPaintLabels(true);
 
-        lblNonBinaryDiceSize = createLabel("NonBinaryDiceSize", null);
-        spnNonBinaryDiceSize = createSpinner("NonBinaryDiceSize", null,
+        lblNonBinaryDiceSize = createLabel("NonBinaryDiceSize");
+        spnNonBinaryDiceSize = createSpinner("NonBinaryDiceSize",
             60, 0, 100000, 1);
 
-        lblFamilyDisplayLevel = createLabel("FamilyDisplayLevel", null);
+        lblFamilyDisplayLevel = createLabel("FamilyDisplayLevel");
 
         pnlAnniversariesPanel = createAnniversariesPanel();
 
@@ -390,10 +390,10 @@ public class BiographyTab {
      */
     private JPanel createAnniversariesPanel() {
         // Contents
-        chkAnnounceBirthdays = createCheckBox("AnnounceBirthdays", null);
-        chkAnnounceRecruitmentAnniversaries = createCheckBox("AnnounceRecruitmentAnniversaries", null);
-        chkAnnounceOfficersOnly = createCheckBox("AnnounceOfficersOnly", null);
-        chkAnnounceChildBirthdays = createCheckBox("AnnounceChildBirthdays", null);
+        chkAnnounceBirthdays = createCheckBox("AnnounceBirthdays");
+        chkAnnounceRecruitmentAnniversaries = createCheckBox("AnnounceRecruitmentAnniversaries");
+        chkAnnounceOfficersOnly = createCheckBox("AnnounceOfficersOnly");
+        chkAnnounceChildBirthdays = createCheckBox("AnnounceChildBirthdays");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("AnniversariesPanel", true,
@@ -430,10 +430,10 @@ public class BiographyTab {
             false, "", true);
 
         // Contents
-        chkUseRandomPersonalities = createCheckBox("UseRandomPersonalities", null);
-        chkUseRandomPersonalityReputation = createCheckBox("UseRandomPersonalityReputation", null);
-        chkUseIntelligenceXpMultiplier = createCheckBox("UseIntelligenceXpMultiplier", null);
-        chkUseSimulatedRelationships = createCheckBox("UseSimulatedRelationships", null);
+        chkUseRandomPersonalities = createCheckBox("UseRandomPersonalities");
+        chkUseRandomPersonalityReputation = createCheckBox("UseRandomPersonalityReputation");
+        chkUseIntelligenceXpMultiplier = createCheckBox("UseIntelligenceXpMultiplier");
+        chkUseSimulatedRelationships = createCheckBox("UseSimulatedRelationships");
 
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
 
@@ -472,13 +472,11 @@ public class BiographyTab {
      */
     private JPanel createRandomOriginOptionsPanel() {
         // Contents
-        chkRandomizeOrigin = createCheckBox("RandomizeOrigin", null);
-        chkRandomizeDependentsOrigin = createCheckBox("RandomizeDependentsOrigin", null);
-        chkRandomizeAroundSpecifiedPlanet = createCheckBox("RandomizeAroundSpecifiedPlanet",
-            null);
+        chkRandomizeOrigin = createCheckBox("RandomizeOrigin");
+        chkRandomizeDependentsOrigin = createCheckBox("RandomizeDependentsOrigin");
+        chkRandomizeAroundSpecifiedPlanet = createCheckBox("RandomizeAroundSpecifiedPlanet");
 
-        chkSpecifiedSystemFactionSpecific = createCheckBox("SpecifiedSystemFactionSpecific",
-            null);
+        chkSpecifiedSystemFactionSpecific = createCheckBox("SpecifiedSystemFactionSpecific");
         chkSpecifiedSystemFactionSpecific.addActionListener(evt -> {
             final PlanetarySystem planetarySystem = comboSpecifiedSystem.getSelectedItem();
             if ((planetarySystem == null)
@@ -488,7 +486,7 @@ public class BiographyTab {
         });
 
 
-        lblSpecifiedSystem = createLabel("SpecifiedSystem", null);
+        lblSpecifiedSystem = createLabel("SpecifiedSystem");
         comboSpecifiedSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -510,7 +508,7 @@ public class BiographyTab {
             }
         });
 
-        lblSpecifiedPlanet = createLabel("SpecifiedPlanet", null);
+        lblSpecifiedPlanet = createLabel("SpecifiedPlanet");
         comboSpecifiedPlanet.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -524,16 +522,16 @@ public class BiographyTab {
             }
         });
 
-        lblOriginSearchRadius = createLabel("OriginSearchRadius", null);
-        spnOriginSearchRadius = createSpinner("OriginSearchRadius", null,
+        lblOriginSearchRadius = createLabel("OriginSearchRadius");
+        spnOriginSearchRadius = createSpinner("OriginSearchRadius",
             0, 0, 2000, 25);
 
-        lblOriginDistanceScale = createLabel("OriginDistanceScale", null);
-        spnOriginDistanceScale = createSpinner("OriginDistanceScale", null,
+        lblOriginDistanceScale = createLabel("OriginDistanceScale");
+        spnOriginDistanceScale = createSpinner("OriginDistanceScale",
             0.6, 0.1, 2.0, 0.1);
 
-        chkAllowClanOrigins = createCheckBox("AllowClanOrigins", null);
-        chkExtraRandomOrigin = createCheckBox("ExtraRandomOrigin", null);
+        chkAllowClanOrigins = createCheckBox("AllowClanOrigins");
+        chkExtraRandomOrigin = createCheckBox("ExtraRandomOrigin");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("RandomOriginOptionsPanel", true,
@@ -656,10 +654,9 @@ public class BiographyTab {
             false, "", true);
 
         // Contents
-        chkKeepMarriedNameUponSpouseDeath = createCheckBox("KeepMarriedNameUponSpouseDeath",
-            null);
+        chkKeepMarriedNameUponSpouseDeath = createCheckBox("KeepMarriedNameUponSpouseDeath");
 
-        lblRandomDeathMethod = createLabel("RandomDeathMethod", null);
+        lblRandomDeathMethod = createLabel("RandomDeathMethod");
         comboRandomDeathMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -673,15 +670,14 @@ public class BiographyTab {
             }
         });
 
-        chkUseRandomClanPersonnelDeath = createCheckBox("UseRandomClanPersonnelDeath",
-            null);
-        chkUseRandomPrisonerDeath = createCheckBox("UseRandomPrisonerDeath", null);
-        chkUseRandomDeathSuicideCause = createCheckBox("UseRandomDeathSuicideCause", null);
+        chkUseRandomClanPersonnelDeath = createCheckBox("UseRandomClanPersonnelDeath");
+        chkUseRandomPrisonerDeath = createCheckBox("UseRandomPrisonerDeath");
+        chkUseRandomDeathSuicideCause = createCheckBox("UseRandomDeathSuicideCause");
 
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
 
-        lblPercentageRandomDeathChance = createLabel("PercentageRandomDeathChance", null);
-        spnPercentageRandomDeathChance = createSpinner("PercentageRandomDeathChance", null,
+        lblPercentageRandomDeathChance = createLabel("PercentageRandomDeathChance");
+        spnPercentageRandomDeathChance = createSpinner("PercentageRandomDeathChance",
             0, 0, 100, 0.000001);
 
         // Layout the Panel
@@ -774,28 +770,28 @@ public class BiographyTab {
             false, "", true);
 
         // Contents
-        chkUseEducationModule = createCheckBox("UseEducationModule", null);
+        chkUseEducationModule = createCheckBox("UseEducationModule");
 
-        lblCurriculumXpRate = createLabel("CurriculumXpRate", null);
-        spnCurriculumXpRate = createSpinner("CurriculumXpRate", null,
+        lblCurriculumXpRate = createLabel("CurriculumXpRate");
+        spnCurriculumXpRate = createSpinner("CurriculumXpRate",
             3, 1, 10, 1);
 
-        lblMaximumJumpCount = createLabel("MaximumJumpCount", null);
-        spnMaximumJumpCount = createSpinner("MaximumJumpCount", null,
+        lblMaximumJumpCount = createLabel("MaximumJumpCount");
+        spnMaximumJumpCount = createSpinner("MaximumJumpCount",
             5, 1, 200, 1);
 
-        chkUseReeducationCamps = createCheckBox("UseReeducationCamps", null);
+        chkUseReeducationCamps = createCheckBox("UseReeducationCamps");
 
         pnlEnableStandardSets = createEnableStandardSetsPanel();
 
-        chkEnableOverrideRequirements = createCheckBox("EnableOverrideRequirements", null);
+        chkEnableOverrideRequirements = createCheckBox("EnableOverrideRequirements");
 
-        chkShowIneligibleAcademies = createCheckBox("ShowIneligibleAcademies", null);
+        chkShowIneligibleAcademies = createCheckBox("ShowIneligibleAcademies");
 
-        lblEntranceExamBaseTargetNumber = createLabel("EntranceExamBaseTargetNumber", null);
-        spnEntranceExamBaseTargetNumber = createSpinner("EntranceExamBaseTargetNumber", null,
+        lblEntranceExamBaseTargetNumber = createLabel("EntranceExamBaseTargetNumber");
+        spnEntranceExamBaseTargetNumber = createSpinner("EntranceExamBaseTargetNumber",
             14, 0, 20, 1);
-        lblEntranceExamBaseTargetNumberPost = createLabel("EntranceExamBaseTargetNumberPost", null);
+        lblEntranceExamBaseTargetNumberPost = createLabel("EntranceExamBaseTargetNumberPost");
 
         pnlXpAndSkillBonuses = createXpAndSkillBonusesPanel();
 
@@ -874,9 +870,9 @@ public class BiographyTab {
      */
     private JPanel createEnableStandardSetsPanel() {
         // Contents
-        chkEnableLocalAcademies = createCheckBox("EnableLocalAcademies", null);
-        chkEnablePrestigiousAcademies = createCheckBox("EnablePrestigiousAcademies", null);
-        chkEnableUnitEducation = createCheckBox("EnableUnitEducation", null);
+        chkEnableLocalAcademies = createCheckBox("EnableLocalAcademies");
+        chkEnablePrestigiousAcademies = createCheckBox("EnablePrestigiousAcademies");
+        chkEnableUnitEducation = createCheckBox("EnableUnitEducation");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("EnableStandardSetsPanel", true,
@@ -916,9 +912,9 @@ public class BiographyTab {
      */
     private JPanel createXpAndSkillBonusesPanel() {
         // Contents
-        chkEnableBonuses = createCheckBox("EnableBonuses", null);
-        lblFacultyXpMultiplier = createLabel("FacultyXpMultiplier", null);
-        spnFacultyXpMultiplier = createSpinner("FacultyXpMultiplier", null,
+        chkEnableBonuses = createCheckBox("EnableBonuses");
+        lblFacultyXpMultiplier = createLabel("FacultyXpMultiplier");
+        spnFacultyXpMultiplier = createSpinner("FacultyXpMultiplier",
             1.00, 0.00, 10.00, 0.01);
 
         // Layout the Panel
@@ -958,11 +954,11 @@ public class BiographyTab {
      */
     private JPanel createDropoutChancePanel() {
         // Contents
-        lblAdultDropoutChance = createLabel("AdultDropoutChance", null);
-        spnAdultDropoutChance = createSpinner("AdultDropoutChance", null,
+        lblAdultDropoutChance = createLabel("AdultDropoutChance");
+        spnAdultDropoutChance = createSpinner("AdultDropoutChance",
             1000, 0, 100000, 1);
-        lblChildrenDropoutChance = createLabel("ChildrenDropoutChance", null);
-        spnChildrenDropoutChance = createSpinner("ChildrenDropoutChance", null,
+        lblChildrenDropoutChance = createLabel("ChildrenDropoutChance");
+        spnChildrenDropoutChance = createSpinner("ChildrenDropoutChance",
             10000, 0, 100000, 1);
 
         // Layout the Panel
@@ -1008,9 +1004,9 @@ public class BiographyTab {
      */
     private JPanel createAccidentsAndEventsPanel() {
         // Contents
-        chkAllAges = createCheckBox("AllAges", null);
-        lblMilitaryAcademyAccidents = createLabel("MilitaryAcademyAccidents", null);
-        spnMilitaryAcademyAccidents = createSpinner("MilitaryAcademyAccidents", null,
+        chkAllAges = createCheckBox("AllAges");
+        lblMilitaryAcademyAccidents = createLabel("MilitaryAcademyAccidents");
+        spnMilitaryAcademyAccidents = createSpinner("MilitaryAcademyAccidents",
             10000, 0, 100000, 1);
 
         // Layout the Panel
@@ -1057,13 +1053,13 @@ public class BiographyTab {
             false, "", true);
 
         // Contents
-        chkUseOriginFactionForNames = createCheckBox("UseOriginFactionForNames", null);
+        chkUseOriginFactionForNames = createCheckBox("UseOriginFactionForNames");
 
-        lblFactionNames = createLabel("FactionNames", null);
+        lblFactionNames = createLabel("FactionNames");
 
         pnlRandomPortrait = createRandomPortraitPanel();
 
-        chkAssignPortraitOnRoleChange = createCheckBox("AssignPortraitOnRoleChange", null);
+        chkAssignPortraitOnRoleChange = createCheckBox("AssignPortraitOnRoleChange");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("NameAndPortraitGenerationTab", true,

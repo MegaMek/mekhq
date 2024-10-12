@@ -121,29 +121,29 @@ public class RepairAndMaintenanceTab {
             "", true);
 
         // Era Mods
-        useEraModsCheckBox = createCheckBox("UseEraModsCheckBox", null);
+        useEraModsCheckBox = createCheckBox("UseEraModsCheckBox");
 
         // Tech Placement
-        assignedTechFirstCheckBox = createCheckBox("AssignedTechFirstCheckBox", null);
-        resetToFirstTechCheckBox = createCheckBox("ResetToFirstTechCheckBox", null);
+        assignedTechFirstCheckBox = createCheckBox("AssignedTechFirstCheckBox");
+        resetToFirstTechCheckBox = createCheckBox("ResetToFirstTechCheckBox");
 
         // Use Quirks
-        useQuirksBox = createCheckBox("UseQuirksBox", null);
+        useQuirksBox = createCheckBox("UseQuirksBox");
 
         // Aero System Damage
-        useAeroSystemHitsBox = createCheckBox("UseAeroSystemHitsBox", null);
+        useAeroSystemHitsBox = createCheckBox("UseAeroSystemHitsBox");
 
         // Damage by Margin
-        useDamageMargin = createCheckBox("UseDamageMargin", null);
+        useDamageMargin = createCheckBox("UseDamageMargin");
         useDamageMargin.addActionListener(evt -> spnDamageMargin.setEnabled(useDamageMargin.isSelected()));
 
-        lblDamageMargin = createLabel("DamageMargin", null);
-        spnDamageMargin = createSpinner("DamageMargin", null,
+        lblDamageMargin = createLabel("DamageMargin");
+        spnDamageMargin = createSpinner("DamageMargin",
             1, 1, 20, 1);
 
         // Equipment Survival
-        lblDestroyPartTarget = createLabel("DestroyPartTarget", null);
-        spnDestroyPartTarget = createSpinner("DestroyPartTarget", null,
+        lblDestroyPartTarget = createLabel("DestroyPartTarget");
+        spnDestroyPartTarget = createSpinner("DestroyPartTarget",
             2, 2, 13, 1);
         JLabel lblDestroyPartTargetPost = new JLabel("<html>+</html>");
 
@@ -204,40 +204,40 @@ public class RepairAndMaintenanceTab {
             false, "", true);
 
         // Check Maintenance
-        checkMaintenance = createCheckBox("CheckMaintenance", null);
+        checkMaintenance = createCheckBox("CheckMaintenance");
 
         // Maintenance Cycle Duration
-        lblMaintenanceDays = createLabel("MaintenanceDays", null);
-        spnDamageMargin = createSpinner("MaintenanceDays", null,
+        lblMaintenanceDays = createLabel("MaintenanceDays");
+        spnDamageMargin = createSpinner("MaintenanceDays",
             7, 1, 365, 1);
 
         // Maintenance Bonus
-        lblMaintenanceBonus = createLabel("MaintenanceBonus", null);
-        spnMaintenanceBonus = createSpinner("MaintenanceBonus", null,
+        lblMaintenanceBonus = createLabel("MaintenanceBonus");
+        spnMaintenanceBonus = createSpinner("MaintenanceBonus",
             0, -13, 13, 1);
 
         // Default Maintenance Time
-        lblDefaultMaintenanceTime = createLabel("DefaultMaintenanceTime", null);
-        spnDefaultMaintenanceTime = createSpinner("DefaultMaintenanceTime", null,
+        lblDefaultMaintenanceTime = createLabel("DefaultMaintenanceTime");
+        spnDefaultMaintenanceTime = createSpinner("DefaultMaintenanceTime",
             1, 1, 4, 1);
 
         // Use Quality Modifiers
-        useQualityMaintenance = createCheckBox("UseQualityMaintenance", null);
+        useQualityMaintenance = createCheckBox("UseQualityMaintenance");
 
         // Reverse Quality names
-        reverseQualityNames = createCheckBox("ReverseQualityNames", null);
+        reverseQualityNames = createCheckBox("ReverseQualityNames");
 
         // Use Random Unit Qualities
-        chkUseRandomUnitQualities = createCheckBox("UseRandomUnitQualities", null);
+        chkUseRandomUnitQualities = createCheckBox("UseRandomUnitQualities");
 
         // Use Planetary Modifiers
-        chkUsePlanetaryModifiers = createCheckBox("UsePlanetaryModifiers", null);
+        chkUsePlanetaryModifiers = createCheckBox("UsePlanetaryModifiers");
 
         // Only Damage F-Rated Equipment
-        useUnofficialMaintenance = createCheckBox("UseUnofficialMaintenance", null);
+        useUnofficialMaintenance = createCheckBox("UseUnofficialMaintenance");
 
         // Report Maintenance checks to Log
-        logMaintenance = createCheckBox("LogMaintenance", null);
+        logMaintenance = createCheckBox("LogMaintenance");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("repairTab", true, "");

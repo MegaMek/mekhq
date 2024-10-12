@@ -3,7 +3,6 @@ package mekhq.gui.panes.campaignOptions.tabs;
 import megamek.client.ui.swing.util.FlatLafStyleBuilder;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
-import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 
 import javax.swing.*;
@@ -18,7 +17,6 @@ import java.util.ResourceBundle;
 import static megamek.client.ui.WrapLayout.wordWrap;
 
 public class CampaignOptionsUtilities {
-    private static final MMLogger logger = MMLogger.create(CampaignOptionsPane.class);
     private static final String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
     static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE);
     final static String IMAGE_DIRECTORY = "data/images/universe/factions/";
@@ -28,6 +26,10 @@ public class CampaignOptionsUtilities {
      */
     static String getImageDirectory() {
         return IMAGE_DIRECTORY;
+    }
+
+    static JCheckBox createCheckBox(String name) {
+        return createCheckBox(name, null);
     }
 
     /**
@@ -54,6 +56,11 @@ public class CampaignOptionsUtilities {
         checkBox.setMinimumSize(size);
 
         return checkBox;
+    }
+
+    static JSpinner createSpinner(String name, double defaultValue, double minimum, double maximum,
+                                  double stepSize) {
+        return createSpinner(name, null, defaultValue, minimum, maximum, stepSize);
     }
 
     /**
@@ -90,6 +97,10 @@ public class CampaignOptionsUtilities {
         return jSpinner;
     }
 
+    static JLabel createLabel(String name) {
+        return createLabel(name, null);
+    }
+
     /**
      * Creates a {@link JLabel} with the specified name and optional customWrapSize.
      * <p>
@@ -118,6 +129,10 @@ public class CampaignOptionsUtilities {
         return jLabel;
     }
 
+    static JTextField createTextField(String name, int width) {
+        return createTextField(name, null, width);
+    }
+
     /**
      * Creates a {@link JTextField} object.
      * <p>
@@ -139,8 +154,8 @@ public class CampaignOptionsUtilities {
         jTextField.setName("txt" + name);
 
         int preferredHeight = jTextField.getPreferredSize().height;
-        jTextField.setMinimumSize(new Dimension(width, preferredHeight));
-        jTextField.setMaximumSize(new Dimension(width, preferredHeight));
+        jTextField.setMinimumSize(new Dimension(UIUtil.scaleForGUI(width), preferredHeight));
+        jTextField.setMaximumSize(new Dimension(UIUtil.scaleForGUI(width), preferredHeight));
 
         return jTextField;
     }
