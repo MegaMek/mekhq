@@ -13,6 +13,20 @@ import javax.swing.JSpinner.NumberEditor;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
+/**
+ * This class represents the FinancesTab campaign options, configuring finance-related settings.
+ * It provides panels including:
+ * <ul>
+ *   <li>{@code GeneralOptions}</li>
+ *   <li>{@code Payments}</li>
+ *   <li>{@code Sales}</li>
+ *   <li>{@code OtherSystems}</li>
+ *   <li>{@code PriceMultipliers}</li>
+ * </ul>
+ * Each panel has form components for user input.
+ * <p>
+ * Requires a valid {@link Campaign} and {@link JFrame} instances.
+ */
 public class FinancesTab {
     Campaign campaign;
     JFrame frame;
@@ -82,9 +96,15 @@ public class FinancesTab {
     private JSpinner spnUnrepairablePartsValueMultiplier;
     private JLabel lblCancelledOrderRefundMultiplier;
     private JSpinner spnCancelledOrderRefundMultiplier;
-
     //end Price Multipliers
 
+    /**
+     * Constructs a new 'FinancesTab' instance, initializes its internal state, and sets up its user interface.
+     *
+     * @param campaign The {@link Campaign} instance associated with this tab.
+     * @param frame The parent {@link JFrame} in which this tab is displayed.
+     * @param name The name to be given to this tab.
+     */
     FinancesTab(Campaign campaign, JFrame frame, String name) {
         this.campaign = campaign;
         this.frame = frame;
@@ -93,11 +113,21 @@ public class FinancesTab {
         initialize();
     }
 
+    /**
+     * Initializes the user interface elements of the component.
+     * It calls other initialization methods such as {@link #initializeGeneralOptionsTab()} and {@link #initializePriceMultipliersTab()}
+     * for setting up specific parts of the interface.
+     */
     private void initialize() {
         initializeGeneralOptionsTab();
         initializePriceMultipliersTab();
     }
 
+    /**
+     * Initializes all components for the 'GeneralOptionsTab'.
+     * This includes setting up panels for General Options, Payments, Sales and Other Systems.
+     * Each panel contains various checkboxes and user interface elements for user interaction.
+     */
     private void initializeGeneralOptionsTab() {
         // General Options
         pnlGeneralOptions = new JPanel();
@@ -109,7 +139,7 @@ public class FinancesTab {
 
         lblFinancialYearDuration = new JLabel();
         comboFinancialYearDuration = new MMComboBox<>("comboFinancialYearDuration",
-            getFinancialYearDurationOptions());
+            FinancialYearDuration.values());
 
         newFinancialYearFinancesToCSVExportBox = new JCheckBox();
 
@@ -143,10 +173,13 @@ public class FinancesTab {
         chkSharesForAll = new JCheckBox();
     }
 
-    private static DefaultComboBoxModel<FinancialYearDuration> getFinancialYearDurationOptions() {
-        return new DefaultComboBoxModel<>(FinancialYearDuration.values());
-    }
-
+    /**
+     * Constructs and returns a {@link JPanel} for the 'FinancesGeneralTab'.
+     * This tab includes 'GeneralOptions', 'Payments', 'Sales', and 'OtherSystems' panels that are
+     * organized using {@link GroupLayout}. A header is also included in the layout.
+     *
+     * @return {@link JPanel} representing the 'Finances General' tab.
+     */
     JPanel createFinancesGeneralOptionsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("FinancesGeneralTab",
@@ -189,6 +222,13 @@ public class FinancesTab {
         return createParentPanel(panel, "FinancesGeneralTab");
     }
 
+    /**
+     * Constructs and returns a {@link JPanel} for the 'PaymentsPanel'.
+     * This panel contains checkboxes for different payment categories, organized into two rows
+     * within a {@link GroupLayout}.
+     *
+     * @return {@link JPanel} representing the 'Payments' panel.
+     */
     private JPanel createPaymentsPanel() {
         // Contents
         payForPartsBox = createCheckBox("PayForPartsBox", null);
@@ -244,6 +284,12 @@ public class FinancesTab {
         return panel;
     }
 
+    /**
+     * Constructs and returns a {@link JPanel} for the 'OtherSystemsPanel'.
+     * This panel includes 'Taxes' and 'Shares' panels, arranged vertically within a {@link GroupLayout}.
+     *
+     * @return {@link JPanel} representing the 'Other Systems' panel.
+     */
     private JPanel createOtherSystemsPanel() {
         // Contents
         pnlTaxes = createTaxesPanel();
@@ -267,6 +313,14 @@ public class FinancesTab {
         return panel;
     }
 
+    /**
+     * Constructs and returns a {@link JPanel} for the 'GeneralOptionsPanel'. This panel contains
+     * checkboxes for various options, a label displaying financial year duration,
+     * and a combo box to select the financial year duration.
+     * The components are arranged vertically within a {@link GroupLayout}.
+     *
+     * @return {@link JPanel} representing the 'General Options' panel.
+     */
     private JPanel createGeneralOptionsPanel() {
         // Contents
         useLoanLimitsBox = createCheckBox("UseLoanLimitsBox", null);
@@ -313,6 +367,13 @@ public class FinancesTab {
         return panel;
     }
 
+    /**
+     * Constructs and returns a {@link JPanel} for the 'SalesPanel'.
+     * This panel contains two checkboxes - 'SellUnitsBox' and 'SellPartsBox',
+     * organized in a horizontal arrangement within a {@link GroupLayout}.
+     *
+     * @return {@link JPanel} representing the 'Sales' panel.
+     */
     private JPanel createSalesPanel() {
         // Contents
         sellUnitsBox = createCheckBox("SellUnitsBox", null);
@@ -341,6 +402,14 @@ public class FinancesTab {
         return panel;
     }
 
+    /**
+     * Creates and returns a {@link JPanel} for the 'TaxesPanel'.
+     * This panel includes a checkbox for activating/deactivating taxes and
+     * a label and spinner for adjusting the tax percentage. These components are organized
+     * vertically in a {@link GroupLayout}.
+     *
+     * @return {@link JPanel} representing the 'Taxes' panel.
+     */
     private JPanel createTaxesPanel() {
         // Contents
         chkUseTaxes = createCheckBox("UseTaxesBox", null);
@@ -373,6 +442,13 @@ public class FinancesTab {
         return panel;
     }
 
+    /**
+     * Creates and returns a {@link JPanel} for the 'SharesPanel'.
+     * This panel includes two check boxes - 'UseShareSystem', and 'SharesForAll' arranged vertically
+     * in a {@link GroupLayout}.
+     *
+     * @return {@link JPanel} representing the 'Shares' panel.
+     */
     private JPanel createSharesPanel() {
         // Contents
         chkUseShareSystem = createCheckBox("UseShareSystem", null);
@@ -397,6 +473,12 @@ public class FinancesTab {
         return panel;
     }
 
+    /**
+     * Initializes the components of the 'PriceMultipliersTab'.
+     * This method assigns new instances of {@link JPanel}, {@link JLabel}, and {@link JSpinner}
+     * to the panel and its accompanying components for 'General Multipliers',
+     * 'Used Parts Multipliers', and 'Other Multipliers'.
+     */
     private void initializePriceMultipliersTab() {
         pnlGeneralMultipliers = new JPanel();
         lblCommonPartPriceMultiplier = new JLabel();
@@ -425,6 +507,14 @@ public class FinancesTab {
         spnCancelledOrderRefundMultiplier = new JSpinner();
     }
 
+    /**
+     * Constructs and returns a {@link JPanel} for the 'PriceMultipliersTab'.
+     * This tab comprises a header panel and three individual sections - 'General Multipliers',
+     * 'Used Parts Multipliers', and 'Other Multipliers'. These sections are vertically aligned
+     * using a {@link GroupLayout}.
+     *
+     * @return {@link JPanel} that constitutes the 'Price Multipliers' tab.
+     */
     JPanel createPriceMultipliersTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("PriceMultipliersTab",
@@ -463,6 +553,14 @@ public class FinancesTab {
         return createParentPanel(panel, "PriceMultipliersTab");
     }
 
+    /**
+     * Creates a {@link JPanel} for entering general multipliers with labeled spinners.
+     * The panel groups together spinners for entering multipliers for multiple categories like 'CommonPart',
+     * 'InnerSphereUnit', 'InnerSpherePart', 'ClanUnit', 'ClanPart', and 'MixedTechUnit'.
+     * Each category has its own row with the respective label and spinner.
+     *
+     * @return {@link JPanel} representing the 'General Multipliers' panel.
+     */
     private JPanel createGeneralMultipliersPanel() {
         // Contents
         lblCommonPartPriceMultiplier = createLabel("CommonPartPriceMultiplier", null);
@@ -546,6 +644,24 @@ public class FinancesTab {
         return panel;
     }
 
+    /**
+     * Creates and returns a {@link JPanel} representing the 'Used Parts Multiplier' panel.
+     * <p>
+     * The {@link JPanel} includes numerous pairs of {@link JLabel} and {@link JSpinner} components,
+     * each associated with a particular 'quality' level of the used parts.
+     * Each {@link JLabel} is named according to the quality level.
+     * Each {@link JSpinner} is initialized with a {@link SpinnerNumberModel} for inputting numbers with
+     * a range of 0.00 to 1.00, and a step increment of 0.05.
+     * <p>
+     * The 'quality' levels range from 'QUALITY_A' to 'QUALITY_F', as defined in the Part class.
+     * These different quality levels represent different conditions of used parts.
+     * <p>
+     * The {@link JPanel} uses a {@link GroupLayout} to arrange its components.
+     * Vertically, each {@link JLabel} is paired alongside its corresponding {@link JSpinner}.
+     * Horizontally, each {@link JLabel}-{@link JSpinner} pair is in a row of its own.
+     *
+     * @return {@link JPanel} representing the 'Used Parts Multiplier' panel.
+     */
     private JPanel createUsedPartsMultiplierPanel() {
         boolean reverseQualities = campaign.getCampaignOptions().isReverseQualityNames();
 
@@ -626,6 +742,18 @@ public class FinancesTab {
         return panel;
     }
 
+    /**
+     * Creates and returns a {@link JPanel} that includes various spinners associated with different multipliers.
+     * These multipliers include "Damaged Parts Value Multiplier", "Unrepairable Parts Value Multiplier",
+     * and "Cancelled Order Refund Multiplier". Each of these multipliers has their own label and
+     * corresponding spinner for input.
+     * <p>
+     * The layout of the panel is organized so that each label is directly paired with its corresponding
+     * spinner horizontally. Vertically, the pairs are stacked on top of each other in the order that they
+     * were added to the panel.
+     *
+     * @return {@link JPanel} representing the 'Other Multipliers' panel.
+     */
     private JPanel createOtherMultipliersPanel() {
         // Contents
         lblDamagedPartsValueMultiplier = createLabel("DamagedPartsValueMultiplier", null);
