@@ -207,11 +207,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JTabbedPane strategicOperationsParentTab = new JTabbedPane();
 
         // Finances
-        FinancesTab financesTab = new FinancesTab(getFrame(), "financesTab");
+        FinancesTab financesTab = new FinancesTab(campaign, getFrame(), "financesTab");
 
         JTabbedPane financesContentTabs = createSubTabs(Map.of(
-            "financesGeneralTab", financesTab.createFinancesGeneralOptionsTab()));// Mercenary
-        // Markets
+            "financesGeneralTab", financesTab.createFinancesGeneralOptionsTab(),
+            "priceMultipliersTab", financesTab.createPriceMultipliersTab()));
+
+        // Markets + Mercenary (don't forget useInfantryDoseNotCountBox)
+
         // Rulesets
 
         // Add tabs

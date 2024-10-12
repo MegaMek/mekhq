@@ -2,14 +2,19 @@ package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
+import mekhq.campaign.parts.Part;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.JSpinner.NumberEditor;
 
 import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
 
 public class FinancesTab {
+    Campaign campaign;
     JFrame frame;
     String name;
 
@@ -52,9 +57,36 @@ public class FinancesTab {
     //end General Options
 
     //start Price Multipliers
+    private JPanel pnlGeneralMultipliers;
+    private JLabel lblCommonPartPriceMultiplier;
+    private JSpinner spnCommonPartPriceMultiplier;
+    private JLabel lblInnerSphereUnitPriceMultiplier;
+    private JSpinner spnInnerSphereUnitPriceMultiplier;
+    private JLabel lblInnerSpherePartPriceMultiplier;
+    private JSpinner spnInnerSpherePartPriceMultiplier;
+    private JLabel lblClanUnitPriceMultiplier;
+    private JSpinner spnClanUnitPriceMultiplier;
+    private JLabel lblClanPartPriceMultiplier;
+    private JSpinner spnClanPartPriceMultiplier;
+    private JLabel lblMixedTechUnitPriceMultiplier;
+    private JSpinner spnMixedTechUnitPriceMultiplier;
+
+    private JPanel pnlUsedPartsMultipliers;
+    private JLabel[] lblUsedPartPriceMultipliers;
+    private JSpinner[] spnUsedPartPriceMultipliers;
+
+    private JPanel pnlOtherMultipliers;
+    private JLabel lblDamagedPartsValueMultiplier;
+    private JSpinner spnDamagedPartsValueMultiplier;
+    private JLabel lblUnrepairablePartsValueMultiplier;
+    private JSpinner spnUnrepairablePartsValueMultiplier;
+    private JLabel lblCancelledOrderRefundMultiplier;
+    private JSpinner spnCancelledOrderRefundMultiplier;
+
     //end Price Multipliers
 
-    FinancesTab(JFrame frame, String name) {
+    FinancesTab(Campaign campaign, JFrame frame, String name) {
+        this.campaign = campaign;
         this.frame = frame;
         this.name = name;
 
@@ -63,8 +95,7 @@ public class FinancesTab {
 
     private void initialize() {
         initializeGeneralOptionsTab();
-        createFinancesGeneralOptionsTab();
-        createPriceMultipliersTab();
+        initializePriceMultipliersTab();
     }
 
     private void initializeGeneralOptionsTab() {
@@ -158,7 +189,7 @@ public class FinancesTab {
         return createParentPanel(panel, "FinancesGeneralTab");
     }
 
-    JPanel createPaymentsPanel() {
+    private JPanel createPaymentsPanel() {
         // Contents
         payForPartsBox = createCheckBox("PayForPartsBox", null);
         payForRepairsBox = createCheckBox("PayForRepairsBox", null);
@@ -213,7 +244,7 @@ public class FinancesTab {
         return panel;
     }
 
-    JPanel createOtherSystemsPanel() {
+    private JPanel createOtherSystemsPanel() {
         // Contents
         pnlTaxes = createTaxesPanel();
         pnlShares = createSharesPanel();
@@ -236,7 +267,7 @@ public class FinancesTab {
         return panel;
     }
 
-    JPanel createGeneralOptionsPanel() {
+    private JPanel createGeneralOptionsPanel() {
         // Contents
         useLoanLimitsBox = createCheckBox("UseLoanLimitsBox", null);
         usePercentageMaintenanceBox = createCheckBox("UsePercentageMaintenanceBox", null);
@@ -282,7 +313,7 @@ public class FinancesTab {
         return panel;
     }
 
-    JPanel createSalesPanel() {
+    private JPanel createSalesPanel() {
         // Contents
         sellUnitsBox = createCheckBox("SellUnitsBox", null);
         sellPartsBox = createCheckBox("SellPartsBox", null);
@@ -310,7 +341,7 @@ public class FinancesTab {
         return panel;
     }
 
-    JPanel createTaxesPanel() {
+    private JPanel createTaxesPanel() {
         // Contents
         chkUseTaxes = createCheckBox("UseTaxesBox", null);
 
@@ -342,7 +373,7 @@ public class FinancesTab {
         return panel;
     }
 
-    JPanel createSharesPanel() {
+    private JPanel createSharesPanel() {
         // Contents
         chkUseShareSystem = createCheckBox("UseShareSystem", null);
         chkSharesForAll = createCheckBox("SharesForAll", null);
@@ -367,9 +398,281 @@ public class FinancesTab {
     }
 
     private void initializePriceMultipliersTab() {
+        pnlGeneralMultipliers = new JPanel();
+        lblCommonPartPriceMultiplier = new JLabel();
+        spnCommonPartPriceMultiplier = new JSpinner();
+        lblInnerSphereUnitPriceMultiplier = new JLabel();
+        spnInnerSphereUnitPriceMultiplier = new JSpinner();
+        lblInnerSpherePartPriceMultiplier = new JLabel();
+        spnInnerSpherePartPriceMultiplier = new JSpinner();
+        lblClanUnitPriceMultiplier = new JLabel();
+        spnClanUnitPriceMultiplier = new JSpinner();
+        lblClanPartPriceMultiplier = new JLabel();
+        spnClanPartPriceMultiplier = new JSpinner();
+        lblMixedTechUnitPriceMultiplier = new JLabel();
+        spnMixedTechUnitPriceMultiplier = new JSpinner();
+
+        pnlUsedPartsMultipliers = new JPanel();
+        lblUsedPartPriceMultipliers = new JLabel[1]; // we initialize this properly later
+        spnUsedPartPriceMultipliers = new JSpinner[1]; // we initialize this properly later
+
+        pnlOtherMultipliers = new JPanel();
+        lblDamagedPartsValueMultiplier = new JLabel();
+        spnDamagedPartsValueMultiplier = new JSpinner();
+        lblUnrepairablePartsValueMultiplier = new JLabel();
+        spnUnrepairablePartsValueMultiplier = new JSpinner();
+        lblCancelledOrderRefundMultiplier = new JLabel();
+        spnCancelledOrderRefundMultiplier = new JSpinner();
     }
 
     JPanel createPriceMultipliersTab() {
-        return null;
+        // Header
+        JPanel headerPanel = createHeaderPanel("PriceMultipliersTab",
+            getImageDirectory() + "logo_illyrian_palatinate.png",
+            false, "", true);
+
+        // Contents
+        pnlGeneralMultipliers = createGeneralMultipliersPanel();
+        pnlUsedPartsMultipliers = createUsedPartsMultiplierPanel();
+        pnlOtherMultipliers = createOtherMultipliersPanel();
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("PriceMultipliersTab", true,
+            "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(headerPanel)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(pnlGeneralMultipliers)
+                    .addComponent(pnlUsedPartsMultipliers)
+                    .addComponent(pnlOtherMultipliers)));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addComponent(headerPanel, Alignment.CENTER)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(pnlGeneralMultipliers)
+                    .addComponent(pnlUsedPartsMultipliers)
+                    .addComponent(pnlOtherMultipliers)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "PriceMultipliersTab");
+    }
+
+    private JPanel createGeneralMultipliersPanel() {
+        // Contents
+        lblCommonPartPriceMultiplier = createLabel("CommonPartPriceMultiplier", null);
+        spnCommonPartPriceMultiplier = createSpinner("CommonPartPriceMultiplier", null,
+            1.0, 0.1, 100, 0.1);
+
+        lblInnerSphereUnitPriceMultiplier = createLabel("InnerSphereUnitPriceMultiplier", null);
+        spnInnerSphereUnitPriceMultiplier = createSpinner("InnerSphereUnitPriceMultiplier", null,
+            1.0, 0.1, 100, 0.1);
+
+        lblInnerSpherePartPriceMultiplier = createLabel("InnerSpherePartPriceMultiplier", null);
+        spnInnerSpherePartPriceMultiplier = createSpinner("InnerSpherePartPriceMultiplier", null,
+            1.0, 0.1, 100, 0.1);
+
+        lblClanUnitPriceMultiplier = createLabel("ClanUnitPriceMultiplier", null);
+        spnClanUnitPriceMultiplier = createSpinner("ClanUnitPriceMultiplier", null,
+            1.0, 0.1, 100, 0.1);
+
+        lblClanPartPriceMultiplier = createLabel("ClanPartPriceMultiplier", null);
+        spnClanPartPriceMultiplier = createSpinner("ClanPartPriceMultiplier", null,
+            1.0, 0.1, 100, 0.1);
+
+        lblMixedTechUnitPriceMultiplier = createLabel("MixedTechUnitPriceMultiplier", null);
+        spnMixedTechUnitPriceMultiplier = createSpinner("MixedTechUnitPriceMultiplier", null,
+            1.0, 0.1, 100, 0.1);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("GeneralMultipliersPanel", true,
+            "GeneralMultipliersPanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblCommonPartPriceMultiplier)
+                    .addComponent(spnCommonPartPriceMultiplier))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblInnerSphereUnitPriceMultiplier)
+                    .addComponent(spnInnerSphereUnitPriceMultiplier))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblInnerSpherePartPriceMultiplier)
+                    .addComponent(spnInnerSpherePartPriceMultiplier))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblClanUnitPriceMultiplier)
+                    .addComponent(spnClanUnitPriceMultiplier))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblClanPartPriceMultiplier)
+                    .addComponent(spnClanPartPriceMultiplier))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblMixedTechUnitPriceMultiplier)
+                    .addComponent(spnMixedTechUnitPriceMultiplier)));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblCommonPartPriceMultiplier)
+                    .addComponent(spnCommonPartPriceMultiplier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblInnerSphereUnitPriceMultiplier)
+                    .addComponent(spnInnerSphereUnitPriceMultiplier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblInnerSpherePartPriceMultiplier)
+                    .addComponent(spnInnerSpherePartPriceMultiplier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblClanUnitPriceMultiplier)
+                    .addComponent(spnClanUnitPriceMultiplier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblClanPartPriceMultiplier)
+                    .addComponent(spnClanPartPriceMultiplier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblMixedTechUnitPriceMultiplier)
+                    .addComponent(spnMixedTechUnitPriceMultiplier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+
+        return panel;
+    }
+
+    private JPanel createUsedPartsMultiplierPanel() {
+        boolean reverseQualities = campaign.getCampaignOptions().isReverseQualityNames();
+
+        // Contents
+        lblUsedPartPriceMultipliers = new JLabel[Part.QUALITY_F + 1];
+        spnUsedPartPriceMultipliers = new JSpinner[Part.QUALITY_F + 1];
+
+        for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
+            final String qualityLevel = Part.getQualityName(i, reverseQualities);
+
+            lblUsedPartPriceMultipliers[i] = new JLabel(qualityLevel);
+            lblUsedPartPriceMultipliers[i].setName("lbl" + qualityLevel);
+
+            spnUsedPartPriceMultipliers[i] = new JSpinner(
+                new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
+            spnUsedPartPriceMultipliers[i].setName("spn" + qualityLevel);
+            spnUsedPartPriceMultipliers[i]
+                .setEditor(new NumberEditor(spnUsedPartPriceMultipliers[i], "0.00"));
+
+            DefaultEditor editor = (DefaultEditor) spnUsedPartPriceMultipliers[i].getEditor();
+            editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
+        }
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("UsedPartsMultiplierPanel", true,
+            "UsedPartsMultiplierPanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblUsedPartPriceMultipliers[0])
+                    .addComponent(spnUsedPartPriceMultipliers[0]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblUsedPartPriceMultipliers[1])
+                    .addComponent(spnUsedPartPriceMultipliers[1]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblUsedPartPriceMultipliers[2])
+                    .addComponent(spnUsedPartPriceMultipliers[2]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblUsedPartPriceMultipliers[3])
+                    .addComponent(spnUsedPartPriceMultipliers[3]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblUsedPartPriceMultipliers[4])
+                    .addComponent(spnUsedPartPriceMultipliers[4]))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblUsedPartPriceMultipliers[5])
+                    .addComponent(spnUsedPartPriceMultipliers[5])));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblUsedPartPriceMultipliers[0])
+                    .addComponent(spnUsedPartPriceMultipliers[0])
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblUsedPartPriceMultipliers[1])
+                    .addComponent(spnUsedPartPriceMultipliers[1])
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblUsedPartPriceMultipliers[2])
+                    .addComponent(spnUsedPartPriceMultipliers[2])
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblUsedPartPriceMultipliers[3])
+                    .addComponent(spnUsedPartPriceMultipliers[3])
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblUsedPartPriceMultipliers[4])
+                    .addComponent(spnUsedPartPriceMultipliers[4])
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblUsedPartPriceMultipliers[5])
+                    .addComponent(spnUsedPartPriceMultipliers[5])
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+
+        return panel;
+    }
+
+    private JPanel createOtherMultipliersPanel() {
+        // Contents
+        lblDamagedPartsValueMultiplier = createLabel("DamagedPartsValueMultiplier", null);
+        spnDamagedPartsValueMultiplier = createSpinner("DamagedPartsValueMultiplier", null,
+            0.33, 0.00, 1.00, 0.05);
+
+        lblUnrepairablePartsValueMultiplier = createLabel("UnrepairablePartsValueMultiplier", null);
+        spnUnrepairablePartsValueMultiplier = createSpinner("UnrepairablePartsValueMultiplier", null,
+            0.10, 0.00, 1.00, 0.05);
+
+        lblCancelledOrderRefundMultiplier = createLabel("CancelledOrderRefundMultiplier", null);
+        spnCancelledOrderRefundMultiplier = createSpinner("CancelledOrderRefundMultiplier", null,
+            0.50, 0.00, 1.00, 0.05);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("OtherMultipliersPanel", true,
+            "OtherMultipliersPanel");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblDamagedPartsValueMultiplier)
+                    .addComponent(spnDamagedPartsValueMultiplier))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblUnrepairablePartsValueMultiplier)
+                    .addComponent(spnUnrepairablePartsValueMultiplier))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblCancelledOrderRefundMultiplier)
+                    .addComponent(spnCancelledOrderRefundMultiplier)));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblDamagedPartsValueMultiplier)
+                    .addComponent(spnDamagedPartsValueMultiplier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblUnrepairablePartsValueMultiplier)
+                    .addComponent(spnUnrepairablePartsValueMultiplier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblCancelledOrderRefundMultiplier)
+                    .addComponent(spnCancelledOrderRefundMultiplier)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+
+        return panel;
     }
 }
