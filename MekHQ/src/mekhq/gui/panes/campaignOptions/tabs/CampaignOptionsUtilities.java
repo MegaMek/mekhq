@@ -58,6 +58,19 @@ public class CampaignOptionsUtilities {
         return checkBox;
     }
 
+    /**
+     * Creates a {@link JSpinner} object.
+     * <p>
+     * The name of the {@link JSpinner} will be {@code "spn" + name},
+     * and it will use the {@code "lbl" + name + ".tooltip"} resource bundle item
+     *
+     * @param name             a string representing the name of the objects.
+     * @param defaultValue     The default value of the spinner
+     * @param minimum          The minimum value of the spinner
+     * @param maximum          The maximum value of the spinner
+     * @param stepSize         The step size of the spinner
+     * @return The created {@link JSpinner}.
+     */
     static JSpinner createSpinner(String name, double defaultValue, double minimum, double maximum,
                                   double stepSize) {
         return createSpinner(name, null, defaultValue, minimum, maximum, stepSize);
@@ -97,6 +110,17 @@ public class CampaignOptionsUtilities {
         return jSpinner;
     }
 
+    /**
+     * Creates a {@link JLabel} with the specified name and optional customWrapSize.
+     * <p>
+     * Please note that 'name' is also used to fetch the resources associated with this label.
+     * For the label text 'name' is appended by '.text'.
+     * For the label tooltip 'name' is appended with '.tooltip'.
+     * These values must exist in the resource bundle otherwise an error will be thrown.
+     *
+     * @param name             the name of the label
+     * @return a new {@link JLabel} object
+     */
     static JLabel createLabel(String name) {
         return createLabel(name, null);
     }
@@ -129,6 +153,16 @@ public class CampaignOptionsUtilities {
         return jLabel;
     }
 
+    /**
+     * Creates a {@link JTextField} object.
+     * <p>
+     * The name of the {@link JTextField} will be {@code}, and it will use the following resource bundle reference:
+     * {@code "lbl" + name + ".tooltip"}.
+     *
+     * @param name                the name of the object.
+     * @param width               The width of the {@link JTextField}.
+     * @return a map containing a {@link JLabel} key and a {@link JTextField} value.
+     */
     static JTextField createTextField(String name, int width) {
         return createTextField(name, null, width);
     }

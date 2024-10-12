@@ -2,6 +2,7 @@ package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.personnel.Skills;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -33,6 +34,15 @@ public class MarketsTab {
     //end Personnel Market
 
     //start Unit Market
+    private JLabel lblUnitMarketMethod;
+    private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
+    private JCheckBox chkUnitMarketRegionalMekVariations;
+    private JLabel lblUnitMarketSpecialUnitChance;
+    private JSpinner spnUnitMarketSpecialUnitChance;
+    private JLabel lblUnitMarketRarityModifier;
+    private JSpinner spnUnitMarketRarityModifier;
+    private JCheckBox chkInstantUnitMarketDelivery;
+    private JCheckBox chkUnitMarketReportRefresh;
     //end Unit Market
 
     //start Contract Market
@@ -120,9 +130,9 @@ public class MarketsTab {
         spnPersonnelMarketDylansWeight = createSpinner("PersonnelMarketDylansWeight", null,
             0.3, 0, 1, 0.1);
 
-        chkPersonnelMarketReportRefresh = createCheckBox("PersonnelMarketReportRefresh", null);
+        chkPersonnelMarketReportRefresh = createCheckBox("PersonnelMarketReportRefresh");
 
-        chkUsePersonnelHireHiringHallOnly = createCheckBox("UsePersonnelHireHiringHallOnly", null);
+        chkUsePersonnelHireHiringHallOnly = createCheckBox("UsePersonnelHireHiringHallOnly");
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("PersonnelMarketGeneralOptionsPanel", false,
@@ -271,16 +281,62 @@ public class MarketsTab {
     }
 
     private void initializeUnitMarket() {
-
+        lblUnitMarketMethod = new JLabel();
+        comboUnitMarketMethod = new MMComboBox<>("comboUnitMarketMethod", UnitMarketMethod.values());
+        chkUnitMarketRegionalMekVariations = new JCheckBox();
+        lblUnitMarketSpecialUnitChance = new JLabel();
+        spnUnitMarketSpecialUnitChance = new JSpinner();
+        lblUnitMarketRarityModifier = new JLabel();
+        spnUnitMarketRarityModifier = new JSpinner();
+        chkInstantUnitMarketDelivery = new JCheckBox();
+        chkUnitMarketReportRefresh = new JCheckBox();
     }
 
     JPanel createUnitMarketTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("PriceMultipliersTab",
-            getImageDirectory() + "logo_clan_sea_fox.png",
+        JPanel headerPanel = createHeaderPanel("UnitMarketTab",
+            getImageDirectory() + "logo_loathian_league.png",
             false, "", true);
 
-        return null;
+        // Contents
+        lblUnitMarketMethod = createLabel("UnitMarketMethod", null);
+        comboUnitMarketMethod = new MMComboBox<>("comboUnitMarketMethod", UnitMarketMethod.values());
+
+        chkUnitMarketRegionalMekVariations = createCheckBox("UnitMarketRegionalMekVariations");
+
+        lblUnitMarketSpecialUnitChance = createLabel("UnitMarketSpecialUnitChance", null);
+        spnUnitMarketSpecialUnitChance = new JSpinner();
+
+        lblUnitMarketRarityModifier = createLabel("UnitMarketRarityModifier", null);
+        spnUnitMarketRarityModifier = new JSpinner();
+
+        chkInstantUnitMarketDelivery = new JCheckBox();
+
+        chkUnitMarketReportRefresh = new JCheckBox();
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("UnitMarketTab", true,
+            "");
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addComponent(headerPanel)
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(pnlPersonnelMarketGeneralOptions)
+                    .addComponent(pnlRemovalTargets)));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addComponent(headerPanel, Alignment.CENTER)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(pnlPersonnelMarketGeneralOptions)
+                    .addComponent(pnlRemovalTargets)
+                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "UnitMarketTab");
     }
 
     private void initializeContractMarket() {
@@ -290,7 +346,7 @@ public class MarketsTab {
     JPanel createContractMarketTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("PriceMultipliersTab",
-            getImageDirectory() + "logo_loathian_league.png",
+            getImageDirectory() + "logo_clan_smoke_jaguar.png",
             false, "", true);
 
         return null;

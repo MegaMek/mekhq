@@ -86,8 +86,8 @@ public class GeneralTab {
         JPanel headerPanel = createGeneralHeader();
 
         // Campaign name
-        lblName = createLabel("Name", null);
-        txtName = createTextField("Name", null, 300);
+        lblName = createLabel("Name");
+        txtName = createTextField("Name", 300);
 
         // Generate new random campaign name
         btnNameGenerator = createButton("NameGenerator");
@@ -95,29 +95,29 @@ public class GeneralTab {
                 .randomMercenaryCompanyNameGenerator(campaign.getFlaggedCommander())));
 
         // Campaign faction
-        lblFaction = createLabel("Faction", null);
+        lblFaction = createLabel("Faction");
         comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), campaign.getLocalDate()));
 
         // Reputation
-        lblReputation = createLabel("Reputation", null);
-        lblManualUnitRatingModifier = createLabel("ManualUnitRatingModifier", null);
-        manualUnitRatingModifier = createSpinner("ManualUnitRatingModifier", null,
+        lblReputation = createLabel("Reputation");
+        lblManualUnitRatingModifier = createLabel("ManualUnitRatingModifier");
+        manualUnitRatingModifier = createSpinner("ManualUnitRatingModifier",
             0, -200, 200, 1);
 
         // Date
-        lblDate = createLabel("Date", null);
+        lblDate = createLabel("Date");
         btnDate = createButton("Date");
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Camouflage
-        lblCamo = createLabel("Camo", null);
+        lblCamo = createLabel("Camo");
         btnCamo.setName("btnCamo");
         btnCamo.setMinimumSize(new Dimension(100, 100));
         btnCamo.setMaximumSize(new Dimension(100, 100));
         btnCamo.addActionListener(this::btnCamoActionPerformed);
 
         // Unit icon
-        lblIcon = createLabel("Icon", null);
+        lblIcon = createLabel("Icon");
         btnIcon.setName("btnIcon");
         btnIcon.setMinimumSize(new Dimension(100,  100));
         btnIcon.setMaximumSize(new Dimension(100, 100));
