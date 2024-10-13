@@ -1008,8 +1008,7 @@ public class AtBDynamicScenarioFactory {
             for (String unitName : bidAwayForces) {
                 if (report.isEmpty()) {
                     report.append(String.format(resources.getString("bidAwayForcesVerbose.text"),
-                            generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
-                            unitName));
+                            generatedForce.getName(), unitName));
                 } else {
                     report.append(unitName).append("<br>");
                 }
@@ -1017,14 +1016,13 @@ public class AtBDynamicScenarioFactory {
         } else {
             if (!bidAwayForces.isEmpty()) {
                 report.append(String.format(resources.getString("bidAwayForces.text"),
-                        generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
-                        bidAwayForces.size(), bidAwayForces.size() > 1 ? "s" : ""));
+                        generatedForce.getName(), bidAwayForces.size(), bidAwayForces.size() > 1 ? "s" : ""));
 
                 boolean isUseLoggerHeader = true;
                 for (String unitName : bidAwayForces) {
                     if (isUseLoggerHeader) {
                         logger.info(String.format(resources.getString("bidAwayForcesLogger.text"),
-                            generatedForce.getName(), scenario.getName(), scenario.getContract(campaign)));
+                            generatedForce.getName()));
                         isUseLoggerHeader = false;
                     }
                     logger.info(unitName);
@@ -1035,8 +1033,7 @@ public class AtBDynamicScenarioFactory {
         if (supplementedForces > 0) {
             if (report.isEmpty()) {
                 report.append(String.format(resources.getString("addedBattleArmorNewReport.text"),
-                        generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
-                        supplementedForces, supplementedForces > 1 ? "s" : ""));
+                        generatedForce.getName(), supplementedForces, supplementedForces > 1 ? "s" : ""));
             } else {
                 report.append(String.format(
                         resources.getString("addedBattleArmorContinueReport.text"),
@@ -1044,17 +1041,9 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        if (supplementedForces > 0 || !bidAwayForces.isEmpty()) {
-            if (Compute.randomInt(8) == 0) {
-                report.append(resources.getString("batchallConcludedVersion2.text"));
-            } else {
-                report.append(resources.getString("batchallConcludedVersion1.text"));
-            }
-        }
-
         if (supplementedForces == 0 && bidAwayForces.isEmpty()) {
-            logger.info(String.format(resources.getString("nothingBidAway.text"),
-                generatedForce.getName(), scenario.getName(), scenario.getContract(campaign)));
+            report.append(String.format(resources.getString("nothingBidAway.text"),
+                generatedForce.getName()));
         }
 
         campaign.addReport(report.toString());
