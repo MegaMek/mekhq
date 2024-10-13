@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Enemy aircraft detected on approach and will arrive shortly after the
-		start of the battle.</additionalBriefingText>
+	<additionalBriefingText>Enemy aircraft detected on approach and will arrive shortly after the start of the battle.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<forceDefinition>

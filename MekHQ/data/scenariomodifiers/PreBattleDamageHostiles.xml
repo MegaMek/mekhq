@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>The hostile force appears to have suffered some minor battle damage in a
-		previous engagement.</additionalBriefingText>
+	<additionalBriefingText>The hostile force appears to have suffered some minor battle damage in a previous engagement.</additionalBriefingText>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<eventRecipient>Opposing</eventRecipient>

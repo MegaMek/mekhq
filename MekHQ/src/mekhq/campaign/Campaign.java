@@ -3746,9 +3746,11 @@ public class Campaign implements ITechManager {
             }
         }
 
+        processNewDayATBScenarios();
+
         for (AtBContract contract : getActiveAtBContracts()) {
             if (campaignOptions.isUseGenericBattleValue()) {
-                if (contract.getStartDate().equals(getLocalDate()) && getLocation().isOnPlanet()) {
+                if (contract.getStartDate().equals(getLocalDate())) {
                     if (getCampaignOptions().isUseGenericBattleValue()
                         && BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
                         contract.setBatchallAccepted(contract.initiateBatchall(this));
@@ -3756,8 +3758,6 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-
-        processNewDayATBScenarios();
     }
 
     /**

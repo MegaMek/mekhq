@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>The allied units have not been fully repaired from their previous
-		engagement.</additionalBriefingText>
+	<additionalBriefingText>The allied units have not been fully repaired from their previous engagement.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<eventRecipient>Allied</eventRecipient>

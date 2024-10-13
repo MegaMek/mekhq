@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>This facility can be captured if 75% of the designated buildings remain
-		intact with 75% of the hostile forces destroyed, crippled or forced to withdraw.</additionalBriefingText>
+	<additionalBriefingText>This facility can be captured if 75% of the designated buildings remain intact with 75% of the hostile forces destroyed, crippled or forced to withdraw.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<modifierName>Capture</modifierName>
@@ -27,8 +26,7 @@
 			<additionalDetails>
 				<additionalDetail>Crippled turrets are considered intact for the purposes of this objective.</additionalDetail>
 			</additionalDetails>
-			<description>Leave intact at least 75% of the following force(s) and unit(s) in order to be
-				able to take control of this facility:</description>
+			<description>Leave intact at least 75% of the following force(s) and unit(s) in order to be able to take control of this facility:</description>
 			<destinationEdge>NONE</destinationEdge>
 			<objectiveCriterion>Preserve</objectiveCriterion>
 			<percentage>75</percentage>
@@ -56,8 +54,7 @@
 				</failureEffect>
 			</failureEffects>
 			<additionalDetails />
-			<description>Destroy, cripple or force the withdrawal of 75% of the following force(s) and
-				unit(s) to take control of the facility:</description>
+			<description>Destroy, cripple or force the withdrawal of 75% of the following force(s) and unit(s) to take control of the facility:</description>
 			<destinationEdge>NONE</destinationEdge>
 			<objectiveCriterion>ForceWithdraw</objectiveCriterion>
 			<percentage>75</percentage>

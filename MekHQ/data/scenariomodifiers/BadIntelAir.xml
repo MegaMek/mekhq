@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Recon underestimated enemy strength, and additional enemy units are
-		present.</additionalBriefingText>
+	<additionalBriefingText>Recon underestimated enemy strength, and additional enemy units are present.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<forceDefinition>

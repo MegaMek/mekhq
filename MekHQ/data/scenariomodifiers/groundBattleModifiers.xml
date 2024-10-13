@@ -159,7 +159,7 @@
 		<modifier>
 			EnemyMekPatrol.xml
 		</modifier>
-		<modifier>
+		<!--modifier>
 			EnemyAceMekARC2R.xml
 		</modifier>
 		<modifier>
@@ -179,17 +179,17 @@
 		</modifier>
 		<modifier>
 			EnemyAceMekPXH1D.xml
-		</modifier>
+		</modifier-->
 		<modifier>
 			EnemyAirCav.xml
 		</modifier>
 		<modifier>
 			EnemyAirMobileInf.xml
 		</modifier>
-		<modifier>
+		<!--modifier>
 			EnemyMercFireSupport.xml
 		</modifier>
-		<modifier>
+		<-modifier>
 			EnemyMercBrawl.xml
 		</modifier>
 		<modifier>
@@ -215,7 +215,7 @@
 		</modifier>
 		<modifier>
 			AlliedMekAceTBT.xml
-		</modifier>
+		</modifier-->
 		<modifier>
 			AlliedOfficerMek.xml
 		</modifier>
@@ -228,20 +228,20 @@
 		<modifier>
 			AlliedHorseCav.xml
 		</modifier>
-		<modifier>
+		<!--modifier>
 			AlliedASFAce01.xml
-		</modifier>
+		</modifier-->
 		<modifier>
 			EnemyFieldArtyCrack.xml
 		</modifier>
 		<modifier>
 			EnemyFieldArtyOffboard.xml
 		</modifier>
-		<modifier>
+		<!--modifier>
 			EnemyASFAce01.xml
 		</modifier>
 		<modifier>
 			EnemyASFAce02.xml
-		</modifier>
+		</modifier-->
 	</modifiers>
 </scenarioModifierManifest>

@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>The flap of leathery wings announces the arrival of an Enemy unit of
-		Branth Sky Infantry. Beware.</additionalBriefingText>
+	<additionalBriefingText>The flap of leathery wings announces the arrival of an Enemy unit of Branth Sky Infantry. Beware.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>

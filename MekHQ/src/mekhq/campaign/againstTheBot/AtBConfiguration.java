@@ -25,7 +25,6 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
@@ -33,6 +32,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -189,21 +189,13 @@ public class AtBConfiguration {
     }
 
     public int weightClassIndex(String wc) {
-        switch (wc) {
-            case "L":
-            case "UL":
-                return 0;
-            case "M":
-                return 1;
-            case "H":
-                return 2;
-            case "A":
-            case "C":
-            case "SH":
-                return 3;
-            default:
-                throw new IllegalArgumentException("Could not parse weight class " + wc);
-        }
+        return switch (wc) {
+            case "L", "UL" -> 0;
+            case "M" -> 1;
+            case "H" -> 2;
+            case "A", "C", "SH" -> 3;
+            default -> throw new IllegalArgumentException("Could not parse weight class " + wc);
+        };
     }
 
     public @Nullable String selectBotLances(String org, int weightClass) {
@@ -273,22 +265,15 @@ public class AtBConfiguration {
      *         weight class
      */
     public static int decodeWeightStr(String s, int i) {
-        switch (s.charAt(i)) {
-            case WEIGHT_ULTRA_LIGHT:
-                return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
-            case WEIGHT_LIGHT:
-                return EntityWeightClass.WEIGHT_LIGHT;
-            case WEIGHT_MEDIUM:
-                return EntityWeightClass.WEIGHT_MEDIUM;
-            case WEIGHT_HEAVY:
-                return EntityWeightClass.WEIGHT_HEAVY;
-            case WEIGHT_ASSAULT:
-                return EntityWeightClass.WEIGHT_ASSAULT;
-            case WEIGHT_SUPER_HEAVY:
-                return EntityWeightClass.WEIGHT_SUPER_HEAVY;
-            default:
-                return 0;
-        }
+        return switch (s.charAt(i)) {
+            case WEIGHT_ULTRA_LIGHT -> EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+            case WEIGHT_LIGHT -> EntityWeightClass.WEIGHT_LIGHT;
+            case WEIGHT_MEDIUM -> EntityWeightClass.WEIGHT_MEDIUM;
+            case WEIGHT_HEAVY -> EntityWeightClass.WEIGHT_HEAVY;
+            case WEIGHT_ASSAULT -> EntityWeightClass.WEIGHT_ASSAULT;
+            case WEIGHT_SUPER_HEAVY -> EntityWeightClass.WEIGHT_SUPER_HEAVY;
+            default -> 0;
+        };
     }
 
     public static String getParentFactionType(final Faction faction) {
@@ -318,16 +303,12 @@ public class AtBConfiguration {
     }
 
     public @Nullable Integer shipSearchTargetBase(int unitType) {
-        switch (unitType) {
-            case UnitType.DROPSHIP:
-                return dropshipSearchTarget;
-            case UnitType.JUMPSHIP:
-                return jumpshipSearchTarget;
-            case UnitType.WARSHIP:
-                return warshipSearchTarget;
-            default:
-                return null;
-        }
+        return switch (unitType) {
+            case UnitType.DROPSHIP -> dropshipSearchTarget;
+            case UnitType.JUMPSHIP -> jumpshipSearchTarget;
+            case UnitType.WARSHIP -> warshipSearchTarget;
+            default -> null;
+        };
     }
 
     public TargetRoll shipSearchTargetRoll(int unitType, Campaign campaign) {
