@@ -91,7 +91,12 @@ MEKHQ VERSION HISTORY:
 + PR #4931: Reworked AtB Bonus Rolls, Fixed Bug in Bulk Hire
 + PR #4981: Implemented Campaign Options IIC Preset Picker #4981
 + PR #4984: Refactored Daily Personnel Processing Logic.
-+ PR #4989: Adaptation to MM #6068 Replace Manual GUI scaling with FlatLaf Scaling
++ PR #4989 #4990: Adaptation to MM #6068 Replace Manual GUI scaling with FlatLaf Scaling
++ PR #5022: Better Current Location / Travel Status
++ PR #4946: Adds Recent Promotion Modifier to Turnover System
++ Fix #5010: Makes StratCon Scenario Generation Respect Non-Combat Flag in TO&E
++ Fix #4986: Camops Paid Recrutiment Removal
++ PR #5029: Better visual distinction for GM mode / overtime toggles
 + PR #5002: Correct issues with fixed map generation #5002
 + PR #4992: Add Customization Option to Refit Dialog
 + PR #5030: Replaced autoAwards Award Ceremony Placeholder Image
@@ -99,6 +104,9 @@ MEKHQ VERSION HISTORY:
 + PR #5017: Display Advanced Medical Injuries in UI
 + PR #5024: Add option to show unit images in TO&E
 + PR #5025: Pin/sticky force view tab on TO&E panel
++ PR #5040: Clarify map dimensions in scenario displays
++ PR #5042: Multiple FG3 Improvements
++ PF #5043: New names cleanup and potential bugfixes
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
