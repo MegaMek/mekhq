@@ -9478,6 +9478,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // region Markets Tab
             // Personnel Market
             options.setPersonnelMarketName(comboPersonnelMarketType.getSelectedItem());
+            if (comboPersonnelMarketType.getSelectedItem().equals("Campaign Ops")) {
+                campaign.getPersonnelMarket().setPaidRecruitment(false);
+            }
             options.setPersonnelMarketReportRefresh(chkPersonnelMarketReportRefresh.isSelected());
             for (final Entry<SkillLevel, JSpinner> entry : spnPersonnelMarketRandomRemovalTargets
                     .entrySet()) {

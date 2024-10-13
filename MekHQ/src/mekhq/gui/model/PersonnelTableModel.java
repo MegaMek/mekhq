@@ -164,30 +164,37 @@ public class PersonnelTableModel extends DataTableModel {
             setToolTipText(personnelColumn.getToolTipText(person, loadAssignmentFromMarket));
 
             // Colouring
+            boolean personIsDamaged = false;
+            if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+                personIsDamaged = person.hasInjuries(false);
+            } else {
+                personIsDamaged = person.getHits() > 0;
+            }
+            boolean personIsFatigued = (campaign.getCampaignOptions().isUseFatigue()
+                    && (person.getEffectiveFatigue(campaign) >= 5));
+
             if (!isSelected) {
-                if (person.getStatus().isDead() || person.getStatus().isRetired()
-                        || person.getStatus().isDeserted()) {
-                    setBackground(UIManager.getColor("Table.background"));
-                    setForeground(UIManager.getColor("Table.foreground"));
-                } else if (person.getStatus().isAbsent()) {
-                    // TODO : Add a specific colour for absent personnel, as they are treated
-                    // TODO : differently than normal personnel
-                    setBackground(UIManager.getColor("Table.background"));
-                    setForeground(UIManager.getColor("Table.foreground"));
+                if (person.getStatus().isAbsent()) {
+                    setBackground(MekHQ.getMHQOptions().getAbsentBackground());
+                    setForeground(MekHQ.getMHQOptions().getAbsentForeground());
+                } else if (person.getStatus().isDepartedUnit()) {
+                    setBackground(MekHQ.getMHQOptions().getGoneBackground());
+                    setForeground(MekHQ.getMHQOptions().getGoneForeground());
                 } else if (person.isDeployed()) {
                     setForeground(MekHQ.getMHQOptions().getDeployedForeground());
                     setBackground(MekHQ.getMHQOptions().getDeployedBackground());
-                } else if (person.hasInjuries(true)
-                        || (Integer.parseInt((String) getValueAt(modelRow,
-                                PersonnelTableModelColumn.INJURIES.ordinal())) > 0)) {
+                } else if (personIsDamaged) {
                     setForeground(MekHQ.getMHQOptions().getInjuredForeground());
                     setBackground(MekHQ.getMHQOptions().getInjuredBackground());
-                } else if (person.hasOnlyHealedPermanentInjuries()) {
-                    setForeground(MekHQ.getMHQOptions().getHealedInjuriesForeground());
-                    setBackground(MekHQ.getMHQOptions().getHealedInjuriesBackground());
                 } else if (person.isPregnant()) {
                     setForeground(MekHQ.getMHQOptions().getPregnantForeground());
                     setBackground(MekHQ.getMHQOptions().getPregnantBackground());
+                } else if (personIsFatigued) {
+                    setForeground(MekHQ.getMHQOptions().getFatiguedForeground());
+                    setBackground(MekHQ.getMHQOptions().getFatiguedBackground());
+                } else if (person.hasOnlyHealedPermanentInjuries()) {
+                    setForeground(MekHQ.getMHQOptions().getHealedInjuriesForeground());
+                    setBackground(MekHQ.getMHQOptions().getHealedInjuriesBackground());
                 } else {
                     setBackground(UIManager.getColor("Table.background"));
                     setForeground(UIManager.getColor("Table.foreground"));

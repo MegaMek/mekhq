@@ -39,7 +39,10 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.GUIPreferences;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.Subscribe;
+import megamek.common.preference.IPreferenceChangeListener;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
@@ -71,11 +74,14 @@ public final class PersonnelTab extends CampaignGuiTab {
     private PersonnelTableModel personModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
 
+    private final IPreferenceChangeListener scalingChangeListener = e -> changePersonnelView();
+
     // region Constructors
     public PersonnelTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
         setUserPreferences();
+        GUIPreferences.getInstance().addPreferenceChangeListener(scalingChangeListener);
     }
     // endregion Constructors
 
@@ -229,6 +235,12 @@ public final class PersonnelTab extends CampaignGuiTab {
         filterPersonnel();
     }
 
+    @Override
+    public void disposeTab() {
+        super.disposeTab();
+        GUIPreferences.getInstance().removePreferenceChangeListener(scalingChangeListener);
+    }
+
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
         final DefaultComboBoxModel<PersonnelFilter> personGroupModel = new DefaultComboBoxModel<>();
         for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(false)) {
@@ -297,7 +309,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 ? PersonnelTabView.GENERAL
                 : choicePersonView.getSelectedItem();
         final XTableColumnModel columnModel = (XTableColumnModel) getPersonnelTable().getColumnModel();
-        getPersonnelTable().setRowHeight(15);
+        getPersonnelTable().setRowHeight(UIUtil.scaleForGUI(15));
 
         // set the renderer
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {

@@ -64,12 +64,17 @@ import org.w3c.dom.NodeList;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
@@ -238,41 +243,32 @@ public class AtBContract extends Contract {
         final String ROOT_DIRECTORY = "data/images/camo/";
 
         String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
-
-        // Use Java File to represent directories
-        File workingDirectory = new File(ROOT_DIRECTORY + camouflageDirectory + '/');
-
-        // List subdirectories and loose files in working directory
-        File[] folders = workingDirectory.listFiles(File::isDirectory);
-        File[] looseFiles = workingDirectory.listFiles();
-
+      
         // Gather all files
-        List<File> allFiles = new ArrayList<>();
-        if (looseFiles != null) {
-            Collections.addAll(allFiles, looseFiles);
-        }
-        if (folders != null) {
-            for (File folder : folders) {
-                File[] folderFiles = folder.listFiles();
-                if (folderFiles != null) {
-                    Collections.addAll(allFiles, folderFiles);
-                }
-            }
-        }
+        List<Path> allPaths = null;
 
+        try {
+            allPaths = Files.find(Paths.get(ROOT_DIRECTORY + camouflageDirectory + '/'), Integer.MAX_VALUE,
+                    (path, bfa) -> {return bfa.isRegularFile();})
+                .collect(Collectors.toList());
+        } catch (IOException e) {
+            logger.error("Error getting list of camouflages", e);
+        }
+        
         // Select a random file to set camouflage, if there are files available
-        if (!allFiles.isEmpty()) {
-            File randomFile = allFiles.get(new Random().nextInt(allFiles.size()));
+        if ((null != allPaths) && (!allPaths.isEmpty())) {
+            Path randomPath = allPaths.get(new Random().nextInt(allPaths.size()));
 
-            String fileName = randomFile.getName();
-            String fileCategory = randomFile.getParent().replaceAll("\\\\", "/");
+            String fileName = randomPath.getFileName().toString();
+            String fileCategory = randomPath.getParent().toString()
+                .replaceAll("\\\\", "/"); // Is this necessary on windows machines?
             fileCategory = fileCategory.replaceAll(ROOT_DIRECTORY, "");
 
             return new Camouflage(fileCategory, fileName);
         } else {
             // Log if no files were found in the directory
             logger.warn(String.format("No files in directory %s - using default camouflage",
-                workingDirectory));
+                camouflageDirectory));
             return null;
         }
     }
@@ -963,18 +959,6 @@ public class AtBContract extends Contract {
                 .plus(getSupportAmount())
                 .plus(getOverheadAmount())
                 .dividedBy(getLength());
-    }
-
-    public void checkForFollowup(Campaign campaign) {
-        if (getContractType().isDiversionaryRaid() || getContractType().isReconRaid()
-                || getContractType().isRiotDuty()) {
-            int roll = Compute.d6();
-            if (roll == 6) {
-                campaign.getContractMarket().addFollowup(campaign, this);
-                campaign.addReport(
-                        "Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
-            }
-        }
     }
 
     @Override

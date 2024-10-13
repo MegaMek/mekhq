@@ -44,8 +44,11 @@ public final class TOETab extends CampaignGuiTab {
     private JTree orgTree;
     private JSplitPane splitOrg;
     private JPanel panForceView;
+    private JTabbedPane tabUnit;
 
     private OrgTreeModel orgModel;
+
+    private int tabUnitLastSelectedIndex;
 
     //region Constructors
     public TOETab(CampaignGUI gui, String name) {
@@ -95,6 +98,8 @@ public final class TOETab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(splitOrg, gridBagConstraints);
+
+        tabUnitLastSelectedIndex = 0;
     }
 
     @Override
@@ -109,6 +114,11 @@ public final class TOETab extends CampaignGuiTab {
         });
     }
 
+
+    public void forceViewTabChange() {
+        tabUnitLastSelectedIndex = tabUnit.getSelectedIndex();
+    }
+
     public void refreshForceView() {
         panForceView.removeAll();
         Object node = orgTree.getLastSelectedPathComponent();
@@ -117,7 +127,7 @@ public final class TOETab extends CampaignGuiTab {
         }
         if (node instanceof Unit) {
             Unit u = ((Unit) node);
-            JTabbedPane tabUnit = new JTabbedPane();
+            tabUnit = new JTabbedPane();
             int crewSize = u.getCrew().size();
             if (crewSize > 0) {
                 JPanel crewPanel = new JPanel(new BorderLayout());
@@ -164,6 +174,8 @@ public final class TOETab extends CampaignGuiTab {
             tabUnit.add("Unit", scrollUnit);
             panForceView.add(tabUnit, BorderLayout.CENTER);
             SwingUtilities.invokeLater(() -> scrollUnit.getVerticalScrollBar().setValue(0));
+            tabUnit.setSelectedIndex(tabUnitLastSelectedIndex);
+            tabUnit.addChangeListener(evt -> forceViewTabChange()); // added late so it won't overwrite
         } else if (node instanceof Force) {
             final JScrollPane scrollForce = new JScrollPane(new ForceViewPanel((Force) node, getCampaign()));
             panForceView.add(scrollForce, BorderLayout.CENTER);

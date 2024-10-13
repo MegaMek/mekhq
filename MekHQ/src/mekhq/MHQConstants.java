@@ -60,6 +60,7 @@ public final class MHQConstants extends SuiteConstants {
                                                            // also used as a limit in the UI
     public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
+    public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
 
     // region Command Center Tab
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
@@ -114,6 +115,12 @@ public final class MHQConstants extends SuiteConstants {
     public static final String HEALED_INJURIES_BACKGROUND = "healedInjuriesBackground";
     public static final String PREGNANT_FOREGROUND = "pregnantForeground";
     public static final String PREGNANT_BACKGROUND = "pregnantBackground";
+    public static final String GONE_FOREGROUND = "goneForeground";
+    public static final String GONE_BACKGROUND = "goneBackground";
+    public static final String ABSENT_FOREGROUND = "absentForeground";
+    public static final String ABSENT_BACKGROUND = "absentBackground";
+    public static final String FATIGUED_FOREGROUND = "fatiguedForeground";
+    public static final String FATIGUED_BACKGROUND = "fatiguedBackground";
     public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
