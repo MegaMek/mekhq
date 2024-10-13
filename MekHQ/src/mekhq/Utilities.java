@@ -1322,23 +1322,9 @@ public class Utilities {
     }
 
     /**
-     * Testable function to get the original unit based on information from a new
-     * unit
-     *
-     * @param newE new Entity we want to read information from
-     * @return MekSummary that most closely represents the original of the new
-     *         Entity
+     * @param shortNameRaw complete Entity name as returned by getShortNameRaw()
      * @throws EntityLoadingException
-     */
-    public static MekSummary retrieveOriginalUnit(Entity newE) throws EntityLoadingException {
-        // this might be better with refreshUnitData() and/or elsewhere
-        MekSummaryCache.getInstance().loadMekData();
-        
-        // I need to change the new entity to the one from the mtf file now, so that
-        // equipment numbers will match
-        return retrieveUnit(newE.getShortNameRaw());
-    }
-    
+     */    
     public static MekSummary retrieveUnit(String shortNameRaw) throws EntityLoadingException {
         MekSummary summary = MekSummaryCache.getInstance().getMek(shortNameRaw);
 

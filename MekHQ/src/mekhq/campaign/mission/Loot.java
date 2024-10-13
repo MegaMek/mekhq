@@ -241,7 +241,7 @@ public class Loot {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cash", getCash());
         for (Entity e : units) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityName", e.getChassis() + ' ' + e.getModel());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityName", e.getShortNameRaw());
         }
 
         for (Part p : parts) {
