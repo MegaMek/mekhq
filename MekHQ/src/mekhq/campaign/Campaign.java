@@ -6880,8 +6880,7 @@ public class Campaign implements ITechManager {
     }
 
     public boolean isCustom(Unit u) {
-        return customs.contains(u.getEntity().getChassis() + ' '
-                + u.getEntity().getModel());
+        return customs.contains(u.getEntity().getShortNameRaw());
     }
 
     /**

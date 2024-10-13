@@ -119,8 +119,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     @Override
     public Object getNewEquipment() {
-        String name = getEntity().getFullChassis() + " " + getEntity().getModel();
-        name = name.trim();
+        String name = getEntity().getShortNameRaw();
         MekSummary summary = MekSummaryCache.getInstance().getMek(name);
         if (null == summary) {
             logger.error("Could not find a mek summary for " + name);
