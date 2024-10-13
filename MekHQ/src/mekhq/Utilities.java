@@ -1322,7 +1322,7 @@ public class Utilities {
     }
 
     /**
-     * @param complete Entity name as returned by getShortNameRaw()
+     * @param shortNameRaw complete Entity name as returned by getShortNameRaw()
      * @throws EntityLoadingException
      */    
     public static MekSummary retrieveUnit(String shortNameRaw) throws EntityLoadingException {
