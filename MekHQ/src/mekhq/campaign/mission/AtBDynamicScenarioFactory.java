@@ -284,11 +284,6 @@ public class AtBDynamicScenarioFactory {
                 } else {
                     int weightClass = randomForceWeight();
 
-                    if (forceTemplate.isEnemyBotForce()) {
-                        int adjustedBV = effectiveBV * (targetPercentage / 100);
-                        int adjustedUnitCount = effectiveUnitCount * (targetPercentage / 100);
-                    }
-
                     generatedLanceCount += generateForce(scenario, contract, campaign,
                             effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
                 }
