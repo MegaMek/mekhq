@@ -14,7 +14,7 @@
 		<canReinforceLinked>false</canReinforceLinked>
 		<contributesToBV>true</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>false</contributesToUnitCount>
+		<contributesToUnitCount>true</contributesToUnitCount>
 		<deploymentZones>
 			<deploymentZone>10</deploymentZone>
 		</deploymentZones>

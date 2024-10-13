@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>One of your employer's ASF Aces is close and is moving to support. Watch
-		and learn.</additionalBriefingText>
+	<additionalBriefingText>One of your employer's ASF Aces is close and is moving to support. Watch and learn.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>

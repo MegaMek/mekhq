@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>A horn heralds the arrival of an Enemy unit of Coventry Kangaroo Cavalry.
-		Beware.</additionalBriefingText>
+	<additionalBriefingText>A horn heralds the arrival of an Enemy unit of Coventry Kangaroo Cavalry. Beware.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>

@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Local coordination has allowed the opposition to deploy a larger force to
-		respond to your presence.</additionalBriefingText>
+	<additionalBriefingText>Local coordination has allowed the opposition to deploy a larger force to respond to your presence.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<eventRecipient>Opposing</eventRecipient>

@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>A force of enemy VTOLs coming in low over the horizon. Don't let this be
-		the apocalypse.</additionalBriefingText>
+	<additionalBriefingText>A force of enemy VTOLs coming in low over the horizon. Don't let this be the apocalypse.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
