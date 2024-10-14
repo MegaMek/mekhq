@@ -176,16 +176,17 @@ public class RefitNameDialog extends JDialog {
         }
         if (model.isEmpty()) {
             model = refit.getOriginalEntity().getModel() + " Mk II";
+            model = model.trim(); // remove leading space if original model name was blank
         }
-        if (null != MekSummaryCache.getInstance().getMek(chassis + " " + model)) {
+        refit.getNewEntity().setChassis(chassis);
+        refit.getNewEntity().setModel(model);
+        if (null != MekSummaryCache.getInstance().getMek(refit.getNewEntity().getShortNameRaw())) {
             JOptionPane.showMessageDialog(null,
                     "There is already a unit in the database with this name.\nPlease select a different name.",
                     "Name already in use",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        refit.getNewEntity().setChassis(chassis);
-        refit.getNewEntity().setModel(model);
         this.setVisible(false);
     }
 

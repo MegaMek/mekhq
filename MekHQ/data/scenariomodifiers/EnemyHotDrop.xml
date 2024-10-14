@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Enemy DropShip has been detected in the area. Telemetry indicates it's at
-		least partially loaded. Expect additional hostile units to be deployed via airdrop.</additionalBriefingText>
+	<additionalBriefingText>Enemy DropShip has been detected in the area. Telemetry indicates it's at least partially loaded. Expect additional hostile units to be deployed via airdrop.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>

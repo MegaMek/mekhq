@@ -129,9 +129,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails />
-            <description>Destroy 50% of the following force(s) and unit(s) before they can reach the
-                destination
-                edge:</description>
+            <description>Destroy 50% of the following force(s) and unit(s) before they can reach the destination edge:</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Destroy</objectiveCriterion>
             <percentage>50</percentage>

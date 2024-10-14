@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>This facility is defended by an additional force of allied artillery who
-		have been unable to clear the area.</additionalBriefingText>
+	<additionalBriefingText>This facility is defended by an additional force of allied artillery who have been unable to clear the area.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
