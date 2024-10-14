@@ -202,40 +202,63 @@ public abstract class Part implements IPartWork, ITechnology {
         this.isTeamSalvaging = false;
     }
 
+
+    /**
+     * @param quality internal quality code such as Part.QUALITY_A
+     * @param reverse are quality names reversed per the campaign option
+     * @return String letter code for quality
+     */
     public static String getQualityName(int quality, boolean reverse) {
-        switch (quality) {
-            case QUALITY_A:
-                if (reverse) {
-                    return "F";
-                }
-                return "A";
-            case QUALITY_B:
-                if (reverse) {
-                    return "E";
-                }
-                return "B";
-            case QUALITY_C:
-                if (reverse) {
-                    return "D";
-                }
-                return "C";
-            case QUALITY_D:
-                if (reverse) {
-                    return "C";
-                }
-                return "D";
-            case QUALITY_E:
-                if (reverse) {
-                    return "B";
-                }
-                return "E";
-            case QUALITY_F:
-                if (reverse) {
-                    return "A";
-                }
-                return "F";
-            default:
-                return "?";
+        if (!reverse) {
+            return switch(quality) {
+                case QUALITY_A -> "A";
+                case QUALITY_B -> "B";
+                case QUALITY_C -> "C";
+                case QUALITY_D -> "D";
+                case QUALITY_E -> "E";
+                case QUALITY_F -> "F";
+                default -> "?";
+            };  
+        } else {
+            return switch(quality) {
+                case QUALITY_A -> "F";
+                case QUALITY_B -> "E";
+                case QUALITY_C -> "D";
+                case QUALITY_D -> "C";
+                case QUALITY_E -> "B";
+                case QUALITY_F -> "A";
+                default -> "?";
+            };
+        }
+    }
+
+    /**
+     * @param name one-character String from A to F; the item quality code
+     * @param reverse are quality names reversed per the campaign option
+     * @return internal quality code such as Part.QUALITY_A
+     * @throws IllegalArgumentException
+     */
+    public static int getQualityFromName(String name, boolean reverse) {
+        if (!reverse) {
+            return switch(name) {
+                case "A" -> QUALITY_A;
+                case "B" -> QUALITY_B;
+                case "C" -> QUALITY_C;
+                case "D" -> QUALITY_D;
+                case "E" -> QUALITY_E;
+                case "F" -> QUALITY_F;
+                default -> throw new IllegalArgumentException("Expecting one-char string A to F");
+            };
+        } else {
+            return switch(name) {
+                case "F" -> QUALITY_A;
+                case "E" -> QUALITY_B;
+                case "D" -> QUALITY_C;
+                case "C" -> QUALITY_D;
+                case "B" -> QUALITY_E;
+                case "A" -> QUALITY_F;
+                default -> throw new IllegalArgumentException("Expecting one-char string A to F");
+            };
         }
     }
 
@@ -979,26 +1002,15 @@ public abstract class Part implements IPartWork, ITechnology {
      */
     private TargetRoll getQualityMods(TargetRoll mods, Person tech) {
         int qualityMod = 0;
-        switch (quality) {
-            case QUALITY_A:
-                qualityMod = 3;
-                break;
-            case QUALITY_B:
-                qualityMod = 2;
-                break;
-            case QUALITY_C:
-                qualityMod = 1;
-                break;
-            case QUALITY_D:
-                qualityMod = 0;
-                break;
-            case QUALITY_E:
-                qualityMod = -1;
-                break;
-            case QUALITY_F:
-                qualityMod = -2;
-                break;
-        }
+        qualityMod = switch (quality) {
+            case QUALITY_A ->  3;
+            case QUALITY_B ->  2;
+            case QUALITY_C ->  1;
+            case QUALITY_D ->  0;
+            case QUALITY_E -> -1;
+            case QUALITY_F -> -2;
+            default -> 0; // Possibly should be an exception?
+        };
         mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().isReverseQualityNames()));
         if ((qualityMod > 0) &&
                 (null != tech) &&
