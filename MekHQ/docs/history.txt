@@ -106,7 +106,9 @@ MEKHQ VERSION HISTORY:
 + PR #5025: Pin/sticky force view tab on TO&E panel
 + PR #5040: Clarify map dimensions in scenario displays
 + PR #5042: Multiple FG3 Improvements
-+ PF #5043: New names cleanup and potential bugfixes
++ PR #5043: New names cleanup and potential bugfixes
++ PR #5046: Prevent StratCon from Pulling in Player DropShips, when Option is Disabled
++ PR #5044: Add Check for StratCon Usage in getAtBBattleChance Method
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
