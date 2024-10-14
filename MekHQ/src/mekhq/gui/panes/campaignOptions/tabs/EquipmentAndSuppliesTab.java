@@ -215,8 +215,7 @@ public class EquipmentAndSuppliesTab {
     JPanel createAcquisitionTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("AcquisitionTab",
-            getImageDirectory() + "logo_calderon_protectorate.png", false,
-            "", true);
+            getImageDirectory() + "logo_calderon_protectorate.png", true);
 
         // Acquisitions skill
         lblChoiceAcquireSkill = createLabel("ChoiceAcquireSkill");
@@ -245,7 +244,7 @@ public class EquipmentAndSuppliesTab {
             0,0, 100, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("acquisitionTab", true, "");
+        final JPanel panel = createStandardPanel("acquisitionTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -301,15 +300,14 @@ public class EquipmentAndSuppliesTab {
     JPanel createPlanetaryAcquisitionTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("PlanetaryAcquisitionTab",
-            getImageDirectory() + "logo_capellan_confederation.png", false,
-            "", true);
+            getImageDirectory() + "logo_capellan_confederation.png", true);
 
         // Sub-Panels
         JPanel options = createOptionsPanel();
         JPanel modifiers = createModifiersPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PlanetaryAcquisitionTab", true, "");
+        final JPanel panel = createStandardPanel("PlanetaryAcquisitionTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -476,7 +474,7 @@ public class EquipmentAndSuppliesTab {
         techLabel.setName(String.format("<html><center>%s</center></html", techLabel.getText()));
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("createTechModifiersPanel", false, "");
+        final JPanel panel = createStandardPanel("createTechModifiersPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -537,7 +535,7 @@ public class EquipmentAndSuppliesTab {
         industryLabel.setName(String.format("<html><center>%s</center></html", industryLabel.getText()));
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("IndustryModifiersPanel", false, "");
+        final JPanel panel = createStandardPanel("IndustryModifiersPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -593,7 +591,7 @@ public class EquipmentAndSuppliesTab {
         outputLabel.setName(String.format("<html><center>%s</center></html", outputLabel.getText()));
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("OutputModifiersPanel", false, "");
+        final JPanel panel = createStandardPanel("OutputModifiersPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -682,8 +680,7 @@ public class EquipmentAndSuppliesTab {
     JPanel createDeliveryTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("DeliveryTab",
-            getImageDirectory() + "logo_clan_burrock.png", false,
-            "", true);
+            getImageDirectory() + "logo_clan_burrock.png", true);
 
         // Delivery Time
         lblNDiceTransitTime = createLabel("NDiceTransitTime");
@@ -705,7 +702,7 @@ public class EquipmentAndSuppliesTab {
             null, 0, 0, 365, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("deliveryTab", true, "");
+        final JPanel panel = createStandardPanel("deliveryTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -809,8 +806,7 @@ public class EquipmentAndSuppliesTab {
     JPanel createTechLimitsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("TechLimitsTab",
-            getImageDirectory() + "logo_clan_cloud_cobra.png", false,
-            "", true);
+            getImageDirectory() + "logo_clan_cloud_cobra.png", true);
 
         // Limit Parts/Units by Year
         limitByYearBox = createCheckBox("LimitByYearBox");
@@ -837,7 +833,7 @@ public class EquipmentAndSuppliesTab {
         useAmmoByTypeBox = createCheckBox("UseAmmoByTypeBox");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("TechLimitsTab", true, "");
+        final JPanel panel = createStandardPanel("TechLimitsTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 

@@ -134,7 +134,7 @@ public class GeneralTab {
             new GridBagLayout());
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("generalTab", true, "");
+        final JPanel panel = createStandardPanel("generalTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -219,7 +219,7 @@ public class GeneralTab {
         Dimension size = lblBody.getPreferredSize();
         lblBody.setMaximumSize(new Dimension(UIUtil.scaleForGUI(750), size.height));
 
-        final JPanel panel = createStandardPanel("pnlGeneralHeaderPanel", false, "");
+        final JPanel panel = createStandardPanel("pnlGeneralHeaderPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 

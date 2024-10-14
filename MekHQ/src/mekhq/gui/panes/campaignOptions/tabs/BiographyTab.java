@@ -323,7 +323,7 @@ public class BiographyTab {
         // Header
         JPanel headerPanel = createHeaderPanel("BiographyGeneralTab",
             getImageDirectory() + "logo_federated_suns.png",
-            false, "", true);
+            true);
 
         // Contents
         chkUseDylansRandomXP = createCheckBox("UseDylansRandomXP");
@@ -343,7 +343,7 @@ public class BiographyTab {
         pnlAnniversariesPanel = createAnniversariesPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("BiographyGeneralTab", true, "");
+        final JPanel panel = createStandardPanel("BiographyGeneralTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -426,8 +426,7 @@ public class BiographyTab {
     JPanel createBackgroundsTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("BackgroundsTab",
-            getImageDirectory() + "logo_clan_goliath_scorpion.png",
-            false, "", true);
+            getImageDirectory() + "logo_clan_goliath_scorpion.png", true);
 
         // Contents
         chkUseRandomPersonalities = createCheckBox("UseRandomPersonalities");
@@ -438,7 +437,7 @@ public class BiographyTab {
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("BackgroundsTab", true, "");
+        final JPanel panel = createStandardPanel("BackgroundsTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -651,7 +650,7 @@ public class BiographyTab {
         // Header
         JPanel headerPanel = createHeaderPanel("DeathTab",
             getImageDirectory() + "logo_filtvelt_coalition.png",
-            false, "", true);
+            true);
 
         // Contents
         chkKeepMarriedNameUponSpouseDeath = createCheckBox("KeepMarriedNameUponSpouseDeath");
@@ -681,7 +680,7 @@ public class BiographyTab {
             0, 0, 100, 0.000001);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("DeathTab", true, "");
+        final JPanel panel = createStandardPanel("DeathTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -767,7 +766,7 @@ public class BiographyTab {
         // Header
         JPanel headerPanel = createHeaderPanel("EducationTab",
             getImageDirectory() + "logo_free_worlds_league.png",
-            false, "", true);
+            true);
 
         // Contents
         chkUseEducationModule = createCheckBox("UseEducationModule");
@@ -800,7 +799,7 @@ public class BiographyTab {
         pnlAccidentsAndEvents = createAccidentsAndEventsPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("EducationTab", true, "");
+        final JPanel panel = createStandardPanel("EducationTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -1050,7 +1049,7 @@ public class BiographyTab {
         // Header
         JPanel headerPanel = createHeaderPanel("NameAndPortraitGenerationTab",
             getImageDirectory() + "logo_clan_mongoose.png",
-            false, "", true);
+            true);
 
         // Contents
         chkUseOriginFactionForNames = createCheckBox("UseOriginFactionForNames");
@@ -1182,7 +1181,7 @@ public class BiographyTab {
         // Header
         JPanel headerPanel = createHeaderPanel("RankTab",
             getImageDirectory() + "logo_hanseatic_league.png",
-            false, "", true);
+            true);
 
         // Contents
         rankSystemsPane = new RankSystemsPane(frame, campaign);

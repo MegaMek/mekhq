@@ -117,8 +117,7 @@ public class RepairAndMaintenanceTab {
     JPanel createRepairTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("RepairTab",
-            getImageDirectory() + "logo_aurigan_coalition.png", false,
-            "", true);
+            getImageDirectory() + "logo_aurigan_coalition.png", true);
 
         // Era Mods
         useEraModsCheckBox = createCheckBox("UseEraModsCheckBox");
@@ -148,7 +147,7 @@ public class RepairAndMaintenanceTab {
         JLabel lblDestroyPartTargetPost = new JLabel("<html>+</html>");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("repairTab", true, "");
+        final JPanel panel = createStandardPanel("repairTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -200,8 +199,7 @@ public class RepairAndMaintenanceTab {
     JPanel createMaintenanceTab() {
         // Header
         JPanel headerPanel = createHeaderPanel("MaintenanceTab",
-            getImageDirectory() + "logo_clan_blood_spirit.png",
-            false, "", true);
+            getImageDirectory() + "logo_clan_blood_spirit.png", true);
 
         // Check Maintenance
         checkMaintenance = createCheckBox("CheckMaintenance");
@@ -240,7 +238,7 @@ public class RepairAndMaintenanceTab {
         logMaintenance = createCheckBox("LogMaintenance");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("repairTab", true, "");
+        final JPanel panel = createStandardPanel("repairTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 

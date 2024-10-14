@@ -229,7 +229,7 @@ public class TurnoverAndRetentionTab {
         // Header
         JPanel headerPanel = createHeaderPanel("TurnoverTab",
             getImageDirectory() + "logo_clan_jade_falcon.png",
-            false, "", true);
+            true);
 
         // Contents
         chkUseRandomRetirement = createCheckBox("UseRandomRetirement");
@@ -239,7 +239,7 @@ public class TurnoverAndRetentionTab {
         pnlUnitCohesion = createUnitCohesionPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("TurnoverTab", true, "");
+        final JPanel panel = createStandardPanel("TurnoverTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -590,7 +590,7 @@ public class TurnoverAndRetentionTab {
         pnlAdministrativeStrain = createAdministrativeStrainPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AdministrativeStrainPanel", false, "");
+        final JPanel panel = createStandardPanel("AdministrativeStrainPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -677,7 +677,7 @@ public class TurnoverAndRetentionTab {
         pnlManagementSkill = createManagementSkillPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("UnitCohesionPanel", false, "");
+        final JPanel panel = createStandardPanel("UnitCohesionPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -757,7 +757,7 @@ public class TurnoverAndRetentionTab {
         // Header
         JPanel headerPanel = createHeaderPanel("FatigueTab",
             getImageDirectory() + "logo_free_rasalhague_republic.png",
-            false, "", true);
+            true);
 
         // Contents
         chkUseFatigue = createCheckBox("UseFatigue");
@@ -779,7 +779,7 @@ public class TurnoverAndRetentionTab {
             13, 0, 17, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("FatigueTab", true, "");
+        final JPanel panel = createStandardPanel("FatigueTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 

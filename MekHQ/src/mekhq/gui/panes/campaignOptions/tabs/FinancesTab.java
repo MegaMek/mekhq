@@ -184,7 +184,7 @@ public class FinancesTab {
         // Header
         JPanel headerPanel = createHeaderPanel("FinancesGeneralTab",
             getImageDirectory() + "logo_clan_nova_cat.png",
-            false, "", true);
+            true);
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
@@ -296,7 +296,7 @@ public class FinancesTab {
         pnlShares = createSharesPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("OtherSystemsPanel", false, "");
+        final JPanel panel = createStandardPanel("OtherSystemsPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -334,7 +334,7 @@ public class FinancesTab {
         newFinancialYearFinancesToCSVExportBox = createCheckBox("NewFinancialYearFinancesToCSVExportBox");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("GeneralOptionsPanel", false, "");
+        final JPanel panel = createStandardPanel("GeneralOptionsPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -518,7 +518,7 @@ public class FinancesTab {
         // Header
         JPanel headerPanel = createHeaderPanel("PriceMultipliersTab",
             getImageDirectory() + "logo_illyrian_palatinate.png",
-            false, "", true);
+            true);
 
         // Contents
         pnlGeneralMultipliers = createGeneralMultipliersPanel();

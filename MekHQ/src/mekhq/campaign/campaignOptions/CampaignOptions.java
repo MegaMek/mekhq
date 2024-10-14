@@ -4275,18 +4275,22 @@ public class CampaignOptions {
         this.useStratCon = useStratCon;
     }
 
+    @Deprecated
     public boolean isUseAero() {
-        return useAero;
+        return true;
     }
 
+    @Deprecated
     public void setUseAero(final boolean useAero) {
         this.useAero = useAero;
     }
 
+    @Deprecated
     public boolean isUseVehicles() {
-        return useVehicles;
+        return true;
     }
 
+    @Deprecated
     public void setUseVehicles(final boolean useVehicles) {
         this.useVehicles = useVehicles;
     }

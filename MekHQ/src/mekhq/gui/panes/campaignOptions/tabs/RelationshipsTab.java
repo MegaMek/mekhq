@@ -210,14 +210,14 @@ public class RelationshipsTab {
         // Header
         JPanel headerPanel = createHeaderPanel("MarriageTab",
             getImageDirectory() + "logo_federated_commonwealth.png",
-            false, "", true);
+            true);
 
         // Contents
         pnlMarriageGeneralOptions = createMarriageGeneralOptionsPanel();
         pnlRandomMarriage = createRandomMarriagePanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("MarriageTab", true, "");
+        final JPanel panel = createStandardPanel("MarriageTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -264,7 +264,7 @@ public class RelationshipsTab {
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("MarriageGeneralOptionsPanel",
-            false, "");
+            false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -439,7 +439,7 @@ public class RelationshipsTab {
         // Header
         JPanel headerPanel = createHeaderPanel("DivorceTab",
             getImageDirectory() + "logo_clan_hells_horses.png",
-            false, "", true);
+            true);
 
         // Contents
         chkUseManualDivorce = createCheckBox("UseManualDivorce");
@@ -449,7 +449,7 @@ public class RelationshipsTab {
         pnlRandomDivorce = createRandomDivorcePanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("DivorceTab", true, "");
+        final JPanel panel = createStandardPanel("DivorceTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -552,14 +552,14 @@ public class RelationshipsTab {
         // Header
         JPanel headerPanel = createHeaderPanel("ProcreationTab",
             getImageDirectory() + "logo_clan_ice_hellion.png",
-            false, "", true);
+            true);
 
         // Contents
         pnlProcreationGeneralOptionsPanel = createProcreationGeneralOptionsPanel();
         pnlRandomProcreationPanel = createRandomProcreationPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("ProcreationTab", true, "");
+        final JPanel panel = createStandardPanel("ProcreationTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -628,7 +628,7 @@ public class RelationshipsTab {
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("ProcreationGeneralOptionsPanel",
-            false, "");
+            false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 

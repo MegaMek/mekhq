@@ -218,6 +218,24 @@ public class CampaignOptionsUtilities {
      *
      * @param name         the name of the panel.
      * @param includeBorder whether the panel should have a border.
+     *
+     * @return a {@link JPanel} with a titled border and {@link GroupLayout} as its layout manager
+     */
+    static JPanel createStandardPanel(String name, boolean includeBorder) {
+        return createStandardPanel(name, includeBorder, "");
+    }
+
+    /**
+     * Creates a standard {@link JPanel} with a titled border.
+     * <p>
+     * {@code createStandardLayout} should also be called and the resulting {@link GroupLayout}
+     * assigned to the panel via {@code setLayout}.
+     * <p>
+     * If {@code borderTitle} isn't empty the resource bundle reference, used to fetch the border's
+     * title, will be {@code "lbl" + borderTitle + ".text"}
+     *
+     * @param name         the name of the panel.
+     * @param includeBorder whether the panel should have a border.
      * @param borderTitle  The resource string that should be used as the title of the border.
      *                    Can be empty to generate an untitled border.
      *
@@ -263,13 +281,10 @@ public class CampaignOptionsUtilities {
      *
      * @param name           the name of the header panel.
      * @param imageAddress   the file path of the image to be displayed in the panel
-     * @param includeBorder  whether the panel should have a border
-     * @param borderTitle    the title of the border; can be empty for an untitled border
      * @param includeBodyText    if {@code true}, include a second {@link JLabel}.
      * @return a {@link JPanel} representing the header panel
      */
-    static JPanel createHeaderPanel(String name, String imageAddress, boolean includeBorder,
-                                           String borderTitle, boolean includeBodyText) {
+    static JPanel createHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
         ImageIcon imageIcon = new ImageIcon(imageAddress);
         JLabel imageLabel = new JLabel(imageIcon);
 
@@ -286,7 +301,7 @@ public class CampaignOptionsUtilities {
             lblBody.setMaximumSize(new Dimension(UIUtil.scaleForGUI(750), size.height));
         }
 
-        final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", includeBorder, borderTitle);
+        final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", false, "");
         Dimension size = panel.getPreferredSize();
         panel.setPreferredSize(new Dimension(UIUtil.scaleForGUI(750), size.height));
 

@@ -120,7 +120,7 @@ public class MarketsTab {
         // Header
         JPanel headerPanel = createHeaderPanel("PersonnelMarketTab",
             getImageDirectory() + "logo_clan_sea_fox.png",
-            false, "", true);
+            true);
 
         // Contents
         pnlPersonnelMarketGeneralOptions = createPersonnelMarketGeneralOptionsPanel();
@@ -214,7 +214,7 @@ public class MarketsTab {
         }
 
         // Layout the Panels
-        final JPanel leftPanel = createStandardPanel("LeftPanel", false, "");
+        final JPanel leftPanel = createStandardPanel("LeftPanel", false);
         final GroupLayout leftLayout = createStandardLayout(leftPanel);
         leftPanel.setLayout(leftLayout);
 
@@ -252,7 +252,7 @@ public class MarketsTab {
                     .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))
                     .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
 
-        final JPanel rightPanel = createStandardPanel("RightPanel", false, "");
+        final JPanel rightPanel = createStandardPanel("RightPanel", false);
         final GroupLayout rightLayout = createStandardLayout(rightPanel);
         rightPanel.setLayout(rightLayout);
 
@@ -327,7 +327,7 @@ public class MarketsTab {
         // Header
         JPanel headerPanel = createHeaderPanel("UnitMarketTab",
             getImageDirectory() + "logo_loathian_league.png",
-            false, "", true);
+            true);
 
         // Contents
         lblUnitMarketMethod = createLabel("UnitMarketMethod");
@@ -428,7 +428,7 @@ public class MarketsTab {
         // Header
         JPanel headerPanel = createHeaderPanel("ContractMarketTab",
             getImageDirectory() + "logo_clan_smoke_jaguar.png",
-            false, "", true);
+            true);
 
         // Contents
         pnlContractMarketGeneralOptions = createContractMarketGeneralOptionsPanel();
@@ -483,7 +483,7 @@ public class MarketsTab {
 
         // Layout the Panel
         final JPanel panel = createStandardPanel("ContractMarketGeneralOptionsPanel",
-            false, "");
+            false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 

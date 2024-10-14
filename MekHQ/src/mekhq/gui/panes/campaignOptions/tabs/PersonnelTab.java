@@ -361,7 +361,7 @@ public class PersonnelTab {
         // Header
         JPanel headerPanel = createHeaderPanel("PersonnelGeneralTab",
             getImageDirectory() + "logo_circinus_federation.png",
-            false, "", true);
+            true);
 
         // Contents
         chkUseTactics = createCheckBox("UseTactics");
@@ -378,7 +378,7 @@ public class PersonnelTab {
         personnelCleanUpPanel = createPersonnelCleanUpPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PersonnelGeneralTab", true, "");
+        final JPanel panel = createStandardPanel("PersonnelGeneralTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -462,7 +462,7 @@ public class PersonnelTab {
         // Header
         JPanel headerPanel = createHeaderPanel("PersonnelLogsTab",
             getImageDirectory() + "logo_clan_coyote.png",
-            false, "", true);
+            true);
 
         // Contents
         chkUseTransfers = createCheckBox("UseTransfers");
@@ -475,7 +475,7 @@ public class PersonnelTab {
         chkDisplayKillRecord = createCheckBox("DisplayKillRecord");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PersonnelLogsTab", true, "");
+        final JPanel panel = createStandardPanel("PersonnelLogsTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -517,7 +517,7 @@ public class PersonnelTab {
         // Header
         JPanel headerPanel = createHeaderPanel("PersonnelInformation",
             getImageDirectory() + "logo_comstar.png",
-            false, "", true);
+            true);
 
         // Contents
         chkUseTimeInService = createCheckBox("UseTimeInService");
@@ -529,7 +529,7 @@ public class PersonnelTab {
         chkShowOriginFaction = createCheckBox("ShowOriginFaction");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PersonnelInformation", true, "");
+        final JPanel panel = createStandardPanel("PersonnelInformation", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -581,7 +581,7 @@ public class PersonnelTab {
         // Header
         JPanel headerPanel = createHeaderPanel("AdministratorsTab",
             getImageDirectory() + "logo_clan_diamond_sharks.png",
-            false, "", true);
+            true);
 
         // Contents
         chkAdminsHaveNegotiation = createCheckBox("AdminsHaveNegotiation");
@@ -590,7 +590,7 @@ public class PersonnelTab {
         chkAdminExperienceLevelIncludeScrounge = createCheckBox("AdminExperienceLevelIncludeScrounge");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AdministratorsTab", true, "");
+        final JPanel panel = createStandardPanel("AdministratorsTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -623,7 +623,7 @@ public class PersonnelTab {
         // Header
         JPanel headerPanel = createHeaderPanel("AwardsTab",
             getImageDirectory() + "logo_draconis_combine.png",
-            false, "", true);
+            true);
 
         // Contents
         lblAwardBonusStyle = createLabel("AwardBonusStyle");
@@ -669,7 +669,7 @@ public class PersonnelTab {
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AwardsTab", true, "");
+        final JPanel panel = createStandardPanel("AwardsTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -795,7 +795,7 @@ public class PersonnelTab {
         // Header
         JPanel headerPanel = createHeaderPanel("PrisonersAndDependentsTab",
             getImageDirectory() + "logo_clan_fire_mandrills.png",
-            false, "", true);
+            true);
 
         // Contents
         prisonerPanel = createPrisonersPanel();
@@ -926,7 +926,7 @@ public class PersonnelTab {
         // Header
         JPanel headerPanel = createHeaderPanel("MedicalTab",
             getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
-            false, "", true);
+            true);
 
         // Contents
         chkUseAdvancedMedical = createCheckBox("UseAdvancedMedical");
@@ -952,7 +952,7 @@ public class PersonnelTab {
             25, 1, 100, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("MedicalTab", true, "");
+        final JPanel panel = createStandardPanel("MedicalTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -1011,7 +1011,7 @@ public class PersonnelTab {
         // Header
         JPanel headerPanel = createHeaderPanel("SalariesTab",
             getImageDirectory() + "logo_clan_ghost_bear.png",
-            false, "", true);
+            true);
 
         // Contents
         chkDisableSecondaryRoleSalary = createCheckBox("DisableSecondaryRoleSalary");
@@ -1020,7 +1020,7 @@ public class PersonnelTab {
         pnlSalaryBaseSalaryPanel = createBaseSalariesPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("SalariesTab", true, "");
+        final JPanel panel = createStandardPanel("SalariesTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
