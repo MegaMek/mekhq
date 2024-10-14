@@ -74,6 +74,7 @@ public class MarketsTab {
     private JSpinner spnWarShipPercent;
     private JRadioButton btnContractPersonnel;
     private JCheckBox useInfantryDoseNotCountBox;
+    private JCheckBox chkMercSizeLimited;
     private JCheckBox chkBLCSaleValue;
     private JCheckBox chkOverageRepaymentInFinalPayment;
     //end Contract Market
@@ -418,6 +419,7 @@ public class MarketsTab {
         spnWarShipPercent = new JSpinner();
         btnContractPersonnel = new JRadioButton();
         useInfantryDoseNotCountBox = new JCheckBox();
+        chkMercSizeLimited = new JCheckBox();
         chkBLCSaleValue = new JCheckBox();
         chkOverageRepaymentInFinalPayment = new JCheckBox();
     }
@@ -555,6 +557,7 @@ public class MarketsTab {
         chkBLCSaleValue = createCheckBox("BLCSaleValue");
 
         useInfantryDoseNotCountBox = createCheckBox("UseInfantryDoseNotCountBox");
+        chkMercSizeLimited = createCheckBox("MercSizeLimited");
 
         chkOverageRepaymentInFinalPayment = createCheckBox("OverageRepaymentInFinalPayment");
 
@@ -584,6 +587,7 @@ public class MarketsTab {
                 .addGap(UIUtil.scaleForGUI(15))
                 .addComponent(chkBLCSaleValue)
                 .addComponent(useInfantryDoseNotCountBox)
+                .addComponent(chkMercSizeLimited)
                 .addComponent(chkOverageRepaymentInFinalPayment));
 
         layout.setHorizontalGroup(
@@ -616,6 +620,7 @@ public class MarketsTab {
                 .addComponent(btnContractPersonnel)
                 .addComponent(chkBLCSaleValue)
                 .addComponent(useInfantryDoseNotCountBox)
+                .addComponent(chkMercSizeLimited)
                 .addComponent(chkOverageRepaymentInFinalPayment));
 
         return panel;
