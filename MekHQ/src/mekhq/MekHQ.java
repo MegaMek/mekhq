@@ -33,13 +33,13 @@ import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.event.*;
 import megamek.common.net.marshalling.SanityInputFilter;
 import megamek.logging.MMLogger;
 import megamek.server.Server;
 import megamek.server.totalwarfare.TWGameManager;
 import megameklab.MegaMekLab;
-import megameklab.util.CConfig;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.Kill;
@@ -72,7 +72,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.ObjectInputFilter;
 import java.io.ObjectInputFilter.Config;
 import java.util.HashMap;
 import java.util.List;
@@ -174,14 +173,13 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
-        updateGuiScaling(); // also sets the look-and-feel
-
         // Setup user preferences
         MegaMek.getMMPreferences().loadFromFile(SuiteConstants.MM_PREFERENCES_FILE);
         MegaMekLab.getMMLPreferences().loadFromFile(SuiteConstants.MML_PREFERENCES_FILE);
         getMHQPreferences().loadFromFile(SuiteConstants.MHQ_PREFERENCES_FILE);
 
         setUserPreferences();
+        updateGuiScaling(); // also sets the look-and-feel
 
         initEventHandlers();
         // create a start-up frame and display it
@@ -658,9 +656,11 @@ public class MekHQ implements GameListener {
     }
 
     private static void setLookAndFeel(String themeName) {
+        final String theme = themeName.isBlank() ? "com.formdev.flatlaf.FlatDarculaLaf" : themeName;
+
         Runnable runnable = () -> {
             try {
-                UIManager.setLookAndFeel(themeName);
+                UIManager.setLookAndFeel(theme);
                 if (System.getProperty("os.name", "").startsWith("Mac OS X")) {
                     // Ensure OSX key bindings are used for copy, paste etc
                     addOSXKeyStrokes((InputMap) UIManager.get("EditorPane.focusInputMap"));
@@ -670,7 +670,7 @@ public class MekHQ implements GameListener {
                     addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
                 }
 
-                updateAfterUiChange();
+                UIUtil.updateAfterUiChange();
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                     | UnsupportedLookAndFeelException e) {
                 logger.error(e, "setLookAndFeel()");
@@ -682,20 +682,6 @@ public class MekHQ implements GameListener {
     public static void updateGuiScaling() {
         System.setProperty("flatlaf.uiScale", Double.toString(GUIPreferences.getInstance().getGUIScale()));
         setLookAndFeel(GUIPreferences.getInstance().getUITheme());
-        updateAfterUiChange();
-    }
-
-    /**
-     * Updates all existing windows and frames. Use after a gui scale change or look-and-feel change.
-     */
-    public static void updateAfterUiChange() {
-        for (Window window : Window.getWindows()) {
-            SwingUtilities.updateComponentTreeUI(window);
-            window.pack();
-            window.invalidate();
-            window.validate();
-            window.repaint();
-        }
     }
 
     private static class MekHqPropertyChangedListener implements PropertyChangeListener {
