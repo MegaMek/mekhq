@@ -305,6 +305,10 @@ public class StratconRulesManager {
                 }
 
                 for (Unit unit : potentialUnits) {
+                    if ((sft.getAllowedUnitType() == 11) && (!campaign.getCampaignOptions().isUseDropShips())) {
+                        continue;
+                    }
+
                     // if it's the right type of unit and is around
                     if (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
                             sft.getAllowedUnitType(), false) &&
