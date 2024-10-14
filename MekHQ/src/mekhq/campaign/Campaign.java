@@ -2243,13 +2243,21 @@ public class Campaign implements ITechManager {
         return (null != result.getPartToBuy()) ? result : null;
     }
 
-    private void updatePartInUseData(PartInUse piu, Part p) {
-        if ((p.getUnit() != null) || (p instanceof MissingPart)) {
+    private void updatePartInUseData(PartInUse piu, Part p, boolean ignoreMothballedUnits,
+            int ignoreSparesUnderQuality) {
+
+        if (ignoreMothballedUnits && (null != p.getUnit()) && p.getUnit().isMothballed()) {
+            // Ignore it
+        } else if ((p.getUnit() != null) || (p instanceof MissingPart)) {
             piu.setUseCount(piu.getUseCount() + getQuantity(p));
         } else {
             if (p.isPresent()) {
-                piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
-                piu.addSpare(p);
+                if (p.getQuality() < ignoreSparesUnderQuality) {
+                    // Ignore it
+                } else {
+                    piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
+                    piu.addSpare(p);
+                }
             } else {
                 piu.setTransferCount(piu.getTransferCount() + getQuantity(p));
             }
@@ -2257,7 +2265,7 @@ public class Campaign implements ITechManager {
     }
 
     /** Update the piu with the current campaign data */
-    public void updatePartInUse(PartInUse piu) {
+    public void updatePartInUse(PartInUse piu, boolean ignoreMothballedUnits, int ignoreSparesUnderQuality) {
         piu.setUseCount(0);
         piu.setStoreCount(0);
         piu.setTransferCount(0);
@@ -2265,7 +2273,7 @@ public class Campaign implements ITechManager {
         getWarehouse().forEachPart(p -> {
             PartInUse newPiu = getPartInUse(p);
             if (piu.equals(newPiu)) {
-                updatePartInUseData(piu, p);
+                updatePartInUseData(piu, p, ignoreMothballedUnits, ignoreSparesUnderQuality);
             }
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
@@ -2278,7 +2286,7 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public Set<PartInUse> getPartsInUse() {
+    public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits, int ignoreSparesUnderQuality) {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
         // java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
@@ -2292,7 +2300,7 @@ public class Campaign implements ITechManager {
             } else {
                 inUse.put(piu, piu);
             }
-            updatePartInUseData(piu, p);
+            updatePartInUseData(piu, p, ignoreMothballedUnits, ignoreSparesUnderQuality);
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             if (!(maybePart instanceof Part)) {
@@ -2312,7 +2320,10 @@ public class Campaign implements ITechManager {
                             : (Part) maybePart) * maybePart.getQuantity());
 
         }
-        return inUse.keySet();
+        return inUse.keySet().stream()
+            // Hacky but otherwise we end up with zero lines when filtering things out
+            .filter(p -> p.getUseCount() != 0 || p.getStoreCount() != 0 || p.getPlannedCount() != 0)
+            .collect(Collectors.toSet());
     }
 
     @Deprecated

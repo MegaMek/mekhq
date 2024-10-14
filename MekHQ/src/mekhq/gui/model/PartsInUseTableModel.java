@@ -201,7 +201,7 @@ public class PartsInUseTableModel extends DataTableModel {
     public int getPreferredWidth(int column) {
         return switch (column) {
             case COL_PART -> 260;
-            case COL_IN_USE, COL_STORED, COL_TONNAGE, COL_IN_TRANSFER -> 20;
+            case COL_IN_USE, COL_STORED, COL_TONNAGE, COL_IN_TRANSFER -> 15;
             case COL_COST -> 40;
             case COL_BUTTON_BUY, COL_BUTTON_SELL -> 25;
             case COL_BUTTON_GMADD -> 65;

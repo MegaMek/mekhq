@@ -18,28 +18,35 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+
+import static javax.swing.GroupLayout.Alignment;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.LayoutStyle;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.parts.Part;
@@ -56,7 +63,8 @@ import mekhq.gui.sorter.TwoNumbersSorter;
  */
 public class PartsReportDialog extends JDialog {
 
-    private JPanel overviewPartsPanel;
+    private JCheckBox ignoreMothballedCheck;
+    private JComboBox<String> ignoreSparesUnderQualityCB;
     private JTable overviewPartsInUseTable;
     private PartsInUseTableModel overviewPartsModel;
 
@@ -74,8 +82,14 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void initComponents() {
-        overviewPartsPanel = new JPanel(new BorderLayout());
-
+   
+        Container container = this.getContentPane();
+        
+        GroupLayout layout = new GroupLayout(container);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        container.setLayout(layout);
+        
         overviewPartsModel = new PartsInUseTableModel();
         overviewPartsInUseTable = new JTable(overviewPartsModel);
         overviewPartsInUseTable.setRowSelectionAllowed(false);
@@ -239,24 +253,69 @@ public class PartsReportDialog extends JDialog {
         new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, addInBulk,
                 PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
 
-        overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), BorderLayout.CENTER);
 
-        JPanel panButtons = new JPanel(new GridBagLayout());
+        JScrollPane tableScroll = new JScrollPane(overviewPartsInUseTable);
+
+        ignoreMothballedCheck = new JCheckBox("Ignore Mothballed Units");
+        ignoreMothballedCheck.addActionListener(evt -> refreshOverviewPartsInUse());
+
+        String[] qualities;
+        if(!campaign.getCampaignOptions().isReverseQualityNames()) {
+            qualities = new String[] {" ", "B", "C", "D", "E", "F"};
+        } else {
+            qualities = new String[] {" ", "E", "D", "C", "B", "A"};
+        }
+        ignoreSparesUnderQualityCB = new JComboBox<String>(qualities);
+        ignoreSparesUnderQualityCB.setMaximumSize(ignoreSparesUnderQualityCB.getPreferredSize());
+        ignoreSparesUnderQualityCB.addActionListener(evt -> refreshOverviewPartsInUse());
+        JLabel ignorePartsUnderLabel = new JLabel("Ignore Parts Below Quality");
+
         JButton btnClose = new JButton("Close");
         btnClose.addActionListener(evt -> setVisible(false));
-        panButtons.add(btnClose, new GridBagConstraints());
-        overviewPartsPanel.add(panButtons, BorderLayout.PAGE_END);
+        
+        layout.setHorizontalGroup(layout.createParallelGroup()
+            .addComponent(tableScroll)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createSequentialGroup()
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(ignorePartsUnderLabel)
+                    .addComponent(ignoreSparesUnderQualityCB)
+                    .addComponent(ignoreMothballedCheck)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnClose))));
 
-        this.setLayout(new BorderLayout());
-        this.add(overviewPartsPanel, BorderLayout.CENTER);
-        setPreferredSize(new Dimension(1000, 800));
+        layout.setVerticalGroup(layout.createSequentialGroup()
+            .addComponent(tableScroll)
+            .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                .addComponent(ignoreMothballedCheck)
+                .addComponent(ignorePartsUnderLabel)
+                .addComponent(ignoreSparesUnderQualityCB)
+                .addComponent(btnClose)));
 
+        setPreferredSize(new Dimension(1400, 1000));
+
+    }
+
+
+    /**
+     * @param rating String containing A to F or space, from combo box
+     * @return minimum internal quality level to use
+     */
+    
+    private int getMinimumQuality(String rating) {
+        if (rating.equals(" ")) {
+            // The blank spot always means "everything", so minimum = lowest
+            return Part.QUALITY_A;
+        } else {
+            return Part.getQualityFromName(rating, campaign.getCampaignOptions().isReverseQualityNames());
+        }
     }
 
     private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
         if (piu.equals(new PartInUse((Part) newPart))) {
             // Simple update
-            campaign.updatePartInUse(piu);
+            campaign.updatePartInUse(piu, ignoreMothballedCheck.isSelected(),
+                    getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem()));
             overviewPartsModel.fireTableRowsUpdated(row, row);
         } else {
             // Some other part changed; fire a full refresh to be sure
@@ -265,7 +324,8 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void refreshOverviewPartsInUse() {
-        overviewPartsModel.setData(campaign.getPartsInUse());
+        overviewPartsModel.setData(campaign.getPartsInUse(ignoreMothballedCheck.isSelected(),
+                getMinimumQuality((String) ignoreSparesUnderQualityCB.getSelectedItem())));
         TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
         PartsInUseTableModel.ButtonColumn column = (PartsInUseTableModel.ButtonColumn) tcm
                 .getColumn(PartsInUseTableModel.COL_BUTTON_GMADD)
@@ -275,4 +335,5 @@ public class PartsReportDialog extends JDialog {
                 .getCellRenderer();
         column.setEnabled(campaign.isGM());
     }
+
 }
