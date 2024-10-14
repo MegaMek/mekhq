@@ -71,6 +71,9 @@ public class PartsReportDialog extends JDialog {
     private Campaign campaign;
     private CampaignGUI gui;
 
+    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
+        "mekhq.resources.PartsReportDialog", MekHQ.getMHQOptions().getLocale());
+
     public PartsReportDialog(CampaignGUI gui, boolean modal) {
         super(gui.getFrame(), modal);
         this.gui = gui;
@@ -83,6 +86,8 @@ public class PartsReportDialog extends JDialog {
 
     private void initComponents() {
    
+        this.setTitle(resourceMap.getString("Form.title"));
+
         Container container = this.getContentPane();
         
         GroupLayout layout = new GroupLayout(container);
@@ -256,7 +261,7 @@ public class PartsReportDialog extends JDialog {
 
         JScrollPane tableScroll = new JScrollPane(overviewPartsInUseTable);
 
-        ignoreMothballedCheck = new JCheckBox("Ignore Mothballed Units");
+        ignoreMothballedCheck = new JCheckBox(resourceMap.getString("chkIgnoreMothballed.text"));
         ignoreMothballedCheck.addActionListener(evt -> refreshOverviewPartsInUse());
 
         String[] qualities;
@@ -268,7 +273,7 @@ public class PartsReportDialog extends JDialog {
         ignoreSparesUnderQualityCB = new JComboBox<String>(qualities);
         ignoreSparesUnderQualityCB.setMaximumSize(ignoreSparesUnderQualityCB.getPreferredSize());
         ignoreSparesUnderQualityCB.addActionListener(evt -> refreshOverviewPartsInUse());
-        JLabel ignorePartsUnderLabel = new JLabel("Ignore Parts Below Quality");
+        JLabel ignorePartsUnderLabel = new JLabel(resourceMap.getString("lblIgnoreSparesUnderQuality.text"));
 
         JButton btnClose = new JButton("Close");
         btnClose.addActionListener(evt -> setVisible(false));
