@@ -111,7 +111,14 @@ public class GeneralTab {
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Camouflage
-        lblCamo = createLabel("Camo");
+        lblCamo = new COptionLabel("Camo") {
+            @Override
+            public Dimension getPreferredSize() {
+                return UIUtil.scaleForGUI(100, 100);
+            }
+        };
+
+//        lblCamo = createLabel("Camo");
         btnCamo.setName("btnCamo");
 //        btnCamo.setMinimumSize(UIUtil.scaleForGUI(100, 100));
 //        btnCamo.setMaximumSize(UIUtil.scaleForGUI(100, 100));
@@ -143,22 +150,18 @@ public class GeneralTab {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-//        gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 5;
         panel.add(headerPanel, gbc);
 
         gbc.gridwidth = 1;
         gbc.gridy++;
-//        gbc.gridx = 0;
         panel.add(lblName, gbc);
 
-//        gbc.gridx += gbc.gridwidth;
         gbc.gridwidth = 2;
         gbc.weightx = 1;
         panel.add(txtName, gbc);
 
-//        gbc.gridx += gbc.gridwidth;
         gbc.gridwidth = 1;
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
@@ -166,31 +169,23 @@ public class GeneralTab {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         gbc.gridy++;
-//        gbc.gridx = 0;
         panel.add(lblFaction, gbc);
-//        gbc.gridx++;
         gbc.gridwidth = 2;
         panel.add(comboFaction, gbc);
 
         gbc.gridwidth = 1;
         gbc.gridy++;
-//        gbc.gridx = 0;
         panel.add(lblReputation, gbc);
-//        gbc.gridx++;
         gbc.gridwidth = 2;
         panel.add(unitRatingMethodCombo, gbc);
 
         gbc.gridwidth = 1;
         gbc.gridy++;
-//        gbc.gridx = 0;
         panel.add(lblManualUnitRatingModifier, gbc);
-//        gbc.gridx++;
         panel.add(manualUnitRatingModifier, gbc);
 
         gbc.gridy++;
-//        gbc.gridx = 0;
         panel.add(lblDate, gbc);
-//        gbc.gridx++;
         panel.add(btnDate, gbc);
 
         gbc.gridy++;
@@ -342,7 +337,13 @@ public class GeneralTab {
         btnDate = new JButton();
 
         lblCamo = new JLabel();
-        btnCamo = new JButton();
+        btnCamo = new JButton() {
+
+            @Override
+            public Dimension getPreferredSize() {
+                return UIUtil.scaleForGUI(100, 100);
+            }
+        };
 
         lblIcon = new JLabel();
         btnIcon = new JButton();

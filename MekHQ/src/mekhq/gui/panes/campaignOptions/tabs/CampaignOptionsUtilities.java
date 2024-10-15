@@ -150,6 +150,23 @@ public class CampaignOptionsUtilities {
         return jLabel;
     }
 
+    static class COptionLabel extends JLabel {
+
+        public COptionLabel(String name) {
+            super(String.format("<html>%s</html>",
+                resources.getString("lbl" + name + ".text")));
+            setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), 100));
+            setName("lbl" + name);
+        }
+
+        public COptionLabel(String name, @Nullable Integer customWrapSize) {
+            super(String.format("<html>%s</html>",
+                resources.getString("lbl" + name + ".text")));
+            setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), processWrapSize(customWrapSize)));
+            setName("lbl" + name);
+        }
+    }
+
     /**
      * Creates a {@link JTextField} object.
      * <p>
