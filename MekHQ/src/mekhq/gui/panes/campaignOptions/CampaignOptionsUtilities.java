@@ -252,23 +252,6 @@ public class CampaignOptionsUtilities {
         return panel;
     }
 
-
-    /**
-     * Creates an empty {@link JPanel} with the specified name and minimum width.
-     * This is used to occupy whitespace to stop GUI elements from getting overly spread out.
-     * Its inclusion is not ideal, but after a couple of days of throwing our heads against a wall,
-     * this was the best solution we could find.
-     *
-     * @param width the minimum width of the {@link JPanel}
-     * @return a new {@link JPanel} with the specified name and minimum width
-     */
-    static JPanel createEmptyPanel(int width) {
-        JPanel panel = new JPanel();
-        panel.setMinimumSize(UIUtil.scaleForGUI(width, 25));
-
-        return panel;
-    }
-
     /**
      * Creates a {@link JPanel} consisting of a {@link JLabel} above an image.
      * If {@code includeBodyText} is {@code true} a second {@link JLabel} is placed after the first.

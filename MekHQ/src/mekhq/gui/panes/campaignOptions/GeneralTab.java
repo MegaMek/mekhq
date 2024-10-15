@@ -92,7 +92,6 @@ public class GeneralTab {
             .randomMercenaryCompanyNameGenerator(campaign.getFlaggedCommander())));
 
         createGeneralOptionsPanel = createGeneralOptionsPanel();
-        JPanel emptyPanel = createEmptyPanel(0);
 
         // Camouflage
         lblCamo = createLabel("Camo");
@@ -131,8 +130,7 @@ public class GeneralTab {
                     .addComponent(txtName)
                     .addComponent(btnNameGenerator))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(createGeneralOptionsPanel)
-                    .addComponent(emptyPanel))
+                    .addComponent(createGeneralOptionsPanel))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblCamo)
                     .addComponent(btnCamo)
@@ -147,8 +145,7 @@ public class GeneralTab {
                     .addComponent(txtName)
                     .addComponent(btnNameGenerator))
                 .addGroup(layout.createSequentialGroup()
-                    .addComponent(createGeneralOptionsPanel)
-                    .addComponent(emptyPanel))
+                    .addComponent(createGeneralOptionsPanel))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblCamo)
                     .addComponent(btnCamo)
