@@ -182,7 +182,7 @@ public class FinancesTab {
      */
     JPanel createFinancesGeneralOptionsTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("FinancesGeneralTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("FinancesGeneralTab",
             getImageDirectory() + "logo_clan_nova_cat.png",
             true);
 
@@ -194,7 +194,7 @@ public class FinancesTab {
         pnlOtherSystems = createOtherSystemsPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("FinancesGeneralTab", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("FinancesGeneralTab", true,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -230,17 +230,17 @@ public class FinancesTab {
      */
     private JPanel createPaymentsPanel() {
         // Contents
-        payForPartsBox = createCheckBox("PayForPartsBox");
-        payForRepairsBox = createCheckBox("PayForRepairsBox");
-        payForUnitsBox = createCheckBox("PayForUnitsBox");
-        payForSalariesBox = createCheckBox("PayForSalariesBox");
-        payForOverheadBox = createCheckBox("PayForOverheadBox");
-        payForMaintainBox = createCheckBox("PayForMaintainBox");
-        payForTransportBox = createCheckBox("PayForTransportBox");
-        payForRecruitmentBox = createCheckBox("PayForRecruitmentBox");
+        payForPartsBox = new CampaignOptionsCheckBox("PayForPartsBox");
+        payForRepairsBox = new CampaignOptionsCheckBox("PayForRepairsBox");
+        payForUnitsBox = new CampaignOptionsCheckBox("PayForUnitsBox");
+        payForSalariesBox = new CampaignOptionsCheckBox("PayForSalariesBox");
+        payForOverheadBox = new CampaignOptionsCheckBox("PayForOverheadBox");
+        payForMaintainBox = new CampaignOptionsCheckBox("PayForMaintainBox");
+        payForTransportBox = new CampaignOptionsCheckBox("PayForTransportBox");
+        payForRecruitmentBox = new CampaignOptionsCheckBox("PayForRecruitmentBox");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PaymentsPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("PaymentsPanel", true,
             "PaymentsPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -293,7 +293,7 @@ public class FinancesTab {
         pnlShares = createSharesPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("OtherSystemsPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("OtherSystemsPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -320,18 +320,18 @@ public class FinancesTab {
      */
     private JPanel createGeneralOptionsPanel() {
         // Contents
-        useLoanLimitsBox = createCheckBox("UseLoanLimitsBox");
-        usePercentageMaintenanceBox = createCheckBox("UsePercentageMaintenanceBox");
-        useExtendedPartsModifierBox = createCheckBox("UseExtendedPartsModifierBox");
-        usePeacetimeCostBox = createCheckBox("UsePeacetimeCostBox");
-        showPeacetimeCostBox = createCheckBox("ShowPeacetimeCostBox");
+        useLoanLimitsBox = new CampaignOptionsCheckBox("UseLoanLimitsBox");
+        usePercentageMaintenanceBox = new CampaignOptionsCheckBox("UsePercentageMaintenanceBox");
+        useExtendedPartsModifierBox = new CampaignOptionsCheckBox("UseExtendedPartsModifierBox");
+        usePeacetimeCostBox = new CampaignOptionsCheckBox("UsePeacetimeCostBox");
+        showPeacetimeCostBox = new CampaignOptionsCheckBox("ShowPeacetimeCostBox");
 
-        lblFinancialYearDuration = createLabel("FinancialYearDuration", null);
+        lblFinancialYearDuration = new CampaignOptionsLabel("FinancialYearDuration");
 
-        newFinancialYearFinancesToCSVExportBox = createCheckBox("NewFinancialYearFinancesToCSVExportBox");
+        newFinancialYearFinancesToCSVExportBox = new CampaignOptionsCheckBox("NewFinancialYearFinancesToCSVExportBox");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("GeneralOptionsPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("GeneralOptionsPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -371,11 +371,11 @@ public class FinancesTab {
      */
     private JPanel createSalesPanel() {
         // Contents
-        sellUnitsBox = createCheckBox("SellUnitsBox");
-        sellPartsBox = createCheckBox("SellPartsBox");
+        sellUnitsBox = new CampaignOptionsCheckBox("SellUnitsBox");
+        sellPartsBox = new CampaignOptionsCheckBox("SellPartsBox");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("SalesPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("SalesPanel", true,
             "SalesPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -406,14 +406,14 @@ public class FinancesTab {
      */
     private JPanel createTaxesPanel() {
         // Contents
-        chkUseTaxes = createCheckBox("UseTaxesBox");
+        chkUseTaxes = new CampaignOptionsCheckBox("UseTaxesBox");
 
-        lblTaxesPercentage = createLabel("TaxesPercentage", null);
-        spnTaxesPercentage = createSpinner("TaxesPercentage", null,
+        lblTaxesPercentage = new CampaignOptionsLabel("TaxesPercentage");
+        spnTaxesPercentage = new CampaignOptionsSpinner("TaxesPercentage",
             30, 1, 100, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("TaxesPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("TaxesPanel", true,
             "TaxesPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -444,11 +444,11 @@ public class FinancesTab {
      */
     private JPanel createSharesPanel() {
         // Contents
-        chkUseShareSystem = createCheckBox("UseShareSystem");
-        chkSharesForAll = createCheckBox("SharesForAll");
+        chkUseShareSystem = new CampaignOptionsCheckBox("UseShareSystem");
+        chkSharesForAll = new CampaignOptionsCheckBox("SharesForAll");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("SharesPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("SharesPanel", true,
             "SharesPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -510,7 +510,7 @@ public class FinancesTab {
      */
     JPanel createPriceMultipliersTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("PriceMultipliersTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("PriceMultipliersTab",
             getImageDirectory() + "logo_illyrian_palatinate.png",
             true);
 
@@ -520,7 +520,7 @@ public class FinancesTab {
         pnlOtherMultipliers = createOtherMultipliersPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PriceMultipliersTab", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("PriceMultipliersTab", true,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -555,32 +555,32 @@ public class FinancesTab {
      */
     private JPanel createGeneralMultipliersPanel() {
         // Contents
-        lblCommonPartPriceMultiplier = createLabel("CommonPartPriceMultiplier", null);
-        spnCommonPartPriceMultiplier = createSpinner("CommonPartPriceMultiplier", null,
+        lblCommonPartPriceMultiplier = new CampaignOptionsLabel("CommonPartPriceMultiplier");
+        spnCommonPartPriceMultiplier = new CampaignOptionsSpinner("CommonPartPriceMultiplier",
             1.0, 0.1, 100, 0.1);
 
-        lblInnerSphereUnitPriceMultiplier = createLabel("InnerSphereUnitPriceMultiplier", null);
-        spnInnerSphereUnitPriceMultiplier = createSpinner("InnerSphereUnitPriceMultiplier", null,
+        lblInnerSphereUnitPriceMultiplier = new CampaignOptionsLabel("InnerSphereUnitPriceMultiplier");
+        spnInnerSphereUnitPriceMultiplier = new CampaignOptionsSpinner("InnerSphereUnitPriceMultiplier",
             1.0, 0.1, 100, 0.1);
 
-        lblInnerSpherePartPriceMultiplier = createLabel("InnerSpherePartPriceMultiplier", null);
-        spnInnerSpherePartPriceMultiplier = createSpinner("InnerSpherePartPriceMultiplier", null,
+        lblInnerSpherePartPriceMultiplier = new CampaignOptionsLabel("InnerSpherePartPriceMultiplier");
+        spnInnerSpherePartPriceMultiplier = new CampaignOptionsSpinner("InnerSpherePartPriceMultiplier",
             1.0, 0.1, 100, 0.1);
 
-        lblClanUnitPriceMultiplier = createLabel("ClanUnitPriceMultiplier", null);
-        spnClanUnitPriceMultiplier = createSpinner("ClanUnitPriceMultiplier", null,
+        lblClanUnitPriceMultiplier = new CampaignOptionsLabel("ClanUnitPriceMultiplier");
+        spnClanUnitPriceMultiplier = new CampaignOptionsSpinner("ClanUnitPriceMultiplier",
             1.0, 0.1, 100, 0.1);
 
-        lblClanPartPriceMultiplier = createLabel("ClanPartPriceMultiplier", null);
-        spnClanPartPriceMultiplier = createSpinner("ClanPartPriceMultiplier", null,
+        lblClanPartPriceMultiplier = new CampaignOptionsLabel("ClanPartPriceMultiplier");
+        spnClanPartPriceMultiplier = new CampaignOptionsSpinner("ClanPartPriceMultiplier",
             1.0, 0.1, 100, 0.1);
 
-        lblMixedTechUnitPriceMultiplier = createLabel("MixedTechUnitPriceMultiplier", null);
-        spnMixedTechUnitPriceMultiplier = createSpinner("MixedTechUnitPriceMultiplier", null,
+        lblMixedTechUnitPriceMultiplier = new CampaignOptionsLabel("MixedTechUnitPriceMultiplier");
+        spnMixedTechUnitPriceMultiplier = new CampaignOptionsSpinner("MixedTechUnitPriceMultiplier",
             1.0, 0.1, 100, 0.1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("GeneralMultipliersPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("GeneralMultipliersPanel", true,
             "GeneralMultipliersPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -672,7 +672,7 @@ public class FinancesTab {
         }
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("UsedPartsMultiplierPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("UsedPartsMultiplierPanel", true,
             "UsedPartsMultiplierPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -736,20 +736,20 @@ public class FinancesTab {
      */
     private JPanel createOtherMultipliersPanel() {
         // Contents
-        lblDamagedPartsValueMultiplier = createLabel("DamagedPartsValueMultiplier", null);
-        spnDamagedPartsValueMultiplier = createSpinner("DamagedPartsValueMultiplier", null,
+        lblDamagedPartsValueMultiplier = new CampaignOptionsLabel("DamagedPartsValueMultiplier");
+        spnDamagedPartsValueMultiplier = new CampaignOptionsSpinner("DamagedPartsValueMultiplier",
             0.33, 0.00, 1.00, 0.05);
 
-        lblUnrepairablePartsValueMultiplier = createLabel("UnrepairablePartsValueMultiplier", null);
-        spnUnrepairablePartsValueMultiplier = createSpinner("UnrepairablePartsValueMultiplier", null,
+        lblUnrepairablePartsValueMultiplier = new CampaignOptionsLabel("UnrepairablePartsValueMultiplier");
+        spnUnrepairablePartsValueMultiplier = new CampaignOptionsSpinner("UnrepairablePartsValueMultiplier",
             0.10, 0.00, 1.00, 0.05);
 
-        lblCancelledOrderRefundMultiplier = createLabel("CancelledOrderRefundMultiplier", null);
-        spnCancelledOrderRefundMultiplier = createSpinner("CancelledOrderRefundMultiplier", null,
+        lblCancelledOrderRefundMultiplier = new CampaignOptionsLabel("CancelledOrderRefundMultiplier");
+        spnCancelledOrderRefundMultiplier = new CampaignOptionsSpinner("CancelledOrderRefundMultiplier",
             0.50, 0.00, 1.00, 0.05);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("OtherMultipliersPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("OtherMultipliersPanel", true,
             "OtherMultipliersPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);

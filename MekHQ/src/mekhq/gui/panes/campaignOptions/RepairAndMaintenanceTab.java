@@ -116,38 +116,38 @@ public class RepairAndMaintenanceTab {
      */
     JPanel createRepairTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("RepairTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("RepairTab",
             getImageDirectory() + "logo_aurigan_coalition.png", true);
 
         // Era Mods
-        useEraModsCheckBox = createCheckBox("UseEraModsCheckBox");
+        useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
 
         // Tech Placement
-        assignedTechFirstCheckBox = createCheckBox("AssignedTechFirstCheckBox");
-        resetToFirstTechCheckBox = createCheckBox("ResetToFirstTechCheckBox");
+        assignedTechFirstCheckBox = new CampaignOptionsCheckBox("AssignedTechFirstCheckBox");
+        resetToFirstTechCheckBox = new CampaignOptionsCheckBox("ResetToFirstTechCheckBox");
 
         // Use Quirks
-        useQuirksBox = createCheckBox("UseQuirksBox");
+        useQuirksBox = new CampaignOptionsCheckBox("UseQuirksBox");
 
         // Aero System Damage
-        useAeroSystemHitsBox = createCheckBox("UseAeroSystemHitsBox");
+        useAeroSystemHitsBox = new CampaignOptionsCheckBox("UseAeroSystemHitsBox");
 
         // Damage by Margin
-        useDamageMargin = createCheckBox("UseDamageMargin");
+        useDamageMargin = new CampaignOptionsCheckBox("UseDamageMargin");
         useDamageMargin.addActionListener(evt -> spnDamageMargin.setEnabled(useDamageMargin.isSelected()));
 
-        lblDamageMargin = createLabel("DamageMargin");
-        spnDamageMargin = createSpinner("DamageMargin",
+        lblDamageMargin = new CampaignOptionsLabel("DamageMargin");
+        spnDamageMargin = new CampaignOptionsSpinner("DamageMargin",
             1, 1, 20, 1);
 
         // Equipment Survival
-        lblDestroyPartTarget = createLabel("DestroyPartTarget");
-        spnDestroyPartTarget = createSpinner("DestroyPartTarget",
+        lblDestroyPartTarget = new CampaignOptionsLabel("DestroyPartTarget");
+        spnDestroyPartTarget = new CampaignOptionsSpinner("DestroyPartTarget",
             2, 2, 13, 1);
         JLabel lblDestroyPartTargetPost = new JLabel("<html>+</html>");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("repairTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("repairTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -196,47 +196,47 @@ public class RepairAndMaintenanceTab {
      */
     JPanel createMaintenanceTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("MaintenanceTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("MaintenanceTab",
             getImageDirectory() + "logo_clan_blood_spirit.png", true);
 
         // Check Maintenance
-        checkMaintenance = createCheckBox("CheckMaintenance");
+        checkMaintenance = new CampaignOptionsCheckBox("CheckMaintenance");
 
         // Maintenance Cycle Duration
-        lblMaintenanceDays = createLabel("MaintenanceDays");
-        spnDamageMargin = createSpinner("MaintenanceDays",
+        lblMaintenanceDays = new CampaignOptionsLabel("MaintenanceDays");
+        spnDamageMargin = new CampaignOptionsSpinner("MaintenanceDays",
             7, 1, 365, 1);
 
         // Maintenance Bonus
-        lblMaintenanceBonus = createLabel("MaintenanceBonus");
-        spnMaintenanceBonus = createSpinner("MaintenanceBonus",
+        lblMaintenanceBonus = new CampaignOptionsLabel("MaintenanceBonus");
+        spnMaintenanceBonus = new CampaignOptionsSpinner("MaintenanceBonus",
             0, -13, 13, 1);
 
         // Default Maintenance Time
-        lblDefaultMaintenanceTime = createLabel("DefaultMaintenanceTime");
-        spnDefaultMaintenanceTime = createSpinner("DefaultMaintenanceTime",
+        lblDefaultMaintenanceTime = new CampaignOptionsLabel("DefaultMaintenanceTime");
+        spnDefaultMaintenanceTime = new CampaignOptionsSpinner("DefaultMaintenanceTime",
             1, 1, 4, 1);
 
         // Use Quality Modifiers
-        useQualityMaintenance = createCheckBox("UseQualityMaintenance");
+        useQualityMaintenance = new CampaignOptionsCheckBox("UseQualityMaintenance");
 
         // Reverse Quality names
-        reverseQualityNames = createCheckBox("ReverseQualityNames");
+        reverseQualityNames = new CampaignOptionsCheckBox("ReverseQualityNames");
 
         // Use Random Unit Qualities
-        chkUseRandomUnitQualities = createCheckBox("UseRandomUnitQualities");
+        chkUseRandomUnitQualities = new CampaignOptionsCheckBox("UseRandomUnitQualities");
 
         // Use Planetary Modifiers
-        chkUsePlanetaryModifiers = createCheckBox("UsePlanetaryModifiers");
+        chkUsePlanetaryModifiers = new CampaignOptionsCheckBox("UsePlanetaryModifiers");
 
         // Only Damage F-Rated Equipment
-        useUnofficialMaintenance = createCheckBox("UseUnofficialMaintenance");
+        useUnofficialMaintenance = new CampaignOptionsCheckBox("UseUnofficialMaintenance");
 
         // Report Maintenance checks to Log
-        logMaintenance = createCheckBox("LogMaintenance");
+        logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("repairTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("repairTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 

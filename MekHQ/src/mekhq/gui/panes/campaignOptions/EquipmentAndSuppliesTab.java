@@ -215,37 +215,37 @@ public class EquipmentAndSuppliesTab {
      */
     JPanel createAcquisitionTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("AcquisitionTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("AcquisitionTab",
             getImageDirectory() + "logo_calderon_protectorate.png", true);
 
         // Acquisitions skill
-        lblChoiceAcquireSkill = createLabel("ChoiceAcquireSkill");
+        lblChoiceAcquireSkill = new CampaignOptionsLabel("ChoiceAcquireSkill");
 
         // Support personnel only
-        chkSupportStaffOnly = createCheckBox("SupportStaffOnly");
+        chkSupportStaffOnly = new CampaignOptionsCheckBox("SupportStaffOnly");
 
         // Clan Acquisition penalty
-        lblAcquireClanPenalty = createLabel("AcquireClanPenalty");
-        spnAcquireClanPenalty = createSpinner("AcquireClanPenalty",
+        lblAcquireClanPenalty = new CampaignOptionsLabel("AcquireClanPenalty");
+        spnAcquireClanPenalty = new CampaignOptionsSpinner("AcquireClanPenalty",
             0, 0, 13, 1);
 
         // IS Acquisition penalty
-        lblAcquireIsPenalty = createLabel("AcquireISPenalty");
-        spnAcquireIsPenalty = createSpinner("AcquireISPenalty",
+        lblAcquireIsPenalty = new CampaignOptionsLabel("AcquireISPenalty");
+        spnAcquireIsPenalty = new CampaignOptionsSpinner("AcquireISPenalty",
             0, 0, 13, 1);
 
         // Waiting Period
-        lblAcquireWaitingPeriod = createLabel("AcquireWaitingPeriod");
-        spnAcquireWaitingPeriod = createSpinner("AcquireWaitingPeriod",
+        lblAcquireWaitingPeriod = new CampaignOptionsLabel("AcquireWaitingPeriod");
+        spnAcquireWaitingPeriod = new CampaignOptionsSpinner("AcquireWaitingPeriod",
             1, 1, 365, 1);
 
         // Maximum Acquisitions
-        lblMaxAcquisitions = createLabel("MaxAcquisitions");
-        spnMaxAcquisitions = createSpinner("MaxAcquisitions",
+        lblMaxAcquisitions = new CampaignOptionsLabel("MaxAcquisitions");
+        spnMaxAcquisitions = new CampaignOptionsSpinner("MaxAcquisitions",
             0,0, 100, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("acquisitionTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("acquisitionTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -295,7 +295,7 @@ public class EquipmentAndSuppliesTab {
 
     JPanel createPlanetaryAcquisitionTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("PlanetaryAcquisitionTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("PlanetaryAcquisitionTab",
             getImageDirectory() + "logo_capellan_confederation.png", true);
 
         // Sub-Panels
@@ -303,7 +303,7 @@ public class EquipmentAndSuppliesTab {
         JPanel modifiers = createModifiersPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PlanetaryAcquisitionTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -334,29 +334,29 @@ public class EquipmentAndSuppliesTab {
      */
     private JPanel createOptionsPanel() {
         // Use Planetary Acquisitions
-        usePlanetaryAcquisitions = createCheckBox("UsePlanetaryAcquisitions");
+        usePlanetaryAcquisitions = new CampaignOptionsCheckBox("UsePlanetaryAcquisitions");
 
         // Max Jump Distance
-        lblMaxJumpPlanetaryAcquisitions = createLabel("MaxJumpPlanetaryAcquisitions");
-        spnMaxJumpPlanetaryAcquisitions = createSpinner("MaxJumpPlanetaryAcquisitions",
+        lblMaxJumpPlanetaryAcquisitions = new CampaignOptionsLabel("MaxJumpPlanetaryAcquisitions");
+        spnMaxJumpPlanetaryAcquisitions = new CampaignOptionsSpinner("MaxJumpPlanetaryAcquisitions",
             2, 0, 5, 1);
 
         // Faction Limits
-        lblPlanetaryAcquisitionsFactionLimits = createLabel("PlanetaryAcquisitionsFactionLimits");
+        lblPlanetaryAcquisitionsFactionLimits = new CampaignOptionsLabel("PlanetaryAcquisitionsFactionLimits");
 
         // Disallow Resource Sharing (Inner Sphere)
-        disallowPlanetaryAcquisitionClanCrossover = createCheckBox("DisallowPlanetaryAcquisitionClanCrossover");
+        disallowPlanetaryAcquisitionClanCrossover = new CampaignOptionsCheckBox("DisallowPlanetaryAcquisitionClanCrossover");
 
         // Disallow Resource Sharing (Clans)
-        disallowClanPartsFromIS = createCheckBox("DisallowClanPartsFromIS");
+        disallowClanPartsFromIS = new CampaignOptionsCheckBox("DisallowClanPartsFromIS");
 
         // Acquisition Penalty
-        lblPenaltyClanPartsFromIS = createLabel("PenaltyClanPartsFromIS");
-        spnPenaltyClanPartsFromIS = createSpinner("PenaltyClanPartsFromIS",
+        lblPenaltyClanPartsFromIS = new CampaignOptionsLabel("PenaltyClanPartsFromIS");
+        spnPenaltyClanPartsFromIS = new CampaignOptionsSpinner("PenaltyClanPartsFromIS",
             0, 0, 12, 1);
 
         // Verbose Reporting
-        usePlanetaryAcquisitionsVerbose = createCheckBox("UsePlanetaryAcquisitionsVerbose");
+        usePlanetaryAcquisitionsVerbose = new CampaignOptionsCheckBox("UsePlanetaryAcquisitionsVerbose");
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -434,7 +434,7 @@ public class EquipmentAndSuppliesTab {
         pnlOutputModifiers = createOutputModifiersPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PlanetaryAcquisitionTabModifiers",
+        final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTabModifiers",
             true, "ModifiersPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -462,11 +462,11 @@ public class EquipmentAndSuppliesTab {
      * @return the created tab panel as a {@link JPanel}
      */
     private JPanel createTechModifiersPanel() {
-        JLabel techLabel = createLabel("TechLabel");
+        JLabel techLabel = new CampaignOptionsLabel("TechLabel");
         techLabel.setName(String.format("<html><center>%s</center></html", techLabel.getText()));
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("createTechModifiersPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("createTechModifiersPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -523,11 +523,11 @@ public class EquipmentAndSuppliesTab {
      * @return the created tab panel as a {@link JPanel}
      */
     private JPanel createIndustryModifiersPanel() {
-        JLabel industryLabel = createLabel("IndustryLabel");
+        JLabel industryLabel = new CampaignOptionsLabel("IndustryLabel");
         industryLabel.setName(String.format("<html><center>%s</center></html", industryLabel.getText()));
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("IndustryModifiersPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("IndustryModifiersPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -579,11 +579,11 @@ public class EquipmentAndSuppliesTab {
     }
 
     private JPanel createOutputModifiersPanel() {
-        JLabel outputLabel = createLabel("OutputLabel");
+        JLabel outputLabel = new CampaignOptionsLabel("OutputLabel");
         outputLabel.setName(String.format("<html><center>%s</center></html", outputLabel.getText()));
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("OutputModifiersPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("OutputModifiersPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -670,30 +670,30 @@ public class EquipmentAndSuppliesTab {
      */
     JPanel createDeliveryTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("DeliveryTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("DeliveryTab",
             getImageDirectory() + "logo_clan_burrock.png", true);
 
         // Delivery Time
-        lblNDiceTransitTime = createLabel("NDiceTransitTime");
-        spnNDiceTransitTime = createSpinner("NDiceTransitTime", 0,
+        lblNDiceTransitTime = new CampaignOptionsLabel("NDiceTransitTime");
+        spnNDiceTransitTime = new CampaignOptionsSpinner("NDiceTransitTime", 0,
             0, 365, 1);
 
-        lblConstantTransitTime = createLabel("ConstantTransitTime");
-        spnConstantTransitTime = createSpinner("ConstantTransitTime",
+        lblConstantTransitTime = new CampaignOptionsLabel("ConstantTransitTime");
+        spnConstantTransitTime = new CampaignOptionsSpinner("ConstantTransitTime",
             0, 0, 365, 1);
 
         // Margin of Success Reductions
-        lblAcquireMosBonus = createLabel("AcquireMosBonus");
-        spnAcquireMosBonus = createSpinner("AcquireMosBonus",
-            null, 0, 0, 365, 1);
+        lblAcquireMosBonus = new CampaignOptionsLabel("AcquireMosBonus");
+        spnAcquireMosBonus = new CampaignOptionsSpinner("AcquireMosBonus",
+            0, 0, 365, 1);
 
         // Minimum Transit Time
-        lblAcquireMinimum = createLabel("AcquireMinimum");
-        spnAcquireMinimum = createSpinner("AcquireMinimum",
-            null, 0, 0, 365, 1);
+        lblAcquireMinimum = new CampaignOptionsLabel("AcquireMinimum");
+        spnAcquireMinimum = new CampaignOptionsSpinner("AcquireMinimum",
+            0, 0, 365, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("deliveryTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("deliveryTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -793,35 +793,35 @@ public class EquipmentAndSuppliesTab {
      */
     JPanel createTechLimitsTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("TechLimitsTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("TechLimitsTab",
             getImageDirectory() + "logo_clan_cloud_cobra.png", true);
 
         // Limit Parts/Units by Year
-        limitByYearBox = createCheckBox("LimitByYearBox");
+        limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
 
         // Disallow Extinct Units/Parts
-        disallowExtinctStuffBox = createCheckBox("DisallowExtinctStuffBox");
+        disallowExtinctStuffBox = new CampaignOptionsCheckBox("DisallowExtinctStuffBox");
 
         // Allow Clan/Inner Sphere Purchases
-        allowClanPurchasesBox = createCheckBox("AllowClanPurchasesBox");
-        allowISPurchasesBox = createCheckBox("AllowISPurchasesBox");
+        allowClanPurchasesBox = new CampaignOptionsCheckBox("AllowClanPurchasesBox");
+        allowISPurchasesBox = new CampaignOptionsCheckBox("AllowISPurchasesBox");
 
         // Canon Purchases/Refits
-        allowCanonOnlyBox = createCheckBox("AllowCanonOnlyBox");
-        allowCanonRefitOnlyBox = createCheckBox("AllowCanonRefitOnlyBox");
+        allowCanonOnlyBox = new CampaignOptionsCheckBox("AllowCanonOnlyBox");
+        allowCanonRefitOnlyBox = new CampaignOptionsCheckBox("AllowCanonRefitOnlyBox");
 
         // Maximum Tech Level
-        lblChoiceTechLevel = createLabel("ChoiceTechLevel");
+        lblChoiceTechLevel = new CampaignOptionsLabel("ChoiceTechLevel");
         choiceTechLevel = new MMComboBox<>("choiceTechLevel", getMaximumTechLevelOptions());
 
         // Variable Tech Level
-        variableTechLevelBox = createCheckBox("VariableTechLevelBox");
+        variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox");
 
         // Ammo by Type
-        useAmmoByTypeBox = createCheckBox("UseAmmoByTypeBox");
+        useAmmoByTypeBox = new CampaignOptionsCheckBox("UseAmmoByTypeBox");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("TechLimitsTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("TechLimitsTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 

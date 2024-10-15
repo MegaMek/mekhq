@@ -227,19 +227,19 @@ public class TurnoverAndRetentionTab {
      */
     JPanel createTurnoverTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("TurnoverTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("TurnoverTab",
             getImageDirectory() + "logo_clan_jade_falcon.png",
             true);
 
         // Contents
-        chkUseRandomRetirement = createCheckBox("UseRandomRetirement");
+        chkUseRandomRetirement = new CampaignOptionsCheckBox("UseRandomRetirement");
         pnlSettings = createSettingsPanel();
         pnlModifiers = createModifiersPanel();
         pnlPayout = createPayoutsPanel();
         pnlUnitCohesion = createUnitCohesionPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("TurnoverTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("TurnoverTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -285,11 +285,11 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createSettingsPanel() {
         // Contents
-        lblTurnoverFixedTargetNumber = createLabel("TurnoverFixedTargetNumber");
-        spnTurnoverFixedTargetNumber = createSpinner("TurnoverFixedTargetNumber",
+        lblTurnoverFixedTargetNumber = new CampaignOptionsLabel("TurnoverFixedTargetNumber");
+        spnTurnoverFixedTargetNumber = new CampaignOptionsSpinner("TurnoverFixedTargetNumber",
             3, 0, 10, 1);
 
-        lblTurnoverFrequency = createLabel("TurnoverFrequency");
+        lblTurnoverFrequency = new CampaignOptionsLabel("TurnoverFrequency");
         comboTurnoverFrequency.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -303,33 +303,33 @@ public class TurnoverAndRetentionTab {
             }
         });
 
-        chkUseContractCompletionRandomRetirement = createCheckBox(
+        chkUseContractCompletionRandomRetirement = new CampaignOptionsCheckBox(
             "UseContractCompletionRandomRetirement");
 
-        chkUseRandomFounderTurnover = createCheckBox("UseRandomFounderTurnover");
+        chkUseRandomFounderTurnover = new CampaignOptionsCheckBox("UseRandomFounderTurnover");
 
-        chkTrackOriginalUnit = createCheckBox("TrackOriginalUnit");
+        chkTrackOriginalUnit = new CampaignOptionsCheckBox("TrackOriginalUnit");
 
-        chkAeroRecruitsHaveUnits = createCheckBox("AeroRecruitsHaveUnits");
+        chkAeroRecruitsHaveUnits = new CampaignOptionsCheckBox("AeroRecruitsHaveUnits");
 
-        chkUseSubContractSoldiers = createCheckBox("UseSubContractSoldiers");
+        chkUseSubContractSoldiers = new CampaignOptionsCheckBox("UseSubContractSoldiers");
 
-        lblServiceContractDuration = createLabel("ServiceContractDuration");
-        spnServiceContractDuration = createSpinner("ServiceContractDuration",
+        lblServiceContractDuration = new CampaignOptionsLabel("ServiceContractDuration");
+        spnServiceContractDuration = new CampaignOptionsSpinner("ServiceContractDuration",
             36, 0, 120, 1);
 
-        lblServiceContractModifier = createLabel("ServiceContractModifier");
-        spnServiceContractModifier = createSpinner("ServiceContractModifier",
+        lblServiceContractModifier = new CampaignOptionsLabel("ServiceContractModifier");
+        spnServiceContractModifier = new CampaignOptionsSpinner("ServiceContractModifier",
             3, 0, 10, 1);
 
-        chkPayBonusDefault = createCheckBox("PayBonusDefault");
+        chkPayBonusDefault = new CampaignOptionsCheckBox("PayBonusDefault");
 
-        lblPayBonusDefaultThreshold = createLabel("PayBonusDefaultThreshold");
-        spnPayBonusDefaultThreshold = createSpinner("PayBonusDefaultThreshold",
+        lblPayBonusDefaultThreshold = new CampaignOptionsLabel("PayBonusDefaultThreshold");
+        spnPayBonusDefaultThreshold = new CampaignOptionsSpinner("PayBonusDefaultThreshold",
             3, 0, 12, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("SettingsPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("SettingsPanel", true,
             "SettingsPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -405,21 +405,21 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createModifiersPanel() {
         // Contents
-        chkUseCustomRetirementModifiers = createCheckBox("UseCustomRetirementModifiers");
-        chkUseFatigueModifiers = createCheckBox("UseFatigueModifiers");
-        chkUseSkillModifiers = createCheckBox("UseSkillModifiers");
-        chkUseAgeModifiers = createCheckBox("UseAgeModifiers");
-        chkUseUnitRatingModifiers = createCheckBox("UseUnitRatingModifiers");
-        chkUseFactionModifiers = createCheckBox("UseFactionModifiers");
-        chkUseMissionStatusModifiers = createCheckBox("UseMissionStatusModifiers");
-        chkUseHostileTerritoryModifiers = createCheckBox("UseHostileTerritoryModifiers");
-        chkUseFamilyModifiers = createCheckBox("UseFamilyModifiers");
-        chkUseLoyaltyModifiers = createCheckBox("UseLoyaltyModifiers");
-        chkUseHideLoyalty = createCheckBox("UseHideLoyalty");
+        chkUseCustomRetirementModifiers = new CampaignOptionsCheckBox("UseCustomRetirementModifiers");
+        chkUseFatigueModifiers = new CampaignOptionsCheckBox("UseFatigueModifiers");
+        chkUseSkillModifiers = new CampaignOptionsCheckBox("UseSkillModifiers");
+        chkUseAgeModifiers = new CampaignOptionsCheckBox("UseAgeModifiers");
+        chkUseUnitRatingModifiers = new CampaignOptionsCheckBox("UseUnitRatingModifiers");
+        chkUseFactionModifiers = new CampaignOptionsCheckBox("UseFactionModifiers");
+        chkUseMissionStatusModifiers = new CampaignOptionsCheckBox("UseMissionStatusModifiers");
+        chkUseHostileTerritoryModifiers = new CampaignOptionsCheckBox("UseHostileTerritoryModifiers");
+        chkUseFamilyModifiers = new CampaignOptionsCheckBox("UseFamilyModifiers");
+        chkUseLoyaltyModifiers = new CampaignOptionsCheckBox("UseLoyaltyModifiers");
+        chkUseHideLoyalty = new CampaignOptionsCheckBox("UseHideLoyalty");
 
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("TurnoverModifiersPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("TurnoverModifiersPanel", true,
             "ModifiersPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -472,26 +472,26 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createPayoutsPanel() {
         // Contents
-        lblPayoutRateOfficer = createLabel("PayoutRateOfficer");
-        spnPayoutRateOfficer = createSpinner("PayoutRateOfficer",
+        lblPayoutRateOfficer = new CampaignOptionsLabel("PayoutRateOfficer");
+        spnPayoutRateOfficer = new CampaignOptionsSpinner("PayoutRateOfficer",
             3, 0, 12, 1);
 
-        lblPayoutRateEnlisted = createLabel("PayoutRateEnlisted");
-        spnPayoutRateEnlisted = createSpinner("PayoutRateEnlisted",
+        lblPayoutRateEnlisted = new CampaignOptionsLabel("PayoutRateEnlisted");
+        spnPayoutRateEnlisted = new CampaignOptionsSpinner("PayoutRateEnlisted",
             3, 0, 12, 1);
 
-        lblPayoutRetirementMultiplier = createLabel("PayoutRetirementMultiplier");
-        spnPayoutRetirementMultiplier = createSpinner("PayoutRetirementMultiplier",
+        lblPayoutRetirementMultiplier = new CampaignOptionsLabel("PayoutRetirementMultiplier");
+        spnPayoutRetirementMultiplier = new CampaignOptionsSpinner("PayoutRetirementMultiplier",
             24, 1, 120, 1);
 
-        chkUsePayoutServiceBonus = createCheckBox("UsePayoutServiceBonus");
+        chkUsePayoutServiceBonus = new CampaignOptionsCheckBox("UsePayoutServiceBonus");
 
-        lblPayoutServiceBonusRate = createLabel("PayoutServiceBonusRate");
-        spnPayoutServiceBonusRate = createSpinner("PayoutServiceBonusRate",
+        lblPayoutServiceBonusRate = new CampaignOptionsLabel("PayoutServiceBonusRate");
+        spnPayoutServiceBonusRate = new CampaignOptionsSpinner("PayoutServiceBonusRate",
             10, 1, 100, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PayoutsPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("PayoutsPanel", true,
             "PayoutsPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -552,7 +552,7 @@ public class TurnoverAndRetentionTab {
         pnlManagementSkillWrapper = createManagementSkillWrapperPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("UnitCohesionPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("UnitCohesionPanel", true,
             "UnitCohesionPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -586,11 +586,11 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createAdministrativeStrainWrapperPanel() {
         // Contents
-        chkUseAdministrativeStrain = createCheckBox("UseAdministrativeStrain");
+        chkUseAdministrativeStrain = new CampaignOptionsCheckBox("UseAdministrativeStrain");
         pnlAdministrativeStrain = createAdministrativeStrainPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AdministrativeStrainPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrainPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -622,16 +622,16 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createAdministrativeStrainPanel() {
         // Contents
-        lblAdministrativeCapacity = createLabel("AdministrativeCapacity");
-        spnAdministrativeCapacity = createSpinner("AdministrativeCapacity",
+        lblAdministrativeCapacity = new CampaignOptionsLabel("AdministrativeCapacity");
+        spnAdministrativeCapacity = new CampaignOptionsSpinner("AdministrativeCapacity",
             10, 1, 30, 1);
 
-        lblMultiCrewStrainDivider = createLabel("MultiCrewStrainDivider");
-        spnMultiCrewStrainDivider = createSpinner("MultiCrewStrainDivider",
+        lblMultiCrewStrainDivider = new CampaignOptionsLabel("MultiCrewStrainDivider");
+        spnMultiCrewStrainDivider = new CampaignOptionsSpinner("MultiCrewStrainDivider",
             5, 1, 25, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AdministrativeStrain", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrain", true,
             "AdministrativeStrain");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -673,11 +673,11 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createManagementSkillWrapperPanel() {
         // Contents
-        chkUseManagementSkill = createCheckBox("UseManagementSkill");
+        chkUseManagementSkill = new CampaignOptionsCheckBox("UseManagementSkill");
         pnlManagementSkill = createManagementSkillPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("UnitCohesionPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("UnitCohesionPanel", false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -710,14 +710,14 @@ public class TurnoverAndRetentionTab {
      */
     private JPanel createManagementSkillPanel() {
         // Contents
-        chkUseCommanderLeadershipOnly = createCheckBox("UseCommanderLeadershipOnly");
+        chkUseCommanderLeadershipOnly = new CampaignOptionsCheckBox("UseCommanderLeadershipOnly");
 
-        lblManagementSkillPenalty = createLabel("ManagementSkillPenalty");
-        spnManagementSkillPenalty = createSpinner("ManagementSkillPenalty",
+        lblManagementSkillPenalty = new CampaignOptionsLabel("ManagementSkillPenalty");
+        spnManagementSkillPenalty = new CampaignOptionsSpinner("ManagementSkillPenalty",
             0, -10, 10, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("ManagementSkill", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("ManagementSkill", true,
             "ManagementSkill");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -755,31 +755,31 @@ public class TurnoverAndRetentionTab {
      */
     JPanel createFatigueTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("FatigueTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("FatigueTab",
             getImageDirectory() + "logo_free_rasalhague_republic.png",
             true);
 
         // Contents
-        chkUseFatigue = createCheckBox("UseFatigue");
+        chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
 
-        lblFatigueRate = createLabel("FatigueRate");
-        spnFatigueRate = createSpinner("FatigueRate",
+        lblFatigueRate = new CampaignOptionsLabel("FatigueRate");
+        spnFatigueRate = new CampaignOptionsSpinner("FatigueRate",
             1, 1, 10, 1);
 
-        chkUseInjuryFatigue = createCheckBox("UseInjuryFatigue");
+        chkUseInjuryFatigue = new CampaignOptionsCheckBox("UseInjuryFatigue");
 
-        lblFieldKitchenCapacity = createLabel("FieldKitchenCapacity");
-        spnFieldKitchenCapacity = createSpinner("FieldKitchenCapacity",
+        lblFieldKitchenCapacity = new CampaignOptionsLabel("FieldKitchenCapacity");
+        spnFieldKitchenCapacity = new CampaignOptionsSpinner("FieldKitchenCapacity",
             150, 0, 450, 1);
 
-        chkFieldKitchenIgnoreNonCombatants = createCheckBox("FieldKitchenIgnoreNonCombatants");
+        chkFieldKitchenIgnoreNonCombatants = new CampaignOptionsCheckBox("FieldKitchenIgnoreNonCombatants");
 
-        lblFatigueLeaveThreshold = createLabel("FatigueLeaveThreshold");
-        spnFatigueLeaveThreshold = createSpinner("FatigueLeaveThreshold",
+        lblFatigueLeaveThreshold = new CampaignOptionsLabel("FatigueLeaveThreshold");
+        spnFatigueLeaveThreshold = new CampaignOptionsSpinner("FatigueLeaveThreshold",
             13, 0, 17, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("FatigueTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("FatigueTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 

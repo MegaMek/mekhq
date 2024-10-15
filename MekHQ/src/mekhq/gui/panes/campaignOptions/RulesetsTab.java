@@ -188,23 +188,23 @@ public class RulesetsTab {
 
     private void substantializeUniversalOptions() {
         // General
-        lblSkillLevel = createLabel("SkillLevel");
+        lblSkillLevel = new CampaignOptionsLabel("SkillLevel");
         comboSkillLevel.setToolTipText(resources.getString("lblSkillLevel.tooltip"));
 
         // OpFor Generation
         pnlUnitRatioPanel = createUniversalUnitRatioPanel();
 
-        chkUseDropShips = createCheckBox("UseDropShips");
-        chkOpForUsesVTOLs = createCheckBox("OpForUsesVTOLs");
-        chkClanVehicles = createCheckBox("ClanVehicles");
-        chkRegionalMekVariations = createCheckBox("RegionalMekVariations");
+        chkUseDropShips = new CampaignOptionsCheckBox("UseDropShips");
+        chkOpForUsesVTOLs = new CampaignOptionsCheckBox("OpForUsesVTOLs");
+        chkClanVehicles = new CampaignOptionsCheckBox("ClanVehicles");
+        chkRegionalMekVariations = new CampaignOptionsCheckBox("RegionalMekVariations");
 
-        chkAttachedPlayerCamouflage = createCheckBox("AttachedPlayerCamouflage");
-        chkPlayerControlsAttachedUnits = createCheckBox("PlayerControlsAttachedUnits");
-        lblSPAUpgradeIntensity = createLabel("SPAUpgradeIntensity");
-        spnSPAUpgradeIntensity = createSpinner("SPAUpgradeIntensity",
+        chkAttachedPlayerCamouflage = new CampaignOptionsCheckBox("AttachedPlayerCamouflage");
+        chkPlayerControlsAttachedUnits = new CampaignOptionsCheckBox("PlayerControlsAttachedUnits");
+        lblSPAUpgradeIntensity = new CampaignOptionsLabel("SPAUpgradeIntensity");
+        spnSPAUpgradeIntensity = new CampaignOptionsSpinner("SPAUpgradeIntensity",
             0, -1, 3, 1);
-        chkAutoConfigMunitions = createCheckBox("AutoConfigMunitions");
+        chkAutoConfigMunitions = new CampaignOptionsCheckBox("AutoConfigMunitions");
 
         // Other
         pnlScenarioModifiers = createUniversalModifiersPanel();
@@ -228,7 +228,7 @@ public class RulesetsTab {
 
     private JPanel createUniversalScenarioGenerationPanel() {
         // Layout the panel
-        final JPanel panel = createStandardPanel("UniversalScenarioGenerationPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("UniversalScenarioGenerationPanel", true,
             "UniversalScenarioGenerationPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -268,18 +268,18 @@ public class RulesetsTab {
 
     private JPanel createUniversalUnitRatioPanel() {
         // Content
-        lblOpForLanceTypeMeks = createLabel("OpForLanceTypeMeks");
-        spnOpForLanceTypeMeks = createSpinner("OpForLanceTypeMeks",
+        lblOpForLanceTypeMeks = new CampaignOptionsLabel("OpForLanceTypeMeks");
+        spnOpForLanceTypeMeks = new CampaignOptionsSpinner("OpForLanceTypeMeks",
             0, 0, 10, 1);
-        lblOpForLanceTypeMixed = createLabel("OpForLanceTypeMixed");
-        spnOpForLanceTypeMixed = createSpinner("OpForLanceTypeMixed",
+        lblOpForLanceTypeMixed = new CampaignOptionsLabel("OpForLanceTypeMixed");
+        spnOpForLanceTypeMixed = new CampaignOptionsSpinner("OpForLanceTypeMixed",
             0, 0, 10, 1);
-        lblOpForLanceTypeVehicle = createLabel("OpForLanceTypeVehicle");
-        spnOpForLanceTypeVehicles = createSpinner("OpForLanceTypeVehicle",
+        lblOpForLanceTypeVehicle = new CampaignOptionsLabel("OpForLanceTypeVehicle");
+        spnOpForLanceTypeVehicles = new CampaignOptionsSpinner("OpForLanceTypeVehicle",
             0, 0, 10, 1);
 
         // Layout the panel
-        final JPanel panel = createStandardPanel("UniversalUnitRatioPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("UniversalUnitRatioPanel", true,
             "UniversalUnitRatioPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -309,18 +309,18 @@ public class RulesetsTab {
 
     private JPanel createUniversalModifiersPanel() {
         //Content
-        lblScenarioModMax = createLabel("ScenarioModMax");
-        spnScenarioModMax = createSpinner("ScenarioModMax",
+        lblScenarioModMax = new CampaignOptionsLabel("ScenarioModMax");
+        spnScenarioModMax = new CampaignOptionsSpinner("ScenarioModMax",
             3, 0, 10, 1);
-        lblScenarioModChance = createLabel("ScenarioModChance");
-        spnScenarioModChance = createSpinner("ScenarioModChance",
+        lblScenarioModChance = new CampaignOptionsLabel("ScenarioModChance");
+        spnScenarioModChance = new CampaignOptionsSpinner("ScenarioModChance",
             25, 5, 100, 5);
-        lblScenarioModBV = createLabel("ScenarioModBV");
-        spnScenarioModBV = createSpinner("ScenarioModBV",
+        lblScenarioModBV = new CampaignOptionsLabel("ScenarioModBV");
+        spnScenarioModBV = new CampaignOptionsSpinner("ScenarioModBV",
             50, 5, 100, 5);
 
         // Layout the panel
-        final JPanel panel = createStandardPanel("UniversalModifiersPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("UniversalModifiersPanel", true,
             "UniversalModifiersPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -354,15 +354,15 @@ public class RulesetsTab {
 
     private JPanel createUniversalMapGenerationPanel() {
         // Content
-        chkUseWeatherConditions = createCheckBox("UseWeatherConditions");
-        chkUseLightConditions = createCheckBox("UseLightConditions");
-        chkUsePlanetaryConditions = createCheckBox("UsePlanetaryConditions");
-        lblFixedMapChance = createLabel("FixedMapChance");
-        spnFixedMapChance = createSpinner("FixedMapChance",
+        chkUseWeatherConditions = new CampaignOptionsCheckBox("UseWeatherConditions");
+        chkUseLightConditions = new CampaignOptionsCheckBox("UseLightConditions");
+        chkUsePlanetaryConditions = new CampaignOptionsCheckBox("UsePlanetaryConditions");
+        lblFixedMapChance = new CampaignOptionsLabel("FixedMapChance");
+        spnFixedMapChance = new CampaignOptionsSpinner("FixedMapChance",
             0, 0, 100, 1);
 
         // Layout the panel
-        final JPanel panel = createStandardPanel("UniversalMapGenerationPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("UniversalMapGenerationPanel", true,
             "UniversalMapGenerationPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -390,7 +390,7 @@ public class RulesetsTab {
 
     private JPanel createUniversalCampaignOptionsPanel() {
         // Layout the panel
-        final JPanel panel = createStandardPanel("UniversalCampaignOptionsPanel", false,
+        final JPanel panel = new CampaignOptionsStandardPanel("UniversalCampaignOptionsPanel", false,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -410,16 +410,16 @@ public class RulesetsTab {
 
     private JPanel createUniversalPartsPanel() {
         // Content
-        chkRestrictPartsByMission = createCheckBox("RestrictPartsByMission");
-        lblBonusPartExchangeValue = createLabel("BonusPartExchangeValue");
-        spnBonusPartExchangeValue = createSpinner("BonusPartExchangeValue",
+        chkRestrictPartsByMission = new CampaignOptionsCheckBox("RestrictPartsByMission");
+        lblBonusPartExchangeValue = new CampaignOptionsLabel("BonusPartExchangeValue");
+        spnBonusPartExchangeValue = new CampaignOptionsSpinner("BonusPartExchangeValue",
             500000, 0, 1000000, 1);
-        lblBonusPartMaxExchangeCount = createLabel("BonusPartMaxExchangeCount");
-        spnBonusPartMaxExchangeCount = createSpinner("BonusPartMaxExchangeCount",
+        lblBonusPartMaxExchangeCount = new CampaignOptionsLabel("BonusPartMaxExchangeCount");
+        spnBonusPartMaxExchangeCount = new CampaignOptionsSpinner("BonusPartMaxExchangeCount",
             10, 0, 100, 1);
 
         // Layout the panel
-        final JPanel panel = createStandardPanel("UniversalPartsPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("UniversalPartsPanel", true,
             "UniversalPartsPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -449,19 +449,19 @@ public class RulesetsTab {
 
     private JPanel createUniversalLancePanel() {
         // Content
-        chkLimitLanceWeight = createCheckBox("LimitLanceWeight");
-        chkLimitLanceNumUnits = createCheckBox("LimitLanceNumUnits");
-        chkUseStrategy = createCheckBox("UseStrategy");
-        lblBaseStrategyDeployment = createLabel("BaseStrategyDeployment");
-        spnBaseStrategyDeployment = createSpinner("BaseStrategyDeployment",
+        chkLimitLanceWeight = new CampaignOptionsCheckBox("LimitLanceWeight");
+        chkLimitLanceNumUnits = new CampaignOptionsCheckBox("LimitLanceNumUnits");
+        chkUseStrategy = new CampaignOptionsCheckBox("UseStrategy");
+        lblBaseStrategyDeployment = new CampaignOptionsLabel("BaseStrategyDeployment");
+        spnBaseStrategyDeployment = new CampaignOptionsSpinner("BaseStrategyDeployment",
             0, 0, 10, 1);
-        lblAdditionalStrategyDeployment = createLabel("AdditionalStrategyDeployment");
-        spnAdditionalStrategyDeployment = createSpinner("AdditionalStrategyDeployment",
+        lblAdditionalStrategyDeployment = new CampaignOptionsLabel("AdditionalStrategyDeployment");
+        spnAdditionalStrategyDeployment = new CampaignOptionsSpinner("AdditionalStrategyDeployment",
             0, 0, 10, 1);
-        chkAdjustPaymentForStrategy = createCheckBox("AdjustPaymentForStrategy");
+        chkAdjustPaymentForStrategy = new CampaignOptionsCheckBox("AdjustPaymentForStrategy");
 
         // Layout the panel
-        final JPanel panel = createStandardPanel("UniversalLancePanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("UniversalLancePanel", true,
             "UniversalLancePanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -503,17 +503,17 @@ public class RulesetsTab {
 
     JPanel createStratConTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("StratConTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("StratConTab",
             getImageDirectory() + "logo_lyran_alliance.png",
             true);
 
         // Content
-        chkUseStratCon = createCheckBox("UseStratCon");
-        chkUseGenericBattleValue = createCheckBox("UseGenericBattleValue");
-        chkUseVerboseBidding = createCheckBox("UseVerboseBidding");
+        chkUseStratCon = new CampaignOptionsCheckBox("UseStratCon");
+        chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
+        chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("StratConTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("StratConTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -579,16 +579,16 @@ public class RulesetsTab {
 
     JPanel createLegacyTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("LegacyTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("LegacyTab",
             getImageDirectory() + "logo_clan_snow_raven.png",
             true);
 
-        chkUseAtB = createCheckBox("UseAtB");
+        chkUseAtB = new CampaignOptionsCheckBox("UseAtB");
         pnlLegacyOpForGenerationPanel = createLegacyOpForGenerationPanel();
         pnlLegacyScenarioGenerationPanel = createLegacyScenarioGenerationPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("LegacyTab", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("LegacyTab", true,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -615,17 +615,17 @@ public class RulesetsTab {
 
     private JPanel createLegacyOpForGenerationPanel() {
         // Content
-        chkUseVehicles = createCheckBox("UseVehicles");
-        chkDoubleVehicles = createCheckBox("DoubleVehicles");
-        chkOpForUsesAero = createCheckBox("OpForUsesAero");
-        lblOpForAeroChance = createLabel("OpForAeroChance");
-        spnOpForAeroChance = createSpinner("OpForAeroChance",
+        chkUseVehicles = new CampaignOptionsCheckBox("UseVehicles");
+        chkDoubleVehicles = new CampaignOptionsCheckBox("DoubleVehicles");
+        chkOpForUsesAero = new CampaignOptionsCheckBox("OpForUsesAero");
+        lblOpForAeroChance = new CampaignOptionsLabel("OpForAeroChance");
+        spnOpForAeroChance = new CampaignOptionsSpinner("OpForAeroChance",
             0, 0, 6, 1);
-        chkOpForUsesLocalForces = createCheckBox("OpForUsesLocalForces");
-        chkAdjustPlayerVehicles = createCheckBox("AdjustPlayerVehicles");
+        chkOpForUsesLocalForces = new CampaignOptionsCheckBox("OpForUsesLocalForces");
+        chkAdjustPlayerVehicles = new CampaignOptionsCheckBox("AdjustPlayerVehicles");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("LegacyOpForGenerationPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("LegacyOpForGenerationPanel", true,
             "LegacyOpForGenerationPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -657,9 +657,9 @@ public class RulesetsTab {
 
     private JPanel createLegacyScenarioGenerationPanel() {
         // Content
-        chkGenerateChases = createCheckBox("GenerateChases");
-        lblIntensity = createLabel("AtBBattleIntensity");
-        spnAtBBattleIntensity = createSpinner("AtBBattleIntensity",
+        chkGenerateChases = new CampaignOptionsCheckBox("GenerateChases");
+        lblIntensity = new CampaignOptionsLabel("AtBBattleIntensity");
+        spnAtBBattleIntensity = new CampaignOptionsSpinner("AtBBattleIntensity",
             0.0, 0.0, 100.0, 0.1);
 
         lblFightChance = new JLabel(AtBLanceRole.FIGHTING.toString());
@@ -673,10 +673,10 @@ public class RulesetsTab {
                 new SpinnerNumberModel(0, 0, 100, 1));
         }
 
-        btnIntensityUpdate = createButton("IntensityUpdate");
+        btnIntensityUpdate = new CampaignOptionsButton("IntensityUpdate");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("LegacyScenarioGenerationPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel", true,
             "LegacyScenarioGenerationPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);

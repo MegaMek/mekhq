@@ -208,7 +208,7 @@ public class RelationshipsTab {
      */
     JPanel createMarriageTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("MarriageTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("MarriageTab",
             getImageDirectory() + "logo_federated_commonwealth.png",
             true);
 
@@ -217,7 +217,7 @@ public class RelationshipsTab {
         pnlRandomMarriage = createRandomMarriagePanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("MarriageTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("MarriageTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -248,22 +248,22 @@ public class RelationshipsTab {
      */
     private JPanel createMarriageGeneralOptionsPanel() {
         // Contents
-        chkUseManualMarriages = createCheckBox("UseManualMarriages");
-        chkUseClanPersonnelMarriages = createCheckBox("UseClanPersonnelMarriages");
-        chkUsePrisonerMarriages = createCheckBox("UsePrisonerMarriages");
+        chkUseManualMarriages = new CampaignOptionsCheckBox("UseManualMarriages");
+        chkUseClanPersonnelMarriages = new CampaignOptionsCheckBox("UseClanPersonnelMarriages");
+        chkUsePrisonerMarriages = new CampaignOptionsCheckBox("UsePrisonerMarriages");
 
-        lblNoInterestInMarriageDiceSize = createLabel("NoInterestInMarriageDiceSize");
-        spnNoInterestInMarriageDiceSize = createSpinner("NoInterestInMarriageDiceSize",
+        lblNoInterestInMarriageDiceSize = new CampaignOptionsLabel("NoInterestInMarriageDiceSize");
+        spnNoInterestInMarriageDiceSize = new CampaignOptionsSpinner("NoInterestInMarriageDiceSize",
             10, 1, 100000, 1);
 
-        lblCheckMutualAncestorsDepth = createLabel("CheckMutualAncestorsDepth");
-        spnCheckMutualAncestorsDepth = createSpinner("CheckMutualAncestorsDepth",
+        lblCheckMutualAncestorsDepth = new CampaignOptionsLabel("CheckMutualAncestorsDepth");
+        spnCheckMutualAncestorsDepth = new CampaignOptionsSpinner("CheckMutualAncestorsDepth",
             4, 0, 20, 1);
 
-        chkLogMarriageNameChanges = createCheckBox("LogMarriageNameChanges");
+        chkLogMarriageNameChanges = new CampaignOptionsCheckBox("LogMarriageNameChanges");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("MarriageGeneralOptionsPanel",
+        final JPanel panel = new CampaignOptionsStandardPanel("MarriageGeneralOptionsPanel",
             false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -310,7 +310,7 @@ public class RelationshipsTab {
      */
     private JPanel createRandomMarriagePanel() {
         // Contents
-        lblRandomMarriageMethod = createLabel("RandomMarriageMethod");
+        lblRandomMarriageMethod = new CampaignOptionsLabel("RandomMarriageMethod");
         comboRandomMarriageMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -324,17 +324,17 @@ public class RelationshipsTab {
             }
         });
 
-        chkUseRandomClanPersonnelMarriages = createCheckBox("UseRandomClanPersonnelMarriages");
-        chkUseRandomPrisonerMarriages = createCheckBox("UseRandomPrisonerMarriages");
+        chkUseRandomClanPersonnelMarriages = new CampaignOptionsCheckBox("UseRandomClanPersonnelMarriages");
+        chkUseRandomPrisonerMarriages = new CampaignOptionsCheckBox("UseRandomPrisonerMarriages");
 
-        lblRandomMarriageAgeRange = createLabel("RandomMarriageAgeRange");
-        spnRandomMarriageAgeRange = createSpinner("RandomMarriageAgeRange",
+        lblRandomMarriageAgeRange = new CampaignOptionsLabel("RandomMarriageAgeRange");
+        spnRandomMarriageAgeRange = new CampaignOptionsSpinner("RandomMarriageAgeRange",
             10, 0, 100, 1.0);
 
         pnlPercentageRandomMarriage = createPercentageRandomMarriagePanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("RandomMarriages", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("RandomMarriages", true,
             "RandomMarriages");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -378,21 +378,20 @@ public class RelationshipsTab {
      */
     private JPanel createPercentageRandomMarriagePanel() {
         // Contents
-        lblRandomMarriageOppositeSexDiceSize = createLabel("RandomMarriageOppositeSexDiceSize",
-            null);
-        spnRandomMarriageDiceSize = createSpinner("RandomMarriageOppositeSexDiceSize",
-            null, 5000, 0, 100000, 1);
+        lblRandomMarriageOppositeSexDiceSize = new CampaignOptionsLabel("RandomMarriageOppositeSexDiceSize");
+        spnRandomMarriageDiceSize = new CampaignOptionsSpinner("RandomMarriageOppositeSexDiceSize",
+            5000, 0, 100000, 1);
 
-        lblRandomSameSexMarriageDiceSize = createLabel("RandomSameSexMarriageDiceSize");
-        spnRandomSameSexMarriageDiceSize = createSpinner("RandomSameSexMarriageDiceSize",
-            null, 14, 0, 100000, 1);
+        lblRandomSameSexMarriageDiceSize = new CampaignOptionsLabel("RandomSameSexMarriageDiceSize");
+        spnRandomSameSexMarriageDiceSize = new CampaignOptionsSpinner("RandomSameSexMarriageDiceSize",
+            14, 0, 100000, 1);
 
-        lblRandomNewDependentMarriage = createLabel("RandomNewDependentMarriage");
-        spnRandomNewDependentMarriage = createSpinner("RandomSameSexMarriageDiceSize",
-            null, 20, 0, 100000, 1);
+        lblRandomNewDependentMarriage = new CampaignOptionsLabel("RandomNewDependentMarriage");
+        spnRandomNewDependentMarriage = new CampaignOptionsSpinner("RandomSameSexMarriageDiceSize",
+            20, 0, 100000, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PercentageRandomMarriagePanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("PercentageRandomMarriagePanel", true,
             "PercentageRandomMarriagePanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -437,19 +436,19 @@ public class RelationshipsTab {
      */
     JPanel createDivorceTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("DivorceTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("DivorceTab",
             getImageDirectory() + "logo_clan_hells_horses.png",
             true);
 
         // Contents
-        chkUseManualDivorce = createCheckBox("UseManualDivorce");
-        chkUseClanPersonnelDivorce = createCheckBox("UseClanPersonnelDivorce");
-        chkUsePrisonerDivorce = createCheckBox("UsePrisonerDivorce");
+        chkUseManualDivorce = new CampaignOptionsCheckBox("UseManualDivorce");
+        chkUseClanPersonnelDivorce = new CampaignOptionsCheckBox("UseClanPersonnelDivorce");
+        chkUsePrisonerDivorce = new CampaignOptionsCheckBox("UsePrisonerDivorce");
 
         pnlRandomDivorce = createRandomDivorcePanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("DivorceTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("DivorceTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -482,7 +481,7 @@ public class RelationshipsTab {
      */
     private JPanel createRandomDivorcePanel() {
         // Contents
-        lblRandomDivorceMethod = createLabel("RandomDivorceMethod");
+        lblRandomDivorceMethod = new CampaignOptionsLabel("RandomDivorceMethod");
         comboRandomDivorceMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -496,17 +495,17 @@ public class RelationshipsTab {
             }
         });
 
-        chkUseRandomOppositeSexDivorce = createCheckBox("UseRandomOppositeSexDivorce");
-        chkUseRandomSameSexDivorce = createCheckBox("UseRandomSameSexDivorce");
-        chkUseRandomClanPersonnelDivorce = createCheckBox("UseRandomClanPersonnelDivorce");
-        chkUseRandomPrisonerDivorce = createCheckBox("UseRandomPrisonerDivorce");
+        chkUseRandomOppositeSexDivorce = new CampaignOptionsCheckBox("UseRandomOppositeSexDivorce");
+        chkUseRandomSameSexDivorce = new CampaignOptionsCheckBox("UseRandomSameSexDivorce");
+        chkUseRandomClanPersonnelDivorce = new CampaignOptionsCheckBox("UseRandomClanPersonnelDivorce");
+        chkUseRandomPrisonerDivorce = new CampaignOptionsCheckBox("UseRandomPrisonerDivorce");
 
-        lblRandomDivorceDiceSize = createLabel("RandomDivorceDiceSize");
-        spnRandomDivorceDiceSize = createSpinner("RandomDivorceDiceSize",
+        lblRandomDivorceDiceSize = new CampaignOptionsLabel("RandomDivorceDiceSize");
+        spnRandomDivorceDiceSize = new CampaignOptionsSpinner("RandomDivorceDiceSize",
             900, 0, 100000, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("RandomDivorcePanel", true, "RandomDivorcePanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("RandomDivorcePanel", true, "RandomDivorcePanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -550,7 +549,7 @@ public class RelationshipsTab {
      */
     JPanel createProcreationTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("ProcreationTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("ProcreationTab",
             getImageDirectory() + "logo_clan_ice_hellion.png",
             true);
 
@@ -559,7 +558,7 @@ public class RelationshipsTab {
         pnlRandomProcreationPanel = createRandomProcreationPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("ProcreationTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("ProcreationTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -588,15 +587,15 @@ public class RelationshipsTab {
      */
     private JPanel createProcreationGeneralOptionsPanel() {
         // Contents
-        chkUseManualProcreation = createCheckBox("UseManualProcreation");
-        chkUseClanPersonnelProcreation = createCheckBox("UseClanPersonnelProcreation");
-        chkUsePrisonerProcreation = createCheckBox("UsePrisonerProcreation");
+        chkUseManualProcreation = new CampaignOptionsCheckBox("UseManualProcreation");
+        chkUseClanPersonnelProcreation = new CampaignOptionsCheckBox("UseClanPersonnelProcreation");
+        chkUsePrisonerProcreation = new CampaignOptionsCheckBox("UsePrisonerProcreation");
 
-        lblMultiplePregnancyOccurrences = createLabel("MultiplePregnancyOccurrences");
-        spnMultiplePregnancyOccurrences = createSpinner("MultiplePregnancyOccurrences",
+        lblMultiplePregnancyOccurrences = new CampaignOptionsLabel("MultiplePregnancyOccurrences");
+        spnMultiplePregnancyOccurrences = new CampaignOptionsSpinner("MultiplePregnancyOccurrences",
             50, 1, 1000, 1);
 
-        lblBabySurnameStyle = createLabel("BabySurnameStyle");
+        lblBabySurnameStyle = new CampaignOptionsLabel("BabySurnameStyle");
         comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -610,24 +609,22 @@ public class RelationshipsTab {
             }
         });
 
-        chkAssignNonPrisonerBabiesFounderTag = createCheckBox("AssignNonPrisonerBabiesFounderTag",
-            null);
-        chkAssignChildrenOfFoundersFounderTag = createCheckBox("AssignChildrenOfFoundersFounderTag",
-            null);
-        chkDetermineFatherAtBirth = createCheckBox("DetermineFatherAtBirth");
-        chkDisplayTrueDueDate = createCheckBox("DisplayTrueDueDate");
+        chkAssignNonPrisonerBabiesFounderTag = new CampaignOptionsCheckBox("AssignNonPrisonerBabiesFounderTag");
+        chkAssignChildrenOfFoundersFounderTag = new CampaignOptionsCheckBox("AssignChildrenOfFoundersFounderTag");
+        chkDetermineFatherAtBirth = new CampaignOptionsCheckBox("DetermineFatherAtBirth");
+        chkDisplayTrueDueDate = new CampaignOptionsCheckBox("DisplayTrueDueDate");
 
-        lblNoInterestInChildrenDiceSize = createLabel("NoInterestInChildrenDiceSize");
-        spnNoInterestInChildrenDiceSize = createSpinner("NoInterestInChildrenDiceSize",
+        lblNoInterestInChildrenDiceSize = new CampaignOptionsLabel("NoInterestInChildrenDiceSize");
+        spnNoInterestInChildrenDiceSize = new CampaignOptionsSpinner("NoInterestInChildrenDiceSize",
             3, 1, 100000, 1);
 
-        chkUseMaternityLeave = createCheckBox("UseMaternityLeave");
-        chkLogProcreation = createCheckBox("LogProcreation");
+        chkUseMaternityLeave = new CampaignOptionsCheckBox("UseMaternityLeave");
+        chkLogProcreation = new CampaignOptionsCheckBox("LogProcreation");
 
         pnlRandomProcreationPanel = createRandomProcreationPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("ProcreationGeneralOptionsPanel",
+        final JPanel panel = new CampaignOptionsStandardPanel("ProcreationGeneralOptionsPanel",
             false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -686,7 +683,7 @@ public class RelationshipsTab {
      */
     private JPanel createRandomProcreationPanel() {
         // Contents
-        lblRandomProcreationMethod = createLabel("RandomProcreationMethod");
+        lblRandomProcreationMethod = new CampaignOptionsLabel("RandomProcreationMethod");
         comboRandomProcreationMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -700,24 +697,20 @@ public class RelationshipsTab {
             }
         });
 
-        chkUseRelationshiplessRandomProcreation =createCheckBox("UseRelationshiplessRandomProcreation",
-            null);
-        chkUseRandomClanPersonnelProcreation = createCheckBox("UseRandomClanPersonnelProcreation",
-            null);
-        chkUseRandomPrisonerProcreation = createCheckBox("UseRandomPrisonerProcreation");
+        chkUseRelationshiplessRandomProcreation =new CampaignOptionsCheckBox("UseRelationshiplessRandomProcreation");
+        chkUseRandomClanPersonnelProcreation = new CampaignOptionsCheckBox("UseRandomClanPersonnelProcreation");
+        chkUseRandomPrisonerProcreation = new CampaignOptionsCheckBox("UseRandomPrisonerProcreation");
 
-        lblRandomProcreationRelationshipDiceSize = createLabel("RandomProcreationRelationshipDiceSize",
-            null);
-        spnRandomProcreationRelationshipDiceSize = createSpinner("RandomProcreationRelationshipDiceSize",
-            null, 621, 0, 100000, 1);
+        lblRandomProcreationRelationshipDiceSize = new CampaignOptionsLabel("RandomProcreationRelationshipDiceSize");
+        spnRandomProcreationRelationshipDiceSize = new CampaignOptionsSpinner("RandomProcreationRelationshipDiceSize",
+            621, 0, 100000, 1);
 
-        lblRandomProcreationRelationshiplessDiceSize = createLabel("RandomProcreationRelationshiplessDiceSize",
-            null);
-        spnRandomProcreationRelationshiplessDiceSize = createSpinner("RandomProcreationRelationshiplessDiceSize",
-            null, 1861, 0, 100000, 1);
+        lblRandomProcreationRelationshiplessDiceSize = new CampaignOptionsLabel("RandomProcreationRelationshiplessDiceSize");
+        spnRandomProcreationRelationshiplessDiceSize = new CampaignOptionsSpinner("RandomProcreationRelationshiplessDiceSize",
+            1861, 0, 100000, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("RandomProcreationPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("RandomProcreationPanel", true,
             "RandomProcreationPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);

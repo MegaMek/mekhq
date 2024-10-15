@@ -22,6 +22,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignPreset;
+import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.CampaignOptionsButton;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -29,9 +30,8 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createButton;
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createStandardLayout;
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.setFontScaling;
 
 /**
  * A dialog for selecting campaign presets. Extends {@link JDialog}.
@@ -153,7 +153,7 @@ public class SelectPresetDialog extends JDialog {
         add(outerPanel, BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel();
 
-        JButton buttonSelect = createButton("PresetDialogSelect");
+        JButton buttonSelect = new CampaignOptionsButton("PresetDialogSelect");
         buttonSelect.addActionListener(e -> {
             selectedPreset = (CampaignPreset) comboBox.getSelectedItem();
             returnState = PRESET_SELECTION_SELECT;
@@ -162,7 +162,7 @@ public class SelectPresetDialog extends JDialog {
         buttonSelect.setEnabled(includePresetSelectOption);
         buttonPanel.add(buttonSelect);
 
-        JButton buttonCustomize = createButton("PresetDialogCustomize");
+        JButton buttonCustomize = new CampaignOptionsButton("PresetDialogCustomize");
         buttonCustomize.addActionListener(e -> {
             selectedPreset = (CampaignPreset) comboBox.getSelectedItem();
             returnState = PRESET_SELECTION_CUSTOMIZE;
@@ -171,7 +171,7 @@ public class SelectPresetDialog extends JDialog {
         buttonCustomize.setEnabled(includeCustomizePresetOption);
         buttonPanel.add(buttonCustomize);
 
-        JButton buttonCancel = createButton("PresetDialogCancel");
+        JButton buttonCancel = new CampaignOptionsButton("PresetDialogCancel");
         buttonCancel.addActionListener(e -> {
             returnState = PRESET_SELECTION_CANCELLED;
             dispose();

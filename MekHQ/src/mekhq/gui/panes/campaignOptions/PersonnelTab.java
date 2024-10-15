@@ -359,26 +359,26 @@ public class PersonnelTab {
 
     JPanel createGeneralTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("PersonnelGeneralTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelGeneralTab",
             getImageDirectory() + "logo_circinus_federation.png",
             true);
 
         // Contents
-        chkUseTactics = createCheckBox("UseTactics");
-        chkUseInitiativeBonus = createCheckBox("UseInitiativeBonus");
-        chkUseToughness = createCheckBox("UseToughness");
-        chkUseRandomToughness = createCheckBox("UseRandomToughness");
-        chkUseArtillery = createCheckBox("UseArtillery");
-        chkUseAbilities = createCheckBox("UseAbilities");
-        chkUseEdge = createCheckBox("UseEdge");
-        chkUseSupportEdge = createCheckBox("UseSupportEdge");
-        chkUseImplants = createCheckBox("UseImplants");
-        chkUseAlternativeQualityAveraging = createCheckBox("UseAlternativeQualityAveraging");
+        chkUseTactics = new CampaignOptionsCheckBox("UseTactics");
+        chkUseInitiativeBonus = new CampaignOptionsCheckBox("UseInitiativeBonus");
+        chkUseToughness = new CampaignOptionsCheckBox("UseToughness");
+        chkUseRandomToughness = new CampaignOptionsCheckBox("UseRandomToughness");
+        chkUseArtillery = new CampaignOptionsCheckBox("UseArtillery");
+        chkUseAbilities = new CampaignOptionsCheckBox("UseAbilities");
+        chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
+        chkUseSupportEdge = new CampaignOptionsCheckBox("UseSupportEdge");
+        chkUseImplants = new CampaignOptionsCheckBox("UseImplants");
+        chkUseAlternativeQualityAveraging = new CampaignOptionsCheckBox("UseAlternativeQualityAveraging");
 
         personnelCleanUpPanel = createPersonnelCleanUpPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PersonnelGeneralTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelGeneralTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -428,12 +428,12 @@ public class PersonnelTab {
      */
     private JPanel createPersonnelCleanUpPanel() {
         // Contents
-        chkUsePersonnelRemoval = createCheckBox("UsePersonnelRemoval");
-        chkUseRemovalExemptCemetery = createCheckBox("UseRemovalExemptCemetery");
-        chkUseRemovalExemptRetirees = createCheckBox("UseRemovalExemptRetirees");
+        chkUsePersonnelRemoval = new CampaignOptionsCheckBox("UsePersonnelRemoval");
+        chkUseRemovalExemptCemetery = new CampaignOptionsCheckBox("UseRemovalExemptCemetery");
+        chkUseRemovalExemptRetirees = new CampaignOptionsCheckBox("UseRemovalExemptRetirees");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PersonnelCleanUpPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelCleanUpPanel", true,
             "PersonnelCleanUpPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -460,22 +460,22 @@ public class PersonnelTab {
      */
     JPanel createPersonnelLogsTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("PersonnelLogsTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelLogsTab",
             getImageDirectory() + "logo_clan_coyote.png",
             true);
 
         // Contents
-        chkUseTransfers = createCheckBox("UseTransfers");
-        chkUseExtendedTOEForceName = createCheckBox("UseExtendedTOEForceName");
-        chkPersonnelLogSkillGain = createCheckBox("PersonnelLogSkillGain");
-        chkPersonnelLogAbilityGain = createCheckBox("PersonnelLogAbilityGain");
-        chkPersonnelLogEdgeGain = createCheckBox("PersonnelLogEdgeGain");
-        chkDisplayPersonnelLog = createCheckBox("DisplayPersonnelLog");
-        chkDisplayScenarioLog = createCheckBox("DisplayScenarioLog");
-        chkDisplayKillRecord = createCheckBox("DisplayKillRecord");
+        chkUseTransfers = new CampaignOptionsCheckBox("UseTransfers");
+        chkUseExtendedTOEForceName = new CampaignOptionsCheckBox("UseExtendedTOEForceName");
+        chkPersonnelLogSkillGain = new CampaignOptionsCheckBox("PersonnelLogSkillGain");
+        chkPersonnelLogAbilityGain = new CampaignOptionsCheckBox("PersonnelLogAbilityGain");
+        chkPersonnelLogEdgeGain = new CampaignOptionsCheckBox("PersonnelLogEdgeGain");
+        chkDisplayPersonnelLog = new CampaignOptionsCheckBox("DisplayPersonnelLog");
+        chkDisplayScenarioLog = new CampaignOptionsCheckBox("DisplayScenarioLog");
+        chkDisplayKillRecord = new CampaignOptionsCheckBox("DisplayKillRecord");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PersonnelLogsTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelLogsTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -515,21 +515,21 @@ public class PersonnelTab {
      */
     JPanel createPersonnelInformationTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("PersonnelInformation",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelInformation",
             getImageDirectory() + "logo_comstar.png",
             true);
 
         // Contents
-        chkUseTimeInService = createCheckBox("UseTimeInService");
-        lblTimeInServiceDisplayFormat = createLabel("TimeInServiceDisplayFormat");
-        chkUseTimeInRank = createCheckBox("UseTimeInRank");
-        lblTimeInRankDisplayFormat = createLabel("TimeInRankDisplayFormat");
-        chkTrackTotalEarnings = createCheckBox("TrackTotalEarnings");
-        chkTrackTotalXPEarnings = createCheckBox("TrackTotalXPEarnings");
-        chkShowOriginFaction = createCheckBox("ShowOriginFaction");
+        chkUseTimeInService = new CampaignOptionsCheckBox("UseTimeInService");
+        lblTimeInServiceDisplayFormat = new CampaignOptionsLabel("TimeInServiceDisplayFormat");
+        chkUseTimeInRank = new CampaignOptionsCheckBox("UseTimeInRank");
+        lblTimeInRankDisplayFormat = new CampaignOptionsLabel("TimeInRankDisplayFormat");
+        chkTrackTotalEarnings = new CampaignOptionsCheckBox("TrackTotalEarnings");
+        chkTrackTotalXPEarnings = new CampaignOptionsCheckBox("TrackTotalXPEarnings");
+        chkShowOriginFaction = new CampaignOptionsCheckBox("ShowOriginFaction");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PersonnelInformation", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelInformation", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -577,18 +577,18 @@ public class PersonnelTab {
      */
     JPanel createAdministratorsTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("AdministratorsTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("AdministratorsTab",
             getImageDirectory() + "logo_clan_diamond_sharks.png",
             true);
 
         // Contents
-        chkAdminsHaveNegotiation = createCheckBox("AdminsHaveNegotiation");
-        chkAdminExperienceLevelIncludeNegotiation = createCheckBox("AdminExperienceLevelIncludeNegotiation");
-        chkAdminsHaveScrounge = createCheckBox("AdminsHaveScrounge");
-        chkAdminExperienceLevelIncludeScrounge = createCheckBox("AdminExperienceLevelIncludeScrounge");
+        chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation");
+        chkAdminExperienceLevelIncludeNegotiation = new CampaignOptionsCheckBox("AdminExperienceLevelIncludeNegotiation");
+        chkAdminsHaveScrounge = new CampaignOptionsCheckBox("AdminsHaveScrounge");
+        chkAdminExperienceLevelIncludeScrounge = new CampaignOptionsCheckBox("AdminExperienceLevelIncludeScrounge");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AdministratorsTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -619,12 +619,12 @@ public class PersonnelTab {
      */
     JPanel createAwardsTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("AwardsTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("AwardsTab",
             getImageDirectory() + "logo_draconis_combine.png",
             true);
 
         // Contents
-        lblAwardBonusStyle = createLabel("AwardBonusStyle");
+        lblAwardBonusStyle = new CampaignOptionsLabel("AwardBonusStyle");
         comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -638,21 +638,21 @@ public class PersonnelTab {
             }
         });
 
-        lblAwardTierSize = createLabel("AwardTierSize");
-        spnAwardTierSize = createSpinner("AwardTierSize",
+        lblAwardTierSize = new CampaignOptionsLabel("AwardTierSize");
+        spnAwardTierSize = new CampaignOptionsSpinner("AwardTierSize",
             5, 1, 100, 1);
 
-        chkEnableAutoAwards = createCheckBox("EnableAutoAwards");
+        chkEnableAutoAwards = new CampaignOptionsCheckBox("EnableAutoAwards");
 
-        chkIssuePosthumousAwards = createCheckBox("IssuePosthumousAwards");
+        chkIssuePosthumousAwards = new CampaignOptionsCheckBox("IssuePosthumousAwards");
 
-        chkIssueBestAwardOnly = createCheckBox("IssueBestAwardOnly");
+        chkIssueBestAwardOnly = new CampaignOptionsCheckBox("IssueBestAwardOnly");
 
-        chkIgnoreStandardSet = createCheckBox("IgnoreStandardSet");
+        chkIgnoreStandardSet = new CampaignOptionsCheckBox("IgnoreStandardSet");
 
         autoAwardsFilterPanel = createAutoAwardsFilterPanel();
 
-        lblAwardSetFilterList = createLabel("AwardSetFilterList");
+        lblAwardSetFilterList = new CampaignOptionsLabel("AwardSetFilterList");
         txtAwardSetFilterList = new JTextArea(5, 20);
         txtAwardSetFilterList.setLineWrap(true);
         txtAwardSetFilterList.setWrapStyleWord(true);
@@ -667,7 +667,7 @@ public class PersonnelTab {
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AwardsTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("AwardsTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -720,21 +720,21 @@ public class PersonnelTab {
      */
     private JPanel createAutoAwardsFilterPanel() {
         // Contents
-        chkEnableContractAwards = createCheckBox("EnableContractAwards");
-        chkEnableFactionHunterAwards = createCheckBox("EnableFactionHunterAwards");
-        chkEnableInjuryAwards = createCheckBox("EnableInjuryAwards");
-        chkEnableIndividualKillAwards = createCheckBox("EnableIndividualKillAwards");
-        chkEnableFormationKillAwards = createCheckBox("EnableFormationKillAwards");
-        chkEnableRankAwards = createCheckBox("EnableRankAwards");
-        chkEnableScenarioAwards = createCheckBox("EnableScenarioAwards");
-        chkEnableSkillAwards = createCheckBox("EnableSkillAwards");
-        chkEnableTheatreOfWarAwards = createCheckBox("EnableTheatreOfWarAwards");
-        chkEnableTimeAwards = createCheckBox("EnableTimeAwards");
-        chkEnableTrainingAwards = createCheckBox("EnableTrainingAwards");
-        chkEnableMiscAwards = createCheckBox("EnableMiscAwards");
+        chkEnableContractAwards = new CampaignOptionsCheckBox("EnableContractAwards");
+        chkEnableFactionHunterAwards = new CampaignOptionsCheckBox("EnableFactionHunterAwards");
+        chkEnableInjuryAwards = new CampaignOptionsCheckBox("EnableInjuryAwards");
+        chkEnableIndividualKillAwards = new CampaignOptionsCheckBox("EnableIndividualKillAwards");
+        chkEnableFormationKillAwards = new CampaignOptionsCheckBox("EnableFormationKillAwards");
+        chkEnableRankAwards = new CampaignOptionsCheckBox("EnableRankAwards");
+        chkEnableScenarioAwards = new CampaignOptionsCheckBox("EnableScenarioAwards");
+        chkEnableSkillAwards = new CampaignOptionsCheckBox("EnableSkillAwards");
+        chkEnableTheatreOfWarAwards = new CampaignOptionsCheckBox("EnableTheatreOfWarAwards");
+        chkEnableTimeAwards = new CampaignOptionsCheckBox("EnableTimeAwards");
+        chkEnableTrainingAwards = new CampaignOptionsCheckBox("EnableTrainingAwards");
+        chkEnableMiscAwards = new CampaignOptionsCheckBox("EnableMiscAwards");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AutoAwardsFilterPanel", true, "AutoAwardsFilterPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("AutoAwardsFilterPanel", true, "AutoAwardsFilterPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -789,7 +789,7 @@ public class PersonnelTab {
      */
     JPanel createPrisonersAndDependentsTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("PrisonersAndDependentsTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("PrisonersAndDependentsTab",
             getImageDirectory() + "logo_clan_fire_mandrills.png",
             true);
 
@@ -798,7 +798,7 @@ public class PersonnelTab {
         dependentsPanel = createDependentsPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PrisonersAndDependentsTab", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("PrisonersAndDependentsTab", true,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -830,7 +830,7 @@ public class PersonnelTab {
      */
     private JPanel createPrisonersPanel() {
         // Contents
-        lblPrisonerCaptureStyle = createLabel("PrisonerCaptureStyle");
+        lblPrisonerCaptureStyle = new CampaignOptionsLabel("PrisonerCaptureStyle");
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -844,14 +844,14 @@ public class PersonnelTab {
             }
         });
 
-        lblPrisonerStatus = createLabel("PrisonerStatus");
+        lblPrisonerStatus = new CampaignOptionsLabel("PrisonerStatus");
 
-        chkPrisonerBabyStatus = createCheckBox("PrisonerBabyStatus");
-        chkAtBPrisonerDefection = createCheckBox("AtBPrisonerDefection");
-        chkAtBPrisonerRansom = createCheckBox("AtBPrisonerRansom");
+        chkPrisonerBabyStatus = new CampaignOptionsCheckBox("PrisonerBabyStatus");
+        chkAtBPrisonerDefection = new CampaignOptionsCheckBox("AtBPrisonerDefection");
+        chkAtBPrisonerRansom = new CampaignOptionsCheckBox("AtBPrisonerRansom");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PrisonersPanel", true, "PrisonersPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true, "PrisonersPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -889,11 +889,11 @@ public class PersonnelTab {
      */
     private JPanel createDependentsPanel() {
         // Contents
-        chkUseRandomDependentAddition = createCheckBox("UseRandomDependentAddition");
-        chkUseRandomDependentRemoval = createCheckBox("UseRandomDependentRemoval");
+        chkUseRandomDependentAddition = new CampaignOptionsCheckBox("UseRandomDependentAddition");
+        chkUseRandomDependentRemoval = new CampaignOptionsCheckBox("UseRandomDependentRemoval");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("DependentsPanel", true, "DependentsPanel");
+        final JPanel panel = new CampaignOptionsStandardPanel("DependentsPanel", true, "DependentsPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -917,35 +917,35 @@ public class PersonnelTab {
      */
     JPanel createMedicalTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("MedicalTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("MedicalTab",
             getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
             true);
 
         // Contents
-        chkUseAdvancedMedical = createCheckBox("UseAdvancedMedical");
+        chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical");
 
-        lblHealWaitingPeriod = createLabel("HealWaitingPeriod");
-        spnHealWaitingPeriod = createSpinner("HealWaitingPeriod",
+        lblHealWaitingPeriod = new CampaignOptionsLabel("HealWaitingPeriod");
+        spnHealWaitingPeriod = new CampaignOptionsSpinner("HealWaitingPeriod",
             1, 1, 30, 1);
 
-        lblNaturalHealWaitingPeriod = createLabel("NaturalHealWaitingPeriod");
-        spnNaturalHealWaitingPeriod = createSpinner("NaturalHealWaitingPeriod",
+        lblNaturalHealWaitingPeriod = new CampaignOptionsLabel("NaturalHealWaitingPeriod");
+        spnNaturalHealWaitingPeriod = new CampaignOptionsSpinner("NaturalHealWaitingPeriod",
             1, 1, 365, 1);
 
-        lblMinimumHitsForVehicles = createLabel("MinimumHitsForVehicles");
-        spnMinimumHitsForVehicles = createSpinner("MinimumHitsForVehicles",
+        lblMinimumHitsForVehicles = new CampaignOptionsLabel("MinimumHitsForVehicles");
+        spnMinimumHitsForVehicles = new CampaignOptionsSpinner("MinimumHitsForVehicles",
             1, 1, 5, 1);
 
-        chkUseRandomHitsForVehicles = createCheckBox("UseRandomHitsForVehicles");
+        chkUseRandomHitsForVehicles = new CampaignOptionsCheckBox("UseRandomHitsForVehicles");
 
-        chkUseTougherHealing = createCheckBox("UseTougherHealing");
+        chkUseTougherHealing = new CampaignOptionsCheckBox("UseTougherHealing");
 
-        lblMaximumPatients = createLabel("MaximumPatients");
-        spnMaximumPatients = createSpinner("MaximumPatients",
+        lblMaximumPatients = new CampaignOptionsLabel("MaximumPatients");
+        spnMaximumPatients = new CampaignOptionsSpinner("MaximumPatients",
             25, 1, 100, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("MedicalTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("MedicalTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -998,18 +998,18 @@ public class PersonnelTab {
      */
     JPanel createSalariesTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("SalariesTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("SalariesTab",
             getImageDirectory() + "logo_clan_ghost_bear.png",
             true);
 
         // Contents
-        chkDisableSecondaryRoleSalary = createCheckBox("DisableSecondaryRoleSalary");
+        chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary");
         pnlSalaryMultipliersPanel = createSalaryMultipliersPanel();
         pnlSalaryExperienceMultipliersPanel = createExperienceMultipliersPanel();
         pnlSalaryBaseSalaryPanel = createBaseSalariesPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("SalariesTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("SalariesTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -1040,16 +1040,16 @@ public class PersonnelTab {
      */
     private JPanel createSalaryMultipliersPanel() {
         // Contents
-        lblAntiMekSalary = createLabel("AntiMekSalary");
-        spnAntiMekSalary = createSpinner("AntiMekSalary",
+        lblAntiMekSalary = new CampaignOptionsLabel("AntiMekSalary");
+        spnAntiMekSalary = new CampaignOptionsSpinner("AntiMekSalary",
             0, 0, 100, 0.05);
 
-        lblSpecialistInfantrySalary = createLabel("SpecialistInfantrySalary");
-        spnSpecialistInfantrySalary = createSpinner("SpecialistInfantrySalary",
+        lblSpecialistInfantrySalary = new CampaignOptionsLabel("SpecialistInfantrySalary");
+        spnSpecialistInfantrySalary = new CampaignOptionsSpinner("SpecialistInfantrySalary",
             0, 0, 100, 0.05);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("SalaryMultipliersPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("SalaryMultipliersPanel", true,
             "SalaryMultipliersPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -1085,17 +1085,17 @@ public class PersonnelTab {
     private JPanel createExperienceMultipliersPanel() {
         // Contents
         for (final SkillLevel skillLevel : Skills.SKILL_LEVELS) {
-            final JLabel label = createLabel("SkillLevel" + skillLevel.toString());
+            final JLabel label = new CampaignOptionsLabel("SkillLevel" + skillLevel.toString());
             lblSalaryExperienceMultipliers.put(skillLevel, label);
 
-            final JSpinner spinner = createSpinner("SkillLevel" + skillLevel,
+            final JSpinner spinner = new CampaignOptionsSpinner("SkillLevel" + skillLevel,
                 0, 0, 10, 0.05);
             spnSalaryExperienceMultipliers.put(skillLevel, spinner);
 
         }
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("ExperienceMultipliersPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("ExperienceMultipliersPanel", true,
             "ExperienceMultipliersPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -1179,7 +1179,7 @@ public class PersonnelTab {
         }
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("BaseSalariesPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("BaseSalariesPanel", true,
             "BaseSalariesPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);

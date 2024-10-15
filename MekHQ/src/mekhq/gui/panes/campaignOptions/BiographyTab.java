@@ -321,29 +321,29 @@ public class BiographyTab {
      */
     JPanel createGeneralTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("BiographyGeneralTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("BiographyGeneralTab",
             getImageDirectory() + "logo_federated_suns.png",
             true);
 
         // Contents
-        chkUseDylansRandomXP = createCheckBox("UseDylansRandomXP");
+        chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP");
 
-        lblGender = createLabel("Gender");
+        lblGender = new CampaignOptionsLabel("Gender");
         sldGender = new JSlider(SwingConstants.HORIZONTAL, 0, 100, RandomGenderGenerator.getPercentFemale());
         sldGender.setMajorTickSpacing(25);
         sldGender.setPaintTicks(true);
         sldGender.setPaintLabels(true);
 
-        lblNonBinaryDiceSize = createLabel("NonBinaryDiceSize");
-        spnNonBinaryDiceSize = createSpinner("NonBinaryDiceSize",
+        lblNonBinaryDiceSize = new CampaignOptionsLabel("NonBinaryDiceSize");
+        spnNonBinaryDiceSize = new CampaignOptionsSpinner("NonBinaryDiceSize",
             60, 0, 100000, 1);
 
-        lblFamilyDisplayLevel = createLabel("FamilyDisplayLevel");
+        lblFamilyDisplayLevel = new CampaignOptionsLabel("FamilyDisplayLevel");
 
         pnlAnniversariesPanel = createAnniversariesPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("BiographyGeneralTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("BiographyGeneralTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -390,13 +390,13 @@ public class BiographyTab {
      */
     private JPanel createAnniversariesPanel() {
         // Contents
-        chkAnnounceBirthdays = createCheckBox("AnnounceBirthdays");
-        chkAnnounceRecruitmentAnniversaries = createCheckBox("AnnounceRecruitmentAnniversaries");
-        chkAnnounceOfficersOnly = createCheckBox("AnnounceOfficersOnly");
-        chkAnnounceChildBirthdays = createCheckBox("AnnounceChildBirthdays");
+        chkAnnounceBirthdays = new CampaignOptionsCheckBox("AnnounceBirthdays");
+        chkAnnounceRecruitmentAnniversaries = new CampaignOptionsCheckBox("AnnounceRecruitmentAnniversaries");
+        chkAnnounceOfficersOnly = new CampaignOptionsCheckBox("AnnounceOfficersOnly");
+        chkAnnounceChildBirthdays = new CampaignOptionsCheckBox("AnnounceChildBirthdays");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AnniversariesPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("AnniversariesPanel", true,
             "AnniversariesPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -425,19 +425,19 @@ public class BiographyTab {
      */
     JPanel createBackgroundsTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("BackgroundsTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("BackgroundsTab",
             getImageDirectory() + "logo_clan_goliath_scorpion.png", true);
 
         // Contents
-        chkUseRandomPersonalities = createCheckBox("UseRandomPersonalities");
-        chkUseRandomPersonalityReputation = createCheckBox("UseRandomPersonalityReputation");
-        chkUseIntelligenceXpMultiplier = createCheckBox("UseIntelligenceXpMultiplier");
-        chkUseSimulatedRelationships = createCheckBox("UseSimulatedRelationships");
+        chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities");
+        chkUseRandomPersonalityReputation = new CampaignOptionsCheckBox("UseRandomPersonalityReputation");
+        chkUseIntelligenceXpMultiplier = new CampaignOptionsCheckBox("UseIntelligenceXpMultiplier");
+        chkUseSimulatedRelationships = new CampaignOptionsCheckBox("UseSimulatedRelationships");
 
         pnlRandomOriginOptions = createRandomOriginOptionsPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("BackgroundsTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("BackgroundsTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -471,11 +471,11 @@ public class BiographyTab {
      */
     private JPanel createRandomOriginOptionsPanel() {
         // Contents
-        chkRandomizeOrigin = createCheckBox("RandomizeOrigin");
-        chkRandomizeDependentsOrigin = createCheckBox("RandomizeDependentsOrigin");
-        chkRandomizeAroundSpecifiedPlanet = createCheckBox("RandomizeAroundSpecifiedPlanet");
+        chkRandomizeOrigin = new CampaignOptionsCheckBox("RandomizeOrigin");
+        chkRandomizeDependentsOrigin = new CampaignOptionsCheckBox("RandomizeDependentsOrigin");
+        chkRandomizeAroundSpecifiedPlanet = new CampaignOptionsCheckBox("RandomizeAroundSpecifiedPlanet");
 
-        chkSpecifiedSystemFactionSpecific = createCheckBox("SpecifiedSystemFactionSpecific");
+        chkSpecifiedSystemFactionSpecific = new CampaignOptionsCheckBox("SpecifiedSystemFactionSpecific");
         chkSpecifiedSystemFactionSpecific.addActionListener(evt -> {
             final PlanetarySystem planetarySystem = comboSpecifiedSystem.getSelectedItem();
             if ((planetarySystem == null)
@@ -485,7 +485,7 @@ public class BiographyTab {
         });
 
 
-        lblSpecifiedSystem = createLabel("SpecifiedSystem");
+        lblSpecifiedSystem = new CampaignOptionsLabel("SpecifiedSystem");
         comboSpecifiedSystem.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -507,7 +507,7 @@ public class BiographyTab {
             }
         });
 
-        lblSpecifiedPlanet = createLabel("SpecifiedPlanet");
+        lblSpecifiedPlanet = new CampaignOptionsLabel("SpecifiedPlanet");
         comboSpecifiedPlanet.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -521,19 +521,19 @@ public class BiographyTab {
             }
         });
 
-        lblOriginSearchRadius = createLabel("OriginSearchRadius");
-        spnOriginSearchRadius = createSpinner("OriginSearchRadius",
+        lblOriginSearchRadius = new CampaignOptionsLabel("OriginSearchRadius");
+        spnOriginSearchRadius = new CampaignOptionsSpinner("OriginSearchRadius",
             0, 0, 2000, 25);
 
-        lblOriginDistanceScale = createLabel("OriginDistanceScale");
-        spnOriginDistanceScale = createSpinner("OriginDistanceScale",
+        lblOriginDistanceScale = new CampaignOptionsLabel("OriginDistanceScale");
+        spnOriginDistanceScale = new CampaignOptionsSpinner("OriginDistanceScale",
             0.6, 0.1, 2.0, 0.1);
 
-        chkAllowClanOrigins = createCheckBox("AllowClanOrigins");
-        chkExtraRandomOrigin = createCheckBox("ExtraRandomOrigin");
+        chkAllowClanOrigins = new CampaignOptionsCheckBox("AllowClanOrigins");
+        chkExtraRandomOrigin = new CampaignOptionsCheckBox("ExtraRandomOrigin");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("RandomOriginOptionsPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("RandomOriginOptionsPanel", true,
             "RandomOriginOptionsPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -648,14 +648,14 @@ public class BiographyTab {
      */
     JPanel createDeathTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("DeathTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("DeathTab",
             getImageDirectory() + "logo_filtvelt_coalition.png",
             true);
 
         // Contents
-        chkKeepMarriedNameUponSpouseDeath = createCheckBox("KeepMarriedNameUponSpouseDeath");
+        chkKeepMarriedNameUponSpouseDeath = new CampaignOptionsCheckBox("KeepMarriedNameUponSpouseDeath");
 
-        lblRandomDeathMethod = createLabel("RandomDeathMethod");
+        lblRandomDeathMethod = new CampaignOptionsLabel("RandomDeathMethod");
         comboRandomDeathMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
@@ -669,18 +669,18 @@ public class BiographyTab {
             }
         });
 
-        chkUseRandomClanPersonnelDeath = createCheckBox("UseRandomClanPersonnelDeath");
-        chkUseRandomPrisonerDeath = createCheckBox("UseRandomPrisonerDeath");
-        chkUseRandomDeathSuicideCause = createCheckBox("UseRandomDeathSuicideCause");
+        chkUseRandomClanPersonnelDeath = new CampaignOptionsCheckBox("UseRandomClanPersonnelDeath");
+        chkUseRandomPrisonerDeath = new CampaignOptionsCheckBox("UseRandomPrisonerDeath");
+        chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
 
         pnlDeathAgeGroup = createDeathAgeGroupsPanel();
 
-        lblPercentageRandomDeathChance = createLabel("PercentageRandomDeathChance");
-        spnPercentageRandomDeathChance = createSpinner("PercentageRandomDeathChance",
+        lblPercentageRandomDeathChance = new CampaignOptionsLabel("PercentageRandomDeathChance");
+        spnPercentageRandomDeathChance = new CampaignOptionsSpinner("PercentageRandomDeathChance",
             0, 0, 100, 0.000001);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("DeathTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("DeathTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -730,7 +730,7 @@ public class BiographyTab {
         final AgeGroup[] ageGroups = AgeGroup.values();
 
         // Create the Panel
-        final JPanel panel = createStandardPanel("DeathAgeGroupsPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("DeathAgeGroupsPanel", true,
             "DeathAgeGroupsPanel");
         panel.setLayout(new GridLayout(1, ageGroups.length));
 
@@ -764,33 +764,33 @@ public class BiographyTab {
      */
     JPanel createEducationTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("EducationTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("EducationTab",
             getImageDirectory() + "logo_free_worlds_league.png",
             true);
 
         // Contents
-        chkUseEducationModule = createCheckBox("UseEducationModule");
+        chkUseEducationModule = new CampaignOptionsCheckBox("UseEducationModule");
 
-        lblCurriculumXpRate = createLabel("CurriculumXpRate");
-        spnCurriculumXpRate = createSpinner("CurriculumXpRate",
+        lblCurriculumXpRate = new CampaignOptionsLabel("CurriculumXpRate");
+        spnCurriculumXpRate = new CampaignOptionsSpinner("CurriculumXpRate",
             3, 1, 10, 1);
 
-        lblMaximumJumpCount = createLabel("MaximumJumpCount");
-        spnMaximumJumpCount = createSpinner("MaximumJumpCount",
+        lblMaximumJumpCount = new CampaignOptionsLabel("MaximumJumpCount");
+        spnMaximumJumpCount = new CampaignOptionsSpinner("MaximumJumpCount",
             5, 1, 200, 1);
 
-        chkUseReeducationCamps = createCheckBox("UseReeducationCamps");
+        chkUseReeducationCamps = new CampaignOptionsCheckBox("UseReeducationCamps");
 
         pnlEnableStandardSets = createEnableStandardSetsPanel();
 
-        chkEnableOverrideRequirements = createCheckBox("EnableOverrideRequirements");
+        chkEnableOverrideRequirements = new CampaignOptionsCheckBox("EnableOverrideRequirements");
 
-        chkShowIneligibleAcademies = createCheckBox("ShowIneligibleAcademies");
+        chkShowIneligibleAcademies = new CampaignOptionsCheckBox("ShowIneligibleAcademies");
 
-        lblEntranceExamBaseTargetNumber = createLabel("EntranceExamBaseTargetNumber");
-        spnEntranceExamBaseTargetNumber = createSpinner("EntranceExamBaseTargetNumber",
+        lblEntranceExamBaseTargetNumber = new CampaignOptionsLabel("EntranceExamBaseTargetNumber");
+        spnEntranceExamBaseTargetNumber = new CampaignOptionsSpinner("EntranceExamBaseTargetNumber",
             14, 0, 20, 1);
-        lblEntranceExamBaseTargetNumberPost = createLabel("EntranceExamBaseTargetNumberPost");
+        lblEntranceExamBaseTargetNumberPost = new CampaignOptionsLabel("EntranceExamBaseTargetNumberPost");
 
         pnlXpAndSkillBonuses = createXpAndSkillBonusesPanel();
 
@@ -799,7 +799,7 @@ public class BiographyTab {
         pnlAccidentsAndEvents = createAccidentsAndEventsPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("EducationTab", true);
+        final JPanel panel = new CampaignOptionsStandardPanel("EducationTab", true);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -869,12 +869,12 @@ public class BiographyTab {
      */
     private JPanel createEnableStandardSetsPanel() {
         // Contents
-        chkEnableLocalAcademies = createCheckBox("EnableLocalAcademies");
-        chkEnablePrestigiousAcademies = createCheckBox("EnablePrestigiousAcademies");
-        chkEnableUnitEducation = createCheckBox("EnableUnitEducation");
+        chkEnableLocalAcademies = new CampaignOptionsCheckBox("EnableLocalAcademies");
+        chkEnablePrestigiousAcademies = new CampaignOptionsCheckBox("EnablePrestigiousAcademies");
+        chkEnableUnitEducation = new CampaignOptionsCheckBox("EnableUnitEducation");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("EnableStandardSetsPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("EnableStandardSetsPanel", true,
             "EnableStandardSetsPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -911,13 +911,13 @@ public class BiographyTab {
      */
     private JPanel createXpAndSkillBonusesPanel() {
         // Contents
-        chkEnableBonuses = createCheckBox("EnableBonuses");
-        lblFacultyXpMultiplier = createLabel("FacultyXpMultiplier");
-        spnFacultyXpMultiplier = createSpinner("FacultyXpMultiplier",
+        chkEnableBonuses = new CampaignOptionsCheckBox("EnableBonuses");
+        lblFacultyXpMultiplier = new CampaignOptionsLabel("FacultyXpMultiplier");
+        spnFacultyXpMultiplier = new CampaignOptionsSpinner("FacultyXpMultiplier",
             1.00, 0.00, 10.00, 0.01);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("XpAndSkillBonusesPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("XpAndSkillBonusesPanel", true,
             "XpAndSkillBonusesPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -953,15 +953,15 @@ public class BiographyTab {
      */
     private JPanel createDropoutChancePanel() {
         // Contents
-        lblAdultDropoutChance = createLabel("AdultDropoutChance");
-        spnAdultDropoutChance = createSpinner("AdultDropoutChance",
+        lblAdultDropoutChance = new CampaignOptionsLabel("AdultDropoutChance");
+        spnAdultDropoutChance = new CampaignOptionsSpinner("AdultDropoutChance",
             1000, 0, 100000, 1);
-        lblChildrenDropoutChance = createLabel("ChildrenDropoutChance");
-        spnChildrenDropoutChance = createSpinner("ChildrenDropoutChance",
+        lblChildrenDropoutChance = new CampaignOptionsLabel("ChildrenDropoutChance");
+        spnChildrenDropoutChance = new CampaignOptionsSpinner("ChildrenDropoutChance",
             10000, 0, 100000, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("DropoutChancePanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("DropoutChancePanel", true,
             "DropoutChancePanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -1003,13 +1003,13 @@ public class BiographyTab {
      */
     private JPanel createAccidentsAndEventsPanel() {
         // Contents
-        chkAllAges = createCheckBox("AllAges");
-        lblMilitaryAcademyAccidents = createLabel("MilitaryAcademyAccidents");
-        spnMilitaryAcademyAccidents = createSpinner("MilitaryAcademyAccidents",
+        chkAllAges = new CampaignOptionsCheckBox("AllAges");
+        lblMilitaryAcademyAccidents = new CampaignOptionsLabel("MilitaryAcademyAccidents");
+        spnMilitaryAcademyAccidents = new CampaignOptionsSpinner("MilitaryAcademyAccidents",
             10000, 0, 100000, 1);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("AccidentsAndEventsPanel", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("AccidentsAndEventsPanel", true,
             "AccidentsAndEventsPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -1047,21 +1047,21 @@ public class BiographyTab {
      */
     JPanel createNameAndPortraitGenerationTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("NameAndPortraitGenerationTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("NameAndPortraitGenerationTab",
             getImageDirectory() + "logo_clan_mongoose.png",
             true);
 
         // Contents
-        chkUseOriginFactionForNames = createCheckBox("UseOriginFactionForNames");
+        chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
 
-        lblFactionNames = createLabel("FactionNames");
+        lblFactionNames = new CampaignOptionsLabel("FactionNames");
 
         pnlRandomPortrait = createRandomPortraitPanel();
 
-        chkAssignPortraitOnRoleChange = createCheckBox("AssignPortraitOnRoleChange");
+        chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("NameAndPortraitGenerationTab", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("NameAndPortraitGenerationTab", true,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -1179,7 +1179,7 @@ public class BiographyTab {
      */
     JPanel createRankTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("RankTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("RankTab",
             getImageDirectory() + "logo_hanseatic_league.png",
             true);
 
@@ -1188,7 +1188,7 @@ public class BiographyTab {
         Component rankSystemsViewport = rankSystemsPane.getViewport().getView();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("RankTab", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("RankTab", true,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);

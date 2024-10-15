@@ -118,7 +118,7 @@ public class MarketsTab {
 
     JPanel createPersonnelMarketTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("PersonnelMarketTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelMarketTab",
             getImageDirectory() + "logo_clan_sea_fox.png",
             true);
 
@@ -127,7 +127,7 @@ public class MarketsTab {
         pnlRemovalTargets = createPersonnelMarketRemovalOptionsPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PersonnelMarketTab", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketTab", true,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -152,20 +152,20 @@ public class MarketsTab {
 
     private JPanel createPersonnelMarketGeneralOptionsPanel() {
         // Contents
-        lblPersonnelMarketType = createLabel("PersonnelMarketType");
+        lblPersonnelMarketType = new CampaignOptionsLabel("PersonnelMarketType");
         comboPersonnelMarketType = new MMComboBox<>("comboPersonnelMarketType",
             getPersonnelMarketTypeOptions());
 
-        lblPersonnelMarketDylansWeight = createLabel("PersonnelMarketDylansWeight");
-        spnPersonnelMarketDylansWeight = createSpinner("PersonnelMarketDylansWeight",
+        lblPersonnelMarketDylansWeight = new CampaignOptionsLabel("PersonnelMarketDylansWeight");
+        spnPersonnelMarketDylansWeight = new CampaignOptionsSpinner("PersonnelMarketDylansWeight",
             0.3, 0, 1, 0.1);
 
-        chkPersonnelMarketReportRefresh = createCheckBox("PersonnelMarketReportRefresh");
+        chkPersonnelMarketReportRefresh = new CampaignOptionsCheckBox("PersonnelMarketReportRefresh");
 
-        chkUsePersonnelHireHiringHallOnly = createCheckBox("UsePersonnelHireHiringHallOnly");
+        chkUsePersonnelHireHiringHallOnly = new CampaignOptionsCheckBox("UsePersonnelHireHiringHallOnly");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("PersonnelMarketGeneralOptionsPanel", false,
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketGeneralOptionsPanel", false,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -211,7 +211,7 @@ public class MarketsTab {
         }
 
         // Layout the Panels
-        final JPanel leftPanel = createStandardPanel("LeftPanel", false);
+        final JPanel leftPanel = new CampaignOptionsStandardPanel("LeftPanel", false);
         final GroupLayout leftLayout = createStandardLayout(leftPanel);
         leftPanel.setLayout(leftLayout);
 
@@ -245,7 +245,7 @@ public class MarketsTab {
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))
                     .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))));
 
-        final JPanel rightPanel = createStandardPanel("RightPanel", false);
+        final JPanel rightPanel = new CampaignOptionsStandardPanel("RightPanel", false);
         final GroupLayout rightLayout = createStandardLayout(rightPanel);
         rightPanel.setLayout(rightLayout);
 
@@ -279,7 +279,7 @@ public class MarketsTab {
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY))
                     .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY))));
 
-        final JPanel parentPanel = createStandardPanel("PersonnelMarketRemovalOptionsPanel",
+        final JPanel parentPanel = new CampaignOptionsStandardPanel("PersonnelMarketRemovalOptionsPanel",
             true, "PersonnelMarketRemovalOptionsPanel");
         final GroupLayout parentLayout = createStandardLayout(parentPanel);
         parentPanel.setLayout(parentLayout);
@@ -313,30 +313,30 @@ public class MarketsTab {
 
     JPanel createUnitMarketTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("UnitMarketTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("UnitMarketTab",
             getImageDirectory() + "logo_loathian_league.png",
             true);
 
         // Contents
-        lblUnitMarketMethod = createLabel("UnitMarketMethod");
+        lblUnitMarketMethod = new CampaignOptionsLabel("UnitMarketMethod");
         comboUnitMarketMethod = new MMComboBox<>("comboUnitMarketMethod", UnitMarketMethod.values());
 
-        chkUnitMarketRegionalMekVariations = createCheckBox("UnitMarketRegionalMekVariations");
+        chkUnitMarketRegionalMekVariations = new CampaignOptionsCheckBox("UnitMarketRegionalMekVariations");
 
-        lblUnitMarketSpecialUnitChance = createLabel("UnitMarketSpecialUnitChance");
-        spnUnitMarketSpecialUnitChance = createSpinner("UnitMarketSpecialUnitChance",
+        lblUnitMarketSpecialUnitChance = new CampaignOptionsLabel("UnitMarketSpecialUnitChance");
+        spnUnitMarketSpecialUnitChance = new CampaignOptionsSpinner("UnitMarketSpecialUnitChance",
             30, 0, 100, 1);
 
-        lblUnitMarketRarityModifier = createLabel("UnitMarketRarityModifier");
-        spnUnitMarketRarityModifier = createSpinner("UnitMarketRarityModifier",
+        lblUnitMarketRarityModifier = new CampaignOptionsLabel("UnitMarketRarityModifier");
+        spnUnitMarketRarityModifier = new CampaignOptionsSpinner("UnitMarketRarityModifier",
             0, -10, 10, 1);
 
-        chkInstantUnitMarketDelivery = createCheckBox("InstantUnitMarketDelivery");
+        chkInstantUnitMarketDelivery = new CampaignOptionsCheckBox("InstantUnitMarketDelivery");
 
-        chkUnitMarketReportRefresh = createCheckBox("UnitMarketReportRefresh");
+        chkUnitMarketReportRefresh = new CampaignOptionsCheckBox("UnitMarketReportRefresh");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("UnitMarketTab", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("UnitMarketTab", true,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -411,7 +411,7 @@ public class MarketsTab {
 
     JPanel createContractMarketTab() {
         // Header
-        JPanel headerPanel = createHeaderPanel("ContractMarketTab",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("ContractMarketTab",
             getImageDirectory() + "logo_clan_smoke_jaguar.png",
             true);
 
@@ -420,7 +420,7 @@ public class MarketsTab {
         pnlContractPay = createContractPayPanel();
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("ContractMarketTab", true,
+        final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketTab", true,
             "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -445,28 +445,28 @@ public class MarketsTab {
 
     private JPanel createContractMarketGeneralOptionsPanel() {
         // Contents
-        lblContractMarketMethod = createLabel("ContractMarketMethod");
+        lblContractMarketMethod = new CampaignOptionsLabel("ContractMarketMethod");
         comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod",
             ContractMarketMethod.values());
 
-        lblContractSearchRadius = createLabel("ContractSearchRadius");
-        spnContractSearchRadius = createSpinner("ContractSearchRadius",
+        lblContractSearchRadius = new CampaignOptionsLabel("ContractSearchRadius");
+        spnContractSearchRadius = new CampaignOptionsSpinner("ContractSearchRadius",
             300, 100, 2500, 100);
 
-        chkVariableContractLength = createCheckBox("VariableContractLength");
+        chkVariableContractLength = new CampaignOptionsCheckBox("VariableContractLength");
 
-        chkContractMarketReportRefresh = createCheckBox("ContractMarketReportRefresh");
+        chkContractMarketReportRefresh = new CampaignOptionsCheckBox("ContractMarketReportRefresh");
 
-        lblCoontractMaxSalvagePercentage = createLabel("CoontractMaxSalvagePercentage");
-        spnContractMaxSalvagePercentage = createSpinner("CoontractMaxSalvagePercentage",
+        lblCoontractMaxSalvagePercentage = new CampaignOptionsLabel("CoontractMaxSalvagePercentage");
+        spnContractMaxSalvagePercentage = new CampaignOptionsSpinner("CoontractMaxSalvagePercentage",
             100, 0, 100, 10);
 
-        lblDropShipBonusPercentage = createLabel("DropShipBonusPercentage");
-        spnDropShipBonusPercentage = createSpinner("DropShipBonusPercentage",
+        lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
+        spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage",
             0, 0, 20, 5);
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("ContractMarketGeneralOptionsPanel",
+        final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketGeneralOptionsPanel",
             false);
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -513,36 +513,36 @@ public class MarketsTab {
         btnContractEquipment = new JRadioButton(resources.getString("lblContractEquipment.text"));
         btnContractEquipment.setToolTipText(resources.getString("lblContractEquipment.tooltip"));
 
-        chkEquipContractSaleValue = createCheckBox("EquipContractSaleValue");
+        chkEquipContractSaleValue = new CampaignOptionsCheckBox("EquipContractSaleValue");
 
-        lblEquipPercent = createLabel("EquipPercent");
-        spnEquipPercent = createSpinner("EquipPercent",
+        lblEquipPercent = new CampaignOptionsLabel("EquipPercent");
+        spnEquipPercent = new CampaignOptionsSpinner("EquipPercent",
             0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
-        lblDropShipPercent = createLabel("DropShipPercent");
-        spnDropShipPercent = createSpinner("DropShipPercent",
+        lblDropShipPercent = new CampaignOptionsLabel("DropShipPercent");
+        spnDropShipPercent = new CampaignOptionsSpinner("DropShipPercent",
             0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
-        lblJumpShipPercent = createLabel("JumpShipPercent");
-        spnJumpShipPercent = createSpinner("JumpShipPercent",
+        lblJumpShipPercent = new CampaignOptionsLabel("JumpShipPercent");
+        spnJumpShipPercent = new CampaignOptionsSpinner("JumpShipPercent",
             0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
-        lblWarShipPercent = createLabel("WarShipPercent");
-        spnWarShipPercent = createSpinner("WarShipPercent",
+        lblWarShipPercent = new CampaignOptionsLabel("WarShipPercent");
+        spnWarShipPercent = new CampaignOptionsSpinner("WarShipPercent",
             0.1, 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1);
 
         btnContractPersonnel = new JRadioButton(resources.getString("lblContractPersonnel.text"));
         btnContractPersonnel.setToolTipText(resources.getString("lblContractPersonnel.tooltip"));
 
-        chkBLCSaleValue = createCheckBox("BLCSaleValue");
+        chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
 
-        useInfantryDoseNotCountBox = createCheckBox("UseInfantryDoseNotCountBox");
-        chkMercSizeLimited = createCheckBox("MercSizeLimited");
+        useInfantryDoseNotCountBox = new CampaignOptionsCheckBox("UseInfantryDoseNotCountBox");
+        chkMercSizeLimited = new CampaignOptionsCheckBox("MercSizeLimited");
 
-        chkOverageRepaymentInFinalPayment = createCheckBox("OverageRepaymentInFinalPayment");
+        chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment");
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("ContractPayPanel",
+        final JPanel panel = new CampaignOptionsStandardPanel("ContractPayPanel",
             true, "ContractPayPanel");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
