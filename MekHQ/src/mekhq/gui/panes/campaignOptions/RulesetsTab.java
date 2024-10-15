@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions.tabs;
+package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
@@ -12,7 +12,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 public class RulesetsTab {
     JFrame frame;

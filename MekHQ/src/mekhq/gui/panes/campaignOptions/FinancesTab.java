@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions.tabs;
+package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.swing.util.UIUtil;
@@ -11,7 +11,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JSpinner.NumberEditor;
 
-import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * This class represents the FinancesTab campaign options, configuring finance-related settings.

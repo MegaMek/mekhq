@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions.tabs;
+package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
@@ -10,7 +10,7 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 
-import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 public class RelationshipsTab {
     JFrame frame;

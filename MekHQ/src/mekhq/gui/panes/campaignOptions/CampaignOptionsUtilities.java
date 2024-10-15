@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions.tabs;
+package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.swing.util.FlatLafStyleBuilder;
 import megamek.client.ui.swing.util.UIUtil;

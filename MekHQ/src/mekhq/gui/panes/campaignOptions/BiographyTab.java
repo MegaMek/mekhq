@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions.tabs;
+package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * The `BiographyTab` class represents the biography settings tab in campaign options.

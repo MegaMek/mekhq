@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions.tabs;
+package mekhq.gui.panes.campaignOptions;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import static java.lang.Math.round;
-import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.createSubTabs;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createSubTabs;
 
 public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private static final MMLogger logger = MMLogger.create(CampaignOptionsPane.class);

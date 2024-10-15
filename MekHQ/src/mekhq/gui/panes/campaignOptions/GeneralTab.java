@@ -1,4 +1,4 @@
-package mekhq.gui.panes.campaignOptions.tabs;
+package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
@@ -24,7 +24,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 
-import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * Represents a tab that allows the user to configure general settings for a campaign.

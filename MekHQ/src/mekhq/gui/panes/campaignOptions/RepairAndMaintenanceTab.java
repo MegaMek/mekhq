@@ -1,9 +1,9 @@
-package mekhq.gui.panes.campaignOptions.tabs;
+package mekhq.gui.panes.campaignOptions;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 
-import static mekhq.gui.panes.campaignOptions.tabs.CampaignOptionsUtilities.*;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
  * This class represents the tab for repair and maintenance settings.
