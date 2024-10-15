@@ -12,7 +12,6 @@ import javax.swing.GroupLayout.Group;
 import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -555,13 +554,11 @@ public class PersonnelTab {
                 .addComponent(chkUseTimeInService)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblTimeInServiceDisplayFormat)
-                    .addComponent(comboTimeInServiceDisplayFormat)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboTimeInServiceDisplayFormat))
                 .addComponent(chkUseTimeInRank)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblTimeInRankDisplayFormat)
-                    .addComponent(comboTimeInRankDisplayFormat)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboTimeInRankDisplayFormat))
                 .addComponent(chkTrackTotalEarnings)
                 .addComponent(chkTrackTotalXPEarnings)
                 .addComponent(chkShowOriginFaction));
@@ -696,12 +693,10 @@ public class PersonnelTab {
                 .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblAwardBonusStyle)
-                    .addComponent(comboAwardBonusStyle)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboAwardBonusStyle))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblAwardTierSize)
-                    .addComponent(spnAwardTierSize)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnAwardTierSize))
                 .addComponent(chkEnableAutoAwards)
                 .addComponent(chkIssuePosthumousAwards)
                 .addComponent(chkIssueBestAwardOnly)
@@ -820,8 +815,7 @@ public class PersonnelTab {
                 .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(prisonerPanel)
-                    .addComponent(dependentsPanel)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(dependentsPanel)));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PrisonersAndDependentsTab");
@@ -877,12 +871,10 @@ public class PersonnelTab {
             layout.createParallelGroup(Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblPrisonerCaptureStyle)
-                    .addComponent(comboPrisonerCaptureStyle)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboPrisonerCaptureStyle))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblPrisonerStatus)
-                    .addComponent(comboPrisonerStatus)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboPrisonerStatus))
                 .addComponent(chkPrisonerBabyStatus)
                 .addComponent(chkAtBPrisonerDefection)
                 .addComponent(chkAtBPrisonerRansom));
@@ -982,22 +974,18 @@ public class PersonnelTab {
                 .addComponent(chkUseAdvancedMedical)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblHealWaitingPeriod)
-                    .addComponent(spnHealWaitingPeriod)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnHealWaitingPeriod))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblNaturalHealWaitingPeriod)
-                    .addComponent(spnNaturalHealWaitingPeriod)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnNaturalHealWaitingPeriod))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblMinimumHitsForVehicles)
-                    .addComponent(spnMinimumHitsForVehicles)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnMinimumHitsForVehicles))
                 .addComponent(chkUseRandomHitsForVehicles)
                 .addComponent(chkUseTougherHealing)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblMaximumPatients)
-                    .addComponent(spnMaximumPatients)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnMaximumPatients)));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "MedicalTab");
@@ -1080,8 +1068,7 @@ public class PersonnelTab {
                     .addComponent(lblAntiMekSalary)
                     .addComponent(spnAntiMekSalary)
                     .addComponent(lblSpecialistInfantrySalary)
-                    .addComponent(spnSpecialistInfantrySalary)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnSpecialistInfantrySalary)));
 
         return panel;
     }
@@ -1132,7 +1119,6 @@ public class PersonnelTab {
 
                 SequentialGroup horizontalSequentialGroup = layout.createSequentialGroup();
                 horizontalSequentialGroup.addComponent(lblSalaryExperienceMultipliers.get(skillLevels[index]));
-                horizontalSequentialGroup.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE);
                 horizontalSequentialGroup.addComponent(spnSalaryExperienceMultipliers.get(skillLevels[index]));
                 if (i != (columns - 1)) {
                     horizontalSequentialGroup.addGap(10);
@@ -1221,7 +1207,6 @@ public class PersonnelTab {
                     SequentialGroup horizontalSequentialGroup = layout.createSequentialGroup();
 
                     horizontalSequentialGroup.addComponent(lblBaseSalary[index]);
-                    horizontalSequentialGroup.addPreferredGap(ComponentPlacement.RELATED, Short.MAX_VALUE, Short.MAX_VALUE);
                     horizontalSequentialGroup.addComponent(spnBaseSalary[index]);
                     if (i != (columns - 1)) {
                         horizontalSequentialGroup.addGap(10);

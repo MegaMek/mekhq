@@ -213,8 +213,7 @@ public class FinancesTab {
                 .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(pnlGeneralOptions)
-                    .addComponent(pnlOtherSystems)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(pnlOtherSystems))
                 .addComponent(pnlSales)
                 .addComponent(pnlPayments));
 
@@ -268,8 +267,7 @@ public class FinancesTab {
                     .addGap(UIUtil.scaleForGUI(5))
                     .addComponent(payForUnitsBox)
                     .addGap(UIUtil.scaleForGUI(5))
-                    .addComponent(payForSalariesBox)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(payForSalariesBox))
                 .addGap(UIUtil.scaleForGUI(5))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(payForOverheadBox)
@@ -278,8 +276,7 @@ public class FinancesTab {
                     .addGap(UIUtil.scaleForGUI(5))
                     .addComponent(payForTransportBox)
                     .addGap(UIUtil.scaleForGUI(5))
-                    .addComponent(payForRecruitmentBox)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(payForRecruitmentBox)));
 
         return panel;
     }
@@ -359,8 +356,7 @@ public class FinancesTab {
                 .addComponent(showPeacetimeCostBox)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblFinancialYearDuration)
-                    .addComponent(comboFinancialYearDuration)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboFinancialYearDuration))
                 .addComponent(newFinancialYearFinancesToCSVExportBox));
 
         return panel;
@@ -395,8 +391,7 @@ public class FinancesTab {
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(sellUnitsBox)
                     .addGap(UIUtil.scaleForGUI(5))
-                    .addComponent(sellPartsBox)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(sellPartsBox)));
 
         return panel;
     }
@@ -435,8 +430,7 @@ public class FinancesTab {
                 .addComponent(chkUseTaxes)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblTaxesPercentage)
-                    .addComponent(spnTaxesPercentage)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnTaxesPercentage)));
 
         return panel;
     }
@@ -545,8 +539,7 @@ public class FinancesTab {
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(pnlGeneralMultipliers)
                     .addComponent(pnlUsedPartsMultipliers)
-                    .addComponent(pnlOtherMultipliers)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(pnlOtherMultipliers)));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PriceMultipliersTab");
@@ -617,28 +610,22 @@ public class FinancesTab {
             layout.createParallelGroup(Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblCommonPartPriceMultiplier)
-                    .addComponent(spnCommonPartPriceMultiplier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnCommonPartPriceMultiplier))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblInnerSphereUnitPriceMultiplier)
-                    .addComponent(spnInnerSphereUnitPriceMultiplier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnInnerSphereUnitPriceMultiplier))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblInnerSpherePartPriceMultiplier)
-                    .addComponent(spnInnerSpherePartPriceMultiplier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnInnerSpherePartPriceMultiplier))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblClanUnitPriceMultiplier)
-                    .addComponent(spnClanUnitPriceMultiplier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnClanUnitPriceMultiplier))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblClanPartPriceMultiplier)
-                    .addComponent(spnClanPartPriceMultiplier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnClanPartPriceMultiplier))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblMixedTechUnitPriceMultiplier)
-                    .addComponent(spnMixedTechUnitPriceMultiplier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnMixedTechUnitPriceMultiplier)));
 
         return panel;
     }
@@ -715,28 +702,22 @@ public class FinancesTab {
             layout.createParallelGroup(Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblUsedPartPriceMultipliers[0])
-                    .addComponent(spnUsedPartPriceMultipliers[0])
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnUsedPartPriceMultipliers[0]))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblUsedPartPriceMultipliers[1])
-                    .addComponent(spnUsedPartPriceMultipliers[1])
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnUsedPartPriceMultipliers[1]))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblUsedPartPriceMultipliers[2])
-                    .addComponent(spnUsedPartPriceMultipliers[2])
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnUsedPartPriceMultipliers[2]))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblUsedPartPriceMultipliers[3])
-                    .addComponent(spnUsedPartPriceMultipliers[3])
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnUsedPartPriceMultipliers[3]))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblUsedPartPriceMultipliers[4])
-                    .addComponent(spnUsedPartPriceMultipliers[4])
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnUsedPartPriceMultipliers[4]))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblUsedPartPriceMultipliers[5])
-                    .addComponent(spnUsedPartPriceMultipliers[5])
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnUsedPartPriceMultipliers[5])));
 
         return panel;
     }
@@ -789,16 +770,13 @@ public class FinancesTab {
             layout.createParallelGroup(Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblDamagedPartsValueMultiplier)
-                    .addComponent(spnDamagedPartsValueMultiplier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnDamagedPartsValueMultiplier))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblUnrepairablePartsValueMultiplier)
-                    .addComponent(spnUnrepairablePartsValueMultiplier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnUnrepairablePartsValueMultiplier))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblCancelledOrderRefundMultiplier)
-                    .addComponent(spnCancelledOrderRefundMultiplier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnCancelledOrderRefundMultiplier)));
 
         return panel;
     }

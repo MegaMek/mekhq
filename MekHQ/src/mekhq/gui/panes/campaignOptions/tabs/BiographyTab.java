@@ -373,11 +373,11 @@ public class BiographyTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblNonBinaryDiceSize)
                         .addComponent(spnNonBinaryDiceSize)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblFamilyDisplayLevel)
                         .addComponent(comboFamilyDisplayLevel)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(pnlAnniversariesPanel)));
 
         // Create Parent Panel and return
@@ -569,13 +569,13 @@ public class BiographyTab {
                         .addComponent(comboSpecifiedSystem)
                         .addComponent(lblSpecifiedPlanet)
                         .addComponent(comboSpecifiedPlanet)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblOriginSearchRadius)
                         .addComponent(spnOriginSearchRadius)
                         .addComponent(lblOriginDistanceScale)
                         .addComponent(spnOriginDistanceScale)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkAllowClanOrigins)
                     .addComponent(chkExtraRandomOrigin)));
 
@@ -707,14 +707,14 @@ public class BiographyTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomDeathMethod)
                         .addComponent(comboRandomDeathMethod)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkUseRandomClanPersonnelDeath)
                     .addComponent(chkUseRandomPrisonerDeath)
                     .addComponent(chkUseRandomDeathSuicideCause)
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(lblPercentageRandomDeathChance)
                             .addComponent(spnPercentageRandomDeathChance)
-                            .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                            )
                         .addComponent(pnlDeathAgeGroup)));
 
         // Create Parent Panel and return
@@ -835,18 +835,18 @@ public class BiographyTab {
                         .addComponent(spnCurriculumXpRate)
                         .addComponent(lblMaximumJumpCount)
                         .addComponent(spnMaximumJumpCount)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkUseReeducationCamps)
                     .addComponent(pnlEnableStandardSets)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(chkShowIneligibleAcademies)
                         .addComponent(chkEnableOverrideRequirements)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblEntranceExamBaseTargetNumber)
                         .addComponent(spnEntranceExamBaseTargetNumber)
                         .addComponent(lblEntranceExamBaseTargetNumberPost)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(pnlXpAndSkillBonuses)
                     .addComponent(pnlDropoutChance)
                     .addComponent(pnlAccidentsAndEvents)));
@@ -893,7 +893,7 @@ public class BiographyTab {
                         .addComponent(chkEnableLocalAcademies)
                         .addComponent(chkEnablePrestigiousAcademies)
                         .addComponent(chkEnableUnitEducation)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -936,7 +936,7 @@ public class BiographyTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblFacultyXpMultiplier)
                         .addComponent(spnFacultyXpMultiplier)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -981,11 +981,11 @@ public class BiographyTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblAdultDropoutChance)
                         .addComponent(spnAdultDropoutChance)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblChildrenDropoutChance)
                         .addComponent(spnChildrenDropoutChance)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -1028,7 +1028,7 @@ public class BiographyTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblMilitaryAcademyAccidents)
                         .addComponent(spnMilitaryAcademyAccidents)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -1084,7 +1084,7 @@ public class BiographyTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblFactionNames)
                         .addComponent(comboFactionNames)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(pnlRandomPortrait)
                     .addComponent(chkAssignPortraitOnRoleChange)));
 

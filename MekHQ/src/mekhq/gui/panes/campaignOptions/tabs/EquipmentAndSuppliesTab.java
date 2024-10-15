@@ -274,25 +274,20 @@ public class EquipmentAndSuppliesTab {
                 .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblChoiceAcquireSkill)
-                    .addComponent(choiceAcquireSkill)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(choiceAcquireSkill))
                 .addComponent(chkSupportStaffOnly)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblAcquireClanPenalty)
-                    .addComponent(spnAcquireClanPenalty)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnAcquireClanPenalty))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblAcquireIsPenalty)
-                    .addComponent(spnAcquireIsPenalty)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnAcquireIsPenalty))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblAcquireWaitingPeriod)
-                    .addComponent(spnAcquireWaitingPeriod)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnAcquireWaitingPeriod))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblMaxAcquisitions)
-                    .addComponent(spnMaxAcquisitions)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnMaxAcquisitions)));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "acquisitionsTab");
@@ -390,18 +385,15 @@ public class EquipmentAndSuppliesTab {
                 .addComponent(usePlanetaryAcquisitions)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblMaxJumpPlanetaryAcquisitions)
-                    .addComponent(spnMaxJumpPlanetaryAcquisitions)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnMaxJumpPlanetaryAcquisitions))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblPlanetaryAcquisitionsFactionLimits)
-                    .addComponent(comboPlanetaryAcquisitionsFactionLimits)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboPlanetaryAcquisitionsFactionLimits))
                 .addComponent(disallowPlanetaryAcquisitionClanCrossover)
                 .addComponent(disallowClanPartsFromIS)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblPenaltyClanPartsFromIS)
-                    .addComponent(spnPenaltyClanPartsFromIS)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnPenaltyClanPartsFromIS))
                 .addComponent(usePlanetaryAcquisitionsVerbose));
 
         return panel;
@@ -459,8 +451,7 @@ public class EquipmentAndSuppliesTab {
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(pnlIndustryModifiers)
                     .addComponent(pnlTechModifiers)
-                    .addComponent(pnlOutputModifiers)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(pnlOutputModifiers)));
 
         return panel;
     }
@@ -732,18 +723,15 @@ public class EquipmentAndSuppliesTab {
                     .addComponent(spnNDiceTransitTime)
                     .addComponent(lblConstantTransitTime)
                     .addComponent(spnConstantTransitTime)
-                    .addComponent(choiceTransitTimeUnits)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(choiceTransitTimeUnits))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblAcquireMosBonus)
                     .addComponent(spnAcquireMosBonus)
-                    .addComponent(choiceAcquireMosUnits)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(choiceAcquireMosUnits))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblAcquireMinimum)
                     .addComponent(spnAcquireMinimum)
-                    .addComponent(choiceAcquireMinimumUnit)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(choiceAcquireMinimumUnit)));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "deliveryTab");
@@ -863,8 +851,7 @@ public class EquipmentAndSuppliesTab {
                 .addComponent(allowCanonRefitOnlyBox)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblChoiceTechLevel)
-                    .addComponent(choiceTechLevel)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(choiceTechLevel))
                 .addComponent(variableTechLevelBox)
                 .addComponent(useAmmoByTypeBox));
 

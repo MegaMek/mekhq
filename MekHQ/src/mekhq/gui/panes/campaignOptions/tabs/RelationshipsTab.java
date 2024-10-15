@@ -235,7 +235,7 @@ public class RelationshipsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(pnlMarriageGeneralOptions)
                         .addComponent(pnlRandomMarriage)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "MarriageTab");
@@ -290,11 +290,11 @@ public class RelationshipsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblNoInterestInMarriageDiceSize)
                         .addComponent(spnNoInterestInMarriageDiceSize)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblCheckMutualAncestorsDepth)
                         .addComponent(spnCheckMutualAncestorsDepth)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkLogMarriageNameChanges)));
 
         return panel;
@@ -357,13 +357,13 @@ public class RelationshipsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomMarriageMethod)
                         .addComponent(comboRandomMarriageMethod)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkUseRandomClanPersonnelMarriages)
                     .addComponent(chkUseRandomPrisonerMarriages)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomMarriageAgeRange)
                         .addComponent(spnRandomMarriageAgeRange)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(pnlPercentageRandomMarriage)));
 
         return panel;
@@ -415,15 +415,15 @@ public class RelationshipsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomMarriageOppositeSexDiceSize)
                         .addComponent(spnRandomMarriageDiceSize)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomSameSexMarriageDiceSize)
                         .addComponent(spnRandomSameSexMarriageDiceSize)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomNewDependentMarriage)
                         .addComponent(spnRandomNewDependentMarriage)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -529,7 +529,7 @@ public class RelationshipsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomDivorceMethod)
                         .addComponent(comboRandomDivorceMethod)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkUseRandomOppositeSexDivorce)
                     .addComponent(chkUseRandomSameSexDivorce)
                     .addComponent(chkUseRandomClanPersonnelDivorce)
@@ -537,7 +537,7 @@ public class RelationshipsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomDivorceDiceSize)
                         .addComponent(spnRandomDivorceDiceSize)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -577,7 +577,7 @@ public class RelationshipsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(pnlProcreationGeneralOptionsPanel)
                         .addComponent(pnlRandomProcreationPanel)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "ProcreationTab");
@@ -662,11 +662,11 @@ public class RelationshipsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblMultiplePregnancyOccurrences)
                         .addComponent(spnMultiplePregnancyOccurrences)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblBabySurnameStyle)
                         .addComponent(comboBabySurnameStyle)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkAssignNonPrisonerBabiesFounderTag)
                     .addComponent(chkAssignChildrenOfFoundersFounderTag)
                     .addComponent(chkDetermineFatherAtBirth)
@@ -674,7 +674,7 @@ public class RelationshipsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblNoInterestInChildrenDiceSize)
                         .addComponent(spnNoInterestInChildrenDiceSize)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkUseMaternityLeave)
                     .addComponent(chkLogProcreation)));
 
@@ -743,18 +743,18 @@ public class RelationshipsTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomProcreationMethod)
                         .addComponent(comboRandomProcreationMethod)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkUseRelationshiplessRandomProcreation)
                     .addComponent(chkUseRandomClanPersonnelProcreation)
                     .addComponent(chkUseRandomPrisonerProcreation)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomProcreationRelationshipDiceSize)
                         .addComponent(spnRandomProcreationRelationshipDiceSize)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRandomProcreationRelationshiplessDiceSize)
                         .addComponent(spnRandomProcreationRelationshiplessDiceSize)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }

@@ -260,8 +260,7 @@ public class RulesetsTab {
                 .addComponent(chkAutoConfigMunitions)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblSPAUpgradeIntensity)
-                    .addComponent(spnSPAUpgradeIntensity)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnSPAUpgradeIntensity))
                 .addComponent(pnlScenarioModifiers));
 
         return panel;
@@ -303,8 +302,7 @@ public class RulesetsTab {
                     .addComponent(lblOpForLanceTypeMixed)
                     .addComponent(spnOpForLanceTypeMixed)
                     .addComponent(lblOpForLanceTypeVehicle)
-                    .addComponent(spnOpForLanceTypeVehicles)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnOpForLanceTypeVehicles)));
 
         return panel;
     }
@@ -343,16 +341,13 @@ public class RulesetsTab {
             layout.createParallelGroup(Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblScenarioModMax)
-                    .addComponent(spnScenarioModMax)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnScenarioModMax))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblScenarioModChance)
-                    .addComponent(spnScenarioModChance)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnScenarioModChance))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblScenarioModBV)
-                    .addComponent(spnScenarioModBV)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnScenarioModBV)));
 
         return panel;
     }
@@ -388,8 +383,7 @@ public class RulesetsTab {
                 .addComponent(chkUsePlanetaryConditions)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblFixedMapChance)
-                    .addComponent(spnFixedMapChance)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnFixedMapChance)));
 
         return panel;
     }
@@ -445,12 +439,10 @@ public class RulesetsTab {
                 .addComponent(chkRestrictPartsByMission)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblBonusPartExchangeValue)
-                    .addComponent(spnBonusPartExchangeValue)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnBonusPartExchangeValue))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblBonusPartMaxExchangeCount)
-                    .addComponent(spnBonusPartMaxExchangeCount)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnBonusPartMaxExchangeCount)));
 
         return panel;
     }
@@ -494,12 +486,10 @@ public class RulesetsTab {
                 .addComponent(chkUseStrategy)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblBaseStrategyDeployment)
-                    .addComponent(spnBaseStrategyDeployment)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnBaseStrategyDeployment))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblAdditionalStrategyDeployment)
-                    .addComponent(spnAdditionalStrategyDeployment)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnAdditionalStrategyDeployment))
                 .addComponent(chkAdjustPaymentForStrategy));
 
         return panel;
@@ -548,16 +538,13 @@ public class RulesetsTab {
                 .addComponent(chkUseStratCon)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblSkillLevel)
-                    .addComponent(comboSkillLevel)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboSkillLevel))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(chkUseGenericBattleValue)
-                    .addComponent(chkUseVerboseBidding)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(chkUseVerboseBidding))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(pnlScenarioGenerationPanel)
-                    .addComponent(pnlCampaignOptions)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(pnlCampaignOptions)));
 
         // Create panel and return
         return createParentPanel(panel, "StratConTab");
@@ -620,8 +607,7 @@ public class RulesetsTab {
                 .addComponent(chkUseAtB)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(pnlLegacyOpForGenerationPanel)
-                    .addComponent(pnlLegacyScenarioGenerationPanel)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(pnlLegacyScenarioGenerationPanel)));
 
         // Create panel and return
         return createParentPanel(panel, "LegacyTab");
@@ -662,8 +648,7 @@ public class RulesetsTab {
                 .addComponent(chkOpForUsesAero)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblOpForAeroChance)
-                    .addComponent(spnOpForAeroChance)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnOpForAeroChance))
                 .addComponent(chkOpForUsesLocalForces)
                 .addComponent(chkAdjustPlayerVehicles));
 
@@ -721,28 +706,23 @@ public class RulesetsTab {
                 .addComponent(chkGenerateChases)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblIntensity)
-                    .addComponent(spnAtBBattleIntensity)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnAtBBattleIntensity))
                 .addGroup(layout.createSequentialGroup()
                     .addGap(UIUtil.scaleForGUI(25))
                     .addComponent(lblFightChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()])
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()]))
                 .addGroup(layout.createSequentialGroup()
                     .addGap(UIUtil.scaleForGUI(25))
                     .addComponent(lblDefendChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()])
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()]))
                 .addGroup(layout.createSequentialGroup()
                     .addGap(UIUtil.scaleForGUI(25))
                     .addComponent(lblScoutChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()])
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()]))
                 .addGroup(layout.createSequentialGroup()
                     .addGap(UIUtil.scaleForGUI(25))
                     .addComponent(lblTrainingChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()])
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()]))
                 .addComponent(btnIntensityUpdate));
 
         return panel;

@@ -179,13 +179,11 @@ public class RepairAndMaintenanceTab {
                 .addComponent(useDamageMargin)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblDamageMargin)
-                    .addComponent(spnDamageMargin)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnDamageMargin))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblDestroyPartTarget)
                     .addComponent(spnDestroyPartTarget)
-                    .addComponent(lblDestroyPartTargetPost)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(lblDestroyPartTargetPost)));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "repairTab");
@@ -268,16 +266,13 @@ public class RepairAndMaintenanceTab {
                 .addComponent(checkMaintenance)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblMaintenanceDays)
-                    .addComponent(spnMaintenanceDays)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnMaintenanceDays))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblMaintenanceBonus)
-                    .addComponent(spnMaintenanceBonus)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnMaintenanceBonus))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblDefaultMaintenanceTime)
-                    .addComponent(spnDefaultMaintenanceTime)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnDefaultMaintenanceTime))
                 .addComponent(useQualityMaintenance)
                 .addComponent(reverseQualityNames)
                 .addComponent(chkUseRandomUnitQualities)

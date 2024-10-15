@@ -262,7 +262,7 @@ public class TurnoverAndRetentionTab {
                         .addComponent(pnlSettings)
                         .addComponent(pnlModifiers)
                         .addComponent(pnlPayout)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(pnlUnitCohesion)));
 
         // Create Parent Panel and return
@@ -364,11 +364,11 @@ public class TurnoverAndRetentionTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblTurnoverFixedTargetNumber)
                         .addComponent(spnTurnoverFixedTargetNumber)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblTurnoverFrequency)
                         .addComponent(comboTurnoverFrequency)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkUseContractCompletionRandomRetirement)
                     .addComponent(chkUseRandomFounderTurnover)
                     .addComponent(chkTrackOriginalUnit)
@@ -377,16 +377,16 @@ public class TurnoverAndRetentionTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblServiceContractDuration)
                         .addComponent(spnServiceContractDuration)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblServiceContractModifier)
                         .addComponent(spnServiceContractModifier)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkPayBonusDefault)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblPayBonusDefaultThreshold)
                         .addComponent(spnPayBonusDefaultThreshold)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -454,7 +454,7 @@ public class TurnoverAndRetentionTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(chkUseLoyaltyModifiers)
                         .addComponent(chkUseHideLoyalty)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -518,20 +518,20 @@ public class TurnoverAndRetentionTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblPayoutRateOfficer)
                         .addComponent(spnPayoutRateOfficer)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblPayoutRateEnlisted)
                         .addComponent(spnPayoutRateEnlisted)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblPayoutRetirementMultiplier)
                         .addComponent(spnPayoutRetirementMultiplier)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addComponent(chkUsePayoutServiceBonus)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblPayoutServiceBonusRate)
                         .addComponent(spnPayoutServiceBonusRate)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -569,7 +569,7 @@ public class TurnoverAndRetentionTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(pnlAdministrativeStrainWrapper)
                         .addComponent(pnlManagementSkillWrapper)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -651,11 +651,11 @@ public class TurnoverAndRetentionTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblAdministrativeCapacity)
                         .addComponent(spnAdministrativeCapacity)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblMultiCrewStrainDivider)
                         .addComponent(spnMultiCrewStrainDivider)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -736,7 +736,7 @@ public class TurnoverAndRetentionTab {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblManagementSkillPenalty)
                         .addComponent(spnManagementSkillPenalty)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         return panel;
     }
@@ -808,16 +808,16 @@ public class TurnoverAndRetentionTab {
                         .addComponent(lblFatigueRate)
                         .addComponent(spnFatigueRate)
                         .addComponent(chkUseInjuryFatigue)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblFieldKitchenCapacity)
                         .addComponent(spnFieldKitchenCapacity)
                         .addComponent(chkFieldKitchenIgnoreNonCombatants)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                        )
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblFatigueLeaveThreshold)
                         .addComponent(spnFatigueLeaveThreshold)
-                        .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))));
+                        )));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "FatigueTab");

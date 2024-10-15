@@ -53,9 +53,6 @@ public class CampaignOptionsUtilities {
 
         setFontScaling(checkBox, false, 1);
 
-        Dimension size = checkBox.getPreferredSize();
-        checkBox.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
-
         return checkBox;
     }
 
@@ -106,9 +103,6 @@ public class CampaignOptionsUtilities {
         DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
         editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
 
-        Dimension size = jSpinner.getPreferredSize();
-        jSpinner.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
-
         return jSpinner;
     }
 
@@ -150,9 +144,6 @@ public class CampaignOptionsUtilities {
 
         setFontScaling(jLabel, false, 1);
 
-        Dimension size = jLabel.getPreferredSize();
-        jLabel.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
-
         return jLabel;
     }
 
@@ -191,10 +182,6 @@ public class CampaignOptionsUtilities {
         jTextField.setName("txt" + name);
 
         setFontScaling(jTextField, false, 1);
-
-        int preferredHeight = jTextField.getPreferredSize().height;
-        jTextField.setMinimumSize(UIUtil.scaleForGUI(width, preferredHeight));
-        jTextField.setMaximumSize(UIUtil.scaleForGUI(width, preferredHeight));
 
         return jTextField;
     }
@@ -258,20 +245,6 @@ public class CampaignOptionsUtilities {
 
         panel.setName(name);
 
-        Dimension size = panel.getPreferredSize();
-        int sizeHeight = size.height;
-        int sizeWidth = size.width;
-        for (Component component : panel.getComponents()) {
-            sizeHeight += component.getPreferredSize().height;
-            sizeWidth += component.getPreferredSize().width;
-        }
-
-        if (sizeWidth < 750) {
-            sizeWidth = 750;
-        }
-
-        panel.setMaximumSize(UIUtil.scaleForGUI(sizeWidth, sizeHeight));
-
         return panel;
     }
 
@@ -308,8 +281,6 @@ public class CampaignOptionsUtilities {
         }
 
         final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", false, "");
-        Dimension size = panel.getPreferredSize();
-        panel.setPreferredSize(UIUtil.scaleForGUI(750, size.height));
 
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -354,7 +325,7 @@ public class CampaignOptionsUtilities {
      */
     static JPanel createParentPanel(JPanel panel, String name) {
         // Create Panel
-        final JPanel parentPanel = createStandardPanel(name, false, "");
+        final JPanel parentPanel = createStandardPanel(name, false);
         final GroupLayout parentLayout = createStandardLayout(parentPanel);
 
         // Set Dimensions
@@ -480,9 +451,6 @@ public class CampaignOptionsUtilities {
         jButton.setName("btn" + name);
 
         setFontScaling(jButton, false, 1);
-
-        Dimension size = jButton.getPreferredSize();
-        jButton.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return jButton;
     }

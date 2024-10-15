@@ -144,8 +144,7 @@ public class MarketsTab {
                 .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(pnlPersonnelMarketGeneralOptions)
-                    .addComponent(pnlRemovalTargets)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(pnlRemovalTargets)));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PersonnelMarketTab");
@@ -186,12 +185,10 @@ public class MarketsTab {
             layout.createParallelGroup(Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblPersonnelMarketType)
-                    .addComponent(comboPersonnelMarketType)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboPersonnelMarketType))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblPersonnelMarketDylansWeight)
-                    .addComponent(spnPersonnelMarketDylansWeight)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnPersonnelMarketDylansWeight))
                 .addComponent(chkPersonnelMarketReportRefresh)
                 .addComponent(chkUsePersonnelHireHiringHallOnly));
 
@@ -237,20 +234,16 @@ public class MarketsTab {
             leftLayout.createParallelGroup(Alignment.LEADING)
                 .addGroup(leftLayout.createSequentialGroup()
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE))
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE)))
                 .addGroup(leftLayout.createSequentialGroup()
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN))
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN)))
                 .addGroup(leftLayout.createSequentialGroup()
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN))
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN)))
                 .addGroup(leftLayout.createSequentialGroup()
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))));
 
         final JPanel rightPanel = createStandardPanel("RightPanel", false);
         final GroupLayout rightLayout = createStandardLayout(rightPanel);
@@ -275,20 +268,16 @@ public class MarketsTab {
             rightLayout.createParallelGroup(Alignment.LEADING)
                 .addGroup(rightLayout.createSequentialGroup()
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN))
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN)))
                 .addGroup(rightLayout.createSequentialGroup()
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE))
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE)))
                 .addGroup(rightLayout.createSequentialGroup()
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC))
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC)))
                 .addGroup(rightLayout.createSequentialGroup()
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY))
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY))));
 
         final JPanel parentPanel = createStandardPanel("PersonnelMarketRemovalOptionsPanel",
             true, "PersonnelMarketRemovalOptionsPanel");
@@ -305,8 +294,7 @@ public class MarketsTab {
             parentLayout.createParallelGroup(Alignment.LEADING)
                 .addGroup(parentLayout.createSequentialGroup()
                     .addComponent(leftPanel)
-                    .addComponent(rightPanel)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(rightPanel)));
 
         return parentPanel;
     }
@@ -374,17 +362,14 @@ public class MarketsTab {
                 .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblUnitMarketMethod)
-                    .addComponent(comboUnitMarketMethod)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboUnitMarketMethod))
                 .addComponent(chkUnitMarketRegionalMekVariations)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblUnitMarketSpecialUnitChance)
-                    .addComponent(spnUnitMarketSpecialUnitChance)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnUnitMarketSpecialUnitChance))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblUnitMarketRarityModifier)
-                    .addComponent(spnUnitMarketRarityModifier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnUnitMarketRarityModifier))
                 .addComponent(chkInstantUnitMarketDelivery)
                 .addComponent(chkUnitMarketReportRefresh));
 
@@ -452,8 +437,7 @@ public class MarketsTab {
                 .addComponent(headerPanel, Alignment.CENTER)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(pnlContractMarketGeneralOptions)
-                    .addComponent(pnlContractPay)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+                    .addComponent(pnlContractPay)));
 
         // Create Parent Panel and return
         return createParentPanel(panel, "ContractMarketTab");
@@ -508,21 +492,17 @@ public class MarketsTab {
             layout.createParallelGroup(Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblContractMarketMethod)
-                    .addComponent(comboContractMarketMethod)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(comboContractMarketMethod))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblContractSearchRadius)
-                    .addComponent(spnContractSearchRadius)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnContractSearchRadius))
                 .addComponent(chkVariableContractLength)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblCoontractMaxSalvagePercentage)
-                    .addComponent(spnContractMaxSalvagePercentage)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnContractMaxSalvagePercentage))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblDropShipBonusPercentage)
-                    .addComponent(spnDropShipBonusPercentage)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnDropShipBonusPercentage))
                 .addComponent(chkContractMarketReportRefresh));
 
         return panel;
@@ -595,28 +575,23 @@ public class MarketsTab {
                 .addComponent(btnContractEquipment)
                 .addGroup(layout.createSequentialGroup()
                     .addGap(UIUtil.scaleForGUI(25))
-                    .addComponent(chkEquipContractSaleValue)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(chkEquipContractSaleValue))
                 .addGroup(layout.createSequentialGroup()
                     .addGap(UIUtil.scaleForGUI(25))
                     .addComponent(lblEquipPercent)
-                    .addComponent(spnEquipPercent)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnEquipPercent))
                 .addGroup(layout.createSequentialGroup()
                     .addGap(UIUtil.scaleForGUI(25))
                     .addComponent(lblDropShipPercent)
-                    .addComponent(spnDropShipPercent)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnDropShipPercent))
                 .addGroup(layout.createSequentialGroup()
                     .addGap(UIUtil.scaleForGUI(25))
                     .addComponent(lblJumpShipPercent)
-                    .addComponent(spnJumpShipPercent)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnJumpShipPercent))
                 .addGroup(layout.createSequentialGroup()
                     .addGap(UIUtil.scaleForGUI(25))
                     .addComponent(lblWarShipPercent)
-                    .addComponent(spnWarShipPercent)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+                    .addComponent(spnWarShipPercent))
                 .addComponent(btnContractPersonnel)
                 .addComponent(chkBLCSaleValue)
                 .addComponent(useInfantryDoseNotCountBox)
