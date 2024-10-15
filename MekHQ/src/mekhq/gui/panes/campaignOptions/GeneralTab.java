@@ -55,6 +55,7 @@ public class GeneralTab {
     private JLabel lblIcon;
     private JButton btnIcon;
     private StandardForceIcon unitIcon;
+    private JPanel createGeneralOptionsPanel;
 
     /**
      * Constructs a new {@link GeneralTab} object.
@@ -83,29 +84,15 @@ public class GeneralTab {
         // Header
         JPanel headerPanel = createGeneralHeader();
 
-        // Campaign name
         lblName = createLabel("Name");
         txtName = createTextField("Name", 300);
 
-        // Generate new random campaign name
         btnNameGenerator = createButton("NameGenerator");
         btnNameGenerator.addActionListener(e -> txtName.setText(BackgroundsController
-                .randomMercenaryCompanyNameGenerator(campaign.getFlaggedCommander())));
+            .randomMercenaryCompanyNameGenerator(campaign.getFlaggedCommander())));
 
-        // Campaign faction
-        lblFaction = createLabel("Faction");
-        comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), campaign.getLocalDate()));
-
-        // Reputation
-        lblReputation = createLabel("Reputation");
-        lblManualUnitRatingModifier = createLabel("ManualUnitRatingModifier");
-        manualUnitRatingModifier = createSpinner("ManualUnitRatingModifier",
-            0, -200, 200, 1);
-
-        // Date
-        lblDate = createLabel("Date");
-        btnDate = createButton("Date");
-        btnDate.addActionListener(this::btnDateActionPerformed);
+        createGeneralOptionsPanel = createGeneralOptionsPanel();
+        JPanel emptyPanel = createEmptyPanel(0);
 
         // Camouflage
         lblCamo = createLabel("Camo");
@@ -144,17 +131,8 @@ public class GeneralTab {
                     .addComponent(txtName)
                     .addComponent(btnNameGenerator))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFaction)
-                    .addComponent(comboFaction))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblReputation)
-                    .addComponent(unitRatingMethodCombo))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblManualUnitRatingModifier)
-                    .addComponent(manualUnitRatingModifier))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblDate)
-                    .addComponent(btnDate))
+                    .addComponent(createGeneralOptionsPanel)
+                    .addComponent(emptyPanel))
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                     .addComponent(lblCamo)
                     .addComponent(btnCamo)
@@ -169,6 +147,56 @@ public class GeneralTab {
                     .addComponent(txtName)
                     .addComponent(btnNameGenerator))
                 .addGroup(layout.createSequentialGroup()
+                    .addComponent(createGeneralOptionsPanel)
+                    .addComponent(emptyPanel))
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(lblCamo)
+                    .addComponent(btnCamo)
+                    .addGap(UIUtil.scaleForGUI(50))
+                    .addComponent(lblIcon)
+                    .addComponent(btnIcon)));
+
+        generalPanel.add(panel);
+
+        return generalPanel;
+    }
+
+    private JPanel createGeneralOptionsPanel() {
+        lblFaction = createLabel("Faction");
+        comboFaction.setSelectedItem(new FactionDisplay(campaign.getFaction(), campaign.getLocalDate()));
+
+        lblReputation = createLabel("Reputation");
+        lblManualUnitRatingModifier = createLabel("ManualUnitRatingModifier");
+        manualUnitRatingModifier = createSpinner("ManualUnitRatingModifier",
+            0, -200, 200, 1);
+
+        lblDate = createLabel("Date");
+        btnDate = createButton("Date");
+        btnDate.addActionListener(this::btnDateActionPerformed);
+
+        // Layout the Panel
+        final JPanel panel = createStandardPanel("GeneralOptionsPanel", false);
+        final GroupLayout layout = createStandardLayout(panel);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblFaction)
+                    .addComponent(comboFaction))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblReputation)
+                    .addComponent(unitRatingMethodCombo))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblManualUnitRatingModifier)
+                    .addComponent(manualUnitRatingModifier))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblDate)
+                    .addComponent(btnDate)));
+
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
                     .addComponent(lblFaction)
                     .addComponent(comboFaction))
                 .addGroup(layout.createSequentialGroup()
@@ -179,17 +207,9 @@ public class GeneralTab {
                     .addComponent(manualUnitRatingModifier))
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(lblDate)
-                    .addComponent(btnDate))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblCamo)
-                    .addComponent(btnCamo)
-                    .addGap(50)
-                    .addComponent(lblIcon)
-                    .addComponent(btnIcon)));
+                    .addComponent(btnDate)));
 
-        generalPanel.add(panel);
-
-        return generalPanel;
+        return panel;
     }
 
     /**

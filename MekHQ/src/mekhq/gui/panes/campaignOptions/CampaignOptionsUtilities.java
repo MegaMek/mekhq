@@ -181,6 +181,10 @@ public class CampaignOptionsUtilities {
         jTextField.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jTextField.setName("txt" + name);
 
+        Dimension size = jTextField.getPreferredSize();
+        jTextField.setMinimumSize(UIUtil.scaleForGUI(width, size.height));
+        jTextField.setMaximumSize(UIUtil.scaleForGUI(width, size.height));
+
         setFontScaling(jTextField, false, 1);
 
         return jTextField;
@@ -244,6 +248,23 @@ public class CampaignOptionsUtilities {
         }
 
         panel.setName(name);
+
+        return panel;
+    }
+
+
+    /**
+     * Creates an empty {@link JPanel} with the specified name and minimum width.
+     * This is used to occupy whitespace to stop GUI elements from getting overly spread out.
+     * Its inclusion is not ideal, but after a couple of days of throwing our heads against a wall,
+     * this was the best solution we could find.
+     *
+     * @param width the minimum width of the {@link JPanel}
+     * @return a new {@link JPanel} with the specified name and minimum width
+     */
+    static JPanel createEmptyPanel(int width) {
+        JPanel panel = new JPanel();
+        panel.setMinimumSize(UIUtil.scaleForGUI(width, 25));
 
         return panel;
     }
