@@ -281,7 +281,6 @@ public class CampaignOptionsUtilities {
         }
 
         final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", false, "");
-
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
 
@@ -326,7 +325,6 @@ public class CampaignOptionsUtilities {
     static JPanel createParentPanel(JPanel panel, String name) {
         // Create Panel
         final JPanel parentPanel = createStandardPanel(name, false);
-        final GroupLayout parentLayout = createStandardLayout(parentPanel);
 
         // Set Dimensions
         int widthNew = parentPanel.getMinimumSize().width;
@@ -347,15 +345,11 @@ public class CampaignOptionsUtilities {
         parentPanel.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         // Layout
-        parentPanel.setLayout(parentLayout);
+        parentPanel.setLayout(new BoxLayout(parentPanel, BoxLayout.Y_AXIS));
 
-        parentLayout.setVerticalGroup(
-            parentLayout.createSequentialGroup()
-                .addComponent(panel));
-
-        parentLayout.setHorizontalGroup(
-            parentLayout.createParallelGroup(Alignment.CENTER)
-                .addComponent(panel));
+        parentPanel.add(Box.createVerticalGlue());
+        parentPanel.add(panel);
+        parentPanel.add(Box.createVerticalGlue());
 
         return parentPanel;
     }
