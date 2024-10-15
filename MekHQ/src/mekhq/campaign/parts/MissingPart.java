@@ -177,7 +177,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                         return part;
                     } else if (bestPart.needsFixing() && !part.needsFixing()) {
                         return part;
-                    } else if (bestPart.getQuality() < part.getQuality()) {
+                    } else if (bestPart.getQuality().toNumeric() < part.getQuality().toNumeric()) {
                         return part;
                     }
                 }

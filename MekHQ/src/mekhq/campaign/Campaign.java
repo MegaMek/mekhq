@@ -72,6 +72,7 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -728,7 +729,7 @@ public class Campaign implements ITechManager {
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        int quality = 3;
+        PartQuality quality = PartQuality.D;
 
         if (campaignOptions.isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);
@@ -1316,7 +1317,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add a new unit to the campaign and set its quality to 3 (D).
+     * Add a new unit to the campaign and set its quality to D.
      *
      * @param en             An <code>Entity</code> object that the new unit will be
      *                       wrapped around
@@ -1326,7 +1327,7 @@ public class Campaign implements ITechManager {
      * @return The newly added unit
      */
     public Unit addNewUnit(Entity en, boolean allowNewPilots, int days) {
-        return addNewUnit(en, allowNewPilots, days, 3);
+        return addNewUnit(en, allowNewPilots, days, PartQuality.D);
     }
 
     /**
@@ -1342,12 +1343,7 @@ public class Campaign implements ITechManager {
      * @throws IllegalArgumentException If the quality is not within the valid range
      *                                  (0-5)
      */
-    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, int quality) {
-        if ((quality < 0) || (quality > 5)) {
-            throw new IllegalArgumentException(
-                    "Invalid quality in mekhq/campaign/Campaign.java/addNewUnit: " + quality);
-        }
-
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, PartQuality quality) {
         Unit unit = new Unit(en, this);
         unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
         getHangar().addUnit(unit);
@@ -7782,7 +7778,7 @@ public class Campaign implements ITechManager {
                 }
             }
             // it is time for a maintenance check
-            int qualityOrig = u.getQuality();
+            PartQuality qualityOrig = u.getQuality();
             String techName = "Nobody";
             String techNameLinked = techName;
             if (null != tech) {
@@ -7830,21 +7826,21 @@ public class Campaign implements ITechManager {
                 logger.info(maintenanceReport.toString());
             }
 
-            int quality = u.getQuality();
+            PartQuality quality = u.getQuality();
             String qualityString;
             boolean reverse = getCampaignOptions().isReverseQualityNames();
-            if (quality > qualityOrig) {
-                qualityString = "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                        + "'>Overall quality improves from "
-                        + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
-                        + "</font>";
-            } else if (quality < qualityOrig) {
-                qualityString = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'>Overall quality declines from "
-                        + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
-                        + "</font>";
+            if (quality.toNumeric() > qualityOrig.toNumeric()) {
+                qualityString = ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                        "Overall quality improves from " + qualityOrig.toName(reverse)
+                        + " to " + quality.toName(reverse));
+            } else if (quality.toNumeric() < qualityOrig.toNumeric()) {
+                qualityString = ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                    "Overall quality declines from " + qualityOrig.toName(reverse)
+                    + " to " + quality.toName(reverse));
             } else {
-                qualityString = "Overall quality remains " + Part.getQualityName(quality, reverse);
+                qualityString = "Overall quality remains " + quality.toName(reverse);
             }
             String damageString = "";
             if (nDamage > 0) {
@@ -7876,7 +7872,7 @@ public class Campaign implements ITechManager {
         if (!p.needsMaintenance()) {
             return null;
         }
-        int oldQuality = p.getQuality();
+        PartQuality oldQuality = p.getQuality();
         TargetRoll target = getTargetForMaintenance(p, u.getTech());
         if (!paidMaintenance) {
             // TODO : Make this modifier user inputtable
@@ -7889,7 +7885,7 @@ public class Campaign implements ITechManager {
         partReport += " rolled a " + roll + ", margin of " + margin;
 
         switch (p.getQuality()) {
-            case Part.QUALITY_A: {
+            case A: {
                 if (margin >= 4) {
                     p.improveQuality();
                 }
@@ -7908,11 +7904,11 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_B: {
+            case B: {
                 if (margin >= 4) {
                     p.improveQuality();
                 } else if (margin < -5) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                 }
                 if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
@@ -7923,9 +7919,9 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_C: {
+            case C: {
                 if (margin < -4) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                 } else if (margin >= 5) {
                     p.improveQuality();
                 }
@@ -7938,9 +7934,9 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_D: {
+            case D: {
                 if (margin < -3) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                     if ((margin < -4) && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
@@ -7949,9 +7945,9 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_E:
+            case E:
                 if (margin < -2) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                     if ((margin < -5) && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
@@ -7959,10 +7955,10 @@ public class Campaign implements ITechManager {
                     p.improveQuality();
                 }
                 break;
-            case Part.QUALITY_F:
+            case F:
             default:
                 if (margin < -2) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                     if (margin < -6 && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
@@ -7973,22 +7969,26 @@ public class Campaign implements ITechManager {
                 // }
                 break;
         }
-        if (p.getQuality() > oldQuality) {
-            partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>new quality is "
-                    + p.getQualityName() + "</font>";
-        } else if (p.getQuality() < oldQuality) {
-            partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>new quality is "
-                    + p.getQualityName() + "</font>";
+        if (p.getQuality().toNumeric() > oldQuality.toNumeric()) { 
+            partReport += ": " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                    "new quality is " + p.getQualityName());
+        } else if (p.getQuality().toNumeric() < oldQuality.toNumeric()) {
+            partReport += ": " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                    "new quality is " + p.getQualityName());
         } else {
             partReport += ": quality remains " + p.getQualityName();
         }
         if (null != partsToDamage.get(p)) {
             if (partsToDamage.get(p) > 3) {
-                partReport += ", <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'><b>part destroyed</b></font>";
+                partReport += ", " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                        "<b>part destroyed</b>");
             } else {
-                partReport += ", <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'><b>part damaged</b></font>";
+                partReport += ", " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                        "<b>part damaged</b>");
             }
         }
 
