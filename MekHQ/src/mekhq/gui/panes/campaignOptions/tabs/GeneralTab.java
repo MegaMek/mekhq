@@ -113,15 +113,15 @@ public class GeneralTab {
         // Camouflage
         lblCamo = createLabel("Camo");
         btnCamo.setName("btnCamo");
-        btnCamo.setMinimumSize(UIUtil.scaleForGUI(100, 100));
-        btnCamo.setMaximumSize(UIUtil.scaleForGUI(100, 100));
+//        btnCamo.setMinimumSize(UIUtil.scaleForGUI(100, 100));
+//        btnCamo.setMaximumSize(UIUtil.scaleForGUI(100, 100));
         btnCamo.addActionListener(this::btnCamoActionPerformed);
 
         // Unit icon
         lblIcon = createLabel("Icon");
         btnIcon.setName("btnIcon");
-        btnIcon.setMinimumSize(UIUtil.scaleForGUI(100, 100));
-        btnIcon.setMaximumSize(UIUtil.scaleForGUI(100, 100));
+//        btnIcon.setMinimumSize(UIUtil.scaleForGUI(100, 100));
+//        btnIcon.setMaximumSize(UIUtil.scaleForGUI(100, 100));
         btnIcon.addActionListener(evt -> {
             final UnitIconDialog unitIconDialog = new UnitIconDialog(frame, unitIcon);
             if (unitIconDialog.showDialog().isConfirmed() && (unitIconDialog.getSelectedItem() != null)) {
@@ -135,18 +135,7 @@ public class GeneralTab {
             new GridBagLayout());
 
         // Layout the Panel
-
-
-
-        final JPanel outerPanel = createStandardPanel("generalTab", true);
-        outerPanel.setLayout(new BorderLayout());
-        outerPanel.add(Box.createHorizontalStrut(25), BorderLayout.LINE_START);
-        outerPanel.add(Box.createHorizontalStrut(25), BorderLayout.LINE_END);
-
-//        outerPanel.add(panel);
-
         JPanel panel = new JPanel();
-        outerPanel.add(panel, BorderLayout.CENTER);
         GridBagConstraints gbc = new GridBagConstraints();
         panel.setLayout(new GridBagLayout());
 
@@ -205,11 +194,18 @@ public class GeneralTab {
         panel.add(btnDate, gbc);
 
         gbc.gridy++;
+        gbc.gridwidth = 5;
         gbc.gridx = GridBagConstraints.RELATIVE;
-        panel.add(lblCamo, gbc);
-        panel.add(btnCamo, gbc);
-        panel.add(lblIcon, gbc);
-        panel.add(btnIcon, gbc);
+        JPanel iconsPanel = new JPanel();
+
+        iconsPanel.add(lblCamo);
+        iconsPanel.add(btnCamo);
+        iconsPanel.add(Box.createHorizontalStrut(50));
+        iconsPanel.add(lblIcon);
+        iconsPanel.add(btnIcon);
+
+        panel.add(iconsPanel, gbc);
+
 
 
 
@@ -274,9 +270,14 @@ public class GeneralTab {
 //                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
 //
 
+        final JPanel outerPanel = createStandardPanel("generalTab", true);
+        // Add some padding left and right (inside the border!)
+        outerPanel.setLayout(new BorderLayout());
+        outerPanel.add(Box.createHorizontalStrut(25), BorderLayout.LINE_START);
+        outerPanel.add(Box.createHorizontalStrut(25), BorderLayout.LINE_END);
+        outerPanel.add(panel, BorderLayout.CENTER);
 
         generalPanel.add(outerPanel);
-
         return generalPanel;
     }
 
