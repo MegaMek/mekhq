@@ -263,13 +263,25 @@ public class CampaignOptionsUtilities {
      * @return a {@link JPanel} representing the header panel
      */
     static JPanel createHeaderPanel(String name, String imageAddress, boolean includeBodyText) {
+        // Fetch and scale image
         ImageIcon imageIcon = new ImageIcon(imageAddress);
+
+        int width = UIUtil.scaleForGUI(imageIcon.getIconWidth());
+        int height = UIUtil.scaleForGUI(imageIcon.getIconHeight());
+
+        Image image = imageIcon.getImage();
+        Image newImg = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
+        imageIcon = new ImageIcon(newImg);
+
         JLabel imageLabel = new JLabel(imageIcon);
 
+        // Create header text
         final JLabel lblHeader = new JLabel(resources.getString("lbl" + name + ".text"), SwingConstants.CENTER);
         lblHeader.setName("lbl" + name);
         setFontScaling(lblHeader, true, 2);
 
+        // Create body text
         JLabel lblBody = new JLabel();
         if (includeBodyText) {
             lblBody = new JLabel(String.format("<html><p align='justify'>%s</p></html>",
@@ -280,6 +292,7 @@ public class CampaignOptionsUtilities {
             lblBody.setMaximumSize(UIUtil.scaleForGUI(750, size.height));
         }
 
+        // Layout panel
         final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", false, "");
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);

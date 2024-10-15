@@ -199,6 +199,15 @@ public class GeneralTab {
      */
     private static JPanel createGeneralHeader() {
         ImageIcon imageIcon = new ImageIcon("data/images/misc/MekHQ.png");
+
+        int width = UIUtil.scaleForGUI(imageIcon.getIconWidth());
+        int height = UIUtil.scaleForGUI(imageIcon.getIconHeight());
+
+        Image image = imageIcon.getImage();
+        Image newImg = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
+        imageIcon = new ImageIcon(newImg);
+
         JLabel imageLabel = new JLabel(imageIcon);
 
         final JLabel lblHeader = new JLabel(resources.getString("lblGeneral.text"), SwingConstants.CENTER);
