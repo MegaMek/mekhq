@@ -651,7 +651,6 @@ public class EquipmentAndSuppliesTab {
      */
     private void setSpinnerWidth(JSpinner spinner) {
         Dimension size = spinner.getPreferredSize();
-        spinner.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
         spinner.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
     }
 

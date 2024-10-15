@@ -1175,7 +1175,6 @@ public class PersonnelTab {
 
             Dimension labelSize = jLabel.getPreferredSize();
             jLabel.setMinimumSize(UIUtil.scaleForGUI(labelSize.width, labelSize.height));
-            jLabel.setMaximumSize(UIUtil.scaleForGUI(labelSize.width, labelSize.height));
 
             // JSpinner
             JSpinner jSpinner = new JSpinner();
@@ -1186,7 +1185,6 @@ public class PersonnelTab {
             editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
 
             Dimension spinnerSize = jSpinner.getPreferredSize();
-            jSpinner.setMaximumSize(UIUtil.scaleForGUI(spinnerSize.width, spinnerSize.height));
             jSpinner.setMinimumSize(UIUtil.scaleForGUI(spinnerSize.width, spinnerSize.height));
 
             // Component Tracking Assignment

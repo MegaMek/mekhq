@@ -52,7 +52,6 @@ public class CampaignOptionsUtilities {
         checkBox.setName("chk" + name);
 
         Dimension size = checkBox.getPreferredSize();
-        checkBox.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
         checkBox.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return checkBox;
@@ -104,7 +103,6 @@ public class CampaignOptionsUtilities {
         editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
 
         Dimension size = jSpinner.getPreferredSize();
-        jSpinner.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
         jSpinner.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return jSpinner;
@@ -148,7 +146,6 @@ public class CampaignOptionsUtilities {
 
         Dimension size = jLabel.getPreferredSize();
         jLabel.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
-        jLabel.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return jLabel;
     }
@@ -261,8 +258,8 @@ public class CampaignOptionsUtilities {
             sizeWidth += component.getPreferredSize().width;
         }
 
-        if (sizeWidth < UIUtil.scaleForGUI(750)) {
-            sizeWidth = UIUtil.scaleForGUI(750);
+        if (sizeWidth < 750) {
+            sizeWidth = 750;
         }
 
         panel.setMaximumSize(UIUtil.scaleForGUI(sizeWidth, sizeHeight));
@@ -474,7 +471,6 @@ public class CampaignOptionsUtilities {
 
         Dimension size = jButton.getPreferredSize();
         jButton.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
-        jButton.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return jButton;
     }
