@@ -204,9 +204,9 @@ public class GeneralTab {
         int height = UIUtil.scaleForGUI(imageIcon.getIconHeight());
 
         Image image = imageIcon.getImage();
-        Image newImg = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 
-        imageIcon = new ImageIcon(newImg);
+        imageIcon = new ImageIcon(scaledImage);
 
         JLabel imageLabel = new JLabel(imageIcon);
 

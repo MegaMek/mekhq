@@ -18,6 +18,7 @@
  */
 package mekhq.gui.panes.campaignOptions;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignPreset;
@@ -28,6 +29,9 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createButton;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createStandardLayout;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.setFontScaling;
 
 /**
  * A dialog for selecting campaign presets. Extends {@link JDialog}.
@@ -38,10 +42,6 @@ public class SelectPresetDialog extends JDialog {
     private static String RESOURCE_PACKAGE = "mekhq/resources/NEWCampaignOptionsDialog";
     private static final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_PACKAGE,
         MekHQ.getMHQOptions().getLocale());
-
-    final static String OPTION_SELECT_PRESET = resources.getString("presetDialogSelect.name");
-    final static String OPTION_CUSTOMIZE_PRESET = resources.getString("presetDialogCustomize.name");
-    final static String OPTION_CANCEL = resources.getString("presetDialogCancel.name");
 
     private static final MMLogger logger = MMLogger.create(SelectPresetDialog.class);
 
@@ -83,19 +83,27 @@ public class SelectPresetDialog extends JDialog {
 
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
-        ImageIcon image = new ImageIcon("data/images/misc/megamek-splash.png");
-        JLabel imageLabel = new JLabel(image);
+        ImageIcon imageIcon = new ImageIcon("data/images/misc/megamek-splash.png");
+
+        int width = UIUtil.scaleForGUI(imageIcon.getIconWidth());
+        int height = UIUtil.scaleForGUI(imageIcon.getIconHeight());
+
+        Image image = imageIcon.getImage();
+        Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
+        imageIcon = new ImageIcon(scaledImage);
+        JLabel imageLabel = new JLabel(imageIcon);
         add(imageLabel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel();
-        final GroupLayout layout = new GroupLayout(centerPanel);
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
+        final GroupLayout layout = createStandardLayout(centerPanel);
         centerPanel.setLayout(layout);
 
         JLabel descriptionLabel = new JLabel(String.format(
-            "<html><body><div style='width:400px;'><center>%s</center></div></body></html>",
+            "<html><body><div style='width:%spx;'><center>%s</center></div></body></html>",
+            UIUtil.scaleForGUI(400),
             resources.getString("presetDialog.description")));
+        setFontScaling(descriptionLabel, false, 1);
 
         final DefaultListModel<CampaignPreset> campaignPresets = new DefaultListModel<>();
         campaignPresets.addAll(CampaignPreset.getCampaignPresets());
@@ -132,16 +140,20 @@ public class SelectPresetDialog extends JDialog {
         );
 
         layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
+            layout.createParallelGroup(Alignment.CENTER)
                 .addComponent(descriptionLabel)
                 .addComponent(comboBox)
         );
 
-        add(centerPanel, BorderLayout.CENTER);
+        JPanel outerPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.CENTER;
+        outerPanel.add(centerPanel,gbc);
+
+        add(outerPanel, BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel();
 
-        JButton buttonSelect = new JButton(OPTION_SELECT_PRESET);
-        buttonSelect.setToolTipText(resources.getString("presetDialogSelect.tooltip"));
+        JButton buttonSelect = createButton("PresetDialogSelect");
         buttonSelect.addActionListener(e -> {
             selectedPreset = (CampaignPreset) comboBox.getSelectedItem();
             returnState = PRESET_SELECTION_SELECT;
@@ -150,8 +162,7 @@ public class SelectPresetDialog extends JDialog {
         buttonSelect.setEnabled(includePresetSelectOption);
         buttonPanel.add(buttonSelect);
 
-        JButton buttonCustomize = new JButton(OPTION_CUSTOMIZE_PRESET);
-        buttonCustomize.setToolTipText(resources.getString("presetDialogCustomize.tooltip"));
+        JButton buttonCustomize = createButton("PresetDialogCustomize");
         buttonCustomize.addActionListener(e -> {
             selectedPreset = (CampaignPreset) comboBox.getSelectedItem();
             returnState = PRESET_SELECTION_CUSTOMIZE;
@@ -160,8 +171,7 @@ public class SelectPresetDialog extends JDialog {
         buttonCustomize.setEnabled(includeCustomizePresetOption);
         buttonPanel.add(buttonCustomize);
 
-        JButton buttonCancel = new JButton(OPTION_CANCEL);
-        buttonCancel.setToolTipText(resources.getString("presetDialogCancel.tooltip"));
+        JButton buttonCancel = createButton("PresetDialogCancel");
         buttonCancel.addActionListener(e -> {
             returnState = PRESET_SELECTION_CANCELLED;
             dispose();
@@ -173,6 +183,7 @@ public class SelectPresetDialog extends JDialog {
         pack();
         setAlwaysOnTop(true);
         setResizable(false);
+        setSize(UIUtil.scaleForGUI(575, 250));
         setLocationRelativeTo(null);
         setVisible(true);
     }
