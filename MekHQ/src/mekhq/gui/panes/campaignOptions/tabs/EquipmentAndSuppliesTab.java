@@ -1,6 +1,7 @@
 package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -650,8 +651,8 @@ public class EquipmentAndSuppliesTab {
      */
     private void setSpinnerWidth(JSpinner spinner) {
         Dimension size = spinner.getPreferredSize();
-        spinner.setMaximumSize(size);
-        spinner.setMinimumSize(size);
+        spinner.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
+        spinner.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
     }
 
     /**

@@ -112,20 +112,20 @@ public class GeneralTab {
         // Camouflage
         lblCamo = createLabel("Camo");
         btnCamo.setName("btnCamo");
-        btnCamo.setMinimumSize(new Dimension(100, 100));
-        btnCamo.setMaximumSize(new Dimension(100, 100));
+        btnCamo.setMinimumSize(UIUtil.scaleForGUI(100, 100));
+        btnCamo.setMaximumSize(UIUtil.scaleForGUI(100, 100));
         btnCamo.addActionListener(this::btnCamoActionPerformed);
 
         // Unit icon
         lblIcon = createLabel("Icon");
         btnIcon.setName("btnIcon");
-        btnIcon.setMinimumSize(new Dimension(100,  100));
-        btnIcon.setMaximumSize(new Dimension(100, 100));
+        btnIcon.setMinimumSize(UIUtil.scaleForGUI(100, 100));
+        btnIcon.setMaximumSize(UIUtil.scaleForGUI(100, 100));
         btnIcon.addActionListener(evt -> {
             final UnitIconDialog unitIconDialog = new UnitIconDialog(frame, unitIcon);
             if (unitIconDialog.showDialog().isConfirmed() && (unitIconDialog.getSelectedItem() != null)) {
                 unitIcon = unitIconDialog.getSelectedItem();
-                btnIcon.setIcon(unitIcon.getImageIcon(75));
+                btnIcon.setIcon(unitIcon.getImageIcon(UIUtil.scaleForGUI(75)));
             }
         });
 
@@ -217,7 +217,7 @@ public class GeneralTab {
             resources.getString("lblGeneralBody.text")), SwingConstants.CENTER);
         lblBody.setName("lblGeneralHeaderBody");
         Dimension size = lblBody.getPreferredSize();
-        lblBody.setMaximumSize(new Dimension(UIUtil.scaleForGUI(750), size.height));
+        lblBody.setMaximumSize(UIUtil.scaleForGUI(750, size.height));
 
         final JPanel panel = createStandardPanel("pnlGeneralHeaderPanel", false);
         final GroupLayout layout = createStandardLayout(panel);

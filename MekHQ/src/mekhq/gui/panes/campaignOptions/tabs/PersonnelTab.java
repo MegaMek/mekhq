@@ -1,6 +1,7 @@
 package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
@@ -1173,8 +1174,8 @@ public class PersonnelTab {
             jLabel.setName("lbl" + componentName);
 
             Dimension labelSize = jLabel.getPreferredSize();
-            jLabel.setMinimumSize(labelSize);
-            jLabel.setMaximumSize(labelSize);
+            jLabel.setMinimumSize(UIUtil.scaleForGUI(labelSize.width, labelSize.height));
+            jLabel.setMaximumSize(UIUtil.scaleForGUI(labelSize.width, labelSize.height));
 
             // JSpinner
             JSpinner jSpinner = new JSpinner();
@@ -1185,8 +1186,8 @@ public class PersonnelTab {
             editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
 
             Dimension spinnerSize = jSpinner.getPreferredSize();
-            jSpinner.setMaximumSize(spinnerSize);
-            jSpinner.setMinimumSize(spinnerSize);
+            jSpinner.setMaximumSize(UIUtil.scaleForGUI(spinnerSize.width, spinnerSize.height));
+            jSpinner.setMinimumSize(UIUtil.scaleForGUI(spinnerSize.width, spinnerSize.height));
 
             // Component Tracking Assignment
             lblBaseSalary[personnelRole.ordinal()] = jLabel;

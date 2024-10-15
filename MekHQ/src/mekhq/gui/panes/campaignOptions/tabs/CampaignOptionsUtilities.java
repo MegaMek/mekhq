@@ -52,8 +52,8 @@ public class CampaignOptionsUtilities {
         checkBox.setName("chk" + name);
 
         Dimension size = checkBox.getPreferredSize();
-        checkBox.setMaximumSize(size);
-        checkBox.setMinimumSize(size);
+        checkBox.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
+        checkBox.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return checkBox;
     }
@@ -104,8 +104,8 @@ public class CampaignOptionsUtilities {
         editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
 
         Dimension size = jSpinner.getPreferredSize();
-        jSpinner.setMaximumSize(size);
-        jSpinner.setMinimumSize(size);
+        jSpinner.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
+        jSpinner.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return jSpinner;
     }
@@ -147,8 +147,8 @@ public class CampaignOptionsUtilities {
         jLabel.setName("lbl" + name);
 
         Dimension size = jLabel.getPreferredSize();
-        jLabel.setMinimumSize(size);
-        jLabel.setMaximumSize(size);
+        jLabel.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
+        jLabel.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return jLabel;
     }
@@ -188,8 +188,8 @@ public class CampaignOptionsUtilities {
         jTextField.setName("txt" + name);
 
         int preferredHeight = jTextField.getPreferredSize().height;
-        jTextField.setMinimumSize(new Dimension(UIUtil.scaleForGUI(width), preferredHeight));
-        jTextField.setMaximumSize(new Dimension(UIUtil.scaleForGUI(width), preferredHeight));
+        jTextField.setMinimumSize(UIUtil.scaleForGUI(width, preferredHeight));
+        jTextField.setMaximumSize(UIUtil.scaleForGUI(width, preferredHeight));
 
         return jTextField;
     }
@@ -265,7 +265,7 @@ public class CampaignOptionsUtilities {
             sizeWidth = UIUtil.scaleForGUI(750);
         }
 
-        panel.setMaximumSize(new Dimension(sizeWidth, sizeHeight));
+        panel.setMaximumSize(UIUtil.scaleForGUI(sizeWidth, sizeHeight));
 
         return panel;
     }
@@ -298,12 +298,12 @@ public class CampaignOptionsUtilities {
                 resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
             lblBody.setName("lbl" + name + "Body");
             Dimension size = lblBody.getPreferredSize();
-            lblBody.setMaximumSize(new Dimension(UIUtil.scaleForGUI(750), size.height));
+            lblBody.setMaximumSize(UIUtil.scaleForGUI(750, size.height));
         }
 
         final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", false, "");
         Dimension size = panel.getPreferredSize();
-        panel.setPreferredSize(new Dimension(UIUtil.scaleForGUI(750), size.height));
+        panel.setPreferredSize(UIUtil.scaleForGUI(750, size.height));
 
         final GroupLayout layout = createStandardLayout(panel);
         panel.setLayout(layout);
@@ -366,8 +366,8 @@ public class CampaignOptionsUtilities {
         }
 
         Dimension size = new Dimension(widthNew, height);
-        parentPanel.setMinimumSize(size);
-        parentPanel.setMaximumSize(size);
+        parentPanel.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
+        parentPanel.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         // Layout
         parentPanel.setLayout(parentLayout);
@@ -473,8 +473,8 @@ public class CampaignOptionsUtilities {
         jButton.setName("btn" + name);
 
         Dimension size = jButton.getPreferredSize();
-        jButton.setMinimumSize(size);
-        jButton.setMaximumSize(size);
+        jButton.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
+        jButton.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return jButton;
     }
