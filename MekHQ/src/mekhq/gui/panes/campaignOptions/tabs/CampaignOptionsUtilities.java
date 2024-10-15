@@ -153,10 +153,7 @@ public class CampaignOptionsUtilities {
     static class COptionLabel extends JLabel {
 
         public COptionLabel(String name) {
-            super(String.format("<html>%s</html>",
-                resources.getString("lbl" + name + ".text")));
-            setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), 100));
-            setName("lbl" + name);
+            this(name, null);
         }
 
         public COptionLabel(String name, @Nullable Integer customWrapSize) {
