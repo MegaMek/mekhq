@@ -51,8 +51,8 @@ public class CampaignOptionsUtilities {
         checkBox.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         checkBox.setName("chk" + name);
 
-        Dimension size = checkBox.getPreferredSize();
-        checkBox.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
+//        Dimension size = checkBox.getPreferredSize();
+//        checkBox.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return checkBox;
     }
@@ -102,8 +102,8 @@ public class CampaignOptionsUtilities {
         DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
         editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
 
-        Dimension size = jSpinner.getPreferredSize();
-        jSpinner.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
+//        Dimension size = jSpinner.getPreferredSize();
+//        jSpinner.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return jSpinner;
     }
@@ -144,8 +144,8 @@ public class CampaignOptionsUtilities {
         jLabel.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jLabel.setName("lbl" + name);
 
-        Dimension size = jLabel.getPreferredSize();
-        jLabel.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
+//        Dimension size = jLabel.getPreferredSize();
+//        jLabel.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return jLabel;
     }
@@ -184,9 +184,9 @@ public class CampaignOptionsUtilities {
         jTextField.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jTextField.setName("txt" + name);
 
-        int preferredHeight = jTextField.getPreferredSize().height;
-        jTextField.setMinimumSize(UIUtil.scaleForGUI(width, preferredHeight));
-        jTextField.setMaximumSize(UIUtil.scaleForGUI(width, preferredHeight));
+//        int preferredHeight = jTextField.getPreferredSize().height;
+//        jTextField.setMinimumSize(UIUtil.scaleForGUI(width, preferredHeight));
+//        jTextField.setMaximumSize(UIUtil.scaleForGUI(width, preferredHeight));
 
         return jTextField;
     }
@@ -241,7 +241,13 @@ public class CampaignOptionsUtilities {
     static JPanel createStandardPanel(String name, boolean includeBorder, String borderTitle) {
         borderTitle = borderTitle.isBlank() ? "" : resources.getString("lbl" + borderTitle + ".text");
 
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel() {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension standardSize = super.getPreferredSize();
+                return new Dimension(Math.max(standardSize.width, UIUtil.scaleForGUI(500)), standardSize.height);
+            }
+        };
 
         if (includeBorder) {
             panel.setBorder(BorderFactory.createTitledBorder(
@@ -250,19 +256,19 @@ public class CampaignOptionsUtilities {
 
         panel.setName(name);
 
-        Dimension size = panel.getPreferredSize();
-        int sizeHeight = size.height;
-        int sizeWidth = size.width;
-        for (Component component : panel.getComponents()) {
-            sizeHeight += component.getPreferredSize().height;
-            sizeWidth += component.getPreferredSize().width;
-        }
-
-        if (sizeWidth < 750) {
-            sizeWidth = 750;
-        }
-
-        panel.setMaximumSize(UIUtil.scaleForGUI(sizeWidth, sizeHeight));
+//        Dimension size = panel.getPreferredSize();
+//        int sizeHeight = size.height;
+//        int sizeWidth = size.width;
+//        for (Component component : panel.getComponents()) {
+//            sizeHeight += component.getPreferredSize().height;
+//            sizeWidth += component.getPreferredSize().width;
+//        }
+//
+//        if (sizeWidth < 750) {
+//            sizeWidth = 750;
+//        }
+//
+//        panel.setMaximumSize(UIUtil.scaleForGUI(sizeWidth, sizeHeight));
 
         return panel;
     }
@@ -286,7 +292,7 @@ public class CampaignOptionsUtilities {
         JLabel imageLabel = new JLabel(imageIcon);
 
         final JLabel lblHeader = new JLabel(resources.getString("lbl" + name + ".text"), SwingConstants.CENTER);
-        new FlatLafStyleBuilder().font(MHQConstants.PROJECT_NAME).bold().size(3).apply(lblHeader);
+        new FlatLafStyleBuilder().bold().size(3).apply(lblHeader);
         lblHeader.setName("lbl" + name);
 
         JLabel lblBody = new JLabel();
@@ -294,28 +300,35 @@ public class CampaignOptionsUtilities {
             lblBody = new JLabel(String.format("<html><p align='justify'>%s</p></html>",
                 resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
             lblBody.setName("lbl" + name + "Body");
-            Dimension size = lblBody.getPreferredSize();
-            lblBody.setMaximumSize(UIUtil.scaleForGUI(750, size.height));
+//            Dimension size = lblBody.getPreferredSize();
+//            lblBody.setMaximumSize(UIUtil.scaleForGUI(750, size.height));
         }
 
         final JPanel panel = createStandardPanel("pnl" + name + "HeaderPanel", false, "");
-        Dimension size = panel.getPreferredSize();
-        panel.setPreferredSize(UIUtil.scaleForGUI(750, size.height));
+//        Dimension size = panel.getPreferredSize();
+//        panel.setPreferredSize(UIUtil.scaleForGUI(750, size.height));
 
-        final GroupLayout layout = createStandardLayout(panel);
-        panel.setLayout(layout);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(lblHeader)
-                .addComponent(lblBody)
-                .addComponent(imageLabel));
+        panel.add(lblHeader);
+        panel.add(lblBody);
+        panel.add(imageLabel);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.CENTER)
-                .addComponent(lblHeader)
-                .addComponent(lblBody)
-                .addComponent(imageLabel));
+
+//        final GroupLayout layout = createStandardLayout(panel);
+//        panel.setLayout(layout);
+//
+//        layout.setVerticalGroup(
+//            layout.createSequentialGroup()
+//                .addComponent(lblHeader)
+//                .addComponent(lblBody)
+//                .addComponent(imageLabel));
+//
+//        layout.setHorizontalGroup(
+//            layout.createParallelGroup(Alignment.CENTER)
+//                .addComponent(lblHeader)
+//                .addComponent(lblBody)
+//                .addComponent(imageLabel));
 
         return panel;
     }
@@ -362,9 +375,9 @@ public class CampaignOptionsUtilities {
             }
         }
 
-        Dimension size = new Dimension(widthNew, height);
-        parentPanel.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
-        parentPanel.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
+//        Dimension size = new Dimension(widthNew, height);
+//        parentPanel.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
+//        parentPanel.setMaximumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         // Layout
         parentPanel.setLayout(parentLayout);
@@ -469,8 +482,8 @@ public class CampaignOptionsUtilities {
         jButton.setToolTipText(resources.getString("lbl" + name + ".tooltip"));
         jButton.setName("btn" + name);
 
-        Dimension size = jButton.getPreferredSize();
-        jButton.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
+//        Dimension size = jButton.getPreferredSize();
+//        jButton.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
         return jButton;
     }

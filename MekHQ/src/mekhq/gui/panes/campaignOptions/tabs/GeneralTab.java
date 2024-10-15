@@ -22,6 +22,7 @@ import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
@@ -134,68 +135,147 @@ public class GeneralTab {
             new GridBagLayout());
 
         // Layout the Panel
-        final JPanel panel = createStandardPanel("generalTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
-        panel.setLayout(layout);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblName)
-                    .addComponent(txtName)
-                    .addComponent(btnNameGenerator))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFaction)
-                    .addComponent(comboFaction))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblReputation)
-                    .addComponent(unitRatingMethodCombo))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblManualUnitRatingModifier)
-                    .addComponent(manualUnitRatingModifier))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblDate)
-                    .addComponent(btnDate))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblCamo)
-                    .addComponent(btnCamo)
-                    .addComponent(lblIcon)
-                    .addComponent(btnIcon)));
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblName)
-                    .addComponent(txtName)
-                    .addComponent(btnNameGenerator)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblFaction)
-                    .addComponent(comboFaction)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblReputation)
-                    .addComponent(unitRatingMethodCombo)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblManualUnitRatingModifier)
-                    .addComponent(manualUnitRatingModifier)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblDate)
-                    .addComponent(btnDate)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblCamo)
-                    .addComponent(btnCamo)
-                    .addGap(50)
-                    .addComponent(lblIcon)
-                    .addComponent(btnIcon)
-                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
 
-        generalPanel.add(panel);
+        final JPanel outerPanel = createStandardPanel("generalTab", true);
+        outerPanel.setLayout(new BorderLayout());
+        outerPanel.add(Box.createHorizontalStrut(25), BorderLayout.LINE_START);
+        outerPanel.add(Box.createHorizontalStrut(25), BorderLayout.LINE_END);
+
+//        outerPanel.add(panel);
+
+        JPanel panel = new JPanel();
+        outerPanel.add(panel, BorderLayout.CENTER);
+        GridBagConstraints gbc = new GridBagConstraints();
+        panel.setLayout(new GridBagLayout());
+
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+//        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 5;
+        panel.add(headerPanel, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.gridy++;
+//        gbc.gridx = 0;
+        panel.add(lblName, gbc);
+
+//        gbc.gridx += gbc.gridwidth;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1;
+        panel.add(txtName, gbc);
+
+//        gbc.gridx += gbc.gridwidth;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(btnNameGenerator, gbc);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.gridy++;
+//        gbc.gridx = 0;
+        panel.add(lblFaction, gbc);
+//        gbc.gridx++;
+        gbc.gridwidth = 2;
+        panel.add(comboFaction, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.gridy++;
+//        gbc.gridx = 0;
+        panel.add(lblReputation, gbc);
+//        gbc.gridx++;
+        gbc.gridwidth = 2;
+        panel.add(unitRatingMethodCombo, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.gridy++;
+//        gbc.gridx = 0;
+        panel.add(lblManualUnitRatingModifier, gbc);
+//        gbc.gridx++;
+        panel.add(manualUnitRatingModifier, gbc);
+
+        gbc.gridy++;
+//        gbc.gridx = 0;
+        panel.add(lblDate, gbc);
+//        gbc.gridx++;
+        panel.add(btnDate, gbc);
+
+        gbc.gridy++;
+        gbc.gridx = GridBagConstraints.RELATIVE;
+        panel.add(lblCamo, gbc);
+        panel.add(btnCamo, gbc);
+        panel.add(lblIcon, gbc);
+        panel.add(btnIcon, gbc);
+
+
+
+//        final GroupLayout layout = createStandardLayout(panel);
+//        panel.setLayout(layout);
+//
+//        layout.setVerticalGroup(
+//            layout.createSequentialGroup()
+//                .addComponent(headerPanel)
+//                .addGroup(layout.createParallelGroup(Alignment.TRAILING)
+//                    .addComponent(lblName)
+//                    .addComponent(txtName)
+//                    .addComponent(btnNameGenerator))
+//                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+//                    .addComponent(lblFaction)
+//                    .addComponent(comboFaction))
+//                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+//                    .addComponent(lblReputation)
+//                    .addComponent(unitRatingMethodCombo))
+//                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+//                    .addComponent(lblManualUnitRatingModifier)
+//                    .addComponent(manualUnitRatingModifier))
+//                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+//                    .addComponent(lblDate)
+//                    .addComponent(btnDate))
+//                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+//                    .addComponent(lblCamo)
+//                    .addComponent(btnCamo)
+//                    .addComponent(lblIcon)
+//                    .addComponent(btnIcon)));
+//
+//        layout.setHorizontalGroup(
+//            layout.createParallelGroup(Alignment.LEADING)
+//                .addComponent(headerPanel, Alignment.CENTER)
+//                .addGroup(layout.createSequentialGroup()
+//                    .addComponent(lblName)
+//                    .addComponent(txtName)
+//                    .addComponent(btnNameGenerator)
+//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+//                .addGroup(layout.createSequentialGroup()
+//                    .addComponent(lblFaction)
+//                    .addComponent(comboFaction)
+//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+//                .addGroup(layout.createSequentialGroup()
+//                    .addComponent(lblReputation)
+//                    .addComponent(unitRatingMethodCombo)
+//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+//                .addGroup(layout.createSequentialGroup()
+//                    .addComponent(lblManualUnitRatingModifier)
+//                    .addComponent(manualUnitRatingModifier)
+//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+//                .addGroup(layout.createSequentialGroup()
+//                    .addComponent(lblDate)
+//                    .addComponent(btnDate)
+//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
+//                .addGroup(layout.createSequentialGroup()
+//                    .addComponent(lblCamo)
+//                    .addComponent(btnCamo)
+//                    .addGap(50)
+//                    .addComponent(lblIcon)
+//                    .addComponent(btnIcon)
+//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
+//
+
+
+        generalPanel.add(outerPanel);
 
         return generalPanel;
     }
