@@ -100,7 +100,7 @@ MEKHQ VERSION HISTORY:
 + PR #5024: Add option to show unit images in TO&E
 + PR #5025: Pin/sticky force view tab on TO&E panel
 + PR #5031: Fixed Refitting Units with Blank Model Name
-+ PR #5033: GUI Scaling fix
++ PR #5033, #5049: GUI Scaling fixes
 + PR #5034: New row highlights for Personnel Table: Gone, Absent, Fatigued
 + FIX #5028: Random Camo Allocation Fixes
 + PR #5036: Corrected Scenario Modifiers for HouseOfficer units
