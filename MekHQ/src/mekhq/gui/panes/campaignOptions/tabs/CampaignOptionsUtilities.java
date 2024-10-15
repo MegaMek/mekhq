@@ -474,4 +474,20 @@ public class CampaignOptionsUtilities {
 
         return jButton;
     }
+
+    /**
+     * Applies font scaling to a given {@link JComponent}.
+     *
+     * @param component The JComponent to which the font scaling is applied.
+     * @param boldText  A boolean that sets whether the text should be bolded.
+     *                  If {@code true}, the text will be bolded, else, it will be regular.
+     * @param size      An integer representing the size of the font to be set.
+     */
+    static void setFontScaling(JComponent component, boolean boldText, int size) {
+        if (boldText) {
+            new FlatLafStyleBuilder().font(MHQConstants.PROJECT_NAME).bold().size(size).apply(component);
+        } else {
+            new FlatLafStyleBuilder().font(MHQConstants.PROJECT_NAME).size(size).apply(component);
+        }
+    }
 }
