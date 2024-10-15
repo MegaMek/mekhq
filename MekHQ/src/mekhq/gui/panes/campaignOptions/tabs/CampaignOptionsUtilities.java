@@ -51,6 +51,8 @@ public class CampaignOptionsUtilities {
         checkBox.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         checkBox.setName("chk" + name);
 
+        setFontScaling(checkBox, false, 1);
+
         Dimension size = checkBox.getPreferredSize();
         checkBox.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
@@ -99,6 +101,8 @@ public class CampaignOptionsUtilities {
         jSpinner.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jSpinner.setName("spn" + name);
 
+        setFontScaling(jSpinner, false, 1);
+
         DefaultEditor editor = (DefaultEditor) jSpinner.getEditor();
         editor.getTextField().setHorizontalAlignment(JTextField.LEFT);
 
@@ -144,6 +148,8 @@ public class CampaignOptionsUtilities {
         jLabel.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jLabel.setName("lbl" + name);
 
+        setFontScaling(jLabel, false, 1);
+
         Dimension size = jLabel.getPreferredSize();
         jLabel.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));
 
@@ -183,6 +189,8 @@ public class CampaignOptionsUtilities {
         JTextField jTextField = new JTextField();
         jTextField.setToolTipText(wordWrap(resources.getString("lbl" + name + ".tooltip"), customWrapSize));
         jTextField.setName("txt" + name);
+
+        setFontScaling(jTextField, false, 1);
 
         int preferredHeight = jTextField.getPreferredSize().height;
         jTextField.setMinimumSize(UIUtil.scaleForGUI(width, preferredHeight));
@@ -286,14 +294,15 @@ public class CampaignOptionsUtilities {
         JLabel imageLabel = new JLabel(imageIcon);
 
         final JLabel lblHeader = new JLabel(resources.getString("lbl" + name + ".text"), SwingConstants.CENTER);
-        new FlatLafStyleBuilder().font(MHQConstants.PROJECT_NAME).bold().size(3).apply(lblHeader);
         lblHeader.setName("lbl" + name);
+        setFontScaling(lblHeader, true, 2);
 
         JLabel lblBody = new JLabel();
         if (includeBodyText) {
             lblBody = new JLabel(String.format("<html><p align='justify'>%s</p></html>",
                 resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
             lblBody.setName("lbl" + name + "Body");
+            setFontScaling(lblBody, false, 1);
             Dimension size = lblBody.getPreferredSize();
             lblBody.setMaximumSize(UIUtil.scaleForGUI(750, size.height));
         }
@@ -419,6 +428,7 @@ public class CampaignOptionsUtilities {
             JLabel quote = new JLabel(String.format(
                 "<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
                 UIUtil.scaleForGUI(650), resources.getString(tabName + ".border")));
+            setFontScaling(quote, false, 1);
 
             GridBagConstraints quoteConstraints = new GridBagConstraints();
             quoteConstraints.gridx = GridBagConstraints.RELATIVE;
@@ -468,6 +478,8 @@ public class CampaignOptionsUtilities {
         JButton jButton = new JButton(resources.getString("lbl" + name + ".text"));
         jButton.setToolTipText(resources.getString("lbl" + name + ".tooltip"));
         jButton.setName("btn" + name);
+
+        setFontScaling(jButton, false, 1);
 
         Dimension size = jButton.getPreferredSize();
         jButton.setMinimumSize(UIUtil.scaleForGUI(size.width, size.height));

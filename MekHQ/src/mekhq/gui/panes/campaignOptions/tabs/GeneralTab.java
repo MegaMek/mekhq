@@ -2,11 +2,9 @@ package mekhq.gui.panes.campaignOptions.tabs;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
-import megamek.client.ui.swing.util.FlatLafStyleBuilder;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -210,12 +208,13 @@ public class GeneralTab {
         JLabel imageLabel = new JLabel(imageIcon);
 
         final JLabel lblHeader = new JLabel(resources.getString("lblGeneral.text"), SwingConstants.CENTER);
-        new FlatLafStyleBuilder().font(MHQConstants.PROJECT_NAME).bold().size(3).apply(lblHeader);
+        setFontScaling(lblHeader, true, 2);
         lblHeader.setName("lblGeneral");
 
         JLabel lblBody = new JLabel(String.format("<html>%s</html>",
             resources.getString("lblGeneralBody.text")), SwingConstants.CENTER);
         lblBody.setName("lblGeneralHeaderBody");
+        setFontScaling(lblBody, false, 1);
         Dimension size = lblBody.getPreferredSize();
         lblBody.setMaximumSize(UIUtil.scaleForGUI(750, size.height));
 
