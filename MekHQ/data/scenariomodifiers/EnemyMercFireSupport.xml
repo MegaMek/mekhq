@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>The Enemy has hired a Mercenary Fire Support Lance with veteran markings.
-		Keep your head down.</additionalBriefingText>
+	<additionalBriefingText>The Enemy has hired a Mercenary Fire Support Lance with veteran markings. Keep your head down.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>

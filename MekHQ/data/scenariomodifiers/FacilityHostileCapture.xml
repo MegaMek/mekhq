@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>This facility must be captured: 75% of the designated buildings must
-		remain intact.</additionalBriefingText>
+	<additionalBriefingText>This facility must be captured: 75% of the designated buildings must remain intact.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<modifierName>Capture</modifierName>
@@ -27,8 +26,7 @@
 			<additionalDetails>
 				<additionalDetail>Crippled turrets are considered intact for the purposes of this objective.</additionalDetail>
 			</additionalDetails>
-			<description>Leave intact the following force(s) and unit(s) to be able to take control of
-				this facility:</description>
+			<description>Leave intact the following force(s) and unit(s) to be able to take control of this facility:</description>
 			<destinationEdge>NONE</destinationEdge>
 			<objectiveCriterion>Preserve</objectiveCriterion>
 			<percentage>75</percentage>
