@@ -268,7 +268,7 @@ public class CampaignOptionsUtilities {
         public CampaignOptionsStandardPanel(String name, boolean includeBorder, String borderTitle) {
             borderTitle = borderTitle.isBlank() ? "" : resources.getString("lbl" + borderTitle + ".text");
 
-            JPanel panel = new JPanel() {
+            new JPanel() {
                 @Override
                 public Dimension getPreferredSize() {
                     Dimension standardSize = super.getPreferredSize();
@@ -277,11 +277,11 @@ public class CampaignOptionsUtilities {
             };
 
             if (includeBorder) {
-                panel.setBorder(BorderFactory.createTitledBorder(
+                setBorder(BorderFactory.createTitledBorder(
                     String.format(String.format("<html>%s</html>", borderTitle))));
             }
 
-            panel.setName("pnl" + name);
+            setName("pnl" + name);
         }
     }
 
@@ -329,7 +329,7 @@ public class CampaignOptionsUtilities {
 
             imageIcon = new ImageIcon(scaledImage);
 
-            JLabel imageLabel = new JLabel(imageIcon);
+            JLabel lblImage = new JLabel(imageIcon);
 
             // Create header text
             final JLabel lblHeader = new JLabel(resources.getString("lbl" + name + ".text"), SwingConstants.CENTER);
@@ -338,20 +338,30 @@ public class CampaignOptionsUtilities {
 
             JLabel lblBody = new JLabel();
             if (includeBodyText) {
-                lblBody = new JLabel(String.format("<html><p align='justify'>%s</p></html>",
+                lblBody = new JLabel(String.format("<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
+                    UIUtil.scaleForGUI(750),
                     resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
                 lblBody.setName("lbl" + name + "Body");
                 setFontScaling(lblBody, false, 1);
             }
 
             // Layout panel
-            final JPanel panel = new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel",
-                false);
-            panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+            new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel", false);
+            final GroupLayout layout = createStandardLayout(this);
+            setLayout(layout);
 
-            panel.add(lblHeader);
-            panel.add(lblBody);
-            panel.add(imageLabel);
+            layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                    .addComponent(lblHeader)
+                    .addComponent(lblBody)
+                    .addComponent(lblImage));
+
+            layout.setHorizontalGroup(
+                layout.createSequentialGroup()
+                    .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(lblHeader, Alignment.CENTER)
+                        .addComponent(lblBody, Alignment.CENTER)
+                        .addComponent(lblImage, Alignment.CENTER)));
         }
     }
 
