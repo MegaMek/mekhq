@@ -1,7 +1,6 @@
 package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -11,8 +10,8 @@ import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JSpinner.DefaultEditor;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,25 +128,22 @@ public class MarketsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketTab", true,
             "");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlPersonnelMarketGeneralOptions)
-                    .addComponent(pnlRemovalTargets)));
+        layout.gridwidth = 5;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(headerPanel, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(pnlPersonnelMarketGeneralOptions)
-                    .addComponent(pnlRemovalTargets)));
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(pnlPersonnelMarketGeneralOptions, layout);
+        layout.gridx++;
+        panel.add(pnlRemovalTargets, layout);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PersonnelMarketTab");
+
     }
 
     private JPanel createPersonnelMarketGeneralOptionsPanel() {
@@ -167,30 +163,27 @@ public class MarketsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketGeneralOptionsPanel", false,
             "");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPersonnelMarketType)
-                    .addComponent(comboPersonnelMarketType))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPersonnelMarketDylansWeight)
-                    .addComponent(spnPersonnelMarketDylansWeight))
-                .addComponent(chkPersonnelMarketReportRefresh)
-                .addComponent(chkUsePersonnelHireHiringHallOnly));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblPersonnelMarketType, layout);
+        layout.gridx++;
+        panel.add(comboPersonnelMarketType, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPersonnelMarketType)
-                    .addComponent(comboPersonnelMarketType))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPersonnelMarketDylansWeight)
-                    .addComponent(spnPersonnelMarketDylansWeight))
-                .addComponent(chkPersonnelMarketReportRefresh)
-                .addComponent(chkUsePersonnelHireHiringHallOnly));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPersonnelMarketDylansWeight, layout);
+        layout.gridx++;
+        panel.add(spnPersonnelMarketDylansWeight, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkPersonnelMarketReportRefresh, layout);
+
+        layout.gridy++;
+        panel.add(chkUsePersonnelHireHiringHallOnly, layout);
 
         return panel;
     }
@@ -211,92 +204,52 @@ public class MarketsTab {
         }
 
         // Layout the Panels
-        final JPanel leftPanel = new CampaignOptionsStandardPanel("LeftPanel");
-        final GroupLayout leftLayout = createGroupLayout(leftPanel);
-        leftPanel.setLayout(leftLayout);
-
-        leftLayout.setVerticalGroup(
-            leftLayout.createSequentialGroup()
-                .addGroup(leftLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE)))
-                .addGroup(leftLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN)))
-                .addGroup(leftLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN)))
-                .addGroup(leftLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))));
-
-        leftLayout.setHorizontalGroup(
-            leftLayout.createParallelGroup(Alignment.LEADING)
-                .addGroup(leftLayout.createSequentialGroup()
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE)))
-                .addGroup(leftLayout.createSequentialGroup()
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN)))
-                .addGroup(leftLayout.createSequentialGroup()
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN)))
-                .addGroup(leftLayout.createSequentialGroup()
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))));
-
-        final JPanel rightPanel = new CampaignOptionsStandardPanel("RightPanel");
-        final GroupLayout rightLayout = createGroupLayout(rightPanel);
-        rightPanel.setLayout(rightLayout);
-
-        rightLayout.setVerticalGroup(
-            rightLayout.createSequentialGroup()
-                .addGroup(rightLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN)))
-                .addGroup(rightLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE)))
-                .addGroup(rightLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC)))
-                .addGroup(rightLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY))));
-
-        rightLayout.setHorizontalGroup(
-            rightLayout.createParallelGroup(Alignment.LEADING)
-                .addGroup(rightLayout.createSequentialGroup()
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN)))
-                .addGroup(rightLayout.createSequentialGroup()
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE)))
-                .addGroup(rightLayout.createSequentialGroup()
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC)))
-                .addGroup(rightLayout.createSequentialGroup()
-                    .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY))
-                    .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY))));
-
-        final JPanel parentPanel = new CampaignOptionsStandardPanel("PersonnelMarketRemovalOptionsPanel",
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketRemovalOptionsPanel",
             true, "PersonnelMarketRemovalOptionsPanel");
-        final GroupLayout parentLayout = createGroupLayout(parentPanel);
-        parentPanel.setLayout(parentLayout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        parentLayout.setVerticalGroup(
-            parentLayout.createSequentialGroup()
-                .addGroup(parentLayout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(leftPanel)
-                    .addComponent(rightPanel)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE), layout);
+        layout.gridx++;
+        panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.NONE), layout);
+        layout.gridx++;
+        panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN), layout);
+        layout.gridx++;
+        panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.VETERAN), layout);
 
-        parentLayout.setHorizontalGroup(
-            parentLayout.createParallelGroup(Alignment.LEADING)
-                .addGroup(parentLayout.createSequentialGroup()
-                    .addComponent(leftPanel)
-                    .addComponent(rightPanel)));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN), layout);
+        layout.gridx++;
+        panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ULTRA_GREEN), layout);
+        layout.gridx++;
+        panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE), layout);
+        layout.gridx++;
+        panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.ELITE), layout);
 
-        return parentPanel;
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN), layout);
+        layout.gridx++;
+        panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.GREEN), layout);
+        layout.gridx++;
+        panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC), layout);
+        layout.gridx++;
+        panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.HEROIC), layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR), layout);
+        layout.gridx++;
+        panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR), layout);
+        layout.gridx++;
+        panel.add(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY), layout);
+        layout.gridx++;
+        panel.add(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.LEGENDARY), layout);
+
+        return panel;
     }
 
     private void initializeUnitMarket() {
@@ -338,40 +291,40 @@ public class MarketsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UnitMarketTab", true,
             "");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblUnitMarketMethod)
-                    .addComponent(comboUnitMarketMethod))
-                .addComponent(chkUnitMarketRegionalMekVariations)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblUnitMarketSpecialUnitChance)
-                    .addComponent(spnUnitMarketSpecialUnitChance))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblUnitMarketRarityModifier)
-                    .addComponent(spnUnitMarketRarityModifier))
-                .addComponent(chkInstantUnitMarketDelivery)
-                .addComponent(chkUnitMarketReportRefresh));
+        layout.gridwidth = 5;
+        layout.gridy = 0;
+        panel.add(headerPanel, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblUnitMarketMethod)
-                    .addComponent(comboUnitMarketMethod))
-                .addComponent(chkUnitMarketRegionalMekVariations)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblUnitMarketSpecialUnitChance)
-                    .addComponent(spnUnitMarketSpecialUnitChance))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblUnitMarketRarityModifier)
-                    .addComponent(spnUnitMarketRarityModifier))
-                .addComponent(chkInstantUnitMarketDelivery)
-                .addComponent(chkUnitMarketReportRefresh));
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblUnitMarketMethod, layout);
+        layout.gridx++;
+        panel.add(comboUnitMarketMethod, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUnitMarketRegionalMekVariations, layout);
+
+        layout.gridy++;
+        panel.add(lblUnitMarketSpecialUnitChance, layout);
+        layout.gridx++;
+        panel.add(spnUnitMarketSpecialUnitChance, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblUnitMarketRarityModifier, layout);
+        layout.gridx++;
+        panel.add(spnUnitMarketRarityModifier, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkInstantUnitMarketDelivery, layout);
+
+        layout.gridy++;
+        panel.add(chkUnitMarketReportRefresh, layout);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "UnitMarketTab");
@@ -422,22 +375,18 @@ public class MarketsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketTab", true,
             "");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlContractMarketGeneralOptions)
-                    .addComponent(pnlContractPay)));
+        layout.gridwidth = 5;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(headerPanel, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(pnlContractMarketGeneralOptions)
-                    .addComponent(pnlContractPay)));
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(pnlContractMarketGeneralOptions, layout);
+        layout.gridx++;
+        panel.add(pnlContractPay, layout);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "ContractMarketTab");
@@ -467,42 +416,38 @@ public class MarketsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketGeneralOptionsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblContractMarketMethod)
-                    .addComponent(comboContractMarketMethod))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblContractSearchRadius)
-                    .addComponent(spnContractSearchRadius))
-                .addComponent(chkVariableContractLength)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblCoontractMaxSalvagePercentage)
-                    .addComponent(spnContractMaxSalvagePercentage))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblDropShipBonusPercentage)
-                    .addComponent(spnDropShipBonusPercentage))
-                .addComponent(chkContractMarketReportRefresh));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblContractMarketMethod, layout);
+        layout.gridx++;
+        panel.add(comboContractMarketMethod, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblContractMarketMethod)
-                    .addComponent(comboContractMarketMethod))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblContractSearchRadius)
-                    .addComponent(spnContractSearchRadius))
-                .addComponent(chkVariableContractLength)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblCoontractMaxSalvagePercentage)
-                    .addComponent(spnContractMaxSalvagePercentage))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblDropShipBonusPercentage)
-                    .addComponent(spnDropShipBonusPercentage))
-                .addComponent(chkContractMarketReportRefresh));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblContractSearchRadius, layout);
+        layout.gridx++;
+        panel.add(spnContractSearchRadius, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkVariableContractLength, layout);
+
+        layout.gridy++;
+        panel.add(chkContractMarketReportRefresh, layout);
+
+        layout.gridy++;
+        panel.add(lblCoontractMaxSalvagePercentage, layout);
+        layout.gridx++;
+        panel.add(spnContractMaxSalvagePercentage, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblDropShipBonusPercentage, layout);
+        layout.gridx++;
+        panel.add(spnDropShipBonusPercentage, layout);
 
         return panel;
     }
@@ -536,66 +481,74 @@ public class MarketsTab {
         chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
 
         useInfantryDoseNotCountBox = new CampaignOptionsCheckBox("UseInfantryDoseNotCountBox");
+
         chkMercSizeLimited = new CampaignOptionsCheckBox("MercSizeLimited");
 
         chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment");
 
         // Layout the Panel
+        final JPanel panelValuePercent = new CampaignOptionsStandardPanel("ContractPayPanelValuePercent",
+            false);
+        final GridBagConstraints layoutValuePercent = new CampaignOptionsGridBagConstraints(panelValuePercent);
+
+        layoutValuePercent.gridx = 0;
+        layoutValuePercent.gridy = 0;
+        layoutValuePercent.gridwidth = 1;
+        panelValuePercent.add(chkEquipContractSaleValue, layoutValuePercent);
+
+        layoutValuePercent.gridy++;
+        panelValuePercent.add(lblEquipPercent, layoutValuePercent);
+        layoutValuePercent.gridx++;
+        panelValuePercent.add(spnEquipPercent, layoutValuePercent);
+
+        layoutValuePercent.gridx = 0;
+        layoutValuePercent.gridy++;
+        panelValuePercent.add(lblDropShipPercent, layoutValuePercent);
+        layoutValuePercent.gridx++;
+        panelValuePercent.add(spnDropShipPercent, layoutValuePercent);
+
+        layoutValuePercent.gridx = 0;
+        layoutValuePercent.gridy++;
+        panelValuePercent.add(lblJumpShipPercent, layoutValuePercent);
+        layoutValuePercent.gridx++;
+        panelValuePercent.add(spnJumpShipPercent, layoutValuePercent);
+
+        layoutValuePercent.gridx = 0;
+        layoutValuePercent.gridy++;
+        panelValuePercent.add(lblWarShipPercent, layoutValuePercent);
+        layoutValuePercent.gridx++;
+        panelValuePercent.add(spnWarShipPercent, layoutValuePercent);
+
         final JPanel panel = new CampaignOptionsStandardPanel("ContractPayPanel",
             true, "ContractPayPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(btnContractEquipment)
-                .addComponent(chkEquipContractSaleValue)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblEquipPercent)
-                    .addComponent(spnEquipPercent))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblDropShipPercent)
-                    .addComponent(spnDropShipPercent))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblJumpShipPercent)
-                    .addComponent(spnJumpShipPercent))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblWarShipPercent)
-                    .addComponent(spnWarShipPercent))
-                .addComponent(btnContractPersonnel)
-                .addGap(UIUtil.scaleForGUI(15))
-                .addComponent(chkBLCSaleValue)
-                .addComponent(useInfantryDoseNotCountBox)
-                .addComponent(chkMercSizeLimited)
-                .addComponent(chkOverageRepaymentInFinalPayment));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(btnContractEquipment, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(btnContractEquipment)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(UIUtil.scaleForGUI(25))
-                    .addComponent(chkEquipContractSaleValue))
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(UIUtil.scaleForGUI(25))
-                    .addComponent(lblEquipPercent)
-                    .addComponent(spnEquipPercent))
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(UIUtil.scaleForGUI(25))
-                    .addComponent(lblDropShipPercent)
-                    .addComponent(spnDropShipPercent))
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(UIUtil.scaleForGUI(25))
-                    .addComponent(lblJumpShipPercent)
-                    .addComponent(spnJumpShipPercent))
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(UIUtil.scaleForGUI(25))
-                    .addComponent(lblWarShipPercent)
-                    .addComponent(spnWarShipPercent))
-                .addComponent(btnContractPersonnel)
-                .addComponent(chkBLCSaleValue)
-                .addComponent(useInfantryDoseNotCountBox)
-                .addComponent(chkMercSizeLimited)
-                .addComponent(chkOverageRepaymentInFinalPayment));
+        layout.gridy++;
+        panel.add(panelValuePercent, layout);
+
+        layout.gridy++;
+        panel.add(btnContractPersonnel, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkBLCSaleValue, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(useInfantryDoseNotCountBox, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkMercSizeLimited, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkOverageRepaymentInFinalPayment, layout);
 
         return panel;
     }
