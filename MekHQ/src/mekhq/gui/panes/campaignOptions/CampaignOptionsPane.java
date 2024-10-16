@@ -99,7 +99,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JTabbedPane personnelContentTabs = createSubTabs(Map.of(
             "personnelGeneralTab", personnelTab.createGeneralTab(),
-            "personnelLogsTab", personnelTab.createPersonnelLogsTab(),
             "personnelInformationTab", personnelTab.createPersonnelInformationTab(),
             "awardsTab", personnelTab.createAwardsTab(),
             "prisonersAndDependentsTab", personnelTab.createPrisonersAndDependentsTab(),

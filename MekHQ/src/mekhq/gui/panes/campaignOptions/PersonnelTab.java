@@ -5,6 +5,7 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -716,58 +717,101 @@ public class PersonnelTab {
     }
 
     /**
-     * Creates a tab for managing personnel logs.
+     * Creates a panel for the Medical Tab in the application.
      *
-     * @return a {@link JPanel} representing the Personnel Logs Tab panel
+     * @return a {@link JPanel} representing the Medical Tab containing settings for medical options.
      */
-    JPanel createPersonnelLogsTab() {
+    JPanel createMedicalTab() {
         // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("PersonnelLogsTab",
-            getImageDirectory() + "logo_clan_coyote.png",
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("MedicalTab",
+            getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
             true);
 
         // Contents
-        chkUseTransfers = new CampaignOptionsCheckBox("UseTransfers");
-        chkUseExtendedTOEForceName = new CampaignOptionsCheckBox("UseExtendedTOEForceName");
-        chkPersonnelLogSkillGain = new CampaignOptionsCheckBox("PersonnelLogSkillGain");
-        chkPersonnelLogAbilityGain = new CampaignOptionsCheckBox("PersonnelLogAbilityGain");
-        chkPersonnelLogEdgeGain = new CampaignOptionsCheckBox("PersonnelLogEdgeGain");
-        chkDisplayPersonnelLog = new CampaignOptionsCheckBox("DisplayPersonnelLog");
-        chkDisplayScenarioLog = new CampaignOptionsCheckBox("DisplayScenarioLog");
-        chkDisplayKillRecord = new CampaignOptionsCheckBox("DisplayKillRecord");
+        chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical");
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelLogsTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        lblHealWaitingPeriod = new CampaignOptionsLabel("HealWaitingPeriod");
+        spnHealWaitingPeriod = new CampaignOptionsSpinner("HealWaitingPeriod",
+            1, 1, 30, 1);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseTransfers)
-                .addComponent(chkUseExtendedTOEForceName)
-                .addComponent(chkPersonnelLogSkillGain)
-                .addComponent(chkPersonnelLogAbilityGain)
-                .addComponent(chkPersonnelLogEdgeGain)
-                .addComponent(chkDisplayPersonnelLog)
-                .addComponent(chkDisplayScenarioLog)
-                .addComponent(chkDisplayKillRecord));
+        lblNaturalHealWaitingPeriod = new CampaignOptionsLabel("NaturalHealWaitingPeriod");
+        spnNaturalHealWaitingPeriod = new CampaignOptionsSpinner("NaturalHealWaitingPeriod",
+            1, 1, 365, 1);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addComponent(chkUseTransfers)
-                .addComponent(chkUseExtendedTOEForceName)
-                .addComponent(chkPersonnelLogSkillGain)
-                .addComponent(chkPersonnelLogAbilityGain)
-                .addComponent(chkPersonnelLogEdgeGain)
-                .addComponent(chkDisplayPersonnelLog)
-                .addComponent(chkDisplayScenarioLog)
-                .addComponent(chkDisplayKillRecord)
-        );
+        lblMinimumHitsForVehicles = new CampaignOptionsLabel("MinimumHitsForVehicles");
+        spnMinimumHitsForVehicles = new CampaignOptionsSpinner("MinimumHitsForVehicles",
+            1, 1, 5, 1);
+
+        chkUseRandomHitsForVehicles = new CampaignOptionsCheckBox("UseRandomHitsForVehicles");
+
+        chkUseTougherHealing = new CampaignOptionsCheckBox("UseTougherHealing");
+
+        lblMaximumPatients = new CampaignOptionsLabel("MaximumPatients");
+        spnMaximumPatients = new CampaignOptionsSpinner("MaximumPatients",
+            25, 1, 100, 1);
+
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("MedicalTabLeft", false);
+        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+
+        layoutLeft.gridy = 0;
+        layoutLeft.gridx = 0;
+        layoutLeft.gridwidth = 1;
+        panelLeft.add(lblMaximumPatients, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnMaximumPatients, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblHealWaitingPeriod, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnHealWaitingPeriod, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblNaturalHealWaitingPeriod, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnNaturalHealWaitingPeriod, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseRandomHitsForVehicles, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblMinimumHitsForVehicles, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnMinimumHitsForVehicles, layoutLeft);
+
+        // Layout the Panels
+        final JPanel panelRight = new CampaignOptionsStandardPanel("MedicalTabRight", false);
+        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
+
+        layoutRight.gridy++;
+        layoutRight.gridwidth = 1;
+        panelRight.add(chkUseAdvancedMedical, layoutRight);
+
+        layoutRight.gridx = 0;
+        layoutRight.gridy++;
+        panelRight.add(chkUseTougherHealing, layoutRight);
+
+        // Layout the Panels
+        final JPanel panelParent = new CampaignOptionsStandardPanel("MedicalTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panelParent.add(panelLeft, layoutParent);
+
+        layoutParent.gridx++;
+        panelParent.add(panelRight, layoutParent);
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "PersonnelLogsTab");
+        return createParentPanel(panelParent, "MedicalTab");
     }
 
     /**
@@ -790,43 +834,103 @@ public class PersonnelTab {
         chkTrackTotalXPEarnings = new CampaignOptionsCheckBox("TrackTotalXPEarnings");
         chkShowOriginFaction = new CampaignOptionsCheckBox("ShowOriginFaction");
 
+        JPanel pnlPersonnelLogs = createPersonnelLogsPanel();
+
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelInformation", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("PersonnelInformationLeft", false);
+        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseTimeInService)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblTimeInServiceDisplayFormat)
-                    .addComponent(comboTimeInServiceDisplayFormat))
-                .addComponent(chkUseTimeInRank)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblTimeInRankDisplayFormat)
-                    .addComponent(comboTimeInRankDisplayFormat))
-                .addComponent(chkTrackTotalEarnings)
-                .addComponent(chkTrackTotalXPEarnings)
-                .addComponent(chkShowOriginFaction));
+        layoutLeft.gridy++;
+        layoutLeft.gridwidth = 1;
+        panelLeft.add(chkUseTimeInService, layoutLeft);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addComponent(chkUseTimeInService)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblTimeInServiceDisplayFormat)
-                    .addComponent(comboTimeInServiceDisplayFormat))
-                .addComponent(chkUseTimeInRank)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblTimeInRankDisplayFormat)
-                    .addComponent(comboTimeInRankDisplayFormat))
-                .addComponent(chkTrackTotalEarnings)
-                .addComponent(chkTrackTotalXPEarnings)
-                .addComponent(chkShowOriginFaction));
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblTimeInServiceDisplayFormat, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(comboTimeInServiceDisplayFormat, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseTimeInRank, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblTimeInRankDisplayFormat, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(comboTimeInRankDisplayFormat, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(chkTrackTotalEarnings, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkTrackTotalXPEarnings, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkShowOriginFaction, layoutLeft);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("PersonnelInformation", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panelParent.add(panelLeft, layoutParent);
+
+        layoutParent.gridx++;
+        panelParent.add(pnlPersonnelLogs, layoutParent);
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "PersonnelInformation");
+        return createParentPanel(panelParent, "PersonnelInformation");
+    }
+
+    JPanel createPersonnelLogsPanel() {
+        // Contents
+        chkUseTransfers = new CampaignOptionsCheckBox("UseTransfers");
+        chkUseExtendedTOEForceName = new CampaignOptionsCheckBox("UseExtendedTOEForceName");
+        chkPersonnelLogSkillGain = new CampaignOptionsCheckBox("PersonnelLogSkillGain");
+        chkPersonnelLogAbilityGain = new CampaignOptionsCheckBox("PersonnelLogAbilityGain");
+        chkPersonnelLogEdgeGain = new CampaignOptionsCheckBox("PersonnelLogEdgeGain");
+        chkDisplayPersonnelLog = new CampaignOptionsCheckBox("DisplayPersonnelLog");
+        chkDisplayScenarioLog = new CampaignOptionsCheckBox("DisplayScenarioLog");
+        chkDisplayKillRecord = new CampaignOptionsCheckBox("DisplayKillRecord");
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelLogsPanel", true,
+            "PersonnelLogsPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(chkUseTransfers, layout);
+
+        layout.gridy++;
+        panel.add(chkUseExtendedTOEForceName, layout);
+
+        layout.gridy++;
+        panel.add(chkPersonnelLogSkillGain, layout);
+
+        layout.gridy++;
+        panel.add(chkPersonnelLogAbilityGain, layout);
+
+        layout.gridy++;
+        panel.add(chkPersonnelLogEdgeGain, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayPersonnelLog, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayScenarioLog, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayKillRecord, layout);
+
+        return panel;
     }
 
     /**
@@ -960,87 +1064,6 @@ public class PersonnelTab {
                 .addComponent(chkUseRandomDependentRemoval));
 
         return panel;
-    }
-
-    /**
-     * Creates a panel for the Medical Tab in the application.
-     *
-     * @return a {@link JPanel} representing the Medical Tab containing settings for medical options.
-     */
-    JPanel createMedicalTab() {
-        // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("MedicalTab",
-            getImageDirectory() + "logo_duchy_of_tamarind_abbey.png",
-            true);
-
-        // Contents
-        chkUseAdvancedMedical = new CampaignOptionsCheckBox("UseAdvancedMedical");
-
-        lblHealWaitingPeriod = new CampaignOptionsLabel("HealWaitingPeriod");
-        spnHealWaitingPeriod = new CampaignOptionsSpinner("HealWaitingPeriod",
-            1, 1, 30, 1);
-
-        lblNaturalHealWaitingPeriod = new CampaignOptionsLabel("NaturalHealWaitingPeriod");
-        spnNaturalHealWaitingPeriod = new CampaignOptionsSpinner("NaturalHealWaitingPeriod",
-            1, 1, 365, 1);
-
-        lblMinimumHitsForVehicles = new CampaignOptionsLabel("MinimumHitsForVehicles");
-        spnMinimumHitsForVehicles = new CampaignOptionsSpinner("MinimumHitsForVehicles",
-            1, 1, 5, 1);
-
-        chkUseRandomHitsForVehicles = new CampaignOptionsCheckBox("UseRandomHitsForVehicles");
-
-        chkUseTougherHealing = new CampaignOptionsCheckBox("UseTougherHealing");
-
-        lblMaximumPatients = new CampaignOptionsLabel("MaximumPatients");
-        spnMaximumPatients = new CampaignOptionsSpinner("MaximumPatients",
-            25, 1, 100, 1);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("MedicalTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseAdvancedMedical)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblHealWaitingPeriod)
-                    .addComponent(spnHealWaitingPeriod))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblNaturalHealWaitingPeriod)
-                    .addComponent(spnNaturalHealWaitingPeriod))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblMinimumHitsForVehicles)
-                    .addComponent(spnMinimumHitsForVehicles))
-                .addComponent(chkUseRandomHitsForVehicles)
-                .addComponent(chkUseTougherHealing)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblMaximumPatients)
-                    .addComponent(spnMaximumPatients)));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addComponent(chkUseAdvancedMedical)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblHealWaitingPeriod)
-                    .addComponent(spnHealWaitingPeriod))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblNaturalHealWaitingPeriod)
-                    .addComponent(spnNaturalHealWaitingPeriod))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblMinimumHitsForVehicles)
-                    .addComponent(spnMinimumHitsForVehicles))
-                .addComponent(chkUseRandomHitsForVehicles)
-                .addComponent(chkUseTougherHealing)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblMaximumPatients)
-                    .addComponent(spnMaximumPatients)));
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "MedicalTab");
     }
 
     /**

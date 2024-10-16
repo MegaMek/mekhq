@@ -9,6 +9,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+import static java.lang.Math.round;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 
@@ -319,8 +320,8 @@ public class CampaignOptionsUtilities {
             // Fetch and scale image
             ImageIcon imageIcon = new ImageIcon(imageAddress);
 
-            int width = UIUtil.scaleForGUI(imageIcon.getIconWidth());
-            int height = UIUtil.scaleForGUI(imageIcon.getIconHeight());
+            int width = (int) UIUtil.scaleForGUI(round(imageIcon.getIconWidth() * .75));
+            int height = (int) UIUtil.scaleForGUI(round(imageIcon.getIconHeight() * .75));
 
             Image image = imageIcon.getImage();
             Image scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
@@ -336,7 +337,7 @@ public class CampaignOptionsUtilities {
 
             JLabel lblBody = new JLabel();
             if (includeBodyText) {
-                lblBody = new JLabel(String.format("<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
+                lblBody = new JLabel(String.format("<html><i><div style='width: %s; text-align:justify;'>%s</div></i></html>",
                     UIUtil.scaleForGUI(750),
                     resources.getString("lbl" + name + "Body.text")), SwingConstants.CENTER);
                 lblBody.setName("lbl" + name + "Body");
