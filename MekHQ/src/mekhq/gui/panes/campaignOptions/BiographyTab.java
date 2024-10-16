@@ -3,6 +3,7 @@ package mekhq.gui.panes.campaignOptions;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.AgeGroup;
@@ -997,29 +998,20 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("DropoutChancePanel", true,
             "DropoutChancePanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAdultDropoutChance)
-                    .addComponent(spnAdultDropoutChance))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblChildrenDropoutChance)
-                    .addComponent(spnChildrenDropoutChance)));
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(lblAdultDropoutChance, layout);
+        layout.gridx++;
+        panel.add(spnAdultDropoutChance, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblAdultDropoutChance)
-                        .addComponent(spnAdultDropoutChance)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblChildrenDropoutChance)
-                        .addComponent(spnChildrenDropoutChance)
-                        )));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblChildrenDropoutChance, layout);
+        layout.gridx++;
+        panel.add(spnChildrenDropoutChance, layout);
 
         return panel;
     }
@@ -1078,41 +1070,47 @@ public class BiographyTab {
             true);
 
         // Contents
+        chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
+
         chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
 
         lblFactionNames = new CampaignOptionsLabel("FactionNames");
 
         pnlRandomPortrait = createRandomPortraitPanel();
 
-        chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
+        // Layout the Panels
+        final JPanel panelTop = new CampaignOptionsStandardPanel("NameAndPortraitGenerationTab");
+        final GridBagConstraints layoutTop = new CampaignOptionsGridBagConstraints(panelTop);
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("NameAndPortraitGenerationTab", true,
-            "");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        layoutTop.gridwidth = 1;
+        layoutTop.gridx = 0;
+        layoutTop.gridy = 0;
+        panelTop.add(chkAssignPortraitOnRoleChange, layoutTop);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseOriginFactionForNames)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFactionNames)
-                    .addComponent(comboFactionNames))
-                .addComponent(pnlRandomPortrait)
-                .addComponent(chkAssignPortraitOnRoleChange));
+        layoutTop.gridy++;
+        panelTop.add(chkUseOriginFactionForNames, layoutTop);
+        layoutTop.gridx++;
+        panelTop.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(25)));
+        layoutTop.gridx++;
+        panelTop.add(lblFactionNames, layoutTop);
+        layoutTop.gridx++;
+        panelTop.add(comboFactionNames, layoutTop);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addComponent(chkUseOriginFactionForNames)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblFactionNames)
-                        .addComponent(comboFactionNames)
-                        )
-                    .addComponent(pnlRandomPortrait)
-                    .addComponent(chkAssignPortraitOnRoleChange)));
+        final JPanel panel = new CampaignOptionsStandardPanel("NameAndPortraitGenerationTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(headerPanel, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(panelTop, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(pnlRandomPortrait, layoutParent);
+
 
         // Create Parent Panel and return
         return createParentPanel(panel, "NameAndPortraitGenerationTab");
@@ -1168,7 +1166,7 @@ public class BiographyTab {
 
         // Layout the Panel
         JPanel panel = new JPanel(
-            new GridLayout((int) Math.ceil((personnelRoles.length + 2) / 4.0), 4));
+            new GridLayout((int) Math.ceil((personnelRoles.length + 2) / 5.0), 5));
         panel.setBorder(BorderFactory.createTitledBorder(
             String.format(String.format("<html>%s</html>",
                 resources.getString("lblRandomPortraitPanel.text")))));
@@ -1214,8 +1212,7 @@ public class BiographyTab {
         Component rankSystemsViewport = rankSystemsPane.getViewport().getView();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RankTab", true,
-            "");
+        final JPanel panel = new CampaignOptionsStandardPanel("RankTab", true);
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 

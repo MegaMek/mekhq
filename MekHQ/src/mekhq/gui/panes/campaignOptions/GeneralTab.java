@@ -2,11 +2,9 @@ package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.dialogs.CamoChooserDialog;
-import megamek.client.ui.swing.util.FlatLafStyleBuilder;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
-import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -26,6 +24,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 
+import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 /**
@@ -174,7 +173,7 @@ public class GeneralTab {
 
         iconsPanel.add(lblIcon);
         iconsPanel.add(btnIcon);
-        iconsPanel.add(Box.createHorizontalStrut(50));
+        iconsPanel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(50)));
         iconsPanel.add(lblCamo);
         iconsPanel.add(btnCamo);
 
@@ -183,8 +182,8 @@ public class GeneralTab {
         final JPanel outerPanel = new CampaignOptionsStandardPanel("generalTab", true);
         // Add some padding left and right (inside the border!)
         outerPanel.setLayout(new BorderLayout());
-        outerPanel.add(Box.createHorizontalStrut(25), BorderLayout.LINE_START);
-        outerPanel.add(Box.createHorizontalStrut(25), BorderLayout.LINE_END);
+        outerPanel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(25)), BorderLayout.LINE_START);
+        outerPanel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(25)), BorderLayout.LINE_END);
         outerPanel.add(panel, BorderLayout.CENTER);
         JLabel label = new JLabel(resources.getString("lblQuote01.text"));
         label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -205,7 +204,7 @@ public class GeneralTab {
         JLabel imageLabel = new JLabel(imageIcon);
 
         final JLabel lblHeader = new JLabel(resources.getString("lblGeneral.text"), SwingConstants.CENTER);
-        new FlatLafStyleBuilder().font(MHQConstants.PROJECT_NAME).bold().size(3).apply(lblHeader);
+        setFontScaling(lblHeader, true, 2);
         lblHeader.setName("lblGeneral");
 
         JLabel lblBody = new JLabel(String.format("<html>%s</html>",

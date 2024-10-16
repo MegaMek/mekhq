@@ -418,7 +418,7 @@ public class CampaignOptionsUtilities {
             panel.setLayout(new GridBagLayout());
 
             this.anchor = Objects.requireNonNullElse(anchor, GridBagConstraints.NORTHWEST);
-            this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.NONE);
+            this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.VERTICAL);
 
             this.insets = new Insets(5, 5, 5, 5);
         }
