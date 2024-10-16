@@ -186,8 +186,12 @@ public class GeneralTab {
         outerPanel.add(Box.createHorizontalStrut(25), BorderLayout.LINE_START);
         outerPanel.add(Box.createHorizontalStrut(25), BorderLayout.LINE_END);
         outerPanel.add(panel, BorderLayout.CENTER);
+        JLabel label = new JLabel(resources.getString("lblQuote01.text"));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        outerPanel.add(label, BorderLayout.SOUTH);
 
         generalPanel.add(outerPanel);
+
         return generalPanel;
     }
 
