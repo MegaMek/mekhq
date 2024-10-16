@@ -176,6 +176,8 @@ public class BiographyTab {
         initializeDeathTab();
         initializeEducationTab();
         initializeNameAndPortraitTab();
+
+        rankSystemsPane = new RankSystemsPane(frame, campaign);
     }
 
     /**
@@ -1207,7 +1209,6 @@ public class BiographyTab {
             true);
 
         // Contents
-        rankSystemsPane = new RankSystemsPane(frame, campaign);
         Component rankSystemsViewport = rankSystemsPane.getViewport().getView();
 
         // Layout the Panel

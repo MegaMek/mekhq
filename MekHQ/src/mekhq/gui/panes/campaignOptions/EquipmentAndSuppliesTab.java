@@ -108,6 +108,7 @@ public class EquipmentAndSuppliesTab {
         initializeAcquisitionTab();
         initializeDelivery();
         initializePlanetaryAcquisitionsTab();
+        initializeTechLimitsTab();
     }
 
     /**
