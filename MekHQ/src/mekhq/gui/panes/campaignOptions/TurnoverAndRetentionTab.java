@@ -4,7 +4,6 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import mekhq.campaign.personnel.enums.TurnoverFrequency;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
@@ -216,6 +215,98 @@ public class TurnoverAndRetentionTab {
     }
 
     /**
+     * Constructs and configures a panel for the Fatigue tab.
+     * This tab contains a header panel, a checkbox for activating fatigue,
+     * a spinner for adjusting the fatigue rate, a checkbox for toggling fatigue from injury,
+     * a spinner for adjusting field kitchen capacity, a checkbox for making field kitchens ignore
+     * non-combatants and a spinner for adjusting the fatigue leave threshold.
+     * <p>
+     * The layout of the tab panel is organized with a {@link GroupLayout}, ensuring organized vertical
+     * and horizontal alignment.
+     *
+     * @return panel the configured {@link JPanel} for the Fatigue tab
+     */
+    JPanel createFatigueTab() {
+        // Header
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("FatigueTab",
+            getImageDirectory() + "logo_free_rasalhague_republic.png",
+            true);
+
+        // Contents
+        chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
+
+        lblFatigueRate = new CampaignOptionsLabel("FatigueRate");
+        spnFatigueRate = new CampaignOptionsSpinner("FatigueRate",
+            1, 1, 10, 1);
+
+        chkUseInjuryFatigue = new CampaignOptionsCheckBox("UseInjuryFatigue");
+
+        lblFieldKitchenCapacity = new CampaignOptionsLabel("FieldKitchenCapacity");
+        spnFieldKitchenCapacity = new CampaignOptionsSpinner("FieldKitchenCapacity",
+            150, 0, 450, 1);
+
+        chkFieldKitchenIgnoreNonCombatants = new CampaignOptionsCheckBox("FieldKitchenIgnoreNonCombatants");
+
+        lblFatigueLeaveThreshold = new CampaignOptionsLabel("FatigueLeaveThreshold");
+        spnFatigueLeaveThreshold = new CampaignOptionsSpinner("FatigueLeaveThreshold",
+            13, 0, 17, 1);
+
+        // Layout the Panels
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("FatigueTabLeft");
+        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy = 0;
+        layoutLeft.gridwidth = 1;
+        panelLeft.add(chkUseFatigue, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseInjuryFatigue, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkFieldKitchenIgnoreNonCombatants, layoutLeft);
+
+        final JPanel panelRight = new CampaignOptionsStandardPanel("FatigueTabRight");
+        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
+
+        layoutRight.gridx = 0;
+        layoutRight.gridy = 0;
+        layoutRight.gridwidth = 1;
+        panelRight.add(lblFatigueRate, layoutRight);
+        layoutRight.gridx++;
+        panelRight.add(spnFatigueRate, layoutRight);
+
+        layoutRight.gridx = 0;
+        layoutRight.gridy++;
+        panelRight.add(lblFieldKitchenCapacity, layoutRight);
+        layoutRight.gridx++;
+        panelRight.add(spnFieldKitchenCapacity, layoutRight);
+
+        layoutRight.gridx = 0;
+        layoutRight.gridy++;
+        panelRight.add(lblFatigueLeaveThreshold, layoutRight);
+        layoutRight.gridx++;
+        panelRight.add(spnFatigueLeaveThreshold, layoutRight);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("FatigueTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridwidth = 1;
+        layoutParent.gridy++;
+        panelParent.add(panelLeft, layoutParent);
+        layoutParent.gridx++;
+        panelParent.add(panelRight, layoutParent);
+
+        // Create Parent Panel and return
+        return createParentPanel(panelParent, "FatigueTab");
+    }
+
+    /**
      * Constructs and configures a panel for the Turnover tab.
      * This tab contains a header panel, a checkbox for activating random retirement, settings,
      * modifiers, payout, and unit cohesion panels.
@@ -239,34 +330,40 @@ public class TurnoverAndRetentionTab {
         pnlUnitCohesion = createUnitCohesionPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("TurnoverTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panelTop = new CampaignOptionsStandardPanel("TurnoverTabTop");
+        final GridBagConstraints layoutTop = new CampaignOptionsGridBagConstraints(panelTop);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseRandomRetirement)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlSettings)
-                    .addComponent(pnlModifiers)
-                    .addComponent(pnlPayout))
-                .addComponent(pnlUnitCohesion));
+        layoutTop.gridwidth = 1;
+        layoutTop.gridx = 0;
+        layoutTop.gridy = 0;
+        panelTop.add(chkUseRandomRetirement, layoutTop);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addComponent(chkUseRandomRetirement)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(pnlSettings)
-                        .addComponent(pnlModifiers)
-                        .addComponent(pnlPayout)
-                        )
-                    .addComponent(pnlUnitCohesion)));
+        layoutTop.gridy++;
+        panelTop.add(pnlSettings, layoutTop);
+        layoutTop.gridx++;
+        panelTop.add(pnlModifiers, layoutTop);
+        layoutTop.gridx++;
+        panelTop.add(pnlPayout, layoutTop);
+
+        // Layout the Panel
+        final JPanel panelParent = new CampaignOptionsStandardPanel("TurnoverTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panelParent.add(panelTop, layoutParent);
+
+        layoutParent.gridy++;
+        panelParent.add(pnlUnitCohesion, layoutParent);
+
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "TurnoverTab");
+        return createParentPanel(panelParent, "TurnoverTab");
     }
 
     /**
@@ -331,62 +428,58 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SettingsPanel", true,
             "SettingsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblTurnoverFixedTargetNumber)
-                    .addComponent(spnTurnoverFixedTargetNumber))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblTurnoverFrequency)
-                    .addComponent(comboTurnoverFrequency))
-                .addComponent(chkUseContractCompletionRandomRetirement)
-                .addComponent(chkUseRandomFounderTurnover)
-                .addComponent(chkTrackOriginalUnit)
-                .addComponent(chkAeroRecruitsHaveUnits)
-                .addComponent(chkUseSubContractSoldiers)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblServiceContractDuration)
-                    .addComponent(spnServiceContractDuration))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblServiceContractModifier)
-                    .addComponent(spnServiceContractModifier))
-                .addComponent(chkPayBonusDefault)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPayBonusDefaultThreshold)
-                    .addComponent(spnPayBonusDefaultThreshold)));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblTurnoverFixedTargetNumber, layout);
+        layout.gridx++;
+        panel.add(spnTurnoverFixedTargetNumber, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblTurnoverFixedTargetNumber)
-                        .addComponent(spnTurnoverFixedTargetNumber)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblTurnoverFrequency)
-                        .addComponent(comboTurnoverFrequency)
-                        )
-                    .addComponent(chkUseContractCompletionRandomRetirement)
-                    .addComponent(chkUseRandomFounderTurnover)
-                    .addComponent(chkTrackOriginalUnit)
-                    .addComponent(chkAeroRecruitsHaveUnits)
-                    .addComponent(chkUseSubContractSoldiers)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblServiceContractDuration)
-                        .addComponent(spnServiceContractDuration)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblServiceContractModifier)
-                        .addComponent(spnServiceContractModifier)
-                        )
-                    .addComponent(chkPayBonusDefault)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblPayBonusDefaultThreshold)
-                        .addComponent(spnPayBonusDefaultThreshold)
-                        )));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblTurnoverFrequency, layout);
+        layout.gridx++;
+        panel.add(comboTurnoverFrequency, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseContractCompletionRandomRetirement, layout);
+
+        layout.gridy++;
+        panel.add(chkUseRandomFounderTurnover, layout);
+
+        layout.gridy++;
+        panel.add(chkTrackOriginalUnit, layout);
+
+        layout.gridy++;
+        panel.add(chkAeroRecruitsHaveUnits, layout);
+
+        layout.gridy++;
+        panel.add(chkUseSubContractSoldiers, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblServiceContractDuration, layout);
+        layout.gridx++;
+        panel.add(spnServiceContractDuration, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblServiceContractModifier, layout);
+        layout.gridx++;
+        panel.add(spnServiceContractModifier, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkPayBonusDefault, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPayBonusDefaultThreshold, layout);
+        layout.gridx++;
+        panel.add(spnPayBonusDefaultThreshold, layout);
 
         return panel;
     }
@@ -417,44 +510,45 @@ public class TurnoverAndRetentionTab {
         chkUseLoyaltyModifiers = new CampaignOptionsCheckBox("UseLoyaltyModifiers");
         chkUseHideLoyalty = new CampaignOptionsCheckBox("UseHideLoyalty");
 
-
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TurnoverModifiersPanel", true,
             "ModifiersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseCustomRetirementModifiers)
-                .addComponent(chkUseFatigueModifiers)
-                .addComponent(chkUseSkillModifiers)
-                .addComponent(chkUseAgeModifiers)
-                .addComponent(chkUseUnitRatingModifiers)
-                .addComponent(chkUseFactionModifiers)
-                .addComponent(chkUseMissionStatusModifiers)
-                .addComponent(chkUseHostileTerritoryModifiers)
-                .addComponent(chkUseFamilyModifiers)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(chkUseLoyaltyModifiers)
-                    .addComponent(chkUseHideLoyalty)));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(chkUseCustomRetirementModifiers, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chkUseCustomRetirementModifiers)
-                    .addComponent(chkUseFatigueModifiers)
-                    .addComponent(chkUseSkillModifiers)
-                    .addComponent(chkUseAgeModifiers)
-                    .addComponent(chkUseUnitRatingModifiers)
-                    .addComponent(chkUseFactionModifiers)
-                    .addComponent(chkUseMissionStatusModifiers)
-                    .addComponent(chkUseHostileTerritoryModifiers)
-                    .addComponent(chkUseFamilyModifiers)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(chkUseLoyaltyModifiers)
-                        .addComponent(chkUseHideLoyalty)
-                        )));
+        layout.gridy++;
+        panel.add(chkUseFatigueModifiers, layout);
+
+        layout.gridy++;
+        panel.add(chkUseSkillModifiers, layout);
+
+        layout.gridy++;
+        panel.add(chkUseAgeModifiers, layout);
+
+        layout.gridy++;
+        panel.add(chkUseUnitRatingModifiers, layout);
+
+        layout.gridy++;
+        panel.add(chkUseFactionModifiers, layout);
+
+        layout.gridy++;
+        panel.add(chkUseMissionStatusModifiers, layout);
+
+        layout.gridy++;
+        panel.add(chkUseHostileTerritoryModifiers, layout);
+
+        layout.gridy++;
+        panel.add(chkUseFamilyModifiers, layout);
+
+        layout.gridy++;
+        panel.add(chkUseLoyaltyModifiers, layout);
+
+        layout.gridy++;
+        panel.add(chkUseHideLoyalty, layout);
 
         return panel;
     }
@@ -493,45 +587,36 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PayoutsPanel", true,
             "PayoutsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPayoutRateOfficer)
-                    .addComponent(spnPayoutRateOfficer))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPayoutRateEnlisted)
-                    .addComponent(spnPayoutRateEnlisted))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPayoutRetirementMultiplier)
-                    .addComponent(spnPayoutRetirementMultiplier))
-                .addComponent(chkUsePayoutServiceBonus)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPayoutServiceBonusRate)
-                    .addComponent(spnPayoutServiceBonusRate)));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblPayoutRateOfficer, layout);
+        layout.gridx++;
+        panel.add(spnPayoutRateOfficer, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblPayoutRateOfficer)
-                        .addComponent(spnPayoutRateOfficer)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblPayoutRateEnlisted)
-                        .addComponent(spnPayoutRateEnlisted)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblPayoutRetirementMultiplier)
-                        .addComponent(spnPayoutRetirementMultiplier)
-                        )
-                    .addComponent(chkUsePayoutServiceBonus)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblPayoutServiceBonusRate)
-                        .addComponent(spnPayoutServiceBonusRate)
-                        )));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPayoutRateEnlisted, layout);
+        layout.gridx++;
+        panel.add(spnPayoutRateEnlisted, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPayoutRetirementMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnPayoutRetirementMultiplier, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUsePayoutServiceBonus, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPayoutServiceBonusRate, layout);
+        layout.gridx++;
+        panel.add(spnPayoutServiceBonusRate, layout);
 
         return panel;
     }
@@ -554,22 +639,14 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UnitCohesionPanel", true,
             "UnitCohesionPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlAdministrativeStrainWrapper)
-                    .addComponent(pnlManagementSkillWrapper)));
-
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(pnlAdministrativeStrainWrapper)
-                        .addComponent(pnlManagementSkillWrapper)
-                        )));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(pnlAdministrativeStrainWrapper, layout);
+        layout.gridx++;
+        panel.add(pnlManagementSkillWrapper, layout);
 
         return panel;
     }
@@ -591,19 +668,15 @@ public class TurnoverAndRetentionTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrainPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseAdministrativeStrain)
-                .addComponent(pnlAdministrativeStrain));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(chkUseAdministrativeStrain, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chkUseAdministrativeStrain)
-                    .addComponent(pnlAdministrativeStrain)));
+        layout.gridy++;
+        panel.add(pnlAdministrativeStrain, layout);
 
         return panel;
     }
@@ -633,29 +706,20 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrain", true,
             "AdministrativeStrain");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAdministrativeCapacity)
-                    .addComponent(spnAdministrativeCapacity))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblMultiCrewStrainDivider)
-                    .addComponent(spnMultiCrewStrainDivider)));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblAdministrativeCapacity, layout);
+        layout.gridx++;
+        panel.add(spnAdministrativeCapacity, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblAdministrativeCapacity)
-                        .addComponent(spnAdministrativeCapacity)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblMultiCrewStrainDivider)
-                        .addComponent(spnMultiCrewStrainDivider)
-                        )));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblMultiCrewStrainDivider, layout);
+        layout.gridx++;
+        panel.add(spnMultiCrewStrainDivider, layout);
 
         return panel;
     }
@@ -678,19 +742,15 @@ public class TurnoverAndRetentionTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UnitCohesionPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseManagementSkill)
-                .addComponent(pnlManagementSkill));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(chkUseManagementSkill, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chkUseManagementSkill)
-                    .addComponent(pnlManagementSkill)));
+        layout.gridy++;
+        panel.add(pnlManagementSkill, layout);
 
         return panel;
     }
@@ -719,107 +779,18 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ManagementSkill", true,
             "ManagementSkill");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseCommanderLeadershipOnly)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblManagementSkillPenalty)
-                    .addComponent(spnManagementSkillPenalty)));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(chkUseCommanderLeadershipOnly, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chkUseCommanderLeadershipOnly)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblManagementSkillPenalty)
-                        .addComponent(spnManagementSkillPenalty)
-                        )));
+        layout.gridy++;
+        panel.add(lblManagementSkillPenalty, layout);
+        layout.gridx++;
+        panel.add(spnManagementSkillPenalty, layout);
 
         return panel;
-    }
-
-    /**
-     * Constructs and configures a panel for the Fatigue tab.
-     * This tab contains a header panel, a checkbox for activating fatigue,
-     * a spinner for adjusting the fatigue rate, a checkbox for toggling fatigue from injury,
-     * a spinner for adjusting field kitchen capacity, a checkbox for making field kitchens ignore
-     * non-combatants and a spinner for adjusting the fatigue leave threshold.
-     * <p>
-     * The layout of the tab panel is organized with a {@link GroupLayout}, ensuring organized vertical
-     * and horizontal alignment.
-     *
-     * @return panel the configured {@link JPanel} for the Fatigue tab
-     */
-    JPanel createFatigueTab() {
-        // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("FatigueTab",
-            getImageDirectory() + "logo_free_rasalhague_republic.png",
-            true);
-
-        // Contents
-        chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
-
-        lblFatigueRate = new CampaignOptionsLabel("FatigueRate");
-        spnFatigueRate = new CampaignOptionsSpinner("FatigueRate",
-            1, 1, 10, 1);
-
-        chkUseInjuryFatigue = new CampaignOptionsCheckBox("UseInjuryFatigue");
-
-        lblFieldKitchenCapacity = new CampaignOptionsLabel("FieldKitchenCapacity");
-        spnFieldKitchenCapacity = new CampaignOptionsSpinner("FieldKitchenCapacity",
-            150, 0, 450, 1);
-
-        chkFieldKitchenIgnoreNonCombatants = new CampaignOptionsCheckBox("FieldKitchenIgnoreNonCombatants");
-
-        lblFatigueLeaveThreshold = new CampaignOptionsLabel("FatigueLeaveThreshold");
-        spnFatigueLeaveThreshold = new CampaignOptionsSpinner("FatigueLeaveThreshold",
-            13, 0, 17, 1);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("FatigueTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseFatigue)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFatigueRate)
-                    .addComponent(spnFatigueRate)
-                    .addComponent(chkUseInjuryFatigue))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFieldKitchenCapacity)
-                    .addComponent(spnFieldKitchenCapacity)
-                    .addComponent(chkFieldKitchenIgnoreNonCombatants))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFatigueLeaveThreshold)
-                    .addComponent(spnFatigueLeaveThreshold)));
-
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addComponent(chkUseFatigue)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblFatigueRate)
-                        .addComponent(spnFatigueRate)
-                        .addComponent(chkUseInjuryFatigue)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblFieldKitchenCapacity)
-                        .addComponent(spnFieldKitchenCapacity)
-                        .addComponent(chkFieldKitchenIgnoreNonCombatants)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblFatigueLeaveThreshold)
-                        .addComponent(spnFatigueLeaveThreshold)
-                        )));
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "FatigueTab");
     }
 }
