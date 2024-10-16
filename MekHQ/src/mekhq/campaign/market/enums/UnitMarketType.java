@@ -172,10 +172,10 @@ public enum UnitMarketType {
             });
         } else {
             return switch(market) {
-                case OPEN, MERCENARY -> PartQuality.C;
-                case EMPLOYER -> PartQuality.B;
-                case BLACK_MARKET -> Compute.d6(1) <= 2 ? PartQuality.A : PartQuality.F;
-                case FACTORY -> PartQuality.F;
+                case OPEN, MERCENARY -> PartQuality.QUALITY_C;
+                case EMPLOYER -> PartQuality.QUALITY_B;
+                case BLACK_MARKET -> Compute.d6(1) <= 2 ? PartQuality.QUALITY_A : PartQuality.QUALITY_F;
+                case FACTORY -> PartQuality.QUALITY_F;
             };
         }
     }

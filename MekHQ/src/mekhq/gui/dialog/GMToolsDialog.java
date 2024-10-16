@@ -1517,7 +1517,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
             if (getGUI().getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
                 quality = Unit.getRandomUnitQuality(0);
             } else {
-                quality = PartQuality.D;
+                quality = PartQuality.QUALITY_D;
             }
 
             final Unit unit = getGUI().getCampaign().addNewUnit(getLastRolledUnit(), false, 0, quality);

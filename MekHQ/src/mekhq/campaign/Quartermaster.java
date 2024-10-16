@@ -467,7 +467,7 @@ public class Quartermaster {
     public boolean buyUnit(Entity en, int days) {
         Objects.requireNonNull(en);
 
-        PartQuality quality = PartQuality.D;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);

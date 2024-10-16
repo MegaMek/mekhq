@@ -125,7 +125,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     protected void select(boolean isGM) {
         if (getSelectedEntity() != null) {
             if (isGM) {
-                PartQuality quality = PartQuality.D;
+                PartQuality quality = PartQuality.QUALITY_D;
 
                 if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
                     quality = UnitOrder.getRandomUnitQuality(0);

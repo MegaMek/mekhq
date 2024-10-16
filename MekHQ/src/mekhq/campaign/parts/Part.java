@@ -191,7 +191,7 @@ public abstract class Part implements IPartWork, ITechnology {
         this.campaign = c;
         this.brandNew = true;
         this.quantity = 1;
-        this.quality = PartQuality.D;
+        this.quality = PartQuality.QUALITY_D;
         this.childParts = new ArrayList<>();
         this.isTeamSalvaging = false;
     }

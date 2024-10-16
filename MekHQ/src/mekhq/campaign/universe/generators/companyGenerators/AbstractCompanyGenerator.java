@@ -995,7 +995,7 @@ public abstract class AbstractCompanyGenerator {
                 continue;
             }
 
-            PartQuality quality = PartQuality.D;
+            PartQuality quality = PartQuality.QUALITY_D;
 
             if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
                 int modifier = 0;
@@ -1373,7 +1373,7 @@ public abstract class AbstractCompanyGenerator {
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);
         } else {
-            quality = PartQuality.D;
+            quality = PartQuality.QUALITY_D;
         }
 
         final List<Unit> mothballedUnits = mothballedEntities.stream()

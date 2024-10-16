@@ -206,24 +206,24 @@ public class Loot {
         if (contract instanceof AtBContract) {
             switch (((AtBContract) contract).getEnemyQuality()) {
                 case IUnitRating.DRAGOON_F:
-                    qualityAndModifier.put("quality", PartQuality.A.toNumeric());
+                    qualityAndModifier.put("quality", PartQuality.QUALITY_A.toNumeric());
                     qualityAndModifier.put("modifier", -2);
                     break;
                 case IUnitRating.DRAGOON_D:
-                    qualityAndModifier.put("quality", PartQuality.B.toNumeric());
+                    qualityAndModifier.put("quality", PartQuality.QUALITY_B.toNumeric());
                     qualityAndModifier.put("modifier", -1);
                     break;
                 case IUnitRating.DRAGOON_C:
                 case IUnitRating.DRAGOON_B:
-                    qualityAndModifier.put("quality", PartQuality.C.toNumeric());
+                    qualityAndModifier.put("quality", PartQuality.QUALITY_C.toNumeric());
                     qualityAndModifier.put("modifier", 0);
                     break;
                 case IUnitRating.DRAGOON_A:
-                    qualityAndModifier.put("quality", PartQuality.D.toNumeric());
+                    qualityAndModifier.put("quality", PartQuality.QUALITY_D.toNumeric());
                     qualityAndModifier.put("modifier", 1);
                     break;
                 case IUnitRating.DRAGOON_ASTAR:
-                    qualityAndModifier.put("quality", PartQuality.F.toNumeric());
+                    qualityAndModifier.put("quality", PartQuality.QUALITY_F.toNumeric());
                     qualityAndModifier.put("modifier", 2);
                     break;
                 default:
@@ -232,7 +232,7 @@ public class Loot {
                                     + ((AtBContract) contract).getEnemyQuality());
             }
         } else {
-            qualityAndModifier.put("quality", PartQuality.D.toNumeric());
+            qualityAndModifier.put("quality", PartQuality.QUALITY_D.toNumeric());
             qualityAndModifier.put("modifier", 0);
         }
 

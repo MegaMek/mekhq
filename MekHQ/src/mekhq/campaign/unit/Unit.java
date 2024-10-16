@@ -1162,12 +1162,12 @@ public class Unit implements ITechnology {
             double[] usedPartPriceMultipliers = campaign.getCampaignOptions().getUsedPartPriceMultipliers();
 
             return switch (this.getQuality()) {
-                case A -> unitCost.multipliedBy(usedPartPriceMultipliers[0]);
-                case B -> unitCost.multipliedBy(usedPartPriceMultipliers[1]);
-                case C -> unitCost.multipliedBy(usedPartPriceMultipliers[2]);
-                case D -> unitCost.multipliedBy(usedPartPriceMultipliers[3]);
-                case E -> unitCost.multipliedBy(usedPartPriceMultipliers[4]);
-                case F -> unitCost.multipliedBy(usedPartPriceMultipliers[5]);
+                case QUALITY_A -> unitCost.multipliedBy(usedPartPriceMultipliers[0]);
+                case QUALITY_B -> unitCost.multipliedBy(usedPartPriceMultipliers[1]);
+                case QUALITY_C -> unitCost.multipliedBy(usedPartPriceMultipliers[2]);
+                case QUALITY_D -> unitCost.multipliedBy(usedPartPriceMultipliers[3]);
+                case QUALITY_E -> unitCost.multipliedBy(usedPartPriceMultipliers[4]);
+                case QUALITY_F -> unitCost.multipliedBy(usedPartPriceMultipliers[5]);
                 default ->
                     throw new IllegalStateException("Unexpected value in mekhq/campaign/unit/Unit.java/getSellValue: "
                             + this.getQuality());
@@ -5239,7 +5239,7 @@ public class Unit implements ITechnology {
             }
         }
         if (nParts == 0) {
-            return PartQuality.D;
+            return PartQuality.QUALITY_D;
         }
         return PartQuality.fromNumeric((int) Math.round((1.0 * sumQuality) / nParts));
     }
@@ -5893,11 +5893,11 @@ public class Unit implements ITechnology {
                 12);
 
         return switch (roll) {
-            case 2, 3, 4, 5 -> PartQuality.A;
-            case 6, 7, 8 -> PartQuality.B;
-            case 9, 10 -> PartQuality.C;
-            case 11 -> PartQuality.D;
-            case 12 -> PartQuality.F;
+            case 2, 3, 4, 5 -> PartQuality.QUALITY_A;
+            case 6, 7, 8 -> PartQuality.QUALITY_B;
+            case 9, 10 -> PartQuality.QUALITY_C;
+            case 11 -> PartQuality.QUALITY_D;
+            case 12 -> PartQuality.QUALITY_F;
             default -> throw new IllegalStateException(
                     "Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
         };

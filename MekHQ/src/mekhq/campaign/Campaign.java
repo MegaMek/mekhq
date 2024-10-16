@@ -729,7 +729,7 @@ public class Campaign implements ITechManager {
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        PartQuality quality = PartQuality.D;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (campaignOptions.isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);
@@ -1327,7 +1327,7 @@ public class Campaign implements ITechManager {
      * @return The newly added unit
      */
     public Unit addNewUnit(Entity en, boolean allowNewPilots, int days) {
-        return addNewUnit(en, allowNewPilots, days, PartQuality.D);
+        return addNewUnit(en, allowNewPilots, days, PartQuality.QUALITY_D);
     }
 
     /**
@@ -7884,7 +7884,7 @@ public class Campaign implements ITechManager {
         partReport += " rolled a " + roll + ", margin of " + margin;
 
         switch (p.getQuality()) {
-            case A: {
+            case QUALITY_A: {
                 if (margin >= 4) {
                     p.improveQuality();
                 }
@@ -7903,7 +7903,7 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case B: {
+            case QUALITY_B: {
                 if (margin >= 4) {
                     p.improveQuality();
                 } else if (margin < -5) {
@@ -7918,7 +7918,7 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case C: {
+            case QUALITY_C: {
                 if (margin < -4) {
                     p.reduceQuality();
                 } else if (margin >= 5) {
@@ -7933,7 +7933,7 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case D: {
+            case QUALITY_D: {
                 if (margin < -3) {
                     p.reduceQuality();
                     if ((margin < -4) && !campaignOptions.isUseUnofficialMaintenance()) {
@@ -7944,7 +7944,7 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case E:
+            case QUALITY_E:
                 if (margin < -2) {
                     p.reduceQuality();
                     if ((margin < -5) && !campaignOptions.isUseUnofficialMaintenance()) {
@@ -7954,7 +7954,7 @@ public class Campaign implements ITechManager {
                     p.improveQuality();
                 }
                 break;
-            case F:
+            case QUALITY_F:
             default:
                 if (margin < -2) {
                     p.reduceQuality();

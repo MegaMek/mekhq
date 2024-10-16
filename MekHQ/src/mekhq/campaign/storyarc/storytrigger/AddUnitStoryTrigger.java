@@ -64,7 +64,7 @@ public class AddUnitStoryTrigger extends StoryTrigger {
 
         Entity en = mekFileParser.getEntity();
 
-        PartQuality quality = PartQuality.D;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);

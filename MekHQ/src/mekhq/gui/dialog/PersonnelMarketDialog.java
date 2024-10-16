@@ -416,7 +416,7 @@ public class PersonnelMarketDialog extends JDialog {
             return;
         }
 
-        PartQuality quality = PartQuality.D;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
             quality = UnitOrder.getRandomUnitQuality(0);

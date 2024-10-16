@@ -213,7 +213,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
             if (gui.getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
                 quality = Unit.getRandomUnitQuality(0);
             } else {
-                quality = PartQuality.D;
+                quality = PartQuality.QUALITY_D;
             }
 
             gui.getCampaign().addNewUnit((Entity) equipment, false, 0, quality);

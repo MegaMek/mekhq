@@ -7557,26 +7557,26 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 .createTitledBorder(resources.getString("usedPartsValueMultipliersPanel.title")));
         panel.setName("usedPartsValueMultipliersPanel");
 
-        spnUsedPartPriceMultipliers = new JSpinner[PartQuality.F.toNumeric() + 1];
+        spnUsedPartPriceMultipliers = new JSpinner[PartQuality.QUALITY_F.toNumeric() + 1];
 
-        for (PartQuality q : PartQuality.allQualities()) {
-            final String qualityLevel = q.toName(reverseQualities);
+        for (PartQuality quality : PartQuality.allQualities()) {
+            final String qualityLevel = quality.toName(reverseQualities);
 
             final JLabel label = new JLabel(qualityLevel);
             label.setToolTipText(resources.getString("lblUsedPartPriceMultiplier.toolTipText"));
             label.setName("lbl" + qualityLevel);
             panel.add(label);
 
-            spnUsedPartPriceMultipliers[q.toNumeric()] = new JSpinner(
+            spnUsedPartPriceMultipliers[quality.toNumeric()] = new JSpinner(
                         new SpinnerNumberModel(0.00, 0.00, 1.00, 0.05));
-            spnUsedPartPriceMultipliers[q.toNumeric()]
+            spnUsedPartPriceMultipliers[quality.toNumeric()]
                     .setToolTipText(resources.getString("lblUsedPartPriceMultiplier.toolTipText"));
-            spnUsedPartPriceMultipliers[q.toNumeric()].setName("spn" + qualityLevel);
-            spnUsedPartPriceMultipliers[q.toNumeric()]
-                    .setEditor(new NumberEditor(spnUsedPartPriceMultipliers[q.toNumeric()], "0.00"));
-            panel.add(spnUsedPartPriceMultipliers[q.toNumeric()]);
+            spnUsedPartPriceMultipliers[quality.toNumeric()].setName("spn" + qualityLevel);
+            spnUsedPartPriceMultipliers[quality.toNumeric()]
+                    .setEditor(new NumberEditor(spnUsedPartPriceMultipliers[quality.toNumeric()], "0.00"));
+            panel.add(spnUsedPartPriceMultipliers[quality.toNumeric()]);
 
-            label.setLabelFor(spnUsedPartPriceMultipliers[q.toNumeric()]);
+            label.setLabelFor(spnUsedPartPriceMultipliers[quality.toNumeric()]);
         }
 
         return panel;
@@ -9912,7 +9912,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnCancelledOrderRefundMultiplier.setValue(options.getCancelledOrderRefundMultiplier());
 
         // Used Parts Multiplier Panel
-        for (int index = PartQuality.A.toNumeric(); index <= PartQuality.F.toNumeric(); index++) {
+        for (int index = PartQuality.QUALITY_A.toNumeric(); index <= PartQuality.QUALITY_F.toNumeric(); index++) {
             spnUsedPartPriceMultipliers[index].setValue(options.getUsedPartPriceMultipliers()[index]);
         }
 
