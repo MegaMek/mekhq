@@ -172,11 +172,11 @@ public class GeneralTab {
         JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         iconsPanel.setBorder(BorderFactory.createTitledBorder(""));
 
-        iconsPanel.add(lblCamo);
-        iconsPanel.add(btnCamo);
-        iconsPanel.add(Box.createHorizontalStrut(50));
         iconsPanel.add(lblIcon);
         iconsPanel.add(btnIcon);
+        iconsPanel.add(Box.createHorizontalStrut(50));
+        iconsPanel.add(lblCamo);
+        iconsPanel.add(btnCamo);
 
         panel.add(iconsPanel, layout);
 

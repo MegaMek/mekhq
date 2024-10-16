@@ -166,7 +166,6 @@ public class PersonnelTab {
         initializeGeneralTab();
         initializePersonnelLogsTab();
         initializePersonnelInformationTab();
-        initializeAdministratorsTab();
         initializeAwardsTab();
         initializeMedicalTab();
         initializePrisonersAndDependentsTab();
@@ -277,17 +276,6 @@ public class PersonnelTab {
     }
 
     /**
-     * Initializes the components of the AdministratorsTab.
-     * The panel contains settings related to administrator abilities.
-     */
-    private void initializeAdministratorsTab() {
-        chkAdminsHaveNegotiation = new JCheckBox();
-        chkAdminExperienceLevelIncludeNegotiation = new JCheckBox();
-        chkAdminsHaveScrounge = new JCheckBox();
-        chkAdminExperienceLevelIncludeScrounge = new JCheckBox();
-    }
-
-    /**
      * Initializes the components of the PersonnelInformationTab.
      * The panel contains settings related to personnel information display.
      */
@@ -345,6 +333,12 @@ public class PersonnelTab {
         chkUsePersonnelRemoval = new JCheckBox();
         chkUseRemovalExemptCemetery = new JCheckBox();
         chkUseRemovalExemptRetirees = new JCheckBox();
+
+        pnlAdministrators = new JPanel();
+        chkAdminsHaveNegotiation = new JCheckBox();
+        chkAdminExperienceLevelIncludeNegotiation = new JCheckBox();
+        chkAdminsHaveScrounge = new JCheckBox();
+        chkAdminExperienceLevelIncludeScrounge = new JCheckBox();
     }
 
     /**
@@ -621,18 +615,14 @@ public class PersonnelTab {
 
         layout.gridx = 0;
         layout.gridy = 0;
-        layout.gridwidth = 1;
         panel.add(lblAwardBonusStyle, layout);
         layout.gridx++;
-        layout.gridwidth = 2;
         panel.add(comboAwardBonusStyle, layout);
 
         layout.gridx = 0;
         layout.gridy++;
-        layout.gridwidth = 1;
         panel.add(lblAwardTierSize, layout);
         layout.gridx++;
-        layout.gridwidth = 2;
         panel.add(spnAwardTierSize, layout);
 
         layout.gridx = 0;
