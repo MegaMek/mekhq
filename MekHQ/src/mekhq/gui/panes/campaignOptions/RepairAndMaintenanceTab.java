@@ -2,6 +2,7 @@ package mekhq.gui.panes.campaignOptions;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
+import java.awt.*;
 
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
@@ -120,7 +121,7 @@ public class RepairAndMaintenanceTab {
             getImageDirectory() + "logo_aurigan_coalition.png", true);
 
         // Era Mods
-        useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
+            useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
 
         // Tech Placement
         assignedTechFirstCheckBox = new CampaignOptionsCheckBox("AssignedTechFirstCheckBox");
@@ -144,49 +145,65 @@ public class RepairAndMaintenanceTab {
         lblDestroyPartTarget = new CampaignOptionsLabel("DestroyPartTarget");
         spnDestroyPartTarget = new CampaignOptionsSpinner("DestroyPartTarget",
             2, 2, 13, 1);
-        JLabel lblDestroyPartTargetPost = new JLabel("<html>+</html>");
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("repairTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("repairTabLeft");
+        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(useEraModsCheckBox)
-                .addComponent(assignedTechFirstCheckBox)
-                .addComponent(resetToFirstTechCheckBox)
-                .addComponent(useQuirksBox)
-                .addComponent(useAeroSystemHitsBox)
-                .addComponent(useDamageMargin)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblDamageMargin)
-                    .addComponent(spnDamageMargin))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblDestroyPartTarget)
-                    .addComponent(spnDestroyPartTarget)
-                    .addComponent(lblDestroyPartTargetPost)));
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy = 0;
+        layoutLeft.gridwidth = 1;
+        panelLeft.add(useEraModsCheckBox, layoutLeft);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addComponent(useEraModsCheckBox)
-                .addComponent(assignedTechFirstCheckBox)
-                .addComponent(resetToFirstTechCheckBox)
-                .addComponent(useQuirksBox)
-                .addComponent(useAeroSystemHitsBox)
-                .addComponent(useDamageMargin)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblDamageMargin)
-                    .addComponent(spnDamageMargin))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblDestroyPartTarget)
-                    .addComponent(spnDestroyPartTarget)
-                    .addComponent(lblDestroyPartTargetPost)));
+        layoutLeft.gridy++;
+        panelLeft.add(assignedTechFirstCheckBox, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(resetToFirstTechCheckBox, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(useQuirksBox, layoutLeft);
+
+        final JPanel panelRight = new CampaignOptionsStandardPanel("RepairTabRight", true,
+            "RepairTabRight");
+        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
+
+        layoutRight.gridx = 0;
+        layoutRight.gridy = 0;
+        layoutRight.gridwidth = 1;
+        panelRight.add(useAeroSystemHitsBox, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(useDamageMargin, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(lblDamageMargin, layoutRight);
+        layoutRight.gridx++;
+        panelRight.add(spnDamageMargin, layoutRight);
+
+        layoutRight.gridx = 0;
+        layoutRight.gridy++;
+        panelRight.add(lblDestroyPartTarget, layoutRight);
+        layoutRight.gridx++;
+        panelRight.add(spnDestroyPartTarget, layoutRight);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("RepairTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panelParent.add(panelLeft, layoutParent);
+
+        layoutParent.gridx++;
+        panelParent.add(panelRight, layoutParent);
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "repairTab");
+        return createParentPanel(panelParent, "repairTab");
     }
 
     /**
