@@ -7,7 +7,6 @@ import mekhq.campaign.personnel.enums.RandomMarriageMethod;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
@@ -34,8 +33,6 @@ public class RelationshipsTab {
     private JCheckBox chkUseRandomPrisonerMarriages;
     private JLabel lblRandomMarriageAgeRange;
     private JSpinner spnRandomMarriageAgeRange;
-
-    private JPanel pnlPercentageRandomMarriage;
     private JLabel lblRandomMarriageOppositeSexDiceSize;
     private JSpinner spnRandomMarriageDiceSize;
     private JLabel lblRandomSameSexMarriageDiceSize;
@@ -190,7 +187,6 @@ public class RelationshipsTab {
         lblRandomMarriageAgeRange = new JLabel();
         spnRandomMarriageAgeRange = new JSpinner();
 
-        pnlPercentageRandomMarriage = new JPanel();
         lblRandomMarriageOppositeSexDiceSize = new JLabel();
         spnRandomMarriageDiceSize = new JSpinner();
         lblRandomSameSexMarriageDiceSize = new JLabel();
@@ -218,24 +214,19 @@ public class RelationshipsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("MarriageTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlMarriageGeneralOptions)
-                    .addComponent(pnlRandomMarriage)));
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(headerPanel, layoutParent);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(pnlMarriageGeneralOptions)
-                        .addComponent(pnlRandomMarriage)
-                        )));
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(pnlMarriageGeneralOptions, layoutParent);
+
+        layoutParent.gridx++;
+        panel.add(pnlRandomMarriage, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "MarriageTab");
@@ -264,37 +255,33 @@ public class RelationshipsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("MarriageGeneralOptionsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseManualMarriages)
-                .addComponent(chkUseClanPersonnelMarriages)
-                .addComponent(chkUsePrisonerMarriages)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblNoInterestInMarriageDiceSize)
-                    .addComponent(spnNoInterestInMarriageDiceSize))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblCheckMutualAncestorsDepth)
-                    .addComponent(spnCheckMutualAncestorsDepth))
-                .addComponent(chkLogMarriageNameChanges));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(chkUseManualMarriages, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chkUseManualMarriages)
-                    .addComponent(chkUseClanPersonnelMarriages)
-                    .addComponent(chkUsePrisonerMarriages)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblNoInterestInMarriageDiceSize)
-                        .addComponent(spnNoInterestInMarriageDiceSize)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblCheckMutualAncestorsDepth)
-                        .addComponent(spnCheckMutualAncestorsDepth)
-                        )
-                    .addComponent(chkLogMarriageNameChanges)));
+        layout.gridy++;
+        panel.add(chkUseClanPersonnelMarriages, layout);
+
+        layout.gridy++;
+        panel.add(chkUsePrisonerMarriages, layout);
+
+        layout.gridy++;
+        panel.add(lblNoInterestInMarriageDiceSize, layout);
+        layout.gridx++;
+        panel.add(spnNoInterestInMarriageDiceSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblCheckMutualAncestorsDepth, layout);
+        layout.gridx++;
+        panel.add(spnCheckMutualAncestorsDepth, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkLogMarriageNameChanges, layout);
 
         return panel;
     }
@@ -330,53 +317,6 @@ public class RelationshipsTab {
         spnRandomMarriageAgeRange = new CampaignOptionsSpinner("RandomMarriageAgeRange",
             10, 0, 100, 1.0);
 
-        pnlPercentageRandomMarriage = createPercentageRandomMarriagePanel();
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RandomMarriages", true,
-            "RandomMarriages");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomMarriageMethod)
-                    .addComponent(comboRandomMarriageMethod))
-                .addComponent(chkUseRandomClanPersonnelMarriages)
-                .addComponent(chkUseRandomPrisonerMarriages)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomMarriageAgeRange)
-                    .addComponent(spnRandomMarriageAgeRange))
-                .addComponent(pnlPercentageRandomMarriage));
-
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomMarriageMethod)
-                        .addComponent(comboRandomMarriageMethod)
-                        )
-                    .addComponent(chkUseRandomClanPersonnelMarriages)
-                    .addComponent(chkUseRandomPrisonerMarriages)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomMarriageAgeRange)
-                        .addComponent(spnRandomMarriageAgeRange)
-                        )
-                    .addComponent(pnlPercentageRandomMarriage)));
-
-        return panel;
-    }
-
-    /**
-     * Creates a panel for setting percentage-based random marriage settings.
-     *
-     * @return a {@link JPanel} representing the Percentage Random Marriage panel with input components
-     * for setting opposite-sex marriage dice size, same-sex marriage dice size, and new dependent
-     * marriage dice size
-     */
-    private JPanel createPercentageRandomMarriagePanel() {
-        // Contents
         lblRandomMarriageOppositeSexDiceSize = new CampaignOptionsLabel("RandomMarriageOppositeSexDiceSize");
         spnRandomMarriageDiceSize = new CampaignOptionsSpinner("RandomMarriageOppositeSexDiceSize",
             5000, 0, 100000, 1);
@@ -390,38 +330,47 @@ public class RelationshipsTab {
             20, 0, 100000, 1);
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PercentageRandomMarriagePanel", true,
-            "PercentageRandomMarriagePanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panel = new CampaignOptionsStandardPanel("RandomMarriages", true,
+            "RandomMarriages");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomMarriageOppositeSexDiceSize)
-                    .addComponent(spnRandomMarriageDiceSize))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomSameSexMarriageDiceSize)
-                    .addComponent(spnRandomSameSexMarriageDiceSize))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomNewDependentMarriage)
-                    .addComponent(spnRandomNewDependentMarriage)));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblRandomMarriageMethod, layout);
+        layout.gridx++;
+        panel.add(comboRandomMarriageMethod, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomMarriageOppositeSexDiceSize)
-                        .addComponent(spnRandomMarriageDiceSize)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomSameSexMarriageDiceSize)
-                        .addComponent(spnRandomSameSexMarriageDiceSize)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomNewDependentMarriage)
-                        .addComponent(spnRandomNewDependentMarriage)
-                        )));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseRandomClanPersonnelMarriages, layout);
+
+        layout.gridy++;
+        panel.add(chkUseRandomPrisonerMarriages, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRandomMarriageAgeRange, layout);
+        layout.gridx++;
+        panel.add(spnRandomMarriageAgeRange, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRandomMarriageOppositeSexDiceSize, layout);
+        layout.gridx++;
+        panel.add(spnRandomMarriageDiceSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRandomSameSexMarriageDiceSize, layout);
+        layout.gridx++;
+        panel.add(spnRandomSameSexMarriageDiceSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRandomNewDependentMarriage, layout);
+        layout.gridx++;
+        panel.add(spnRandomNewDependentMarriage, layout);
 
         return panel;
     }
@@ -447,29 +396,37 @@ public class RelationshipsTab {
         pnlRandomDivorce = createRandomDivorcePanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("DivorceTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("DivorceTabLeft");
+        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseManualDivorce)
-                .addComponent(chkUseClanPersonnelDivorce)
-                .addComponent(chkUsePrisonerDivorce)
-                .addComponent(pnlRandomDivorce));
+        layoutLeft.gridwidth = 1;
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy = 0;
+        panelLeft.add(chkUseManualDivorce, layoutLeft);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addComponent(chkUseManualDivorce)
-                    .addComponent(chkUseClanPersonnelDivorce)
-                    .addComponent(chkUsePrisonerDivorce)
-                    .addComponent(pnlRandomDivorce)));
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseClanPersonnelDivorce, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkUsePrisonerDivorce, layoutLeft);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("DivorceTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panelParent.add(panelLeft, layoutParent);
+
+        layoutParent.gridx++;
+        panelParent.add(pnlRandomDivorce, layoutParent);
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "DivorceTab");
+        return createParentPanel(panelParent, "DivorceTab");
     }
 
     /**
@@ -504,38 +461,36 @@ public class RelationshipsTab {
             900, 0, 100000, 1);
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("RandomDivorcePanel", true, "RandomDivorcePanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panel = new CampaignOptionsStandardPanel("RandomDivorcePanel", true,
+            "RandomDivorcePanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomDivorceMethod)
-                    .addComponent(comboRandomDivorceMethod))
-                .addComponent(chkUseRandomOppositeSexDivorce)
-                .addComponent(chkUseRandomSameSexDivorce)
-                .addComponent(chkUseRandomClanPersonnelDivorce)
-                .addComponent(chkUseRandomPrisonerDivorce)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomDivorceDiceSize)
-                    .addComponent(spnRandomDivorceDiceSize)));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblRandomDivorceMethod, layout);
+        layout.gridx++;
+        panel.add(comboRandomDivorceMethod, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomDivorceMethod)
-                        .addComponent(comboRandomDivorceMethod)
-                        )
-                    .addComponent(chkUseRandomOppositeSexDivorce)
-                    .addComponent(chkUseRandomSameSexDivorce)
-                    .addComponent(chkUseRandomClanPersonnelDivorce)
-                    .addComponent(chkUseRandomPrisonerDivorce)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomDivorceDiceSize)
-                        .addComponent(spnRandomDivorceDiceSize)
-                        )));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseRandomOppositeSexDivorce, layout);
+
+        layout.gridy++;
+        panel.add(chkUseRandomSameSexDivorce, layout);
+
+        layout.gridy++;
+        panel.add(chkUseRandomClanPersonnelDivorce, layout);
+
+
+        layout.gridy++;
+        panel.add(chkUseRandomPrisonerDivorce, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRandomDivorceDiceSize, layout);
+        layout.gridx++;
+        panel.add(spnRandomDivorceDiceSize, layout);
 
         return panel;
     }
@@ -558,24 +513,19 @@ public class RelationshipsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ProcreationTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlProcreationGeneralOptionsPanel)
-                    .addComponent(pnlRandomProcreationPanel)));
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(headerPanel, layoutParent);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(pnlProcreationGeneralOptionsPanel)
-                        .addComponent(pnlRandomProcreationPanel)
-                        )));
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(pnlProcreationGeneralOptionsPanel, layoutParent);
+
+        layoutParent.gridx++;
+        panel.add(pnlRandomProcreationPanel, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "ProcreationTab");
@@ -620,58 +570,58 @@ public class RelationshipsTab {
         chkUseMaternityLeave = new CampaignOptionsCheckBox("UseMaternityLeave");
         chkLogProcreation = new CampaignOptionsCheckBox("LogProcreation");
 
-        pnlRandomProcreationPanel = createRandomProcreationPanel();
-
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ProcreationGeneralOptionsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseManualProcreation)
-                .addComponent(chkUseClanPersonnelProcreation)
-                .addComponent(chkUsePrisonerProcreation)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblMultiplePregnancyOccurrences)
-                    .addComponent(spnMultiplePregnancyOccurrences))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblBabySurnameStyle)
-                    .addComponent(comboBabySurnameStyle))
-                .addComponent(chkAssignNonPrisonerBabiesFounderTag)
-                .addComponent(chkAssignChildrenOfFoundersFounderTag)
-                .addComponent(chkDetermineFatherAtBirth)
-                .addComponent(chkDisplayTrueDueDate)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblNoInterestInChildrenDiceSize)
-                    .addComponent(spnNoInterestInChildrenDiceSize))
-                .addComponent(chkUseMaternityLeave)
-                .addComponent(chkLogProcreation));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(chkUseManualProcreation, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chkUseManualProcreation)
-                    .addComponent(chkUseClanPersonnelProcreation)
-                    .addComponent(chkUsePrisonerProcreation)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblMultiplePregnancyOccurrences)
-                        .addComponent(spnMultiplePregnancyOccurrences)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblBabySurnameStyle)
-                        .addComponent(comboBabySurnameStyle)
-                        )
-                    .addComponent(chkAssignNonPrisonerBabiesFounderTag)
-                    .addComponent(chkAssignChildrenOfFoundersFounderTag)
-                    .addComponent(chkDetermineFatherAtBirth)
-                    .addComponent(chkDisplayTrueDueDate)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblNoInterestInChildrenDiceSize)
-                        .addComponent(spnNoInterestInChildrenDiceSize)
-                        )
-                    .addComponent(chkUseMaternityLeave)
-                    .addComponent(chkLogProcreation)));
+        layout.gridy++;
+        panel.add(chkUseClanPersonnelProcreation, layout);
+
+        layout.gridy++;
+        panel.add(chkUsePrisonerProcreation, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblMultiplePregnancyOccurrences, layout);
+        layout.gridx++;
+        panel.add(spnMultiplePregnancyOccurrences, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblBabySurnameStyle, layout);
+        layout.gridx++;
+        panel.add(comboBabySurnameStyle, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkAssignNonPrisonerBabiesFounderTag, layout);
+
+        layout.gridy++;
+        panel.add(chkAssignChildrenOfFoundersFounderTag, layout);
+
+        layout.gridy++;
+        panel.add(chkDetermineFatherAtBirth, layout);
+
+        layout.gridy++;
+        panel.add(chkDisplayTrueDueDate, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblNoInterestInChildrenDiceSize, layout);
+        layout.gridx++;
+        panel.add(spnNoInterestInChildrenDiceSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseMaternityLeave, layout);
+
+        layout.gridy++;
+        panel.add(chkLogProcreation, layout);
 
         return panel;
     }
@@ -710,42 +660,36 @@ public class RelationshipsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RandomProcreationPanel", true,
             "RandomProcreationPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomProcreationMethod)
-                    .addComponent(comboRandomProcreationMethod))
-                .addComponent(chkUseRelationshiplessRandomProcreation)
-                .addComponent(chkUseRandomClanPersonnelProcreation)
-                .addComponent(chkUseRandomPrisonerProcreation)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomProcreationRelationshipDiceSize)
-                    .addComponent(spnRandomProcreationRelationshipDiceSize))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomProcreationRelationshiplessDiceSize)
-                    .addComponent(spnRandomProcreationRelationshiplessDiceSize)));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblRandomProcreationMethod, layout);
+        layout.gridx++;
+        panel.add(comboRandomProcreationMethod, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomProcreationMethod)
-                        .addComponent(comboRandomProcreationMethod)
-                        )
-                    .addComponent(chkUseRelationshiplessRandomProcreation)
-                    .addComponent(chkUseRandomClanPersonnelProcreation)
-                    .addComponent(chkUseRandomPrisonerProcreation)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomProcreationRelationshipDiceSize)
-                        .addComponent(spnRandomProcreationRelationshipDiceSize)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomProcreationRelationshiplessDiceSize)
-                        .addComponent(spnRandomProcreationRelationshiplessDiceSize)
-                        )));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseRelationshiplessRandomProcreation, layout);
+
+        layout.gridy++;
+        panel.add(chkUseRandomClanPersonnelProcreation, layout);
+
+        layout.gridy++;
+        panel.add(chkUseRandomPrisonerProcreation, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRandomProcreationRelationshipDiceSize, layout);
+        layout.gridx++;
+        panel.add(spnRandomProcreationRelationshipDiceSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblRandomProcreationRelationshiplessDiceSize, layout);
+        layout.gridx++;
+        panel.add(spnRandomProcreationRelationshiplessDiceSize, layout);
 
         return panel;
     }
