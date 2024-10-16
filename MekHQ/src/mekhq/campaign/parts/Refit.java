@@ -1609,7 +1609,8 @@ public class Refit extends Part implements IAcquisitionWork {
     public void saveCustomization() throws EntityLoadingException {
         UnitUtil.compactCriticals(newEntity);
 
-        String fileName = MHQXMLUtility.escape(newEntity.getChassis() + ' ' + newEntity.getModel());
+        String unitName = newEntity.getShortNameRaw();
+        String fileName = MHQXMLUtility.escape(unitName);
         String sCustomsDir = String.join(File.separator, "data", "mekfiles", "customs"); // TODO : Remove inline file
                                                                                          // path
         String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getName();
@@ -1632,28 +1633,22 @@ public class Refit extends Part implements IAcquisitionWork {
 
         String fileNameCampaign;
         try {
+            String fileExtension = newEntity instanceof Mek ? ".mtf" : ".blk";
+            String fileOutName = sCustomsDir + File.separator + fileName + fileExtension;
+            fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + fileExtension;
+            
+            // if this file already exists then don't overwrite it or we will end up with a bunch of copies
+            if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                throw new IOException("A file already exists with the custom name " + fileNameCampaign
+                        + ". Please choose a different name. (Unit name and/or model)");
+            }
+            
             if (newEntity instanceof Mek) {
-                // if this file already exists then don't overwrite it or we will end up with a
-                // bunch of copies
-                String fileOutName = sCustomsDir + File.separator + fileName + ".mtf";
-                fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
-                if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                    throw new IOException("A file already exists with the custom name " + fileNameCampaign
-                            + ". Please choose a different name. (Unit name and/or model)");
-                }
                 try (FileOutputStream out = new FileOutputStream(fileNameCampaign);
                         PrintStream p = new PrintStream(out)) {
                     p.println(((Mek) newEntity).getMtf());
                 }
             } else {
-                // if this file already exists then don't overwrite it or we will end up with a
-                // bunch of copies
-                String fileOutName = sCustomsDir + File.separator + fileName + ".blk";
-                fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
-                if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                    throw new IOException("A file already exists with the custom name " + fileNameCampaign
-                            + ". Please choose a different name. (Unit name and/or model)");
-                }
                 BLKFile.encode(fileNameCampaign, newEntity);
             }
         } catch (Exception ex) {
@@ -1661,17 +1656,16 @@ public class Refit extends Part implements IAcquisitionWork {
             fileNameCampaign = null;
         }
 
-        getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
+        getCampaign().addCustom(unitName);
+        MekSummaryCache.refreshUnitData(false);
 
         try {
-            MekSummary summary = Utilities.retrieveOriginalUnit(newEntity);
+            MekSummary summary = Utilities.retrieveUnit(newEntity.getShortNameRaw());
 
             newEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-            logger.info(String.format("Saved %s %s to %s",
-                    newEntity.getChassis(), newEntity.getModel(), summary.getSourceFile()));
+            logger.info(String.format("Saved %s to %s", unitName, summary.getSourceFile()));
         } catch (EntityLoadingException ex) {
-            logger.error(String.format("Could not read back refit entity %s %s",
-                    newEntity.getChassis(), newEntity.getModel()), ex);
+            logger.error(String.format("Could not read back refit entity %s", unitName), ex);
 
             if (fileNameCampaign != null) {
                 logger.warn("Deleting invalid refit file " + fileNameCampaign);
@@ -1680,10 +1674,9 @@ public class Refit extends Part implements IAcquisitionWork {
                 } catch (SecurityException ex2) {
                     logger.warn("Could not clean up bad refit file " + fileNameCampaign, ex2);
                 }
+                // Reload the mek cache if we had to delete the file
+                MekSummaryCache.refreshUnitData(false);
             }
-
-            // Reload the mek cache if we had to delete the file
-            MekSummaryCache.getInstance().loadMekData();
 
             throw ex;
         }

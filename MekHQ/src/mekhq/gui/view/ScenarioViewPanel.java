@@ -412,7 +412,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlMap.add(lblMapSize, leftGbc);
 
-        JLabel lblMapSizeDesc = new JLabel(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        JLabel lblMapSizeDesc = new JLabel(scenario.getMapSizeX() + " W x " + scenario.getMapSizeY() + " H");
         rightGbc.gridy++;
         pnlMap.add(lblMapSizeDesc, rightGbc);
 

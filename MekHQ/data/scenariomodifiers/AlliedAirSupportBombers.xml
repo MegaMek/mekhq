@@ -8,9 +8,9 @@
 		<allowedUnitType>-3</allowedUnitType>
 		<arrivalTurn>-3</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>false</contributesToBV>
+		<contributesToBV>true</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>false</contributesToUnitCount>
+		<contributesToUnitCount>true</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones />
 		<destinationZone>5</destinationZone>

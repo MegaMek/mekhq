@@ -539,7 +539,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
         }
 
-        lblMapSizeDesc.setText(scenario.getMapX() + "x" + scenario.getMapY());
+        lblMapSizeDesc.setText(scenario.getMapX() + " W x " + scenario.getMapY() + " H");
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapSizeDesc, gridBagConstraints);
@@ -721,7 +721,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
         }
 
-        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        lblMapSizeDesc.setText(scenario.getMapSizeX() + " W x " + scenario.getMapSizeY() + " H");
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapSizeDesc, gridBagConstraints);
@@ -764,7 +764,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
         }
 
-        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        lblMapSizeDesc.setText(scenario.getMapSizeX() + " W x " + scenario.getMapSizeY() + " H");
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapSizeDesc, gridBagConstraints);

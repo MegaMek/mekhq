@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>OpFor Mercenary Skirmishers with veteran markings are in the area. Don't
-		get flanked.</additionalBriefingText>
+	<additionalBriefingText>OpFor Mercenary Skirmishers with veteran markings are in the area. Don't get flanked.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>

@@ -847,7 +847,7 @@ public class CustomizeScenarioDialog extends JDialog {
         rightGbc.gridy++;
         panMap.add(new JLabel(resourceMap.getString("lblMapSize.text")), leftGbc);
         sb = new StringBuilder();
-        sb.append(mapSizeX).append(" x ").append(mapSizeY);
+        sb.append(mapSizeX).append(" W x ").append(mapSizeY).append(" H");
         lblMapSize = new JLabel(sb.toString());
         panMap.add(lblMapSize, rightGbc);
     }
@@ -862,7 +862,7 @@ public class CustomizeScenarioDialog extends JDialog {
         }
         lblMap.setText(sb.toString());
         sb = new StringBuilder();
-        sb.append(mapSizeX).append(" x ").append(mapSizeY);
+        sb.append(mapSizeX).append(" W x ").append(mapSizeY).append(" H");
         lblMapSize.setText(sb.toString());
     }
 

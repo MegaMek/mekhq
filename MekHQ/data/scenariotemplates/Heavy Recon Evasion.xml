@@ -91,67 +91,6 @@
     <scenarioObjectives>
         <scenarioObjective>
             <associatedForceNames>
-                <associatedForceName>OpFor</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails>
-                <additionalDetail>Scans may be conducted by moving a unit within three hexes of the
-                    target and foregoing all attacks.</additionalDetail>
-                <additionalDetail>Any kind of probe, improved sensors quirk or sensor geek SPA
-                    extends the range to five hexes, and the unit may attack as normal.</additionalDetail>
-                <additionalDetail>Note: This objective should be tracked manually outside of
-                    MegaMek.</additionalDetail>
-            </additionalDetails>
-            <description>Scan the following enemy unit(s) and force(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>Custom</objectiveCriterion>
-            <percentage>100</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
-                <associatedForceName>OpFor</associatedForceName>
-            </associatedForceNames>
-            <associatedUnitIDs />
-            <successEffects>
-                <successEffect>
-                    <effectType>ScenarioVictory</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </successEffect>
-            </successEffects>
-            <failureEffects>
-                <failureEffect>
-                    <effectType>ScenarioDefeat</effectType>
-                    <effectScaling>Fixed</effectScaling>
-                    <howMuch>1</howMuch>
-                </failureEffect>
-            </failureEffects>
-            <additionalDetails />
-            <description>Destroy or rout 50% of the following force(s) and unit(s):</description>
-            <destinationEdge>NONE</destinationEdge>
-            <objectiveCriterion>ForceWithdraw</objectiveCriterion>
-            <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
-        </scenarioObjective>
-        <scenarioObjective>
-            <associatedForceNames>
                 <associatedForceName>Player</associatedForceName>
             </associatedForceNames>
             <associatedUnitIDs />
@@ -174,8 +113,9 @@
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Preserve</objectiveCriterion>
             <percentage>50</percentage>
-            <timeLimitAtMost>true</timeLimitAtMost>
-            <timeLimitType>None</timeLimitType>
+            <timeLimitAtMost>false</timeLimitAtMost>
+            <timeLimitScaleFactor>2</timeLimitScaleFactor>
+            <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
         </scenarioObjective>
     </scenarioObjectives>
 </ScenarioTemplate>

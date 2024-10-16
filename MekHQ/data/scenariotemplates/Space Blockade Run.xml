@@ -158,7 +158,7 @@
                 <forceAlignment>1</forceAlignment>
                 <forceMultiplier>1.0</forceMultiplier>
                 <forceName>DropShip</forceName>
-                <generationMethod>3</generationMethod>
+                <generationMethod>4</generationMethod>
                 <generationOrder>4</generationOrder>
                 <maxWeightClass>4</maxWeightClass>
                 <minWeightClass>1</minWeightClass>

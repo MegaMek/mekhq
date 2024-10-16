@@ -1093,48 +1093,39 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
         for (Unit unit : units) {
-            String fileName = unit.getEntity().getChassis() + ' ' + unit.getEntity().getModel();
-            if (unit.getEntity() instanceof Mek) {
-                // if this file already exists then don't overwrite
-                // it or we will end up with a bunch of copies
-                String fileOutName = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + File.separator
-                        + fileName + ".mtf";
-                String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
-                if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                    JOptionPane.showMessageDialog(null,
-                            "A file already exists for this unit, cannot tag as custom. (Unit name and model)",
-                            "File Already Exists", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+            Entity entity = unit.getEntity();
+            String unitName = entity.getShortNameRaw();
+            String fileExtension = entity instanceof Mek ? ".mtf" : ".blk";
+            String fileOutName = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + File.separator 
+                    + unitName + fileExtension;
+            String fileNameCampaign = sCustomsDirCampaign + File.separator + unitName + fileExtension;
+            
+            // if this file already exists then don't overwrite it or we will end up with a bunch of copies
+            if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                JOptionPane.showMessageDialog(null,
+                        "A file already exists for this unit, cannot tag as custom. (Unit name and model)",
+                        "File Already Exists", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            if (entity instanceof Mek) {
                 try (OutputStream os = new FileOutputStream(fileNameCampaign);
                         PrintStream p = new PrintStream(os)) {
 
-                    p.println(((Mek) unit.getEntity()).getMtf());
+                    p.println(((Mek) entity).getMtf());
                 } catch (Exception e) {
                     logger.error("", e);
                 }
             } else {
-                // if this file already exists then don't overwrite
-                // it or we will end up with a bunch of copies
-                String fileOutName = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + File.separator
-                        + fileName + ".blk";
-                String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
-                if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                    JOptionPane.showMessageDialog(null,
-                            "A file already exists for this unit, cannot tag as custom. (Unit name and model)",
-                            "File Already Exists", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
                 try {
-                    BLKFile.encode(fileNameCampaign, unit.getEntity());
+                    BLKFile.encode(fileNameCampaign, entity);
                 } catch (EntitySavingException e) {
                     logger.error("Error encoding unit {}", unit.getName(), e);
                     return;
                 }
             }
-            gui.getCampaign().addCustom(unit.getEntity().getChassis() + ' '
-                    + unit.getEntity().getModel());
+            gui.getCampaign().addCustom(unitName);
         }
-        MekSummaryCache.getInstance().loadMekData();
+        MekSummaryCache.refreshUnitData(false);
     }
 }

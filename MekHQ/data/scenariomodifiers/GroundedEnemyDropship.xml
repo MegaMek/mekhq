@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An enemy DropShip has been grounded in this area, but its weapons are
-		still active so pay attention.</additionalBriefingText>
+	<additionalBriefingText>An enemy DropShip has been grounded in this area, but its weapons are still active so pay attention.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
