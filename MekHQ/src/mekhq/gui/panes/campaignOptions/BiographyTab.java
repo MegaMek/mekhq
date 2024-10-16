@@ -65,6 +65,7 @@ public class BiographyTab {
     //end General Tab
 
     //start Backgrounds Tab
+    private JPanel pnlRandomBackgrounds;
     private JCheckBox chkUseRandomPersonalities;
     private JCheckBox chkUseRandomPersonalityReputation;
     private JCheckBox chkUseIntelligenceXpMultiplier;
@@ -256,6 +257,7 @@ public class BiographyTab {
      * The panel contains various general settings.
      */
     private void initializeBackgroundsTab() {
+        pnlRandomBackgrounds = new JPanel();
         chkUseRandomPersonalities = new JCheckBox();
         chkUseRandomPersonalityReputation = new JCheckBox();
         chkUseIntelligenceXpMultiplier = new JCheckBox();
@@ -343,45 +345,47 @@ public class BiographyTab {
         pnlAnniversariesPanel = createAnniversariesPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("BiographyGeneralTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("BiographyGeneralTabLeft", true);
+        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseDylansRandomXP)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblGender)
-                    .addComponent(sldGender))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblNonBinaryDiceSize)
-                    .addComponent(spnNonBinaryDiceSize))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFamilyDisplayLevel)
-                    .addComponent(comboFamilyDisplayLevel))
-                .addComponent(pnlAnniversariesPanel));
+        layoutLeft.gridy = 0;
+        layoutLeft.gridx = 0;
+        layoutLeft.gridwidth = 1;
+        panelLeft.add(chkUseDylansRandomXP, layoutLeft);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addComponent(chkUseDylansRandomXP)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblGender)
-                        .addComponent(sldGender))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblNonBinaryDiceSize)
-                        .addComponent(spnNonBinaryDiceSize)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblFamilyDisplayLevel)
-                        .addComponent(comboFamilyDisplayLevel)
-                        )
-                    .addComponent(pnlAnniversariesPanel)));
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblGender, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(sldGender, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblNonBinaryDiceSize, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnNonBinaryDiceSize, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblFamilyDisplayLevel, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(comboFamilyDisplayLevel, layoutLeft);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("BiographyGeneralTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panelParent.add(panelLeft, layoutParent);
+        layoutParent.gridx++;
+        panelParent.add(pnlAnniversariesPanel, layoutParent);
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "BiographyGeneralTab");
+        return createParentPanel(panelParent, "BiographyGeneralTab");
     }
 
     /**
@@ -398,23 +402,22 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AnniversariesPanel", true,
             "AnniversariesPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkAnnounceOfficersOnly)
-                .addComponent(chkAnnounceBirthdays)
-                .addComponent(chkAnnounceChildBirthdays)
-                .addComponent(chkAnnounceRecruitmentAnniversaries));
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(chkAnnounceBirthdays, layoutParent);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chkAnnounceOfficersOnly)
-                    .addComponent(chkAnnounceBirthdays)
-                    .addComponent(chkAnnounceChildBirthdays)
-                    .addComponent(chkAnnounceRecruitmentAnniversaries)));
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(chkAnnounceRecruitmentAnniversaries, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(chkAnnounceOfficersOnly, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(chkAnnounceChildBirthdays, layoutParent);
 
         return panel;
     }
@@ -429,39 +432,56 @@ public class BiographyTab {
             getImageDirectory() + "logo_clan_goliath_scorpion.png", true);
 
         // Contents
+        pnlRandomOriginOptions = createRandomOriginOptionsPanel();
+        pnlRandomBackgrounds = createRandomBackgroundsPanel();
+
+        // Layout the Panels
+        final JPanel panel = new CampaignOptionsStandardPanel("BackgroundsTab", true);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridwidth = 5;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(headerPanel, layout);
+
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(pnlRandomOriginOptions, layout);
+
+        layout.gridx++;
+        panel.add(pnlRandomBackgrounds, layout);
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "BackgroundsTab");
+    }
+
+    JPanel createRandomBackgroundsPanel() {
+        // Contents
         chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities");
         chkUseRandomPersonalityReputation = new CampaignOptionsCheckBox("UseRandomPersonalityReputation");
         chkUseIntelligenceXpMultiplier = new CampaignOptionsCheckBox("UseIntelligenceXpMultiplier");
         chkUseSimulatedRelationships = new CampaignOptionsCheckBox("UseSimulatedRelationships");
 
-        pnlRandomOriginOptions = createRandomOriginOptionsPanel();
+        // Layout the Panels
+        final JPanel panel = new CampaignOptionsStandardPanel("RandomBackgroundsPanel", true,
+            "RandomBackgroundsPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("BackgroundsTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(chkUseRandomPersonalities, layout);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseRandomPersonalities)
-                .addComponent(chkUseRandomPersonalityReputation)
-                .addComponent(chkUseIntelligenceXpMultiplier)
-                .addComponent(chkUseSimulatedRelationships)
-                .addComponent(pnlRandomOriginOptions));
+        layout.gridy++;
+        panel.add(chkUseRandomPersonalityReputation, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                        .addComponent(chkUseRandomPersonalities)
-                        .addComponent(chkUseRandomPersonalityReputation)
-                        .addComponent(chkUseIntelligenceXpMultiplier)
-                        .addComponent(chkUseSimulatedRelationships)
-                        .addComponent(pnlRandomOriginOptions)));
+        layout.gridy++;
+        panel.add(chkUseIntelligenceXpMultiplier, layout);
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "BackgroundsTab");
+        layout.gridy++;
+        panel.add(chkUseSimulatedRelationships, layout);
+
+        return panel;
     }
 
     /**
@@ -533,51 +553,58 @@ public class BiographyTab {
         chkExtraRandomOrigin = new CampaignOptionsCheckBox("ExtraRandomOrigin");
 
         // Layout the Panel
+        final JPanel panelSystemPlanetOrigins = new CampaignOptionsStandardPanel(
+            "RandomOriginOptionsPanelSystemPlanetOrigins", false, "");
+        final GridBagConstraints layoutSystemPlanetOrigins = new CampaignOptionsGridBagConstraints(panelSystemPlanetOrigins);
+
+        layoutSystemPlanetOrigins.gridwidth = 1;
+        layoutSystemPlanetOrigins.gridx = 0;
+        layoutSystemPlanetOrigins.gridy = 0;
+        panelSystemPlanetOrigins.add(lblSpecifiedSystem, layoutSystemPlanetOrigins);
+        layoutSystemPlanetOrigins.gridx++;
+        panelSystemPlanetOrigins.add(comboSpecifiedSystem, layoutSystemPlanetOrigins);
+        layoutSystemPlanetOrigins.gridx++;
+        panelSystemPlanetOrigins.add(lblSpecifiedPlanet, layoutSystemPlanetOrigins);
+        layoutSystemPlanetOrigins.gridx++;
+        panelSystemPlanetOrigins.add(comboSpecifiedPlanet, layoutSystemPlanetOrigins);
+
+        layoutSystemPlanetOrigins.gridx = 0;
+        layoutSystemPlanetOrigins.gridy++;
+        panelSystemPlanetOrigins.add(lblOriginSearchRadius, layoutSystemPlanetOrigins);
+        layoutSystemPlanetOrigins.gridx++;
+        panelSystemPlanetOrigins.add(spnOriginSearchRadius, layoutSystemPlanetOrigins);
+        layoutSystemPlanetOrigins.gridx++;
+        panelSystemPlanetOrigins.add(lblOriginDistanceScale, layoutSystemPlanetOrigins);
+        layoutSystemPlanetOrigins.gridx++;
+        panelSystemPlanetOrigins.add(spnOriginDistanceScale, layoutSystemPlanetOrigins);
+
         final JPanel panel = new CampaignOptionsStandardPanel("RandomOriginOptionsPanel", true,
             "RandomOriginOptionsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkRandomizeOrigin)
-                .addComponent(chkRandomizeDependentsOrigin)
-                .addComponent(chkRandomizeAroundSpecifiedPlanet)
-                .addComponent(chkSpecifiedSystemFactionSpecific)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblSpecifiedSystem)
-                    .addComponent(comboSpecifiedSystem)
-                    .addComponent(lblSpecifiedPlanet)
-                    .addComponent(comboSpecifiedPlanet))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblOriginSearchRadius)
-                    .addComponent(spnOriginSearchRadius)
-                    .addComponent(lblOriginDistanceScale)
-                    .addComponent(spnOriginDistanceScale))
-                .addComponent(chkAllowClanOrigins)
-                .addComponent(chkExtraRandomOrigin));
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(chkRandomizeOrigin, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chkRandomizeOrigin)
-                    .addComponent(chkRandomizeDependentsOrigin)
-                    .addComponent(chkRandomizeAroundSpecifiedPlanet)
-                    .addComponent(chkSpecifiedSystemFactionSpecific)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblSpecifiedSystem)
-                        .addComponent(comboSpecifiedSystem)
-                        .addComponent(lblSpecifiedPlanet)
-                        .addComponent(comboSpecifiedPlanet)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblOriginSearchRadius)
-                        .addComponent(spnOriginSearchRadius)
-                        .addComponent(lblOriginDistanceScale)
-                        .addComponent(spnOriginDistanceScale)
-                        )
-                    .addComponent(chkAllowClanOrigins)
-                    .addComponent(chkExtraRandomOrigin)));
+        layout.gridy++;
+        panel.add(chkRandomizeDependentsOrigin, layout);
+
+        layout.gridy++;
+        panel.add(chkRandomizeAroundSpecifiedPlanet, layout);
+
+        layout.gridy++;
+        panel.add(chkSpecifiedSystemFactionSpecific, layout);
+
+        layout.gridy++;
+        panel.add(panelSystemPlanetOrigins, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkAllowClanOrigins, layout);
+
+        layout.gridy++;
+        panel.add(chkExtraRandomOrigin, layout);
 
         return panel;
     }
