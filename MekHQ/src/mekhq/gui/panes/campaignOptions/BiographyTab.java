@@ -700,52 +700,57 @@ public class BiographyTab {
         chkUseRandomPrisonerDeath = new CampaignOptionsCheckBox("UseRandomPrisonerDeath");
         chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
 
-        pnlDeathAgeGroup = createDeathAgeGroupsPanel();
-
         lblPercentageRandomDeathChance = new CampaignOptionsLabel("PercentageRandomDeathChance");
         spnPercentageRandomDeathChance = new CampaignOptionsSpinner("PercentageRandomDeathChance",
             0, 0, 100, 0.000001);
 
+        pnlDeathAgeGroup = createDeathAgeGroupsPanel();
+
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("DeathTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("DeathTabLeft", true);
+        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkKeepMarriedNameUponSpouseDeath)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblRandomDeathMethod)
-                    .addComponent(comboRandomDeathMethod))
-                .addComponent(chkUseRandomClanPersonnelDeath)
-                .addComponent(chkUseRandomPrisonerDeath)
-                .addComponent(chkUseRandomDeathSuicideCause)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPercentageRandomDeathChance)
-                    .addComponent(spnPercentageRandomDeathChance))
-                .addComponent(pnlDeathAgeGroup));
+        layoutLeft.gridy = 0;
+        layoutLeft.gridx = 0;
+        layoutLeft.gridwidth = 1;
+        panelLeft.add(chkKeepMarriedNameUponSpouseDeath, layoutLeft);
+        layoutLeft.gridy++;
+        panelLeft.add(lblRandomDeathMethod, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(comboRandomDeathMethod, layoutLeft);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addComponent(chkKeepMarriedNameUponSpouseDeath)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRandomDeathMethod)
-                        .addComponent(comboRandomDeathMethod)
-                        )
-                    .addComponent(chkUseRandomClanPersonnelDeath)
-                    .addComponent(chkUseRandomPrisonerDeath)
-                    .addComponent(chkUseRandomDeathSuicideCause)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(lblPercentageRandomDeathChance)
-                            .addComponent(spnPercentageRandomDeathChance)
-                            )
-                        .addComponent(pnlDeathAgeGroup)));
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseRandomClanPersonnelDeath, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseRandomPrisonerDeath, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseRandomDeathSuicideCause, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(lblPercentageRandomDeathChance, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnPercentageRandomDeathChance, layoutLeft);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("DeathTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panelParent.add(panelLeft, layoutParent);
+
+        layoutParent.gridx++;
+        panelParent.add(pnlDeathAgeGroup, layoutParent);
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "DeathTab");
+        return createParentPanel(panelParent, "DeathTab");
     }
 
     /**
@@ -759,7 +764,7 @@ public class BiographyTab {
         // Create the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("DeathAgeGroupsPanel", true,
             "DeathAgeGroupsPanel");
-        panel.setLayout(new GridLayout(1, ageGroups.length));
+        panel.setLayout(new GridLayout(ageGroups.length / 2, 1));
 
         // Contents
         for (final AgeGroup ageGroup : ageGroups) {

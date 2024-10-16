@@ -829,11 +829,11 @@ public class PersonnelTab {
         final JPanel panelLeft = new CampaignOptionsStandardPanel("PersonnelInformationLeft", false);
         final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
-        layoutLeft.gridy++;
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy = 0;
         layoutLeft.gridwidth = 1;
         panelLeft.add(chkUseTimeInService, layoutLeft);
 
-        layoutLeft.gridx = 0;
         layoutLeft.gridy++;
         panelLeft.add(lblTimeInServiceDisplayFormat, layoutLeft);
         layoutLeft.gridx++;
