@@ -173,7 +173,9 @@ public class GeneralTab {
         gbc.gridy++;
         gbc.gridwidth = 5;
         gbc.gridx = GridBagConstraints.RELATIVE;
-        JPanel iconsPanel = new JPanel();
+
+        JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        iconsPanel.setBorder(BorderFactory.createTitledBorder(""));
 
         iconsPanel.add(lblCamo);
         iconsPanel.add(btnCamo);
@@ -256,7 +258,6 @@ public class GeneralTab {
 
         lblCamo = new JLabel();
         btnCamo = new JButton() {
-
             @Override
             public Dimension getPreferredSize() {
                 return UIUtil.scaleForGUI(100, 100);
@@ -264,7 +265,12 @@ public class GeneralTab {
         };
 
         lblIcon = new JLabel();
-        btnIcon = new JButton();
+        btnIcon = new JButton() {
+            @Override
+            public Dimension getPreferredSize() {
+                return UIUtil.scaleForGUI(100, 100);
+            }
+        };
     }
 
     /**

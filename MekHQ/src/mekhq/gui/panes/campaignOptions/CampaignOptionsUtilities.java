@@ -278,7 +278,7 @@ public class CampaignOptionsUtilities {
 
             if (includeBorder) {
                 setBorder(BorderFactory.createTitledBorder(
-                    String.format(String.format("<html>%s</html>", borderTitle))));
+                    String.format("<html>%s</html>", borderTitle)));
             }
 
             setName("pnl" + name);
