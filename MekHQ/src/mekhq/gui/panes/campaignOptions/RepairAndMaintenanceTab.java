@@ -1,7 +1,6 @@
 package mekhq.gui.panes.campaignOptions;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
@@ -216,86 +215,75 @@ public class RepairAndMaintenanceTab {
         JPanel headerPanel = new CampaignOptionsHeaderPanel("MaintenanceTab",
             getImageDirectory() + "logo_clan_blood_spirit.png", true);
 
-        // Check Maintenance
+        // Contents
         checkMaintenance = new CampaignOptionsCheckBox("CheckMaintenance");
 
-        // Maintenance Cycle Duration
         lblMaintenanceDays = new CampaignOptionsLabel("MaintenanceDays");
         spnDamageMargin = new CampaignOptionsSpinner("MaintenanceDays",
             7, 1, 365, 1);
 
-        // Maintenance Bonus
         lblMaintenanceBonus = new CampaignOptionsLabel("MaintenanceBonus");
         spnMaintenanceBonus = new CampaignOptionsSpinner("MaintenanceBonus",
             0, -13, 13, 1);
 
-        // Default Maintenance Time
         lblDefaultMaintenanceTime = new CampaignOptionsLabel("DefaultMaintenanceTime");
         spnDefaultMaintenanceTime = new CampaignOptionsSpinner("DefaultMaintenanceTime",
             1, 1, 4, 1);
 
-        // Use Quality Modifiers
         useQualityMaintenance = new CampaignOptionsCheckBox("UseQualityMaintenance");
 
-        // Reverse Quality names
         reverseQualityNames = new CampaignOptionsCheckBox("ReverseQualityNames");
 
-        // Use Random Unit Qualities
         chkUseRandomUnitQualities = new CampaignOptionsCheckBox("UseRandomUnitQualities");
 
-        // Use Planetary Modifiers
         chkUsePlanetaryModifiers = new CampaignOptionsCheckBox("UsePlanetaryModifiers");
 
-        // Only Damage F-Rated Equipment
         useUnofficialMaintenance = new CampaignOptionsCheckBox("UseUnofficialMaintenance");
 
-        // Report Maintenance checks to Log
         logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("repairTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(checkMaintenance)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblMaintenanceDays)
-                    .addComponent(spnMaintenanceDays))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblMaintenanceBonus)
-                    .addComponent(spnMaintenanceBonus))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblDefaultMaintenanceTime)
-                    .addComponent(spnDefaultMaintenanceTime))
-                .addComponent(useQualityMaintenance)
-                .addComponent(reverseQualityNames)
-                .addComponent(chkUseRandomUnitQualities)
-                .addComponent(chkUsePlanetaryModifiers)
-                .addComponent(useUnofficialMaintenance)
-                .addComponent(logMaintenance));
+        layoutParent.gridwidth = 5;
+        layoutParent.gridy = 0;
+        panel.add(headerPanel, layoutParent);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addComponent(checkMaintenance)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblMaintenanceDays)
-                    .addComponent(spnMaintenanceDays))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblMaintenanceBonus)
-                    .addComponent(spnMaintenanceBonus))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblDefaultMaintenanceTime)
-                    .addComponent(spnDefaultMaintenanceTime))
-                .addComponent(useQualityMaintenance)
-                .addComponent(reverseQualityNames)
-                .addComponent(chkUseRandomUnitQualities)
-                .addComponent(chkUsePlanetaryModifiers)
-                .addComponent(useUnofficialMaintenance)
-                .addComponent(logMaintenance));
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(checkMaintenance, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(lblMaintenanceDays, layoutParent);
+        layoutParent.gridx++;
+        panel.add(spnDamageMargin, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        panel.add(lblDefaultMaintenanceTime, layoutParent);
+        layoutParent.gridx++;
+        panel.add(spnDefaultMaintenanceTime, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        panel.add(useQualityMaintenance, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(reverseQualityNames, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(chkUseRandomUnitQualities, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(chkUseRandomUnitQualities, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(chkUsePlanetaryModifiers, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(useUnofficialMaintenance, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "maintenanceTab");
