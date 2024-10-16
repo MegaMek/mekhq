@@ -5,7 +5,6 @@ import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
-import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -956,22 +955,19 @@ public class PersonnelTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PrisonersAndDependentsTab", true,
             "");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(prisonerPanel)
-                    .addComponent(dependentsPanel)));
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(headerPanel, layoutParent);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(prisonerPanel)
-                    .addComponent(dependentsPanel)));
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(prisonerPanel, layoutParent);
+
+        layoutParent.gridx++;
+        panel.add(dependentsPanel, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PrisonersAndDependentsTab");
@@ -1007,33 +1003,32 @@ public class PersonnelTab {
         chkAtBPrisonerRansom = new CampaignOptionsCheckBox("AtBPrisonerRansom");
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true, "PrisonersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true,
+            "PrisonersPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPrisonerCaptureStyle)
-                    .addComponent(comboPrisonerCaptureStyle))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPrisonerStatus)
-                    .addComponent(comboPrisonerStatus))
-                .addComponent(chkPrisonerBabyStatus)
-                .addComponent(chkAtBPrisonerDefection)
-                .addComponent(chkAtBPrisonerRansom));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblPrisonerCaptureStyle, layout);
+        layout.gridx++;
+        panel.add(comboPrisonerCaptureStyle, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPrisonerCaptureStyle)
-                    .addComponent(comboPrisonerCaptureStyle))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPrisonerStatus)
-                    .addComponent(comboPrisonerStatus))
-                .addComponent(chkPrisonerBabyStatus)
-                .addComponent(chkAtBPrisonerDefection)
-                .addComponent(chkAtBPrisonerRansom));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPrisonerStatus, layout);
+        layout.gridx++;
+        panel.add(comboPrisonerStatus, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkPrisonerBabyStatus, layout);
+
+        layout.gridy++;
+        panel.add(chkAtBPrisonerDefection, layout);
+
+        layout.gridy++;
+        panel.add(chkAtBPrisonerRansom, layout);
 
         return panel;
     }
@@ -1050,18 +1045,15 @@ public class PersonnelTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("DependentsPanel", true, "DependentsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseRandomDependentAddition)
-                .addComponent(chkUseRandomDependentRemoval));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(chkUseRandomDependentAddition, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(chkUseRandomDependentAddition)
-                .addComponent(chkUseRandomDependentRemoval));
+        layout.gridy++;
+        panel.add(chkUseRandomDependentRemoval, layout);
 
         return panel;
     }
