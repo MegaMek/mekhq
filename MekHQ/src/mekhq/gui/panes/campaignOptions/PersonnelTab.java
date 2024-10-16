@@ -75,6 +75,7 @@ public class PersonnelTab {
     //end Personnel Information Tab
 
     //start Awards Tab
+    private JPanel pnlAwardsGeneralOptions;
     private JLabel lblAwardBonusStyle;
     private MMComboBox<AwardBonus> comboAwardBonusStyle;
     private JLabel lblAwardTierSize;
@@ -84,7 +85,7 @@ public class PersonnelTab {
     private JCheckBox chkIssueBestAwardOnly;
     private JCheckBox chkIgnoreStandardSet;
 
-    private JPanel autoAwardsFilterPanel;
+    private JPanel pnlAutoAwardsFilter;
     private JCheckBox chkEnableContractAwards;
     private JCheckBox chkEnableFactionHunterAwards;
     private JCheckBox chkEnableInjuryAwards;
@@ -247,6 +248,7 @@ public class PersonnelTab {
      * The panel contains settings related to award allocation.
      */
     private void initializeAwardsTab() {
+        pnlAwardsGeneralOptions = new JPanel();
         lblAwardBonusStyle = new JLabel();
         comboAwardBonusStyle = new MMComboBox<>("comboAwardBonusStyle", AwardBonus.values());
 
@@ -269,7 +271,7 @@ public class PersonnelTab {
         chkEnableTrainingAwards = new JCheckBox();
         chkEnableMiscAwards = new JCheckBox();
 
-        autoAwardsFilterPanel = new JPanel();
+        pnlAutoAwardsFilter = new JPanel();
         lblAwardSetFilterList = new JLabel();
         txtAwardSetFilterList = new JTextArea();
     }
@@ -418,7 +420,6 @@ public class PersonnelTab {
 
         layout.gridy = 0;
         layout.gridwidth = 1;
-        layout.gridy++;
         panel.add(chkUseTactics, layout);
 
         layout.gridy++;
@@ -476,7 +477,6 @@ public class PersonnelTab {
 
         layout.gridy = 0;
         layout.gridwidth = 1;
-        layout.gridy++;
         panel.add(chkUsePersonnelRemoval, layout);
 
         layout.gridy++;
@@ -510,7 +510,6 @@ public class PersonnelTab {
 
         layout.gridy = 0;
         layout.gridwidth = 1;
-        layout.gridy++;
         panel.add(chkAdminsHaveNegotiation, layout);
 
         layout.gridy++;
@@ -521,6 +520,197 @@ public class PersonnelTab {
 
         layout.gridy++;
         panel.add(chkAdminExperienceLevelIncludeScrounge, layout);
+
+        return panel;
+    }
+
+    /**
+     * Creates the Awards Tab panel with various components like labels, checkboxes, and filter options.
+     *
+     * @return the {@link JPanel} representing the Awards Tab panel
+     */
+    JPanel createAwardsTab() {
+        // Header
+        JPanel headerPanel = new CampaignOptionsHeaderPanel("AwardsTab",
+            getImageDirectory() + "logo_draconis_combine.png",
+            true);
+
+        // Contents
+        pnlAwardsGeneralOptions = createAwardsGeneralOptionsPanel();
+        pnlAutoAwardsFilter = createAutoAwardsFilterPanel();
+
+        lblAwardSetFilterList = new CampaignOptionsLabel("AwardSetFilterList");
+        txtAwardSetFilterList = new JTextArea(5, 20);
+        txtAwardSetFilterList.setLineWrap(true);
+        txtAwardSetFilterList.setWrapStyleWord(true);
+        txtAwardSetFilterList.setToolTipText(
+            wordWrap(resources.getString("lblAwardSetFilterList.tooltip")));
+        txtAwardSetFilterList.setName("txtAwardSetFilterList");
+        txtAwardSetFilterList.setText("");
+        JScrollPane scrollAwardSetFilterList = new JScrollPane(txtAwardSetFilterList);
+        scrollAwardSetFilterList.setHorizontalScrollBarPolicy(
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollAwardSetFilterList.setVerticalScrollBarPolicy(
+            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        // Layout the Panel
+        final JPanel panelRight = new CampaignOptionsStandardPanel("AwardsTab", false);
+        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
+
+        layoutRight.gridy = 0;
+        layoutRight.gridwidth = 1;
+        layoutRight.gridy++;
+        panelRight.add(pnlAutoAwardsFilter, layoutRight);
+
+        layoutRight.gridx = 0;
+        layoutRight.gridy++;
+        panelRight.add(lblAwardSetFilterList, layoutRight);
+        layoutRight.gridy++;
+        panelRight.add(txtAwardSetFilterList, layoutRight);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("AwardsTabRight", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panelParent.add(pnlAwardsGeneralOptions, layoutParent);
+
+        layoutParent.gridx++;
+        panelParent.add(panelRight, layoutParent);
+
+        // Create Parent Panel and return
+        return createParentPanel(panelParent, "AwardsTab");
+    }
+
+    JPanel createAwardsGeneralOptionsPanel() {
+        // Contents
+        lblAwardBonusStyle = new CampaignOptionsLabel("AwardBonusStyle");
+        comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AwardBonus) {
+                    list.setToolTipText(((AwardBonus) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
+        lblAwardTierSize = new CampaignOptionsLabel("AwardTierSize");
+        spnAwardTierSize = new CampaignOptionsSpinner("AwardTierSize",
+            5, 1, 100, 1);
+
+        chkEnableAutoAwards = new CampaignOptionsCheckBox("EnableAutoAwards");
+
+        chkIssuePosthumousAwards = new CampaignOptionsCheckBox("IssuePosthumousAwards");
+
+        chkIssueBestAwardOnly = new CampaignOptionsCheckBox("IssueBestAwardOnly");
+
+        chkIgnoreStandardSet = new CampaignOptionsCheckBox("IgnoreStandardSet");
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("AwardsGeneralOptionsPanel", false);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblAwardBonusStyle, layout);
+        layout.gridx++;
+        layout.gridwidth = 2;
+        panel.add(comboAwardBonusStyle, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(lblAwardTierSize, layout);
+        layout.gridx++;
+        layout.gridwidth = 2;
+        panel.add(spnAwardTierSize, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkEnableAutoAwards, layout);
+
+        layout.gridy++;
+        panel.add(chkIssuePosthumousAwards, layout);
+
+        layout.gridy++;
+        panel.add(chkIssueBestAwardOnly, layout);
+
+        layout.gridy++;
+        panel.add(chkIgnoreStandardSet, layout);
+
+        return panel;
+    }
+
+    /**
+     * Creates a panel with checkboxes for various types of autoAwards award filter options.
+     * <p>
+     * This method creates checkboxes for different types of awards filters such as contract awards,
+     * faction hunter awards, injury awards, individual kill awards, etc.
+     *
+     * @return a {@link JPanel} containing checkboxes for various types of autoAwards award filter
+     * options
+     */
+    private JPanel createAutoAwardsFilterPanel() {
+        // Contents
+        chkEnableContractAwards = new CampaignOptionsCheckBox("EnableContractAwards");
+        chkEnableFactionHunterAwards = new CampaignOptionsCheckBox("EnableFactionHunterAwards");
+        chkEnableInjuryAwards = new CampaignOptionsCheckBox("EnableInjuryAwards");
+        chkEnableIndividualKillAwards = new CampaignOptionsCheckBox("EnableIndividualKillAwards");
+        chkEnableFormationKillAwards = new CampaignOptionsCheckBox("EnableFormationKillAwards");
+        chkEnableRankAwards = new CampaignOptionsCheckBox("EnableRankAwards");
+        chkEnableScenarioAwards = new CampaignOptionsCheckBox("EnableScenarioAwards");
+        chkEnableSkillAwards = new CampaignOptionsCheckBox("EnableSkillAwards");
+        chkEnableTheatreOfWarAwards = new CampaignOptionsCheckBox("EnableTheatreOfWarAwards");
+        chkEnableTimeAwards = new CampaignOptionsCheckBox("EnableTimeAwards");
+        chkEnableTrainingAwards = new CampaignOptionsCheckBox("EnableTrainingAwards");
+        chkEnableMiscAwards = new CampaignOptionsCheckBox("EnableMiscAwards");
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("AutoAwardsFilterPanel", true, "AutoAwardsFilterPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(chkEnableContractAwards, layout);
+        layout.gridx++;
+        panel.add(chkEnableFactionHunterAwards, layout);
+        layout.gridx++;
+        panel.add(chkEnableInjuryAwards, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkEnableIndividualKillAwards, layout);
+        layout.gridx++;
+        panel.add(chkEnableFormationKillAwards, layout);
+        layout.gridx++;
+        panel.add(chkEnableRankAwards, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkEnableScenarioAwards, layout);
+        layout.gridx++;
+        panel.add(chkEnableSkillAwards, layout);
+        layout.gridx++;
+        panel.add(chkEnableTheatreOfWarAwards, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkEnableTimeAwards, layout);
+        layout.gridx++;
+        panel.add(chkEnableTrainingAwards, layout);
+        layout.gridx++;
+        panel.add(chkEnableMiscAwards, layout);
 
         return panel;
     }
@@ -637,171 +827,6 @@ public class PersonnelTab {
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PersonnelInformation");
-    }
-
-    /**
-     * Creates the Awards Tab panel with various components like labels, checkboxes, and filter options.
-     *
-     * @return the {@link JPanel} representing the Awards Tab panel
-     */
-    JPanel createAwardsTab() {
-        // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("AwardsTab",
-            getImageDirectory() + "logo_draconis_combine.png",
-            true);
-
-        // Contents
-        lblAwardBonusStyle = new CampaignOptionsLabel("AwardBonusStyle");
-        comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof AwardBonus) {
-                    list.setToolTipText(((AwardBonus) value).getToolTipText());
-                }
-                return this;
-            }
-        });
-
-        lblAwardTierSize = new CampaignOptionsLabel("AwardTierSize");
-        spnAwardTierSize = new CampaignOptionsSpinner("AwardTierSize",
-            5, 1, 100, 1);
-
-        chkEnableAutoAwards = new CampaignOptionsCheckBox("EnableAutoAwards");
-
-        chkIssuePosthumousAwards = new CampaignOptionsCheckBox("IssuePosthumousAwards");
-
-        chkIssueBestAwardOnly = new CampaignOptionsCheckBox("IssueBestAwardOnly");
-
-        chkIgnoreStandardSet = new CampaignOptionsCheckBox("IgnoreStandardSet");
-
-        autoAwardsFilterPanel = createAutoAwardsFilterPanel();
-
-        lblAwardSetFilterList = new CampaignOptionsLabel("AwardSetFilterList");
-        txtAwardSetFilterList = new JTextArea(5, 20);
-        txtAwardSetFilterList.setLineWrap(true);
-        txtAwardSetFilterList.setWrapStyleWord(true);
-        txtAwardSetFilterList.setToolTipText(
-            wordWrap(resources.getString("lblAwardSetFilterList.tooltip")));
-        txtAwardSetFilterList.setName("txtAwardSetFilterList");
-        txtAwardSetFilterList.setText("");
-        JScrollPane scrollAwardSetFilterList = new JScrollPane(txtAwardSetFilterList);
-        scrollAwardSetFilterList.setHorizontalScrollBarPolicy(
-            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollAwardSetFilterList.setVerticalScrollBarPolicy(
-            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AwardsTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAwardBonusStyle)
-                    .addComponent(comboAwardBonusStyle))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAwardTierSize)
-                    .addComponent(spnAwardTierSize))
-                .addComponent(chkEnableAutoAwards)
-                .addComponent(chkIssuePosthumousAwards)
-                .addComponent(chkIssueBestAwardOnly)
-                .addComponent(chkIgnoreStandardSet)
-                .addComponent(autoAwardsFilterPanel)
-                .addComponent(lblAwardSetFilterList)
-                .addComponent(txtAwardSetFilterList));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblAwardBonusStyle)
-                    .addComponent(comboAwardBonusStyle))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblAwardTierSize)
-                    .addComponent(spnAwardTierSize))
-                .addComponent(chkEnableAutoAwards)
-                .addComponent(chkIssuePosthumousAwards)
-                .addComponent(chkIssueBestAwardOnly)
-                .addComponent(chkIgnoreStandardSet)
-                .addComponent(autoAwardsFilterPanel)
-                .addComponent(lblAwardSetFilterList)
-                .addComponent(txtAwardSetFilterList));
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "AwardsTab");
-    }
-
-    /**
-     * Creates a panel with checkboxes for various types of autoAwards award filter options.
-     * <p>
-     * This method creates checkboxes for different types of awards filters such as contract awards,
-     * faction hunter awards, injury awards, individual kill awards, etc.
-     *
-     * @return a {@link JPanel} containing checkboxes for various types of autoAwards award filter
-     * options
-     */
-    private JPanel createAutoAwardsFilterPanel() {
-        // Contents
-        chkEnableContractAwards = new CampaignOptionsCheckBox("EnableContractAwards");
-        chkEnableFactionHunterAwards = new CampaignOptionsCheckBox("EnableFactionHunterAwards");
-        chkEnableInjuryAwards = new CampaignOptionsCheckBox("EnableInjuryAwards");
-        chkEnableIndividualKillAwards = new CampaignOptionsCheckBox("EnableIndividualKillAwards");
-        chkEnableFormationKillAwards = new CampaignOptionsCheckBox("EnableFormationKillAwards");
-        chkEnableRankAwards = new CampaignOptionsCheckBox("EnableRankAwards");
-        chkEnableScenarioAwards = new CampaignOptionsCheckBox("EnableScenarioAwards");
-        chkEnableSkillAwards = new CampaignOptionsCheckBox("EnableSkillAwards");
-        chkEnableTheatreOfWarAwards = new CampaignOptionsCheckBox("EnableTheatreOfWarAwards");
-        chkEnableTimeAwards = new CampaignOptionsCheckBox("EnableTimeAwards");
-        chkEnableTrainingAwards = new CampaignOptionsCheckBox("EnableTrainingAwards");
-        chkEnableMiscAwards = new CampaignOptionsCheckBox("EnableMiscAwards");
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AutoAwardsFilterPanel", true, "AutoAwardsFilterPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setVerticalGroup(
-            layout.createParallelGroup(Alignment.BASELINE)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(chkEnableContractAwards)
-                    .addComponent(chkEnableFactionHunterAwards)
-                    .addComponent(chkEnableInjuryAwards)
-                    .addComponent(chkEnableIndividualKillAwards))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(chkEnableRankAwards)
-                    .addComponent(chkEnableScenarioAwards)
-                    .addComponent(chkEnableSkillAwards)
-                    .addComponent(chkEnableFormationKillAwards))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(chkEnableTheatreOfWarAwards)
-                    .addComponent(chkEnableTimeAwards)
-                    .addComponent(chkEnableTrainingAwards)
-                    .addComponent(chkEnableMiscAwards)));
-
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup()
-                    .addComponent(chkEnableContractAwards)
-                    .addComponent(chkEnableFactionHunterAwards)
-                    .addComponent(chkEnableInjuryAwards)
-                    .addComponent(chkEnableIndividualKillAwards))
-                .addGroup(layout.createParallelGroup()
-                    .addComponent(chkEnableFormationKillAwards)
-                    .addComponent(chkEnableRankAwards)
-                    .addComponent(chkEnableScenarioAwards)
-                    .addComponent(chkEnableSkillAwards))
-                .addGroup(layout.createParallelGroup()
-                    .addComponent(chkEnableTheatreOfWarAwards)
-                    .addComponent(chkEnableTimeAwards)
-                    .addComponent(chkEnableTrainingAwards)
-                    .addComponent(chkEnableMiscAwards)));
-
-        return panel;
     }
 
     /**
