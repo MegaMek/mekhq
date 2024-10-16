@@ -373,7 +373,7 @@ public class PersonnelTab {
         panelRight.add(pnlPersonnelCleanup, layoutRight);
 
         layoutRight.gridy++;
-        layoutRight.gridwidth = 1;        panelRight.add(pnlAdministrators, layoutRight);
+        panelRight.add(pnlAdministrators, layoutRight);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("PersonnelGeneralTab", true);
         GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
@@ -466,17 +466,26 @@ public class PersonnelTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelCleanUpPanel", true,
             "PersonnelCleanUpPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel, null, GridBagConstraints.NONE);
 
+        layout.gridx = 0;
         layout.gridy = 0;
         layout.gridwidth = 1;
         panel.add(chkUsePersonnelRemoval, layout);
+        layout.gridx++;
+        panel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(35)));
 
+        layout.gridx = 0;
         layout.gridy++;
         panel.add(chkUseRemovalExemptCemetery, layout);
+        layout.gridx++;
+        panel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(35)));
 
+        layout.gridx = 0;
         layout.gridy++;
         panel.add(chkUseRemovalExemptRetirees, layout);
+        layout.gridx++;
+        panel.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(35)));
 
         return panel;
     }

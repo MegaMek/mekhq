@@ -238,7 +238,7 @@ public class EquipmentAndSuppliesTab {
         layoutParent.gridwidth = 1;
         panel.add(pnlAcquisitions, layoutParent);
 
-        layoutParent.gridy++;
+        layoutParent.gridx++;
         panel.add(pnlDeliveries, layoutParent);
 
 
@@ -355,32 +355,39 @@ public class EquipmentAndSuppliesTab {
         layoutTransit.gridx++;
         panelTransit.add(choiceTransitTimeUnits, layoutTransit);
 
-        final JPanel panel = new CampaignOptionsStandardPanel("DeliveryPanel", true,
+        // Layout the Panel
+        final JPanel panelDeliveries = new CampaignOptionsStandardPanel("DeliveryPanelDeliveries");
+        final GridBagConstraints layoutDeliveries = new CampaignOptionsGridBagConstraints(panelDeliveries);
+
+        layoutDeliveries.gridy = 0;
+        layoutDeliveries.gridx = 0;
+        layoutDeliveries.gridwidth = 1;
+        panelDeliveries.add(lblAcquireMosBonus, layoutDeliveries);
+        layoutDeliveries.gridx++;
+        panelDeliveries.add(spnAcquireMosBonus, layoutDeliveries);
+        layoutDeliveries.gridx++;
+        panelDeliveries.add(choiceAcquireMosUnits, layoutDeliveries);
+
+        layoutDeliveries.gridx = 0;
+        layoutDeliveries.gridy++;
+        panelDeliveries.add(lblAcquireMinimum, layoutDeliveries);
+        layoutDeliveries.gridx++;
+        panelDeliveries.add(spnAcquireMinimum, layoutDeliveries);
+        layoutDeliveries.gridx++;
+        panelDeliveries.add(choiceAcquireMinimumUnit, layoutDeliveries);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("DeliveryPanel", true,
             "DeliveryPanel");
-        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
 
-        layout.gridy = 0;
-        layout.gridx = 0;
-        layout.gridwidth = 2;
-        panel.add(panelTransit, layout);
+        layoutParent.gridy = 0;
+        layoutParent.gridx = 0;
+        layoutParent.gridwidth = 2;
+        panelParent.add(panelTransit, layoutParent);
+        layoutParent.gridy++;
+        panelParent.add(panelDeliveries, layoutParent);
 
-        layout.gridwidth = 1;
-        layout.gridy++;
-        panel.add(lblAcquireMosBonus, layout);
-        layout.gridx++;
-        panel.add(spnAcquireMosBonus, layout);
-        layout.gridx++;
-        panel.add(choiceAcquireMosUnits, layout);
-
-        layout.gridx = 0;
-        layout.gridy++;
-        panel.add(lblAcquireMinimum, layout);
-        layout.gridx++;
-        panel.add(spnAcquireMinimum, layout);
-        layout.gridx++;
-        panel.add(choiceAcquireMinimumUnit, layout);
-
-        return panel;
+        return panelParent;
     }
 
     JPanel createPlanetaryAcquisitionTab() {

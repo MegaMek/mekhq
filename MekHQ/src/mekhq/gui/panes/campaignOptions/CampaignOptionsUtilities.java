@@ -355,21 +355,20 @@ public class CampaignOptionsUtilities {
 
             // Layout panel
             new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel");
-            final GroupLayout layout = createGroupLayout(this);
-            setLayout(layout);
+            final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(this);
 
-            layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                    .addComponent(lblHeader)
-                    .addComponent(lblBody)
-                    .addComponent(lblImage));
+            layout.gridwidth = 5;
+            layout.gridx = 0;
+            layout.gridy = 0;
+            this.add(lblHeader, layout);
 
-            layout.setHorizontalGroup(
-                layout.createSequentialGroup()
-                    .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(lblHeader, Alignment.CENTER)
-                        .addComponent(lblBody, Alignment.CENTER)
-                        .addComponent(lblImage, Alignment.CENTER)));
+            layout.gridy++;
+            layout.gridwidth = 1;
+            this.add(lblBody, layout);
+
+            layout.gridy++;
+            layout.gridwidth = 1;
+            this.add(lblImage, layout);
         }
     }
 
@@ -418,7 +417,7 @@ public class CampaignOptionsUtilities {
             panel.setLayout(new GridBagLayout());
 
             this.anchor = Objects.requireNonNullElse(anchor, GridBagConstraints.NORTHWEST);
-            this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.NONE);
+            this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.HORIZONTAL);
 
             this.insets = new Insets(5, 5, 5, 5);
         }
