@@ -1,15 +1,14 @@
 package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.parts.Part;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JSpinner.NumberEditor;
+import java.awt.*;
 
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
@@ -188,34 +187,40 @@ public class FinancesTab {
 
         // Contents
         pnlGeneralOptions = createGeneralOptionsPanel();
+        pnlOtherSystems = createOtherSystemsPanel();
+
         pnlPayments = createPaymentsPanel();
         pnlSales = createSalesPanel();
 
-        pnlOtherSystems = createOtherSystemsPanel();
-
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("FinancesGeneralTab", true,
-            "");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panelTransactions = new CampaignOptionsStandardPanel("FinancesGeneralTabTransactions");
+        GridBagConstraints layoutTransactions = new CampaignOptionsGridBagConstraints(panelTransactions);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlGeneralOptions)
-                    .addComponent(pnlOtherSystems))
-                .addComponent(pnlSales)
-                .addComponent(pnlPayments));
+        layoutTransactions.gridwidth = 2;
+        layoutTransactions.gridy = 0;
+        layoutTransactions.gridx = 0;
+        panelTransactions.add(pnlPayments, layoutTransactions);
+        layoutTransactions.gridx += 2;
+        panelTransactions.add(pnlSales, layoutTransactions);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(pnlGeneralOptions)
-                    .addComponent(pnlOtherSystems))
-                .addComponent(pnlSales)
-                .addComponent(pnlPayments));
+        final JPanel panel = new CampaignOptionsStandardPanel("FinancesGeneralTab", true);
+        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridy = 0;
+        panel.add(headerPanel, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(pnlGeneralOptions, layoutParent);
+        layoutParent.gridx++;
+        panel.add(pnlOtherSystems, layoutParent);
+
+        layoutParent.gridwidth = 2;
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        panel.add(panelTransactions, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "FinancesGeneralTab");
@@ -242,41 +247,32 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PaymentsPanel", true,
             "PaymentsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(payForPartsBox)
-                    .addComponent(payForRepairsBox)
-                    .addComponent(payForUnitsBox)
-                    .addComponent(payForSalariesBox))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(payForOverheadBox)
-                    .addComponent(payForMaintainBox)
-                    .addComponent(payForTransportBox)
-                    .addComponent(payForRecruitmentBox)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(payForPartsBox, layout);
+        layout.gridx++;
+        panel.add(payForRepairsBox, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(payForPartsBox)
-                    .addGap(UIUtil.scaleForGUI(5))
-                    .addComponent(payForRepairsBox)
-                    .addGap(UIUtil.scaleForGUI(5))
-                    .addComponent(payForUnitsBox)
-                    .addGap(UIUtil.scaleForGUI(5))
-                    .addComponent(payForSalariesBox))
-                .addGap(UIUtil.scaleForGUI(5))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(payForOverheadBox)
-                    .addGap(UIUtil.scaleForGUI(5))
-                    .addComponent(payForMaintainBox)
-                    .addGap(UIUtil.scaleForGUI(5))
-                    .addComponent(payForTransportBox)
-                    .addGap(UIUtil.scaleForGUI(5))
-                    .addComponent(payForRecruitmentBox)));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(payForUnitsBox, layout);
+        layout.gridx++;
+        panel.add(payForSalariesBox, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(payForOverheadBox, layout);
+        layout.gridx++;
+        panel.add(payForMaintainBox, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(payForTransportBox, layout);
+        layout.gridx++;
+        panel.add(payForRecruitmentBox, layout);
 
         return panel;
     }
@@ -294,18 +290,15 @@ public class FinancesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OtherSystemsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(pnlTaxes)
-                .addComponent(pnlShares));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(pnlTaxes, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(pnlTaxes)
-                .addComponent(pnlShares));
+        layout.gridy++;
+        panel.add(pnlShares, layout);
 
         return panel;
     }
@@ -331,33 +324,42 @@ public class FinancesTab {
         newFinancialYearFinancesToCSVExportBox = new CampaignOptionsCheckBox("NewFinancialYearFinancesToCSVExportBox");
 
         // Layout the Panel
+        final JPanel panelFinancialDuration = new CampaignOptionsStandardPanel("GeneralOptionsPanelFinancialDuration");
+        final GridBagConstraints layoutFinancialDuration = new CampaignOptionsGridBagConstraints(panelFinancialDuration);
+
+        layoutFinancialDuration.gridx = 0;
+        layoutFinancialDuration.gridy = 0;
+        layoutFinancialDuration.gridwidth = 1;
+        panelFinancialDuration.add(lblFinancialYearDuration, layoutFinancialDuration);
+        layoutFinancialDuration.gridx++;
+        panelFinancialDuration.add(comboFinancialYearDuration, layoutFinancialDuration);
+
         final JPanel panel = new CampaignOptionsStandardPanel("GeneralOptionsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(useLoanLimitsBox)
-                .addComponent(usePercentageMaintenanceBox)
-                .addComponent(useExtendedPartsModifierBox)
-                .addComponent(usePeacetimeCostBox)
-                .addComponent(showPeacetimeCostBox)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFinancialYearDuration)
-                    .addComponent(comboFinancialYearDuration))
-                .addComponent(newFinancialYearFinancesToCSVExportBox));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(useLoanLimitsBox, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(useLoanLimitsBox)
-                .addComponent(usePercentageMaintenanceBox)
-                .addComponent(useExtendedPartsModifierBox)
-                .addComponent(usePeacetimeCostBox)
-                .addComponent(showPeacetimeCostBox)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblFinancialYearDuration)
-                    .addComponent(comboFinancialYearDuration))
-                .addComponent(newFinancialYearFinancesToCSVExportBox));
+        layout.gridy++;
+        panel.add(usePercentageMaintenanceBox, layout);
+
+        layout.gridy++;
+        panel.add(useExtendedPartsModifierBox, layout);
+
+        layout.gridy++;
+        panel.add(usePeacetimeCostBox, layout);
+
+        layout.gridy++;
+        panel.add(showPeacetimeCostBox, layout);
+
+        layout.gridy++;
+        panel.add(panelFinancialDuration, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(newFinancialYearFinancesToCSVExportBox, layout);
 
         return panel;
     }
@@ -377,21 +379,15 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalesPanel", true,
             "SalesPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(sellUnitsBox)
-                    .addComponent(sellPartsBox)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(sellUnitsBox, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(sellUnitsBox)
-                    .addGap(UIUtil.scaleForGUI(5))
-                    .addComponent(sellPartsBox)));
+        layout.gridy++;
+        panel.add(sellPartsBox, layout);
 
         return panel;
     }
@@ -415,22 +411,17 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TaxesPanel", true,
             "TaxesPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseTaxes)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblTaxesPercentage)
-                    .addComponent(spnTaxesPercentage)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(chkUseTaxes, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(chkUseTaxes)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblTaxesPercentage)
-                    .addComponent(spnTaxesPercentage)));
+        layout.gridy++;
+        panel.add(lblTaxesPercentage, layout);
+        layout.gridx++;
+        panel.add(spnTaxesPercentage, layout);
 
         return panel;
     }
@@ -450,18 +441,15 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SharesPanel", true,
             "SharesPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseShareSystem)
-                .addComponent(chkSharesForAll));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(chkUseShareSystem, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(chkUseShareSystem)
-                .addComponent(chkSharesForAll));
+        layout.gridy++;
+        panel.add(chkSharesForAll, layout);
 
         return panel;
     }
@@ -520,26 +508,21 @@ public class FinancesTab {
         pnlOtherMultipliers = createOtherMultipliersPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PriceMultipliersTab", true,
-            "");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panel = new CampaignOptionsStandardPanel("PriceMultipliersTab", true);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlGeneralMultipliers)
-                    .addComponent(pnlUsedPartsMultipliers)
-                    .addComponent(pnlOtherMultipliers)));
+        layout.gridwidth = 5;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(headerPanel, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(pnlGeneralMultipliers)
-                    .addComponent(pnlUsedPartsMultipliers)
-                    .addComponent(pnlOtherMultipliers)));
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(pnlGeneralMultipliers, layout);
+        layout.gridx++;
+        panel.add(pnlUsedPartsMultipliers, layout);
+        layout.gridx++;
+        panel.add(pnlOtherMultipliers, layout);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PriceMultipliersTab");
@@ -582,50 +565,38 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("GeneralMultipliersPanel", true,
             "GeneralMultipliersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblCommonPartPriceMultiplier)
-                    .addComponent(spnCommonPartPriceMultiplier))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblInnerSphereUnitPriceMultiplier)
-                    .addComponent(spnInnerSphereUnitPriceMultiplier))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblInnerSpherePartPriceMultiplier)
-                    .addComponent(spnInnerSpherePartPriceMultiplier))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblClanUnitPriceMultiplier)
-                    .addComponent(spnClanUnitPriceMultiplier))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblClanPartPriceMultiplier)
-                    .addComponent(spnClanPartPriceMultiplier))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblMixedTechUnitPriceMultiplier)
-                    .addComponent(spnMixedTechUnitPriceMultiplier)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblCommonPartPriceMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnCommonPartPriceMultiplier, layout);
+        layout.gridx++;
+        panel.add(lblMixedTechUnitPriceMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnMixedTechUnitPriceMultiplier, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblCommonPartPriceMultiplier)
-                    .addComponent(spnCommonPartPriceMultiplier))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblInnerSphereUnitPriceMultiplier)
-                    .addComponent(spnInnerSphereUnitPriceMultiplier))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblInnerSpherePartPriceMultiplier)
-                    .addComponent(spnInnerSpherePartPriceMultiplier))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblClanUnitPriceMultiplier)
-                    .addComponent(spnClanUnitPriceMultiplier))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblClanPartPriceMultiplier)
-                    .addComponent(spnClanPartPriceMultiplier))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblMixedTechUnitPriceMultiplier)
-                    .addComponent(spnMixedTechUnitPriceMultiplier)));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblInnerSphereUnitPriceMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnInnerSphereUnitPriceMultiplier, layout);
+        layout.gridx++;
+        panel.add(lblInnerSpherePartPriceMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnInnerSpherePartPriceMultiplier, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblClanUnitPriceMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnClanUnitPriceMultiplier, layout);
+        layout.gridx++;
+        panel.add(lblClanPartPriceMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnClanPartPriceMultiplier, layout);
 
         return panel;
     }
@@ -674,50 +645,17 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UsedPartsMultiplierPanel", true,
             "UsedPartsMultiplierPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblUsedPartPriceMultipliers[0])
-                    .addComponent(spnUsedPartPriceMultipliers[0]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblUsedPartPriceMultipliers[1])
-                    .addComponent(spnUsedPartPriceMultipliers[1]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblUsedPartPriceMultipliers[2])
-                    .addComponent(spnUsedPartPriceMultipliers[2]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblUsedPartPriceMultipliers[3])
-                    .addComponent(spnUsedPartPriceMultipliers[3]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblUsedPartPriceMultipliers[4])
-                    .addComponent(spnUsedPartPriceMultipliers[4]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblUsedPartPriceMultipliers[5])
-                    .addComponent(spnUsedPartPriceMultipliers[5])));
+        layout.gridwidth = 1;
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblUsedPartPriceMultipliers[0])
-                    .addComponent(spnUsedPartPriceMultipliers[0]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblUsedPartPriceMultipliers[1])
-                    .addComponent(spnUsedPartPriceMultipliers[1]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblUsedPartPriceMultipliers[2])
-                    .addComponent(spnUsedPartPriceMultipliers[2]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblUsedPartPriceMultipliers[3])
-                    .addComponent(spnUsedPartPriceMultipliers[3]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblUsedPartPriceMultipliers[4])
-                    .addComponent(spnUsedPartPriceMultipliers[4]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblUsedPartPriceMultipliers[5])
-                    .addComponent(spnUsedPartPriceMultipliers[5])));
+        for (int i = 0; i < 6; i++) {
+            layout.gridx = 0;
+            layout.gridy = i;
+            panel.add(lblUsedPartPriceMultipliers[i], layout);
+            layout.gridx++;
+            panel.add(spnUsedPartPriceMultipliers[i], layout);
+        }
 
         return panel;
     }
@@ -751,32 +689,26 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OtherMultipliersPanel", true,
             "OtherMultipliersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblDamagedPartsValueMultiplier)
-                    .addComponent(spnDamagedPartsValueMultiplier))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblUnrepairablePartsValueMultiplier)
-                    .addComponent(spnUnrepairablePartsValueMultiplier))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblCancelledOrderRefundMultiplier)
-                    .addComponent(spnCancelledOrderRefundMultiplier)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblDamagedPartsValueMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnDamagedPartsValueMultiplier, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblDamagedPartsValueMultiplier)
-                    .addComponent(spnDamagedPartsValueMultiplier))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblUnrepairablePartsValueMultiplier)
-                    .addComponent(spnUnrepairablePartsValueMultiplier))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblCancelledOrderRefundMultiplier)
-                    .addComponent(spnCancelledOrderRefundMultiplier)));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblUnrepairablePartsValueMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnUnrepairablePartsValueMultiplier, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblCancelledOrderRefundMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnCancelledOrderRefundMultiplier, layout);
 
         return panel;
     }
