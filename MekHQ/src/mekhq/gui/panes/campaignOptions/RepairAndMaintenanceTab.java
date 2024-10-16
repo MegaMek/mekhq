@@ -260,6 +260,7 @@ public class RepairAndMaintenanceTab {
         layoutParent.gridx++;
         panel.add(spnMaintenanceDays, layoutParent);
 
+        layoutParent.gridx = 0;
         layoutParent.gridy++;
         panel.add(lblMaintenanceBonus, layoutParent);
         layoutParent.gridx++;
