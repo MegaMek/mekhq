@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>This facility is guarded by a lance of allied meks who will fight
-		alongside us in its defense.</additionalBriefingText>
+	<additionalBriefingText>This facility is guarded by a lance of allied meks who will fight alongside us in its defense.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>

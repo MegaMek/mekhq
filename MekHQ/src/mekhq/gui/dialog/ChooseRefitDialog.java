@@ -40,6 +40,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.codeUtilities.StringUtility;
 import megamek.common.Entity;
 import megamek.common.MekFileParser;
 import megamek.common.MekSummary;
@@ -287,17 +288,11 @@ public class ChooseRefitDialog extends JDialog {
     private void populateRefits() {
         List<Refit> refits = new ArrayList<>();
         Entity e = unit.getEntity();
+        String chassis = e.getFullChassis();
         for (String model : Utilities.getAllVariants(e, campaign)) {
-            MekSummary summary = MekSummaryCache.getInstance().getMek(e.getFullChassis() + " " + model);
-            if (null == summary) {
-                // Attempt to deal with new naming scheme directly
-                summary = MekSummaryCache.getInstance()
-                        .getMek(e.getChassis() + " (" + e.getClanChassisName() + ") " + model);
-                if (null == summary) {
-                    continue;
-                }
-            }
+            model = StringUtility.isNullOrBlank(model) ? "" : " " + model;
             try {
+                MekSummary summary = Utilities.retrieveUnit(chassis + model);
                 Entity refitEn = new MekFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
                 if (null != refitEn) {
                     Refit r = new Refit(unit, refitEn, false, false, false);

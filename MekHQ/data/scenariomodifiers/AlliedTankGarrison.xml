@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>This facility has a garrison of tanks, which will fight alongside your
-		force in the facility's defense.</additionalBriefingText>
+	<additionalBriefingText>This facility has a garrison of tanks, which will fight alongside your force in the facility's defense.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -15,7 +14,7 @@
 		<canReinforceLinked>false</canReinforceLinked>
 		<contributesToBV>true</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>false</contributesToUnitCount>
+		<contributesToUnitCount>true</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones>
 			<deploymentZone>10</deploymentZone>

@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>The Enemy has hired a Mercenary Brawler Lance with veteran markings.
-		Beware.</additionalBriefingText>
+	<additionalBriefingText>The Enemy has hired a Mercenary Brawler Lance with veteran markings. Beware.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
