@@ -25,6 +25,8 @@ import megamek.logging.MMLogger;
 import megamek.common.enums.*;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
+
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -127,116 +129,6 @@ public class SkillType {
     public static final int EXP_VETERAN = 3;
     public static final int EXP_ELITE = 4;
 
-    /**
-     * @param level skill level integer to get name for
-     * @return String skill name
-     */
-    public static String getExperienceLevelName(int level) {
-        switch (level) {
-            case EXP_ULTRA_GREEN:
-                return "Ultra-Green";
-            case EXP_GREEN:
-                return "Green";
-            case EXP_REGULAR:
-                return "Regular";
-            case EXP_VETERAN:
-                return "Veteran";
-            case EXP_ELITE:
-                return "Elite";
-            case -1:
-                return "Unknown";
-            default:
-                return "Impossible";
-        }
-    }
-
-    /**
-     * @param level skill level integer to get color for
-     * @return String hex code for a font tag
-     */
-    public static String getExperienceLevelColor(int level) {
-        switch (level) {
-            case EXP_ULTRA_GREEN:
-                return MekHQ.getMHQOptions().getFontColorSkillUltraGreenHexColor();
-            case EXP_GREEN:
-                return MekHQ.getMHQOptions().getFontColorSkillGreenHexColor();
-            case EXP_REGULAR:
-                return MekHQ.getMHQOptions().getFontColorSkillRegularHexColor();
-            case EXP_VETERAN:
-                return MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
-            case EXP_ELITE:
-                return MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
-            case -1:
-                return "";
-            default:
-                return "";
-        }
-    }
-
-     /**
-     * @param level SkillLevel enum to get color for
-     * @return String hex code for a font tag
-     */
-    public static String getExperienceLevelColor(SkillLevel level) {
-        switch(level) {
-            case ULTRA_GREEN:
-                return MekHQ.getMHQOptions().getFontColorSkillUltraGreenHexColor();
-            case GREEN:
-                return MekHQ.getMHQOptions().getFontColorSkillGreenHexColor();
-            case REGULAR:
-                return MekHQ.getMHQOptions().getFontColorSkillRegularHexColor();
-            case VETERAN:
-                return MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
-            case ELITE:
-                return MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
-            case HEROIC:
-                return MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
-            case LEGENDARY:
-                return MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
-            default:
-                return "";
-        }
-    }
-
-    /**
-     * @param level - skill level integer to get tagged name for
-     * @return String "<font color="X">SkillName</font>" or "Skillname" if no color exists
-    */
-    public static String getColoredExperienceLevelName(int level) {
-        if (getExperienceLevelColor(level) == "") {
-            return getExperienceLevelName(level);
-        }
-
-        StringBuilder toReturn = new StringBuilder(64);
-        toReturn.append("<font color='")
-            .append(getExperienceLevelColor(level))
-            .append("'>")
-            .append(getExperienceLevelName(level))
-            .append("</font>");
-        return toReturn.toString();
-    }
-
-    /**
-     * @param level - SkillLevel enum to get tagged name for
-     * @return String "<font color="X">SkillName</font>" or "Skillname" if no color exists
-    */
-    public static String getColoredExperienceLevelName(SkillLevel level) {
-        if (getExperienceLevelColor(level) == "") {
-            return level.toString();
-        }
-
-        StringBuilder toReturn = new StringBuilder(64);
-        toReturn.append("<font color='")
-            .append(getExperienceLevelColor(level))
-            .append("'>")
-            .append(level.toString())
-            .append("</font>");
-        return toReturn.toString();
-    }
-    
-
-
-
     private String name;
     private int target;
     private boolean countUp;
@@ -245,6 +137,82 @@ public class SkillType {
     private int vetLvl;
     private int eliteLvl;
     private Integer[] costs;
+
+   /**
+     * @param level skill level integer to get name for
+     * @return String skill name
+     */
+    public static String getExperienceLevelName(int level) {
+        return switch (level) {
+            case EXP_ULTRA_GREEN -> "Ultra-Green";
+            case EXP_GREEN -> "Green";
+            case EXP_REGULAR -> "Regular";
+            case EXP_VETERAN -> "Veteran";
+            case EXP_ELITE -> "Elite";
+            case -1 -> "Unknown";
+            default -> "Impossible";
+        };
+    }
+
+    /**
+     * @param level skill level integer to get color for
+     * @return String hex code for a font tag
+     */
+    public static String getExperienceLevelColor(int level) {
+        return switch (level) {
+            case EXP_ULTRA_GREEN -> MekHQ.getMHQOptions().getFontColorSkillUltraGreenHexColor();
+            case EXP_GREEN -> MekHQ.getMHQOptions().getFontColorSkillGreenHexColor();
+            case EXP_REGULAR -> MekHQ.getMHQOptions().getFontColorSkillRegularHexColor();
+            case EXP_VETERAN -> MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
+            case EXP_ELITE -> MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+            case -1 -> "";
+            default -> "";
+        };
+    }
+
+     /**
+     * @param level SkillLevel enum to get color for
+     * @return String hex code for a font tag
+     */
+    public static String getExperienceLevelColor(SkillLevel level) {
+        return switch(level) {
+            case ULTRA_GREEN -> MekHQ.getMHQOptions().getFontColorSkillUltraGreenHexColor();
+            case GREEN -> MekHQ.getMHQOptions().getFontColorSkillGreenHexColor();
+            case REGULAR -> MekHQ.getMHQOptions().getFontColorSkillRegularHexColor();
+            case VETERAN -> MekHQ.getMHQOptions().getFontColorSkillVeteranHexColor();
+            case ELITE -> MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+            case HEROIC -> MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+            case LEGENDARY -> MekHQ.getMHQOptions().getFontColorSkillEliteHexColor();
+            default -> "";
+        };
+    }
+
+    /**
+     * @param level - skill level integer to get tagged name for
+     * @return String "<font color="X">SkillName</font>" or "Skillname" if no color exists
+     */
+    public static String getColoredExperienceLevelName(int level) {
+        if (getExperienceLevelColor(level) == "") {
+            return getExperienceLevelName(level);
+        }
+        
+        return ReportingUtilities.messageSurroundedBySpanWithColor(
+            getExperienceLevelColor(level), getExperienceLevelName(level));
+    }
+
+    /**
+     * @param level - SkillLevel enum to get tagged name for
+     * @return String "<font color="X">SkillName</font>" or "Skillname" if no color exists
+     */
+    public static String getColoredExperienceLevelName(SkillLevel level) {
+        if (getExperienceLevelColor(level) == "") {
+            return level.toString();
+        }
+
+        return ReportingUtilities.messageSurroundedBySpanWithColor(
+            getExperienceLevelColor(level), level.toString());
+    }
+
 
     public static void setSkillTypes(Map<String, SkillType> skills) {
         // we are going to cycle through all skills in case ones have been added since

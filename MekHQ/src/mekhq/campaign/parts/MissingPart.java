@@ -30,6 +30,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
+import mekhq.utilities.ReportingUtilities;
 
 import java.io.PrintWriter;
 
@@ -82,37 +83,32 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getDesc() {
-        String bonus = getAllMods(null).getValueAsString();
-        if (getAllMods(null).getValue() > -1) {
-            bonus = '+' + bonus;
-        }
-        String toReturn = "<html><font";
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><b>Replace ")
+            .append(getName())
+            .append(" - ")
+            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                SkillType.getExperienceLevelColor(getSkillMin()),
+                SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+            .append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>");
 
-        toReturn += ">";
-        toReturn += "<b>Replace " + getName();
-
-        if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</b></span>";
-        } else {
-            toReturn += " - <span color='" + SkillType.getExperienceLevelColor(getSkillMin()) + "'>"
-                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                    + "</span></b></b><br/>";
-        }
-
-        toReturn += getDetails() + "<br/>";
         if (getSkillMin() <= SkillType.EXP_ELITE) {
-            toReturn += getTimeLeft() + " minutes" + scheduled;
-            toReturn += " <b>TN:</b> " + bonus;
+            toReturn.append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled)" : "")
+                .append(" <b>TN:</b> ")
+                .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                .append(getAllMods(null).getValueAsString());
             if (getMode() != WorkTime.NORMAL) {
-                toReturn += " <i>" + getCurrentModeName() + "</i>";
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
             }
         }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</html>");
+        return toReturn.toString();
     }
 
     @Override

@@ -423,71 +423,65 @@ public abstract class Part implements IPartWork, ITechnology {
 
     @Override
     public String getDesc() {
-        String bonus = getAllMods(null).getValueAsString();
-        if (getAllMods(null).getValue() > -1) {
-            bonus = '+' + bonus;
-        }
-        String toReturn = "<html><font";
-        String action = "Repair ";
-        if (isSalvaging()) {
-            action = "Salvage ";
-        }
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
-
-        toReturn += ">";
-        toReturn += "<b>" + action + getName();
-
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><b>")
+            .append(isSalvaging() ? "Salvage  " : "Repair ")
+            .append(getName());
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-            toReturn += " - <b><span color='" + SkillType.getExperienceLevelColor(getSkillMin()) + "'>"
-                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                    + "</span></b></b><br/>";
-        } else {
-            toReturn += "</b><br/>";
+            toReturn.append(" - ")
+            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                SkillType.getExperienceLevelColor(getSkillMin()),
+                SkillType.getExperienceLevelName(getSkillMin()) + "+"));
         }
+        toReturn.append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>");
 
-        toReturn += getDetails() + "<br/>";
-        if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</font>";
-        } else {
-            toReturn += getTimeLeft() + " minutes" + scheduled;
-            toReturn += " <b>TN:</b> " + bonus;
+        if (getSkillMin() <= SkillType.EXP_ELITE) {
+            toReturn.append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled)" : "")
+                .append(" <b>TN:</b> ")
+                .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                .append(getAllMods(null).getValueAsString());
             if (getMode() != WorkTime.NORMAL) {
-                toReturn += " <i>" + getCurrentModeName() + "</i>";
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
             }
         }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</html>");
+        return toReturn.toString();
     }
 
     public String getRepairDesc() {
-        String toReturn = "";
-        if (needsFixing()) {
-            String scheduled = "";
-            if (getTech() != null) {
-                scheduled = " (scheduled) ";
-            }
-            String bonus = getAllMods(null).getValueAsString();
-            if (getAllMods(null).getValue() > -1) {
-                bonus = '+' + bonus;
-            }
+        StringBuilder toReturn = new StringBuilder();
 
-            toReturn += getTimeLeft() + " minutes" + scheduled;
+        if (needsFixing()) {
+            toReturn.append("<html>")
+                .append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled) " : "");
 
             if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-                toReturn += ", <span color='" + SkillType.getExperienceLevelColor(getSkillMin()) + "'>"
-                        + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                        + ReportingUtilities.CLOSING_SPAN_TAG;
+                toReturn.append(" - <b>")
+                .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    SkillType.getExperienceLevelColor(getSkillMin()),
+                    SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+                .append("</b>");
             }
 
-            toReturn += ", TN: " + bonus;
+            toReturn.append(", TN: ")
+                .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                .append(getAllMods(null).getValueAsString());
             if (getMode() != WorkTime.NORMAL) {
-                toReturn += ", " + getCurrentModeName();
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
             }
+            toReturn.append("</html>");
         }
-        return toReturn;
+        return toReturn.toString();
     }
 
     public String getTechBaseName() {
