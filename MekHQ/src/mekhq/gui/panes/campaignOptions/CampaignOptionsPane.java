@@ -184,7 +184,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JTabbedPane suppliesAndAcquisitionContentTabs = createSubTabs(Map.of(
             "acquisitionTab", suppliesAndAcquisitionTab.createAcquisitionTab(),
-            "deliveryTab", suppliesAndAcquisitionTab.createDeliveryTab(),
             "planetaryAcquisitionTab", suppliesAndAcquisitionTab.createPlanetaryAcquisitionTab(),
             "techLimitsTab", suppliesAndAcquisitionTab.createTechLimitsTab()));
 

@@ -418,7 +418,7 @@ public class CampaignOptionsUtilities {
             panel.setLayout(new GridBagLayout());
 
             this.anchor = Objects.requireNonNullElse(anchor, GridBagConstraints.NORTHWEST);
-            this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.BOTH);
+            this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.NONE);
 
             this.insets = new Insets(5, 5, 5, 5);
         }
@@ -488,7 +488,8 @@ public class CampaignOptionsUtilities {
             JPanel quotePanel = new JPanel(new GridBagLayout());
             JLabel quote = new JLabel(String.format(
                 "<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
-                UIUtil.scaleForGUI(mainPanel.getPreferredSize().width), resources.getString(tabName + ".border")));
+                UIUtil.scaleForGUI(mainPanel.getPreferredSize().width),
+                resources.getString(tabName + ".border")));
 
             GridBagConstraints quoteConstraints = new GridBagConstraints();
             quoteConstraints.gridx = GridBagConstraints.RELATIVE;

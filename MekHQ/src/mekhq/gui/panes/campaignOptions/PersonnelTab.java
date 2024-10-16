@@ -98,7 +98,6 @@ public class PersonnelTab {
     private JCheckBox chkEnableTimeAwards;
     private JCheckBox chkEnableTrainingAwards;
     private JCheckBox chkEnableMiscAwards;
-    private JLabel lblAwardSetFilterList;
     private JTextArea txtAwardSetFilterList;
     //end Awards Tab
 
@@ -271,7 +270,6 @@ public class PersonnelTab {
         chkEnableMiscAwards = new JCheckBox();
 
         pnlAutoAwardsFilter = new JPanel();
-        lblAwardSetFilterList = new JLabel();
         txtAwardSetFilterList = new JTextArea();
     }
 
@@ -369,12 +367,13 @@ public class PersonnelTab {
         final JPanel panelRight = new CampaignOptionsStandardPanel("RightPanel");
         GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
 
+        layoutRight.gridwidth = 1;
         layoutRight.gridx = 0;
         layoutRight.gridy = 0;
         panelRight.add(pnlPersonnelCleanup, layoutRight);
 
         layoutRight.gridy++;
-        panelRight.add(pnlAdministrators, layoutRight);
+        layoutRight.gridwidth = 1;        panelRight.add(pnlAdministrators, layoutRight);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("PersonnelGeneralTab", true);
         GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
@@ -533,8 +532,7 @@ public class PersonnelTab {
         pnlAwardsGeneralOptions = createAwardsGeneralOptionsPanel();
         pnlAutoAwardsFilter = createAutoAwardsFilterPanel();
 
-        lblAwardSetFilterList = new CampaignOptionsLabel("AwardSetFilterList");
-        txtAwardSetFilterList = new JTextArea(5, 20);
+        txtAwardSetFilterList = new JTextArea(10, 60);
         txtAwardSetFilterList.setLineWrap(true);
         txtAwardSetFilterList.setWrapStyleWord(true);
         txtAwardSetFilterList.setToolTipText(
@@ -548,7 +546,7 @@ public class PersonnelTab {
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // Layout the Panel
-        final JPanel panelRight = new CampaignOptionsStandardPanel("AwardsTab");
+        final JPanel panelRight = new CampaignOptionsStandardPanel("AwardsTabRight");
         final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
 
         layoutRight.gridy = 0;
@@ -556,11 +554,14 @@ public class PersonnelTab {
         layoutRight.gridy++;
         panelRight.add(pnlAutoAwardsFilter, layoutRight);
 
-        layoutRight.gridx = 0;
-        layoutRight.gridy++;
-        panelRight.add(lblAwardSetFilterList, layoutRight);
-        layoutRight.gridy++;
-        panelRight.add(txtAwardSetFilterList, layoutRight);
+        final JPanel panelBottom = new CampaignOptionsStandardPanel("AwardsTabBottom", true,
+            "AwardsTabBottom");
+        final GridBagConstraints layoutBottom = new CampaignOptionsGridBagConstraints(panelBottom,
+            null, GridBagConstraints.HORIZONTAL);
+
+        layoutBottom.gridx = 0;
+        layoutBottom.gridy++;
+        panelBottom.add(txtAwardSetFilterList, layoutBottom);
 
         final JPanel panelParent = new CampaignOptionsStandardPanel("AwardsTabRight", true);
         final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
@@ -576,6 +577,11 @@ public class PersonnelTab {
 
         layoutParent.gridx++;
         panelParent.add(panelRight, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 2;
+        panelParent.add(panelBottom, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panelParent, "AwardsTab");

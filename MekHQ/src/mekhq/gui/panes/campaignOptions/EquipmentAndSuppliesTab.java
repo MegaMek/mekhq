@@ -25,6 +25,7 @@ public class EquipmentAndSuppliesTab {
     String name;
 
     //start Acquisition Tab
+    private JPanel pnlAcquisitions;
     private JLabel lblChoiceAcquireSkill;
     private MMComboBox<String> choiceAcquireSkill;
     private JCheckBox chkSupportStaffOnly;
@@ -39,6 +40,7 @@ public class EquipmentAndSuppliesTab {
     //end Acquisition Tab
 
     //start Delivery Tab
+    private JPanel pnlDeliveries;
     private JLabel lblNDiceTransitTime;
     private JSpinner spnNDiceTransitTime;
     private JLabel lblConstantTransitTime;
@@ -154,6 +156,7 @@ public class EquipmentAndSuppliesTab {
      * The panel contains settings related to divorce mechanics within the simulation.
      */
     private void initializeDelivery() {
+        pnlDeliveries = new JPanel();
         lblNDiceTransitTime = new JLabel();
         spnNDiceTransitTime = new JSpinner();
         lblConstantTransitTime = new JLabel();
@@ -174,6 +177,7 @@ public class EquipmentAndSuppliesTab {
      * The panel contains various settings related to marriage mechanics within the simulation.
      */
     private void initializeAcquisitionTab() {
+        pnlAcquisitions = new JPanel();
         lblChoiceAcquireSkill = new JLabel();
         choiceAcquireSkill = new MMComboBox<>("choiceAcquireSkill", buildAcquireSkillComboOptions());
 
@@ -219,79 +223,165 @@ public class EquipmentAndSuppliesTab {
         JPanel headerPanel = new CampaignOptionsHeaderPanel("AcquisitionTab",
             getImageDirectory() + "logo_calderon_protectorate.png", true);
 
-        // Acquisitions skill
+        pnlAcquisitions = createAcquisitionPanel();
+        pnlDeliveries = createDeliveryPanel();
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("acquisitionTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(headerPanel, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(pnlAcquisitions, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(pnlDeliveries, layoutParent);
+
+
+        // Create Parent Panel and return
+        return createParentPanel(panel, "acquisitionsTab");
+    }
+
+    /**
+     * Creates the acquisition tab panel.
+     *
+     * @return the created tab panel as a {@link JPanel}
+     */
+    private JPanel createAcquisitionPanel() {
+        // Content
         lblChoiceAcquireSkill = new CampaignOptionsLabel("ChoiceAcquireSkill");
 
-        // Support personnel only
         chkSupportStaffOnly = new CampaignOptionsCheckBox("SupportStaffOnly");
 
-        // Clan Acquisition penalty
         lblAcquireClanPenalty = new CampaignOptionsLabel("AcquireClanPenalty");
         spnAcquireClanPenalty = new CampaignOptionsSpinner("AcquireClanPenalty",
             0, 0, 13, 1);
 
-        // IS Acquisition penalty
         lblAcquireIsPenalty = new CampaignOptionsLabel("AcquireISPenalty");
         spnAcquireIsPenalty = new CampaignOptionsSpinner("AcquireISPenalty",
             0, 0, 13, 1);
 
-        // Waiting Period
         lblAcquireWaitingPeriod = new CampaignOptionsLabel("AcquireWaitingPeriod");
         spnAcquireWaitingPeriod = new CampaignOptionsSpinner("AcquireWaitingPeriod",
             1, 1, 365, 1);
 
-        // Maximum Acquisitions
         lblMaxAcquisitions = new CampaignOptionsLabel("MaxAcquisitions");
         spnMaxAcquisitions = new CampaignOptionsSpinner("MaxAcquisitions",
             0,0, 100, 1);
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("acquisitionTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panel = new CampaignOptionsStandardPanel("AcquisitionPanel", true,
+            "AcquisitionPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblChoiceAcquireSkill)
-                    .addComponent(choiceAcquireSkill))
-                .addComponent(chkSupportStaffOnly)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAcquireClanPenalty)
-                    .addComponent(spnAcquireClanPenalty))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAcquireIsPenalty)
-                    .addComponent(spnAcquireIsPenalty))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAcquireWaitingPeriod)
-                    .addComponent(spnAcquireWaitingPeriod))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblMaxAcquisitions)
-                    .addComponent(spnMaxAcquisitions)));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblChoiceAcquireSkill, layout);
+        layout.gridx++;
+        panel.add(choiceAcquireSkill, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblChoiceAcquireSkill)
-                    .addComponent(choiceAcquireSkill))
-                .addComponent(chkSupportStaffOnly)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblAcquireClanPenalty)
-                    .addComponent(spnAcquireClanPenalty))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblAcquireIsPenalty)
-                    .addComponent(spnAcquireIsPenalty))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblAcquireWaitingPeriod)
-                    .addComponent(spnAcquireWaitingPeriod))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblMaxAcquisitions)
-                    .addComponent(spnMaxAcquisitions)));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkSupportStaffOnly, layout);
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "acquisitionsTab");
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAcquireClanPenalty, layout);
+        layout.gridx++;
+        panel.add(spnAcquireClanPenalty, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAcquireIsPenalty, layout);
+        layout.gridx++;
+        panel.add(spnAcquireIsPenalty, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAcquireWaitingPeriod, layout);
+        layout.gridx++;
+        panel.add(spnAcquireWaitingPeriod, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblMaxAcquisitions, layout);
+        layout.gridx++;
+        panel.add(spnMaxAcquisitions, layout);
+
+        return panel;
+    }
+
+    /**
+     * Creates the delivery tab panel.
+     *
+     * @return the created tab panel as a {@link JPanel}
+     */
+    private JPanel createDeliveryPanel() {
+        lblNDiceTransitTime = new CampaignOptionsLabel("NDiceTransitTime");
+        spnNDiceTransitTime = new CampaignOptionsSpinner("NDiceTransitTime", 0,
+            0, 365, 1);
+
+        lblConstantTransitTime = new CampaignOptionsLabel("ConstantTransitTime");
+        spnConstantTransitTime = new CampaignOptionsSpinner("ConstantTransitTime",
+            0, 0, 365, 1);
+
+        lblAcquireMosBonus = new CampaignOptionsLabel("AcquireMosBonus");
+        spnAcquireMosBonus = new CampaignOptionsSpinner("AcquireMosBonus",
+            0, 0, 365, 1);
+
+        lblAcquireMinimum = new CampaignOptionsLabel("AcquireMinimum");
+        spnAcquireMinimum = new CampaignOptionsSpinner("AcquireMinimum",
+            0, 0, 365, 1);
+
+        // Layout the Panel
+        final JPanel panelTransit = new CampaignOptionsStandardPanel("DeliveryPanelTransit");
+        final GridBagConstraints layoutTransit = new CampaignOptionsGridBagConstraints(panelTransit);
+
+        layoutTransit.gridy = 0;
+        layoutTransit.gridx = 0;
+        layoutTransit.gridwidth = 1;
+        panelTransit.add(lblNDiceTransitTime, layoutTransit);
+        layoutTransit.gridx++;
+        panelTransit.add(spnNDiceTransitTime, layoutTransit);
+        layoutTransit.gridx++;
+        panelTransit.add(lblConstantTransitTime, layoutTransit);
+        layoutTransit.gridx++;
+        panelTransit.add(spnConstantTransitTime, layoutTransit);
+        layoutTransit.gridx++;
+        panelTransit.add(choiceTransitTimeUnits, layoutTransit);
+
+        final JPanel panel = new CampaignOptionsStandardPanel("DeliveryPanel", true,
+            "DeliveryPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 2;
+        panel.add(panelTransit, layout);
+
+        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(lblAcquireMosBonus, layout);
+        layout.gridx++;
+        panel.add(spnAcquireMosBonus, layout);
+        layout.gridx++;
+        panel.add(choiceAcquireMosUnits, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAcquireMinimum, layout);
+        layout.gridx++;
+        panel.add(spnAcquireMinimum, layout);
+        layout.gridx++;
+        panel.add(choiceAcquireMinimumUnit, layout);
+
+        return panel;
     }
 
     JPanel createPlanetaryAcquisitionTab() {
@@ -662,80 +752,6 @@ public class EquipmentAndSuppliesTab {
             case EquipmentType.RATING_F -> "F";
             default -> "ERROR";
         };
-    }
-
-    /**
-     * Creates the delivery tab panel.
-     *
-     * @return the created tab panel as a {@link JPanel}
-     */
-    JPanel createDeliveryTab() {
-        // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("DeliveryTab",
-            getImageDirectory() + "logo_clan_burrock.png", true);
-
-        // Delivery Time
-        lblNDiceTransitTime = new CampaignOptionsLabel("NDiceTransitTime");
-        spnNDiceTransitTime = new CampaignOptionsSpinner("NDiceTransitTime", 0,
-            0, 365, 1);
-
-        lblConstantTransitTime = new CampaignOptionsLabel("ConstantTransitTime");
-        spnConstantTransitTime = new CampaignOptionsSpinner("ConstantTransitTime",
-            0, 0, 365, 1);
-
-        // Margin of Success Reductions
-        lblAcquireMosBonus = new CampaignOptionsLabel("AcquireMosBonus");
-        spnAcquireMosBonus = new CampaignOptionsSpinner("AcquireMosBonus",
-            0, 0, 365, 1);
-
-        // Minimum Transit Time
-        lblAcquireMinimum = new CampaignOptionsLabel("AcquireMinimum");
-        spnAcquireMinimum = new CampaignOptionsSpinner("AcquireMinimum",
-            0, 0, 365, 1);
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("deliveryTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblNDiceTransitTime)
-                    .addComponent(spnNDiceTransitTime)
-                    .addComponent(lblConstantTransitTime)
-                    .addComponent(spnConstantTransitTime)
-                    .addComponent(choiceTransitTimeUnits))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAcquireMosBonus)
-                    .addComponent(spnAcquireMosBonus)
-                    .addComponent(choiceAcquireMosUnits))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAcquireMinimum)
-                    .addComponent(spnAcquireMinimum)
-                    .addComponent(choiceAcquireMinimumUnit)));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblNDiceTransitTime)
-                    .addComponent(spnNDiceTransitTime)
-                    .addComponent(lblConstantTransitTime)
-                    .addComponent(spnConstantTransitTime)
-                    .addComponent(choiceTransitTimeUnits))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblAcquireMosBonus)
-                    .addComponent(spnAcquireMosBonus)
-                    .addComponent(choiceAcquireMosUnits))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblAcquireMinimum)
-                    .addComponent(spnAcquireMinimum)
-                    .addComponent(choiceAcquireMinimumUnit)));
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "deliveryTab");
     }
 
     /**
