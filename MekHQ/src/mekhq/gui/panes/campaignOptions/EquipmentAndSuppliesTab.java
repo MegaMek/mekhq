@@ -466,7 +466,7 @@ public class EquipmentAndSuppliesTab {
         techLabel.setName(String.format("<html><center>%s</center></html", techLabel.getText()));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("createTechModifiersPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("createTechModifiersPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
@@ -527,7 +527,7 @@ public class EquipmentAndSuppliesTab {
         industryLabel.setName(String.format("<html><center>%s</center></html", industryLabel.getText()));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("IndustryModifiersPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("IndustryModifiersPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
@@ -583,7 +583,7 @@ public class EquipmentAndSuppliesTab {
         outputLabel.setName(String.format("<html><center>%s</center></html", outputLabel.getText()));
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("OutputModifiersPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("OutputModifiersPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 

@@ -293,7 +293,7 @@ public class FinancesTab {
         pnlShares = createSharesPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("OtherSystemsPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("OtherSystemsPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
@@ -331,7 +331,7 @@ public class FinancesTab {
         newFinancialYearFinancesToCSVExportBox = new CampaignOptionsCheckBox("NewFinancialYearFinancesToCSVExportBox");
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("GeneralOptionsPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("GeneralOptionsPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 

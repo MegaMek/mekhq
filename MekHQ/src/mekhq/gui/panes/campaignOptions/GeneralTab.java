@@ -125,7 +125,7 @@ public class GeneralTab {
 
         // Layout the Panel
         JPanel panel = new JPanel();
-        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel, null, GridBagConstraints.HORIZONTAL);
 
         layout.gridy = 0;
         layout.gridwidth = 5;
@@ -214,7 +214,7 @@ public class GeneralTab {
         Dimension size = lblBody.getPreferredSize();
         lblBody.setMaximumSize(UIUtil.scaleForGUI(750, size.height));
 
-        final JPanel panel = new CampaignOptionsStandardPanel("pnlGeneralHeaderPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("pnlGeneralHeaderPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 

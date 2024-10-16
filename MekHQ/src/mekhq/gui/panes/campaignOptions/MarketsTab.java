@@ -211,7 +211,7 @@ public class MarketsTab {
         }
 
         // Layout the Panels
-        final JPanel leftPanel = new CampaignOptionsStandardPanel("LeftPanel", false);
+        final JPanel leftPanel = new CampaignOptionsStandardPanel("LeftPanel");
         final GroupLayout leftLayout = createGroupLayout(leftPanel);
         leftPanel.setLayout(leftLayout);
 
@@ -245,7 +245,7 @@ public class MarketsTab {
                     .addComponent(lblPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))
                     .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))));
 
-        final JPanel rightPanel = new CampaignOptionsStandardPanel("RightPanel", false);
+        final JPanel rightPanel = new CampaignOptionsStandardPanel("RightPanel");
         final GroupLayout rightLayout = createGroupLayout(rightPanel);
         rightPanel.setLayout(rightLayout);
 
@@ -466,8 +466,7 @@ public class MarketsTab {
             0, 0, 20, 5);
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketGeneralOptionsPanel",
-            false);
+        final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketGeneralOptionsPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 

@@ -366,8 +366,8 @@ public class PersonnelTab {
         pnlAdministrators = createAdministratorsPanel();
 
         // Layout the Panels
-        final JPanel panelRight = new CampaignOptionsStandardPanel("RightPanel", false);
-        GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight, null, GridBagConstraints.NONE);
+        final JPanel panelRight = new CampaignOptionsStandardPanel("RightPanel");
+        GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
 
         layoutRight.gridx = 0;
         layoutRight.gridy = 0;
@@ -409,7 +409,7 @@ public class PersonnelTab {
         chkUseAlternativeQualityAveraging = new CampaignOptionsCheckBox("UseAlternativeQualityAveraging");
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelGeneralTab", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelGeneralTab");
         GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
@@ -548,7 +548,7 @@ public class PersonnelTab {
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // Layout the Panel
-        final JPanel panelRight = new CampaignOptionsStandardPanel("AwardsTab", false);
+        final JPanel panelRight = new CampaignOptionsStandardPanel("AwardsTab");
         final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
 
         layoutRight.gridy = 0;
@@ -610,7 +610,7 @@ public class PersonnelTab {
         chkIgnoreStandardSet = new CampaignOptionsCheckBox("IgnoreStandardSet");
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AwardsGeneralOptionsPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("AwardsGeneralOptionsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
@@ -739,7 +739,7 @@ public class PersonnelTab {
         spnMaximumPatients = new CampaignOptionsSpinner("MaximumPatients",
             25, 1, 100, 1);
 
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("MedicalTabLeft", false);
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("MedicalTabLeft");
         final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
         layoutLeft.gridy = 0;
@@ -772,7 +772,7 @@ public class PersonnelTab {
         panelLeft.add(spnMinimumHitsForVehicles, layoutLeft);
 
         // Layout the Panels
-        final JPanel panelRight = new CampaignOptionsStandardPanel("MedicalTabRight", false);
+        final JPanel panelRight = new CampaignOptionsStandardPanel("MedicalTabRight");
         final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
 
         layoutRight.gridy++;
@@ -826,7 +826,7 @@ public class PersonnelTab {
         JPanel pnlPersonnelLogs = createPersonnelLogsPanel();
 
         // Layout the Panel
-        final JPanel panelLeft = new CampaignOptionsStandardPanel("PersonnelInformationLeft", false);
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("PersonnelInformationLeft");
         final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
         layoutLeft.gridx = 0;
@@ -894,6 +894,7 @@ public class PersonnelTab {
             "PersonnelLogsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
+        layout.gridwidth = 1;
         layout.gridx = 0;
         layout.gridy = 0;
         panel.add(chkUseTransfers, layout);

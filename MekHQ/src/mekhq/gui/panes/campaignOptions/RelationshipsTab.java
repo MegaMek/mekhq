@@ -263,8 +263,7 @@ public class RelationshipsTab {
         chkLogMarriageNameChanges = new CampaignOptionsCheckBox("LogMarriageNameChanges");
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("MarriageGeneralOptionsPanel",
-            false);
+        final JPanel panel = new CampaignOptionsStandardPanel("MarriageGeneralOptionsPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
@@ -624,8 +623,7 @@ public class RelationshipsTab {
         pnlRandomProcreationPanel = createRandomProcreationPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("ProcreationGeneralOptionsPanel",
-            false);
+        final JPanel panel = new CampaignOptionsStandardPanel("ProcreationGeneralOptionsPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 

@@ -237,13 +237,22 @@ public class CampaignOptionsUtilities {
      */
     static class CampaignOptionsStandardPanel extends JPanel {
         /**
+         * Creates a standardized {@link JPanel} without a border.
+         * <p>
+         * {@code createGroupLayout} should also be called and the resulting {@link GroupLayout}
+         * assigned to the panel via {@code setLayout}.
+         *
+         * @param name         the name of the panel.
+         */
+        public CampaignOptionsStandardPanel(String name) {
+            this(name, false, "");
+        }
+
+        /**
          * Creates a standardized {@link JPanel} with an untitled border.
          * <p>
          * {@code createGroupLayout} should also be called and the resulting {@link GroupLayout}
          * assigned to the panel via {@code setLayout}.
-         * <p>
-         * If {@code borderTitle} isn't empty the resource bundle reference, used to fetch the border's
-         * title, will be {@code "lbl" + borderTitle + ".text"}
          *
          * @param name         the name of the panel.
          * @param includeBorder whether the panel should have a border.
@@ -345,7 +354,7 @@ public class CampaignOptionsUtilities {
             }
 
             // Layout panel
-            new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel", false);
+            new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel");
             final GroupLayout layout = createGroupLayout(this);
             setLayout(layout);
 
@@ -409,7 +418,7 @@ public class CampaignOptionsUtilities {
             panel.setLayout(new GridBagLayout());
 
             this.anchor = Objects.requireNonNullElse(anchor, GridBagConstraints.NORTHWEST);
-            this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.HORIZONTAL);
+            this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.NONE);
 
             this.insets = new Insets(5, 5, 5, 5);
         }
@@ -424,7 +433,7 @@ public class CampaignOptionsUtilities {
      */
     static JPanel createParentPanel(JPanel panel, String name) {
         // Create Panel
-        final JPanel parentPanel = new CampaignOptionsStandardPanel(name, false);
+        final JPanel parentPanel = new CampaignOptionsStandardPanel(name);
         final GroupLayout parentLayout = createGroupLayout(parentPanel);
 
         // Layout

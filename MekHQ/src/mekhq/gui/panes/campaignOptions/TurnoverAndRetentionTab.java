@@ -590,7 +590,7 @@ public class TurnoverAndRetentionTab {
         pnlAdministrativeStrain = createAdministrativeStrainPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrainPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrainPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
@@ -677,7 +677,7 @@ public class TurnoverAndRetentionTab {
         pnlManagementSkill = createManagementSkillPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("UnitCohesionPanel", false);
+        final JPanel panel = new CampaignOptionsStandardPanel("UnitCohesionPanel");
         final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 

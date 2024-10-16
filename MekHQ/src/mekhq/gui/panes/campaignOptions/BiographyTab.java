@@ -112,7 +112,6 @@ public class BiographyTab {
     private JCheckBox chkShowIneligibleAcademies;
     private JLabel lblEntranceExamBaseTargetNumber;
     private JSpinner spnEntranceExamBaseTargetNumber;
-    private JLabel lblEntranceExamBaseTargetNumberPost;
 
     private JPanel pnlEnableStandardSets;
     private JCheckBox chkEnableLocalAcademies;
@@ -210,7 +209,6 @@ public class BiographyTab {
         chkShowIneligibleAcademies = new JCheckBox();
         lblEntranceExamBaseTargetNumber = new JLabel();
         spnEntranceExamBaseTargetNumber = new JSpinner();
-        lblEntranceExamBaseTargetNumberPost = new JLabel();
 
         pnlEnableStandardSets = new JPanel();
         chkEnableLocalAcademies = new JCheckBox();
@@ -813,8 +811,6 @@ public class BiographyTab {
 
         chkUseReeducationCamps = new CampaignOptionsCheckBox("UseReeducationCamps");
 
-        pnlEnableStandardSets = createEnableStandardSetsPanel();
-
         chkEnableOverrideRequirements = new CampaignOptionsCheckBox("EnableOverrideRequirements");
 
         chkShowIneligibleAcademies = new CampaignOptionsCheckBox("ShowIneligibleAcademies");
@@ -822,7 +818,8 @@ public class BiographyTab {
         lblEntranceExamBaseTargetNumber = new CampaignOptionsLabel("EntranceExamBaseTargetNumber");
         spnEntranceExamBaseTargetNumber = new CampaignOptionsSpinner("EntranceExamBaseTargetNumber",
             14, 0, 20, 1);
-        lblEntranceExamBaseTargetNumberPost = new CampaignOptionsLabel("EntranceExamBaseTargetNumberPost");
+
+        pnlEnableStandardSets = createEnableStandardSetsPanel();
 
         pnlXpAndSkillBonuses = createXpAndSkillBonusesPanel();
 
@@ -830,61 +827,81 @@ public class BiographyTab {
 
         pnlAccidentsAndEvents = createAccidentsAndEventsPanel();
 
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("EducationTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        // Layout the Panels
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("EducationTabLeft");
+        final GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseEducationModule)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblCurriculumXpRate)
-                    .addComponent(spnCurriculumXpRate)
-                    .addComponent(lblMaximumJumpCount)
-                    .addComponent(spnMaximumJumpCount))
-                .addComponent(chkUseReeducationCamps)
-                .addComponent(pnlEnableStandardSets)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(chkShowIneligibleAcademies)
-                    .addComponent(chkEnableOverrideRequirements))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblEntranceExamBaseTargetNumber)
-                    .addComponent(spnEntranceExamBaseTargetNumber)
-                    .addComponent(lblEntranceExamBaseTargetNumberPost))
-                .addComponent(pnlXpAndSkillBonuses)
-                .addComponent(pnlDropoutChance)
-                .addComponent(pnlAccidentsAndEvents));
+        layoutLeft.gridwidth = 5;
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy = 0;
+        panelLeft.add(headerPanel, layoutLeft);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addComponent(chkUseEducationModule)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblCurriculumXpRate)
-                        .addComponent(spnCurriculumXpRate)
-                        .addComponent(lblMaximumJumpCount)
-                        .addComponent(spnMaximumJumpCount)
-                        )
-                    .addComponent(chkUseReeducationCamps)
-                    .addComponent(pnlEnableStandardSets)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(chkShowIneligibleAcademies)
-                        .addComponent(chkEnableOverrideRequirements)
-                        )
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblEntranceExamBaseTargetNumber)
-                        .addComponent(spnEntranceExamBaseTargetNumber)
-                        .addComponent(lblEntranceExamBaseTargetNumberPost)
-                        )
-                    .addComponent(pnlXpAndSkillBonuses)
-                    .addComponent(pnlDropoutChance)
-                    .addComponent(pnlAccidentsAndEvents)));
+        layoutLeft.gridy++;
+        layoutLeft.gridwidth = 1;
+        panelLeft.add(chkUseEducationModule, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(lblCurriculumXpRate, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnCurriculumXpRate, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblMaximumJumpCount, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnMaximumJumpCount, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(chkUseReeducationCamps, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkEnableOverrideRequirements, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(chkShowIneligibleAcademies, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(lblEntranceExamBaseTargetNumber, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnEntranceExamBaseTargetNumber, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(pnlEnableStandardSets, layoutLeft);
+
+        final JPanel panelRight = new CampaignOptionsStandardPanel("EducationTabRight");
+        final GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
+
+        layoutRight.gridy++;
+        layoutRight.gridwidth = 1;
+        panelRight.add(panelLeft, layoutRight);
+        layoutRight.gridy++;
+        panelRight.add(pnlXpAndSkillBonuses, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(pnlDropoutChance, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(pnlAccidentsAndEvents, layoutRight);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("EducationTab", true);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panelParent.add(panelLeft, layoutParent);
+
+        layoutParent.gridx++;
+        panelParent.add(panelRight, layoutParent);
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "EducationTab");
+        return createParentPanel(panelParent, "EducationTab");
     }
 
     /**
@@ -900,32 +917,25 @@ public class BiographyTab {
      * Enable Standard Sets settings.
      */
     private JPanel createEnableStandardSetsPanel() {
-        // Contents
         chkEnableLocalAcademies = new CampaignOptionsCheckBox("EnableLocalAcademies");
         chkEnablePrestigiousAcademies = new CampaignOptionsCheckBox("EnablePrestigiousAcademies");
         chkEnableUnitEducation = new CampaignOptionsCheckBox("EnableUnitEducation");
 
-        // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("EnableStandardSetsPanel", true,
             "EnableStandardSetsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(chkEnableLocalAcademies)
-                    .addComponent(chkEnablePrestigiousAcademies)
-                    .addComponent(chkEnableUnitEducation)));
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(chkEnableLocalAcademies)
-                        .addComponent(chkEnablePrestigiousAcademies)
-                        .addComponent(chkEnableUnitEducation)
-                        )));
+        layout.gridwidth = 1;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(chkEnableLocalAcademies, layout);
+
+        layout.gridy++;
+        panel.add(chkEnablePrestigiousAcademies, layout);
+
+        layout.gridy++;
+        panel.add(chkEnableUnitEducation, layout);
 
         return panel;
     }
@@ -951,24 +961,16 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("XpAndSkillBonusesPanel", true,
             "XpAndSkillBonusesPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkEnableBonuses)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFacultyXpMultiplier)
-                    .addComponent(spnFacultyXpMultiplier)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(chkEnableBonuses, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chkEnableBonuses)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblFacultyXpMultiplier)
-                        .addComponent(spnFacultyXpMultiplier)
-                        )));
+        layout.gridy++;
+        panel.add(lblFacultyXpMultiplier, layout);
+        layout.gridx++;
+        panel.add(spnFacultyXpMultiplier, layout);
 
         return panel;
     }
@@ -1043,24 +1045,16 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AccidentsAndEventsPanel", true,
             "AccidentsAndEventsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkAllAges)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblMilitaryAcademyAccidents)
-                    .addComponent(spnMilitaryAcademyAccidents)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(chkAllAges, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(chkAllAges)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblMilitaryAcademyAccidents)
-                        .addComponent(spnMilitaryAcademyAccidents)
-                        )));
+        layout.gridy++;
+        panel.add(lblMilitaryAcademyAccidents, layout);
+        layout.gridx++;
+        panel.add(spnMilitaryAcademyAccidents, layout);
 
         return panel;
     }
