@@ -1077,24 +1077,26 @@ public class PersonnelTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalariesTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkDisableSecondaryRoleSalary)
-                .addComponent(pnlSalaryMultipliersPanel)
-                .addComponent(pnlSalaryExperienceMultipliersPanel)
-                .addComponent(pnlSalaryBaseSalaryPanel));
+        layout.gridwidth = 5;
+        layout.gridy = 0;
+        panel.add(headerPanel, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addComponent(chkDisableSecondaryRoleSalary)
-                .addComponent(pnlSalaryMultipliersPanel)
-                .addComponent(pnlSalaryExperienceMultipliersPanel)
-                .addComponent(pnlSalaryBaseSalaryPanel));
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(chkDisableSecondaryRoleSalary, layout);
+
+        layout.gridy++;
+        panel.add(pnlSalaryMultipliersPanel, layout);
+        layout.gridx++;
+        panel.add(pnlSalaryExperienceMultipliersPanel, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 2;
+        panel.add(pnlSalaryBaseSalaryPanel, layout);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "SalariesTab");
@@ -1118,24 +1120,20 @@ public class PersonnelTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalaryMultipliersPanel", true,
             "SalaryMultipliersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAntiMekSalary)
-                    .addComponent(spnAntiMekSalary)
-                    .addComponent(lblSpecialistInfantrySalary)
-                    .addComponent(spnSpecialistInfantrySalary)));
+        layout.gridy = 0;
+        layout.gridx = 0;
+        layout.gridwidth = 1;
+        panel.add(lblAntiMekSalary, layout);
+        layout.gridx++;
+        panel.add(spnAntiMekSalary, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblAntiMekSalary)
-                    .addComponent(spnAntiMekSalary)
-                    .addComponent(lblSpecialistInfantrySalary)
-                    .addComponent(spnSpecialistInfantrySalary)));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblSpecialistInfantrySalary, layout);
+        layout.gridx++;
+        panel.add(spnSpecialistInfantrySalary, layout);
 
         return panel;
     }
