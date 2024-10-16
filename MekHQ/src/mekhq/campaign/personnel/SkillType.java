@@ -189,10 +189,10 @@ public class SkillType {
 
     /**
      * @param level - skill level integer to get tagged name for
-     * @return String "<font color="X">SkillName</font>" or "Skillname" if no color exists
+     * @return "Skillname" wrapped by coloring span or bare if no color exists
      */
     public static String getColoredExperienceLevelName(int level) {
-        if (getExperienceLevelColor(level) == "") {
+        if (getExperienceLevelColor(level).equals("")) {
             return getExperienceLevelName(level);
         }
         
@@ -202,10 +202,10 @@ public class SkillType {
 
     /**
      * @param level - SkillLevel enum to get tagged name for
-     * @return String "<font color="X">SkillName</font>" or "Skillname" if no color exists
+     * @return "Skillname" wrapped by coloring span or bare if no color exists
      */
     public static String getColoredExperienceLevelName(SkillLevel level) {
-        if (getExperienceLevelColor(level) == "") {
+        if (getExperienceLevelColor(level).equals("")) {
             return level.toString();
         }
 
