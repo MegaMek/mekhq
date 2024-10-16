@@ -192,7 +192,7 @@ public class SkillType {
      * @return "Skillname" wrapped by coloring span or bare if no color exists
      */
     public static String getColoredExperienceLevelName(int level) {
-        if (getExperienceLevelColor(level).equals("")) {
+        if (getExperienceLevelColor(level).isEmpty()) {
             return getExperienceLevelName(level);
         }
         
@@ -205,7 +205,7 @@ public class SkillType {
      * @return "Skillname" wrapped by coloring span or bare if no color exists
      */
     public static String getColoredExperienceLevelName(SkillLevel level) {
-        if (getExperienceLevelColor(level).equals("")) {
+        if (getExperienceLevelColor(level).isEmpty()) {
             return level.toString();
         }
 
