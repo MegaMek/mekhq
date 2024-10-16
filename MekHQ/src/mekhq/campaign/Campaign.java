@@ -2240,7 +2240,7 @@ public class Campaign implements ITechManager {
     }
 
     private void updatePartInUseData(PartInUse piu, Part p, boolean ignoreMothballedUnits,
-            int ignoreSparesUnderQuality) {
+            PartQuality ignoreSparesUnderQuality) {
 
         if (ignoreMothballedUnits && (null != p.getUnit()) && p.getUnit().isMothballed()) {
             // Ignore it
@@ -2248,7 +2248,7 @@ public class Campaign implements ITechManager {
             piu.setUseCount(piu.getUseCount() + getQuantity(p));
         } else {
             if (p.isPresent()) {
-                if (p.getQuality() < ignoreSparesUnderQuality) {
+                if (p.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
                     // Ignore it
                 } else {
                     piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
@@ -2261,7 +2261,8 @@ public class Campaign implements ITechManager {
     }
 
     /** Update the piu with the current campaign data */
-    public void updatePartInUse(PartInUse piu, boolean ignoreMothballedUnits, int ignoreSparesUnderQuality) {
+    public void updatePartInUse(PartInUse piu, boolean ignoreMothballedUnits, 
+            PartQuality ignoreSparesUnderQuality) {
         piu.setUseCount(0);
         piu.setStoreCount(0);
         piu.setTransferCount(0);
@@ -2282,7 +2283,8 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits, int ignoreSparesUnderQuality) {
+    public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits,
+            PartQuality ignoreSparesUnderQuality) {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
         // java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
