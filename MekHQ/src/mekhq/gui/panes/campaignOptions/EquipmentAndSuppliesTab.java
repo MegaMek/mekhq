@@ -9,7 +9,6 @@ import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.personnel.SkillType;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.util.ResourceBundle;
 
@@ -395,23 +394,19 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(options)
-                    .addComponent(modifiers)));
+        layoutParent.gridwidth = 5;
+        layoutParent.gridy = 0;
+        panel.add(headerPanel, layoutParent);
 
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(options, layoutParent);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(options)
-                    .addComponent(modifiers)));
+        layoutParent.gridx++;
+        panel.add(modifiers, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PlanetaryAcquisitionTab");
@@ -424,68 +419,58 @@ public class EquipmentAndSuppliesTab {
      * @return the created tab panel as a {@link JPanel}
      */
     private JPanel createOptionsPanel() {
-        // Use Planetary Acquisitions
         usePlanetaryAcquisitions = new CampaignOptionsCheckBox("UsePlanetaryAcquisitions");
 
-        // Max Jump Distance
         lblMaxJumpPlanetaryAcquisitions = new CampaignOptionsLabel("MaxJumpPlanetaryAcquisitions");
         spnMaxJumpPlanetaryAcquisitions = new CampaignOptionsSpinner("MaxJumpPlanetaryAcquisitions",
             2, 0, 5, 1);
 
-        // Faction Limits
         lblPlanetaryAcquisitionsFactionLimits = new CampaignOptionsLabel("PlanetaryAcquisitionsFactionLimits");
 
-        // Disallow Resource Sharing (Inner Sphere)
         disallowPlanetaryAcquisitionClanCrossover = new CampaignOptionsCheckBox("DisallowPlanetaryAcquisitionClanCrossover");
 
-        // Disallow Resource Sharing (Clans)
         disallowClanPartsFromIS = new CampaignOptionsCheckBox("DisallowClanPartsFromIS");
 
-        // Acquisition Penalty
         lblPenaltyClanPartsFromIS = new CampaignOptionsLabel("PenaltyClanPartsFromIS");
         spnPenaltyClanPartsFromIS = new CampaignOptionsSpinner("PenaltyClanPartsFromIS",
             0, 0, 12, 1);
 
-        // Verbose Reporting
         usePlanetaryAcquisitionsVerbose = new CampaignOptionsCheckBox("UsePlanetaryAcquisitionsVerbose");
 
         // Layout the Panel
         final JPanel panel = new JPanel();
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(usePlanetaryAcquisitions)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(spnMaxJumpPlanetaryAcquisitions)
-                    .addComponent(lblMaxJumpPlanetaryAcquisitions))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetaryAcquisitionsFactionLimits)
-                    .addComponent(comboPlanetaryAcquisitionsFactionLimits))
-                .addComponent(disallowPlanetaryAcquisitionClanCrossover)
-                .addComponent(disallowClanPartsFromIS)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(spnPenaltyClanPartsFromIS)
-                    .addComponent(lblPenaltyClanPartsFromIS))
-                .addComponent(usePlanetaryAcquisitionsVerbose));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(usePlanetaryAcquisitions, layout);
+        layout.gridx++;
+        panel.add(usePlanetaryAcquisitionsVerbose, layout);
 
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblMaxJumpPlanetaryAcquisitions, layout);
+        layout.gridx++;
+        panel.add(spnMaxJumpPlanetaryAcquisitions, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(usePlanetaryAcquisitions)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblMaxJumpPlanetaryAcquisitions)
-                    .addComponent(spnMaxJumpPlanetaryAcquisitions))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetaryAcquisitionsFactionLimits)
-                    .addComponent(comboPlanetaryAcquisitionsFactionLimits))
-                .addComponent(disallowPlanetaryAcquisitionClanCrossover)
-                .addComponent(disallowClanPartsFromIS)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPenaltyClanPartsFromIS)
-                    .addComponent(spnPenaltyClanPartsFromIS))
-                .addComponent(usePlanetaryAcquisitionsVerbose));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPlanetaryAcquisitionsFactionLimits, layout);
+        layout.gridx++;
+        panel.add(comboPlanetaryAcquisitionsFactionLimits, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(disallowPlanetaryAcquisitionClanCrossover, layout);
+
+        layout.gridy++;
+        panel.add(disallowClanPartsFromIS, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblPenaltyClanPartsFromIS, layout);
+        layout.gridx++;
+        panel.add(spnPenaltyClanPartsFromIS, layout);
 
         return panel;
     }
@@ -527,22 +512,15 @@ public class EquipmentAndSuppliesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTabModifiers",
             true, "ModifiersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlIndustryModifiers)
-                    .addComponent(pnlTechModifiers)
-                    .addComponent(pnlOutputModifiers)));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(pnlIndustryModifiers)
-                    .addComponent(pnlTechModifiers)
-                    .addComponent(pnlOutputModifiers)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(pnlIndustryModifiers, layout);
+        layout.gridx++;
+        panel.add(pnlTechModifiers, layout);
+        layout.gridx++;
+        panel.add(pnlOutputModifiers, layout);
 
         return panel;
     }
@@ -558,52 +536,15 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("createTechModifiersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(techLabel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[0])
-                    .addComponent(spnPlanetAcquireTechBonus[0]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[1])
-                    .addComponent(spnPlanetAcquireTechBonus[1]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[2])
-                    .addComponent(spnPlanetAcquireTechBonus[2]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[3])
-                    .addComponent(spnPlanetAcquireTechBonus[3]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[4])
-                    .addComponent(spnPlanetAcquireTechBonus[4]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireTechBonus[5])
-                    .addComponent(spnPlanetAcquireTechBonus[5])));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(techLabel)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[0])
-                    .addComponent(spnPlanetAcquireTechBonus[0]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[1])
-                    .addComponent(spnPlanetAcquireTechBonus[1]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[2])
-                    .addComponent(spnPlanetAcquireTechBonus[2]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[3])
-                    .addComponent(spnPlanetAcquireTechBonus[3]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[4])
-                    .addComponent(spnPlanetAcquireTechBonus[4]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireTechBonus[5])
-                    .addComponent(spnPlanetAcquireTechBonus[5])));
+        for (int i = 0; i < 6; i++) {
+            layout.gridx = 0;
+            layout.gridy = i;
+            panel.add(lblPlanetAcquireTechBonus[i], layout);
+            layout.gridx++;
+            panel.add(spnPlanetAcquireTechBonus[i], layout);
+        }
 
         return panel;
     }
@@ -619,52 +560,15 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("IndustryModifiersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(industryLabel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireIndustryBonus[0])
-                    .addComponent(spnPlanetAcquireIndustryBonus[0]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireIndustryBonus[1])
-                    .addComponent(spnPlanetAcquireIndustryBonus[1]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireIndustryBonus[2])
-                    .addComponent(spnPlanetAcquireIndustryBonus[2]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireIndustryBonus[3])
-                    .addComponent(spnPlanetAcquireIndustryBonus[3]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireIndustryBonus[4])
-                    .addComponent(spnPlanetAcquireIndustryBonus[4]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireIndustryBonus[5])
-                    .addComponent(spnPlanetAcquireIndustryBonus[5])));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(industryLabel)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireIndustryBonus[0])
-                    .addComponent(spnPlanetAcquireIndustryBonus[0]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireIndustryBonus[1])
-                    .addComponent(spnPlanetAcquireIndustryBonus[1]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireIndustryBonus[2])
-                    .addComponent(spnPlanetAcquireIndustryBonus[2]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireIndustryBonus[3])
-                    .addComponent(spnPlanetAcquireIndustryBonus[3]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireIndustryBonus[4])
-                    .addComponent(spnPlanetAcquireIndustryBonus[4]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireIndustryBonus[5])
-                    .addComponent(spnPlanetAcquireIndustryBonus[5])));
+        for (int i = 0; i < 6; i++) {
+            layout.gridx = 0;
+            layout.gridy = i;
+            panel.add(lblPlanetAcquireIndustryBonus[i], layout);
+            layout.gridx++;
+            panel.add(spnPlanetAcquireIndustryBonus[i], layout);
+        }
 
         return panel;
     }
@@ -675,52 +579,15 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OutputModifiersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(outputLabel)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireOutputBonus[0])
-                    .addComponent(spnPlanetAcquireOutputBonus[0]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireOutputBonus[1])
-                    .addComponent(spnPlanetAcquireOutputBonus[1]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireOutputBonus[2])
-                    .addComponent(spnPlanetAcquireOutputBonus[2]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireOutputBonus[3])
-                    .addComponent(spnPlanetAcquireOutputBonus[3]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireOutputBonus[4])
-                    .addComponent(spnPlanetAcquireOutputBonus[4]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblPlanetAcquireOutputBonus[5])
-                    .addComponent(spnPlanetAcquireOutputBonus[5])));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(outputLabel)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireOutputBonus[0])
-                    .addComponent(spnPlanetAcquireOutputBonus[0]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireOutputBonus[1])
-                    .addComponent(spnPlanetAcquireOutputBonus[1]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireOutputBonus[2])
-                    .addComponent(spnPlanetAcquireOutputBonus[2]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireOutputBonus[3])
-                    .addComponent(spnPlanetAcquireOutputBonus[3]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireOutputBonus[4])
-                    .addComponent(spnPlanetAcquireOutputBonus[4]))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblPlanetAcquireOutputBonus[5])
-                    .addComponent(spnPlanetAcquireOutputBonus[5])));
+        for (int i = 0; i < 6; i++) {
+            layout.gridx = 0;
+            layout.gridy = i;
+            panel.add(lblPlanetAcquireOutputBonus[i], layout);
+            layout.gridx++;
+            panel.add(spnPlanetAcquireOutputBonus[i], layout);
+        }
 
         return panel;
     }
@@ -813,13 +680,10 @@ public class EquipmentAndSuppliesTab {
         JPanel headerPanel = new CampaignOptionsHeaderPanel("TechLimitsTab",
             getImageDirectory() + "logo_clan_cloud_cobra.png", true);
 
-        // Limit Parts/Units by Year
         limitByYearBox = new CampaignOptionsCheckBox("LimitByYearBox");
 
-        // Disallow Extinct Units/Parts
         disallowExtinctStuffBox = new CampaignOptionsCheckBox("DisallowExtinctStuffBox");
 
-        // Allow Clan/Inner Sphere Purchases
         allowClanPurchasesBox = new CampaignOptionsCheckBox("AllowClanPurchasesBox");
         allowISPurchasesBox = new CampaignOptionsCheckBox("AllowISPurchasesBox");
 
@@ -839,38 +703,43 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TechLimitsTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(limitByYearBox)
-                .addComponent(disallowExtinctStuffBox)
-                .addComponent(allowClanPurchasesBox)
-                .addComponent(allowISPurchasesBox)
-                .addComponent(allowCanonOnlyBox)
-                .addComponent(allowCanonRefitOnlyBox)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblChoiceTechLevel)
-                    .addComponent(choiceTechLevel))
-                .addComponent(variableTechLevelBox)
-                .addComponent(useAmmoByTypeBox));
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(headerPanel, layoutParent);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addComponent(limitByYearBox)
-                .addComponent(disallowExtinctStuffBox)
-                .addComponent(allowClanPurchasesBox)
-                .addComponent(allowISPurchasesBox)
-                .addComponent(allowCanonOnlyBox)
-                .addComponent(allowCanonRefitOnlyBox)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblChoiceTechLevel)
-                    .addComponent(choiceTechLevel))
-                .addComponent(variableTechLevelBox)
-                .addComponent(useAmmoByTypeBox));
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(lblChoiceTechLevel, layoutParent);
+        layoutParent.gridx++;
+        panel.add(choiceTechLevel, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        panel.add(limitByYearBox, layoutParent);
+        layoutParent.gridx++;
+        panel.add(disallowExtinctStuffBox, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        panel.add(allowClanPurchasesBox, layoutParent);
+        layoutParent.gridx++;
+        panel.add(allowISPurchasesBox, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        panel.add(allowCanonOnlyBox, layoutParent);
+        layoutParent.gridx++;
+        panel.add(allowCanonRefitOnlyBox, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        panel.add(variableTechLevelBox, layoutParent);
+        layoutParent.gridx++;
+        panel.add(useAmmoByTypeBox, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "TechLimitsTab");
