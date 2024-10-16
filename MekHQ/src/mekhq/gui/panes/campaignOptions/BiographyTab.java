@@ -344,7 +344,7 @@ public class BiographyTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("BiographyGeneralTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -398,7 +398,7 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AnniversariesPanel", true,
             "AnniversariesPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -438,7 +438,7 @@ public class BiographyTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("BackgroundsTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -535,7 +535,7 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RandomOriginOptionsPanel", true,
             "RandomOriginOptionsPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -681,7 +681,7 @@ public class BiographyTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("DeathTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -800,7 +800,7 @@ public class BiographyTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("EducationTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -876,7 +876,7 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("EnableStandardSetsPanel", true,
             "EnableStandardSetsPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -919,7 +919,7 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("XpAndSkillBonusesPanel", true,
             "XpAndSkillBonusesPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -963,7 +963,7 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("DropoutChancePanel", true,
             "DropoutChancePanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -1011,7 +1011,7 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AccidentsAndEventsPanel", true,
             "AccidentsAndEventsPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -1063,7 +1063,7 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("NameAndPortraitGenerationTab", true,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -1190,7 +1190,7 @@ public class BiographyTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RankTab", true,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(

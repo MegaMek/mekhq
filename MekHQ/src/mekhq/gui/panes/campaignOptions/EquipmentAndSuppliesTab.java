@@ -246,7 +246,7 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("acquisitionTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -304,7 +304,7 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -360,7 +360,7 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new JPanel();
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -436,7 +436,7 @@ public class EquipmentAndSuppliesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PlanetaryAcquisitionTabModifiers",
             true, "ModifiersPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -467,7 +467,7 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("createTechModifiersPanel", false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -528,7 +528,7 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("IndustryModifiersPanel", false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -584,7 +584,7 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OutputModifiersPanel", false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -694,7 +694,7 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("deliveryTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -822,7 +822,7 @@ public class EquipmentAndSuppliesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TechLimitsTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(

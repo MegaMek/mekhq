@@ -6,10 +6,8 @@ import megamek.common.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
@@ -240,7 +238,7 @@ public class CampaignOptionsUtilities {
         /**
          * Creates a standardized {@link JPanel} with an untitled border.
          * <p>
-         * {@code createStandardLayout} should also be called and the resulting {@link GroupLayout}
+         * {@code createGroupLayout} should also be called and the resulting {@link GroupLayout}
          * assigned to the panel via {@code setLayout}.
          * <p>
          * If {@code borderTitle} isn't empty the resource bundle reference, used to fetch the border's
@@ -256,7 +254,7 @@ public class CampaignOptionsUtilities {
         /**
          * Creates a standardized {@link JPanel} with a titled border.
          * <p>
-         * {@code createStandardLayout} should also be called and the resulting {@link GroupLayout}
+         * {@code createGroupLayout} should also be called and the resulting {@link GroupLayout}
          * assigned to the panel via {@code setLayout}.
          * <p>
          * If {@code borderTitle} isn't empty the resource bundle reference, used to fetch the border's
@@ -347,7 +345,7 @@ public class CampaignOptionsUtilities {
 
             // Layout panel
             new CampaignOptionsStandardPanel("pnl" + name + "HeaderPanel", false);
-            final GroupLayout layout = createStandardLayout(this);
+            final GroupLayout layout = createGroupLayout(this);
             setLayout(layout);
 
             layout.setVerticalGroup(
@@ -368,17 +366,52 @@ public class CampaignOptionsUtilities {
     /**
      * Creates a {@link GroupLayout} object for the specified {@link JPanel}.
      * <p>
-     * Written to be paired with {@code new CampaignOptionsStandardPanel}.
+     * Written to be paired with {@code CampaignOptionsStandardPanel}.
      *
      * @param panel the {@link JPanel} for which the {@link GroupLayout} is created
      * @return the created {@link GroupLayout} object
      */
-    static GroupLayout createStandardLayout(JPanel panel) {
+    static GroupLayout createGroupLayout(JPanel panel) {
         final GroupLayout layout = new GroupLayout(panel);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
         return layout;
+    }
+
+    static class CampaignOptionsGridBagConstraints extends GridBagConstraints {
+        /**
+         * Creates a {@link GridBagConstraints} object for the specified {@link JPanel}.
+         * <p>
+         * Written to be paired with {@code CampaignOptionsStandardPanel}.
+         *
+         * @param panel the {@link JPanel} for which the {@link GridBagConstraints} is created
+         */
+        public CampaignOptionsGridBagConstraints(JPanel panel) {
+            this(panel, null, null);
+        }
+
+        /**
+         * Creates a {@link GridBagConstraints} object for the specified {@link JPanel} according to the
+         * provided settings.
+         * <p>
+         * Written to be paired with {@code CampaignOptionsStandardPanel}.
+         *
+         * @param panel the {@link JPanel} for which the {@link GridBagConstraints} is created
+         * @param anchor the anchor setting for the {@link GridBagConstraints}, or {@code null} to use
+         *              the default value {@link GridBagConstraints#NORTHWEST}
+         * @param fill the fill setting for the {@link GridBagConstraints}, or {@code null} to use the
+         *            default value {@link GridBagConstraints#NORTHWEST}
+         */
+        public CampaignOptionsGridBagConstraints(JPanel panel, @Nullable Integer anchor, @Nullable Integer fill) {
+            super();
+            panel.setLayout(new GridBagLayout());
+
+            this.anchor = Objects.requireNonNullElse(anchor, GridBagConstraints.NORTHWEST);
+            this.fill = Objects.requireNonNullElse(fill, GridBagConstraints.HORIZONTAL);
+
+            this.insets = new Insets(5, 5, 5, 5);
+        }
     }
 
     /**
@@ -391,7 +424,7 @@ public class CampaignOptionsUtilities {
     static JPanel createParentPanel(JPanel panel, String name) {
         // Create Panel
         final JPanel parentPanel = new CampaignOptionsStandardPanel(name, false);
-        final GroupLayout parentLayout = createStandardLayout(parentPanel);
+        final GroupLayout parentLayout = createGroupLayout(parentPanel);
 
         // Layout
         parentPanel.setLayout(parentLayout);
@@ -445,7 +478,7 @@ public class CampaignOptionsUtilities {
             JPanel quotePanel = new JPanel(new GridBagLayout());
             JLabel quote = new JLabel(String.format(
                 "<html><i><div style='width: %s; text-align:center;'>%s</div></i></html>",
-                UIUtil.scaleForGUI(650), resources.getString(tabName + ".border")));
+                UIUtil.scaleForGUI(mainPanel.getPreferredSize().width), resources.getString(tabName + ".border")));
 
             GridBagConstraints quoteConstraints = new GridBagConstraints();
             quoteConstraints.gridx = GridBagConstraints.RELATIVE;

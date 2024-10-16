@@ -129,7 +129,7 @@ public class MarketsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketTab", true,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -167,7 +167,7 @@ public class MarketsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelMarketGeneralOptionsPanel", false,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -212,7 +212,7 @@ public class MarketsTab {
 
         // Layout the Panels
         final JPanel leftPanel = new CampaignOptionsStandardPanel("LeftPanel", false);
-        final GroupLayout leftLayout = createStandardLayout(leftPanel);
+        final GroupLayout leftLayout = createGroupLayout(leftPanel);
         leftPanel.setLayout(leftLayout);
 
         leftLayout.setVerticalGroup(
@@ -246,7 +246,7 @@ public class MarketsTab {
                     .addComponent(spnPersonnelMarketRandomRemovalTargets.get(SkillLevel.REGULAR))));
 
         final JPanel rightPanel = new CampaignOptionsStandardPanel("RightPanel", false);
-        final GroupLayout rightLayout = createStandardLayout(rightPanel);
+        final GroupLayout rightLayout = createGroupLayout(rightPanel);
         rightPanel.setLayout(rightLayout);
 
         rightLayout.setVerticalGroup(
@@ -281,7 +281,7 @@ public class MarketsTab {
 
         final JPanel parentPanel = new CampaignOptionsStandardPanel("PersonnelMarketRemovalOptionsPanel",
             true, "PersonnelMarketRemovalOptionsPanel");
-        final GroupLayout parentLayout = createStandardLayout(parentPanel);
+        final GroupLayout parentLayout = createGroupLayout(parentPanel);
         parentPanel.setLayout(parentLayout);
 
         parentLayout.setVerticalGroup(
@@ -338,7 +338,7 @@ public class MarketsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UnitMarketTab", true,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -422,7 +422,7 @@ public class MarketsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketTab", true,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -468,7 +468,7 @@ public class MarketsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ContractMarketGeneralOptionsPanel",
             false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -544,7 +544,7 @@ public class MarketsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ContractPayPanel",
             true, "ContractPayPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(

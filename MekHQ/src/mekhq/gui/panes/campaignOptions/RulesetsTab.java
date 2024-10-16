@@ -230,7 +230,7 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalScenarioGenerationPanel", true,
             "UniversalScenarioGenerationPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -281,7 +281,7 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalUnitRatioPanel", true,
             "UniversalUnitRatioPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -322,7 +322,7 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalModifiersPanel", true,
             "UniversalModifiersPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -364,7 +364,7 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalMapGenerationPanel", true,
             "UniversalMapGenerationPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -392,7 +392,7 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalCampaignOptionsPanel", false,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -421,7 +421,7 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalPartsPanel", true,
             "UniversalPartsPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -463,7 +463,7 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalLancePanel", true,
             "UniversalLancePanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -514,7 +514,7 @@ public class RulesetsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("StratConTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -590,7 +590,7 @@ public class RulesetsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyTab", true,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -627,7 +627,7 @@ public class RulesetsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyOpForGenerationPanel", true,
             "LegacyOpForGenerationPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -678,7 +678,7 @@ public class RulesetsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel", true,
             "LegacyScenarioGenerationPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(

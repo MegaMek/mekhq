@@ -240,7 +240,7 @@ public class TurnoverAndRetentionTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TurnoverTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -331,7 +331,7 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SettingsPanel", true,
             "SettingsPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -421,7 +421,7 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TurnoverModifiersPanel", true,
             "ModifiersPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -493,7 +493,7 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PayoutsPanel", true,
             "PayoutsPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -554,7 +554,7 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UnitCohesionPanel", true,
             "UnitCohesionPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -591,7 +591,7 @@ public class TurnoverAndRetentionTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrainPanel", false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -633,7 +633,7 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AdministrativeStrain", true,
             "AdministrativeStrain");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -678,7 +678,7 @@ public class TurnoverAndRetentionTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UnitCohesionPanel", false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -719,7 +719,7 @@ public class TurnoverAndRetentionTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ManagementSkill", true,
             "ManagementSkill");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -780,7 +780,7 @@ public class TurnoverAndRetentionTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("FatigueTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(

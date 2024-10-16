@@ -27,6 +27,7 @@ public class PersonnelTab {
     String name;
 
     //start General Tab
+    private JPanel pnlPersonnelGeneralOptions;
     private JCheckBox chkUseTactics;
     private JCheckBox chkUseInitiativeBonus;
     private JCheckBox chkUseToughness;
@@ -38,10 +39,16 @@ public class PersonnelTab {
     private JCheckBox chkUseImplants;
     private JCheckBox chkUseAlternativeQualityAveraging;
 
-    private JPanel personnelCleanUpPanel;
+    private JPanel pnlPersonnelCleanup;
     private JCheckBox chkUsePersonnelRemoval;
     private JCheckBox chkUseRemovalExemptCemetery;
     private JCheckBox chkUseRemovalExemptRetirees;
+
+    private JPanel pnlAdministrators;
+    private JCheckBox chkAdminsHaveNegotiation;
+    private JCheckBox chkAdminExperienceLevelIncludeNegotiation;
+    private JCheckBox chkAdminsHaveScrounge;
+    private JCheckBox chkAdminExperienceLevelIncludeScrounge;
     //end General Tab
 
     //start Personnel Logs Tab
@@ -66,13 +73,6 @@ public class PersonnelTab {
     private JCheckBox chkTrackTotalXPEarnings;
     private JCheckBox chkShowOriginFaction;
     //end Personnel Information Tab
-
-    //start Administrators Tab
-    private JCheckBox chkAdminsHaveNegotiation;
-    private JCheckBox chkAdminExperienceLevelIncludeNegotiation;
-    private JCheckBox chkAdminsHaveScrounge;
-    private JCheckBox chkAdminExperienceLevelIncludeScrounge;
-    //end Administrators Tab
 
     //start Awards Tab
     private JLabel lblAwardBonusStyle;
@@ -327,6 +327,7 @@ public class PersonnelTab {
      * The panel contains general settings.
      */
     private void initializeGeneralTab() {
+        pnlPersonnelGeneralOptions = new JPanel();
         chkUseTactics = new JCheckBox();
         chkUseInitiativeBonus = new JCheckBox();
         chkUseToughness = new JCheckBox();
@@ -338,7 +339,7 @@ public class PersonnelTab {
         chkUseImplants = new JCheckBox();
         chkUseAlternativeQualityAveraging = new JCheckBox();
 
-        personnelCleanUpPanel = new JPanel();
+        pnlPersonnelCleanup = new JPanel();
         chkUsePersonnelRemoval = new JCheckBox();
         chkUseRemovalExemptCemetery = new JCheckBox();
         chkUseRemovalExemptRetirees = new JCheckBox();
@@ -364,6 +365,42 @@ public class PersonnelTab {
             true);
 
         // Contents
+        pnlPersonnelGeneralOptions = createGeneralOptionsPanel();
+        pnlPersonnelCleanup = createPersonnelCleanUpPanel();
+        pnlAdministrators = createAdministratorsPanel();
+
+        // Layout the Panels
+        final JPanel panelRight = new CampaignOptionsStandardPanel("RightPanel", false);
+        GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight, null, GridBagConstraints.NONE);
+
+        layoutRight.gridx = 0;
+        layoutRight.gridy = 0;
+        panelRight.add(pnlPersonnelCleanup, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(pnlAdministrators, layoutRight);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("PersonnelGeneralTab", true);
+        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
+
+        layoutParent.gridwidth = 5;
+        layoutParent.gridy = 0;
+        panelParent.add(headerPanel, layoutParent);
+
+        layoutParent.gridx = 0;
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panelParent.add(pnlPersonnelGeneralOptions, layoutParent);
+
+        layoutParent.gridx++;
+        panelParent.add(panelRight, layoutParent);
+
+        // Create Parent Panel and return
+        return createParentPanel(panelParent, "PersonnelGeneralTab");
+    }
+
+    private JPanel createGeneralOptionsPanel() {
+        // Contents
         chkUseTactics = new CampaignOptionsCheckBox("UseTactics");
         chkUseInitiativeBonus = new CampaignOptionsCheckBox("UseInitiativeBonus");
         chkUseToughness = new CampaignOptionsCheckBox("UseToughness");
@@ -375,47 +412,47 @@ public class PersonnelTab {
         chkUseImplants = new CampaignOptionsCheckBox("UseImplants");
         chkUseAlternativeQualityAveraging = new CampaignOptionsCheckBox("UseAlternativeQualityAveraging");
 
-        personnelCleanUpPanel = createPersonnelCleanUpPanel();
-
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelGeneralTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panel = new CampaignOptionsStandardPanel("PersonnelGeneralTab", false);
+        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseTactics)
-                .addComponent(chkUseInitiativeBonus)
-                .addComponent(chkUseToughness)
-                .addComponent(chkUseRandomToughness)
-                .addComponent(chkUseArtillery)
-                .addComponent(chkUseAbilities)
-                .addComponent(chkUseEdge)
-                .addComponent(chkUseSupportEdge)
-                .addComponent(chkUseImplants)
-                .addComponent(chkUseAlternativeQualityAveraging)
-                .addComponent(personnelCleanUpPanel));
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(chkUseTactics, layout);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addComponent(chkUseTactics)
-                    .addComponent(chkUseInitiativeBonus)
-                    .addComponent(chkUseToughness)
-                    .addComponent(chkUseRandomToughness)
-                    .addComponent(chkUseArtillery)
-                    .addComponent(chkUseAbilities)
-                    .addComponent(chkUseEdge)
-                    .addComponent(chkUseSupportEdge)
-                    .addComponent(chkUseImplants)
-                    .addComponent(chkUseAlternativeQualityAveraging)
-                    .addComponent(personnelCleanUpPanel))
-        );
+        layout.gridy++;
+        panel.add(chkUseInitiativeBonus, layout);
 
-        // Create Parent Panel and return
-        return createParentPanel(panel, "PersonnelGeneralTab");
+        layout.gridy++;
+        panel.add(chkUseToughness, layout);
+
+        layout.gridy++;
+        panel.add(chkUseRandomToughness, layout);
+
+        layout.gridy++;
+        panel.add(chkUseArtillery, layout);
+
+        layout.gridy++;
+        panel.add(chkUseAbilities, layout);
+
+        layout.gridy++;
+        panel.add(chkUseEdge, layout);
+
+        layout.gridy++;
+        panel.add(chkUseSupportEdge, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(chkUseImplants, layout);
+
+        layout.gridy++;
+        panel.add(chkUseImplants, layout);
+
+        layout.gridy++;
+        panel.add(chkUseAlternativeQualityAveraging, layout);
+
+        return panel;
     }
 
     /**
@@ -435,20 +472,55 @@ public class PersonnelTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelCleanUpPanel", true,
             "PersonnelCleanUpPanel");
-        final GroupLayout layout = createStandardLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUsePersonnelRemoval)
-                .addComponent(chkUseRemovalExemptCemetery)
-                .addComponent(chkUseRemovalExemptRetirees));
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(chkUsePersonnelRemoval, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(chkUsePersonnelRemoval)
-                .addComponent(chkUseRemovalExemptCemetery)
-                .addComponent(chkUseRemovalExemptRetirees));
+        layout.gridy++;
+        panel.add(chkUseRemovalExemptCemetery, layout);
+
+        layout.gridy++;
+        panel.add(chkUseRemovalExemptRetirees, layout);
+
+        return panel;
+    }
+
+    /**
+     * Creates a panel for the Administrators Tab in the application.
+     * <p>
+     * This method constructs the header panel and checkbox components for administrator settings
+     * including negotiation and scrounging options.
+     *
+     * @return a {@link JPanel} representing the Administrators Tab panel
+     */
+    private JPanel createAdministratorsPanel() {
+        // Contents
+        chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation");
+        chkAdminExperienceLevelIncludeNegotiation = new CampaignOptionsCheckBox("AdminExperienceLevelIncludeNegotiation");
+        chkAdminsHaveScrounge = new CampaignOptionsCheckBox("AdminsHaveScrounge");
+        chkAdminExperienceLevelIncludeScrounge = new CampaignOptionsCheckBox("AdminExperienceLevelIncludeScrounge");
+
+        // Layout the Panel
+        final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsPanel", true,
+            "AdministratorsPanel");
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
+
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(chkAdminsHaveNegotiation, layout);
+
+        layout.gridy++;
+        panel.add(chkAdminExperienceLevelIncludeNegotiation, layout);
+
+        layout.gridy++;
+        panel.add(chkAdminsHaveScrounge, layout);
+
+        layout.gridy++;
+        panel.add(chkAdminExperienceLevelIncludeScrounge, layout);
 
         return panel;
     }
@@ -476,7 +548,7 @@ public class PersonnelTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelLogsTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -530,7 +602,7 @@ public class PersonnelTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PersonnelInformation", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -565,51 +637,6 @@ public class PersonnelTab {
 
         // Create Parent Panel and return
         return createParentPanel(panel, "PersonnelInformation");
-    }
-
-    /**
-     * Creates a panel for the Administrators Tab in the application.
-     * <p>
-     * This method constructs the header panel and checkbox components for administrator settings
-     * including negotiation and scrounging options.
-     *
-     * @return a {@link JPanel} representing the Administrators Tab panel
-     */
-    JPanel createAdministratorsTab() {
-        // Header
-        JPanel headerPanel = new CampaignOptionsHeaderPanel("AdministratorsTab",
-            getImageDirectory() + "logo_clan_diamond_sharks.png",
-            true);
-
-        // Contents
-        chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation");
-        chkAdminExperienceLevelIncludeNegotiation = new CampaignOptionsCheckBox("AdminExperienceLevelIncludeNegotiation");
-        chkAdminsHaveScrounge = new CampaignOptionsCheckBox("AdminsHaveScrounge");
-        chkAdminExperienceLevelIncludeScrounge = new CampaignOptionsCheckBox("AdminExperienceLevelIncludeScrounge");
-
-        // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("AdministratorsTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
-        panel.setLayout(layout);
-
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkAdminsHaveNegotiation)
-                .addComponent(chkAdminExperienceLevelIncludeNegotiation)
-                .addComponent(chkAdminsHaveScrounge)
-                .addComponent(chkAdminExperienceLevelIncludeScrounge));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addComponent(chkAdminsHaveNegotiation)
-                .addComponent(chkAdminExperienceLevelIncludeNegotiation)
-                .addComponent(chkAdminsHaveScrounge)
-                .addComponent(chkAdminExperienceLevelIncludeScrounge));
-
-        // Create Parent Panel and return
-        return createParentPanel(panel, "AdministratorsTab");
     }
 
     /**
@@ -668,7 +695,7 @@ public class PersonnelTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AwardsTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -735,7 +762,7 @@ public class PersonnelTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("AutoAwardsFilterPanel", true, "AutoAwardsFilterPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -800,7 +827,7 @@ public class PersonnelTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PrisonersAndDependentsTab", true,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -852,7 +879,7 @@ public class PersonnelTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PrisonersPanel", true, "PrisonersPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -894,7 +921,7 @@ public class PersonnelTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("DependentsPanel", true, "DependentsPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -946,7 +973,7 @@ public class PersonnelTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("MedicalTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -1010,7 +1037,7 @@ public class PersonnelTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalariesTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -1051,7 +1078,7 @@ public class PersonnelTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalaryMultipliersPanel", true,
             "SalaryMultipliersPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -1097,7 +1124,7 @@ public class PersonnelTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ExperienceMultipliersPanel", true,
             "ExperienceMultipliersPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         SkillLevel[] skillLevels = SkillLevel.values();
@@ -1181,7 +1208,7 @@ public class PersonnelTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("BaseSalariesPanel", true,
             "BaseSalariesPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         SequentialGroup mainHorizontalGroup = layout.createSequentialGroup();

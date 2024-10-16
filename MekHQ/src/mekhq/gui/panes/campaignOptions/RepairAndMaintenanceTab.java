@@ -148,7 +148,7 @@ public class RepairAndMaintenanceTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("repairTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -237,7 +237,7 @@ public class RepairAndMaintenanceTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("repairTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(

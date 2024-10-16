@@ -218,7 +218,7 @@ public class RelationshipsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("MarriageTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -265,7 +265,7 @@ public class RelationshipsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("MarriageGeneralOptionsPanel",
             false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -336,7 +336,7 @@ public class RelationshipsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RandomMarriages", true,
             "RandomMarriages");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -393,7 +393,7 @@ public class RelationshipsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PercentageRandomMarriagePanel", true,
             "PercentageRandomMarriagePanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -449,7 +449,7 @@ public class RelationshipsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("DivorceTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -506,7 +506,7 @@ public class RelationshipsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RandomDivorcePanel", true, "RandomDivorcePanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -559,7 +559,7 @@ public class RelationshipsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ProcreationTab", true);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -626,7 +626,7 @@ public class RelationshipsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("ProcreationGeneralOptionsPanel",
             false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -712,7 +712,7 @@ public class RelationshipsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RandomProcreationPanel", true,
             "RandomProcreationPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(

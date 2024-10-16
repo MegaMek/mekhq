@@ -125,54 +125,49 @@ public class GeneralTab {
 
         // Layout the Panel
         JPanel panel = new JPanel();
-        GridBagConstraints gbc = new GridBagConstraints();
-        panel.setLayout(new GridBagLayout());
+        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        layout.gridy = 0;
+        layout.gridwidth = 5;
+        panel.add(headerPanel, layout);
 
-        gbc.gridy = 0;
-        gbc.gridwidth = 5;
-        panel.add(headerPanel, gbc);
+        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(lblName, layout);
 
-        gbc.gridwidth = 1;
-        gbc.gridy++;
-        panel.add(lblName, gbc);
+        layout.gridwidth = 2;
+        layout.weightx = 1;
+        panel.add(txtName, layout);
 
-        gbc.gridwidth = 2;
-        gbc.weightx = 1;
-        panel.add(txtName, gbc);
+        layout.gridwidth = 1;
+        layout.weightx = 0;
+        layout.fill = GridBagConstraints.NONE;
+        panel.add(btnNameGenerator, layout);
+        layout.fill = GridBagConstraints.HORIZONTAL;
 
-        gbc.gridwidth = 1;
-        gbc.weightx = 0;
-        gbc.fill = GridBagConstraints.NONE;
-        panel.add(btnNameGenerator, gbc);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        layout.gridy++;
+        panel.add(lblFaction, layout);
+        layout.gridwidth = 2;
+        panel.add(comboFaction, layout);
 
-        gbc.gridy++;
-        panel.add(lblFaction, gbc);
-        gbc.gridwidth = 2;
-        panel.add(comboFaction, gbc);
+        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(lblReputation, layout);
+        layout.gridwidth = 2;
+        panel.add(unitRatingMethodCombo, layout);
 
-        gbc.gridwidth = 1;
-        gbc.gridy++;
-        panel.add(lblReputation, gbc);
-        gbc.gridwidth = 2;
-        panel.add(unitRatingMethodCombo, gbc);
+        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(lblManualUnitRatingModifier, layout);
+        panel.add(manualUnitRatingModifier, layout);
 
-        gbc.gridwidth = 1;
-        gbc.gridy++;
-        panel.add(lblManualUnitRatingModifier, gbc);
-        panel.add(manualUnitRatingModifier, gbc);
+        layout.gridy++;
+        panel.add(lblDate, layout);
+        panel.add(btnDate, layout);
 
-        gbc.gridy++;
-        panel.add(lblDate, gbc);
-        panel.add(btnDate, gbc);
-
-        gbc.gridy++;
-        gbc.gridwidth = 5;
-        gbc.gridx = GridBagConstraints.RELATIVE;
+        layout.gridy++;
+        layout.gridwidth = 5;
+        layout.gridx = GridBagConstraints.RELATIVE;
 
         JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         iconsPanel.setBorder(BorderFactory.createTitledBorder(""));
@@ -183,7 +178,7 @@ public class GeneralTab {
         iconsPanel.add(lblIcon);
         iconsPanel.add(btnIcon);
 
-        panel.add(iconsPanel, gbc);
+        panel.add(iconsPanel, layout);
 
         final JPanel outerPanel = new CampaignOptionsStandardPanel("generalTab", true);
         // Add some padding left and right (inside the border!)
@@ -216,7 +211,7 @@ public class GeneralTab {
         lblBody.setMaximumSize(UIUtil.scaleForGUI(750, size.height));
 
         final JPanel panel = new CampaignOptionsStandardPanel("pnlGeneralHeaderPanel", false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(

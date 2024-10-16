@@ -31,7 +31,7 @@ import java.util.ResourceBundle;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.swing.util.FlatLafStyleBuilder.setFontScaling;
-import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createStandardLayout;
+import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.createGroupLayout;
 
 /**
  * A dialog for selecting campaign presets. Extends {@link JDialog}.
@@ -96,7 +96,7 @@ public class SelectPresetDialog extends JDialog {
         add(imageLabel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel();
-        final GroupLayout layout = createStandardLayout(centerPanel);
+        final GroupLayout layout = createGroupLayout(centerPanel);
         centerPanel.setLayout(layout);
 
         JLabel descriptionLabel = new JLabel(String.format(

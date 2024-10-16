@@ -196,7 +196,7 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("FinancesGeneralTab", true,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -242,7 +242,7 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PaymentsPanel", true,
             "PaymentsPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -294,7 +294,7 @@ public class FinancesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OtherSystemsPanel", false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -332,7 +332,7 @@ public class FinancesTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("GeneralOptionsPanel", false);
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -377,7 +377,7 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SalesPanel", true,
             "SalesPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -415,7 +415,7 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("TaxesPanel", true,
             "TaxesPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -450,7 +450,7 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("SharesPanel", true,
             "SharesPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -522,7 +522,7 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("PriceMultipliersTab", true,
             "");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -582,7 +582,7 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("GeneralMultipliersPanel", true,
             "GeneralMultipliersPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -674,7 +674,7 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("UsedPartsMultiplierPanel", true,
             "UsedPartsMultiplierPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
@@ -751,7 +751,7 @@ public class FinancesTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("OtherMultipliersPanel", true,
             "OtherMultipliersPanel");
-        final GroupLayout layout = createStandardLayout(panel);
+        final GroupLayout layout = createGroupLayout(panel);
         panel.setLayout(layout);
 
         layout.setVerticalGroup(

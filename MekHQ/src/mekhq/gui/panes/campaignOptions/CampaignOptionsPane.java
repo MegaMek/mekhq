@@ -101,7 +101,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             "personnelGeneralTab", personnelTab.createGeneralTab(),
             "personnelLogsTab", personnelTab.createPersonnelLogsTab(),
             "personnelInformationTab", personnelTab.createPersonnelInformationTab(),
-            "administratorsTab", personnelTab.createAdministratorsTab(),
             "awardsTab", personnelTab.createAwardsTab(),
             "prisonersAndDependentsTab", personnelTab.createPrisonersAndDependentsTab(),
             "medicalTab", personnelTab.createMedicalTab(),
