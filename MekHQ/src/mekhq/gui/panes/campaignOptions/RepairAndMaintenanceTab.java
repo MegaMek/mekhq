@@ -219,7 +219,7 @@ public class RepairAndMaintenanceTab {
         checkMaintenance = new CampaignOptionsCheckBox("CheckMaintenance");
 
         lblMaintenanceDays = new CampaignOptionsLabel("MaintenanceDays");
-        spnDamageMargin = new CampaignOptionsSpinner("MaintenanceDays",
+        spnMaintenanceDays = new CampaignOptionsSpinner("MaintenanceDays",
             7, 1, 365, 1);
 
         lblMaintenanceBonus = new CampaignOptionsLabel("MaintenanceBonus");
@@ -258,7 +258,12 @@ public class RepairAndMaintenanceTab {
         layoutParent.gridy++;
         panel.add(lblMaintenanceDays, layoutParent);
         layoutParent.gridx++;
-        panel.add(spnDamageMargin, layoutParent);
+        panel.add(spnMaintenanceDays, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(lblMaintenanceBonus, layoutParent);
+        layoutParent.gridx++;
+        panel.add(spnMaintenanceBonus, layoutParent);
 
         layoutParent.gridx = 0;
         layoutParent.gridy++;
@@ -284,6 +289,9 @@ public class RepairAndMaintenanceTab {
 
         layoutParent.gridy++;
         panel.add(useUnofficialMaintenance, layoutParent);
+
+        layoutParent.gridy++;
+        panel.add(logMaintenance, layoutParent);
 
         // Create Parent Panel and return
         return createParentPanel(panel, "maintenanceTab");
