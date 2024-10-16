@@ -16,7 +16,6 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.panes.RankSystemsPane;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -1213,19 +1212,17 @@ public class BiographyTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("RankTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(rankSystemsViewport));
+        layoutParent.gridwidth = 5;
+        layoutParent.gridx = 0;
+        layoutParent.gridy = 0;
+        panel.add(headerPanel, layoutParent);
 
-        layout.setHorizontalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(headerPanel, Alignment.CENTER)
-                    .addComponent(rankSystemsViewport)));
+        layoutParent.gridy++;
+        layoutParent.gridwidth = 1;
+        panel.add(rankSystemsViewport, layoutParent);
+
 
         // Create Parent Panel and return
         return createParentPanel(panel, "RankTab");

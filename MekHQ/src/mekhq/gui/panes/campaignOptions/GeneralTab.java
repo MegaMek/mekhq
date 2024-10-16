@@ -124,7 +124,7 @@ public class GeneralTab {
 
         // Layout the Panel
         JPanel panel = new JPanel();
-        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel, null, GridBagConstraints.HORIZONTAL);
+        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridy = 0;
         layout.gridwidth = 5;
