@@ -26,6 +26,7 @@ import megamek.common.loaders.*;
 import megamek.common.util.BuildingBlock;
 import mekhq.TestUtilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartQuality;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public final class UnitTestUtilities {
 
     public static Unit addAndGetUnit(Campaign campaign, Entity entity) {
-        campaign.addNewUnit(entity, false, 0, 3);
+        campaign.addNewUnit(entity, false, 0, PartQuality.QUALITY_D);
         for (Unit unit : campaign.getHangar().getUnits()) {
             return unit;
         }

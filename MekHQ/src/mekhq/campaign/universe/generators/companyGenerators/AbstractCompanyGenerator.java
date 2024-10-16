@@ -40,6 +40,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -994,7 +995,7 @@ public abstract class AbstractCompanyGenerator {
                 continue;
             }
 
-            int quality = 3;
+            PartQuality quality = PartQuality.QUALITY_D;
 
             if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
                 int modifier = 0;
@@ -1367,12 +1368,12 @@ public abstract class AbstractCompanyGenerator {
      */
     private List<Unit> createMothballedSpareUnits(final Campaign campaign,
             final List<Entity> mothballedEntities) {
-        int quality;
+        PartQuality quality;
 
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);
         } else {
-            quality = 3;
+            quality = PartQuality.QUALITY_D;
         }
 
         final List<Unit> mothballedUnits = mothballedEntities.stream()
