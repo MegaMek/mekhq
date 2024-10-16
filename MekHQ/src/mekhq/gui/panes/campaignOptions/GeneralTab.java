@@ -110,31 +110,14 @@ public class GeneralTab {
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Camouflage
-        lblCamo = new CampaignOptionsLabel("Camo") {
-            @Override
-            public Dimension getPreferredSize() {
-                return UIUtil.scaleForGUI(100, 100);
-            }
-        };
-
-//        lblCamo = new CampaignOptionsLabel("Camo");
+        lblCamo = new CampaignOptionsLabel("Camo");
         btnCamo.setName("btnCamo");
-//        btnCamo.setMinimumSize(UIUtil.scaleForGUI(100, 100));
-//        btnCamo.setMaximumSize(UIUtil.scaleForGUI(100, 100));
         btnCamo.addActionListener(this::btnCamoActionPerformed);
 
         // Unit icon
         lblIcon = new CampaignOptionsLabel("Icon");
         btnIcon.setName("btnIcon");
-//        btnIcon.setMinimumSize(UIUtil.scaleForGUI(100, 100));
-//        btnIcon.setMaximumSize(UIUtil.scaleForGUI(100, 100));
-        btnIcon.addActionListener(evt -> {
-            final UnitIconDialog unitIconDialog = new UnitIconDialog(frame, unitIcon);
-            if (unitIconDialog.showDialog().isConfirmed() && (unitIconDialog.getSelectedItem() != null)) {
-                unitIcon = unitIconDialog.getSelectedItem();
-                btnIcon.setIcon(unitIcon.getImageIcon(UIUtil.scaleForGUI(75)));
-            }
-        });
+        btnIcon.addActionListener(this::btnIconActionPerformed);
 
         // Initialize the parent panel
         AbstractMHQScrollablePanel generalPanel = new DefaultMHQScrollablePanel(frame, "generalPanel",
@@ -199,70 +182,6 @@ public class GeneralTab {
         iconsPanel.add(btnIcon);
 
         panel.add(iconsPanel, gbc);
-
-
-
-
-//        final GroupLayout layout = createStandardLayout(panel);
-//        panel.setLayout(layout);
-//
-//        layout.setVerticalGroup(
-//            layout.createSequentialGroup()
-//                .addComponent(headerPanel)
-//                .addGroup(layout.createParallelGroup(Alignment.TRAILING)
-//                    .addComponent(lblName)
-//                    .addComponent(txtName)
-//                    .addComponent(btnNameGenerator))
-//                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-//                    .addComponent(lblFaction)
-//                    .addComponent(comboFaction))
-//                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-//                    .addComponent(lblReputation)
-//                    .addComponent(unitRatingMethodCombo))
-//                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-//                    .addComponent(lblManualUnitRatingModifier)
-//                    .addComponent(manualUnitRatingModifier))
-//                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-//                    .addComponent(lblDate)
-//                    .addComponent(btnDate))
-//                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-//                    .addComponent(lblCamo)
-//                    .addComponent(btnCamo)
-//                    .addComponent(lblIcon)
-//                    .addComponent(btnIcon)));
-//
-//        layout.setHorizontalGroup(
-//            layout.createParallelGroup(Alignment.LEADING)
-//                .addComponent(headerPanel, Alignment.CENTER)
-//                .addGroup(layout.createSequentialGroup()
-//                    .addComponent(lblName)
-//                    .addComponent(txtName)
-//                    .addComponent(btnNameGenerator)
-//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-//                .addGroup(layout.createSequentialGroup()
-//                    .addComponent(lblFaction)
-//                    .addComponent(comboFaction)
-//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-//                .addGroup(layout.createSequentialGroup()
-//                    .addComponent(lblReputation)
-//                    .addComponent(unitRatingMethodCombo)
-//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-//                .addGroup(layout.createSequentialGroup()
-//                    .addComponent(lblManualUnitRatingModifier)
-//                    .addComponent(manualUnitRatingModifier)
-//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-//                .addGroup(layout.createSequentialGroup()
-//                    .addComponent(lblDate)
-//                    .addComponent(btnDate)
-//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE))
-//                .addGroup(layout.createSequentialGroup()
-//                    .addComponent(lblCamo)
-//                    .addComponent(btnCamo)
-//                    .addGap(50)
-//                    .addComponent(lblIcon)
-//                    .addComponent(btnIcon)
-//                    .addContainerGap(Short.MAX_VALUE, Short.MAX_VALUE)));
-//
 
         final JPanel outerPanel = new CampaignOptionsStandardPanel("generalTab", true);
         // Add some padding left and right (inside the border!)
@@ -409,6 +328,14 @@ public class GeneralTab {
         if (camoChooserDialog.showDialog().isConfirmed()) {
             camouflage = camoChooserDialog.getSelectedItem();
             btnCamo.setIcon(camouflage.getImageIcon());
+        }
+    }
+
+    private void btnIconActionPerformed(ActionEvent actionEvent) {
+        final UnitIconDialog unitIconDialog = new UnitIconDialog(frame, unitIcon);
+        if (unitIconDialog.showDialog().isConfirmed() && (unitIconDialog.getSelectedItem() != null)) {
+            unitIcon = unitIconDialog.getSelectedItem();
+            btnIcon.setIcon(unitIcon.getImageIcon(UIUtil.scaleForGUI(75)));
         }
     }
 }
