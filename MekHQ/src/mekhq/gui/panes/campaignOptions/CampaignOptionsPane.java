@@ -149,7 +149,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JTabbedPane createUnitDevelopmentParentTab() {
-        // Experience + Skills + Skill Randomization
+        // Experience + Skill Randomization
+        // Combat Skills + Non-Combat Skills + Roleplay Skills
         // SPAs
 
         // Parent Tab
