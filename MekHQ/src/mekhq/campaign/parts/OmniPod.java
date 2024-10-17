@@ -69,6 +69,15 @@ public class OmniPod extends Part {
     }
 
     @Override
+    public int getTechBase() {
+        if (null != partType) {
+            return partType.getTechBase();
+        } else {
+            return TechAdvancement.TECH_BASE_ALL;
+        }
+    }
+
+    @Override
     public void setCampaign(Campaign c) {
         super.setCampaign(c);
         partType.setCampaign(c);
