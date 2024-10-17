@@ -33,6 +33,7 @@ import megamek.common.MekSummary;
 import megamek.common.MekSummaryCache;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -63,7 +64,7 @@ public class AddUnitStoryTrigger extends StoryTrigger {
 
         Entity en = mekFileParser.getEntity();
 
-        int quality = 3;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);

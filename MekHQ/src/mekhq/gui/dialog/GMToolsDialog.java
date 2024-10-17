@@ -34,6 +34,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Clan;
 import mekhq.campaign.personnel.Person;
@@ -1511,12 +1512,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         if (getLastRolledUnit() != null) {
-            int quality;
+            PartQuality quality;
 
             if (getGUI().getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
                 quality = Unit.getRandomUnitQuality(0);
             } else {
-                quality = 3;
+                quality = PartQuality.QUALITY_D;
             }
 
             final Unit unit = getGUI().getCampaign().addNewUnit(getLastRolledUnit(), false, 0, quality);

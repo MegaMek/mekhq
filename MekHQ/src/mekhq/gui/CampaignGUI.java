@@ -51,6 +51,7 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -1914,7 +1915,7 @@ public class CampaignGUI extends JPanel {
     protected void loadListFile(final boolean allowNewPilots) {
         final File unitFile = FileDialogs.openUnits(getFrame()).orElse(null);
 
-        int quality = 3;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);
