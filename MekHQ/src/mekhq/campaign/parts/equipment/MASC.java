@@ -81,7 +81,7 @@ public class MASC extends EquipmentPart {
     @Override
     public Money getStickerPrice() {
         if (isSupercharger()) {
-            return Money.of(engineRating * (isOmniPodded() ? 1250 : 10000));
+            return Money.of(engineRating * (isOmniPodded() ? 12500 : 10000));
         } else {
             return Money.of(engineRating * getTonnage() * 1000);
         }
