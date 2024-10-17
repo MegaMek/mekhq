@@ -10,6 +10,9 @@ public class AdvancementTab {
     String name;
 
     //start XP Awards Tab
+    private JLabel lblXpCostMultiplier;
+    private JSpinner spnXpCostMultiplier;
+
     private JPanel pnlTasks;
     private JLabel lblTaskXP;
     private JSpinner spnTaskXP;
@@ -67,6 +70,9 @@ public class AdvancementTab {
     }
 
     private void initializeXPAwardsTab() {
+        lblXpCostMultiplier = new JLabel();
+        spnXpCostMultiplier = new JSpinner();
+
         pnlTasks = new JPanel();
         lblTaskXP = new JLabel();
         spnTaskXP = new JSpinner();
@@ -115,6 +121,10 @@ public class AdvancementTab {
             true);
 
         // Contents
+        lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier");
+        spnXpCostMultiplier = new CampaignOptionsSpinner("XpCostMultiplier",
+            1, 0, 5, 0.05);
+
         pnlTasks = createTasksPanel();
         pnlScenarios = createScenariosPanel();
         pnlAdministrators = createAdministratorsPanel();
@@ -130,15 +140,24 @@ public class AdvancementTab {
 
         layout.gridy++;
         layout.gridwidth = 1;
-        panel.add(pnlTasks, layout);
+        panel.add(lblXpCostMultiplier, layout);
         layout.gridx++;
+        panel.add(spnXpCostMultiplier, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 3;
+        panel.add(pnlTasks, layout);
+        layout.gridx += 3;
+        layout.gridwidth = 1;
         panel.add(pnlMissions, layout);
 
         layout.gridx = 0;
         layout.gridy++;
-        layout.gridwidth = 1;
+        layout.gridwidth = 3;
         panel.add(pnlScenarios, layout);
-        layout.gridx++;
+        layout.gridx += 3;
+        layout.gridwidth = 1;
         panel.add(pnlAdministrators, layout);
 
         // Create Parent Panel and return
