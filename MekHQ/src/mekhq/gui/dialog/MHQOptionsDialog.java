@@ -140,6 +140,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private ColourSelectorButton optionFontColorNegative;
         private ColourSelectorButton optionFontColorWarning;
         private ColourSelectorButton optionFontColorPositive;
+        private ColourSelectorButton optionFontColorSkillUltraGreen;
+        private ColourSelectorButton optionFontColorSkillGreen;
+        private ColourSelectorButton optionFontColorSkillRegular;
+        private ColourSelectorButton optionFontColorSkillVeteran;
+        private ColourSelectorButton optionFontColorSkillElite;
         // endregion Colors
 
         // region Fonts
@@ -630,6 +635,17 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 optionFontColorWarning = new ColourSelectorButton(resources.getString("optionFontColorWarning.text"));
 
                 optionFontColorPositive = new ColourSelectorButton(resources.getString("optionFontColorPositive.text"));
+
+                optionFontColorSkillUltraGreen = new ColourSelectorButton(resources.getString("optionFontColorSkillUltraGreen.text"));
+
+                optionFontColorSkillGreen = new ColourSelectorButton(resources.getString("optionFontColorSkillGreen.text"));
+
+                optionFontColorSkillRegular = new ColourSelectorButton(resources.getString("optionFontColorSkillRegular.text"));
+
+                optionFontColorSkillVeteran = new ColourSelectorButton(resources.getString("optionFontColorSkillVeteran.text"));
+
+                optionFontColorSkillElite = new ColourSelectorButton(resources.getString("optionFontColorSkillElite.text"));
+                
                 // endregion Create Graphical Components
 
                 // region Layout
@@ -722,7 +738,17 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                                 .addComponent(optionFontColorPositive,
                                                                                 Alignment.TRAILING))
                                                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                                                .addComponent(optionFontColorWarning)));
+                                                                .addComponent(optionFontColorWarning)
+                                                                .addComponent(optionFontColorSkillUltraGreen,
+                                                                                Alignment.TRAILING))
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                                .addComponent(optionFontColorSkillGreen)
+                                                                .addComponent(optionFontColorSkillRegular,
+                                                                                Alignment.TRAILING))
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                                .addComponent(optionFontColorSkillVeteran)
+                                                                .addComponent(optionFontColorSkillElite,
+                                                                                Alignment.TRAILING)));
 
                 layout.setHorizontalGroup(
                                 layout.createParallelGroup(Alignment.LEADING)
@@ -786,7 +812,14 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                                 .addComponent(optionFontColorNegative)
                                                                 .addComponent(optionFontColorPositive))
                                                 .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(optionFontColorWarning)));
+                                                                .addComponent(optionFontColorWarning)
+                                                                .addComponent(optionFontColorSkillUltraGreen))
+                                                .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(optionFontColorSkillGreen)
+                                                                .addComponent(optionFontColorSkillRegular))
+                                                .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(optionFontColorSkillVeteran)
+                                                                .addComponent(optionFontColorSkillElite)));
                 // endregion Layout
 
                 return body;
@@ -1417,6 +1450,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 MekHQ.getMHQOptions().setFontColorNegative(optionFontColorNegative.getColour());
                 MekHQ.getMHQOptions().setFontColorWarning(optionFontColorWarning.getColour());
                 MekHQ.getMHQOptions().setFontColorPositive(optionFontColorPositive.getColour());
+                MekHQ.getMHQOptions().setFontColorSkillUltraGreen(optionFontColorSkillUltraGreen.getColour());
+                MekHQ.getMHQOptions().setFontColorSkillGreen(optionFontColorSkillGreen.getColour());
+                MekHQ.getMHQOptions().setFontColorSkillRegular(optionFontColorSkillRegular.getColour());
+                MekHQ.getMHQOptions().setFontColorSkillVeteran(optionFontColorSkillVeteran.getColour());
+                MekHQ.getMHQOptions().setFontColorSkillElite(optionFontColorSkillElite.getColour());
 
                 MekHQ.getMHQOptions().setMedicalViewDialogHandwritingFont(
                                 comboMedicalViewDialogHandwritingFont.getFont().getFamily());
@@ -1571,6 +1609,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 optionFontColorNegative.setColour(MekHQ.getMHQOptions().getFontColorNegative());
                 optionFontColorWarning.setColour(MekHQ.getMHQOptions().getFontColorWarning());
                 optionFontColorPositive.setColour(MekHQ.getMHQOptions().getFontColorPositive());
+                optionFontColorSkillUltraGreen.setColour(MekHQ.getMHQOptions().getFontColorSkillUltraGreen());
+                optionFontColorSkillGreen.setColour(MekHQ.getMHQOptions().getFontColorSkillGreen());
+                optionFontColorSkillRegular.setColour(MekHQ.getMHQOptions().getFontColorSkillRegular());
+                optionFontColorSkillVeteran.setColour(MekHQ.getMHQOptions().getFontColorSkillVeteran());
+                optionFontColorSkillElite.setColour(MekHQ.getMHQOptions().getFontColorSkillElite());
 
                 comboMedicalViewDialogHandwritingFont.setSelectedItem(
                                 new FontDisplay(MekHQ.getMHQOptions().getMedicalViewDialogHandwritingFont()));
