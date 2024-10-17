@@ -1,7 +1,5 @@
 package mekhq.gui.panes.campaignOptions;
 
-import mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,9 +10,6 @@ public class AdvancementTab {
     String name;
 
     //start XP Awards Tab
-    private JLabel lblXpCostMultiplier;
-    private JSpinner spnXpCostMultiplier;
-
     private JPanel pnlTasks;
     private JLabel lblTaskXP;
     private JSpinner spnTaskXP;
