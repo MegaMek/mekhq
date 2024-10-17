@@ -19,7 +19,7 @@
 package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.Hangar;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.finances.Finances;

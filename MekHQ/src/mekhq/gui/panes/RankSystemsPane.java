@@ -18,21 +18,6 @@
  */
 package mekhq.gui.panes;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-
 import megamek.client.ui.baseComponents.MMButton;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.baseComponents.SpinnerCellEditor;
@@ -52,6 +37,14 @@ import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.baseComponents.SortedComboBoxModel;
 import mekhq.gui.dialog.CustomRankSystemCreationDialog;
 import mekhq.gui.model.RankTableModel;
+
+import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.io.File;
+import java.util.List;
+import java.util.*;
 
 public class RankSystemsPane extends AbstractMHQScrollPane {
     private static final MMLogger logger = MMLogger.create(RankSystemsPane.class);
@@ -179,16 +172,6 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTHWEST;
 
-        final JTextArea txtInstructionsRanks = new JTextArea(resources.getString("txtInstructionsRanks.text"));
-        txtInstructionsRanks.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder(resources.getString("txtInstructionsRanks.title")),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        txtInstructionsRanks.setOpaque(false);
-        txtInstructionsRanks.setEditable(false);
-        txtInstructionsRanks.setLineWrap(true);
-        txtInstructionsRanks.setWrapStyleWord(true);
-        rankSystemsPanel.add(txtInstructionsRanks, gbc);
-
         gbc.gridy++;
         rankSystemsPanel.add(createRankSystemPanel(), gbc);
 
@@ -287,14 +270,14 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblRankSystem)
                                 .addComponent(getComboRankSystems())
                                 .addComponent(getComboRankSystemType())
-                                .addComponent(btnCreateCustomRankSystem, GroupLayout.Alignment.LEADING)));
+                                .addComponent(btnCreateCustomRankSystem, Alignment.LEADING)));
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblRankSystem)
                                 .addComponent(getComboRankSystems())
