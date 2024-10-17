@@ -39,7 +39,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             resources.getString("generalPanel.title")), createGeneralTab());
 
         createTab("humanResourcesParentTab", createHumanResourcesParentTab());
-        createTab("unitDevelopmentParentTab", createUnitDevelopmentParentTab());
+        createTab("advancementParentTab", createAdvancementParentTab());
         createTab("logisticsAndMaintenanceParentTab", createEquipmentAndSuppliesParentTab());
         createTab("strategicOperationsParentTab", createStrategicOperationsParentTab());
     }
@@ -148,15 +148,28 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return humanResourcesParentTab;
     }
 
-    private JTabbedPane createUnitDevelopmentParentTab() {
+    private JTabbedPane createAdvancementParentTab() {
+        // Parent Tab
+        JTabbedPane advancementParentTab = new JTabbedPane();
+
         // Experience + Skill Randomization
+        AdvancementTab advancementTab = new AdvancementTab(getFrame(), "advancementTab");
+
+        JTabbedPane awardsAndRandomizationContentTabs = createSubTabs(Map.of(
+            "xpAwardsTab", advancementTab.xpAwardsTab()));
+
         // Combat Skills + Non-Combat Skills + Roleplay Skills
+
         // SPAs
 
-        // Parent Tab
-        JTabbedPane unitDevelopmentParentTab = new JTabbedPane();
+        // Add Tabs
+        advancementParentTab.addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("awardsAndRandomizationContentTabs.title")), awardsAndRandomizationContentTabs);
 
-        return unitDevelopmentParentTab;
+        addTab(String.format("<html><font size=%s><b>%s</b></font></html>", 4,
+            resources.getString("advancementParentTab.title")), advancementParentTab);
+
+        return advancementParentTab;
     }
 
     /**
