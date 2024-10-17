@@ -47,7 +47,6 @@ public class RelationshipsTab {
     private JCheckBox chkUsePrisonerDivorce;
 
     private JPanel pnlRandomDivorce;
-
     private JLabel lblRandomDivorceMethod;
     private MMComboBox<RandomDivorceMethod> comboRandomDivorceMethod;
     private JCheckBox chkUseRandomOppositeSexDivorce;
@@ -343,6 +342,7 @@ public class RelationshipsTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkUseRandomClanPersonnelMarriages, layout);
 
         layout.gridy++;
@@ -350,6 +350,7 @@ public class RelationshipsTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblRandomMarriageAgeRange, layout);
         layout.gridx++;
         panel.add(spnRandomMarriageAgeRange, layout);
@@ -474,6 +475,7 @@ public class RelationshipsTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkUseRandomOppositeSexDivorce, layout);
 
         layout.gridy++;
@@ -482,12 +484,12 @@ public class RelationshipsTab {
         layout.gridy++;
         panel.add(chkUseRandomClanPersonnelDivorce, layout);
 
-
         layout.gridy++;
         panel.add(chkUseRandomPrisonerDivorce, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblRandomDivorceDiceSize, layout);
         layout.gridx++;
         panel.add(spnRandomDivorceDiceSize, layout);
@@ -671,6 +673,7 @@ public class RelationshipsTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkUseRelationshiplessRandomProcreation, layout);
 
         layout.gridy++;
@@ -681,6 +684,7 @@ public class RelationshipsTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblRandomProcreationRelationshipDiceSize, layout);
         layout.gridx++;
         panel.add(spnRandomProcreationRelationshipDiceSize, layout);

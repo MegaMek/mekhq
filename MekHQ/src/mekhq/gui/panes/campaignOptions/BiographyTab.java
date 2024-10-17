@@ -712,9 +712,11 @@ public class BiographyTab {
 
         layoutLeft.gridy = 0;
         layoutLeft.gridx = 0;
-        layoutLeft.gridwidth = 1;
+        layoutLeft.gridwidth = 2;
         panelLeft.add(chkKeepMarriedNameUponSpouseDeath, layoutLeft);
+
         layoutLeft.gridy++;
+        layoutLeft.gridwidth = 1;
         panelLeft.add(lblRandomDeathMethod, layoutLeft);
         layoutLeft.gridx++;
         panelLeft.add(comboRandomDeathMethod, layoutLeft);
@@ -967,9 +969,11 @@ public class BiographyTab {
 
         layout.gridx = 0;
         layout.gridy = 0;
+        layout.gridwidth = 2;
         panel.add(chkEnableBonuses, layout);
 
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblFacultyXpMultiplier, layout);
         layout.gridx++;
         panel.add(spnFacultyXpMultiplier, layout);

@@ -287,10 +287,12 @@ public class EquipmentAndSuppliesTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkSupportStaffOnly, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblAcquireClanPenalty, layout);
         layout.gridx++;
         panel.add(spnAcquireClanPenalty, layout);
@@ -468,6 +470,7 @@ public class EquipmentAndSuppliesTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(disallowPlanetaryAcquisitionClanCrossover, layout);
 
         layout.gridy++;
@@ -475,6 +478,7 @@ public class EquipmentAndSuppliesTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblPenaltyClanPartsFromIS, layout);
         layout.gridx++;
         panel.add(spnPenaltyClanPartsFromIS, layout);

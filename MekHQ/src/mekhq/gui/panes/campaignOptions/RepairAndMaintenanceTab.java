@@ -169,13 +169,14 @@ public class RepairAndMaintenanceTab {
 
         layoutRight.gridx = 0;
         layoutRight.gridy = 0;
-        layoutRight.gridwidth = 1;
+        layoutRight.gridwidth = 2;
         panelRight.add(useAeroSystemHitsBox, layoutRight);
 
         layoutRight.gridy++;
         panelRight.add(useDamageMargin, layoutRight);
 
         layoutRight.gridy++;
+        layoutRight.gridwidth = 1;
         panelRight.add(lblDamageMargin, layoutRight);
         layoutRight.gridx++;
         panelRight.add(spnDamageMargin, layoutRight);
@@ -243,59 +244,75 @@ public class RepairAndMaintenanceTab {
         logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("repairTab", true);
-        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panel);
+        final JPanel panelLeft = new CampaignOptionsStandardPanel("repairTabLeft");
+        GridBagConstraints layoutLeft = new CampaignOptionsGridBagConstraints(panelLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy = 0;
+        layoutLeft.gridwidth = 1;
+        panelLeft.add(checkMaintenance, layoutLeft);
+
+        layoutLeft.gridy++;
+        panelLeft.add(lblMaintenanceDays, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnMaintenanceDays, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblMaintenanceBonus, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnMaintenanceBonus, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        panelLeft.add(lblDefaultMaintenanceTime, layoutLeft);
+        layoutLeft.gridx++;
+        panelLeft.add(spnDefaultMaintenanceTime, layoutLeft);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy++;
+        layoutLeft.gridwidth = 2;
+        panelLeft.add(logMaintenance, layoutLeft);
+
+        final JPanel panelRight = new CampaignOptionsStandardPanel("repairTabRight", true);
+        GridBagConstraints layoutRight = new CampaignOptionsGridBagConstraints(panelRight);
+
+        layoutLeft.gridx = 0;
+        layoutLeft.gridy = 0;
+        layoutLeft.gridwidth = 1;
+        panelRight.add(useQualityMaintenance, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(reverseQualityNames, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(chkUseRandomUnitQualities, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(chkUseRandomUnitQualities, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(chkUsePlanetaryModifiers, layoutRight);
+
+        layoutRight.gridy++;
+        panelRight.add(useUnofficialMaintenance, layoutRight);
+
+        final JPanel panelParent = new CampaignOptionsStandardPanel("repairTab", true);
+        GridBagConstraints layoutParent = new CampaignOptionsGridBagConstraints(panelParent);
 
         layoutParent.gridwidth = 5;
         layoutParent.gridy = 0;
-        panel.add(headerPanel, layoutParent);
+        panelParent.add(headerPanel, layoutParent);
 
         layoutParent.gridx = 0;
         layoutParent.gridy++;
         layoutParent.gridwidth = 1;
-        panel.add(checkMaintenance, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(lblMaintenanceDays, layoutParent);
+        panelParent.add(panelLeft, layoutParent);
         layoutParent.gridx++;
-        panel.add(spnMaintenanceDays, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(lblMaintenanceBonus, layoutParent);
-        layoutParent.gridx++;
-        panel.add(spnMaintenanceBonus, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(lblDefaultMaintenanceTime, layoutParent);
-        layoutParent.gridx++;
-        panel.add(spnDefaultMaintenanceTime, layoutParent);
-
-        layoutParent.gridx = 0;
-        layoutParent.gridy++;
-        panel.add(useQualityMaintenance, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(reverseQualityNames, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkUseRandomUnitQualities, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkUseRandomUnitQualities, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(chkUsePlanetaryModifiers, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(useUnofficialMaintenance, layoutParent);
-
-        layoutParent.gridy++;
-        panel.add(logMaintenance, layoutParent);
+        panelParent.add(panelRight, layoutParent);
 
         // Create Parent Panel and return
-        return createParentPanel(panel, "maintenanceTab");
+        return createParentPanel(panelParent, "maintenanceTab");
     }
 
     private void recreateFinancesPanel(boolean isReversingQualityNames) {

@@ -324,22 +324,12 @@ public class FinancesTab {
         newFinancialYearFinancesToCSVExportBox = new CampaignOptionsCheckBox("NewFinancialYearFinancesToCSVExportBox");
 
         // Layout the Panel
-        final JPanel panelFinancialDuration = new CampaignOptionsStandardPanel("GeneralOptionsPanelFinancialDuration");
-        final GridBagConstraints layoutFinancialDuration = new CampaignOptionsGridBagConstraints(panelFinancialDuration);
-
-        layoutFinancialDuration.gridx = 0;
-        layoutFinancialDuration.gridy = 0;
-        layoutFinancialDuration.gridwidth = 1;
-        panelFinancialDuration.add(lblFinancialYearDuration, layoutFinancialDuration);
-        layoutFinancialDuration.gridx++;
-        panelFinancialDuration.add(comboFinancialYearDuration, layoutFinancialDuration);
-
         final JPanel panel = new CampaignOptionsStandardPanel("GeneralOptionsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
         layout.gridx = 0;
         layout.gridy = 0;
-        layout.gridwidth = 1;
+        layout.gridwidth = 2;
         panel.add(useLoanLimitsBox, layout);
 
         layout.gridy++;
@@ -355,10 +345,14 @@ public class FinancesTab {
         panel.add(showPeacetimeCostBox, layout);
 
         layout.gridy++;
-        panel.add(panelFinancialDuration, layout);
+        layout.gridwidth = 1;
+        panel.add(lblFinancialYearDuration, layout);
+        layout.gridx++;
+        panel.add(comboFinancialYearDuration, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(newFinancialYearFinancesToCSVExportBox, layout);
 
         return panel;
@@ -415,10 +409,11 @@ public class FinancesTab {
 
         layout.gridx = 0;
         layout.gridy = 0;
-        layout.gridwidth = 1;
+        layout.gridwidth = 2;
         panel.add(chkUseTaxes, layout);
 
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblTaxesPercentage, layout);
         layout.gridx++;
         panel.add(spnTaxesPercentage, layout);

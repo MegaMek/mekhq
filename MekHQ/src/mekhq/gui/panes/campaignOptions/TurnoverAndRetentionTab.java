@@ -445,6 +445,7 @@ public class TurnoverAndRetentionTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkUseContractCompletionRandomRetirement, layout);
 
         layout.gridy++;
@@ -461,6 +462,7 @@ public class TurnoverAndRetentionTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblServiceContractDuration, layout);
         layout.gridx++;
         panel.add(spnServiceContractDuration, layout);
@@ -473,10 +475,12 @@ public class TurnoverAndRetentionTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkPayBonusDefault, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblPayBonusDefaultThreshold, layout);
         layout.gridx++;
         panel.add(spnPayBonusDefaultThreshold, layout);
@@ -610,10 +614,12 @@ public class TurnoverAndRetentionTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkUsePayoutServiceBonus, layout);
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblPayoutServiceBonusRate, layout);
         layout.gridx++;
         panel.add(spnPayoutServiceBonusRate, layout);
@@ -746,10 +752,11 @@ public class TurnoverAndRetentionTab {
 
         layout.gridy = 0;
         layout.gridx = 0;
-        layout.gridwidth = 1;
+        layout.gridwidth = 2;
         panel.add(chkUseManagementSkill, layout);
 
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(pnlManagementSkill, layout);
 
         return panel;
@@ -783,10 +790,11 @@ public class TurnoverAndRetentionTab {
 
         layout.gridy = 0;
         layout.gridx = 0;
-        layout.gridwidth = 1;
+        layout.gridwidth = 2;
         panel.add(chkUseCommanderLeadershipOnly, layout);
 
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblManagementSkillPenalty, layout);
         layout.gridx++;
         panel.add(spnManagementSkillPenalty, layout);

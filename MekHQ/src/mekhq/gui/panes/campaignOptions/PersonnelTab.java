@@ -642,6 +642,7 @@ public class PersonnelTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkEnableAutoAwards, layout);
 
         layout.gridy++;
@@ -1028,6 +1029,7 @@ public class PersonnelTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkPrisonerBabyStatus, layout);
 
         layout.gridy++;

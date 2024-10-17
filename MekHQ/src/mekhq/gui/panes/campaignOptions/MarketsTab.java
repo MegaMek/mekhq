@@ -180,6 +180,7 @@ public class MarketsTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkPersonnelMarketReportRefresh, layout);
 
         layout.gridy++;
@@ -306,9 +307,11 @@ public class MarketsTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkUnitMarketRegionalMekVariations, layout);
 
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblUnitMarketSpecialUnitChance, layout);
         layout.gridx++;
         panel.add(spnUnitMarketSpecialUnitChance, layout);
@@ -321,6 +324,7 @@ public class MarketsTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkInstantUnitMarketDelivery, layout);
 
         layout.gridy++;
@@ -433,12 +437,14 @@ public class MarketsTab {
 
         layout.gridx = 0;
         layout.gridy++;
+        layout.gridwidth = 2;
         panel.add(chkVariableContractLength, layout);
 
         layout.gridy++;
         panel.add(chkContractMarketReportRefresh, layout);
 
         layout.gridy++;
+        layout.gridwidth = 1;
         panel.add(lblCoontractMaxSalvagePercentage, layout);
         layout.gridx++;
         panel.add(spnContractMaxSalvagePercentage, layout);

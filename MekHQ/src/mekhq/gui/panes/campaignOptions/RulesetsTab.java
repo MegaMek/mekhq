@@ -1,16 +1,15 @@
 package mekhq.gui.panes.campaignOptions;
 
 import megamek.client.ui.baseComponents.MMComboBox;
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.personnel.Skills;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 
 import static mekhq.gui.panes.campaignOptions.CampaignOptionsUtilities.*;
 
@@ -212,7 +211,6 @@ public class RulesetsTab {
         pnlPartsPanel = createUniversalPartsPanel();
         pnlLancePanel = createUniversalLancePanel();
 
-
         pnlScenarioGenerationPanel = createUniversalScenarioGenerationPanel();
         pnlCampaignOptions = createUniversalCampaignOptionsPanel();
     }
@@ -230,38 +228,45 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalScenarioGenerationPanel", true,
             "UniversalScenarioGenerationPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(pnlUnitRatioPanel)
-                .addComponent(chkUseDropShips)
-                .addComponent(chkOpForUsesVTOLs)
-                .addComponent(chkClanVehicles)
-                .addComponent(chkRegionalMekVariations)
-                .addComponent(chkAttachedPlayerCamouflage)
-                .addComponent(chkPlayerControlsAttachedUnits)
-                .addComponent(chkAutoConfigMunitions)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblSPAUpgradeIntensity)
-                    .addComponent(spnSPAUpgradeIntensity))
-                .addComponent(pnlScenarioModifiers));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 3;
+        panel.add(pnlUnitRatioPanel, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(pnlUnitRatioPanel)
-                .addComponent(chkUseDropShips)
-                .addComponent(chkOpForUsesVTOLs)
-                .addComponent(chkClanVehicles)
-                .addComponent(chkRegionalMekVariations)
-                .addComponent(chkAttachedPlayerCamouflage)
-                .addComponent(chkPlayerControlsAttachedUnits)
-                .addComponent(chkAutoConfigMunitions)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblSPAUpgradeIntensity)
-                    .addComponent(spnSPAUpgradeIntensity))
-                .addComponent(pnlScenarioModifiers));
+        layout.gridy++;
+        layout.gridwidth = 2;
+        panel.add(chkUseDropShips, layout);
+
+        layout.gridy++;
+        panel.add(chkOpForUsesVTOLs, layout);
+
+        layout.gridy++;
+        panel.add(chkClanVehicles, layout);
+
+        layout.gridy++;
+        panel.add(chkRegionalMekVariations, layout);
+
+        layout.gridy++;
+        panel.add(chkAttachedPlayerCamouflage, layout);
+
+        layout.gridy++;
+        panel.add(chkPlayerControlsAttachedUnits, layout);
+
+        layout.gridy++;
+        panel.add(chkAutoConfigMunitions, layout);
+
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(lblSPAUpgradeIntensity, layout);
+        layout.gridx++;
+        panel.add(spnSPAUpgradeIntensity, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 3;
+        panel.add(pnlScenarioModifiers, layout);
 
         return panel;
     }
@@ -281,28 +286,22 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalUnitRatioPanel", true,
             "UniversalUnitRatioPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblOpForLanceTypeMeks)
-                    .addComponent(spnOpForLanceTypeMeks)
-                    .addComponent(lblOpForLanceTypeMixed)
-                    .addComponent(spnOpForLanceTypeMixed)
-                    .addComponent(lblOpForLanceTypeVehicle)
-                    .addComponent(spnOpForLanceTypeVehicles)));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblOpForLanceTypeMeks)
-                    .addComponent(spnOpForLanceTypeMeks)
-                    .addComponent(lblOpForLanceTypeMixed)
-                    .addComponent(spnOpForLanceTypeMixed)
-                    .addComponent(lblOpForLanceTypeVehicle)
-                    .addComponent(spnOpForLanceTypeVehicles)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblOpForLanceTypeMeks, layout);
+        layout.gridx++;
+        panel.add(spnOpForLanceTypeMeks, layout);
+        layout.gridx++;
+        panel.add(lblOpForLanceTypeMixed, layout);
+        layout.gridx++;
+        panel.add(spnOpForLanceTypeMixed, layout);
+        layout.gridx++;
+        panel.add(lblOpForLanceTypeVehicle, layout);
+        layout.gridx++;
+        panel.add(spnOpForLanceTypeVehicles, layout);
 
         return panel;
     }
@@ -322,32 +321,26 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalModifiersPanel", true,
             "UniversalModifiersPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblScenarioModMax)
-                    .addComponent(spnScenarioModMax))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblScenarioModChance)
-                    .addComponent(spnScenarioModChance))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblScenarioModBV)
-                    .addComponent(spnScenarioModBV)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 1;
+        panel.add(lblScenarioModMax, layout);
+        layout.gridx++;
+        panel.add(spnScenarioModMax, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblScenarioModMax)
-                    .addComponent(spnScenarioModMax))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblScenarioModChance)
-                    .addComponent(spnScenarioModChance))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblScenarioModBV)
-                    .addComponent(spnScenarioModBV)));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblScenarioModChance, layout);
+        layout.gridx++;
+        panel.add(spnScenarioModChance, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblScenarioModBV, layout);
+        layout.gridx++;
+        panel.add(spnScenarioModBV, layout);
 
         return panel;
     }
@@ -364,46 +357,41 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalMapGenerationPanel", true,
             "UniversalMapGenerationPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseWeatherConditions)
-                .addComponent(chkUseLightConditions)
-                .addComponent(chkUsePlanetaryConditions)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFixedMapChance)
-                    .addComponent(spnFixedMapChance)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        panel.add(chkUseWeatherConditions, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(chkUseWeatherConditions)
-                .addComponent(chkUseLightConditions)
-                .addComponent(chkUsePlanetaryConditions)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblFixedMapChance)
-                    .addComponent(spnFixedMapChance)));
+        layout.gridy++;
+        panel.add(chkUseLightConditions, layout);
+
+        layout.gridy++;
+        panel.add(chkUsePlanetaryConditions, layout);
+
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(lblFixedMapChance, layout);
+        layout.gridx++;
+        panel.add(spnFixedMapChance, layout);
 
         return panel;
     }
 
     private JPanel createUniversalCampaignOptionsPanel() {
         // Layout the panel
-        final JPanel panel = new CampaignOptionsStandardPanel("UniversalCampaignOptionsPanel", false,
-            "");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panel = new CampaignOptionsStandardPanel("UniversalCampaignOptionsPanel");
+        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(pnlPartsPanel)
-                .addComponent(pnlLancePanel));
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(pnlPartsPanel)
-                .addComponent(pnlLancePanel));
+        layout.gridwidth = 2;
+        layout.gridy = 0;
+        layout.gridx = 0;
+        panel.add(pnlPartsPanel, layout);
+        layout.gridy++;
+        panel.add(pnlLancePanel, layout);
+        layout.gridy++;
+        panel.add(pnlMapGenerationPanel, layout);
 
         return panel;
     }
@@ -421,28 +409,24 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalPartsPanel", true,
             "UniversalPartsPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkRestrictPartsByMission)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblBonusPartExchangeValue)
-                    .addComponent(spnBonusPartExchangeValue))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblBonusPartMaxExchangeCount)
-                    .addComponent(spnBonusPartMaxExchangeCount)));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        panel.add(chkRestrictPartsByMission, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(chkRestrictPartsByMission)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblBonusPartExchangeValue)
-                    .addComponent(spnBonusPartExchangeValue))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblBonusPartMaxExchangeCount)
-                    .addComponent(spnBonusPartMaxExchangeCount)));
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(lblBonusPartExchangeValue, layout);
+        layout.gridx++;
+        panel.add(spnBonusPartExchangeValue, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblBonusPartMaxExchangeCount, layout);
+        layout.gridx++;
+        panel.add(spnBonusPartMaxExchangeCount, layout);
 
         return panel;
     }
@@ -463,34 +447,36 @@ public class RulesetsTab {
         // Layout the panel
         final JPanel panel = new CampaignOptionsStandardPanel("UniversalLancePanel", true,
             "UniversalLancePanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkLimitLanceWeight)
-                .addComponent(chkLimitLanceNumUnits)
-                .addComponent(chkUseStrategy)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblBaseStrategyDeployment)
-                    .addComponent(spnBaseStrategyDeployment))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblAdditionalStrategyDeployment)
-                    .addComponent(spnAdditionalStrategyDeployment))
-                .addComponent(chkAdjustPaymentForStrategy));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        panel.add(chkLimitLanceWeight, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(chkLimitLanceWeight)
-                .addComponent(chkLimitLanceNumUnits)
-                .addComponent(chkUseStrategy)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblBaseStrategyDeployment)
-                    .addComponent(spnBaseStrategyDeployment))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblAdditionalStrategyDeployment)
-                    .addComponent(spnAdditionalStrategyDeployment))
-                .addComponent(chkAdjustPaymentForStrategy));
+        layout.gridy++;
+        panel.add(chkLimitLanceNumUnits, layout);
+
+        layout.gridy++;
+        panel.add(chkUseStrategy, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(lblBaseStrategyDeployment, layout);
+        layout.gridx++;
+        panel.add(spnBaseStrategyDeployment, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblAdditionalStrategyDeployment, layout);
+        layout.gridx++;
+        panel.add(spnAdditionalStrategyDeployment, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 2;
+        panel.add(chkAdjustPaymentForStrategy, layout);
 
         return panel;
     }
@@ -514,37 +500,32 @@ public class RulesetsTab {
 
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("StratConTab", true);
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseStratCon)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblSkillLevel)
-                    .addComponent(comboSkillLevel))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(chkUseGenericBattleValue)
-                    .addComponent(chkUseVerboseBidding))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlScenarioGenerationPanel)
-                    .addComponent(pnlCampaignOptions)));
+        layout.gridwidth = 5;
+        layout.gridy = 0;
+        panel.add(headerPanel, layout);
 
+        layout.gridwidth = 1;
+        layout.gridy++;
+        panel.add(chkUseStratCon, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addComponent(chkUseStratCon)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblSkillLevel)
-                    .addComponent(comboSkillLevel))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(chkUseGenericBattleValue)
-                    .addComponent(chkUseVerboseBidding))
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(pnlScenarioGenerationPanel)
-                    .addComponent(pnlCampaignOptions)));
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(lblSkillLevel, layout);
+        layout.gridx++;
+        panel.add(comboSkillLevel, layout);
+        layout.gridx++;
+        panel.add(chkUseGenericBattleValue, layout);
+        layout.gridx++;
+        panel.add(chkUseVerboseBidding, layout);
+
+        layout.gridwidth = 2;
+        layout.gridx = 0;
+        layout.gridy++;
+        panel.add(pnlScenarioGenerationPanel, layout);
+        layout.gridx += 2;
+        panel.add(pnlCampaignOptions, layout);
 
         // Create panel and return
         return createParentPanel(panel, "StratConTab");
@@ -588,26 +569,22 @@ public class RulesetsTab {
         pnlLegacyScenarioGenerationPanel = createLegacyScenarioGenerationPanel();
 
         // Layout the Panel
-        final JPanel panel = new CampaignOptionsStandardPanel("LegacyTab", true,
-            "");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final JPanel panel = new CampaignOptionsStandardPanel("LegacyTab", true);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(headerPanel)
-                .addComponent(chkUseAtB)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(pnlLegacyOpForGenerationPanel)
-                    .addComponent(pnlLegacyScenarioGenerationPanel)));
+        layout.gridwidth = 5;
+        layout.gridx = 0;
+        layout.gridy = 0;
+        panel.add(headerPanel, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(headerPanel, Alignment.CENTER)
-                .addComponent(chkUseAtB)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(pnlLegacyOpForGenerationPanel)
-                    .addComponent(pnlLegacyScenarioGenerationPanel)));
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(chkUseAtB, layout);
+
+        layout.gridy++;
+        panel.add(pnlLegacyOpForGenerationPanel, layout);
+        layout.gridx++;
+        panel.add(pnlLegacyScenarioGenerationPanel, layout);
 
         // Create panel and return
         return createParentPanel(panel, "LegacyTab");
@@ -627,30 +604,33 @@ public class RulesetsTab {
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyOpForGenerationPanel", true,
             "LegacyOpForGenerationPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkUseVehicles)
-                .addComponent(chkDoubleVehicles)
-                .addComponent(chkOpForUsesAero)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblOpForAeroChance)
-                    .addComponent(spnOpForAeroChance))
-                .addComponent(chkOpForUsesLocalForces)
-                .addComponent(chkAdjustPlayerVehicles));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        panel.add(chkUseVehicles, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(chkUseVehicles)
-                .addComponent(chkDoubleVehicles)
-                .addComponent(chkOpForUsesAero)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblOpForAeroChance)
-                    .addComponent(spnOpForAeroChance))
-                .addComponent(chkOpForUsesLocalForces)
-                .addComponent(chkAdjustPlayerVehicles));
+        layout.gridy++;
+        panel.add(chkDoubleVehicles, layout);
+
+        layout.gridy++;
+        panel.add(chkOpForUsesAero, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(lblOpForAeroChance, layout);
+        layout.gridx++;
+        panel.add(spnOpForAeroChance, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 2;
+        panel.add(chkOpForUsesLocalForces, layout);
+
+        layout.gridy++;
+        panel.add(chkAdjustPlayerVehicles, layout);
 
         return panel;
     }
@@ -676,54 +656,57 @@ public class RulesetsTab {
         btnIntensityUpdate = new CampaignOptionsButton("IntensityUpdate");
 
         // Layout the Panel
+        final JPanel panelBattleChance = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel");
+        final GridBagConstraints layoutBattleChance = new CampaignOptionsGridBagConstraints(panelBattleChance);
+
+        layoutBattleChance.gridx = 0;
+        layoutBattleChance.gridy = 0;
+        layoutBattleChance.gridwidth = 1;
+        panelBattleChance.add(lblFightChance, layoutBattleChance);
+        layoutBattleChance.gridx++;
+        panelBattleChance.add(spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()], layoutBattleChance);
+
+        layoutBattleChance.gridx = 0;
+        layoutBattleChance.gridy++;
+        panelBattleChance.add(lblDefendChance, layoutBattleChance);
+        layoutBattleChance.gridx++;
+        panelBattleChance.add(spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()], layoutBattleChance);
+
+        layoutBattleChance.gridx = 0;
+        layoutBattleChance.gridy++;
+        panelBattleChance.add(lblScoutChance, layoutBattleChance);
+        layoutBattleChance.gridx++;
+        panelBattleChance.add(spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()], layoutBattleChance);
+
+        layoutBattleChance.gridx = 0;
+        layoutBattleChance.gridy++;
+        panelBattleChance.add(lblTrainingChance, layoutBattleChance);
+        layoutBattleChance.gridx++;
+        panelBattleChance.add(spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()], layoutBattleChance);
+
         final JPanel panel = new CampaignOptionsStandardPanel("LegacyScenarioGenerationPanel", true,
             "LegacyScenarioGenerationPanel");
-        final GroupLayout layout = createGroupLayout(panel);
-        panel.setLayout(layout);
+        final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
 
-        layout.setVerticalGroup(
-            layout.createSequentialGroup()
-                .addComponent(chkGenerateChases)
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblIntensity)
-                    .addComponent(spnAtBBattleIntensity))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblFightChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblDefendChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblScoutChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()]))
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(lblTrainingChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()]))
-                .addComponent(btnIntensityUpdate));
+        layout.gridx = 0;
+        layout.gridy = 0;
+        layout.gridwidth = 2;
+        panel.add(chkGenerateChases, layout);
 
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(Alignment.LEADING)
-                .addComponent(chkGenerateChases)
-                .addGroup(layout.createSequentialGroup()
-                    .addComponent(lblIntensity)
-                    .addComponent(spnAtBBattleIntensity))
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(UIUtil.scaleForGUI(25))
-                    .addComponent(lblFightChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.FIGHTING.ordinal()]))
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(UIUtil.scaleForGUI(25))
-                    .addComponent(lblDefendChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.DEFENCE.ordinal()]))
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(UIUtil.scaleForGUI(25))
-                    .addComponent(lblScoutChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.SCOUTING.ordinal()]))
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(UIUtil.scaleForGUI(25))
-                    .addComponent(lblTrainingChance)
-                    .addComponent(spnAtBBattleChance[AtBLanceRole.TRAINING.ordinal()]))
-                .addComponent(btnIntensityUpdate));
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(lblIntensity, layout);
+        layout.gridx++;
+        panel.add(spnAtBBattleIntensity, layout);
+
+        layout.gridx = 0;
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(panelBattleChance, layout);
+
+        layout.gridy++;
+        layout.gridwidth = 1;
+        panel.add(btnIntensityUpdate, layout);
 
         return panel;
     }
