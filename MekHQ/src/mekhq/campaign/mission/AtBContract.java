@@ -63,7 +63,6 @@ import org.w3c.dom.NodeList;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -174,6 +173,11 @@ public class AtBContract extends Contract {
             "mekhq.resources.AtBContract",
             MekHQ.getMHQOptions().getLocale());
 
+    private int commandRoll;
+    private int salvageRoll;
+    private int supportRoll;
+    private int transportRoll;
+
     protected AtBContract() {
         this(null);
     }
@@ -243,7 +247,7 @@ public class AtBContract extends Contract {
         final String ROOT_DIRECTORY = "data/images/camo/";
 
         String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
-      
+
         // Gather all files
         List<Path> allPaths = null;
 
@@ -254,7 +258,7 @@ public class AtBContract extends Contract {
         } catch (IOException e) {
             logger.error("Error getting list of camouflages", e);
         }
-        
+
         // Select a random file to set camouflage, if there are files available
         if ((null != allPaths) && (!allPaths.isEmpty())) {
             Path randomPath = allPaths.get(new Random().nextInt(allPaths.size()));
@@ -1005,6 +1009,10 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "priorLogisticsFailure", priorLogisticsFailure);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleTypeMod", battleTypeMod);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nextWeekBattleTypeMod", nextWeekBattleTypeMod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandRoll", commandRoll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageRoll", salvageRoll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportRoll", supportRoll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportRoll", transportRoll);
 
         if (parentContract != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentContractId", parentContract.getId());
@@ -1089,6 +1097,14 @@ public class AtBContract extends Contract {
                     battleTypeMod = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextWeekBattleTypeMod")) {
                     nextWeekBattleTypeMod = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("commandRoll")) {
+                    commandRoll = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvageRoll")) {
+                    salvageRoll = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("supportRoll")) {
+                    supportRoll = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportRoll")) {
+                    transportRoll = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioDate")) {
                     specialEventScenarioDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
@@ -1903,5 +1919,85 @@ public class AtBContract extends Contract {
         }
 
         return totalBattleValue / rollingCount;
+    }
+
+    /**
+     * Get the command roll that was used to determine command rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getCommandRoll() {
+        return commandRoll;
+    }
+
+    /**
+     * Set the command roll that was used to determine command rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setCommandRoll(int roll) {
+        commandRoll = roll;
+    }
+
+    /**
+     * Get the salvage roll that was used to determine salvage rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getSalvageRoll() {
+        return salvageRoll;
+    }
+
+    /**
+     * Set the salvage roll that was used to determine salvage rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setSalvageRoll(int roll) {
+        salvageRoll = roll;
+    }
+
+    /**
+     * Get the support roll that was used to determine support rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getSupportRoll() {
+        return supportRoll;
+    }
+
+    /**
+     * Set the support roll that was used to determine support rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setSupportRoll(int roll) {
+        supportRoll = roll;
+    }
+
+    /**
+     * Get the transport roll that was used to determine transport rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getTransportRoll() {
+        return transportRoll;
+    }
+
+    /**
+     * Set the transport roll that was used to determine transport rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setTransportRoll(int roll) {
+        transportRoll = roll;
     }
 }
