@@ -125,6 +125,11 @@ public final class MHQConstants extends SuiteConstants {
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
     public static final String FONT_COLOR_WARNING = "fontColorWarning";
+    public static final String FONT_COLOR_SKILL_ULTRAGREEN = "fontColorSkillUltraGreen";
+    public static final String FONT_COLOR_SKILL_GREEN = "fontColorSkillGreen";
+    public static final String FONT_COLOR_SKILL_REGULAR = "fontColorSkillRegular";
+    public static final String FONT_COLOR_SKILL_VETERAN = "fontColorSkillVeteran";
+    public static final String FONT_COLOR_SKILL_ELITE = "fontColorSkillElite";
     // endregion Colours
 
     // region Fonts
