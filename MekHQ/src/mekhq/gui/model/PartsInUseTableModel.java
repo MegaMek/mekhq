@@ -199,26 +199,15 @@ public class PartsInUseTableModel extends DataTableModel {
     }
 
     public int getPreferredWidth(int column) {
-        switch (column) {
-            case COL_PART:
-                return 300;
-            case COL_IN_USE:
-            case COL_STORED:
-            case COL_TONNAGE:
-            case COL_IN_TRANSFER:
-            case COL_COST:
-                return 20;
-            case COL_BUTTON_BUY:
-            case COL_BUTTON_SELL:
-                return 50;
-            case COL_BUTTON_GMADD:
-                return 70;
-            case COL_BUTTON_BUY_BULK:
-            case COL_BUTTON_SELL_BULK:
-                return 80;
-            default:
-                return 100;
-        }
+        return switch (column) {
+            case COL_PART -> 260;
+            case COL_IN_USE, COL_STORED, COL_TONNAGE, COL_IN_TRANSFER -> 15;
+            case COL_COST -> 40;
+            case COL_BUTTON_BUY, COL_BUTTON_SELL -> 25;
+            case COL_BUTTON_GMADD -> 65;
+            case COL_BUTTON_BUY_BULK, COL_BUTTON_SELL_BULK -> 65;
+            default -> 100;
+        };
     }
 
     public boolean hasConstantWidth(int col) {
