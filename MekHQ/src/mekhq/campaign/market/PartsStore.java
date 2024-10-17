@@ -429,7 +429,7 @@ public class PartsStore {
         parts.add(new VeeStabilizer(0, -1, c));
         for (int ton = 5; ton <= 100; ton = ton + 5) {
             parts.add(new Rotor(ton, c));
-            parts.add(new Turret(ton, -1, c));
+            parts.add(new Turret(ton, ton, c));
         }
     }
 
