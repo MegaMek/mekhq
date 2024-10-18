@@ -133,6 +133,9 @@ public class PlanetarySystem {
     // the location of the primary planet for this system
     private int primarySlot;
 
+    @XmlElement(name = "hiringHall", required = false)
+    private HiringHallOverride staticHall = null;
+
     /** Marker for "please delete this system" */
     @XmlJavaTypeAdapter(value = BooleanValueAdapter.class)
     public Boolean delete;
