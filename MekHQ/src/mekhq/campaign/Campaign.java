@@ -2239,76 +2239,110 @@ public class Campaign implements ITechManager {
         return (null != result.getPartToBuy()) ? result : null;
     }
 
-    private void updatePartInUseData(PartInUse piu, Part p) {
-        if ((p.getUnit() != null) || (p instanceof MissingPart)) {
-            piu.setUseCount(piu.getUseCount() + getQuantity(p));
+    /**
+     * Add data from an actual part to a PartInUse data element
+     * @param partInUse part in use record to update
+     * @param incomingPart new part that needs to be added to this record
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     */
+    private void updatePartInUseData(PartInUse partInUse, Part incomingPart,
+            boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
+
+        if (ignoreMothballedUnits && (null != incomingPart.getUnit()) && incomingPart.getUnit().isMothballed()) {
+            return;
+        } else if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
+            partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
         } else {
-            if (p.isPresent()) {
-                piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
-                piu.addSpare(p);
+            if (incomingPart.isPresent()) {
+                if (incomingPart.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
+                    return;
+                } else {
+                    partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
+                    partInUse.addSpare(incomingPart);
+                }
             } else {
-                piu.setTransferCount(piu.getTransferCount() + getQuantity(p));
+                partInUse.setTransferCount(partInUse.getTransferCount() + getQuantity(incomingPart));
             }
         }
     }
 
-    /** Update the piu with the current campaign data */
-    public void updatePartInUse(PartInUse piu) {
-        piu.setUseCount(0);
-        piu.setStoreCount(0);
-        piu.setTransferCount(0);
-        piu.setPlannedCount(0);
-        getWarehouse().forEachPart(p -> {
-            PartInUse newPiu = getPartInUse(p);
-            if (piu.equals(newPiu)) {
-                updatePartInUseData(piu, p);
+    /**
+     * Find all the parts that match this PartInUse and update their data
+     * @param partInUse part in use record to update
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     */
+    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits, 
+            PartQuality ignoreSparesUnderQuality) {
+        partInUse.setUseCount(0);
+        partInUse.setStoreCount(0);
+        partInUse.setTransferCount(0);
+        partInUse.setPlannedCount(0);
+        getWarehouse().forEachPart(incomingPart -> {
+            PartInUse newPiu = getPartInUse(incomingPart);
+            if (partInUse.equals(newPiu)) {
+                updatePartInUseData(partInUse, incomingPart,
+                    ignoreMothballedUnits, ignoreSparesUnderQuality);
             }
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             PartInUse newPiu = getPartInUse((Part) maybePart);
-            if (piu.equals(newPiu)) {
-                piu.setPlannedCount(piu.getPlannedCount()
-                        + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart()
-                                : (Part) maybePart) * maybePart.getQuantity());
+            if (partInUse.equals(newPiu)) {
+                partInUse.setPlannedCount(partInUse.getPlannedCount()
+                        + getQuantity((maybePart instanceof MissingPart) ? 
+                            ((MissingPart) maybePart).getNewPart() :
+                            (Part) maybePart) * maybePart.getQuantity());
             }
         }
     }
 
-    public Set<PartInUse> getPartsInUse() {
+    /**
+     * Create a data set detailing all the parts being used (or not) and their warehouse spares
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     * @return a Set of PartInUse data for display or inspection
+     */
+    public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits,
+            PartQuality ignoreSparesUnderQuality) {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
         // java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
-        getWarehouse().forEachPart(p -> {
-            PartInUse piu = getPartInUse(p);
-            if (null == piu) {
+        getWarehouse().forEachPart(incomingPart -> {
+            PartInUse partInUse = getPartInUse(incomingPart);
+            if (null == partInUse) {
                 return;
             }
-            if (inUse.containsKey(piu)) {
-                piu = inUse.get(piu);
+            if (inUse.containsKey(partInUse)) {
+                partInUse = inUse.get(partInUse);
             } else {
-                inUse.put(piu, piu);
+                inUse.put(partInUse, partInUse);
             }
-            updatePartInUseData(piu, p);
+            updatePartInUseData(partInUse, incomingPart, ignoreMothballedUnits, ignoreSparesUnderQuality);
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             if (!(maybePart instanceof Part)) {
                 continue;
             }
-            PartInUse piu = getPartInUse((Part) maybePart);
-            if (null == piu) {
+            PartInUse partInUse = getPartInUse((Part) maybePart);
+            if (null == partInUse) {
                 continue;
             }
-            if (inUse.containsKey(piu)) {
-                piu = inUse.get(piu);
+            if (inUse.containsKey(partInUse)) {
+                partInUse = inUse.get(partInUse);
             } else {
-                inUse.put(piu, piu);
+                inUse.put(partInUse, partInUse);
             }
-            piu.setPlannedCount(piu.getPlannedCount()
-                    + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart()
-                            : (Part) maybePart) * maybePart.getQuantity());
+            partInUse.setPlannedCount(partInUse.getPlannedCount()
+                    + getQuantity((maybePart instanceof MissingPart) ? 
+                            ((MissingPart) maybePart).getNewPart() :
+                            (Part) maybePart) * maybePart.getQuantity());
 
         }
-        return inUse.keySet();
+        return inUse.keySet().stream()
+            // Hacky but otherwise we end up with zero lines when filtering things out
+            .filter(p -> p.getUseCount() != 0 || p.getStoreCount() != 0 || p.getPlannedCount() != 0)
+            .collect(Collectors.toSet());
     }
 
     @Deprecated
