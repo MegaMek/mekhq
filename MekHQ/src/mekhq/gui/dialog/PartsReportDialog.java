@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2024 The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -45,6 +45,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ui.swing.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
@@ -301,7 +302,7 @@ public class PartsReportDialog extends JDialog {
                 .addComponent(ignoreSparesUnderQualityCB)
                 .addComponent(btnClose)));
 
-        setPreferredSize(new Dimension(1400, 1000));
+        setPreferredSize(UIUtil.scaleForGUI(1400,1000));
 
     }
 
@@ -310,7 +311,6 @@ public class PartsReportDialog extends JDialog {
      * @param rating String containing A to F or space, from combo box
      * @return minimum internal quality level to use
      */
-    
     private PartQuality getMinimumQuality(String rating) {
         if (rating.equals(" ")) {
             // The blank spot always means "everything", so minimum = lowest
