@@ -21,16 +21,15 @@
  */
 package mekhq.campaign;
 
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.util.UUID;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * A kill record
@@ -118,6 +117,18 @@ public class Kill {
 
     public void setForceId(final int id) {
         forceId = id;
+    }
+
+    /**
+     * Returns a unique identifier for the award based on the combination of various factors.
+     * <p>
+     * This is used by autoAwards to identify duplicate kills across multi-crewed units.
+     *
+     * @return The string representation of the award identifier combining {@code killed},
+     * {@code missionId}, {@code scenarioId}, {@code forceId}, and {@code unitType}
+     */
+    public String getAwardIdentifier() {
+        return killed + missionId + scenarioId + forceId + unitType;
     }
 
     /**
