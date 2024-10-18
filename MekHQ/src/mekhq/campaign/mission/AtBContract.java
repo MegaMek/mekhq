@@ -43,6 +43,7 @@ import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -1767,7 +1768,7 @@ public class AtBContract extends Contract {
         // Estimate the power of the enemy forces
         SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(enemyCode, enemySkill);
         double enemySkillMultiplier = getSkillMultiplier(opposingSkill);
-        int enemyPower = getAverageBattleValue(campaign, enemyCode, enemyQuality);
+        double enemyPower = estimateMekStrength(campaign, enemyCode, enemyQuality);
 
         // If we cannot calculate enemy power, abort.
         if (enemyPower == 0) {
@@ -1777,26 +1778,30 @@ public class AtBContract extends Contract {
         enemyPower = (int) round(enemyPower * enemySkillMultiplier);
 
         // Estimate player power
-        int playerPower = estimatePlayerPower(campaign);
+        double playerPower = estimatePlayerPower(campaign);
 
         // Estimate the power of allied forces
-        int allyPower = 0;
-        if (!getCommandRights().isIndependent()) {
+        // TODO pull these directly from Force Generation instead of using magic numbers
+        // TODO estimate the LIAISON ratio by going through each combat lance and
+        // getting the actual average (G)BV for an allied heavy/assault mek.
+        double allyRatio = switch (getCommandRights()) {
+            case INDEPENDENT    -> 0; // no allies
+            case LIAISON        -> 0.4; // single allied heavy/assault mek, pure guess for now
+            case HOUSE          -> 1; // allies with same (G)BV budget
+            case INTEGRATED     -> 2; // allies with twice the player's (G)BV budget
+            default -> 0;
+        };
+        if (allyRatio > 0) {
             SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
             double allySkillMultiplier = getSkillMultiplier(alliedSkill);
-            allyPower = getAverageBattleValue(campaign, employerCode, allyQuality);
-
+            double allyPower = estimateMekStrength(campaign, employerCode, allyQuality);
+            allyPower = allyPower * allySkillMultiplier;
             // If we cannot calculate ally's power, use player power as a fallback.
             if (allyPower == 0) {
                 allyPower = playerPower;
             }
-
-            allyPower = (int) round(allyPower * allySkillMultiplier);
-        }
-
-        if (allyPower > 0) {
-            playerPower += allyPower;
-            enemyPower *= 2;
+            playerPower += allyRatio * allyPower;
+            enemyPower += allyRatio * enemyPower;
         }
 
         // Calculate difficulty based on the percentage difference between the two forces.
@@ -1830,10 +1835,11 @@ public class AtBContract extends Contract {
      * Estimates the power of the player in a campaign based on the battle values of their units.
      *
      * @param campaign the object containing the forces and units of the player
-     * @return the estimated player power in the campaign
+     * @return average battle value per player unit OR total BV2 divided by total GBV
      */
-    private static int estimatePlayerPower(Campaign campaign) {
+    private static double estimatePlayerPower(Campaign campaign) {
         int playerPower = 0;
+        int playerGBV = 0;
         int playerUnitCount = 0;
         for (Force force : campaign.getAllForces()) {
             if (!force.isCombatForce()) {
@@ -1841,13 +1847,18 @@ public class AtBContract extends Contract {
             }
 
             for (UUID unitID : force.getUnits()) {
-                Unit unit = campaign.getUnit(unitID);
-                playerPower += unit.getEntity().calculateBattleValue();
+                Entity entity = campaign.getUnit(unitID).getEntity();
+                playerPower += entity.calculateBattleValue();
+                playerGBV += entity.getGenericBattleValue();
                 playerUnitCount ++;
             }
         }
 
-        return round((float) playerPower / playerUnitCount);
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            return ((double) playerPower) / playerGBV;
+        } else {
+            return ((double) playerPower) / playerUnitCount;
+        }
     }
 
     /**
@@ -1869,15 +1880,17 @@ public class AtBContract extends Contract {
         };
     }
     /**
-     * Calculates the average battle value for Mek units of a specific faction and quality.
+     * Estimates the relative strength for Mek units of a specific faction and quality.
+     * Excludes salvage.
      *
-     * @param campaign the campaign to calculate the average battle value for
-     * @param factionCode the code of the faction to calculate the average battle value for
-     * @param quality the quality of the units to calculate the average battle value for
-     * @return the average battle value for units of the specified faction and quality
+     * @param campaign the campaign to estimate the average Mek strength for
+     * @param factionCode the code of the faction to estimate the average Mek strength for
+     * @param quality the quality of the Meks to calculate the average strength for
+     * @return the average battle value OR total BV2 divided by total GBV
+     * for Meks of the specified faction and quality OR 0 on error
      */
-    private static int getAverageBattleValue(Campaign campaign, String factionCode, int quality) {
-        final int ERROR = 0;
+    private static double estimateMekStrength(Campaign campaign, String factionCode, int quality) {
+        final double ERROR = 0;
 
         RATGenerator ratGenerator = Factions.getInstance().getRATGenerator();
         FactionRecord faction = ratGenerator.getFaction(factionCode);
@@ -1908,17 +1921,30 @@ public class AtBContract extends Contract {
         int entries = unitTable.getNumEntries();
 
         int totalBattleValue = 0;
+        int totalGBV = 0;
         int rollingCount = 0;
 
         for (int i = 0; i < entries; i++) {
-            int weight = unitTable.getEntryWeight(i);
-            int battleValue = unitTable.generateUnit().getBV();
-
+            int battleValue = unitTable.getBV(i); // 0 for salvage
+            if (0 == battleValue) {
+                // Removing this check will break things, see the other comments.
+                continue;
+            }
+            // TODO implement getGBV(int index) in UnitTable to simplify this?
+            // getMekSummary(int index) is NULL for salvage.
+            int genericBattleValue = unitTable.getMekSummary(i).loadEntity().getGenericBattleValue();
+            int weight = unitTable.getEntryWeight(i); // NOT 0 for salvage
+            
             totalBattleValue += battleValue * weight;
+            totalGBV += genericBattleValue * weight;
             rollingCount += weight;
         }
 
-        return totalBattleValue / rollingCount;
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            return ((double) totalBattleValue) / totalGBV;
+        } else {
+            return ((double) totalBattleValue) / rollingCount;
+        }
     }
 
     /**
