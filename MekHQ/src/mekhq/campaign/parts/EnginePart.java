@@ -54,6 +54,7 @@ public class EnginePart extends Part {
         this.engine = e;
         this.forHover = hover;
         this.name = engine.getEngineName() + " Engine";
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -408,19 +409,8 @@ public class EnginePart extends Part {
     @Override
     public String getDetails(boolean includeRepairDetails) {
         String details = super.getDetails(includeRepairDetails);
-        if (null != unit) {
-            return details;
-        }
-
-        if (!details.isEmpty()) {
-            details += ", ";
-        }
-
-        String hvrString = "";
-        if (forHover) {
-            hvrString = " (hover)";
-        }
-        return details + getUnitTonnage() + " tons" + hvrString;
+        
+        return details + (forHover ? " (hover)" : "");
     }
 
     @Override

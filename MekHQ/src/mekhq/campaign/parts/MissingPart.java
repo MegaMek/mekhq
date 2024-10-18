@@ -84,9 +84,14 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String getDesc() {
         StringBuilder toReturn = new StringBuilder();
-        toReturn.append("<html><b>Replace ")
-            .append(getName())
-            .append(" - ")
+            toReturn.append("<html><b>Replace ")
+                .append(getName());
+            if(isUnitTonnageMatters()) {
+                toReturn.append(" (")
+                    .append(getUnitTonnage())
+                    .append(" ton)");
+            }
+            toReturn.append(" - ")
             .append(ReportingUtilities.messageSurroundedBySpanWithColor(
                 SkillType.getExperienceLevelColor(getSkillMin()),
                 SkillType.getExperienceLevelName(getSkillMin()) + "+"))

@@ -146,6 +146,11 @@ public class MASC extends EquipmentPart {
     }
 
     @Override
+    public boolean isUnitTonnageMatters() {
+        return !isSupercharger();
+    }
+
+    @Override
     public String getDetails() {
         return getDetails(true);
     }
@@ -153,16 +158,14 @@ public class MASC extends EquipmentPart {
     @Override
     public String getDetails(boolean includeRepairDetails) {
         String details = super.getDetails(includeRepairDetails);
-        if (null != unit) {
-            return details;
-        }
         if (!details.isEmpty()) {
             details += ", ";
         }
         if (isSupercharger()) {
-            return details + ", " + getEngineRating() + " rating";
+            // Causes extra information but needed so omnipods show all data
+            details += equipTonnage + " tons, ";
         }
-        return details + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
+        return details + getEngineRating() + " rating";
     }
 
     @Override

@@ -98,10 +98,16 @@ public abstract class Part implements IPartWork, ITechnology {
     protected String name;
     protected int id;
 
-    // this is the unitTonnage which needs to be tracked for some parts
-    // even when off the unit. actual tonnage is returned via the
-    // getTonnage() method
+    /** 
+     * This is the unitTonnage which needs to be tracked for some parts
+     * even when off the unit. Actual tonnage is returned via the
+     * getTonnage() method
+     */
     protected int unitTonnage;
+    /**
+     * Is this part's unitTonnage something that differentiates it from other parts
+     */
+    protected boolean unitTonnageMatters;
 
     protected boolean omniPodded;
 
@@ -185,6 +191,7 @@ public abstract class Part implements IPartWork, ITechnology {
     public Part(int tonnage, boolean omniPodded, Campaign c) {
         this.name = "Unknown";
         this.unitTonnage = tonnage;
+        this.unitTonnageMatters = false;
         this.omniPodded = omniPodded;
         this.hits = 0;
         this.skillMin = SkillType.EXP_GREEN;
@@ -354,6 +361,13 @@ public abstract class Part implements IPartWork, ITechnology {
     public int getUnitTonnage() {
         return unitTonnage;
     }
+    
+    /** 
+     * @return Is this an item that exists in multiple forms for units of different tonnages?
+     */
+    public boolean isUnitTonnageMatters() {
+        return unitTonnageMatters;
+    }
 
     public abstract double getTonnage();
 
@@ -427,6 +441,11 @@ public abstract class Part implements IPartWork, ITechnology {
         toReturn.append("<html><b>")
             .append(isSalvaging() ? "Salvage  " : "Repair ")
             .append(getName());
+            if(isUnitTonnageMatters()) {
+                toReturn.append(" (")
+                    .append(getUnitTonnage())
+                    .append(" ton)");
+            }
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
             .append(ReportingUtilities.messageSurroundedBySpanWithColor(
@@ -1123,9 +1142,14 @@ public abstract class Part implements IPartWork, ITechnology {
             sj.add("OmniPod");
         }
 
-        if (includeRepairDetails) {
-            sj.add(hits + " hit(s)");
-            if (campaign.getCampaignOptions().isPayForRepairs() && (hits > 0)) {
+        if (isUnitTonnageMatters())
+        {
+            sj.add(getUnitTonnage() + " tons");
+        }
+
+        if (includeRepairDetails && hits > 0) {            
+            sj.add(hits + (hits == 1 ? " hit" : " hits"));
+            if (campaign.getCampaignOptions().isPayForRepairs()) {
                 sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
         }

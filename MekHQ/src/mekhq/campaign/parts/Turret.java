@@ -53,6 +53,7 @@ public class Turret extends TankLocation {
         super(loc, tonnage, c);
         weight = 0;
         this.name = "Turret";
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -225,15 +226,6 @@ public class Turret extends TankLocation {
     @Override
     public String getDetails() {
         return getDetails(true);
-    }
-
-    @Override
-    public String getDetails(boolean includeRepairDetails) {
-        String details = weight + " tons";
-        if (includeRepairDetails) {
-            details += ", " + damage + " point(s) of damage";
-        }
-        return details;
     }
 
     @Override
