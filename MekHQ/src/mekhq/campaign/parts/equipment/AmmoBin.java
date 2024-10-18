@@ -43,6 +43,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -488,18 +489,18 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         if (isSalvaging()) {
             return super.getDesc();
         }
-        String toReturn = "<html><font";
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
-
-        toReturn += ">";
-        toReturn += "<b>Reload " + getName() + "</b><br/>";
-        toReturn += getDetails() + "<br/>";
-        toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-        toReturn += "</font></html>";
-        return toReturn;
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html>")
+            .append("<b>Reload ")
+            .append(getName())
+            .append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>")
+            .append(getTimeLeft())
+            .append(" minutes")
+            .append(null != getTech() ? " (scheduled) " : "")
+            .append("</html>");
+        return toReturn.toString();
     }
 
     @Override
@@ -513,24 +514,44 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             return super.getDetails(includeRepairDetails);
         }
         if (null != unit) {
-            String availability;
             int shotsAvailable = getAmountAvailable();
             PartInventory inventories = campaign.getPartInventory(getNewPart());
+            
+            StringBuilder toReturn = new StringBuilder();
+            toReturn.append(getType().getDesc())
+                .append(", ")
+                .append(getShotsNeeded())
+                .append(" shots needed")
+                .append("<br/>");
 
-            String orderTransitString = inventories.getTransitOrderedDetails();
-
-            if (shotsAvailable == 0) {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No ammo ("
-                        + orderTransitString + ")</font>";
+            if(shotsAvailable == 0) {
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "None in stock"));
             } else if (shotsAvailable < getShotsNeeded()) {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only "
-                        + shotsAvailable + " available (" + orderTransitString + ")</font>";
+                toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
+                    .append("Only ")
+                    .append(shotsAvailable)
+                    .append(" in stock")
+                    .append(ReportingUtilities.CLOSING_SPAN_TAG);
             } else {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + shotsAvailable + " available (" + orderTransitString + ")</font>";
+                toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                        MekHQ.getMHQOptions().getFontColorPositiveHexColor()))
+                    .append(shotsAvailable)
+                    .append(" in stock")
+                    .append(ReportingUtilities.CLOSING_SPAN_TAG);
             }
 
-            return getType().getDesc() + ", " + getShotsNeeded() + " shots needed" + availability;
+            String orderTransitString = inventories.getTransitOrderedDetails();
+            if (!orderTransitString.isEmpty()) {
+                toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                        MekHQ.getMHQOptions().getFontColorWarningHexColor()))
+                    .append(" (")
+                    .append(orderTransitString)
+                    .append(")")
+                    .append(ReportingUtilities.CLOSING_SPAN_TAG);
+            }
+            return toReturn.toString();
         } else {
             return "";
         }
