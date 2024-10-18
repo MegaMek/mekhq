@@ -224,11 +224,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             StringBuilder incomingSB = new StringBuilder();
 
             incomingSB.append(" (")
-                .append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                    MekHQ.getMHQOptions().getFontColorWarningHexColor(), incoming))
+                .append(incoming)
                 .append(")");
 
-            toReturn.append(incomingSB.toString());
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorWarningHexColor(), incomingSB.toString()));
         }
         return toReturn.toString();
     } 
@@ -264,9 +264,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                 part.decrementQuantity();
                 skillMin = SkillType.EXP_GREEN;
             }
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed and part destroyed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                    "<b> failed and part destroyed</b>") + ".";
         } else {
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                    "<b> failed</b>") + ".";
         }
     }
 
@@ -345,14 +349,24 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String find(int transitDays) {
+        // TODO: Move me to live with procurment functions?
+        // Which shopping method is this used for?
         Part newPart = getNewPart();
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
+        StringBuilder toReturn = new StringBuilder();
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> part found</b>"))
+                .append(". It will be delivered in ")
+                .append(transitDays)
+                .append(" days.");
         } else {
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                "<b> You cannot afford this part. Transaction cancelled</b>"));
         }
+        return toReturn.toString();
     }
 
     @Override
@@ -364,7 +378,9 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> part not found</b>.</font>";
+        // TODO: Move me to live with procurment functions?
+        return ReportingUtilities.messageSurroundedBySpanWithColor(
+            MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "<b> part not found</b>") + ".";
     }
 
     @Override
