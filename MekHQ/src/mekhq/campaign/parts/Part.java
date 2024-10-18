@@ -1096,25 +1096,6 @@ public abstract class Part implements IPartWork, ITechnology {
         return sj.toString();
     }
 
-    /**
-     * Converts the array of strings normally returned by a call to
-     * campaign.getInventory()
-     * to a string that reads like "(x in transit, y on order)"
-     *
-     * @param inventories The inventory array, see campaign.getInventory() for
-     *                    details.
-     * @return Human readable string.
-     */
-    public String getOrderTransitStringForDetails(PartInventory inventories) {
-        String inTransitString = (inventories.getTransit() == 0) ? "" : inventories.transitAsString() + " in transit";
-        String onOrderString = (inventories.getOrdered() == 0) ? "" : inventories.orderedAsString() + " on order";
-        String transitOrderSeparator = !inTransitString.isBlank() && !onOrderString.isBlank() ? ", " : "";
-
-        return (!inTransitString.isBlank() || !onOrderString.isBlank())
-                ? String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString)
-                : "";
-    }
-
     @Override
     public boolean isSalvaging() {
         if (null != unit) {

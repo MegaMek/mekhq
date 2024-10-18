@@ -170,17 +170,17 @@ public class Armor extends Part implements IAcquisitionWork {
                 int amountAvailable = getAmountAvailable();
                 PartInventory inventories = campaign.getPartInventory(getNewPart());
 
-                String orderTransitString = getOrderTransitStringForDetails(inventories);
+                String orderTransitString = inventories.getTransitOrderedDetails();
 
                 if (amountAvailable == 0) {
                     availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                            + "'>No armor " + orderTransitString + "</font>";
+                            + "'>No armor (" + orderTransitString + ")</font>";
                 } else if (amountAvailable < amountNeeded) {
                     availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                            + "'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
+                            + "'>Only " + amountAvailable + " available (" + orderTransitString + ")</font>";
                 } else {
                     availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + amountAvailable + " available " + orderTransitString + "</font>";
+                            + amountAvailable + " available (" + orderTransitString + ")</font>";
                 }
 
                 return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points"

@@ -517,17 +517,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             int shotsAvailable = getAmountAvailable();
             PartInventory inventories = campaign.getPartInventory(getNewPart());
 
-            String orderTransitString = getOrderTransitStringForDetails(inventories);
+            String orderTransitString = inventories.getTransitOrderedDetails();
 
             if (shotsAvailable == 0) {
-                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No ammo "
-                        + orderTransitString + "</font>";
+                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No ammo ("
+                        + orderTransitString + ")</font>";
             } else if (shotsAvailable < getShotsNeeded()) {
                 availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only "
-                        + shotsAvailable + " available" + orderTransitString + "</font>";
+                        + shotsAvailable + " available (" + orderTransitString + ")</font>";
             } else {
                 availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + shotsAvailable + " available " + orderTransitString + "</font>";
+                        + shotsAvailable + " available (" + orderTransitString + ")</font>";
             }
 
             return getType().getDesc() + ", " + getShotsNeeded() + " shots needed" + availability;
