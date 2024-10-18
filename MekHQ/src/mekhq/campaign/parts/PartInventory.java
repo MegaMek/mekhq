@@ -140,6 +140,18 @@ public class PartInventory {
      * @see #orderedAsString()
      */
     public String getTransitOrderedDetails() {
-        return transitAsString() + " in transit, " + orderedAsString() + " on order";
+        StringBuilder toReturn = new StringBuilder();
+        if(transit > 0) {
+            toReturn.append(transitAsString())
+                .append(" in transit");
+        }
+        if(ordered > 0) {
+            if (transit > 0) {
+                toReturn.append(", ");
+            }
+            toReturn.append(orderedAsString())
+                .append(" on order");
+        }
+        return toReturn.toString();
     }
 }

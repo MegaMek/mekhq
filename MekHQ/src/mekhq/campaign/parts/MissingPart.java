@@ -84,7 +84,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String getDesc() {
         StringBuilder toReturn = new StringBuilder();
-            toReturn.append("<html><b>Replace ")
+        toReturn.append("<html><b>Replace ")
                 .append(getName());
             if(isUnitTonnageMatters()) {
                 toReturn.append(" (")
@@ -119,7 +119,9 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     @Override
     public String succeed() {
         fix();
-        return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> replaced.</b></font>";
+        return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                " <b>replaced</b>.");
     }
 
     @Override
@@ -178,7 +180,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                         return part;
                     } else if (bestPart.needsFixing() && !part.needsFixing()) {
                         return part;
-                    } else if (bestPart.getQuality() < part.getQuality()) {
+                    } else if (bestPart.getQuality().toNumeric() < part.getQuality().toNumeric()) {
                         return part;
                     }
                 }
@@ -206,13 +208,30 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
+        PartInventory inventories = campaign.getPartInventory(getNewPart());
+        StringBuilder toReturn = new StringBuilder();
+
         if (isReplacementAvailable()) {
-            return "Replacement part available";
+            toReturn.append(inventories.getSupply())
+                .append(" in stock");
         } else {
-            PartInventory inventories = campaign.getPartInventory(getNewPart());
-            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No replacement (" + inventories.getTransitOrderedDetails() + ")</font>";
+            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "None in stock"));
         }
-    }
+
+        String incoming = inventories.getTransitOrderedDetails();
+        if (!incoming.isEmpty()) {
+            StringBuilder incomingSB = new StringBuilder();
+
+            incomingSB.append(" (")
+                .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorWarningHexColor(), incoming))
+                .append(")");
+
+            toReturn.append(incomingSB.toString());
+        }
+        return toReturn.toString();
+    } 
 
     @Override
     public boolean needsFixing() {
