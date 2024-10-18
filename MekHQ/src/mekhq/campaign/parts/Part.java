@@ -1031,18 +1031,20 @@ public abstract class Part implements IPartWork, ITechnology {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed.</b></font>";
+        return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "'<b> failed</b>") + ".";
     }
 
     @Override
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                    + "'><b> salvaged.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> salvaged</b>") + ".";
         } else {
             fix();
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> fixed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> fixed</b>") + ".";
         }
     }
 
