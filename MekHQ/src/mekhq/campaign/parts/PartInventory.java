@@ -133,9 +133,8 @@ public class PartInventory {
     /**
      * Gets the transit and ordered counts formatted as a String.
      *
-     * @return A String like, <code>&quot;XXX in transit, YYY on order&quot;</code>,
-     *         describing
-     *         the transit and ordered counts.
+     * @return A String like, <code>&quot;X in transit, Y on order&quot;</code>,
+     *         describing the transit and ordered counts.
      * @see #transitAsString()
      * @see #orderedAsString()
      */
