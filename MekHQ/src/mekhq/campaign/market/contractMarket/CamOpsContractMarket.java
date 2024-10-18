@@ -89,16 +89,37 @@ public class CamOpsContractMarket extends AbstractContractMarket {
 
     @Override
     public double calculatePaymentMultiplier(Campaign campaign, AtBContract contract) {
-        Faction employer = contract.getEmployerFaction();
         int reputationFactor = campaign.getReputation().getReputationFactor();
-        ContractTerms terms = new ContractTerms(contract.getContractType(), employer,
-            reputationFactor, campaign.getLocalDate());
+        ContractTerms terms = getContractTerms(campaign, contract);
         return terms.getEmploymentMultiplier() * terms.getOperationsTempoMultiplier() * reputationFactor;
     }
 
     @Override
     public void checkForFollowup(Campaign campaign, AtBContract contract) {
 
+    }
+
+    @Override
+    public void rerollClause(AtBContract contract, int clause, Campaign campaign) {
+        if (getRerollsUsed(contract, clause) > 0) {
+            // CamOps RAW only allows 1 negotiation attempt
+            return;
+        }
+        int negotiationSkill = findNegotiationSkill(campaign);
+        int ratingMod = campaign.getReputation().getReputationModifier();
+        int margin = rollOpposedNegotiation(negotiationSkill, ratingMod);
+        int change = margin / 2;
+        ContractTerms terms = getContractTerms(campaign, contract);
+
+        switch (clause) {
+            case CLAUSE_COMMAND -> setCommandRights(contract, terms, contract.getCommandRoll() + change);
+            case CLAUSE_SALVAGE -> setSalvageRights(contract, terms, contract.getSalvageRoll() + change);
+            case CLAUSE_SUPPORT -> setSupportRights(contract, terms, contract.getSupportRoll() + change);
+            case CLAUSE_TRANSPORT -> setTransportRights(contract, terms, contract.getTransportRoll() + change);
+            default -> throw new IllegalStateException("Unexpected clause when rerolling contract clause: " + clause);
+        }
+        clauseMods.get(contract.getId()).rerollsUsed[clause]++;
+        contract.calculateContract(campaign);
     }
 
     private HiringHallModifiers getHiringHallModifiers(Campaign campaign) {
@@ -127,7 +148,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
     }
 
     private int rollOpposedNegotiation(int skill, int modifiers) {
-        return Compute.d6(2) + skill + modifiers - Compute.d6(2) + EMPLOYER_NEGOTIATION_SKILL_LEVEL;
+        return rollNegotiation(skill, modifiers) - Compute.d6(2) + EMPLOYER_NEGOTIATION_SKILL_LEVEL;
     }
 
     private int getNumberOfOffers(int margin) {
@@ -162,8 +183,7 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
         // Step 2: Determine the mission type
         contract.setContractType(determineMission(campaign, employer, reputation.getReputationModifier()));
-        ContractTerms contractTerms = new ContractTerms(contract.getContractType(),
-            employer, reputation.getReputationFactor(), campaign.getLocalDate());
+        ContractTerms contractTerms = getContractTerms(campaign, contract);
         setEnemyCode(contract);
         setAttacker(contract);
         // Step 3: Set the system location
@@ -297,20 +317,28 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private void setContractClauses(AtBContract contract, ContractTerms terms) {
-        setCommandRights(contract, terms);
-        setSalvageRights(contract, terms);
-        setSupportRights(contract, terms);
-        setTransportRights(contract, terms);
+    private ContractTerms getContractTerms(Campaign campaign, AtBContract contract) {
+        return new ContractTerms(contract.getContractType(),
+            contract.getEmployerFaction(),
+            campaign.getReputation().getReputationFactor(),
+            campaign.getLocalDate());
     }
 
-    private void setCommandRights(AtBContract contract, ContractTerms terms) {
-        int roll = Compute.d6(2);
+    private void setContractClauses(AtBContract contract, ContractTerms terms) {
+        clauseMods.put(contract.getId(), new ClauseMods());
+        setCommandRights(contract, terms, Compute.d6(2));
+        setSalvageRights(contract, terms, Compute.d6(2));
+        setSupportRights(contract, terms, Compute.d6(2));
+        setTransportRights(contract, terms, Compute.d6(2));
+    }
+
+    private void setCommandRights(AtBContract contract, ContractTerms terms, int roll) {
+        contract.setCommandRoll(roll);
         contract.setCommandRights(terms.getCommandRights(roll));
     }
 
-    private void setSalvageRights(AtBContract contract, ContractTerms terms) {
-        int roll = Compute.d6(2);
+    private void setSalvageRights(AtBContract contract, ContractTerms terms, int roll) {
+        contract.setSalvageRoll(roll);
         if (terms.isSalvageExchange(roll)) {
             contract.setSalvageExchange(true);
         } else {
@@ -319,8 +347,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private void setSupportRights(AtBContract contract, ContractTerms terms) {
-        int roll = Compute.d6(2);
+    private void setSupportRights(AtBContract contract, ContractTerms terms, int roll) {
+        contract.setSupportRoll(roll);
         if (terms.isStraightSupport(roll)) {
             contract.setStraightSupport(terms.getSupportPercentage(roll));
         } else if (terms.isBattleLossComp(roll)) {
@@ -330,8 +358,8 @@ public class CamOpsContractMarket extends AbstractContractMarket {
         }
     }
 
-    private void setTransportRights(AtBContract contract, ContractTerms terms) {
-        int roll = Compute.d6(2);
+    private void setTransportRights(AtBContract contract, ContractTerms terms, int roll) {
+        contract.setTransportRoll(roll);
         contract.setTransportComp(terms.getTransportTerms(roll));
     }
 

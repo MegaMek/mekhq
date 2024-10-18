@@ -30,6 +30,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -81,13 +82,6 @@ public abstract class Part implements IPartWork, ITechnology {
     public static final int T_IS = 1;
     public static final int T_CLAN = 2;
 
-    public static final int QUALITY_A = 0;
-    public static final int QUALITY_B = 1;
-    public static final int QUALITY_C = 2;
-    public static final int QUALITY_D = 3;
-    public static final int QUALITY_E = 4;
-    public static final int QUALITY_F = 5;
-
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
     protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TECH_BASE_ALL)
@@ -127,7 +121,7 @@ public abstract class Part implements IPartWork, ITechnology {
     // null is valid. It indicates parts that are not attached to units.
     protected Unit unit;
 
-    protected int quality;
+    protected PartQuality quality;
 
     protected boolean brandNew;
 
@@ -204,50 +198,13 @@ public abstract class Part implements IPartWork, ITechnology {
         this.campaign = c;
         this.brandNew = true;
         this.quantity = 1;
-        this.quality = QUALITY_D;
+        this.quality = PartQuality.QUALITY_D;
         this.childParts = new ArrayList<>();
         this.isTeamSalvaging = false;
     }
 
-    public static String getQualityName(int quality, boolean reverse) {
-        switch (quality) {
-            case QUALITY_A:
-                if (reverse) {
-                    return "F";
-                }
-                return "A";
-            case QUALITY_B:
-                if (reverse) {
-                    return "E";
-                }
-                return "B";
-            case QUALITY_C:
-                if (reverse) {
-                    return "D";
-                }
-                return "C";
-            case QUALITY_D:
-                if (reverse) {
-                    return "C";
-                }
-                return "D";
-            case QUALITY_E:
-                if (reverse) {
-                    return "B";
-                }
-                return "E";
-            case QUALITY_F:
-                if (reverse) {
-                    return "A";
-                }
-                return "F";
-            default:
-                return "?";
-        }
-    }
-
     public String getQualityName() {
-        return getQualityName(getQuality(), campaign.getCampaignOptions().isReverseQualityNames());
+        return quality.toName(campaign.getCampaignOptions().isReverseQualityNames());
     }
 
     public void setId(int id) {
@@ -315,7 +272,8 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         if (!isBrandNew()) {
-            cost = cost.multipliedBy(campaign.getCampaignOptions().getUsedPartPriceMultipliers()[getQuality()]);
+            cost = cost.multipliedBy(campaign.getCampaignOptions()
+                    .getUsedPartPriceMultipliers()[getQuality().toNumeric()]);
         }
 
         if (needsFixing() && !isPriceAdjustedForAmount()) {
@@ -576,16 +534,18 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public abstract boolean isSamePartType(Part part);
 
-    public boolean isSameStatus(Part part) {
+    public boolean isSameStatus(Part otherPart) {
         // parts that are reserved for refit or being worked on are never the same
         // status
         if (isReservedForRefit() || isBeingWorkedOn() || isReservedForReplacement() || hasParentPart()
-                || part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement()
-                || part.hasParentPart()) {
+                || otherPart.isReservedForRefit() || otherPart.isBeingWorkedOn() 
+                || otherPart.isReservedForReplacement() || otherPart.hasParentPart()) {
             return false;
         }
-        return quality == part.getQuality() && hits == part.getHits() && part.getSkillMin() == this.getSkillMin()
-                && this.getDaysToArrival() == part.getDaysToArrival();
+        return getQuality() == otherPart.getQuality()
+                && getHits() == otherPart.getHits()
+                && getSkillMin() == otherPart.getSkillMin() 
+                && getDaysToArrival() == otherPart.getDaysToArrival();
     }
 
     protected boolean isClanTechBase() {
@@ -653,7 +613,7 @@ public abstract class Part implements IPartWork, ITechnology {
         if (reservedBy != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reserveId", reservedBy.getId());
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quality", quality);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quality", quality.toNumeric());
         if (isTeamSalvaging) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isTeamSalvaging", true);
         }
@@ -760,7 +720,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
                     retVal.replacementPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
-                    retVal.quality = Integer.parseInt(wn2.getTextContent());
+                    retVal.quality = PartQuality.fromNumeric(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("parentPartId")) {
                     retVal.parentPart = new PartRef(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("childPartId")) {
@@ -991,31 +951,9 @@ public abstract class Part implements IPartWork, ITechnology {
      * @return the modified {@link TargetRoll}
      */
     private TargetRoll getQualityMods(TargetRoll mods, Person tech) {
-        int qualityMod = 0;
-        switch (quality) {
-            case QUALITY_A:
-                qualityMod = 3;
-                break;
-            case QUALITY_B:
-                qualityMod = 2;
-                break;
-            case QUALITY_C:
-                qualityMod = 1;
-                break;
-            case QUALITY_D:
-                qualityMod = 0;
-                break;
-            case QUALITY_E:
-                qualityMod = -1;
-                break;
-            case QUALITY_F:
-                qualityMod = -2;
-                break;
-        }
-        mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().isReverseQualityNames()));
-        if ((qualityMod > 0) &&
-                (null != tech) &&
-                tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
+        mods.addModifier(getQuality().getRepairModifier(), getQualityName());
+        if ((getQuality().getRepairModifier() > 0)
+                && (null != tech) && tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
             // fixers can ignore the first point of penalty for poor quality
             mods.addModifier(-1, "Mr/Ms Fix-it");
         }
@@ -1427,19 +1365,19 @@ public abstract class Part implements IPartWork, ITechnology {
         updateConditionFromEntity(false);
     }
 
-    public int getQuality() {
+    public PartQuality getQuality() {
         return quality;
     }
 
     public void improveQuality() {
-        quality += 1;
+        quality = quality.improveQuality();
     }
 
-    public void decreaseQuality() {
-        quality -= 1;
+    public void reduceQuality() {
+        quality = quality.reduceQuality();
     }
 
-    public void setQuality(int q) {
+    public void setQuality(PartQuality q) {
         quality = q;
     }
 

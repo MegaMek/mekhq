@@ -40,6 +40,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.*;
@@ -192,32 +193,24 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_PARTS_REPORT)) { // Single Unit only
             new PartQualityReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SET_QUALITY)) {
-            // TODO : Duplicated in PartsTableMouseAdapter#actionPerformed
-            int q = -1;
             boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
             Object[] possibilities = {
-                    Part.getQualityName(Part.QUALITY_A, reverse),
-                    Part.getQualityName(Part.QUALITY_B, reverse),
-                    Part.getQualityName(Part.QUALITY_C, reverse),
-                    Part.getQualityName(Part.QUALITY_D, reverse),
-                    Part.getQualityName(Part.QUALITY_E, reverse),
-                    Part.getQualityName(Part.QUALITY_F, reverse)
+                    PartQuality.QUALITY_A.toName(reverse),
+                    PartQuality.QUALITY_B.toName(reverse),
+                    PartQuality.QUALITY_C.toName(reverse),
+                    PartQuality.QUALITY_D.toName(reverse),
+                    PartQuality.QUALITY_E.toName(reverse),
+                    PartQuality.QUALITY_F.toName(reverse)
             };
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(), "Choose the new quality level",
                     "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
-                    Part.getQualityName(Part.QUALITY_D, reverse));
-            for (int i = 0; i < possibilities.length; i++) {
-                if (possibilities[i].equals(quality)) {
-                    q = i;
-                    break;
-                }
-            }
-            if (q != -1) {
-                for (Unit unit : units) {
-                    if (unit != null) {
-                        unit.setQuality(q);
-                        MekHQ.triggerEvent(new UnitChangedEvent(unit));
-                    }
+                    PartQuality.QUALITY_D.toName(reverse));
+            
+            PartQuality q = PartQuality.fromName(quality, reverse);
+            for (Unit unit : units) {
+                if (null != unit) {
+                    unit.setQuality(q);
+                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 }
             }
         } else if (command.equals(COMMAND_SELL)) {

@@ -60,6 +60,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -415,7 +416,7 @@ public class PersonnelMarketDialog extends JDialog {
             return;
         }
 
-        int quality = 3;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
             quality = UnitOrder.getRandomUnitQuality(0);

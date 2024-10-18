@@ -1581,9 +1581,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         if (isRefurbishing) {
             for (Part p : oldUnit.getParts()) {
-                if (p.getQuality() != QUALITY_F) {
-                    p.improveQuality();
-                }
+                p.improveQuality();
             }
         }
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));

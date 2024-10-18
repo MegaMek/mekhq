@@ -33,6 +33,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
@@ -207,12 +208,12 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         if (equipment instanceof Part) {
             gui.getCampaign().getQuartermaster().addPart((Part) equipment, 0);
         } else if (equipment instanceof Entity) {
-            int quality;
+            PartQuality quality;
 
             if (gui.getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
                 quality = Unit.getRandomUnitQuality(0);
             } else {
-                quality = 3;
+                quality = PartQuality.QUALITY_D;
             }
 
             gui.getCampaign().addNewUnit((Entity) equipment, false, 0, quality);
