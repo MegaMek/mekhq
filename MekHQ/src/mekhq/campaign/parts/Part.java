@@ -239,17 +239,33 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
+    public Money getUndamagedValue() {
+        return adjustCostsForCampaignOptions(getStickerPrice(), true);
+    }
+
+    @Override
     public boolean isPriceAdjustedForAmount() {
         return false;
     }
 
     /**
-     * Adjusts the cost of a part based on one's campaign options
+     * Adjusts the cost of a part based on campaign options and the part's condition
      *
      * @param cost the part's base cost
      * @return the part's cost adjusted for campaign options
      */
     public Money adjustCostsForCampaignOptions(@Nullable Money cost) {
+        return adjustCostsForCampaignOptions(cost, false);
+    } 
+
+    /**
+     * Adjusts the cost of a part based on campaign options
+     *
+     * @param cost the part's base cost
+     * @param ignoreDamage do we ignore damaged condition
+     * @return the part's cost adjusted for campaign options
+     */
+    public Money adjustCostsForCampaignOptions(@Nullable Money cost, boolean ignoreDamage) {
         // if the part doesn't cost anything, no amount of multiplication will change it
         if ((cost == null) || cost.isZero()) {
             return Money.zero();
@@ -276,7 +292,7 @@ public abstract class Part implements IPartWork, ITechnology {
                     .getUsedPartPriceMultipliers()[getQuality().toNumeric()]);
         }
 
-        if (needsFixing() && !isPriceAdjustedForAmount()) {
+        if (!ignoreDamage && needsFixing() && !isPriceAdjustedForAmount()) {
             cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_ELITE)
                     ? campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier()
                     : campaign.getCampaignOptions().getDamagedPartsValueMultiplier());

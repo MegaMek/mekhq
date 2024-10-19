@@ -604,6 +604,10 @@ public class MekLocation extends Part {
                 toReturn.append(" (")
                     .append(Math.round(100 * getPercent()))
                     .append("%)");
+                if (campaign.getCampaignOptions().isPayForRepairs()) {
+                    toReturn.append(", ")
+                        .append(getUndamagedValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
+                }
             }
         }
 

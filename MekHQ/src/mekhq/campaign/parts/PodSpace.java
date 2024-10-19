@@ -516,6 +516,17 @@ public class PodSpace implements IPartWork {
         return Money.of(0.0);
     }
 
+    /**
+     * This is the value of the part that may be affected by characteristics and campaign options
+     * but which ignores damage
+     * (Note: Pod Space, an abstraction, does not have value or price.
+     * @return the part's actual value
+     */
+    @Override
+    public Money getUndamagedValue() {
+        return Money.of(0.0);
+    }
+
     @Override
     public boolean isPriceAdjustedForAmount(){
         return false;

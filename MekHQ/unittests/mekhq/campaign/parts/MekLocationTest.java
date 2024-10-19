@@ -2017,7 +2017,9 @@ class MekLocationTest {
     @Test
     void getDetailsSpareTest() {
         Campaign mockCampaign = mock(Campaign.class);
-
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        
         MekLocation mekLocation = new MekLocation(Mek.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
 
         assertNotNull(mekLocation.getDetails());
@@ -2062,6 +2064,8 @@ class MekLocationTest {
     @Test
     void getDetailsOnUnitTest() {
         Campaign mockCampaign = mock(Campaign.class);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         Unit unit = mock(Unit.class);
         Mek entity = mock(Mek.class);
         when(unit.getEntity()).thenReturn(entity);
