@@ -520,8 +520,14 @@ public class ContractMarketDialog extends JDialog {
             10, "messageChallengeVeryHard.text"
         );
 
-        // Extract the resource mapping
+        // Extract the resource mapping and get the resource string
         String resourceKey = difficultyMessages.getOrDefault(difficulty, "");
+
+        // If resourceKey is not found, just return true, acting as if the player had accepted the mission
+        if (resourceKey.isEmpty()) {
+            return true;
+        }
+
         String messageResource = resourceMap.getString(resourceKey);
 
         // Format the HTML message
