@@ -723,13 +723,11 @@ public final class BriefingTab extends CampaignGuiTab {
         resolveDialog.setVisible(true);
 
         if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-            RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
+            RetirementDefectionDialog dialog = new RetirementDefectionDialog(getCampaignGui(),
                     getCampaign().getMission(scenario.getMissionId()), false);
 
-
-
-            if (!rdd.wasAborted()) {
-                getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+            if (!dialog.wasAborted()) {
+                getCampaign().applyRetirement(dialog.totalPayout(), dialog.getUnitAssignments());
             }
         }
 

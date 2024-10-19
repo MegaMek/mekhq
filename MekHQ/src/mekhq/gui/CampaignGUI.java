@@ -1221,10 +1221,10 @@ public class CampaignGUI extends JPanel {
          * custom schedule
          */
         boolean doRetirement = getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty();
-        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null, doRetirement);
+        RetirementDefectionDialog dialog = new RetirementDefectionDialog(this, null, doRetirement);
 
-        if (!rdd.wasAborted()) {
-            getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+        if (!dialog.wasAborted()) {
+            getCampaign().applyRetirement(dialog.totalPayout(), dialog.getUnitAssignments());
             return true;
         } else {
             return false;
