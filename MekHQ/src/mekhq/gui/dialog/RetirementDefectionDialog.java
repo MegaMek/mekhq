@@ -23,6 +23,7 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -122,7 +123,7 @@ public class RetirementDefectionDialog extends JDialog {
             targetRolls = rdTracker.getTargetNumbers(mission, hqView.getCampaign());
         }
         currentPanel = doRetirement ? PAN_OVERVIEW : PAN_RESULTS;
-        setSize(new Dimension(800, 600));
+        setSize(UIUtil.scaleForGUI(800, 600));
         initComponents(doRetirement);
         if (!doRetirement) {
             initResults();
