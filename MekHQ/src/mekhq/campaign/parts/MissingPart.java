@@ -412,9 +412,17 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String getAcquisitionName() {
+        // TODO: Unify shopping system to use these everywhere instead of only some places?
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append(getPartName());
+
         String details = getNewPart().getDetails();
-        details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
-        return getPartName() + ' ' + details;
+        if (!details.isEmpty()) {
+            toReturn.append(" (")
+                .append(details)
+                .append(')');
+        }
+        return toReturn.toString();
     }
 
     @Override
