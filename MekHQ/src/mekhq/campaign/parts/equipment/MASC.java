@@ -157,15 +157,19 @@ public class MASC extends EquipmentPart {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        String details = super.getDetails(includeRepairDetails);
+        StringBuilder details = new StringBuilder();
+        details.append(super.getDetails(includeRepairDetails));
         if (!details.isEmpty()) {
-            details += ", ";
+            details.append(", ");
         }
         if (isSupercharger()) {
             // Causes extra information but needed so omnipods show all data
-            details += equipTonnage + " tons, ";
+            details.append(equipTonnage)
+                .append(" tons, ");
         }
-        return details + getEngineRating() + " rating";
+        details.append(getEngineRating())
+            .append(" rating");
+        return details.toString();
     }
 
     @Override
