@@ -108,6 +108,7 @@ MEKHQ VERSION HISTORY:
 + PR #5053: Colorise Skill Levels
 + PR #5054: Implement CamOps Contract Negotiation
 + PR #5055: Parts In Use - Filter Mothballed and Spare Part Quality
++ PR #5064: Bug fix and improvements for calculateContractDifficulty()
 
 0.50.0 (2024-09-01 2000 UTC) (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
