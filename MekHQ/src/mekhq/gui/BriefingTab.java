@@ -1146,10 +1146,13 @@ public final class BriefingTab extends CampaignGuiTab {
             chosen.clear();
             chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
             file = determineMULFilePath(scenario, ((AtBContract) mission).getEmployer());
+
+            int genericBattleValue = calculateGenericBattleValue(chosen);
+
             if (file != null) {
                 try {
                     // Save the player's allied entities to the file.
-                    EntityListFile.saveTo(file, chosen);
+                    EntityListFile.saveTo(file, chosen, genericBattleValue);
                 } catch (Exception ex) {
                     logger.error("", ex);
                 }
@@ -1164,15 +1167,36 @@ public final class BriefingTab extends CampaignGuiTab {
                 continue;
             }
             file = determineMULFilePath(scenario, botForce.getName());
+
+            int genericBattleValue = calculateGenericBattleValue(chosen);
+
             if (file != null) {
                 try {
                     // Save the bot force's entities to the file.
-                    EntityListFile.saveTo(file, chosen);
+                    EntityListFile.saveTo(file, chosen, genericBattleValue);
                 } catch (Exception ex) {
                     logger.error("", ex);
                 }
             }
         }
+    }
+
+    /**
+     * Calculates the total generic battle value of the entities chosen.
+     * If the use of generic battle value option is enabled in the campaign options, the generic battle
+     * value of each entity in the list is summed up and returned as the total generic battle value.
+     * If the said option is disabled, the method returns 0.
+     *
+     * @param chosen the list of entities for which the generic battle value is to be calculated.
+     * @return the total generic battle value or 0 if the generic battle value usage is turned off in
+     * campaign options.
+     */
+    private int calculateGenericBattleValue(ArrayList<Entity> chosen) {
+        int genericBattleValue = 0;
+        if (getCampaign().getCampaignOptions().isUseGenericBattleValue()) {
+            genericBattleValue = chosen.stream().mapToInt(Entity::getGenericBattleValue).sum();
+        }
+        return genericBattleValue;
     }
 
     private @Nullable File determineMULFilePath(final Scenario scenario, final String name) {
