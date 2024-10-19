@@ -2250,13 +2250,11 @@ public class Campaign implements ITechManager {
             boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
 
         if (ignoreMothballedUnits && (null != incomingPart.getUnit()) && incomingPart.getUnit().isMothballed()) {
-            return;
         } else if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
             partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
         } else {
             if (incomingPart.isPresent()) {
                 if (incomingPart.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
-                    return;
                 } else {
                     partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
                     partInUse.addSpare(incomingPart);
@@ -2273,7 +2271,7 @@ public class Campaign implements ITechManager {
      * @param ignoreMothballedUnits don't count parts in mothballed units
      * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
      */
-    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits, 
+    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits,
             PartQuality ignoreSparesUnderQuality) {
         partInUse.setUseCount(0);
         partInUse.setStoreCount(0);
@@ -2290,7 +2288,7 @@ public class Campaign implements ITechManager {
             PartInUse newPiu = getPartInUse((Part) maybePart);
             if (partInUse.equals(newPiu)) {
                 partInUse.setPlannedCount(partInUse.getPlannedCount()
-                        + getQuantity((maybePart instanceof MissingPart) ? 
+                        + getQuantity((maybePart instanceof MissingPart) ?
                             ((MissingPart) maybePart).getNewPart() :
                             (Part) maybePart) * maybePart.getQuantity());
             }
@@ -2334,7 +2332,7 @@ public class Campaign implements ITechManager {
                 inUse.put(partInUse, partInUse);
             }
             partInUse.setPlannedCount(partInUse.getPlannedCount()
-                    + getQuantity((maybePart instanceof MissingPart) ? 
+                    + getQuantity((maybePart instanceof MissingPart) ?
                             ((MissingPart) maybePart).getNewPart() :
                             (Part) maybePart) * maybePart.getQuantity());
 
@@ -3770,7 +3768,8 @@ public class Campaign implements ITechManager {
 
                 AtBMoraleLevel morale = contract.getMoraleLevel();
 
-                String report = "<html>Current enemy condition is '" + morale + "' on contract " + contract.getName() + "<br><br>" + morale.getToolTipText() + "</html>";
+                String report = "Current enemy condition is <b>" + morale + "</b> on contract "
+                    + contract.getName() + "<br><br>" + morale.getToolTipText();
 
                 addReport(report);
             }
@@ -4222,8 +4221,7 @@ public class Campaign implements ITechManager {
         setLocalDate(getLocalDate().plusDays(1));
 
         // Determine if we have an active contract or not, as this can get used
-        // elsewhere before
-        // we actually hit the AtB new day (e.g., personnel market)
+        // elsewhere before we actually hit the AtB new day (e.g., personnel market)
         if (getCampaignOptions().isUseAtB()) {
             setHasActiveContract();
         }
@@ -4233,6 +4231,8 @@ public class Campaign implements ITechManager {
         setCurrentReportHTML("");
         newReports.clear();
         beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(getLocalDate()) + "</b>");
+
+        MekHQ.triggerEvent(new NewDayEvent(this));
 
         // New Year Changes
         if (getLocalDate().getDayOfYear() == 1) {
@@ -4297,7 +4297,10 @@ public class Campaign implements ITechManager {
             processPersonnelRemoval();
         }
 
-        MekHQ.triggerEvent(new NewDayEvent(this));
+        if ((campaignOptions.isEnableAutoAwards()) && (getLocalDate().getDayOfMonth() == 1)) {
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+            autoAwardsController.ManualController(this, false);
+        }
 
         // this duplicates any turnover information so that it is still available on the
         // new day.
@@ -8002,7 +8005,7 @@ public class Campaign implements ITechManager {
                 // }
                 break;
         }
-        if (p.getQuality().toNumeric() > oldQuality.toNumeric()) { 
+        if (p.getQuality().toNumeric() > oldQuality.toNumeric()) {
             partReport += ": " + ReportingUtilities.messageSurroundedBySpanWithColor(
                     MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
                     "new quality is " + p.getQualityName());
