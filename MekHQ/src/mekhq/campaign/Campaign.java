@@ -1463,7 +1463,7 @@ public class Campaign implements ITechManager {
             person = newPerson(PersonnelRole.DEPENDENT, PersonnelRole.NONE,
                     new DefaultFactionSelector(getCampaignOptions().getRandomOriginOptions()),
                     new DefaultPlanetSelector(getCampaignOptions().getRandomOriginOptions()),
-                    Gender.RANDOMIZE);
+                gender);
         } else {
             person = newPerson(PersonnelRole.DEPENDENT);
         }
