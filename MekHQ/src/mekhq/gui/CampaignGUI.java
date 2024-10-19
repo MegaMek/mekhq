@@ -1222,8 +1222,8 @@ public class CampaignGUI extends JPanel {
          */
         RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
                 getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
-        rdd.setLocation(rdd.getLocation().x, 0);
-        rdd.setVisible(true);
+
+
 
         if (!rdd.wasAborted()) {
             getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());

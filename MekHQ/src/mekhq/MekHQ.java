@@ -515,8 +515,6 @@ public class MekHQ implements GameListener {
             if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
                         campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
-                rdd.setLocation(rdd.getLocation().x, 0);
-                rdd.setVisible(true);
 
                 if (!rdd.wasAborted()) {
                     getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
