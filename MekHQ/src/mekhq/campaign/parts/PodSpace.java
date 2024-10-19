@@ -234,10 +234,12 @@ public class PodSpace implements IPartWork {
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> removed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> removed</b>") + ".";
         } else {
             fix();
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> fixed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> fixed</b>") + ".";
         }
     }
 
@@ -255,9 +257,12 @@ public class PodSpace implements IPartWork {
             }
         }
         if (rating >= SkillType.EXP_ELITE && replacing) {
-                return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed and part(s) destroyed.</b></font>";
+                return ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                        "<b> failed and part(s) destroyed</b>") + ".";
         } else {
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),"<b> failed</b>") + ".";
         }
     }
 
