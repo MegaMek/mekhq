@@ -133,7 +133,7 @@ public class PlanetarySystem {
     // the location of the primary planet for this system
     private int primarySlot;
 
-    @XmlElement(name = "hiringHall", required = false)
+    @XmlElement(name = "hiringHall")
     private HiringHallOverride staticHall = null;
 
     /** Marker for "please delete this system" */
@@ -753,10 +753,12 @@ public class PlanetarySystem {
      * @return The hiring hall level on the given date
      */
     public HiringHallLevel getHiringHallLevel(LocalDate date) {
+        if (staticHall != null && staticHall.isActive(date)) {
+            return staticHall.getLevel();
+        }
         if (getPopulation(date) == 0) {
             return HiringHallLevel.NONE;
         }
-        int score = 0;
         for (Faction faction : getFactionSet(date)) {
             if (faction.isPirate() || faction.isChaos()) {
                 return HiringHallLevel.QUESTIONABLE;
@@ -765,8 +767,18 @@ public class PlanetarySystem {
                 return HiringHallLevel.NONE;
             }
         }
+        int score = calculateHiringHallScore(date);
+        return resolveHiringHallScore(score);
+    }
+
+    private int calculateHiringHallScore(LocalDate date) {
+        int score = 0;
         score += getHiringHallHpgBonus(date);
         score += getHiringHallTechBonus(date);
+        return score;
+    }
+
+    private HiringHallLevel resolveHiringHallScore(int score) {
         if (score > 9) {
             return HiringHallLevel.GREAT;
         } else if (score > 6) {
