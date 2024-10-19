@@ -35,7 +35,7 @@ public class HiringHallOverride {
     private LocalDate start;
     @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
     private LocalDate end;
-    @XmlElement(name = "level", required = false)
+    @XmlElement(name = "level")
     private HiringHallLevel level;
 
 
