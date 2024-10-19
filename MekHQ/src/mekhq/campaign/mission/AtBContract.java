@@ -1713,12 +1713,12 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * This method returns a {@link JPanel} that represents the difficulty stars for a given mission.
+     * This method returns a {@link JPanel} that represents the difficulty skulls for a given mission.
      *
-     * @param campaign the campaign for which the difficulty stars are calculated
-     * @return a {@link JPanel} with the difficulty stars displayed
+     * @param campaign the campaign for which the difficulty skulls are calculated
+     * @return a {@link JPanel} with the difficulty skulls displayed
      */
-    public JPanel getContractDifficultyStars(Campaign campaign) {
+    public JPanel getContractDifficultySkulls(Campaign campaign) {
         final int ERROR = -99;
         int difficulty = calculateContractDifficulty(campaign);
 
