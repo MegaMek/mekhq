@@ -570,18 +570,22 @@ public class MekLocation extends Part {
     public String getDetails(boolean includeRepairDetails) {
         StringBuilder toReturn = new StringBuilder();
 
-        toReturn.append(super.getDetails(includeRepairDetails));
+        if (null != getUnit()) {
+            toReturn.append(Objects.requireNonNull(getUnit()).getEntity().getLocationName(loc))
+                .append(", ");
+        }
 
+        toReturn.append(getUnitTonnage())
+            .append(" tons");
+            
         if (loc == Mek.LOC_HEAD) {
             StringJoiner components = new StringJoiner(", ");
             if (hasSensors()) {
                 components.add("Sensors");
             }
-
             if (hasLifeSupport()) {
                 components.add("Life Support");
             }
-
             if (components.length() > 0) {
                 toReturn.append(" [")
                     .append(components)
@@ -589,31 +593,21 @@ public class MekLocation extends Part {
             }
         }
 
-        if (getUnit() != null) {
-            return getDetailsOnUnit(includeRepairDetails);
-        }
-
-        if (includeRepairDetails && getPercent() < 1.0) {
-            toReturn.append(" (")
+        if (includeRepairDetails) {
+            if (isBlownOff()) {
+                toReturn.append(" (Blown Off)");
+            } else if (isBreached()) {
+                toReturn.append(" (Breached)");
+            } else if (onBadHipOrShoulder()) {
+                toReturn.append(" (Bad Hip/Shoulder)");
+            } else if (getPercent() < 1.0) {
+                toReturn.append(" (")
                     .append(Math.round(100 * getPercent()))
                     .append("%)");
+            }
         }
 
         return toReturn.toString();
-    }
-
-    private String getDetailsOnUnit(boolean includeRepairDetails) {
-        String toReturn = Objects.requireNonNull(getUnit()).getEntity().getLocationName(loc);
-        if (includeRepairDetails) {
-            if (isBlownOff()) {
-                toReturn += " (Blown Off)";
-            } else if (isBreached()) {
-                toReturn += " (Breached)";
-            } else if (onBadHipOrShoulder()) {
-                toReturn += " (Bad Hip/Shoulder)";
-            }
-        }
-        return toReturn;
     }
 
     @Override
