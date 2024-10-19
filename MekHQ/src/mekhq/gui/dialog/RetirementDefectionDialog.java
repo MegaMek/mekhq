@@ -30,12 +30,14 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.RetirementTableModel;
@@ -121,6 +123,14 @@ public class RetirementDefectionDialog extends JDialog {
         rdTracker = hqView.getCampaign().getRetirementDefectionTracker();
         if (doRetirement) {
             targetRolls = rdTracker.getTargetNumbers(mission, hqView.getCampaign());
+
+            if (targetRolls.isEmpty()) {
+                aborted = false;
+                setVisible(false);
+
+                nobodyEligibleDialog(gui, gui.getCampaign());
+                return;
+            }
         }
         currentPanel = doRetirement ? PAN_OVERVIEW : PAN_RESULTS;
         setSize(UIUtil.scaleForGUI(800, 600));
@@ -755,6 +765,17 @@ public class RetirementDefectionDialog extends JDialog {
         return unitAssignments;
     }
 
+    /**
+     * Returns a {@link Map} containing the {@link TargetRoll} objects associated with the {@link UUID} keys.
+     * <p>
+     * If this returns empty, it means nobody is eligible for retirement/resignation
+     *
+     * @return a {@link Map} of {@link UUID} keys mapped to {@link TargetRoll} values
+     */
+    public Map<UUID, TargetRoll> getTargetRolls() {
+        return targetRolls;
+    }
+
     public boolean wasAborted() {
         return aborted;
     }
@@ -888,6 +909,49 @@ public class RetirementDefectionDialog extends JDialog {
             }
             filterUnits();
         }
+    }
+
+    /**
+     * Creates and displays a dialog showing that no members of the campaign have a turnover target
+     * number greater than 2. The dialog includes a scaled faction logo, a message, and an 'OK'
+     * button to close the dialog.
+     *
+     * @param gui       the {@link CampaignGUI} object providing context for the dialog.
+     * @param campaign  the current {@link Campaign}.
+     */
+    private void nobodyEligibleDialog(CampaignGUI gui, Campaign campaign) {
+        // Main frame for the test
+        JFrame frame = gui.getFrame();
+
+        // Creating an instance of JDialog
+        JDialog dialog = new JDialog(frame, resourceMap.getString("nobodyEligibleDialog.title"), true);
+
+        // Setting the layout
+        dialog.setLayout(new BorderLayout());
+
+        // Creating and scaling the image label
+        ImageIcon originalIcon = Factions.getFactionLogo(campaign, campaign.getFaction().getShortName(),
+            true);
+        ImageIcon scaledIcon = new ImageIcon(originalIcon.getImage().getScaledInstance(
+            originalIcon.getIconWidth()/2, originalIcon.getIconHeight()/2, Image.SCALE_FAST));
+        JLabel imageLabel = new JLabel(scaledIcon);
+
+        dialog.add(imageLabel, BorderLayout.NORTH);
+
+        // Dialog body
+        JLabel text = new JLabel(resourceMap.getString("nobodyEligibleDialog.text"), JLabel.CENTER);
+        dialog.add(text, BorderLayout.CENTER);
+
+        // Options
+        JButton okButton = new JButton(resourceMap.getString("btnDone.text"));
+        okButton.addActionListener(e -> dialog.dispose());
+        dialog.add(okButton, BorderLayout.SOUTH);
+
+        // Formating
+        dialog.setSize(UIUtil.scaleForGUI(400, 200));
+        dialog.setLocationRelativeTo(gui.getFrame());
+        dialog.setAlwaysOnTop(true);
+        dialog.setVisible(true);
     }
 }
 

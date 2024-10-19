@@ -440,8 +440,6 @@ public final class BriefingTab extends CampaignGuiTab {
                 && (getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement())) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(), mission, true);
 
-
-
             if (rdd.wasAborted()) {
                 /*
                  * Once the retirement rolls have been made, the outstanding payouts can be

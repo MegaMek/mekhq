@@ -1220,10 +1220,8 @@ public class CampaignGUI extends JPanel {
          * present the retirement view to give the player a chance to follow a
          * custom schedule
          */
-        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
-                getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
-
-
+        boolean doRetirement = getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty();
+        RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null, doRetirement);
 
         if (!rdd.wasAborted()) {
             getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
