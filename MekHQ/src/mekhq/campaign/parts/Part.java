@@ -1048,7 +1048,7 @@ public abstract class Part implements IPartWork, ITechnology {
         timeSpent = 0;
         shorthandedMod = 0;
         return ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "'<b> failed</b>") + ".";
+                MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "<b> failed</b>") + ".";
     }
 
     @Override
