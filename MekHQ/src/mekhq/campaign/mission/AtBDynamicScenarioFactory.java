@@ -284,6 +284,7 @@ public class AtBDynamicScenarioFactory {
                 } else {
                     int weightClass = randomForceWeight();
 
+                    logger.info(String.format("++ Generating a force for the %s template ++", forceTemplate.getForceName()).toUpperCase());
                     generatedLanceCount += generateForce(scenario, contract, campaign,
                             effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
                 }
