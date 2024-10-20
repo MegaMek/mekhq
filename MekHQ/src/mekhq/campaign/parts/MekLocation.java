@@ -872,9 +872,9 @@ public class MekLocation extends Part {
         toReturn.append("<html><b>")
             .append(isBlownOff() ? "Re-attach " : "Seal ")
             .append(getName())
-            .append(", ")
-            .append(getTonnage())
-            .append("ton - ")
+            .append(" (")
+            .append(getUnitTonnage())
+            .append(" ton) - ")
             .append(ReportingUtilities.messageSurroundedBySpanWithColor(
                 SkillType.getExperienceLevelColor(getSkillMin()),
                 SkillType.getExperienceLevelName(getSkillMin()) + "+"))

@@ -2038,7 +2038,6 @@ class MekLocationTest {
 
         assertNotNull(mekLocation.getDetails());
         assertTrue(mekLocation.getDetails().startsWith("25 tons"));
-        //assertTrue(mekLocation.getDetails().contains("(100%)"));
         assertNotNull(mekLocation.getDetails(false));
         assertEquals("25 tons", mekLocation.getDetails(false));
 
@@ -2046,7 +2045,6 @@ class MekLocationTest {
 
         assertNotNull(mekLocation.getDetails());
         assertTrue(mekLocation.getDetails().startsWith("25 tons"));
-        //assertTrue(mekLocation.getDetails().contains("(100%)"));
         assertTrue(mekLocation.getDetails().contains("[Sensors]"));
         assertNotNull(mekLocation.getDetails(false));
         assertEquals("25 tons [Sensors]", mekLocation.getDetails(false));
@@ -2055,7 +2053,6 @@ class MekLocationTest {
 
         assertNotNull(mekLocation.getDetails());
         assertTrue(mekLocation.getDetails().startsWith("25 tons"));
-        //assertTrue(mekLocation.getDetails().contains("(100%)"));
         assertTrue(mekLocation.getDetails().contains("[Sensors, Life Support]"));
         assertNotNull(mekLocation.getDetails(false));
         assertEquals("25 tons [Sensors, Life Support]", mekLocation.getDetails(false));
