@@ -26,6 +26,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -210,25 +211,34 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     public String getDetails(boolean includeRepairDetails) {
         PartInventory inventories = campaign.getPartInventory(getNewPart());
         StringBuilder toReturn = new StringBuilder();
+        
+        String superDetails = super.getDetails(includeRepairDetails);
+        toReturn.append(superDetails);
 
-        if (isReplacementAvailable()) {
-            toReturn.append(inventories.getSupply())
-                .append(" in stock");
-        } else {
-            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "None in stock"));
-        }
+        if (!(this instanceof MissingAmmoBin)) {
+            // Ammo bins don't require/have stock replacements.
+            if(!superDetails.isEmpty()) {
+                toReturn.append(", ");
+            }
+            if (isReplacementAvailable()) {
+                toReturn.append(inventories.getSupply())
+                    .append(" in stock");
+            } else {
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "None in stock"));
+            }
 
-        String incoming = inventories.getTransitOrderedDetails();
-        if (!incoming.isEmpty()) {
-            StringBuilder incomingSB = new StringBuilder();
+            String incoming = inventories.getTransitOrderedDetails();
+            if (!incoming.isEmpty()) {
+                StringBuilder incomingSB = new StringBuilder();
 
-            incomingSB.append(" (")
-                .append(incoming)
-                .append(")");
+                incomingSB.append(" (")
+                    .append(incoming)
+                    .append(")");
 
-            toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
-                MekHQ.getMHQOptions().getFontColorWarningHexColor(), incomingSB.toString()));
+                toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorWarningHexColor(), incomingSB.toString()));
+            }
         }
         return toReturn.toString();
     } 
