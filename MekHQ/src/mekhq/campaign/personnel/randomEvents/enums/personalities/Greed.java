@@ -18,9 +18,10 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import java.util.ResourceBundle;
-
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+
+import java.util.ResourceBundle;
 
 public enum Greed {
     // region Enum Declarations
@@ -237,7 +238,7 @@ public enum Greed {
      * @throws IllegalStateException if the given string does not match any valid
      *                               Greed
      */
-
+    @Deprecated
     public static Greed parseFromString(final String greed) {
         return switch (greed) {
             case "0", "None" -> NONE;
@@ -281,54 +282,23 @@ public enum Greed {
     }
 
     /**
-     * Parses an integer value into an Greed enum.
+     * Returns the {@link Greed} associated with the given ordinal.
      *
-     * @param greed the integer value representing the Greed level
-     * @return the corresponding Greed enum value
-     * @throws IllegalStateException if the integer value does not correspond to any
-     *                               valid Greed enum value
+     * @param ordinal the ordinal value of the {@link Greed}
+     * @return the {@link Greed} associated with the given ordinal, or default value
+     * {@code NONE} if not found
      */
+    public static Greed fromOrdinal(int ordinal) {
+        for (Greed greed : values()) {
+            if (greed.ordinal() == ordinal) {
+                return greed;
+            }
+        }
 
-    public static Greed parseFromInt(final int greed) {
-        return switch (greed) {
-            case 0 -> NONE;
-            // Minor Characteristics
-            case 1 -> ASTUTE;
-            case 2 -> ADEPT;
-            case 3 -> AVARICIOUS;
-            case 4 -> DYNAMIC;
-            case 5 -> EAGER;
-            case 6 -> EXPLOITATIVE;
-            case 7 -> FRAUDULENT;
-            case 8 -> GENEROUS;
-            case 9 -> GREEDY;
-            case 10 -> HOARDING;
-            case 11 -> INSATIABLE;
-            case 12 -> INSIGHTFUL;
-            case 13 -> JUDICIOUS;
-            case 14 -> LUSTFUL;
-            case 15 -> MERCENARY;
-            case 16 -> OVERREACHING;
-            case 17 -> PROFITABLE;
-            case 18 -> SAVVY;
-            case 19 -> SELF_SERVING;
-            case 20 -> SHAMELESS;
-            case 21 -> SHREWD;
-            case 22 -> TACTICAL;
-            case 23 -> UNPRINCIPLED;
-            case 24 -> VORACIOUS;
-            // Major Characteristics
-            case 25 -> CORRUPT;
-            case 26 -> ENTERPRISING;
-            case 27 -> INTUITIVE;
-            case 28 -> METICULOUS;
-            case 29 -> NEFARIOUS;
-            case 30 -> THIEF;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Greed.java/parseFromInt: "
-                                + greed);
-        };
+        final MMLogger logger = MMLogger.create(Greed.class);
+        logger.error(String.format("Unknown Greed ordinal: %s - returning NONE.", ordinal));
+
+        return NONE;
     }
 
     @Override
