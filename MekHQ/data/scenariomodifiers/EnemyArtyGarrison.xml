@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>This facility is defended by an additional force of enemy artillery who
-		have been unable to clear the area.</additionalBriefingText>
+	<additionalBriefingText>This facility is defended by an additional force of enemy artillery who have been unable to clear the area.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -24,12 +23,12 @@
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Artillery Garrison</forceName>
+		<forceName>Artillery Garrison</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>5</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>0</startingAltitude>

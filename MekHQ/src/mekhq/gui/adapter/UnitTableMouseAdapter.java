@@ -40,6 +40,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.*;
@@ -192,32 +193,24 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_PARTS_REPORT)) { // Single Unit only
             new PartQualityReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SET_QUALITY)) {
-            // TODO : Duplicated in PartsTableMouseAdapter#actionPerformed
-            int q = -1;
             boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
             Object[] possibilities = {
-                    Part.getQualityName(Part.QUALITY_A, reverse),
-                    Part.getQualityName(Part.QUALITY_B, reverse),
-                    Part.getQualityName(Part.QUALITY_C, reverse),
-                    Part.getQualityName(Part.QUALITY_D, reverse),
-                    Part.getQualityName(Part.QUALITY_E, reverse),
-                    Part.getQualityName(Part.QUALITY_F, reverse)
+                    PartQuality.QUALITY_A.toName(reverse),
+                    PartQuality.QUALITY_B.toName(reverse),
+                    PartQuality.QUALITY_C.toName(reverse),
+                    PartQuality.QUALITY_D.toName(reverse),
+                    PartQuality.QUALITY_E.toName(reverse),
+                    PartQuality.QUALITY_F.toName(reverse)
             };
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(), "Choose the new quality level",
                     "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
-                    Part.getQualityName(Part.QUALITY_D, reverse));
-            for (int i = 0; i < possibilities.length; i++) {
-                if (possibilities[i].equals(quality)) {
-                    q = i;
-                    break;
-                }
-            }
-            if (q != -1) {
-                for (Unit unit : units) {
-                    if (unit != null) {
-                        unit.setQuality(q);
-                        MekHQ.triggerEvent(new UnitChangedEvent(unit));
-                    }
+                    PartQuality.QUALITY_D.toName(reverse));
+            
+            PartQuality q = PartQuality.fromName(quality, reverse);
+            for (Unit unit : units) {
+                if (null != unit) {
+                    unit.setQuality(q);
+                    MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 }
             }
         } else if (command.equals(COMMAND_SELL)) {
@@ -365,7 +358,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().succeed());
         } else if (command.equals(COMMAND_REFURBISH)) {
             for (Unit unit : units) {
-                Refit refit = new Refit(unit, unit.getEntity(), false, true);
+                Refit refit = new Refit(unit, unit.getEntity(), false, true, false);
                 gui.refitUnit(refit, false);
             }
         } else if (command.equals(COMMAND_REFIT_KIT)) { // Single Unit or Multiple of Units of the same type only
@@ -381,7 +374,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                             Entity refitEntity = new MekFileParser(summary.getSourceFile(), summary.getEntryName())
                                     .getEntity();
                             if (refitEntity != null) {
-                                Refit refit = new Refit(unit, refitEntity, false, false);
+                                Refit refit = new Refit(unit, refitEntity, crd.isCustomize(), false, false);
                                 if (refit.checkFixable() == null) {
                                     gui.refitUnit(refit, false);
                                 }
@@ -850,7 +843,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                                 || (unit.getEntity() instanceof Aero)
                                 || ((unit.getEntity() instanceof Infantry)))) {
                     menuItem = new JMenuItem(unit.getEntity().isOmni() ? "Choose configuration..."
-                            : "Choose Refit Kit...");
+                            : "Refit/Customize...");
                     menuItem.setActionCommand(COMMAND_REFIT_KIT);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
@@ -1093,48 +1086,39 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
         for (Unit unit : units) {
-            String fileName = unit.getEntity().getChassis() + ' ' + unit.getEntity().getModel();
-            if (unit.getEntity() instanceof Mek) {
-                // if this file already exists then don't overwrite
-                // it or we will end up with a bunch of copies
-                String fileOutName = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + File.separator
-                        + fileName + ".mtf";
-                String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".mtf";
-                if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                    JOptionPane.showMessageDialog(null,
-                            "A file already exists for this unit, cannot tag as custom. (Unit name and model)",
-                            "File Already Exists", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+            Entity entity = unit.getEntity();
+            String unitName = entity.getShortNameRaw();
+            String fileExtension = entity instanceof Mek ? ".mtf" : ".blk";
+            String fileOutName = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + File.separator 
+                    + unitName + fileExtension;
+            String fileNameCampaign = sCustomsDirCampaign + File.separator + unitName + fileExtension;
+            
+            // if this file already exists then don't overwrite it or we will end up with a bunch of copies
+            if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                JOptionPane.showMessageDialog(null,
+                        "A file already exists for this unit, cannot tag as custom. (Unit name and model)",
+                        "File Already Exists", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            if (entity instanceof Mek) {
                 try (OutputStream os = new FileOutputStream(fileNameCampaign);
                         PrintStream p = new PrintStream(os)) {
 
-                    p.println(((Mek) unit.getEntity()).getMtf());
+                    p.println(((Mek) entity).getMtf());
                 } catch (Exception e) {
                     logger.error("", e);
                 }
             } else {
-                // if this file already exists then don't overwrite
-                // it or we will end up with a bunch of copies
-                String fileOutName = MHQConstants.CUSTOM_MEKFILES_DIRECTORY_PATH + File.separator
-                        + fileName + ".blk";
-                String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + ".blk";
-                if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-                    JOptionPane.showMessageDialog(null,
-                            "A file already exists for this unit, cannot tag as custom. (Unit name and model)",
-                            "File Already Exists", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
                 try {
-                    BLKFile.encode(fileNameCampaign, unit.getEntity());
+                    BLKFile.encode(fileNameCampaign, entity);
                 } catch (EntitySavingException e) {
                     logger.error("Error encoding unit {}", unit.getName(), e);
                     return;
                 }
             }
-            gui.getCampaign().addCustom(unit.getEntity().getChassis() + ' '
-                    + unit.getEntity().getModel());
+            gui.getCampaign().addCustom(unitName);
         }
-        MekSummaryCache.getInstance().loadMekData();
+        MekSummaryCache.refreshUnitData(false);
     }
 }

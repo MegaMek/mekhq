@@ -28,6 +28,7 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -466,7 +467,7 @@ public class Quartermaster {
     public boolean buyUnit(Entity en, int days) {
         Objects.requireNonNull(en);
 
-        int quality = 3;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);

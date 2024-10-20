@@ -25,7 +25,9 @@ import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.GameOptionsDialog;
+import megamek.client.ui.swing.MMToggleButton;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.client.ui.swing.util.UIUtil;
@@ -49,6 +51,7 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -74,6 +77,7 @@ import mekhq.gui.dialog.nagDialogs.*;
 import mekhq.gui.dialog.reportDialogs.*;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.panes.campaignOptions.SelectPresetDialog;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Document;
@@ -94,6 +98,8 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
+
+import static mekhq.gui.panes.campaignOptions.SelectPresetDialog.PRESET_SELECTION_CANCELLED;
 
 /**
  * The application's main frame.
@@ -141,8 +147,8 @@ public class CampaignGUI extends JPanel {
 
     /* for the top button panel */
     private JPanel btnPanel;
-    private JToggleButton btnGMMode;
-    private JToggleButton btnOvertime;
+    private final JToggleButton btnGMMode = new MMToggleButton(resourceMap.getString("btnGMMode.text"));
+    private final JToggleButton btnOvertime = new MMToggleButton(resourceMap.getString("btnOvertime.text"));
 
     ReportHyperlinkListener reportHLL;
 
@@ -307,7 +313,7 @@ public class CampaignGUI extends JPanel {
      * as they are both accessed through the same GUI page.
      * The following mnemonic keys are being used as of 30-MAR-2020:
      * A, B, C, E, F, H, I, L, M, N, O, P, R, S, T, V, W, /
-     *
+     * <p>
      * Note 1: the slash is used for the help, as it is normally the same key as the
      * ?
      * Note 2: the A mnemonic is used for the Advance Day button
@@ -376,9 +382,9 @@ public class CampaignGUI extends JPanel {
         miImportCampaignPreset.setMnemonic(KeyEvent.VK_C);
         miImportCampaignPreset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK));
         miImportCampaignPreset.addActionListener(evt -> {
-            final CampaignPresetSelectionDialog campaignPresetSelectionDialog = new CampaignPresetSelectionDialog(
-                    getFrame());
-            if (!campaignPresetSelectionDialog.showDialog().isConfirmed()) {
+            final SelectPresetDialog campaignPresetSelectionDialog =
+                new SelectPresetDialog(getFrame(), true, false);
+            if (campaignPresetSelectionDialog.getReturnState() == PRESET_SELECTION_CANCELLED) {
                 return;
             }
             final CampaignPreset preset = campaignPresetSelectionDialog.getSelectedPreset();
@@ -1058,52 +1064,44 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weightx = 1;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(3, 10, 3, 3);
         btnPanel.add(lblLocation, gridBagConstraints);
 
-        btnGMMode = new JToggleButton(resourceMap.getString("btnGMMode.text"));
         btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText"));
         btnGMMode.setSelected(getCampaign().isGM());
         btnGMMode.addActionListener(e -> getCampaign().setGMMode(btnGMMode.isSelected()));
-        btnGMMode.setMinimumSize(new Dimension(150, 25));
-        btnGMMode.setPreferredSize(new Dimension(150, 25));
-        btnGMMode.setMaximumSize(new Dimension(150, 25));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         btnPanel.add(btnGMMode, gridBagConstraints);
 
-        btnOvertime = new JToggleButton(resourceMap.getString("btnOvertime.text"));
         btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText"));
         btnOvertime.addActionListener(evt -> getCampaign().setOvertime(btnOvertime.isSelected()));
-        btnOvertime.setMinimumSize(new Dimension(150, 25));
-        btnOvertime.setPreferredSize(new Dimension(150, 25));
-        btnOvertime.setMaximumSize(new Dimension(150, 25));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(3, 3, 3, 3);
         btnPanel.add(btnOvertime, gridBagConstraints);
 
         // This button uses a mnemonic that is unique and listed in the initMenu JavaDoc
-        JButton btnAdvanceDay = new JButton(resourceMap.getString("btnAdvanceDay.text"));
+        String padding = "       ";
+        JButton btnAdvanceDay = new JButton(padding + resourceMap.getString("btnAdvanceDay.text") + padding);
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText"));
         btnAdvanceDay.addActionListener(evt -> getCampaignController().advanceDay());
         btnAdvanceDay.setMnemonic(KeyEvent.VK_A);
-        btnAdvanceDay.setPreferredSize(new Dimension(250, 50));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -1251,14 +1249,18 @@ public class CampaignGUI extends JPanel {
         menuThemes.removeAll();
         JCheckBoxMenuItem miPlaf;
         for (LookAndFeelInfo laf : UIManager.getInstalledLookAndFeels()) {
-            miPlaf = new JCheckBoxMenuItem(laf.getName());
-            if (laf.getClassName().equalsIgnoreCase(MekHQ.getSelectedTheme().getValue())) {
-                miPlaf.setSelected(true);
-            }
+            // intentionally only limits the themes in the menu; as a last resort for GUI problems, other laf can be used by
+            // hand-editing mhq.preferences
+            if (GUIPreferences.isSupportedLookAndFeel(laf)) {
+                miPlaf = new JCheckBoxMenuItem(laf.getName());
+                if (laf.getClassName().equalsIgnoreCase(MekHQ.getSelectedTheme().getValue())) {
+                    miPlaf.setSelected(true);
+                }
 
-            menuThemes.add(miPlaf);
-            miPlaf.setActionCommand(laf.getClassName());
-            miPlaf.addActionListener(this::changeTheme);
+                menuThemes.add(miPlaf);
+                miPlaf.setActionCommand(laf.getClassName());
+                miPlaf.addActionListener(this::changeTheme);
+            }
         }
     }
 
@@ -1545,7 +1547,7 @@ public class CampaignGUI extends JPanel {
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
             miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         }
-        
+
         AbstractContractMarket contractMarket = getCampaign().getContractMarket();
         if (contractMarket.getMethod() != newOptions.getContractMarketMethod()) {
             getCampaign().setContractMarket(newOptions.getContractMarketMethod().getContractMarket());
@@ -1611,10 +1613,21 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                name = tech.getFullName() + ", " + tech.getSkillLevel(getCampaign(), false) + ' '
-                        + tech.getPrimaryRoleDesc() + " ("
-                        + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
-                        + tech.getMinutesLeft() + '/' + tech.getDailyAvailableTechTime() + " minutes";
+                StringBuilder nameBuilder = new StringBuilder(128);
+                nameBuilder.append("<html>")
+                    .append(tech.getFullName())
+                    .append(", <b>") 
+                    .append(SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(), false)))
+                    .append("</b> ")
+                    .append(tech.getPrimaryRoleDesc())
+                    .append(" (")
+                    .append(getCampaign().getTargetFor(r, tech).getValueAsString())
+                    .append("+), ")
+                    .append(tech.getMinutesLeft())
+                    .append('/')
+                    .append(tech.getDailyAvailableTechTime())
+                    .append(" minutes</html>");
+                name = nameBuilder.toString();
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);
@@ -1913,7 +1926,7 @@ public class CampaignGUI extends JPanel {
     protected void loadListFile(final boolean allowNewPilots) {
         final File unitFile = FileDialogs.openUnits(getFrame()).orElse(null);
 
-        int quality = 3;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);

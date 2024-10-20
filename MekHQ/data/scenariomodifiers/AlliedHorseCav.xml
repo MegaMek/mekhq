@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>From half a league onward a Mercenary Light Brigade of Horse Cavalry rides
-		into the valley of death to assist.</additionalBriefingText>
+	<additionalBriefingText>From half a league onward a Mercenary Light Brigade of Horse Cavalry rides into the valley of death to assist.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>

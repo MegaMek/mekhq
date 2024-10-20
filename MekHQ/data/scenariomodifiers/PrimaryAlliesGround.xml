@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>To compensate for the presence of a large opposing force, allied units
-		will be working alongside us on this operation.</additionalBriefingText>
+	<additionalBriefingText>To compensate for the presence of a large opposing force, allied units will be working alongside us on this operation.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -13,9 +12,9 @@
 		<allowedUnitType>-2</allowedUnitType>
 		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>true</contributesToBV>
+		<contributesToBV>false</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>true</contributesToUnitCount>
+		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones />
 		<destinationZone>5</destinationZone>

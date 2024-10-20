@@ -214,7 +214,6 @@ public class Utilities {
     }
 
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
-        CampaignOptions options = campaign.getCampaignOptions();
         ArrayList<String> variants = new ArrayList<>();
 
         for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
@@ -235,11 +234,6 @@ public class Utilities {
                 if (summary.getTons() != en.getWeight()) {
                     continue;
                 }
-            }
-
-            // If we only allow canon units and this isn't canon we continue
-            if (!summary.isCanon() && options.isAllowCanonRefitOnly()) {
-                continue;
             }
 
             // If the unit doesn't meet the tech filter criteria we continue
@@ -1328,32 +1322,16 @@ public class Utilities {
     }
 
     /**
-     * Testable function to get the original unit based on information from a new
-     * unit
-     *
-     * @param newE new Entity we want to read information from
-     * @return MekSummary that most closely represents the original of the new
-     *         Entity
+     * @param shortNameRaw complete Entity name as returned by getShortNameRaw()
      * @throws EntityLoadingException
-     */
-    public static MekSummary retrieveOriginalUnit(Entity newE) throws EntityLoadingException {
-        MekSummaryCache cacheInstance = MekSummaryCache.getInstance();
-        cacheInstance.loadMekData();
-
-        // I need to change the new entity to the one from the mtf file now, so that
-        // equipment numbers will match
-        MekSummary summary = cacheInstance.getMek(newE.getFullChassis() + ' ' + newE.getModel());
-
-        if (null == summary) {
-            // Attempt to deal with new naming convention directly
-            summary = cacheInstance.getMek(
-                    newE.getChassis() + " (" + newE.getClanChassisName() + ") " + newE.getModel());
-        }
+     */    
+    public static MekSummary retrieveUnit(String shortNameRaw) throws EntityLoadingException {
+        MekSummary summary = MekSummaryCache.getInstance().getMek(shortNameRaw);
 
         // If we got this far with no summary loaded, give up
         if (null == summary) {
-            throw new EntityLoadingException(String.format("Could not load %s %s from the mek cache",
-                    newE.getChassis(), newE.getModel()));
+            throw new EntityLoadingException(String.format("Could not load %s from the mek cache",
+                    shortNameRaw));
         }
 
         return summary;

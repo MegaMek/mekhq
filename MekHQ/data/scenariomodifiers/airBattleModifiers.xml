@@ -23,11 +23,11 @@
 			GoodEquipment.xml
 		</modifier>
 		<!--modifier>
-			Need ability to allow player to specifically deploy dropships
+			Need ability to allow player to specifically deploy DropShips
 			HotDrop.xml
 		</modifier-->
 		<modifier>
-			EnemyDropship.xml
+			EnemyDropShip.xml
 		</modifier>
 		<modifier>
 			GoodIntel.xml
@@ -59,7 +59,7 @@
 		</modifier>
 		<!--modifier>
 			Need campaign state
-			Need way to change rat for opfor
+			Need way to change rat for OpFor
 			AlliedTreachery.xml
 		</modifier-->
 		<modifier>
@@ -74,7 +74,7 @@
 		<modifier>
 			EnemyAirPatrol.xml
 		</modifier>
-		<modifier>
+		<!--modifier>
 			AlliedASFAce01.xml
 		</modifier>
 		<modifier>
@@ -82,6 +82,6 @@
 		</modifier>
 		<modifier>
 			EnemyASFAce02.xml
-		</modifier>
+		</modifier-->
 	</modifiers>
 </scenarioModifierManifest>

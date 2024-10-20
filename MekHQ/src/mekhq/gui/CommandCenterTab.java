@@ -229,7 +229,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
         if (getCampaign().getCampaignOptions().getUnitRatingMethod().isFMMR()) {
             lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
         } else {
-            lblExperience.setText(getCampaign().getReputation().getAverageSkillLevel().toString());
+            // This seems to be overwritten completely and immediately by refresh
+            StringBuilder experienceString = new StringBuilder(64);
+            experienceString.append("<html><b>")
+                .append(mekhq.campaign.personnel.SkillType.getColoredExperienceLevelName(getCampaign().getReputation().getAverageSkillLevel()))
+                .append("</b></html>");
+            lblExperience.setText(experienceString.toString());
         }
 
         lblExperienceHead.setLabelFor(lblExperience);
@@ -582,7 +587,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 reputationController.initializeReputation(campaign);
                 campaign.setReputation(reputationController);
             }
-            lblExperience.setText(campaign.getReputation().getAverageSkillLevel().toString());
+
+            StringBuilder experienceString = new StringBuilder(64);
+            experienceString.append("<html><b>")
+                .append(mekhq.campaign.personnel.SkillType.getColoredExperienceLevelName(campaign.getReputation().getAverageSkillLevel()))
+                .append("</b></html>");
+            lblExperience.setText(experienceString.toString());
         }
 
         campaignSummary.updateInformation();

@@ -36,7 +36,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.verifier.Structure;
 import megamek.common.verifier.TestEntity.Ceil;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -46,6 +45,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.MHQXMLUtility;
+import mekhq.utilities.ReportingUtilities;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -864,46 +864,35 @@ public class MekLocation extends Part {
         if ((!isBreached() && !isBlownOff()) || isSalvaging()) {
             return super.getDesc();
         }
-        String toReturn = "<html><font size='3'";
-        String scheduled = "";
-        if (getTech() != null) {
-            scheduled = " (scheduled) ";
-        }
+        StringBuilder toReturn = new StringBuilder();
+        toReturn.append("<html><b>")
+            .append(isBlownOff() ? "Re-attach " : "Seal ")
+            .append(getName())
+            .append(" - ")
+            .append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                SkillType.getExperienceLevelColor(getSkillMin()),
+                SkillType.getExperienceLevelName(getSkillMin()) + "+"))
+            .append("</b><br/>")
+            .append(getDetails())
+            .append("<br/>");
 
-        toReturn += ">";
-        if (isBlownOff()) {
-            toReturn += "<b>Re-attach " + getName();
-
-        } else {
-            toReturn += "<b>Seal " + getName();
-
-        }
-
-        if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                    + "'>Impossible</b></span>";
-        } else {
-            toReturn += " - <span color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>"
-                    + SkillType.getExperienceLevelName(getSkillMin()) + '+'
-                    + "</span></b></b><br/>";
-        }
-
-        toReturn += getDetails() + "<br/>";
         if (getSkillMin() <= SkillType.EXP_ELITE) {
-            toReturn += getTimeLeft() + " minutes" + scheduled;
-            if (isBlownOff()) {
-                String bonus = getAllMods(null).getValueAsString();
-                if (getAllMods(null).getValue() > -1) {
-                    bonus = '+' + bonus;
+            toReturn.append(getTimeLeft())
+                .append(" minutes")
+                .append(null != getTech() ? " (scheduled)" : "");
+                if(isBlownOff()) {
+                    toReturn.append(" <b>TN:</b> ")
+                        .append(getAllMods(null).getValue() > -1 ? "+" : "")
+                        .append(getAllMods(null).getValueAsString());
                 }
-                toReturn += " <b>TN:</b> " + bonus;
-                if (getMode() != WorkTime.NORMAL) {
-                    toReturn += " <i>" + getCurrentModeName() + "</i>";
-                }
+            if (getMode() != WorkTime.NORMAL) {
+                toReturn.append(" <i>")
+                    .append(getCurrentModeName())
+                    .append( "</i>");
             }
         }
-        toReturn += "</font></html>";
-        return toReturn;
+        toReturn.append("</html>");
+        return toReturn.toString();
     }
 
     @Override

@@ -305,6 +305,10 @@ public class StratconRulesManager {
                 }
 
                 for (Unit unit : potentialUnits) {
+                    if ((sft.getAllowedUnitType() == 11) && (!campaign.getCampaignOptions().isUseDropShips())) {
+                        continue;
+                    }
+
                     // if it's the right type of unit and is around
                     if (forceCompositionMatchesDeclaredUnitType(unit.getEntity().getUnitType(),
                             sft.getAllowedUnitType(), false) &&
@@ -1087,6 +1091,7 @@ public class StratconRulesManager {
                 .mapToInt(key -> key)
                 .mapToObj(campaign::getForce).filter(force -> (force != null)
                         && !force.isDeployed()
+                        && force.isCombatForce()
                         && !forcesInTracks.contains(force.getId()))
                 .map(Force::getId)
                 .collect(Collectors.toList());

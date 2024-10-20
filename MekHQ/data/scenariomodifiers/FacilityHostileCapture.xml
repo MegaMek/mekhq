@@ -1,21 +1,15 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>This facility must be captured: 75% of the designated buildings must
-		remain intact.</additionalBriefingText>
+	<additionalBriefingText>This facility must be captured: 75% of the designated buildings must remain intact.</additionalBriefingText>
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PostForceGeneration</eventTiming>
 	<modifierName>Capture</modifierName>
 	<objectives>
 		<objective>
 			<associatedForceNames>
-				<associatedForceName>Base Turrets</associatedForceName>
+				<associatedForceName>Base Defenses</associatedForceName>
 			</associatedForceNames>
 			<associatedUnitIDs />
 			<successEffects>
-				<successEffect>
-					<effectType>ScenarioVictory</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>2</howMuch>
-				</successEffect>
 				<successEffect>
 					<effectType>FacilityCaptured</effectType>
 					<effectScaling>Fixed</effectScaling>
@@ -23,11 +17,6 @@
 				</successEffect>
 			</successEffects>
 			<failureEffects>
-				<failureEffect>
-					<effectType>ScenarioDefeat</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>1</howMuch>
-				</failureEffect>
 				<failureEffect>
 					<effectType>FacilityRemains</effectType>
 					<effectScaling>Fixed</effectScaling>
@@ -37,8 +26,7 @@
 			<additionalDetails>
 				<additionalDetail>Crippled turrets are considered intact for the purposes of this objective.</additionalDetail>
 			</additionalDetails>
-			<description>Leave intact the following force(s) and unit(s) to be able to take control of
-				this facility:</description>
+			<description>Leave intact the following force(s) and unit(s) to be able to take control of this facility:</description>
 			<destinationEdge>NONE</destinationEdge>
 			<objectiveCriterion>Preserve</objectiveCriterion>
 			<percentage>75</percentage>
@@ -48,16 +36,10 @@
 		</objective>
 		<objective>
 			<associatedForceNames>
-				<associatedForceName>Primary Opfor</associatedForceName>
-				<associatedForceName>Base Turrets</associatedForceName>
+				<associatedForceName>OpFor</associatedForceName>
 			</associatedForceNames>
 			<associatedUnitIDs />
 			<successEffects>
-				<successEffect>
-					<effectType>ScenarioVictory</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>2</howMuch>
-				</successEffect>
 				<successEffect>
 					<effectType>FacilityCaptured</effectType>
 					<effectScaling>Fixed</effectScaling>
@@ -65,11 +47,6 @@
 				</successEffect>
 			</successEffects>
 			<failureEffects>
-				<failureEffect>
-					<effectType>ScenarioDefeat</effectType>
-					<effectScaling>Fixed</effectScaling>
-					<howMuch>1</howMuch>
-				</failureEffect>
 				<failureEffect>
 					<effectType>FacilityRemains</effectType>
 					<effectScaling>Fixed</effectScaling>

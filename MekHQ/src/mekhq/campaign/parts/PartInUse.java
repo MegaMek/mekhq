@@ -92,7 +92,7 @@ public class PartInUse {
      */
     public List<Part> getSpares() {
         return spares.stream()
-            .sorted(Comparator.comparingInt(Part::getQuality))
+            .sorted(Comparator.comparing(Part::getQuality))
             .collect(Collectors.toList());
     }
 

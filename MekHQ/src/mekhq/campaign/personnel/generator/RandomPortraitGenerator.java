@@ -18,19 +18,14 @@
  */
 package mekhq.campaign.personnel.generator;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import megamek.common.Compute;
 import megamek.common.icons.Portrait;
 import megamek.logging.MMLogger;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.personnel.Person;
+
+import java.io.File;
+import java.util.*;
 
 public class RandomPortraitGenerator {
     private static final MMLogger logger = MMLogger.create(RandomPortraitGenerator.class);
@@ -52,7 +47,7 @@ public class RandomPortraitGenerator {
         // duplicates
         Set<String> existingPortraits = new HashSet<>();
         for (Person existingPerson : personnel) {
-            existingPortraits.add(existingPerson.getPortrait().getCategory() + ":"
+            existingPortraits.add(existingPerson.getPortrait().getCategory() + ':'
                     + existingPerson.getPortrait().getFilename());
         }
 
@@ -72,6 +67,8 @@ public class RandomPortraitGenerator {
                 searchCat_RoleGroup = "Admin";
             } else if (p.getPrimaryRole().isVesselCrew()) {
                 searchCat_RoleGroup = "Vessel Crew";
+            } else if (p.getPrimaryRole().isVehicleCrewMember()) {
+                searchCat_RoleGroup = "Vehicle Crew";
             } else if (p.getPrimaryRole().isTech()) {
                 searchCat_RoleGroup = "Tech";
             } else if (p.getPrimaryRole().isMedicalStaff()) {
@@ -134,7 +131,7 @@ public class RandomPortraitGenerator {
 
             final Iterator<String> names = MHQStaticDirectoryManager.getPortraits().getItemNames(category);
             while (names.hasNext()) {
-                final String location = category + ":" + names.next();
+                final String location = category + ':' + names.next();
                 if (existingPortraits.contains(location)) {
                     continue;
                 }

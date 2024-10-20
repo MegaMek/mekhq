@@ -4465,9 +4465,13 @@ public class CampaignOptions {
 
     /**
      * @param role the {@link AtBLanceRole} to get the battle chance for
-     * @return the chance of having a battle for the specified role
+     * @return the chance of having a battle for the specified role, or {@code 0} if StratCon is enabled
      */
     public int getAtBBattleChance(final AtBLanceRole role) {
+        if (useStratCon) {
+            return 0;
+        }
+
         return role.isUnassigned() ? 0 : atbBattleChance[role.ordinal()];
     }
 

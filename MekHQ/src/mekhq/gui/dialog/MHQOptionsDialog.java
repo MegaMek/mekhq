@@ -25,6 +25,7 @@ import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
 import megamek.client.ui.swing.ColourSelectorButton;
 import megamek.client.ui.swing.CommonSettingsDialog;
+import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.HelpDialog;
 import megamek.common.preference.PreferenceManager;
 import megamek.logging.MMLogger;
@@ -45,6 +46,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Hashtable;
 import java.util.Objects;
 
 /**
@@ -69,9 +71,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         // region Display
         private JTextField optionDisplayDateFormat;
         private JTextField optionLongDisplayDateFormat;
+        private final JSlider guiScale = new JSlider();
         private JCheckBox optionHistoricalDailyLog;
         private JCheckBox chkCompanyGeneratorStartup;
         private JCheckBox chkShowCompanyGenerator;
+        private JCheckBox chkShowUnitPicturesOnTOE;
 
         // region Command Center Tab
         private JCheckBox optionCommandCenterUseUnitMarket;
@@ -126,10 +130,21 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         private ColourSelectorButton optionHealedInjuriesBackground;
         private ColourSelectorButton optionPregnantForeground;
         private ColourSelectorButton optionPregnantBackground;
+        private ColourSelectorButton optionGoneForeground;
+        private ColourSelectorButton optionGoneBackground;
+        private ColourSelectorButton optionAbsentForeground;
+        private ColourSelectorButton optionAbsentBackground;
+        private ColourSelectorButton optionFatiguedForeground;
+        private ColourSelectorButton optionFatiguedBackground;
         private ColourSelectorButton optionStratConHexCoordForeground;
         private ColourSelectorButton optionFontColorNegative;
         private ColourSelectorButton optionFontColorWarning;
         private ColourSelectorButton optionFontColorPositive;
+        private ColourSelectorButton optionFontColorSkillUltraGreen;
+        private ColourSelectorButton optionFontColorSkillGreen;
+        private ColourSelectorButton optionFontColorSkillRegular;
+        private ColourSelectorButton optionFontColorSkillVeteran;
+        private ColourSelectorButton optionFontColorSkillElite;
         // endregion Colors
 
         // region Fonts
@@ -221,6 +236,25 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         private JPanel createDisplayTab() {
+            guiScale.setMajorTickSpacing(3);
+            guiScale.setMinimum(7);
+            guiScale.setMaximum(24);
+            Hashtable<Integer, JComponent> table = new Hashtable<>();
+            table.put(7, new JLabel("70%"));
+            table.put(10, new JLabel("100%"));
+            table.put(16, new JLabel("160%"));
+            table.put(22, new JLabel("220%"));
+            guiScale.setLabelTable(table);
+            guiScale.setPaintTicks(true);
+            guiScale.setPaintLabels(true);
+            guiScale.setValue((int) (GUIPreferences.getInstance().getGUIScale() * 10));
+            guiScale.setToolTipText(Messages.getString("CommonSettingsDialog.guiScaleTT"));
+            JLabel guiScaleLabel = new JLabel(Messages.getString("CommonSettingsDialog.guiScale"));
+            JPanel scaleLine = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            scaleLine.add(guiScaleLabel);
+            scaleLine.add(Box.createHorizontalStrut(5));
+            scaleLine.add(guiScale);
+
                 // Initialize Components Used in ActionListeners
                 final JLabel lblInterstellarMapShowJumpRadiusMinimumZoom = new JLabel();
                 final JLabel lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom = new JLabel();
@@ -258,6 +292,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 chkShowCompanyGenerator.setToolTipText(resources.getString("chkShowCompanyGenerator.toolTipText"));
                 chkShowCompanyGenerator.setName("chkShowCompanyGenerator");
 
+                chkShowUnitPicturesOnTOE = new JCheckBox(resources.getString("chkShowUnitPicturesOnTOE.text"));
+                chkShowUnitPicturesOnTOE.setToolTipText(resources.getString("chkShowUnitPicturesOnTOE.toolTipText"));
+                chkShowUnitPicturesOnTOE.setName("chkShowUnitPicturesOnTOE");
+                
                 // region Command Center Tab
                 JLabel labelCommandCenterDisplay = new JLabel(resources.getString("labelCommandCenterDisplay.text"));
 
@@ -410,9 +448,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                                 .addComponent(optionLongDisplayDateFormat)
                                                                 .addComponent(labelLongDisplayDateFormatExample,
                                                                                 Alignment.TRAILING))
+                                    .addComponent(scaleLine)
                                                 .addComponent(optionHistoricalDailyLog)
                                                 .addComponent(chkCompanyGeneratorStartup)
                                                 .addComponent(chkShowCompanyGenerator)
+                                                .addComponent(chkShowUnitPicturesOnTOE)
                                                 .addComponent(labelCommandCenterDisplay)
                                                 .addComponent(optionCommandCenterUseUnitMarket)
                                                 .addComponent(optionCommandCenterMRMS)
@@ -449,9 +489,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                                 .addComponent(labelLongDisplayDateFormat)
                                                                 .addComponent(optionLongDisplayDateFormat)
                                                                 .addComponent(labelLongDisplayDateFormatExample))
+                                    .addComponent(scaleLine)
                                                 .addComponent(optionHistoricalDailyLog)
                                                 .addComponent(chkCompanyGeneratorStartup)
                                                 .addComponent(chkShowCompanyGenerator)
+                                                .addComponent(chkShowUnitPicturesOnTOE)
                                                 .addComponent(labelCommandCenterDisplay)
                                                 .addComponent(optionCommandCenterUseUnitMarket)
                                                 .addComponent(optionCommandCenterMRMS)
@@ -567,6 +609,24 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 optionPregnantBackground = new ColourSelectorButton(
                                 resources.getString("optionPregnantBackground.text"));
 
+                optionGoneForeground = new ColourSelectorButton(
+                                resources.getString("optionGoneForeground.text"));
+
+                optionGoneBackground = new ColourSelectorButton(
+                                resources.getString("optionGoneBackground.text"));
+
+                optionAbsentForeground = new ColourSelectorButton(
+                                resources.getString("optionAbsentForeground.text"));
+                
+                optionAbsentBackground = new ColourSelectorButton(
+                                resources.getString("optionAbsentBackground.text"));
+
+                optionFatiguedForeground = new ColourSelectorButton(
+                                resources.getString("optionFatiguedForeground.text"));
+        
+                optionFatiguedBackground = new ColourSelectorButton(
+                                resources.getString("optionFatiguedBackground.text"));
+
                 optionStratConHexCoordForeground = new ColourSelectorButton(
                                 resources.getString("optionStratConHexCoordForeground.text"));
 
@@ -575,6 +635,17 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 optionFontColorWarning = new ColourSelectorButton(resources.getString("optionFontColorWarning.text"));
 
                 optionFontColorPositive = new ColourSelectorButton(resources.getString("optionFontColorPositive.text"));
+
+                optionFontColorSkillUltraGreen = new ColourSelectorButton(resources.getString("optionFontColorSkillUltraGreen.text"));
+
+                optionFontColorSkillGreen = new ColourSelectorButton(resources.getString("optionFontColorSkillGreen.text"));
+
+                optionFontColorSkillRegular = new ColourSelectorButton(resources.getString("optionFontColorSkillRegular.text"));
+
+                optionFontColorSkillVeteran = new ColourSelectorButton(resources.getString("optionFontColorSkillVeteran.text"));
+
+                optionFontColorSkillElite = new ColourSelectorButton(resources.getString("optionFontColorSkillElite.text"));
+                
                 // endregion Create Graphical Components
 
                 // region Layout
@@ -649,13 +720,35 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                                 .addComponent(optionPregnantBackground,
                                                                                 Alignment.TRAILING))
                                                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                                .addComponent(optionGoneForeground)
+                                                                .addComponent(optionGoneBackground,
+                                                                                Alignment.TRAILING))
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                                .addComponent(optionAbsentForeground)
+                                                                .addComponent(optionAbsentBackground,
+                                                                                Alignment.TRAILING))
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                                .addComponent(optionFatiguedForeground)
+                                                                .addComponent(optionFatiguedBackground,
+                                                                                Alignment.TRAILING))
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                                 .addComponent(optionStratConHexCoordForeground))
                                                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                                                 .addComponent(optionFontColorNegative)
                                                                 .addComponent(optionFontColorPositive,
                                                                                 Alignment.TRAILING))
                                                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                                                .addComponent(optionFontColorWarning)));
+                                                                .addComponent(optionFontColorWarning)
+                                                                .addComponent(optionFontColorSkillUltraGreen,
+                                                                                Alignment.TRAILING))
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                                .addComponent(optionFontColorSkillGreen)
+                                                                .addComponent(optionFontColorSkillRegular,
+                                                                                Alignment.TRAILING))
+                                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                                                .addComponent(optionFontColorSkillVeteran)
+                                                                .addComponent(optionFontColorSkillElite,
+                                                                                Alignment.TRAILING)));
 
                 layout.setHorizontalGroup(
                                 layout.createParallelGroup(Alignment.LEADING)
@@ -705,12 +798,28 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                                                 .addComponent(optionPregnantForeground)
                                                                 .addComponent(optionPregnantBackground))
                                                 .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(optionGoneForeground)
+                                                                .addComponent(optionGoneBackground))
+                                                .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(optionAbsentForeground)
+                                                                .addComponent(optionAbsentBackground))
+                                                .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(optionFatiguedForeground)
+                                                                .addComponent(optionFatiguedBackground))                                             
+                                                .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(optionStratConHexCoordForeground))
                                                 .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(optionFontColorNegative)
                                                                 .addComponent(optionFontColorPositive))
                                                 .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(optionFontColorWarning)));
+                                                                .addComponent(optionFontColorWarning)
+                                                                .addComponent(optionFontColorSkillUltraGreen))
+                                                .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(optionFontColorSkillGreen)
+                                                                .addComponent(optionFontColorSkillRegular))
+                                                .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(optionFontColorSkillVeteran)
+                                                                .addComponent(optionFontColorSkillElite)));
                 // endregion Layout
 
                 return body;
@@ -1256,6 +1365,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         @Override
         protected void okAction() {
+            if (GUIPreferences.getInstance().getGUIScale() * 10 != guiScale.getValue()) {
+                GUIPreferences.getInstance().setValue(GUIPreferences.GUI_SCALE, 0.1 * guiScale.getValue());
+                MekHQ.updateGuiScaling();
+            }
                 if (validateDateFormat(optionDisplayDateFormat.getText())) {
                         MekHQ.getMHQOptions().setDisplayDateFormat(optionDisplayDateFormat.getText());
                 }
@@ -1266,6 +1379,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 MekHQ.getMHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
                 MekHQ.getMHQOptions().setCompanyGeneratorStartup(chkCompanyGeneratorStartup.isSelected());
                 MekHQ.getMHQOptions().setShowCompanyGenerator(chkShowCompanyGenerator.isSelected());
+                MekHQ.getMHQOptions().setShowUnitPicturesOnTOE(chkShowUnitPicturesOnTOE.isSelected());
 
                 // Command Center Tab
                 MekHQ.getMHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
@@ -1326,10 +1440,21 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 MekHQ.getMHQOptions().setHealedInjuriesBackground(optionHealedInjuriesBackground.getColour());
                 MekHQ.getMHQOptions().setPregnantForeground(optionPregnantForeground.getColour());
                 MekHQ.getMHQOptions().setPregnantBackground(optionPregnantBackground.getColour());
+                MekHQ.getMHQOptions().setGoneForeground(optionGoneForeground.getColour());
+                MekHQ.getMHQOptions().setGoneBackground(optionGoneBackground.getColour());
+                MekHQ.getMHQOptions().setAbsentForeground(optionAbsentForeground.getColour());
+                MekHQ.getMHQOptions().setAbsentBackground(optionAbsentBackground.getColour());
+                MekHQ.getMHQOptions().setFatiguedForeground(optionFatiguedForeground.getColour());
+                MekHQ.getMHQOptions().setFatiguedBackground(optionFatiguedBackground.getColour());
                 MekHQ.getMHQOptions().setStratConHexCoordForeground(optionStratConHexCoordForeground.getColour());
                 MekHQ.getMHQOptions().setFontColorNegative(optionFontColorNegative.getColour());
                 MekHQ.getMHQOptions().setFontColorWarning(optionFontColorWarning.getColour());
                 MekHQ.getMHQOptions().setFontColorPositive(optionFontColorPositive.getColour());
+                MekHQ.getMHQOptions().setFontColorSkillUltraGreen(optionFontColorSkillUltraGreen.getColour());
+                MekHQ.getMHQOptions().setFontColorSkillGreen(optionFontColorSkillGreen.getColour());
+                MekHQ.getMHQOptions().setFontColorSkillRegular(optionFontColorSkillRegular.getColour());
+                MekHQ.getMHQOptions().setFontColorSkillVeteran(optionFontColorSkillVeteran.getColour());
+                MekHQ.getMHQOptions().setFontColorSkillElite(optionFontColorSkillElite.getColour());
 
                 MekHQ.getMHQOptions().setMedicalViewDialogHandwritingFont(
                                 comboMedicalViewDialogHandwritingFont.getFont().getFamily());
@@ -1401,11 +1526,13 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         }
 
         private void setInitialState() {
+            guiScale.setValue((int) (GUIPreferences.getInstance().getGUIScale() * 10));
                 optionDisplayDateFormat.setText(MekHQ.getMHQOptions().getDisplayDateFormat());
                 optionLongDisplayDateFormat.setText(MekHQ.getMHQOptions().getLongDisplayDateFormat());
                 optionHistoricalDailyLog.setSelected(MekHQ.getMHQOptions().getHistoricalDailyLog());
                 chkCompanyGeneratorStartup.setSelected(MekHQ.getMHQOptions().getCompanyGeneratorStartup());
                 chkShowCompanyGenerator.setSelected(MekHQ.getMHQOptions().getShowCompanyGenerator());
+                chkShowUnitPicturesOnTOE.setSelected(MekHQ.getMHQOptions().getShowUnitPicturesOnTOE());
 
                 // Command Center Tab
                 optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMHQOptions().getCommandCenterUseUnitMarket());
@@ -1472,10 +1599,21 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                 optionHealedInjuriesBackground.setColour(MekHQ.getMHQOptions().getHealedInjuriesBackground());
                 optionPregnantForeground.setColour(MekHQ.getMHQOptions().getPregnantForeground());
                 optionPregnantBackground.setColour(MekHQ.getMHQOptions().getPregnantBackground());
+                optionGoneForeground.setColour(MekHQ.getMHQOptions().getGoneForeground());
+                optionGoneBackground.setColour(MekHQ.getMHQOptions().getGoneBackground());
+                optionAbsentForeground.setColour(MekHQ.getMHQOptions().getAbsentForeground());
+                optionAbsentBackground.setColour(MekHQ.getMHQOptions().getAbsentBackground());
+                optionFatiguedForeground.setColour(MekHQ.getMHQOptions().getFatiguedForeground());
+                optionFatiguedBackground.setColour(MekHQ.getMHQOptions().getFatiguedBackground());
                 optionStratConHexCoordForeground.setColour(MekHQ.getMHQOptions().getStratConHexCoordForeground());
                 optionFontColorNegative.setColour(MekHQ.getMHQOptions().getFontColorNegative());
                 optionFontColorWarning.setColour(MekHQ.getMHQOptions().getFontColorWarning());
                 optionFontColorPositive.setColour(MekHQ.getMHQOptions().getFontColorPositive());
+                optionFontColorSkillUltraGreen.setColour(MekHQ.getMHQOptions().getFontColorSkillUltraGreen());
+                optionFontColorSkillGreen.setColour(MekHQ.getMHQOptions().getFontColorSkillGreen());
+                optionFontColorSkillRegular.setColour(MekHQ.getMHQOptions().getFontColorSkillRegular());
+                optionFontColorSkillVeteran.setColour(MekHQ.getMHQOptions().getFontColorSkillVeteran());
+                optionFontColorSkillElite.setColour(MekHQ.getMHQOptions().getFontColorSkillElite());
 
                 comboMedicalViewDialogHandwritingFont.setSelectedItem(
                                 new FontDisplay(MekHQ.getMHQOptions().getMedicalViewDialogHandwritingFont()));

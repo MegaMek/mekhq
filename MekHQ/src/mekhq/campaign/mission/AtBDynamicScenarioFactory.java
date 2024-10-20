@@ -21,7 +21,7 @@ package mekhq.campaign.mission;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.*;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
-import megamek.client.generator.skillGenerators.StratConSkillGenerator;
+import megamek.client.generator.skillGenerators.ModifiedConstantSkillGenerator;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
@@ -32,9 +32,7 @@ import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.planetaryconditions.Atmosphere;
-import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.logging.MMLogger;
-import megamek.utilities.BoardClassifier;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -69,7 +67,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.lang.Math.round;
+import static megamek.client.ratgenerator.MissionRole.CIVILIAN;
+import static megamek.common.planetaryconditions.Wind.TORNADO_F4;
 import static mekhq.campaign.mission.Scenario.T_GROUND;
+import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS;
 import static mekhq.campaign.mission.ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX;
 
 /**
@@ -210,7 +211,7 @@ public class AtBDynamicScenarioFactory {
         // approximate estimate, anyway.
         scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
         setScenarioMapSize(scenario);
-        setScenarioMap(scenario, campaign.getCampaignOptions().getFixedMapChance());
+        scenario.setScenarioMap(campaign.getCampaignOptions().getFixedMapChance());
         setDeploymentZones(scenario);
         setDestinationZones(scenario);
 
@@ -241,6 +242,7 @@ public class AtBDynamicScenarioFactory {
      * @return How many "lances" or other individual units were generated?
      */
     private static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign) {
+        logger.info(String.format("GENERATING FORCES FOR: %s", scenario.getName().toUpperCase()));
         int generatedLanceCount = 0;
         List<ScenarioForceTemplate> forceTemplates = scenario.getTemplate().getAllScenarioForces();
 
@@ -266,6 +268,11 @@ public class AtBDynamicScenarioFactory {
         // generate all forces in a specific order level taking into account previously
         // generated but not current order levels.
         // recalculate effective BV and unit count each time we change levels
+
+        // how close to the allowances do we want to get?
+        int targetPercentage = 100 + ((Compute.randomInt(8) - 3) * 5);
+        logger.info(String.format("Target Percentage: %s", targetPercentage));
+
         for (int generationOrder : generationOrders) {
             List<ScenarioForceTemplate> currentForceTemplates = orderedForceTemplates.get(generationOrder);
             effectiveBV = calculateEffectiveBV(scenario, campaign, false);
@@ -431,14 +438,16 @@ public class AtBDynamicScenarioFactory {
         int forceBVBudget = (int) (effectiveBV * forceTemplate.getForceMultiplier());
 
         if (isScenarioModifier) {
-            forceBVBudget = (int) (forceBVBudget * ((double) campaign.getCampaignOptions().getScenarioModBV() / 100) * forceTemplate.getForceMultiplier());
+            forceBVBudget = (int) (forceBVBudget * ((double) campaign.getCampaignOptions().getScenarioModBV() / 100)
+                * forceTemplate.getForceMultiplier());
         }
 
         int forceUnitBudget = 0;
 
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
             forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
-        } else if ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) || (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())) {
+        } else if ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal())
+            || (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal())) {
             forceUnitBudget = forceTemplate.getFixedUnitCount() == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE ? lanceSize : forceTemplate.getFixedUnitCount();
         }
 
@@ -447,35 +456,46 @@ public class AtBDynamicScenarioFactory {
         boolean isLowPressure = false;
         boolean isTainted = false;
         boolean allowsConvInfantry = true;
+        boolean allowsBattleArmor = true;
         boolean allowsTanks = true;
-        if (scenario.getAtmosphere().isLighterThan(Atmosphere.THIN)) {
-            isLowPressure = true;
-            allowsTanks = false;
-        } else {
-            mekhq.campaign.universe.Atmosphere specific_atmosphere = contract.getSystem().getPrimaryPlanet().getAtmosphere(currentDate);
-            switch (specific_atmosphere) {
-                case TOXICPOISON:
-                case TOXICCAUSTIC:
-                    allowsConvInfantry = false;
-                    allowsTanks = false;
-                    break;
-                case TAINTEDPOISON:
-                case TAINTEDCAUSTIC:
-                    isTainted = true;
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (scenario.getWind().isTornadoF1ToF3() || scenario.getWind().isTornadoF4()) {
-            allowsConvInfantry = false;
-            if (scenario.getWind().isTornadoF4()) {
+
+        if (campaign.getCampaignOptions().isUsePlanetaryModifiers()) {
+            if (scenario.getAtmosphere().isLighterThan(Atmosphere.THIN)) {
+                isLowPressure = true;
                 allowsTanks = false;
+            } else {
+                mekhq.campaign.universe.Atmosphere specific_atmosphere =
+                    contract.getSystem().getPrimaryPlanet().getAtmosphere(currentDate);
+
+                switch (specific_atmosphere) {
+                    case TOXICPOISON:
+                    case TOXICCAUSTIC:
+                        allowsConvInfantry = false;
+                        allowsTanks = false;
+                        break;
+                    case TAINTEDPOISON:
+                    case TAINTEDCAUSTIC:
+                        isTainted = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (scenario.getGravity() <= 0.2) {
+                allowsTanks = false;
+                isLowGravity = true;
             }
         }
-        if (scenario.getGravity() <= 0.2) {
-            allowsTanks = false;
-            isLowGravity = true;
+
+        if (campaign.getCampaignOptions().isUseWeatherConditions()) {
+            if (scenario.getWind().isTornadoF1ToF3() || scenario.getWind().isTornadoF4()) {
+                allowsConvInfantry = false;
+                if (scenario.getWind().isTornadoF4()) {
+                    allowsTanks = false;
+                    allowsBattleArmor = false;
+                }
+            }
         }
 
         // Required roles for units in this force. Because these can vary by unit type,
@@ -492,10 +512,10 @@ public class AtBDynamicScenarioFactory {
             } else if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
                 requiredRoles.put(UnitType.CONV_FIGHTER, new ArrayList<>(baseRoles));
                 requiredRoles.put(UnitType.AEROSPACEFIGHTER, new ArrayList<>(baseRoles));
-            } else if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
+            } else if (forceTemplate.getAllowedUnitType() == SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
                 // TODO: this will need to be adjusted to cover SUPPORT and CIVILIAN separately
                 for (int i = 0; i <= UnitType.AERO; i++) {
-                    if (MissionRole.CIVILIAN.fitsUnitType(i)) {
+                    if (CIVILIAN.fitsUnitType(i)) {
                         requiredRoles.put(i, new ArrayList<>(baseRoles));
                     }
                 }
@@ -548,9 +568,6 @@ public class AtBDynamicScenarioFactory {
         boolean stopGenerating = false;
         String currentLanceWeightString = "";
 
-        // how close to the BV allowance do we want to get?
-        int targetPercentage = 100 + ((Compute.randomInt(8) - 3) * 5);
-
         // Generate a tactical formation (lance/star/etc.) until the BV or unit count
         // limits are exceeded
         while (!stopGenerating) {
@@ -581,52 +598,72 @@ public class AtBDynamicScenarioFactory {
             }
 
             // If there are no weight classes available, something went wrong so don't
-            // bother trying
-            // to generate units
+            // bother trying to generate units
             if (currentLanceWeightString == null) {
                 generatedLance = new ArrayList<>();
+            } else {
                 // Hazardous conditions may prohibit deploying infantry or vehicles
-            } else if ((actualUnitType == UnitType.INFANTRY && !allowsConvInfantry) || (actualUnitType == UnitType.TANK && !allowsTanks)) {
-                generatedLance = new ArrayList<>();
-                logger.warn(String.format("Skipping generation of unit type %s due to hostile conditions.", UnitType.getTypeName(actualUnitType)));
+                if ((actualUnitType == UnitType.INFANTRY && !allowsConvInfantry)
+                    || (actualUnitType == UnitType.BATTLE_ARMOR && !allowsBattleArmor)) {
+                    logger.warn("Unable to generate Infantry due to hostile conditions." +
+                        " Switching to Tank.");
+                    actualUnitType = UnitType.TANK;
+                }
+
+                if (actualUnitType == UnitType.TANK && !allowsTanks) {
+                    logger.warn("Unable to generate Tank due to hostile conditions." +
+                        " Switching to Mek.");
+                    actualUnitType = UnitType.MEK;
+                }
 
                 // Gun emplacements use fixed tables instead of the force generator system
-            } else if (actualUnitType == UnitType.GUN_EMPLACEMENT) {
-                generatedLance = generateTurrets(4, skill, quality, campaign, faction);
-
-                // Civilian formations use fixed tables instead of the force generator system
-            } else if (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
-                generatedLance = generateCivilianUnits(4, campaign);
+                if (actualUnitType == UnitType.GUN_EMPLACEMENT) {
+                    generatedLance = generateTurrets(4, skill, quality, campaign, faction);
 
                 // All other unit types use the force generator system to randomly select units
-            } else {
-                // Determine unit types for each unit of the formation. Normally this is all one
-                // type, but SPECIAL_UNIT_TYPE_ATB_MIX may generate all Meks, all vehicles, or
-                // a Mek/vehicle mixed formation.
-                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality, factionCode, allowsTanks, campaign);
-
-                // Formations composed entirely of Meks, aerospace fighters (but not conventional),
-                // and ground vehicles use weight categories as do SPECIAL_UNIT_TYPE_ATB_MIX.
-                // Formations of other types, plus artillery formations do not use weight classes.
-                if ((actualUnitType == SPECIAL_UNIT_TYPE_ATB_MIX || IUnitGenerator.unitTypeSupportsWeightClass(actualUnitType)) && !forceTemplate.getUseArtillery()) {
-
-                    // Generate a specific weight class for each unit based on the formation weight
-                    // class and lower/upper bounds
-                    final String unitWeights = generateUnitWeights(unitTypes, factionCode, AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), forceTemplate.getMaxWeightClass(), forceTemplate.getMinWeightClass(), requiredRoles, campaign);
-
-                    if (unitWeights != null) {
-                        generatedLance = generateLance(factionCode, skill, quality, unitTypes, unitWeights, requiredRoles, campaign);
-                    } else {
-                        generatedLance = new ArrayList<>();
-                    }
                 } else {
-                    generatedLance = generateLance(factionCode, skill, quality, unitTypes, requiredRoles, campaign);
+                    // Determine unit types for each unit of the formation. Normally this is all one
+                    // type, but SPECIAL_UNIT_TYPE_ATB_MIX may generate all Meks, all vehicles, or
+                    // a Mek/vehicle mixed formation.
+                    List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality,
+                        factionCode, allowsTanks, campaign);
 
-                    // If extreme temperatures are present and XCT infantry is not being generated,
-                    // swap out standard armor for snowsuits or heat suits as appropriate
-                    if (actualUnitType == UnitType.INFANTRY) {
-                        for (Entity curPlatoon : generatedLance) {
-                            changeInfantryKit((Infantry) curPlatoon, isLowPressure, isTainted, scenario.getTemperature());
+                    // Formations composed entirely of Meks, aerospace fighters (but not conventional),
+                    // and ground vehicles use weight categories as do SPECIAL_UNIT_TYPE_ATB_MIX.
+                    // Formations of other types, plus artillery formations do not use weight classes.
+                    if ((actualUnitType == SPECIAL_UNIT_TYPE_ATB_MIX
+                        || actualUnitType == SPECIAL_UNIT_TYPE_ATB_CIVILIANS
+                        || IUnitGenerator.unitTypeSupportsWeightClass(actualUnitType))
+                        && !forceTemplate.getUseArtillery()) {
+
+                        // Generate a specific weight class for each unit based on the formation weight
+                        // class and lower/upper bounds
+                        final String unitWeights = generateUnitWeights(unitTypes, factionCode,
+                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0),
+                            forceTemplate.getMaxWeightClass(), forceTemplate.getMinWeightClass(),
+                            requiredRoles, campaign);
+
+                        if (unitWeights != null) {
+                            generatedLance = generateLance(factionCode, skill, quality, unitTypes, unitWeights,
+                                requiredRoles, campaign, scenario);
+                        } else {
+                            generatedLance = new ArrayList<>();
+                        }
+
+                        if (!generatedLance.isEmpty() && forceTemplate.isEnemyBotForce()) {
+                            logger.info(String.format("Force Weights: %s (%s)",
+                                currentLanceWeightString, unitWeights));
+                        }
+                    } else {
+                        generatedLance = generateLance(factionCode, skill, quality, unitTypes, requiredRoles,
+                            campaign, scenario);
+
+                        // If extreme temperatures are present and XCT infantry is not being generated,
+                        // swap out standard armor for snowsuits or heat suits as appropriate
+                        if (actualUnitType == UnitType.INFANTRY) {
+                            for (Entity curPlatoon : generatedLance) {
+                                changeInfantryKit((Infantry) curPlatoon, isLowPressure, isTainted, scenario.getTemperature());
+                            }
                         }
                     }
                 }
@@ -636,7 +673,8 @@ public class AtBDynamicScenarioFactory {
             // work with what is already generated
             if (generatedLance.isEmpty()) {
                 stopGenerating = true;
-                logger.warn(String.format("Unable to generate units from RAT: %s, type %d, max weight %d", factionCode, forceTemplate.getAllowedUnitType(), weightClass));
+                logger.warn(String.format("Unable to generate units from RAT: %s, type %d, max weight %d",
+                    factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                 continue;
             }
 
@@ -672,7 +710,9 @@ public class AtBDynamicScenarioFactory {
                     ArrayList<Entity> arrayGeneratedLance = new ArrayList<>(generatedLance);
                     // bin fill ratio will be adjusted by the load out generator based on piracy and
                     // quality
-                    ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(cGame, cGame.getOptions(), arrayGeneratedLance, factionCode, new ArrayList<>(), new ArrayList<>(), ownerBaseQuality, ((isPirate) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f));
+                    ReconfigurationParameters rp = TeamLoadOutGenerator.generateParameters(cGame,
+                        cGame.getOptions(), arrayGeneratedLance, factionCode, new ArrayList<>(),
+                        new ArrayList<>(), ownerBaseQuality, ((isPirate) ? TeamLoadOutGenerator.UNSET_FILL_RATIO : 1.0f));
                     rp.isPirate = isPirate;
                     rp.groundMap = onGround;
                     rp.spaceEnvironment = (mapLocation == MapLocation.Space);
@@ -719,7 +759,7 @@ public class AtBDynamicScenarioFactory {
                 // the percentage chosen based on unit rating
                 double currentPercentage = ((double) forceBV / forceBVBudget) * 100;
 
-                stopGenerating = currentPercentage > targetPercentage;
+                stopGenerating = currentPercentage > 100;
             } else {
                 // For generation methods other than scaled BV, compare to the overall budget
                 stopGenerating = generatedEntities.size() >= forceUnitBudget;
@@ -739,10 +779,10 @@ public class AtBDynamicScenarioFactory {
             if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
                 balancingType = " Generic";
             }
-            logger.info(String.format("Generated a force with %s / %s %s BV",
-                    forceBV, forceBVBudget, balancingType));
+            logger.info(String.format("%s generated a force with %s / %s %s BV",
+                forceTemplate.getForceName(), forceBV, forceBVBudget, balancingType));
 
-            int adjustedBvBudget = (int) (forceBVBudget * 1.25);
+            int adjustedBvBudget = (int) (forceBVBudget * 1.1);
 
             while ((forceBV > adjustedBvBudget) && (generatedEntities.size() > 1)) {
                 int targetUnit = Compute.randomInt(generatedEntities.size());
@@ -762,7 +802,7 @@ public class AtBDynamicScenarioFactory {
                 generatedEntities.remove(targetUnit);
             }
 
-            logger.info(String.format("Final force %s / %s %s BV",
+            logger.info(String.format("Final force %s / %s %s BV (adjusted for bounds)",
                     forceBV, adjustedBvBudget, balancingType));
         }
 
@@ -823,7 +863,8 @@ public class AtBDynamicScenarioFactory {
                 }
 
                 // There is no point in adding extra Battle Armor to non-ground scenarios
-                if (scenario.getBoardType() == T_GROUND) {
+                // Similarly, there is no point adding Battle Armor to scenarios they cannot survive in.
+                if (scenario.getBoardType() == T_GROUND && scenario.getWind() != TORNADO_F4) {
                     // We want to purposefully exclude off-board artillery, to stop them being
                     // assigned random units of Battle Armor.
                     // If we ever implement the ability to move those units on-board, or for players
@@ -962,8 +1003,7 @@ public class AtBDynamicScenarioFactory {
             for (String unitName : bidAwayForces) {
                 if (report.isEmpty()) {
                     report.append(String.format(resources.getString("bidAwayForcesVerbose.text"),
-                            generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
-                            unitName));
+                            generatedForce.getName(), unitName));
                 } else {
                     report.append(unitName).append("<br>");
                 }
@@ -971,14 +1011,13 @@ public class AtBDynamicScenarioFactory {
         } else {
             if (!bidAwayForces.isEmpty()) {
                 report.append(String.format(resources.getString("bidAwayForces.text"),
-                        generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
-                        bidAwayForces.size(), bidAwayForces.size() > 1 ? "s" : ""));
+                        generatedForce.getName(), bidAwayForces.size(), bidAwayForces.size() > 1 ? "s" : ""));
 
                 boolean isUseLoggerHeader = true;
                 for (String unitName : bidAwayForces) {
                     if (isUseLoggerHeader) {
                         logger.info(String.format(resources.getString("bidAwayForcesLogger.text"),
-                            generatedForce.getName(), scenario.getName(), scenario.getContract(campaign)));
+                            generatedForce.getName()));
                         isUseLoggerHeader = false;
                     }
                     logger.info(unitName);
@@ -989,8 +1028,7 @@ public class AtBDynamicScenarioFactory {
         if (supplementedForces > 0) {
             if (report.isEmpty()) {
                 report.append(String.format(resources.getString("addedBattleArmorNewReport.text"),
-                        generatedForce.getName(), scenario.getName(), scenario.getContract(campaign),
-                        supplementedForces, supplementedForces > 1 ? "s" : ""));
+                        generatedForce.getName(), supplementedForces, supplementedForces > 1 ? "s" : ""));
             } else {
                 report.append(String.format(
                         resources.getString("addedBattleArmorContinueReport.text"),
@@ -998,17 +1036,9 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        if (supplementedForces > 0 || !bidAwayForces.isEmpty()) {
-            if (Compute.randomInt(8) == 0) {
-                report.append(resources.getString("batchallConcludedVersion2.text"));
-            } else {
-                report.append(resources.getString("batchallConcludedVersion1.text"));
-            }
-        }
-
         if (supplementedForces == 0 && bidAwayForces.isEmpty()) {
-            logger.info(String.format(resources.getString("nothingBidAway.text"),
-                generatedForce.getName(), scenario.getName(), scenario.getContract(campaign)));
+            report.append(String.format(resources.getString("nothingBidAway.text"),
+                generatedForce.getName()));
         }
 
         campaign.addReport(report.toString());
@@ -1380,38 +1410,6 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * If there are maps of the appropriate size available and we roll higher than
-     * the given threshold, replace the scenario's generated map with a fixed map
-     * from data/boards
-     */
-    private static void setScenarioMap(AtBDynamicScenario scenario, int mapChance) {
-        if (scenario.getBoardType() != Scenario.T_SPACE
-                && scenario.getTerrainType().equals("Space")
-                && (scenario.getMapSizeX() > 0)
-                && (scenario.getMapSizeY() > 0)
-                && (Compute.randomInt(100) <= mapChance)) {
-            BoardClassifier bc = BoardClassifier.getInstance();
-            List<String> maps = bc.getMatchingBoards(scenario.getMapSizeX(), scenario.getMapSizeY(), 5, 5,
-                    new ArrayList<>());
-
-            if (!maps.isEmpty()) {
-                String mapPath = ObjectUtility.getRandomItem(maps);
-                MegaMekFile mapFile = new MegaMekFile(mapPath);
-                BoardDimensions dimensions = Board.getSize(mapFile.getFile());
-
-                scenario.setMap(bc.getBoardPaths().get(mapPath));
-                scenario.setMapSizeX(dimensions.width());
-                scenario.setMapSizeY(dimensions.height());
-                scenario.setUsingFixedMap(true);
-                return;
-            }
-        }
-
-        scenario.setUsingFixedMap(false);
-        scenario.setMapFile();
-    }
-
-    /**
      * Randomly generates the number of scenario modifiers for a scenario,
      * for each random scenario in the count a random modifier is applied to the
      * scenario.
@@ -1518,7 +1516,7 @@ public class AtBDynamicScenarioFactory {
             int quality,
             int unitType,
             int weightClass,
-            Collection<MissionRole> rolesByType,
+            @Nullable Collection<MissionRole> rolesByType,
             Campaign campaign) {
         MekSummary unitData;
 
@@ -1543,12 +1541,20 @@ public class AtBDynamicScenarioFactory {
             unitData = campaign.getUnitGenerator().generate(params);
         }
 
+
         if (unitData == null) {
             if (!params.getMissionRoles().isEmpty()) {
-                logger.warn(String.format("Unable to randomly generate %s %s with roles: %s",
+                Entity secondChanceEntity = getEntity(faction, skill, quality, unitType, weightClass, campaign);
+
+                if (secondChanceEntity == null) {
+                    logger.warn(String.format("Unable to randomly generate %s %s with roles: %s." +
+                            " Second chance generation also failed.",
                         EntityWeightClass.getClassName(params.getWeightClass()),
                         UnitType.getTypeName(unitType),
                         params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(","))));
+                } else {
+                    return secondChanceEntity;
+                }
             }
             return null;
         }
@@ -2223,7 +2229,19 @@ public class AtBDynamicScenarioFactory {
         innerMap.put(Crew.MAP_GIVEN_NAME, crewNameArray[0]);
         innerMap.put(Crew.MAP_SURNAME, crewNameArray[1]);
 
-        final AbstractSkillGenerator skillGenerator = new StratConSkillGenerator();
+        final AbstractSkillGenerator skillGenerator = new ModifiedConstantSkillGenerator();
+
+        int skillValue = skill.ordinal();
+        int skillRoll = Compute.d6(1);
+
+        if (skillRoll == 1) {
+            skillValue = Math.max(1, skillValue - 1);
+        } else if (skillRoll == 6) {
+            skillValue = Math.min(7, skillValue + 1);
+        }
+
+        skill = SkillLevel.parseFromInteger(skillValue);
+
         skillGenerator.setLevel(skill);
         int[] skills = skillGenerator.generateRandomSkills(en);
 
@@ -2464,6 +2482,34 @@ public class AtBDynamicScenarioFactory {
             } else {
                 actualUnitType = UnitType.MEK;
             }
+        } else if (unitTypeCode == SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
+            // Use the Vehicle/Mixed ratios from campaign options as weighted values for
+            // random unit types.
+            int vehicleLanceWeight = campaign.getCampaignOptions().getOpForLanceTypeVehicles();
+            int mixedLanceWeight = campaign.getCampaignOptions().getOpForLanceTypeMixed();
+
+            int totalWeight = mixedLanceWeight + vehicleLanceWeight;
+
+            // Roll for unit types
+            if (totalWeight <= 0) {
+                actualUnitType = UnitType.TANK;
+            } else {
+                int roll = Compute.randomInt(totalWeight);
+                if (roll < vehicleLanceWeight) {
+                    actualUnitType = UnitType.TANK;
+                // Mixed units randomly select between Mek or ground vehicle
+                } else {
+                    for (int x = 0; x < unitCount; x++) {
+                        boolean addTank = Compute.randomInt(2) == 0;
+                        if (addTank) {
+                            unitTypes.add(UnitType.TANK);
+                        } else {
+                            unitTypes.add(UnitType.MEK);
+                        }
+                    }
+                    return unitTypes;
+                }
+            }
         }
 
         // Add unit types to the list of actual unity types
@@ -2640,6 +2686,9 @@ public class AtBDynamicScenarioFactory {
         int bvBudget = 0;
         double difficultyMultiplier = getDifficultyMultiplier(campaign);
 
+        String generationMethod = campaign.getCampaignOptions().isUseGenericBattleValue() ?
+            "Generic BV" : "BV2";
+
         // deployed player forces:
         for (int forceID : scenario.getForceIDs()) {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
@@ -2668,16 +2717,22 @@ public class AtBDynamicScenarioFactory {
             bvBudget = (int) round(bvBudget * difficultyMultiplier);
         }
 
+        logger.info(String.format("Total Player %s: %s (adjusted for campaign difficulty)", generationMethod, bvBudget));
+
         // allied bot forces that contribute to BV do not get multiplied by the
-        // difficulty
-        // even if the player is super good, the AI doesn't get any better
+        // difficulty even if the player is perfect, the AI doesn't get any better
         for (int index = 0; index < scenario.getNumBots(); index++) {
             BotForce botForce = scenario.getBotForce(index);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
             if (forceTemplate != null && forceTemplate.getContributesToBV()) {
                 bvBudget += botForce.getTotalBV(campaign);
+
+                logger.info(String.format("%s %s: %s",
+                    botForce.getName(), generationMethod, botForce.getTotalBV(campaign)));
             }
         }
+
+        logger.info(String.format("Total Base %s Budget: %s", generationMethod, bvBudget));
 
         return bvBudget;
     }
@@ -2790,7 +2845,7 @@ public class AtBDynamicScenarioFactory {
             int quality,
             List<Integer> unitTypes,
             Map<Integer, Collection<MissionRole>> rolesByType,
-            Campaign campaign) {
+            Campaign campaign, Scenario scenario) {
 
         List<Entity> generatedEntities = new ArrayList<>();
 
@@ -2802,6 +2857,52 @@ public class AtBDynamicScenarioFactory {
                     UNIT_WEIGHT_UNSPECIFIED,
                     rolesByType.getOrDefault(unitTypes.get(i), new ArrayList<>()),
                     campaign);
+
+            if (newEntity == null) {
+                // We reset the count locally, so that we're passing through the entire list.
+                // The idea is that this will give us the best chance of hitting a valid unit.
+                int freshIteration = 0;
+
+                while (freshIteration < unitTypes.size()) {
+                    newEntity = getEntity(faction,
+                        skill,
+                        quality,
+                        unitTypes.get(i),
+                        UNIT_WEIGHT_UNSPECIFIED,
+                        rolesByType.getOrDefault(unitTypes.get(i), new ArrayList<>()),
+                        campaign);
+
+                    if (newEntity != null) {
+                        break;
+                    }
+
+                    freshIteration++;
+                }
+
+                // If we still haven't got a valid entity, use hardcoded fallbacks.
+                if (newEntity == null) {
+                    if (unitTypes.get(0) == UnitType.DROPSHIP) {
+                        newEntity = getEntity(faction,
+                            skill,
+                            quality,
+                            UnitType.DROPSHIP,
+                            UNIT_WEIGHT_UNSPECIFIED,
+                            List.of(CIVILIAN),
+                            campaign);
+                    } else {
+                        if (scenario.getBoardType() == T_GROUND) {
+                            getEntity(faction,
+                                skill,
+                                quality,
+                                UnitType.TANK,
+                                UNIT_WEIGHT_UNSPECIFIED,
+                                null,
+                                campaign);
+                        }
+                    }
+                }
+            }
+
             if (newEntity != null) {
                 generatedEntities.add(newEntity);
             }
@@ -2836,7 +2937,7 @@ public class AtBDynamicScenarioFactory {
             List<Integer> unitTypes,
             String weights,
             Map<Integer, Collection<MissionRole>> rolesByType,
-            Campaign campaign) {
+            Campaign campaign, AtBScenario scenario) {
         List<Entity> generatedEntities = new ArrayList<>();
 
         // If the number of unit types and number of weight classes don't match,
@@ -2852,19 +2953,75 @@ public class AtBDynamicScenarioFactory {
         }
 
         for (int i = 0; i < unitTypeSize; i++) {
-            Entity newEntity = getEntity(faction,
-                    skill,
-                    quality,
-                    unitTypes.get(i),
-                    AtBConfiguration.decodeWeightStr(weights, i),
-                    rolesByType.getOrDefault(unitTypes.get(i), new ArrayList<>()),
-                    campaign);
+            Entity newEntity = getNewEntity(faction, skill, quality, unitTypes, weights, rolesByType,
+                campaign, i);
+
+            if (newEntity == null) {
+                // We reset the count locally, so that we're passing through the entire list.
+                // The idea is that this will give us the best chance of hitting a valid unit.
+                int freshIteration = 0;
+
+                while (freshIteration < unitTypeSize) {
+                    newEntity = getNewEntity(faction, skill, quality, unitTypes, weights, rolesByType,
+                        campaign, freshIteration);
+
+                    if (newEntity != null) {
+                        break;
+                    }
+
+                    freshIteration++;
+                }
+
+                // If we still haven't got a valid entity, use hardcoded fallbacks.
+                if (newEntity == null) {
+                    if (unitTypes.get(0) == UnitType.DROPSHIP) {
+                        newEntity = getNewEntity(faction, skill, quality, List.of(UnitType.TANK),
+                            weights, Map.of(UnitType.DROPSHIP, List.of(CIVILIAN)),
+                            campaign, 0);
+                    } else {
+                        if (scenario.getBoardType() == T_GROUND) {
+                            newEntity = getNewEntity(faction, skill, quality, List.of(UnitType.TANK),
+                                weights, null, campaign, 0);
+                        }
+                    }
+                }
+            }
+
             if (newEntity != null) {
                 generatedEntities.add(newEntity);
             }
         }
 
         return generatedEntities;
+    }
+
+    /**
+     * Retrieve a new instance of Entity with the given parameters.
+     *
+     * @param faction       the faction of the entity
+     * @param skill         the skill level of the entity
+     * @param quality       the quality of the entity
+     * @param unitTypes     the list of unit types
+     * @param weights       the unit weights string
+     * @param rolesByType   the mapping of unit types to mission roles
+     * @param campaign      the campaign associated with the entity
+     * @param i             the index of the unit type in the unitTypes list
+     *
+     * @return a new instance of Entity with the specified parameters
+     */
+    private static Entity getNewEntity(String faction, SkillLevel skill, int quality,
+                                       List<Integer> unitTypes, String weights,
+                                       @Nullable Map<Integer, Collection<MissionRole>> rolesByType,
+                                       Campaign campaign, int i) {
+        Collection<MissionRole> roles;
+
+        if (rolesByType != null) {
+            roles = rolesByType.getOrDefault(unitTypes.get(i), new ArrayList<>());
+        } else {
+            roles = null;
+        }
+        return getEntity(faction, skill, quality, unitTypes.get(i),
+            AtBConfiguration.decodeWeightStr(weights, i), roles, campaign);
     }
 
     /**

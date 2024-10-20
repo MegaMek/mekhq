@@ -247,6 +247,11 @@ public class Faction {
         return isRebel() || isPirate();
     }
 
+    public boolean isGovernment() {
+        return !isClan() && (isComStar() || isISMajorOrSuperPower() || isMinorPower()
+            || isPlanetaryGovt() || isIndependent());
+    }
+
     public boolean isComStar() {
         return "CS".equals(getShortName());
     }
@@ -326,6 +331,22 @@ public class Faction {
 
     public boolean isChaos() {
         return is(Tag.CHAOS);
+    }
+
+    public boolean isStingy() {
+        return is(Tag.STINGY);
+    }
+
+    public boolean isGenerous() {
+        return is(Tag.GENEROUS);
+    }
+
+    public boolean isControlling() {
+        return is(Tag.CONTROLLING);
+    }
+
+    public boolean isLenient() {
+        return is(Tag.LENIENT);
     }
     // endregion Power Checks
     // endregion Checks
@@ -477,6 +498,14 @@ public class Faction {
         /** Faction is an independent planetary government (Camops p. 39) */
         PLANETARY_GOVERNMENT,
         /** Faction is an independent corporation (Camops p. 39) */
-        CORPORATION
+        CORPORATION,
+        /** Faction is stingy and tends to pay less for contracts (Camops p. 42) */
+        STINGY,
+        /** Faction is generous and tends to pay more for contracts (Camops p. 42) */
+        GENEROUS,
+        /** Faction is controlling with mercenary command rights (Camops p. 42) */
+        CONTROLLING,
+        /** Faction is lenient with mercenary command rights (Camops p. 42) */
+        LENIENT
     }
 }

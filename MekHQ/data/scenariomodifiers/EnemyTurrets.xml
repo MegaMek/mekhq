@@ -28,7 +28,7 @@
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Base Turrets</objectiveLinkedForce>
+			<objectiveLinkedForce>Base Defenses</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<syncDeploymentType>None</syncDeploymentType>
 	</forceDefinition>

@@ -758,6 +758,9 @@ public class PlanetarySystem {
             if (faction.isPirate() || faction.isChaos()) {
                 return HiringHallLevel.QUESTIONABLE;
             }
+            if (faction.isClan()) {
+                return HiringHallLevel.NONE;
+            }
         }
         score += getHiringHallHpgBonus(date);
         score += getHiringHallTechBonus(date);

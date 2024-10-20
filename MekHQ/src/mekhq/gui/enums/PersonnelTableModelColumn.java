@@ -18,6 +18,7 @@
  */
 package mekhq.gui.enums;
 
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
@@ -489,7 +490,11 @@ public enum PersonnelTableModelColumn {
             case GENDER:
                 return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
-                return person.getSkillLevel(campaign, false).toString();
+                StringBuilder levelName = new StringBuilder(64);
+                levelName.append("<html>")
+                    .append(SkillType.getColoredExperienceLevelName(person.getSkillLevel(campaign, false)))
+                    .append("</html>");
+                return levelName.toString();
             case PERSONNEL_ROLE:
                 return person.getRoleDesc();
             case UNIT_ASSIGNMENT: {
@@ -666,7 +671,11 @@ public enum PersonnelTableModelColumn {
                         ? Integer.toString(person.getSkill(SkillType.S_SCROUNGE).getFinalSkillValue())
                         : "-";
             case INJURIES:
-                return Integer.toString(person.getHits());
+                if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+                    return Integer.toString(person.getInjuries().size());
+                } else { 
+                    return Integer.toString(person.getHits());
+                }
             case KILLS:
                 return Integer.toString(campaign.getKillsFor(person.getId()).size());
             case SALARY:
@@ -806,7 +815,7 @@ public enum PersonnelTableModelColumn {
             final JTable table) {
         return switch (view) {
             case GRAPHIC -> {
-                table.setRowHeight(80);
+                table.setRowHeight(UIUtil.scaleForGUI(60));
                 yield switch (this) {
                     case PERSON, UNIT_ASSIGNMENT, FORCE -> true;
                     default -> false;

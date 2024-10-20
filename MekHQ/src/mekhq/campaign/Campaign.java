@@ -72,6 +72,7 @@ import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.*;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -107,6 +108,7 @@ import mekhq.campaign.unit.*;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.eras.Era;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.fameAndInfamy.BatchallFactions;
@@ -417,6 +419,16 @@ public class Campaign implements ITechManager {
         return location.getCurrentSystem();
     }
 
+    /**
+     * Returns the Hiring Hall level from the force's current system on the current date. If there
+     * is no hiring hall present, the level is HiringHallLevel.NONE.
+     *
+     * @return The Hiring Hall level of the current system at the present date.
+     */
+    public HiringHallLevel getSystemHiringHallLevel() {
+        return getCurrentSystem().getHiringHallLevel(getLocalDate());
+    }
+
     public Money getFunds() {
         return finances.getBalance();
     }
@@ -717,7 +729,7 @@ public class Campaign implements ITechManager {
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        int quality = 3;
+        PartQuality quality = PartQuality.QUALITY_D;
 
         if (campaignOptions.isUseRandomUnitQualities()) {
             quality = Unit.getRandomUnitQuality(0);
@@ -1305,7 +1317,7 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add a new unit to the campaign and set its quality to 3 (D).
+     * Add a new unit to the campaign and set its quality to D.
      *
      * @param en             An <code>Entity</code> object that the new unit will be
      *                       wrapped around
@@ -1315,7 +1327,7 @@ public class Campaign implements ITechManager {
      * @return The newly added unit
      */
     public Unit addNewUnit(Entity en, boolean allowNewPilots, int days) {
-        return addNewUnit(en, allowNewPilots, days, 3);
+        return addNewUnit(en, allowNewPilots, days, PartQuality.QUALITY_D);
     }
 
     /**
@@ -1331,12 +1343,7 @@ public class Campaign implements ITechManager {
      * @throws IllegalArgumentException If the quality is not within the valid range
      *                                  (0-5)
      */
-    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, int quality) {
-        if ((quality < 0) || (quality > 5)) {
-            throw new IllegalArgumentException(
-                    "Invalid quality in mekhq/campaign/Campaign.java/addNewUnit: " + quality);
-        }
-
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, PartQuality quality) {
         Unit unit = new Unit(en, this);
         unit.setMaintenanceMultiplier(getCampaignOptions().getDefaultMaintenanceTime());
         getHangar().addUnit(unit);
@@ -2232,76 +2239,110 @@ public class Campaign implements ITechManager {
         return (null != result.getPartToBuy()) ? result : null;
     }
 
-    private void updatePartInUseData(PartInUse piu, Part p) {
-        if ((p.getUnit() != null) || (p instanceof MissingPart)) {
-            piu.setUseCount(piu.getUseCount() + getQuantity(p));
+    /**
+     * Add data from an actual part to a PartInUse data element
+     * @param partInUse part in use record to update
+     * @param incomingPart new part that needs to be added to this record
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     */
+    private void updatePartInUseData(PartInUse partInUse, Part incomingPart,
+            boolean ignoreMothballedUnits, PartQuality ignoreSparesUnderQuality) {
+
+        if (ignoreMothballedUnits && (null != incomingPart.getUnit()) && incomingPart.getUnit().isMothballed()) {
+            return;
+        } else if ((incomingPart.getUnit() != null) || (incomingPart instanceof MissingPart)) {
+            partInUse.setUseCount(partInUse.getUseCount() + getQuantity(incomingPart));
         } else {
-            if (p.isPresent()) {
-                piu.setStoreCount(piu.getStoreCount() + getQuantity(p));
-                piu.addSpare(p);
+            if (incomingPart.isPresent()) {
+                if (incomingPart.getQuality().toNumeric() < ignoreSparesUnderQuality.toNumeric()) {
+                    return;
+                } else {
+                    partInUse.setStoreCount(partInUse.getStoreCount() + getQuantity(incomingPart));
+                    partInUse.addSpare(incomingPart);
+                }
             } else {
-                piu.setTransferCount(piu.getTransferCount() + getQuantity(p));
+                partInUse.setTransferCount(partInUse.getTransferCount() + getQuantity(incomingPart));
             }
         }
     }
 
-    /** Update the piu with the current campaign data */
-    public void updatePartInUse(PartInUse piu) {
-        piu.setUseCount(0);
-        piu.setStoreCount(0);
-        piu.setTransferCount(0);
-        piu.setPlannedCount(0);
-        getWarehouse().forEachPart(p -> {
-            PartInUse newPiu = getPartInUse(p);
-            if (piu.equals(newPiu)) {
-                updatePartInUseData(piu, p);
+    /**
+     * Find all the parts that match this PartInUse and update their data
+     * @param partInUse part in use record to update
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     */
+    public void updatePartInUse(PartInUse partInUse, boolean ignoreMothballedUnits, 
+            PartQuality ignoreSparesUnderQuality) {
+        partInUse.setUseCount(0);
+        partInUse.setStoreCount(0);
+        partInUse.setTransferCount(0);
+        partInUse.setPlannedCount(0);
+        getWarehouse().forEachPart(incomingPart -> {
+            PartInUse newPiu = getPartInUse(incomingPart);
+            if (partInUse.equals(newPiu)) {
+                updatePartInUseData(partInUse, incomingPart,
+                    ignoreMothballedUnits, ignoreSparesUnderQuality);
             }
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             PartInUse newPiu = getPartInUse((Part) maybePart);
-            if (piu.equals(newPiu)) {
-                piu.setPlannedCount(piu.getPlannedCount()
-                        + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart()
-                                : (Part) maybePart) * maybePart.getQuantity());
+            if (partInUse.equals(newPiu)) {
+                partInUse.setPlannedCount(partInUse.getPlannedCount()
+                        + getQuantity((maybePart instanceof MissingPart) ? 
+                            ((MissingPart) maybePart).getNewPart() :
+                            (Part) maybePart) * maybePart.getQuantity());
             }
         }
     }
 
-    public Set<PartInUse> getPartsInUse() {
+    /**
+     * Create a data set detailing all the parts being used (or not) and their warehouse spares
+     * @param ignoreMothballedUnits don't count parts in mothballed units
+     * @param ignoreSparesUnderQuality don't count spare parts lower than this quality
+     * @return a Set of PartInUse data for display or inspection
+     */
+    public Set<PartInUse> getPartsInUse(boolean ignoreMothballedUnits,
+            PartQuality ignoreSparesUnderQuality) {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a
         // java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<>();
-        getWarehouse().forEachPart(p -> {
-            PartInUse piu = getPartInUse(p);
-            if (null == piu) {
+        getWarehouse().forEachPart(incomingPart -> {
+            PartInUse partInUse = getPartInUse(incomingPart);
+            if (null == partInUse) {
                 return;
             }
-            if (inUse.containsKey(piu)) {
-                piu = inUse.get(piu);
+            if (inUse.containsKey(partInUse)) {
+                partInUse = inUse.get(partInUse);
             } else {
-                inUse.put(piu, piu);
+                inUse.put(partInUse, partInUse);
             }
-            updatePartInUseData(piu, p);
+            updatePartInUseData(partInUse, incomingPart, ignoreMothballedUnits, ignoreSparesUnderQuality);
         });
         for (IAcquisitionWork maybePart : shoppingList.getPartList()) {
             if (!(maybePart instanceof Part)) {
                 continue;
             }
-            PartInUse piu = getPartInUse((Part) maybePart);
-            if (null == piu) {
+            PartInUse partInUse = getPartInUse((Part) maybePart);
+            if (null == partInUse) {
                 continue;
             }
-            if (inUse.containsKey(piu)) {
-                piu = inUse.get(piu);
+            if (inUse.containsKey(partInUse)) {
+                partInUse = inUse.get(partInUse);
             } else {
-                inUse.put(piu, piu);
+                inUse.put(partInUse, partInUse);
             }
-            piu.setPlannedCount(piu.getPlannedCount()
-                    + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart()
-                            : (Part) maybePart) * maybePart.getQuantity());
+            partInUse.setPlannedCount(partInUse.getPlannedCount()
+                    + getQuantity((maybePart instanceof MissingPart) ? 
+                            ((MissingPart) maybePart).getNewPart() :
+                            (Part) maybePart) * maybePart.getQuantity());
 
         }
-        return inUse.keySet();
+        return inUse.keySet().stream()
+            // Hacky but otherwise we end up with zero lines when filtering things out
+            .filter(p -> p.getUseCount() != 0 || p.getStoreCount() != 0 || p.getPlannedCount() != 0)
+            .collect(Collectors.toSet());
     }
 
     @Deprecated
@@ -3735,9 +3776,11 @@ public class Campaign implements ITechManager {
             }
         }
 
+        processNewDayATBScenarios();
+
         for (AtBContract contract : getActiveAtBContracts()) {
             if (campaignOptions.isUseGenericBattleValue()) {
-                if (contract.getStartDate().equals(getLocalDate()) && getLocation().isOnPlanet()) {
+                if (contract.getStartDate().equals(getLocalDate())) {
                     if (getCampaignOptions().isUseGenericBattleValue()
                         && BatchallFactions.usesBatchalls(contract.getEnemyCode())) {
                         contract.setBatchallAccepted(contract.initiateBatchall(this));
@@ -3745,14 +3788,12 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-
-        processNewDayATBScenarios();
     }
 
     /**
-     * Processes the new day for all active personnel.
+     * Processes the new day for all personnel present in the campaign.
      * <p>
-     * This method loops through all active personnel and performs the necessary actions
+     * This method loops through all personnel present and performs the necessary actions
      * for each person for a new day.
      * <p>
      * The following tasks are performed for each person:
@@ -3778,9 +3819,15 @@ public class Campaign implements ITechManager {
      * Note: This method uses several other methods to perform the specific actions for each task.
      */
     public void processNewDayPersonnel() {
-        // This MUST use getActivePersonnel as we only want to process active personnel, and
-        //  furthermore, this allows us to add and remove personnel without issue
-        for (Person person : getActivePersonnel()) {
+        List<Person> personnelForRelationshipProcessing = new ArrayList<>();
+
+        for (Person person : getPersonnel()) {
+            if (person.getStatus().isDepartedUnit()) {
+                continue;
+            }
+
+            personnelForRelationshipProcessing.add(person);
+
             // Death
             if (getDeath().processNewDay(this, getLocalDate(), person)) {
                 // The person has died, so don't continue to process the dead
@@ -3790,146 +3837,227 @@ public class Campaign implements ITechManager {
             person.resetMinutesLeft();
             // Reset acquisitions made to 0
             person.setAcquisition(0);
-            if (person.needsFixing() && !getCampaignOptions().isUseAdvancedMedical()) {
-                person.decrementDaysToWaitForHealing();
-                Person doctor = getPerson(person.getDoctorId());
-                if ((doctor != null) && doctor.isDoctor()) {
-                    if (person.getDaysToWaitForHealing() <= 0) {
-                        addReport(healPerson(person, doctor));
-                    }
-                } else if (person.checkNaturalHealing(15)) {
-                    addReport(person.getHyperlinkedFullTitle() + " heals naturally!");
-                    Unit u = person.getUnit();
-                    if (u != null) {
-                        u.resetPilotAndEntity();
-                    }
-                }
-            }
-            // TODO Advanced Medical needs to go away from here later on
-            if (getCampaignOptions().isUseAdvancedMedical()) {
-                InjuryUtil.resolveDailyHealing(this, person);
-                Unit u = person.getUnit();
-                if (u != null) {
-                    u.resetPilotAndEntity();
-                }
-            }
 
-            // TODO : Reset this based on hasSupportRole(false) instead of checking for each type
-            // TODO : person.isEngineer will need to stay, however
+            processAdvancedMedicalEvents(person);
+
             // Reset edge points to the purchased value each week. This should only
             // apply for support personnel - combat troops reset with each new mm game
-            if ((person.isAdministrator() || person.isDoctor() || person.isEngineer() || person.isTech())
-                    && (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
-                person.resetCurrentEdge();
-            }
+            processWeeklyEdgeResets(person);
 
-            if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
-                    && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
-                person.setIdleMonths(person.getIdleMonths() + 1);
-                if (person.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
-                    if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-                        person.awardXP(this, getCampaignOptions().getIdleXP());
-                        addReport(person.getHyperlinkedFullTitle() + " has gained "
-                                + getCampaignOptions().getIdleXP() + " XP");
-                    }
-                    person.setIdleMonths(0);
-                }
-            }
-
-            // Divorce, Marriage, & Procreation
-            if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                getDivorce().processNewWeek(this, getLocalDate(), person, false);
-                getMarriage().processNewWeek(this, getLocalDate(), person);
-                getProcreation().processNewWeek(this, getLocalDate(), person);
-
-                if (person.getGender().isFemale()) {
-                    if (campaignOptions.isUseMaternityLeave()) {
-                        if ((person.isPregnant())
-                                && (person.getStatus().isActive())
-                                && (person.getDueDate().minusWeeks(20).isEqual(getLocalDate()))) {
-
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.ON_MATERNITY_LEAVE);
-                        }
-
-                        List<Person> children = person.getGenealogy().getChildren();
-
-                        if ((person.getStatus().isOnMaternityLeave()) && (!children.isEmpty())) {
-
-                            children.sort(Comparator.comparing(Person::getDateOfBirth).reversed());
-
-                            if (getLocalDate().isAfter(children.get(0).getDateOfBirth().plusDays(41))) {
-                                person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
-                            }
-                        }
-                    }
-                }
-            }
+            processMonthlyIdleXP(person);
 
             // Anniversaries
-            if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-                if ((person.getBirthday(getGameYear()).isEqual(getLocalDate()))
-                    && (campaignOptions.isAnnounceBirthdays())) {
-                    addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        person.getAge(getLocalDate()),
-                        CLOSING_SPAN_TAG));
-                }
-
-                LocalDate recruitmentDate = person.getRecruitment();
-                if (recruitmentDate != null) {
-                    LocalDate recruitmentAnniversary = recruitmentDate.withYear(getGameYear());
-                    int yearsOfEmployment = (int) ChronoUnit.YEARS.between(recruitmentDate, currentDay);
-
-                    if ((recruitmentAnniversary.isEqual(getLocalDate()))
-                        && (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
-                        addReport(String.format(resources.getString("anniversaryRecruitment.text"),
-                            person.getHyperlinkedFullTitle(),
-                            ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                            yearsOfEmployment, CLOSING_SPAN_TAG, name));
-                    }
-                }
-            } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
-                if (person.getBirthday(getGameYear()).isEqual(getLocalDate())) {
-                    addReport(String.format(resources.getString("anniversaryBirthday.text"),
-                        person.getHyperlinkedFullTitle(),
-                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
-                        person.getAge(getLocalDate()),
-                        CLOSING_SPAN_TAG));
-                }
-            }
+            processAnniversaries(person);
 
             // autoAwards
-            if (getLocalDate().getDayOfMonth() == 1) {
-                double multiplier = 0;
+            processMonthlyAutoAwards(person);
+        }
 
-                int score = 0;
+        // Divorce, Marriage
+        // This has to be processed separately to avoid a ConcurrentModificationException
+        for (Person person : personnelForRelationshipProcessing) {
+            processWeeklyRelationshipEvents(person);
+        }
+    }
 
-                if (person.getPrimaryRole().isSupport(true)) {
-                    int dice = person.getExperienceLevel(this, false);
-
-                    if (dice > 0) {
-                        score = Compute.d6(dice);
-                    }
-
-                    multiplier += 0.5;
+    /**
+     * Processes advanced medical events for a person.
+     *
+     * @param person the {@link Person} to process advanced medical events for
+     */
+    private void processAdvancedMedicalEvents(Person person) {
+        if (person.needsFixing() && !getCampaignOptions().isUseAdvancedMedical()) {
+            person.decrementDaysToWaitForHealing();
+            Person doctor = getPerson(person.getDoctorId());
+            if ((doctor != null) && doctor.isDoctor()) {
+                if (person.getDaysToWaitForHealing() <= 0) {
+                    addReport(healPerson(person, doctor));
                 }
-
-                if (person.getSecondaryRole().isSupport(true)) {
-                    int dice = person.getExperienceLevel(this, true);
-
-                    if (dice > 0) {
-                        score += Compute.d6(dice);
-                    }
-
-                    multiplier += 0.5;
-                } else if (person.getSecondaryRole().isNone()) {
-                    multiplier += 0.5;
+            } else if (person.checkNaturalHealing(15)) {
+                addReport(person.getHyperlinkedFullTitle() + " heals naturally!");
+                Unit unit = person.getUnit();
+                if (unit != null) {
+                    unit.resetPilotAndEntity();
                 }
-
-                person.changeAutoAwardSupportPoints((int) (score * multiplier));
             }
         }
+        // TODO Advanced Medical needs to go away from here later on
+        if (getCampaignOptions().isUseAdvancedMedical()) {
+            InjuryUtil.resolveDailyHealing(this, person);
+            Unit unit = person.getUnit();
+            if (unit != null) {
+                unit.resetPilotAndEntity();
+            }
+        }
+    }
+
+    /**
+     * Process weekly Edge resets for a given person.
+     *
+     * @param person the person for whom weekly Edge resets will be processed
+     */
+    private void processWeeklyEdgeResets(Person person) {
+        if ((person.hasSupportRole(true) || person.isEngineer())
+                && (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY)) {
+            person.resetCurrentEdge();
+        }
+    }
+
+    /**
+     * Process monthly idle XP for a given person.
+     * This method checks if the person is eligible to gain idle XP based on campaign options and current status.
+     * If the person meets the criteria, they may gain XP and an associated report will be added.
+     *
+     * @param person The person for whom to process monthly idle XP.
+     */
+    private void processMonthlyIdleXP(Person person) {
+        if (!person.getStatus().isActive()) {
+            return;
+        }
+
+        if ((getCampaignOptions().getIdleXP() > 0) && (getLocalDate().getDayOfMonth() == 1)
+                && !person.getPrisonerStatus().isCurrentPrisoner()) { // Prisoners can't gain XP, while Bondsmen can gain xp
+            person.setIdleMonths(person.getIdleMonths() + 1);
+            if (person.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
+                if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
+                    person.awardXP(this, getCampaignOptions().getIdleXP());
+                    addReport(person.getHyperlinkedFullTitle() + " has gained "
+                            + getCampaignOptions().getIdleXP() + " XP");
+                }
+                person.setIdleMonths(0);
+            }
+        }
+    }
+
+    /**
+     * Process weekly relationship events for a given {@link Person} on Monday.
+     * This method triggers specific events related to divorce, marriage, procreation, and maternity leave.
+     *
+     * @param person The {@link Person} for which to process weekly relationship events
+     */
+    private void processWeeklyRelationshipEvents(Person person) {
+        if (getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+            getDivorce().processNewWeek(this, getLocalDate(), person, false);
+            getMarriage().processNewWeek(this, getLocalDate(), person);
+            getProcreation().processNewWeek(this, getLocalDate(), person);
+
+            if (person.getGender().isFemale()) {
+                if (campaignOptions.isUseMaternityLeave()) {
+                    if ((person.isPregnant())
+                            && (person.getStatus().isActive())
+                            && (person.getDueDate().minusWeeks(20).isEqual(getLocalDate()))) {
+
+                        person.changeStatus(this, getLocalDate(), PersonnelStatus.ON_MATERNITY_LEAVE);
+                    }
+
+                    List<Person> children = person.getGenealogy().getChildren();
+
+                    if ((person.getStatus().isOnMaternityLeave()) && (!children.isEmpty())) {
+                        LocalDate lastChildBirthDate = getYoungestChildDateOfBirth(children);
+
+                        if (currentDay.isAfter(lastChildBirthDate)) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Process anniversaries for a given person, including birthdays and recruitment anniversaries.
+     *
+     * @param person The {@link Person} for whom the anniversaries will be processed
+     */
+    private void processAnniversaries(Person person) {
+        if ((person.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
+            if ((person.getBirthday(getGameYear()).isEqual(getLocalDate()))
+                && (campaignOptions.isAnnounceBirthdays())) {
+                addReport(String.format(resources.getString("anniversaryBirthday.text"),
+                    person.getHyperlinkedFullTitle(),
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                    person.getAge(getLocalDate()),
+                    CLOSING_SPAN_TAG));
+            }
+
+            LocalDate recruitmentDate = person.getRecruitment();
+            if (recruitmentDate != null) {
+                LocalDate recruitmentAnniversary = recruitmentDate.withYear(getGameYear());
+                int yearsOfEmployment = (int) ChronoUnit.YEARS.between(recruitmentDate, currentDay);
+
+                if ((recruitmentAnniversary.isEqual(getLocalDate()))
+                    && (campaignOptions.isAnnounceRecruitmentAnniversaries())) {
+                    addReport(String.format(resources.getString("anniversaryRecruitment.text"),
+                        person.getHyperlinkedFullTitle(),
+                        ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                        yearsOfEmployment, CLOSING_SPAN_TAG, name));
+                }
+            }
+        } else if ((person.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays())) {
+            if (person.getBirthday(getGameYear()).isEqual(getLocalDate())) {
+                addReport(String.format(resources.getString("anniversaryBirthday.text"),
+                    person.getHyperlinkedFullTitle(),
+                    ReportingUtilities.spanOpeningWithCustomColor(MekHQ.getMHQOptions().getFontColorPositiveHexColor()),
+                    person.getAge(getLocalDate()),
+                    CLOSING_SPAN_TAG));
+            }
+        }
+    }
+
+    /**
+     * Process monthly auto awards for a given person based on their roles and experience level.
+     *
+     * @param person the person for whom the monthly auto awards are being processed
+     */
+    private void processMonthlyAutoAwards(Person person) {
+        if (getLocalDate().getDayOfMonth() == 1) {
+            double multiplier = 0;
+
+            int score = 0;
+
+            if (person.getPrimaryRole().isSupport(true)) {
+                int dice = person.getExperienceLevel(this, false);
+
+                if (dice > 0) {
+                    score = Compute.d6(dice);
+                }
+
+                multiplier += 0.5;
+            }
+
+            if (person.getSecondaryRole().isSupport(true)) {
+                int dice = person.getExperienceLevel(this, true);
+
+                if (dice > 0) {
+                    score += Compute.d6(dice);
+                }
+
+                multiplier += 0.5;
+            } else if (person.getSecondaryRole().isNone()) {
+                multiplier += 0.5;
+            }
+
+            person.changeAutoAwardSupportPoints((int) (score * multiplier));
+        }
+    }
+
+    /**
+     * Retrieves the date of birth of the youngest child among the provided list of children.
+     *
+     * @param children the list children
+     * @return the date of birth of the youngest child
+     */
+    private LocalDate getYoungestChildDateOfBirth(List<Person> children) {
+        LocalDate youngestChildBirthDate = LocalDate.MIN;
+
+        for (Person child : children) {
+            LocalDate dateOfBirth = child.getDateOfBirth();
+            if (dateOfBirth.isAfter(youngestChildBirthDate)) {
+                youngestChildBirthDate = dateOfBirth;
+            }
+        }
+
+        return youngestChildBirthDate;
     }
 
     public void processNewDayUnits() {
@@ -6782,8 +6910,7 @@ public class Campaign implements ITechManager {
     }
 
     public boolean isCustom(Unit u) {
-        return customs.contains(u.getEntity().getChassis() + ' '
-                + u.getEntity().getModel());
+        return customs.contains(u.getEntity().getShortNameRaw());
     }
 
     /**
@@ -6835,10 +6962,9 @@ public class Campaign implements ITechManager {
     /**
      * Retrieves the unit rating modifier based on campaign options.
      * If the unit rating method is not enabled, it returns the default value of
-     * IUnitRating.DRAGOON_C.
-     * If the unit rating method uses FMMR, it returns the unit rating as an
-     * integer.
-     * Otherwise, it calculates the modifier using the getAtBModifier method.
+     * IUnitRating.DRAGOON_C. If the unit rating method uses FMMR, it returns the
+     * unit rating as an integer. Otherwise, it calculates the modifier using the
+     * getAtBModifier method.
      *
      * @return The unit rating modifier based on the campaign options.
      */
@@ -6849,14 +6975,6 @@ public class Campaign implements ITechManager {
 
         return getCampaignOptions().getUnitRatingMethod().isFMMR() ? getUnitRating().getUnitRatingAsInteger()
                 : reputation.getAtbModifier();
-    }
-
-    public int getReputationFactor() {
-        return switch (campaignOptions.getUnitRatingMethod()) {
-            case NONE -> 5;
-            case FLD_MAN_MERCS_REV -> getAtBUnitRatingMod() * 2;
-            case CAMPAIGN_OPS -> (int) ((getReputation().getReputationRating() * 0.2) + 0.5);
-        };
     }
 
     /**
@@ -7693,7 +7811,7 @@ public class Campaign implements ITechManager {
                 }
             }
             // it is time for a maintenance check
-            int qualityOrig = u.getQuality();
+            PartQuality qualityOrig = u.getQuality();
             String techName = "Nobody";
             String techNameLinked = techName;
             if (null != tech) {
@@ -7741,21 +7859,21 @@ public class Campaign implements ITechManager {
                 logger.info(maintenanceReport.toString());
             }
 
-            int quality = u.getQuality();
+            PartQuality quality = u.getQuality();
             String qualityString;
             boolean reverse = getCampaignOptions().isReverseQualityNames();
-            if (quality > qualityOrig) {
-                qualityString = "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                        + "'>Overall quality improves from "
-                        + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
-                        + "</font>";
-            } else if (quality < qualityOrig) {
-                qualityString = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'>Overall quality declines from "
-                        + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
-                        + "</font>";
+            if (quality.toNumeric() > qualityOrig.toNumeric()) {
+                qualityString = ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                        "Overall quality improves from " + qualityOrig.toName(reverse)
+                        + " to " + quality.toName(reverse));
+            } else if (quality.toNumeric() < qualityOrig.toNumeric()) {
+                qualityString = ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                    "Overall quality declines from " + qualityOrig.toName(reverse)
+                    + " to " + quality.toName(reverse));
             } else {
-                qualityString = "Overall quality remains " + Part.getQualityName(quality, reverse);
+                qualityString = "Overall quality remains " + quality.toName(reverse);
             }
             String damageString = "";
             if (nDamage > 0) {
@@ -7787,7 +7905,7 @@ public class Campaign implements ITechManager {
         if (!p.needsMaintenance()) {
             return null;
         }
-        int oldQuality = p.getQuality();
+        PartQuality oldQuality = p.getQuality();
         TargetRoll target = getTargetForMaintenance(p, u.getTech());
         if (!paidMaintenance) {
             // TODO : Make this modifier user inputtable
@@ -7800,7 +7918,7 @@ public class Campaign implements ITechManager {
         partReport += " rolled a " + roll + ", margin of " + margin;
 
         switch (p.getQuality()) {
-            case Part.QUALITY_A: {
+            case QUALITY_A: {
                 if (margin >= 4) {
                     p.improveQuality();
                 }
@@ -7819,11 +7937,11 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_B: {
+            case QUALITY_B: {
                 if (margin >= 4) {
                     p.improveQuality();
                 } else if (margin < -5) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                 }
                 if (!campaignOptions.isUseUnofficialMaintenance()) {
                     if (margin < -6) {
@@ -7834,9 +7952,9 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_C: {
+            case QUALITY_C: {
                 if (margin < -4) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                 } else if (margin >= 5) {
                     p.improveQuality();
                 }
@@ -7849,9 +7967,9 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_D: {
+            case QUALITY_D: {
                 if (margin < -3) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                     if ((margin < -4) && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
@@ -7860,9 +7978,9 @@ public class Campaign implements ITechManager {
                 }
                 break;
             }
-            case Part.QUALITY_E:
+            case QUALITY_E:
                 if (margin < -2) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                     if ((margin < -5) && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
@@ -7870,10 +7988,10 @@ public class Campaign implements ITechManager {
                     p.improveQuality();
                 }
                 break;
-            case Part.QUALITY_F:
+            case QUALITY_F:
             default:
                 if (margin < -2) {
-                    p.decreaseQuality();
+                    p.reduceQuality();
                     if (margin < -6 && !campaignOptions.isUseUnofficialMaintenance()) {
                         partsToDamage.put(p, 1);
                     }
@@ -7884,22 +8002,26 @@ public class Campaign implements ITechManager {
                 // }
                 break;
         }
-        if (p.getQuality() > oldQuality) {
-            partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>new quality is "
-                    + p.getQualityName() + "</font>";
-        } else if (p.getQuality() < oldQuality) {
-            partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>new quality is "
-                    + p.getQualityName() + "</font>";
+        if (p.getQuality().toNumeric() > oldQuality.toNumeric()) { 
+            partReport += ": " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorPositiveHexColor(),
+                    "new quality is " + p.getQualityName());
+        } else if (p.getQuality().toNumeric() < oldQuality.toNumeric()) {
+            partReport += ": " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                    "new quality is " + p.getQualityName());
         } else {
             partReport += ": quality remains " + p.getQualityName();
         }
         if (null != partsToDamage.get(p)) {
             if (partsToDamage.get(p) > 3) {
-                partReport += ", <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'><b>part destroyed</b></font>";
+                partReport += ", " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                        "<b>part destroyed</b>");
             } else {
-                partReport += ", <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'><b>part damaged</b></font>";
+                partReport += ", " + ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(),
+                        "<b>part damaged</b>");
             }
         }
 

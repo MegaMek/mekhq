@@ -90,6 +90,14 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, value);
     }
 
+    public boolean getShowUnitPicturesOnTOE() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.SHOW_UNIT_PICTURES_ON_TOE, true);
+    }
+
+    public void setShowUnitPicturesOnTOE(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_UNIT_PICTURES_ON_TOE, value);
+    }
+
     // region Command Center Tab
     public boolean getCommandCenterUseUnitMarket() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET,
@@ -488,6 +496,60 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PREGNANT_BACKGROUND, value.getRGB());
     }
 
+    public Color getGoneForeground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.GONE_FOREGROUND, 0xffffff));
+    }
+
+    public void setGoneForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.GONE_FOREGROUND, value.getRGB());
+    }
+
+    public Color getGoneBackground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.GONE_BACKGROUND, 0x222222));
+    }
+
+    public void setGoneBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.GONE_BACKGROUND, value.getRGB());
+    }
+
+    public Color getAbsentForeground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.ABSENT_FOREGROUND, 0x000000));
+    }
+
+    public void setAbsentForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.ABSENT_FOREGROUND, value.getRGB());
+    }
+
+    public Color getAbsentBackground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.ABSENT_BACKGROUND, 0xffffff));
+    }
+
+    public void setAbsentBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.ABSENT_BACKGROUND, value.getRGB());
+    }
+
+    public Color getFatiguedForeground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FATIGUED_FOREGROUND, 0x000000));
+    }
+
+    public void setFatiguedForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FATIGUED_FOREGROUND, value.getRGB());
+    }
+
+    public Color getFatiguedBackground() {
+        return new Color(
+                userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FATIGUED_BACKGROUND, 0xeeee00));
+    }
+
+    public void setFatiguedBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FATIGUED_BACKGROUND, value.getRGB());
+    }
+
     public Color getStratConHexCoordForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE)
                 .getInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
@@ -545,6 +607,88 @@ public final class MHQOptions extends SuiteOptions {
     public void setFontColorWarning(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_WARNING, value.getRGB());
     }
+
+
+    public Color getFontColorSkillUltraGreen() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN,
+                0xDF5341));
+    }
+
+    /**
+     * @return the hexadecimal color code for the ultra green skill.
+     */
+    public String getFontColorSkillUltraGreenHexColor() {
+        return convertFontColorToHexColor(getFontColorSkillUltraGreen());
+    }
+
+    public void setFontColorSkillUltraGreen(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_ULTRAGREEN, value.getRGB());
+    }
+
+    public Color getFontColorSkillGreen() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_GREEN,
+                0xCFAB43));
+    }
+
+    /**
+     * @return the hexadecimal color code for the green skill.
+     */
+    public String getFontColorSkillGreenHexColor() {
+        return convertFontColorToHexColor(getFontColorSkillGreen());
+    }
+
+    public void setFontColorSkillGreen(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_GREEN, value.getRGB());
+    }
+
+    public Color getFontColorSkillRegular() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_REGULAR,
+                0x7FCF43));
+    }
+
+    /**
+     * @return the hexadecimal color code for the regular skill.
+     */
+    public String getFontColorSkillRegularHexColor() {
+        return convertFontColorToHexColor(getFontColorSkillRegular());
+    }
+
+    public void setFontColorSkillRegular(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_REGULAR, value.getRGB());
+    }
+
+    public Color getFontColorSkillVeteran() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_VETERAN,
+                0x5CE8E0));
+    }
+
+    /**
+     * @return the hexadecimal color code for the veteran skill.
+     */
+    public String getFontColorSkillVeteranHexColor() {
+        return convertFontColorToHexColor(getFontColorSkillVeteran());
+    }
+
+    public void setFontColorSkillVeteran(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_VETERAN, value.getRGB());
+    }
+
+    public Color getFontColorSkillElite() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_SKILL_ELITE,
+                0xC344C3));
+    }
+
+    /**
+     * @return the hexadecimal color code for the elite skill.
+     */
+    public String getFontColorSkillEliteHexColor() {
+        return convertFontColorToHexColor(getFontColorSkillElite());
+    }
+
+    public void setFontColorSkillElite(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_SKILL_ELITE, value.getRGB());
+    }
+
 
     /**
      * Converts the font color to a hexadecimal color representation.

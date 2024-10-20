@@ -30,16 +30,14 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.education.EducationController;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.generator.AbstractSpecialAbilityGenerator;
 import mekhq.campaign.personnel.generator.DefaultSpecialAbilityGenerator;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.JSpinner.DefaultEditor;
@@ -51,20 +49,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import static mekhq.campaign.personnel.SkillType.*;
-import static mekhq.campaign.personnel.generator.AbstractSkillGenerator.addSkill;
-
-import javax.swing.*;
-import javax.swing.JSpinner.DefaultEditor;
-import javax.swing.JSpinner.NumberEditor;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -379,37 +363,55 @@ public class HireBulkPersonnelDialog extends JDialog {
                 } else if (age < 18) {
                     person.limitSkills(0);
                 }
-
-                // re-roll SPAs to include in any age and skill adjustments
-                Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
-
-                for (IOption option : Collections.list(options)) {
-                    person.getOptions().getOption(option.getName()).clearValue();
-                }
-
-                int experienceLevel = person.getExperienceLevel(campaign, false);
-
-                if (experienceLevel <= 0) {
-                    person.setLoyalty(Compute.d6(3) + 2);
-                } else if (experienceLevel == 1) {
-                    person.setLoyalty(Compute.d6(3) + 1);
-                } else {
-                    person.setLoyalty(Compute.d6(3));
-                }
-
-                if (experienceLevel > 0) {
-                    AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-                    specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
-                    specialAbilityGenerator.generateSpecialAbilities(campaign, person, experienceLevel);
-                }
             }
 
+            int experienceLevel = person.getExperienceLevel(campaign, false);
+
+            reRollLoyalty(person, experienceLevel);
+            reRollAdvantages(campaign, person, experienceLevel);
 
             if (!campaign.recruitPerson(person, isGmHire)) {
                 number = 0;
             } else {
                 number--;
             }
+        }
+    }
+
+    /**
+     * Re-rolls the SPAs of a person based on their experience level.
+     *
+     * @param campaign       The current campaign.
+     * @param person         The person whose advantages are being re-rolled.
+     * @param experienceLevel The experience level of the person.
+     */
+    public static void reRollAdvantages(Campaign campaign, Person person, int experienceLevel) {
+        Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
+
+        for (IOption option : Collections.list(options)) {
+            person.getOptions().getOption(option.getName()).clearValue();
+        }
+
+        if (experienceLevel > 0) {
+            AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
+            specialAbilityGenerator.setSkillPreferences(new RandomSkillPreferences());
+            specialAbilityGenerator.generateSpecialAbilities(campaign, person, experienceLevel);
+        }
+    }
+
+    /**
+     * Re-rolls the loyalty of a person based on their experience level.
+     *
+     * @param person         The person whose loyalty is being re-rolled.
+     * @param experienceLevel The experience level of the person.
+     */
+    public static void reRollLoyalty(Person person, int experienceLevel) {
+        if (experienceLevel <= 0) {
+            person.setLoyalty(Compute.d6(3) + 2);
+        } else if (experienceLevel == 1) {
+            person.setLoyalty(Compute.d6(3) + 1);
+        } else {
+            person.setLoyalty(Compute.d6(3));
         }
     }
 

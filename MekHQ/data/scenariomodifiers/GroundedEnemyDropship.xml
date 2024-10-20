@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>An enemy dropship has been grounded in this area, but its weapons are
-		still active so pay attention.</additionalBriefingText>
+	<additionalBriefingText>An enemy DropShip has been grounded in this area, but its weapons are still active so pay attention.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -22,14 +21,23 @@
 		<fixedUnitCount>1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Opfor Grounded Dropship</forceName>
-		<generationMethod>3</generationMethod>
+		<forceName>DropShip</forceName>
+		<generationMethod>2</generationMethod>
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>50</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<syncDeploymentType>SameEdge</syncDeploymentType>
-		<syncedForceName>Primary Opfor</syncedForceName>
+		<syncedForceName>OpFor</syncedForceName>
 		<useArtillery>false</useArtillery>
+        <roleChoices>
+            <forceRole>MEK_CARRIER</forceRole>
+            <forceRole>MEK_CARRIER</forceRole>
+            <forceRole>ASF_CARRIER</forceRole>
+            <forceRole>VEE_CARRIER</forceRole>
+            <forceRole>INFANTRY_CARRIER</forceRole>
+            <forceRole>TROOP_CARRIER</forceRole>
+            <forceRole>CIVILIAN</forceRole>
+        </roleChoices>
 	</forceDefinition>
 </AtBScenarioModifier>

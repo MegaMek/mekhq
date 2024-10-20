@@ -1,6 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Recon underestimated enemy strength, and additional enemy units are
-		present.</additionalBriefingText>
+	<additionalBriefingText>Recon underestimated enemy strength, and additional enemy units are present.</additionalBriefingText>
 	<allowedMapLocations>
 		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
 		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
@@ -31,13 +30,13 @@
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<forceName>Additional Opfor Ground Units</forceName>
+		<forceName>Additional OpFor</forceName>
 		<generationMethod>3</generationMethod>
 		<generationOrder>3</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>
 		<objectiveLinkedForces>
-			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+			<objectiveLinkedForce>OpFor</objectiveLinkedForce>
 		</objectiveLinkedForces>
 		<syncDeploymentType>None</syncDeploymentType>
 		<syncedForceName />

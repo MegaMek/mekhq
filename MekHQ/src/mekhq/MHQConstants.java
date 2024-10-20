@@ -60,6 +60,7 @@ public final class MHQConstants extends SuiteConstants {
                                                            // also used as a limit in the UI
     public static final String COMPANY_GENERATOR_STARTUP = "companyGeneratorStartup";
     public static final String SHOW_COMPANY_GENERATOR = "showCompanyGenerator";
+    public static final String SHOW_UNIT_PICTURES_ON_TOE = "showUnitPicturesOnTOE";
 
     // region Command Center Tab
     public static final String COMMAND_CENTER_USE_UNIT_MARKET = "commandCenterUseUnitMarket";
@@ -114,10 +115,21 @@ public final class MHQConstants extends SuiteConstants {
     public static final String HEALED_INJURIES_BACKGROUND = "healedInjuriesBackground";
     public static final String PREGNANT_FOREGROUND = "pregnantForeground";
     public static final String PREGNANT_BACKGROUND = "pregnantBackground";
+    public static final String GONE_FOREGROUND = "goneForeground";
+    public static final String GONE_BACKGROUND = "goneBackground";
+    public static final String ABSENT_FOREGROUND = "absentForeground";
+    public static final String ABSENT_BACKGROUND = "absentBackground";
+    public static final String FATIGUED_FOREGROUND = "fatiguedForeground";
+    public static final String FATIGUED_BACKGROUND = "fatiguedBackground";
     public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
     public static final String FONT_COLOR_WARNING = "fontColorWarning";
+    public static final String FONT_COLOR_SKILL_ULTRAGREEN = "fontColorSkillUltraGreen";
+    public static final String FONT_COLOR_SKILL_GREEN = "fontColorSkillGreen";
+    public static final String FONT_COLOR_SKILL_REGULAR = "fontColorSkillRegular";
+    public static final String FONT_COLOR_SKILL_VETERAN = "fontColorSkillVeteran";
+    public static final String FONT_COLOR_SKILL_ELITE = "fontColorSkillElite";
     // endregion Colours
 
     // region Fonts
@@ -261,7 +273,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRATCON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratconBiomeManifest.xml";
     public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
     public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
-    public static final String ALLIED_FACILITY_SCENARIO = "Allied Facility.xml";
+    public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_UNITS = "PrimaryAlliesAir.xml";
     public static final String SCENARIO_MODIFIER_LIAISON_GROUND = "LiaisonGround.xml";

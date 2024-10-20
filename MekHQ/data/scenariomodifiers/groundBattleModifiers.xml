@@ -50,17 +50,17 @@
 			HostileBVBudgetIncrease.xml
 		</modifier>
 		<!--modifier>
-			Need ability to allow player to specifically deploy dropships
+			Need ability to allow player to specifically deploy DropShips
 			HotDrop.xml
 		</modifier-->
 		<modifier>
 			EnemyHotDrop.xml
 		</modifier>
 		<modifier>
-			EnemyDropship.xml
+			EnemyDropShip.xml
 		</modifier>
 		<modifier>
-			GroundedEnemyDropship.xml
+			GroundedEnemyDropShip.xml
 		</modifier>
 		<modifier>
 			GoodIntel.xml
@@ -119,7 +119,7 @@
 		</modifier>
 		<!--modifier>
 			Need campaign state
-			Need way to change rat for opfor
+			Need way to change rat for OpFor
 			AlliedTreachery.xml
 		</modifier-->
 		<modifier>
@@ -132,9 +132,6 @@
 			Need planetary condition adjustments
 			OffworldOperation.xml
 		</modifier-->
-		<modifier>
-			SearchAndRescue.xml
-		</modifier>
 		<modifier>
 			AlliedTraineesGround.xml
 		</modifier>
@@ -162,7 +159,7 @@
 		<modifier>
 			EnemyMekPatrol.xml
 		</modifier>
-		<modifier>
+		<!--modifier>
 			EnemyAceMekARC2R.xml
 		</modifier>
 		<modifier>
@@ -182,17 +179,17 @@
 		</modifier>
 		<modifier>
 			EnemyAceMekPXH1D.xml
-		</modifier>
+		</modifier-->
 		<modifier>
 			EnemyAirCav.xml
 		</modifier>
 		<modifier>
 			EnemyAirMobileInf.xml
 		</modifier>
-		<modifier>
+		<!--modifier>
 			EnemyMercFireSupport.xml
 		</modifier>
-		<modifier>
+		<-modifier>
 			EnemyMercBrawl.xml
 		</modifier>
 		<modifier>
@@ -218,7 +215,7 @@
 		</modifier>
 		<modifier>
 			AlliedMekAceTBT.xml
-		</modifier>
+		</modifier-->
 		<modifier>
 			AlliedOfficerMek.xml
 		</modifier>
@@ -231,20 +228,20 @@
 		<modifier>
 			AlliedHorseCav.xml
 		</modifier>
-		<modifier>
+		<!--modifier>
 			AlliedASFAce01.xml
-		</modifier>
+		</modifier-->
 		<modifier>
 			EnemyFieldArtyCrack.xml
 		</modifier>
 		<modifier>
 			EnemyFieldArtyOffboard.xml
 		</modifier>
-		<modifier>
+		<!--modifier>
 			EnemyASFAce01.xml
 		</modifier>
 		<modifier>
 			EnemyASFAce02.xml
-		</modifier>
+		</modifier-->
 	</modifiers>
 </scenarioModifierManifest>

@@ -103,7 +103,7 @@ public class TechTableModel extends DataTableModel {
 
     public String getTechDesc(Person tech, boolean overtimeAllowed, IPartWork part) {
         StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font size='3'");
+        toReturn.append("<html><font");
         if ((null != part) && (null != part.getUnit()) && tech.getTechUnits().contains(part.getUnit())) {
             toReturn.append(" color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b>@");
         } else {
@@ -120,8 +120,9 @@ public class TechTableModel extends DataTableModel {
                 toReturn.append("; ");
             }
 
-            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()));
-            toReturn.append(' ').append(skillName);
+            toReturn.append("<b>")
+                .append(SkillType.getColoredExperienceLevelName(skill.getExperienceLevel()))
+                .append("</b> ").append(skillName);
             first = false;
         }
 

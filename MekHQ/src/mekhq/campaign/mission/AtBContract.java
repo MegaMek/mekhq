@@ -21,26 +21,33 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generator.RandomUnitGenerator;
+import megamek.client.ratgenerator.FactionRecord;
+import megamek.client.ratgenerator.RATGenerator;
+import megamek.client.ratgenerator.UnitTable;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.*;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.UnitType;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import megamek.common.loaders.EntityLoadingException;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
+import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.stratcon.StratconCampaignState;
@@ -57,15 +64,33 @@ import org.w3c.dom.NodeList;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static java.lang.Math.round;
+import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
+import static megamek.client.ratgenerator.UnitTable.findTable;
+import static megamek.common.UnitType.MEK;
+import static megamek.common.enums.SkillLevel.ELITE;
+import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.enums.SkillLevel.parseFromInteger;
+import static megamek.common.enums.SkillLevel.parseFromString;
+import static mekhq.campaign.mission.AtBDynamicScenarioFactory.getEntity;
+import static mekhq.campaign.mission.BotForceRandomizer.UNIT_WEIGHT_UNSPECIFIED;
+import static mekhq.campaign.universe.Factions.getFactionLogo;
 import static mekhq.campaign.universe.fameAndInfamy.BatchallFactions.BATCHALL_FACTIONS;
+import static mekhq.gui.dialog.HireBulkPersonnelDialog.overrideSkills;
+import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollAdvantages;
+import static mekhq.gui.dialog.HireBulkPersonnelDialog.reRollLoyalty;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -149,6 +174,11 @@ public class AtBContract extends Contract {
             "mekhq.resources.AtBContract",
             MekHQ.getMHQOptions().getLocale());
 
+    private int commandRoll;
+    private int salvageRoll;
+    private int supportRoll;
+    private int transportRoll;
+
     protected AtBContract() {
         this(null);
     }
@@ -164,9 +194,9 @@ public class AtBContract extends Contract {
         isAttacker = false;
 
         setContractType(AtBContractType.GARRISON_DUTY);
-        setAllySkill(SkillLevel.REGULAR);
+        setAllySkill(REGULAR);
         allyQuality = IUnitRating.DRAGOON_C;
-        setEnemySkill(SkillLevel.REGULAR);
+        setEnemySkill(REGULAR);
         enemyQuality = IUnitRating.DRAGOON_C;
         allyBotName = "Ally";
         enemyBotName = "Enemy";
@@ -219,40 +249,31 @@ public class AtBContract extends Contract {
 
         String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
 
-        // Use Java File to represent directories
-        File workingDirectory = new File(ROOT_DIRECTORY + camouflageDirectory + '/');
-
-        // List subdirectories and loose files in working directory
-        File[] folders = workingDirectory.listFiles(File::isDirectory);
-        File[] looseFiles = workingDirectory.listFiles();
-
         // Gather all files
-        List<File> allFiles = new ArrayList<>();
-        if (looseFiles != null) {
-            Collections.addAll(allFiles, looseFiles);
-        }
-        if (folders != null) {
-            for (File folder : folders) {
-                File[] folderFiles = folder.listFiles();
-                if (folderFiles != null) {
-                    Collections.addAll(allFiles, folderFiles);
-                }
-            }
+        List<Path> allPaths = null;
+
+        try {
+            allPaths = Files.find(Paths.get(ROOT_DIRECTORY + camouflageDirectory + '/'), Integer.MAX_VALUE,
+                    (path, bfa) -> {return bfa.isRegularFile();})
+                .collect(Collectors.toList());
+        } catch (IOException e) {
+            logger.error("Error getting list of camouflages", e);
         }
 
         // Select a random file to set camouflage, if there are files available
-        if (!allFiles.isEmpty()) {
-            File randomFile = allFiles.get(new Random().nextInt(allFiles.size()));
+        if ((null != allPaths) && (!allPaths.isEmpty())) {
+            Path randomPath = allPaths.get(new Random().nextInt(allPaths.size()));
 
-            String fileName = randomFile.getName();
-            String fileCategory = randomFile.getParent().replaceAll("\\\\", "/");
+            String fileName = randomPath.getFileName().toString();
+            String fileCategory = randomPath.getParent().toString()
+                .replaceAll("\\\\", "/"); // Is this necessary on windows machines?
             fileCategory = fileCategory.replaceAll(ROOT_DIRECTORY, "");
 
             return new Camouflage(fileCategory, fileName);
         } else {
             // Log if no files were found in the directory
             logger.warn(String.format("No files in directory %s - using default camouflage",
-                workingDirectory));
+                camouflageDirectory));
             return null;
         }
     }
@@ -359,7 +380,7 @@ public class AtBContract extends Contract {
                 continue;
             }
             switch (campaign.getUnit(uuid).getEntity().getUnitType()) {
-                case UnitType.MEK:
+                case MEK:
                     numUnits += 1;
                     break;
                 case UnitType.TANK:
@@ -442,8 +463,8 @@ public class AtBContract extends Contract {
         }
 
         // Calculate various modifiers for morale
-        int enemySkillModifier = getEnemySkill().getAdjustedValue() - SkillLevel.REGULAR.getAdjustedValue();
-        int allySkillModifier = getAllySkill().getAdjustedValue() - SkillLevel.REGULAR.getAdjustedValue();
+        int enemySkillModifier = getEnemySkill().getAdjustedValue() - REGULAR.getAdjustedValue();
+        int allySkillModifier = getAllySkill().getAdjustedValue() - REGULAR.getAdjustedValue();
 
         int performanceModifier = 0;
 
@@ -630,77 +651,84 @@ public class AtBContract extends Contract {
         return contractScoreArbitraryModifier;
     }
 
-    public void doBonusRoll(Campaign c) {
+    public void doBonusRoll(Campaign campaign) {
         int number;
-        String rat = null;
         int roll = Compute.d6();
+
         switch (roll) {
             case 1: /* 1d6 dependents */
-                if (c.getCampaignOptions().isUseRandomDependentAddition()) {
+                if (campaign.getCampaignOptions().isUseRandomDependentAddition()) {
                     number = Compute.d6();
-                    c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
+                    campaign.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
 
                     for (int i = 0; i < number; i++) {
-                        Person p = c.newDependent(false, Gender.RANDOMIZE);
-                        c.recruitPerson(p);
+                        Person p = campaign.newDependent(false, Gender.RANDOMIZE);
+                        campaign.recruitPerson(p);
                     }
                 }
                 break;
-            case 2: /* Recruit (choose) */
-                c.addReport("Bonus: hire one recruit of your choice.");
+            case 2:
+                campaign.addReport("Bonus: Ronin");
+                recruitRonin(campaign);
                 break;
-            case 3: /* 1d6 parts */
-                number = Compute.d6();
-                numBonusParts += number;
-                c.addReport("Bonus: " + number + " part" + ((number > 1) ? "s" : ""));
+            case 3:
+                numBonusParts++;
+                campaign.addReport("Bonus: Part");
                 break;
-            case 4: /* civilian vehicle */
-                rat = "CivilianUnits_CivVeh";
-                c.addReport("Bonus: civilian vehicle");
+            case 4:
+                campaign.addReport("Bonus: Unit");
+                addBonusUnit(campaign, UnitType.TANK);
                 break;
-            case 5: /* APC */
-                rat = "CivilianUnits_APC";
-                c.addReport("Bonus: civilian APC");
+            case 5:
+                campaign.addReport("Bonus: Unit");
+                addBonusUnit(campaign, UnitType.AEROSPACEFIGHTER);
                 break;
-            case 6: /* civilian 'Mek */
-                rat = "CivilianUnits_PrimMek";
-                c.addReport("Bonus: civilian Mek");
+            case 6:
+                campaign.addReport("Bonus: Unit");
+                addBonusUnit(campaign, MEK);
                 break;
             default:
                 throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
+                    "Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
+        }
+    }
+
+    /**
+     * Generates a Ronin and adds them to the personnel roster.
+     *
+     * @param campaign the current campaign.
+     */
+    private static void recruitRonin(Campaign campaign) {
+        Person ronin = campaign.newPerson(PersonnelRole.MEKWARRIOR);
+
+        overrideSkills(campaign, ronin, PersonnelRole.MEKWARRIOR,
+            Objects.requireNonNull(SkillLevel.VETERAN).ordinal());
+
+        reRollLoyalty(ronin, ronin.getExperienceLevel(campaign, false));
+        reRollAdvantages(campaign, ronin, ronin.getExperienceLevel(campaign, false));
+        ronin.setCallsign(RandomCallsignGenerator.getInstance().generate());
+
+        campaign.recruitPerson(ronin, true);
+    }
+
+    /**
+     * Generates a bonus unit for a given campaign and unit type.
+     *
+     * @param campaign  the campaign object to add the bonus unit to
+     * @param unitType  the type of unit for the bonus
+     */
+    private void addBonusUnit(Campaign campaign, int unitType) {
+        String faction = employerCode;
+        int quality = allyQuality;
+
+        if (Compute.randomInt(2) > 0) {
+            faction = enemyCode;
+            quality = enemyQuality;
         }
 
-        if (null != rat) {
-            Entity en = null;
-            RandomUnitGenerator.getInstance().setChosenRAT(rat);
-            ArrayList<MekSummary> msl = RandomUnitGenerator.getInstance().generate(1);
-
-            int quality = 3;
-
-            if (c.getCampaignOptions().isUseRandomUnitQualities()) {
-                quality = Unit.getRandomUnitQuality(0);
-            }
-
-            if (!msl.isEmpty() && (msl.get(0) != null)) {
-                try {
-                    en = new MekFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
-                } catch (EntityLoadingException ex) {
-                    logger.error("Unable to load entity: {}: {}: {}",
-                            msl.get(0).getSourceFile(),
-                            msl.get(0).getEntryName(),
-                            ex.getMessage(),
-                            ex);
-                }
-            }
-
-            if (null != en) {
-                c.addNewUnit(en, false, 0, quality);
-            } else {
-                c.addReport("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                        + "'>Could not load unit</font></html>");
-            }
-        }
+        Entity newUnit = getEntity(faction, REGULAR, quality, unitType,
+            UNIT_WEIGHT_UNSPECIFIED, null, campaign);
+        campaign.addNewUnit(newUnit, false, 0);
     }
 
     public boolean isSubcontract() {
@@ -835,7 +863,7 @@ public class AtBContract extends Contract {
                             break;
                         case 6:
                             final String unitName = c.getUnitMarket().addSingleUnit(c,
-                                    UnitMarketType.EMPLOYER, UnitType.MEK, getEmployerFaction(),
+                                    UnitMarketType.EMPLOYER, MEK, getEmployerFaction(),
                                     IUnitRating.DRAGOON_F, 50);
                             if (unitName != null) {
                                 text += String.format(
@@ -938,18 +966,6 @@ public class AtBContract extends Contract {
                 .dividedBy(getLength());
     }
 
-    public void checkForFollowup(Campaign campaign) {
-        if (getContractType().isDiversionaryRaid() || getContractType().isReconRaid()
-                || getContractType().isRiotDuty()) {
-            int roll = Compute.d6();
-            if (roll == 6) {
-                campaign.getContractMarket().addFollowup(campaign, this);
-                campaign.addReport(
-                        "Your employer has offered a follow-up contract (available on the <a href=\"CONTRACT_MARKET\">contract market</a>).");
-            }
-        }
-    }
-
     @Override
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         indent = super.writeToXMLBegin(pw, indent);
@@ -994,6 +1010,10 @@ public class AtBContract extends Contract {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "priorLogisticsFailure", priorLogisticsFailure);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleTypeMod", battleTypeMod);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nextWeekBattleTypeMod", nextWeekBattleTypeMod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandRoll", commandRoll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageRoll", salvageRoll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportRoll", supportRoll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportRoll", transportRoll);
 
         if (parentContract != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentContractId", parentContract.getId());
@@ -1027,11 +1047,11 @@ public class AtBContract extends Contract {
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractType")) {
                     setContractType(AtBContractType.parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("allySkill")) {
-                    setAllySkill(SkillLevel.parseFromString(wn2.getTextContent().trim()));
+                    setAllySkill(parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("allyQuality")) {
                     allyQuality = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemySkill")) {
-                    setEnemySkill(SkillLevel.parseFromString(wn2.getTextContent().trim()));
+                    setEnemySkill(parseFromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enemyQuality")) {
                     enemyQuality = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("allyBotName")) {
@@ -1078,6 +1098,14 @@ public class AtBContract extends Contract {
                     battleTypeMod = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextWeekBattleTypeMod")) {
                     nextWeekBattleTypeMod = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("commandRoll")) {
+                    commandRoll = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("salvageRoll")) {
+                    salvageRoll = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("supportRoll")) {
+                    supportRoll = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("transportRoll")) {
+                    transportRoll = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioDate")) {
                     specialEventScenarioDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("specialEventScenarioType")) {
@@ -1483,80 +1511,8 @@ public class AtBContract extends Contract {
         // Retrieves the batchall statement based on infamy and enemy code
         String batchallStatement = BatchallFactions.getGreeting(campaign, enemyCode);
 
-        // Constants for the directory of the portraits and the file type
-        final String PORTRAIT_DIRECTORY = "data/images/force/Pieces/Logos/Clan/";
-        final String PORTRAIT_FILE_TYPE = ".png";
-
         // An ImageIcon to hold the clan's faction icon
-        ImageIcon icon;
-
-        // A switch statement that selects the icon based on the enemy code
-        switch (enemyCode) {
-            // Each case sets the icon to the corresponding image
-            case "CBS" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Blood Spirit"
-                + PORTRAIT_FILE_TYPE);
-            case "CB" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Burrock"
-                + PORTRAIT_FILE_TYPE);
-            case "CCC" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Cloud Cobra"
-                + PORTRAIT_FILE_TYPE);
-            case "CCO" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Coyote"
-                + PORTRAIT_FILE_TYPE);
-            case "CDS" -> {
-                if (campaign.getGameYear() >= 3100) {
-                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Sea Fox"
-                        + PORTRAIT_FILE_TYPE);
-                } else {
-                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Diamond Shark"
-                        + PORTRAIT_FILE_TYPE);
-                }
-            }
-            case "CFM" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Fire Mandrill"
-                + PORTRAIT_FILE_TYPE);
-            case "CGB" -> {
-                if (campaign.getGameYear() >= 3060) {
-                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Ghost Bear Dominion"
-                        + PORTRAIT_FILE_TYPE);
-                } else {
-                    icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ghost Bear"
-                        + PORTRAIT_FILE_TYPE);
-                }
-            }
-            case "CGS" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Goliath Scorpion"
-                + PORTRAIT_FILE_TYPE);
-            case "CHH" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Hell's Horses"
-                + PORTRAIT_FILE_TYPE);
-            case "CIH" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Ice Hellion"
-                + PORTRAIT_FILE_TYPE);
-            case "CJF" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Jade Falcon"
-                + PORTRAIT_FILE_TYPE);
-            case "CMG" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Mongoose"
-                + PORTRAIT_FILE_TYPE);
-            case "CNC" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Nova Cat"
-                + PORTRAIT_FILE_TYPE);
-            case "CSJ" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Smoke Jaguar"
-                + PORTRAIT_FILE_TYPE);
-            case "CSR" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Snow Raven"
-                + PORTRAIT_FILE_TYPE);
-            case "CSA" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Star Adder"
-                + PORTRAIT_FILE_TYPE);
-            case "CSV" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Steel Viper"
-                + PORTRAIT_FILE_TYPE);
-            case "CSL" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Stone Lion"
-                + PORTRAIT_FILE_TYPE);
-            case "CWI" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Widowmaker"
-                + PORTRAIT_FILE_TYPE);
-            case "CW", "CWE" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf"
-                + PORTRAIT_FILE_TYPE);
-            case "CWIE" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Clan Wolf-in-Exile"
-                + PORTRAIT_FILE_TYPE);
-            case "CEI" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Scorpion Empire"
-                + PORTRAIT_FILE_TYPE);
-            case "RD" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Rasalhague Dominion"
-                + PORTRAIT_FILE_TYPE);
-            case "RA" -> icon = new ImageIcon(PORTRAIT_DIRECTORY + "Raven Alliance"
-                + PORTRAIT_FILE_TYPE);
-            default -> icon = new ImageIcon("data/images/force/Pieces/Logos/Inner Sphere/Star League.png");
-        }
+        ImageIcon icon = getFactionLogo(campaign, enemyCode, false);
 
         // Set the commander's rank and use a name generator to generate the commander's name
         String rank = resources.getString("starColonel.text");
@@ -1755,5 +1711,319 @@ public class AtBContract extends Contract {
         dialog.setLocationRelativeTo(null); // Center the dialog on the screen
         dialog.setModal(true); // Set the dialog to be modal
         dialog.setVisible(true); // Show the dialog
+    }
+
+    /**
+     * This method returns a {@link JPanel} that represents the difficulty stars for a given mission.
+     *
+     * @param campaign the campaign for which the difficulty stars are calculated
+     * @return a {@link JPanel} with the difficulty stars displayed
+     */
+    public JPanel getContractDifficultyStars(Campaign campaign) {
+        final int ERROR = -99;
+        int difficulty = Math.min(calculateContractDifficulty(campaign), 8);
+
+        // Create a new JFrame
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Create a pane with FlowLayout
+        JPanel panel = new JPanel(new FlowLayout());
+
+        // Load and scale the image
+        ImageIcon imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_orange.png");
+        if (difficulty < 1 && difficulty != ERROR) {
+            imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_green.png");
+        } else if (difficulty > 0) {
+            imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_red.png");
+        }
+
+        Image scaledImage = imageIcon.getImage().getScaledInstance(40, 40, Image.SCALE_FAST);
+        imageIcon = new ImageIcon(scaledImage);
+
+        int iterations = difficulty;
+
+        if (difficulty == ERROR) {
+            iterations = 1;
+        } else if (difficulty < 1) {
+            iterations = -difficulty + 1;
+        }
+
+        for (int i = 0; i < iterations; i++) {
+            panel.add(new JLabel(imageIcon));
+        }
+
+        return panel;
+    }
+
+    /**
+     * Calculates the contract difficulty based on the given campaign and parameters.
+     *
+     * @param campaign The campaign object containing the necessary data.
+     * @return The contract difficulty as an integer value.
+     */
+    public int calculateContractDifficulty(Campaign campaign) {
+        final int ERROR = -99;
+
+        // Estimate the power of the enemy forces
+        SkillLevel opposingSkill = modifySkillLevelBasedOnFaction(enemyCode, enemySkill);
+        double enemySkillMultiplier = getSkillMultiplier(opposingSkill);
+        double enemyPower = estimateMekStrength(campaign, enemyCode, enemyQuality);
+
+        // If we cannot calculate enemy power, abort.
+        if (enemyPower == 0) {
+            return ERROR;
+        }
+
+        enemyPower = (int) round(enemyPower * enemySkillMultiplier);
+
+        // Estimate player power
+        double playerPower = estimatePlayerPower(campaign);
+
+        // Estimate the power of allied forces
+        // TODO pull these directly from Force Generation instead of using magic numbers
+        // TODO estimate the LIAISON ratio by going through each combat lance and
+        // getting the actual average (G)BV for an allied heavy/assault mek.
+        double allyRatio = switch (getCommandRights()) {
+            case INDEPENDENT    -> 0; // no allies
+            case LIAISON        -> 0.4; // single allied heavy/assault mek, pure guess for now
+            case HOUSE          -> 1; // allies with same (G)BV budget
+            case INTEGRATED     -> 2; // allies with twice the player's (G)BV budget
+            default -> 0;
+        };
+        if (allyRatio > 0) {
+            SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
+            double allySkillMultiplier = getSkillMultiplier(alliedSkill);
+            double allyPower = estimateMekStrength(campaign, employerCode, allyQuality);
+            allyPower = allyPower * allySkillMultiplier;
+            // If we cannot calculate ally's power, use player power as a fallback.
+            if (allyPower == 0) {
+                allyPower = playerPower;
+            }
+            playerPower += allyRatio * allyPower;
+            enemyPower += allyRatio * enemyPower;
+        }
+
+        // Calculate difficulty based on the percentage difference between the two forces.
+        // If the enemy force exceeds the player force, this will be a positive percentage, otherwise negative.
+        double difference = enemyPower - playerPower;
+        double percentDifference = (difference / playerPower) * 100;
+
+        return (int) round(percentDifference / 20);
+    }
+
+    /**
+     * Modifies the skill level based on the faction code.
+     *
+     * @param factionCode  the code of the faction
+     * @param skillLevel   the original skill level
+     * @return the modified skill level
+     */
+    private static SkillLevel modifySkillLevelBasedOnFaction(String factionCode, SkillLevel skillLevel) {
+        if (Objects.equals(factionCode, "SOC")) {
+            return ELITE;
+        }
+
+        if (Factions.getInstance().getFaction(factionCode).isClan()) {
+            return parseFromInteger(skillLevel.ordinal() + 1);
+        }
+
+        return skillLevel;
+    }
+
+    /**
+     * Estimates the power of the player in a campaign based on the battle values of their units.
+     *
+     * @param campaign the object containing the forces and units of the player
+     * @return average battle value per player unit OR total BV2 divided by total GBV
+     */
+    private static double estimatePlayerPower(Campaign campaign) {
+        int playerPower = 0;
+        int playerGBV = 0;
+        int playerUnitCount = 0;
+        for (Force force : campaign.getAllForces()) {
+            if (!force.isCombatForce()) {
+                continue;
+            }
+
+            for (UUID unitID : force.getUnits()) {
+                Entity entity = campaign.getUnit(unitID).getEntity();
+                playerPower += entity.calculateBattleValue();
+                playerGBV += entity.getGenericBattleValue();
+                playerUnitCount ++;
+            }
+        }
+
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            return ((double) playerPower) / playerGBV;
+        } else {
+            return ((double) playerPower) / playerUnitCount;
+        }
+    }
+
+    /**
+     * Returns the skill BV multiplier based on the given skill level.
+     *
+     * @param skillLevel the skill level to determine the multiplier
+     * @return the skill multiplier
+     */
+    private static double getSkillMultiplier(SkillLevel skillLevel) {
+        return switch (skillLevel) {
+            case NONE -> 0.68;
+            case ULTRA_GREEN -> 0.77;
+            case GREEN -> 0.86;
+            case REGULAR -> 1.00;
+            case VETERAN -> 1.32;
+            case ELITE -> 1.68;
+            case HEROIC -> 2.02;
+            case LEGENDARY -> 2.31;
+        };
+    }
+    /**
+     * Estimates the relative strength for Mek units of a specific faction and quality.
+     * Excludes salvage.
+     *
+     * @param campaign the campaign to estimate the average Mek strength for
+     * @param factionCode the code of the faction to estimate the average Mek strength for
+     * @param quality the quality of the Meks to calculate the average strength for
+     * @return the average battle value OR total BV2 divided by total GBV
+     * for Meks of the specified faction and quality OR 0 on error
+     */
+    private static double estimateMekStrength(Campaign campaign, String factionCode, int quality) {
+        final double ERROR = 0;
+
+        RATGenerator ratGenerator = Factions.getInstance().getRATGenerator();
+        FactionRecord faction = ratGenerator.getFaction(factionCode);
+
+        if (faction == null) {
+            return ERROR;
+        }
+
+        UnitTable unitTable;
+        try {
+            unitTable = findTable(
+                faction,
+                MEK,
+                campaign.getGameYear(),
+                String.valueOf(quality),
+                new ArrayList<>(),
+                NETWORK_NONE,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                0,
+                faction);
+        } catch (Exception ignored) {
+            return ERROR;
+        }
+
+        // Otherwise, calculate the estimated power of the faction
+        int entries = unitTable.getNumEntries();
+
+        int totalBattleValue = 0;
+        int totalGBV = 0;
+        int rollingCount = 0;
+
+        for (int i = 0; i < entries; i++) {
+            int battleValue = unitTable.getBV(i); // 0 for salvage
+            if (0 == battleValue) {
+                // Removing this check will break things, see the other comments.
+                continue;
+            }
+            // TODO implement getGBV(int index) in UnitTable to simplify this?
+            // getMekSummary(int index) is NULL for salvage.
+            int genericBattleValue = unitTable.getMekSummary(i).loadEntity().getGenericBattleValue();
+            int weight = unitTable.getEntryWeight(i); // NOT 0 for salvage
+            
+            totalBattleValue += battleValue * weight;
+            totalGBV += genericBattleValue * weight;
+            rollingCount += weight;
+        }
+
+        if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
+            return ((double) totalBattleValue) / totalGBV;
+        } else {
+            return ((double) totalBattleValue) / rollingCount;
+        }
+    }
+
+    /**
+     * Get the command roll that was used to determine command rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getCommandRoll() {
+        return commandRoll;
+    }
+
+    /**
+     * Set the command roll that was used to determine command rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setCommandRoll(int roll) {
+        commandRoll = roll;
+    }
+
+    /**
+     * Get the salvage roll that was used to determine salvage rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getSalvageRoll() {
+        return salvageRoll;
+    }
+
+    /**
+     * Set the salvage roll that was used to determine salvage rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setSalvageRoll(int roll) {
+        salvageRoll = roll;
+    }
+
+    /**
+     * Get the support roll that was used to determine support rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getSupportRoll() {
+        return supportRoll;
+    }
+
+    /**
+     * Set the support roll that was used to determine support rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setSupportRoll(int roll) {
+        supportRoll = roll;
+    }
+
+    /**
+     * Get the transport roll that was used to determine transport rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @return
+     */
+    public int getTransportRoll() {
+        return transportRoll;
+    }
+
+    /**
+     * Set the transport roll that was used to determine transport rights. Only used by CamOps Contract
+     * Market.
+     *
+     * @param roll
+     */
+    public void setTransportRoll(int roll) {
+        transportRoll = roll;
     }
 }

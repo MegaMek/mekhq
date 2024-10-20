@@ -10,7 +10,7 @@
         <canReinforceLinked>true</canReinforceLinked>
         <contributesToBV>true</contributesToBV>
         <contributesToMapSize>true</contributesToMapSize>
-        <contributesToUnitCount>false</contributesToUnitCount>
+        <contributesToUnitCount>true</contributesToUnitCount>
         <deployOffboard>false</deployOffboard>
         <deploymentZones>
             <deploymentZone>10</deploymentZone>
@@ -28,6 +28,12 @@
         <startingAltitude>0</startingAltitude>
         <syncDeploymentType>None</syncDeploymentType>
         <useArtillery>false</useArtillery>
+        <roleChoices>
+            <forceRole>CIVILIAN</forceRole>
+            <forceRole>CARGO</forceRole>
+            <forceRole>SUPPORT</forceRole>
+            <forceRole>APC</forceRole>
+        </roleChoices>
     </forceDefinition>
     <modifierName>Evacuate</modifierName>
     <objectives>
