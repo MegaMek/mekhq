@@ -23,6 +23,7 @@ import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;

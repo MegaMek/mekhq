@@ -26,6 +26,7 @@ import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
