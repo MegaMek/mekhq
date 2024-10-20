@@ -183,6 +183,11 @@ public class Force {
         return scenarioId;
     }
 
+    /**
+     * Set scenario ID (e.g. deploy to scenario) for a force and all of its subforces and units
+     * @param scenarioId scenario to deploy to
+     * @param campaign campaign - required to update units
+     */
     public void setScenarioId(int scenarioId, Campaign campaign) {
         this.scenarioId = scenarioId;
         for (Force sub : getSubForces()) {
