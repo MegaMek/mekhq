@@ -2901,7 +2901,8 @@ public class AtBDynamicScenarioFactory {
 
             if (newEntity == null) {
                 logger.info(String.format("Failed to generate unit of type %s, weight %s. Beginning substitution.",
-                    unitTypes.get(i), AtBConfiguration.decodeWeightStr(weights, i)));
+                    UnitType.getTypeName(unitTypes.get(i)),
+                    EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, i))));
 
                 // If we've failed to get an entity, we start adjusting weight categories to see
                 // if we hit something valid.
@@ -2917,16 +2918,16 @@ public class AtBDynamicScenarioFactory {
                     newEntity = getNewEntity(faction, skill, quality, individualType, weight, individualRole, campaign, 0);
 
                     if (newEntity != null) {
-                        logger.info(String.format("Substitution successful. Substituted with %s.",
-                            weight));
+                        logger.info(String.format("Substitution successful (%s)",
+                            EntityWeightClass.getClassName(AtBConfiguration.decodeWeightStr(weights, i))));
                         break;
                     }
                 }
 
                 // If we still haven't got a valid entity, use hardcoded fallbacks.
-                logger.info("Substitution unsuccessful. Using hardcoded fallbacks");
-
                 if (newEntity == null) {
+                    logger.info("Substitution unsuccessful. Using hardcoded fallbacks");
+
                     if (unitTypes.get(0) == UnitType.DROPSHIP) {
                         newEntity = getNewEntity(faction, skill, quality, List.of(UnitType.DROPSHIP),
                             weights, Map.of(UnitType.DROPSHIP, List.of(CIVILIAN)),
