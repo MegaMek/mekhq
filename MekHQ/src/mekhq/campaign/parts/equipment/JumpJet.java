@@ -36,6 +36,7 @@ public class JumpJet extends EquipmentPart {
         // TODO : on which it would have a different price (only tonnage is taken into
         // TODO : account for compatibility)
         super(tonnage, et, equipNum, 1.0, omniPodded, c);
+        this.unitTonnageMatters = true;
     }
 
     @Override

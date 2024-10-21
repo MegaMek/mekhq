@@ -77,6 +77,7 @@ public class ProtoMekLocation extends Part {
         this.percent = 1.0;
         this.forQuad = quad;
         this.breached = false;
+        this.unitTonnageMatters = true;
         this.name = "ProtoMek Location";
         switch (loc) {
             case ProtoMek.LOC_HEAD:
@@ -584,6 +585,11 @@ public class ProtoMekLocation extends Part {
         toReturn.append("<html><b>")
             .append(isBlownOff() ? "Re-attach " : "Seal ")
             .append(getName());
+        if(isUnitTonnageMatters()) {
+            toReturn.append(" (")
+                .append(getUnitTonnage())
+                .append(" ton)");
+        }
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
             .append(ReportingUtilities.messageSurroundedBySpanWithColor(

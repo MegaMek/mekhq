@@ -53,6 +53,7 @@ public class ProtoMekSensor extends Part {
     public ProtoMekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "ProtoMek Sensors";
+        this.unitTonnageMatters = true;
     }
 
     @Override
