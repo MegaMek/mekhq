@@ -21,10 +21,13 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
+import java.util.Objects;
 
 /**
  * This class represents a nag dialog displayed when the campaign can't afford its next jump
@@ -45,7 +48,11 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
         Money currentFunds = campaign.getFunds();
         Money nextJumpCost = getNextJumpCost(campaign);
 
-        return currentFunds.isLessThan(nextJumpCost);
+        if (nextJumpCost.isZero()) {
+            return false;
+        } else {
+            return currentFunds.isLessThan(nextJumpCost);
+        }
     }
 
     /**
@@ -59,7 +66,14 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
      * @return the cost of the next jump for the campaign
      */
     static Money getNextJumpCost(Campaign campaign) {
-        if (campaign.getLocation().getJumpPath() == null) {
+        CurrentLocation location = campaign.getLocation();
+        JumpPath jumpPath = location.getJumpPath();
+
+        if (jumpPath == null) {
+            return Money.zero();
+        }
+
+        if (Objects.equals(jumpPath.getLastSystem(), location.getCurrentSystem())) {
             return Money.zero();
         }
 

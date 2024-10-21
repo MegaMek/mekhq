@@ -23,6 +23,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -57,8 +58,12 @@ class UnableToAffordJumpNagDialogTest {
         // Stubs
         when(campaign.getCampaignOptions()).thenReturn(options);
 
-        jumpPath.addSystem(campaign.getSystemById("Terra"));
+        PlanetarySystem originSystem = mock(PlanetarySystem.class);
+        PlanetarySystem destinationSystem = mock(PlanetarySystem.class);
+
+        jumpPath.addSystem(destinationSystem);
         when(campaign.getLocation()).thenReturn(location);
+        when(location.getCurrentSystem()).thenReturn(originSystem);
         when(location.getJumpPath()).thenReturn(jumpPath);
     }
 
