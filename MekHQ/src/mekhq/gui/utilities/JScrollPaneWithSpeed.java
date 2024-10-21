@@ -39,7 +39,7 @@ public class JScrollPaneWithSpeed extends JScrollPane {
     }
 
     /**
-     * @see JPanel#JPanel(Component)
+     * @see JPanel#JPanel()
      */
     public JScrollPaneWithSpeed(Component view) {
         super(view);
@@ -47,13 +47,16 @@ public class JScrollPaneWithSpeed extends JScrollPane {
     }
 
     /**
-     * @see JPanel#JPanel(Component, int, int)
+     * @see JPanel#JPanel()
      */
     public JScrollPaneWithSpeed(Component view, int vsbPolicy, int hsbPolicy) {
         super(view, vsbPolicy, hsbPolicy);
         setScaleIncrement();
     }
 
+    /**
+     * Set the panel's scroll increments based on the UI scale
+     */
     private void setScaleIncrement() {
         float scale = GUIPreferences.getInstance().getGUIScale();
 
