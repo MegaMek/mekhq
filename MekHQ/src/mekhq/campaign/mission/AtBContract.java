@@ -73,7 +73,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
@@ -246,15 +245,19 @@ public class AtBContract extends Contract {
         // Define the root directory and get the faction-specific camouflage directory
         final String ROOT_DIRECTORY = "data/images/camo/";
 
-        String camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
+        String camouflageDirectory = "Standard Camouflage";
+
+        if (factionCode != null) {
+            camouflageDirectory = getCamouflageDirectory(currentYear, factionCode);
+        }
 
         // Gather all files
         List<Path> allPaths = null;
 
         try {
             allPaths = Files.find(Paths.get(ROOT_DIRECTORY + camouflageDirectory + '/'), Integer.MAX_VALUE,
-                    (path, bfa) -> {return bfa.isRegularFile();})
-                .collect(Collectors.toList());
+                    (path, bfa) -> bfa.isRegularFile())
+                .toList();
         } catch (IOException e) {
             logger.error("Error getting list of camouflages", e);
         }
@@ -265,7 +268,7 @@ public class AtBContract extends Contract {
 
             String fileName = randomPath.getFileName().toString();
             String fileCategory = randomPath.getParent().toString()
-                .replaceAll("\\\\", "/"); // Is this necessary on windows machines?
+                .replaceAll("\\\\", "/"); // This is necessary for windows machines
             fileCategory = fileCategory.replaceAll(ROOT_DIRECTORY, "");
 
             return new Camouflage(fileCategory, fileName);
