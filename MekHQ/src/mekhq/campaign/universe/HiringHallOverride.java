@@ -18,10 +18,7 @@
  */
 package mekhq.campaign.universe;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.adapter.LocalDateAdapter;
 import mekhq.campaign.universe.enums.HiringHallLevel;
@@ -32,28 +29,11 @@ import java.time.LocalDate;
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class HiringHallOverride {
     @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
-    private LocalDate start;
+    private LocalDate start = null;
     @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
-    private LocalDate end;
-    @XmlElement(name = "level")
-    private HiringHallLevel level;
-
-
-    public LocalDate getStart() {
-        return start;
-    }
-
-    public void setStart(LocalDate start) {
-        this.start = start;
-    }
-
-    public LocalDate getEnd() {
-        return end;
-    }
-
-    public void setEnd(LocalDate end) {
-        this.end = end;
-    }
+    private LocalDate end = null;
+    @XmlElement
+    private HiringHallLevel level = HiringHallLevel.NONE;
 
     public HiringHallLevel getLevel() {
         return level;
@@ -64,6 +44,15 @@ public class HiringHallOverride {
     }
 
     public boolean isActive(LocalDate date) {
+        // Hall has no start date, so it's always inactive
+        if (start == null) {
+            return false;
+        }
+        // Hall has a start date and no end date, so it's always active
+        if (end == null) {
+            return true;
+        }
+        // Hall has a start date and end date, so it's only active between those dates
         return date.isAfter(start) && date.isBefore(end);
     }
 }
