@@ -320,9 +320,6 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 if ((preset != null) && (preset.getGameOptions() != null)) {
                     campaign.setGameOptions(preset.getGameOptions());
                 }
-                campaign.setLocalDate(dc.getDate());
-                campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-                campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
 
                 // This must be after the date chooser to enable correct functionality.
                 setVisible(false);
@@ -330,7 +327,17 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 // Campaign Options
                 if (isSelect && preset != null) {
                     preset.applyContinuousToCampaign(campaign);
+
+                    // This needs to be after we've applied the preset
+                    campaign.setLocalDate(dc.getDate());
+                    campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+                    campaign.setStartingSystem(preset.getPlanet());
                 } else {
+                    // This needs to be before we trigger the customize preset dialog
+                    campaign.setLocalDate(dc.getDate());
+                    campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+                    campaign.setStartingSystem((preset == null) ? null : preset.getPlanet());
+
                     CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(dialog, getFrame(), campaign, true);
                     optionsDialog.setLocationRelativeTo(getFrame());
                     optionsDialog.applyPreset(preset);
