@@ -2417,7 +2417,7 @@ public class CampaignGUI extends JPanel {
                         continue;
                     }
                     scenario.addForces(sub.getId());
-                    sub.setScenarioId(scenario.getId());
+                    sub.setScenarioId(scenario.getId(), getCampaign());
                 }
                 prevId = parent.getId();
             }

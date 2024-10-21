@@ -896,7 +896,7 @@ public class Campaign implements ITechManager {
         int id = lastForceId + 1;
         force.setId(id);
         superForce.addSubForce(force, true);
-        force.setScenarioId(superForce.getScenarioId());
+        force.setScenarioId(superForce.getScenarioId(), this);
         forceIds.put(id, force);
         lastForceId = id;
 
@@ -917,15 +917,7 @@ public class Campaign implements ITechManager {
         }
 
         superForce.addSubForce(force, true);
-        force.setScenarioId(superForce.getScenarioId());
-
-        for (Object o : force.getAllChildren(this)) {
-            if (o instanceof Unit) {
-                ((Unit) o).setScenarioId(superForce.getScenarioId());
-            } else if (o instanceof Force) {
-                ((Force) o).setScenarioId(superForce.getScenarioId());
-            }
-        }
+        force.setScenarioId(superForce.getScenarioId(), this);
 
         // repopulate formation levels across the TO&E
         Force.populateFormationLevelsFromOrigin(this);
@@ -3695,14 +3687,8 @@ public class Campaign implements ITechManager {
                         }
 
                         if (!forceUnderRepair) {
-                            forceIds.get(forceId).setScenarioId(s.getId());
+                            forceIds.get(forceId).setScenarioId(s.getId(), this);
                             s.addForces(forceId);
-                            for (UUID uid : forceIds.get(forceId).getAllUnits(true)) {
-                                Unit u = getHangar().getUnit(uid);
-                                if (u != null) {
-                                    u.setScenarioId(s.getId());
-                                }
-                            }
 
                             addReport(MessageFormat.format(
                                     resources.getString("atbScenarioTodayWithForce.format"),
