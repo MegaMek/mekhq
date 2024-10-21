@@ -361,13 +361,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     force.clearScenarioIds(gui.getCampaign(), true);
                     if (null != scenario) {
                         scenario.addForces(force.getId());
-                        force.setScenarioId(scenario.getId());
-                        for (UUID uid : force.getAllUnits(true)) {
-                            Unit u = gui.getCampaign().getUnit(uid);
-                            if (null != u) {
-                                u.setScenarioId(scenario.getId());
-                            }
-                        }
+                        force.setScenarioId(scenario.getId(), gui.getCampaign());
                     }
                     MekHQ.triggerEvent(new DeploymentChangedEvent(force, scenario));
                 }

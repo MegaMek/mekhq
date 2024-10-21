@@ -92,10 +92,16 @@ public abstract class Part implements IPartWork, ITechnology {
     protected String name;
     protected int id;
 
-    // this is the unitTonnage which needs to be tracked for some parts
-    // even when off the unit. actual tonnage is returned via the
-    // getTonnage() method
+    /** 
+     * This is the unitTonnage which needs to be tracked for some parts
+     * even when off the unit. Actual tonnage is returned via the
+     * getTonnage() method
+     */
     protected int unitTonnage;
+    /**
+     * Is this part's unitTonnage something that differentiates it from other parts
+     */
+    protected boolean unitTonnageMatters;
 
     protected boolean omniPodded;
 
@@ -179,6 +185,7 @@ public abstract class Part implements IPartWork, ITechnology {
     public Part(int tonnage, boolean omniPodded, Campaign c) {
         this.name = "Unknown";
         this.unitTonnage = tonnage;
+        this.unitTonnageMatters = false;
         this.omniPodded = omniPodded;
         this.hits = 0;
         this.skillMin = SkillType.EXP_GREEN;
@@ -232,17 +239,33 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
+    public Money getUndamagedValue() {
+        return adjustCostsForCampaignOptions(getStickerPrice(), true);
+    }
+
+    @Override
     public boolean isPriceAdjustedForAmount() {
         return false;
     }
 
     /**
-     * Adjusts the cost of a part based on one's campaign options
+     * Adjusts the cost of a part based on campaign options and the part's condition
      *
      * @param cost the part's base cost
      * @return the part's cost adjusted for campaign options
      */
     public Money adjustCostsForCampaignOptions(@Nullable Money cost) {
+        return adjustCostsForCampaignOptions(cost, false);
+    } 
+
+    /**
+     * Adjusts the cost of a part based on campaign options
+     *
+     * @param cost the part's base cost
+     * @param ignoreDamage do we ignore damaged condition
+     * @return the part's cost adjusted for campaign options
+     */
+    public Money adjustCostsForCampaignOptions(@Nullable Money cost, boolean ignoreDamage) {
         // if the part doesn't cost anything, no amount of multiplication will change it
         if ((cost == null) || cost.isZero()) {
             return Money.zero();
@@ -269,7 +292,7 @@ public abstract class Part implements IPartWork, ITechnology {
                     .getUsedPartPriceMultipliers()[getQuality().toNumeric()]);
         }
 
-        if (needsFixing() && !isPriceAdjustedForAmount()) {
+        if (!ignoreDamage && needsFixing() && !isPriceAdjustedForAmount()) {
             cost = cost.multipliedBy((getSkillMin() > SkillType.EXP_ELITE)
                     ? campaign.getCampaignOptions().getUnrepairablePartsValueMultiplier()
                     : campaign.getCampaignOptions().getDamagedPartsValueMultiplier());
@@ -311,6 +334,13 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public int getUnitTonnage() {
         return unitTonnage;
+    }
+    
+    /** 
+     * @return Is this an item that exists in multiple forms for units of different tonnages?
+     */
+    public boolean isUnitTonnageMatters() {
+        return unitTonnageMatters;
     }
 
     public abstract double getTonnage();
@@ -385,6 +415,11 @@ public abstract class Part implements IPartWork, ITechnology {
         toReturn.append("<html><b>")
             .append(isSalvaging() ? "Salvage  " : "Repair ")
             .append(getName());
+            if(isUnitTonnageMatters()) {
+                toReturn.append(" (")
+                    .append(getUnitTonnage())
+                    .append(" ton)");
+            }
         if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
             toReturn.append(" - ")
             .append(ReportingUtilities.messageSurroundedBySpanWithColor(
@@ -1012,18 +1047,20 @@ public abstract class Part implements IPartWork, ITechnology {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed.</b></font>";
+        return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "<b> failed</b>") + ".";
     }
 
     @Override
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor()
-                    + "'><b> salvaged.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> salvaged</b>") + ".";
         } else {
             fix();
-            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> fixed.</b></font>";
+            return ReportingUtilities.messageSurroundedBySpanWithColor(
+                MekHQ.getMHQOptions().getFontColorPositiveHexColor(), "<b> fixed</b>") + ".";
         }
     }
 
@@ -1061,32 +1098,18 @@ public abstract class Part implements IPartWork, ITechnology {
             sj.add("OmniPod");
         }
 
-        if (includeRepairDetails) {
-            sj.add(hits + " hit(s)");
-            if (campaign.getCampaignOptions().isPayForRepairs() && (hits > 0)) {
+        if (isUnitTonnageMatters())
+        {
+            sj.add(getUnitTonnage() + " tons");
+        }
+
+        if (includeRepairDetails && hits > 0) {            
+            sj.add(hits + (hits == 1 ? " hit" : " hits"));
+            if (campaign.getCampaignOptions().isPayForRepairs()) {
                 sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
         }
         return sj.toString();
-    }
-
-    /**
-     * Converts the array of strings normally returned by a call to
-     * campaign.getInventory()
-     * to a string that reads like "(x in transit, y on order)"
-     *
-     * @param inventories The inventory array, see campaign.getInventory() for
-     *                    details.
-     * @return Human readable string.
-     */
-    public String getOrderTransitStringForDetails(PartInventory inventories) {
-        String inTransitString = (inventories.getTransit() == 0) ? "" : inventories.transitAsString() + " in transit";
-        String onOrderString = (inventories.getOrdered() == 0) ? "" : inventories.orderedAsString() + " on order";
-        String transitOrderSeparator = !inTransitString.isBlank() && !onOrderString.isBlank() ? ", " : "";
-
-        return (!inTransitString.isBlank() || !onOrderString.isBlank())
-                ? String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString)
-                : "";
     }
 
     @Override

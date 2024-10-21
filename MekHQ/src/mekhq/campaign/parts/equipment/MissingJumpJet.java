@@ -36,6 +36,7 @@ public class MissingJumpJet extends MissingEquipmentPart {
 
     public MissingJumpJet(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
         super(tonnage, et, equipNum, c, 1, 1.0, omniPodded);
+        this.unitTonnageMatters = true;
     }
 
     @Override

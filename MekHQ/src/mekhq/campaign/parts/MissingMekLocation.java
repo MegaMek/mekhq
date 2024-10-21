@@ -80,6 +80,7 @@ public class MissingMekLocation extends MissingPart {
         this.tsm = hasTSM;
         this.percent = 1.0;
         this.forQuad = quad;
+        this.unitTonnageMatters = true;
         // TODO: need to account for internal structure and myomer types
         // crap, no static report for location names?
         this.name = "Mek Location";

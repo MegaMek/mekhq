@@ -57,6 +57,7 @@ public class MissingKFDriveController extends MissingPart {
         this.coreType = coreType;
         this.docks = docks;
         this.name = "K-F Drive Controller";
+        this.unitTonnageMatters = true;
     }
 
     @Override

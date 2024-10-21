@@ -72,6 +72,7 @@ public class KFDriveController extends Part {
         this.coreType = coreType;
         this.docks = docks;
         this.name = "K-F Drive Controller";
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -255,7 +256,7 @@ public class KFDriveController extends Part {
         if (!details.isEmpty()) {
             joiner.add(details);
         }
-        joiner.add(getUnitTonnage() + " tons").add(getDocks() + " collars");
+        joiner.add(getDocks() + " collars");
         return joiner.toString();
     }
 

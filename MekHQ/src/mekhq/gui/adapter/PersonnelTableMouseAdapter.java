@@ -824,7 +824,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (showDialog) {
                     RetirementDefectionDialog rdd = new RetirementDefectionDialog(
                             gui, null, false);
-                    rdd.setVisible(true);
+
                     if (rdd.wasAborted()
                             || !gui.getCampaign().applyRetirement(rdd.totalPayout(),
                                     rdd.getUnitAssignments())) {

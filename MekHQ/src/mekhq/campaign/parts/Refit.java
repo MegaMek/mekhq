@@ -57,6 +57,7 @@ import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
@@ -1766,8 +1767,8 @@ public class Refit extends Part implements IAcquisitionWork {
             mods.addModifier(2, "custom job");
         }
 
-        if ((null != tech) && tech.getOptions().booleanOption("tech_engineer")) {
-            mods.addModifier(-2, "engineer");
+        if ((null != tech) && tech.getOptions().booleanOption(PersonnelOptions.TECH_ENGINEER)) {
+            mods.addModifier(-2, "Engineer");
         }
         return mods;
     }

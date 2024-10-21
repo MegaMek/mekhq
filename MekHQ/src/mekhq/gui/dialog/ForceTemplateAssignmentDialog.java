@@ -209,7 +209,7 @@ public class ForceTemplateAssignmentDialog extends JDialog {
         // all this stuff apparently needs to happen when assigning a force to a scenario
         campaignGUI.undeployForce(force);
         force.clearScenarioIds(campaignGUI.getCampaign(), true);
-        force.setScenarioId(currentScenario.getId());
+        force.setScenarioId(currentScenario.getId(),campaignGUI.getCampaign());
         currentScenario.addForce(forceID, templateList.getSelectedValue().getForceName());
         for (UUID uid : force.getAllUnits(true)) {
             Unit u = campaignGUI.getCampaign().getUnit(uid);

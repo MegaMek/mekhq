@@ -62,6 +62,7 @@ public class MissingMekActuator extends MissingPart {
         Mek m = new BipedMek();
         this.name = m.getSystemName(type) + " Actuator";
         this.location = loc;
+        this.unitTonnageMatters = true;
     }
 
     @Override

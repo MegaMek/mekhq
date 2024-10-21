@@ -18,9 +18,9 @@
  */
 package mekhq.gui.dialog.reportDialogs;
 
-import mekhq.MekHQ;
+import megamek.client.ui.swing.util.UIUtil;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.ReportingUtilities;
 
@@ -51,6 +51,8 @@ public class PartQualityReportDialog extends AbstractReportDialog {
         setTitle(String.format(resources.getString("PartQualityReportDialog.Unit.title"),
             unit.getName()));
         initialize();
+        pack();
+        setModal(true);
     }
     //endregion Constructors
 
@@ -87,6 +89,10 @@ public class PartQualityReportDialog extends AbstractReportDialog {
 
         // Iterate over parts, assigning each to its location in the map.
         for (Part part : unit.getParts()) {
+            if (part instanceof AmmoBin) {
+                continue;
+            }
+
             String location = part.getLocationName() != null ? part.getLocationName() : unit.getName();
             reportMap.computeIfAbsent(location, k -> new ArrayList<>()).add(part);
         }
@@ -113,17 +119,18 @@ public class PartQualityReportDialog extends AbstractReportDialog {
                 String colorCode = unit.getQuality().getHexColor();
 
                 // Add the location and its colored quality rating to the report.
-                report.append("<span style=\"font-size: 18px;\">")
+                int headerFontSize = UIUtil.scaleForGUI(18);
+                report.append("<span style=\"font-size: ").append(headerFontSize).append("px;\">")
                     .append(location)
                     .append(" - ");
-                report.append("<span style=\"color: ")
-                    .append(colorCode)
-                    .append(";\">")
+                report.append("<span style=\"color: ").append(colorCode).append(";\">")
                     .append(unit.getQualityName())
                     .append("</span>");
                 report.append("</span>");
             } else {
-                report.append("<span style=\"font-size: 12px;\">").append(location).append("</span>");
+                int headerFontSize = UIUtil.scaleForGUI(12);
+                report.append("<span style=\"font-size: ").append(headerFontSize).append("px;\">")
+                    .append(location).append("</span>");
             }
             report.append("</b><br>");
 

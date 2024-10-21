@@ -18,9 +18,10 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import java.util.ResourceBundle;
-
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+
+import java.util.ResourceBundle;
 
 public enum Intelligence {
     // region Enum Declarations
@@ -73,105 +74,8 @@ public enum Intelligence {
     // endregion Getters
 
     // region Boolean Comparison Methods
-
-    public boolean isBrainDead() {
-        return this == BRAIN_DEAD;
-    }
-
-    public boolean isUnintelligent() {
-        return this == UNINTELLIGENT;
-    }
-
-    public boolean isFeebleMinded() {
-        return this == FOOLISH;
-    }
-
-    public boolean isSimple() {
-        return this == SIMPLE;
-    }
-
-    public boolean isSlow() {
-        return this == SLOW;
-    }
-
-    public boolean isUninspired() {
-        return this == UNINSPIRED;
-    }
-
-    public boolean isDull() {
-        return this == DULL;
-    }
-
-    public boolean isDimwitted() {
-        return this == DIMWITTED;
-    }
-
-    public boolean isObtuse() {
-        return this == OBTUSE;
-    }
-
-    public boolean isBelowAverage() {
-        return this == BELOW_AVERAGE;
-    }
-
-    public boolean isUnderPerforming() {
-        return this == UNDER_PERFORMING;
-    }
-
-    public boolean isLimitedInsight() {
-        return this == LIMITED_INSIGHT;
-    }
-
     public boolean isAverage() {
         return this == AVERAGE;
-    }
-
-    public boolean isAboveAverage() {
-        return this == ABOVE_AVERAGE;
-    }
-
-    public boolean isSTUDIOUS() {
-        return this == STUDIOUS;
-    }
-
-    public boolean isDiscerning() {
-        return this == DISCERNING;
-    }
-
-    public boolean isSharp() {
-        return this == SHARP;
-    }
-
-    public boolean isQuickWitted() {
-        return this == QUICK_WITTED;
-    }
-
-    public boolean isPerceptive() {
-        return this == PERCEPTIVE;
-    }
-
-    public boolean isBright() {
-        return this == BRIGHT;
-    }
-
-    public boolean isClever() {
-        return this == CLEVER;
-    }
-
-    public boolean isIntellectual() {
-        return this == INTELLECTUAL;
-    }
-
-    public boolean isBrilliant() {
-        return this == BRILLIANT;
-    }
-
-    public boolean isExceptional() {
-        return this == EXCEPTIONAL;
-    }
-
-    public boolean isGenius() {
-        return this == GENIUS;
     }
     // endregion Boolean Comparison Methods
 
@@ -185,6 +89,7 @@ public enum Intelligence {
      * @throws IllegalStateException if the given string does not match any valid
      *                               Quirk
      */
+    @Deprecated
     public static Intelligence parseFromString(final String quirk) {
         return switch (quirk) {
             case "0", "Brain Dead" -> BRAIN_DEAD;
@@ -220,40 +125,23 @@ public enum Intelligence {
     }
 
     /**
-     * Parses the given Intelligence enum value to an integer.
+     * Returns the {@link Intelligence} associated with the given ordinal.
      *
-     * @param intelligence the Intelligence enum value to be parsed
-     * @return the integer value representing the parsed Intelligence
+     * @param ordinal the ordinal value of the {@link Intelligence}
+     * @return the {@link Intelligence} associated with the given ordinal, or default value
+     * {@code AVERAGE} if not found
      */
+    public static Intelligence fromOrdinal(int ordinal) {
+        for (Intelligence intelligence : values()) {
+            if (intelligence.ordinal() == ordinal) {
+                return intelligence;
+            }
+        }
 
-    public static int parseToInt(final Intelligence intelligence) {
-        return switch (intelligence) {
-            case BRAIN_DEAD -> 0;
-            case UNINTELLIGENT -> 1;
-            case FOOLISH -> 2;
-            case SIMPLE -> 3;
-            case SLOW -> 4;
-            case UNINSPIRED -> 5;
-            case DULL -> 6;
-            case DIMWITTED -> 7;
-            case OBTUSE -> 8;
-            case BELOW_AVERAGE -> 9;
-            case UNDER_PERFORMING -> 10;
-            case LIMITED_INSIGHT -> 11;
-            case AVERAGE -> 12;
-            case ABOVE_AVERAGE -> 13;
-            case STUDIOUS -> 14;
-            case DISCERNING -> 15;
-            case SHARP -> 16;
-            case QUICK_WITTED -> 17;
-            case PERCEPTIVE -> 18;
-            case BRIGHT -> 19;
-            case CLEVER -> 20;
-            case INTELLECTUAL -> 21;
-            case BRILLIANT -> 22;
-            case EXCEPTIONAL -> 23;
-            case GENIUS -> 24;
-        };
+        final MMLogger logger = MMLogger.create(Intelligence.class);
+        logger.error(String.format("Unknown Intelligence ordinal: %s - returning AVERAGE.", ordinal));
+
+        return AVERAGE;
     }
 
     @Override

@@ -18,9 +18,10 @@
  */
 package mekhq.campaign.personnel.randomEvents.enums.personalities;
 
-import java.util.ResourceBundle;
-
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+
+import java.util.ResourceBundle;
 
 public enum Aggression {
     // region Enum Declarations
@@ -106,126 +107,6 @@ public enum Aggression {
     public boolean isNone() {
         return this == NONE;
     }
-
-    public boolean isBloodthirsty() {
-        return this == BLOODTHIRSTY;
-    }
-
-    public boolean isBold() {
-        return this == BOLD;
-    }
-
-    public boolean isAggressive() {
-        return this == AGGRESSIVE;
-    }
-
-    public boolean isAssertive() {
-        return this == ASSERTIVE;
-    }
-
-    public boolean isBelligerent() {
-        return this == BELLIGERENT;
-    }
-
-    public boolean isBrash() {
-        return this == BRASH;
-    }
-
-    public boolean isConfident() {
-        return this == CONFIDENT;
-    }
-
-    public boolean isCourageous() {
-        return this == COURAGEOUS;
-    }
-
-    public boolean isDaring() {
-        return this == DARING;
-    }
-
-    public boolean isDecisive() {
-        return this == DECISIVE;
-    }
-
-    public boolean isDetermined() {
-        return this == DETERMINED;
-    }
-
-    public boolean isDiplomatic() {
-        return this == DIPLOMATIC;
-    }
-
-    public boolean isDomineering() {
-        return this == DOMINEERING;
-    }
-
-    public boolean isFearless() {
-        return this == FEARLESS;
-    }
-
-    public boolean isHostile() {
-        return this == HOSTILE;
-    }
-
-    public boolean isHotHeaded() {
-        return this == HOT_HEADED;
-    }
-
-    public boolean isImpetuous() {
-        return this == IMPETUOUS;
-    }
-
-    public boolean isImpulsive() {
-        return this == IMPULSIVE;
-    }
-
-    public boolean isInflexible() {
-        return this == INFLEXIBLE;
-    }
-
-    public boolean isIntrepid() {
-        return this == INTREPID;
-    }
-
-    public boolean isMurderous() {
-        return this == MURDEROUS;
-    }
-
-    public boolean isOverbearing() {
-        return this == OVERBEARING;
-    }
-
-    public boolean isPacifistic() {
-        return this == PACIFISTIC;
-    }
-
-    public boolean isReckless() {
-        return this == RECKLESS;
-    }
-
-    public boolean isResolute() {
-        return this == RESOLUTE;
-    }
-
-    public boolean isSadistic() {
-        return this == SADISTIC;
-    }
-
-    public boolean isSavage() {
-        return this == SAVAGE;
-    }
-
-    public boolean isStubborn() {
-        return this == STUBBORN;
-    }
-
-    public boolean isTenacious() {
-        return this == TENACIOUS;
-    }
-
-    public boolean isVigilant() {
-        return this == VIGILANT;
-    }
     // endregion Boolean Comparison Methods
 
     // region File I/O
@@ -238,7 +119,7 @@ public enum Aggression {
      * @throws IllegalStateException if the given string does not match any valid
      *                               Aggression
      */
-
+    @Deprecated
     public static Aggression parseFromString(final String aggression) {
         return switch (aggression) {
             case "0", "None" -> NONE;
@@ -282,54 +163,23 @@ public enum Aggression {
     }
 
     /**
-     * Parses an integer value into an Aggression enum.
+     * Returns the {@link Aggression} associated with the given ordinal.
      *
-     * @param aggression the integer value representing the Aggression level
-     * @return the corresponding Aggression enum value
-     * @throws IllegalStateException if the integer value does not correspond to any
-     *                               valid Aggression enum value
+     * @param ordinal the ordinal value of the {@link Aggression}
+     * @return the {@link Aggression} associated with the given ordinal, or default value
+     * {@code NONE} if not found
      */
+    public static Aggression fromOrdinal(int ordinal) {
+        for (Aggression aggression : values()) {
+            if (aggression.ordinal() == ordinal) {
+                return aggression;
+            }
+        }
 
-    public static Aggression parseFromInt(final int aggression) {
-        return switch (aggression) {
-            case 0 -> NONE;
-            // Minor Characteristics
-            case 1 -> BOLD;
-            case 2 -> AGGRESSIVE;
-            case 3 -> ASSERTIVE;
-            case 4 -> BELLIGERENT;
-            case 5 -> BRASH;
-            case 6 -> CONFIDENT;
-            case 7 -> COURAGEOUS;
-            case 8 -> DARING;
-            case 9 -> DECISIVE;
-            case 10 -> DETERMINED;
-            case 11 -> DOMINEERING;
-            case 12 -> FEARLESS;
-            case 13 -> HOSTILE;
-            case 14 -> HOT_HEADED;
-            case 15 -> IMPETUOUS;
-            case 16 -> IMPULSIVE;
-            case 17 -> INFLEXIBLE;
-            case 18 -> INTREPID;
-            case 19 -> OVERBEARING;
-            case 20 -> RECKLESS;
-            case 21 -> RESOLUTE;
-            case 22 -> STUBBORN;
-            case 23 -> TENACIOUS;
-            case 24 -> VIGILANT;
-            // Major Characteristics
-            case 25 -> BLOODTHIRSTY;
-            case 26 -> DIPLOMATIC;
-            case 27 -> MURDEROUS;
-            case 28 -> PACIFISTIC;
-            case 29 -> SADISTIC;
-            case 30 -> SAVAGE;
-            default ->
-                throw new IllegalStateException(
-                        "Unexpected value in mekhq/campaign/personnel/enums/randomEvents/personalities/Aggression.java/parseFromInt: "
-                                + aggression);
-        };
+        final MMLogger logger = MMLogger.create(Aggression.class);
+        logger.error(String.format("Unknown Aggression ordinal: %s - returning NONE.", ordinal));
+
+        return NONE;
     }
 
     @Override

@@ -160,35 +160,58 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
+        StringBuilder toReturn = new StringBuilder();
         if (null != unit) {
-            String rearMount = "";
-            if (rear) {
-                rearMount = " (R)";
-            }
-            if (!isSalvaging()) {
-                String availability;
+            if (isSalvaging()) {
+                toReturn.append(unit.getEntity().getLocationName(location))
+                .append(rear ? " (Rear)" : "")
+                .append(", ")
+                .append(amount)
+                .append(amount == 1 ? " point" : " points");
+            } else {
+                toReturn.append(unit.getEntity().getLocationName(location))
+                    .append(rear ? " (Rear)" : "")
+                    .append(", ")
+                    .append(amountNeeded)
+                    .append(amountNeeded == 1 ? " point" : " points")
+                    .append("<br/>");
+
                 int amountAvailable = getAmountAvailable();
-                PartInventory inventories = campaign.getPartInventory(getNewPart());
-
-                String orderTransitString = getOrderTransitStringForDetails(inventories);
-
-                if (amountAvailable == 0) {
-                    availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                            + "'>No armor " + orderTransitString + "</font>";
+                if(amountAvailable == 0) {
+                    toReturn.append(ReportingUtilities.messageSurroundedBySpanWithColor(
+                        MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "None in stock"));
                 } else if (amountAvailable < amountNeeded) {
-                    availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor()
-                            + "'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
+                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                            MekHQ.getMHQOptions().getFontColorNegativeHexColor()))
+                        .append("Only ")
+                        .append(amountAvailable)
+                        .append(" in stock")
+                        .append(ReportingUtilities.CLOSING_SPAN_TAG);
                 } else {
-                    availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                            + amountAvailable + " available " + orderTransitString + "</font>";
+                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                            MekHQ.getMHQOptions().getFontColorPositiveHexColor()))
+                        .append(amountAvailable)
+                        .append(" in stock")
+                        .append(ReportingUtilities.CLOSING_SPAN_TAG);
                 }
-
-                return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points"
-                        + availability;
+    
+                PartInventory inventories = campaign.getPartInventory(getNewPart());
+                String orderTransitString = inventories.getTransitOrderedDetails();
+                if (!orderTransitString.isEmpty()) {
+                    toReturn.append(ReportingUtilities.spanOpeningWithCustomColor(
+                            MekHQ.getMHQOptions().getFontColorWarningHexColor()))
+                        .append(" (")
+                        .append(orderTransitString)
+                        .append(")")
+                        .append(ReportingUtilities.CLOSING_SPAN_TAG);
+                }
             }
-            return unit.getEntity().getLocationName(location) + rearMount + ", " + amount + " points";
+        
+        } else {
+            toReturn.append(amount)
+                .append(" points");
         }
-        return amount + " points";
+        return toReturn.toString();
     }
 
     public int getType() {

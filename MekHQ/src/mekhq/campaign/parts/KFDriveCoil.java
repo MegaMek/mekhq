@@ -72,6 +72,7 @@ public class KFDriveCoil extends Part {
         this.coreType = coreType;
         this.docks = docks;
         this.name = "K-F Drive Coil";
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -254,8 +255,7 @@ public class KFDriveCoil extends Part {
         if (!details.isEmpty()) {
             joiner.add(details);
         }
-        joiner.add(getUnitTonnage() + " tons")
-                .add(getDocks() + " collars");
+        joiner.add(getDocks() + " collars");
         return joiner.toString();
     }
 

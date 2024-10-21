@@ -68,6 +68,7 @@ public class MekLocation extends Part {
 
     public MekLocation() {
         this(0, 0, 0, false, false, false, false, false, null);
+        this.unitTonnageMatters = true;
     }
 
     @Override
@@ -109,6 +110,7 @@ public class MekLocation extends Part {
         this.sensors = sensors;
         this.lifeSupport = lifeSupport;
         this.breached = false;
+        this.unitTonnageMatters = true;
         // TODO : need to account for internal structure and myomer types
         // crap, no static report for location names?
         this.name = "Mek Location";
@@ -566,48 +568,50 @@ public class MekLocation extends Part {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        if (getUnit() != null) {
-            return getDetailsOnUnit(includeRepairDetails);
+        StringBuilder toReturn = new StringBuilder();
+
+        if (null != getUnit()) {
+            toReturn.append(Objects.requireNonNull(getUnit()).getEntity().getLocationName(loc))
+                .append(", ");
         }
 
-        String toReturn = getUnitTonnage() + " tons";
-        if (includeRepairDetails) {
-            toReturn += " (" + Math.round(100 * getPercent()) + "%)";
-        }
-
+        toReturn.append(getUnitTonnage())
+            .append(" tons");
+            
         if (loc == Mek.LOC_HEAD) {
             StringJoiner components = new StringJoiner(", ");
             if (hasSensors()) {
                 components.add("Sensors");
             }
-
             if (hasLifeSupport()) {
                 components.add("Life Support");
             }
-
             if (components.length() > 0) {
-                toReturn += " [" + components + ']';
+                toReturn.append(" [")
+                    .append(components)
+                    .append(']');
             }
         }
 
-        return toReturn;
-    }
-
-    private String getDetailsOnUnit(boolean includeRepairDetails) {
-        String toReturn = Objects.requireNonNull(getUnit()).getEntity().getLocationName(loc);
         if (includeRepairDetails) {
             if (isBlownOff()) {
-                toReturn += " (Blown Off)";
+                toReturn.append(" (Blown Off)");
             } else if (isBreached()) {
-                toReturn += " (Breached)";
+                toReturn.append(" (Breached)");
             } else if (onBadHipOrShoulder()) {
-                toReturn += " (Bad Hip/Shoulder)";
-            } else {
-                toReturn += " (" + Math.round(100 * getPercent()) + "%)";
+                toReturn.append(" (Bad Hip/Shoulder)");
+            } else if (getPercent() < 1.0) {
+                toReturn.append(" (")
+                    .append(Math.round(100 * getPercent()))
+                    .append("%)");
+                if (campaign.getCampaignOptions().isPayForRepairs()) {
+                    toReturn.append(", ")
+                        .append(getUndamagedValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
+                }
             }
         }
 
-        return toReturn;
+        return toReturn.toString();
     }
 
     @Override
@@ -861,14 +865,16 @@ public class MekLocation extends Part {
 
     @Override
     public String getDesc() {
-        if ((!isBreached() && !isBlownOff()) || isSalvaging()) {
+        if ((!isBreached() && !isBlownOff())) {
             return super.getDesc();
         }
         StringBuilder toReturn = new StringBuilder();
         toReturn.append("<html><b>")
             .append(isBlownOff() ? "Re-attach " : "Seal ")
             .append(getName())
-            .append(" - ")
+            .append(" (")
+            .append(getUnitTonnage())
+            .append(" ton) - ")
             .append(ReportingUtilities.messageSurroundedBySpanWithColor(
                 SkillType.getExperienceLevelColor(getSkillMin()),
                 SkillType.getExperienceLevelName(getSkillMin()) + "+"))
