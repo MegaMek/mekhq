@@ -43,7 +43,6 @@ import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.mission.enums.AtBMoraleLevel;
-import mekhq.campaign.mission.enums.ContractCommandRights;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -1714,14 +1713,14 @@ public class AtBContract extends Contract {
     }
 
     /**
-     * This method returns a {@link JPanel} that represents the difficulty stars for a given mission.
+     * This method returns a {@link JPanel} that represents the difficulty skulls for a given mission.
      *
-     * @param campaign the campaign for which the difficulty stars are calculated
-     * @return a {@link JPanel} with the difficulty stars displayed
+     * @param campaign the campaign for which the difficulty skulls are calculated
+     * @return a {@link JPanel} with the difficulty skulls displayed
      */
-    public JPanel getContractDifficultyStars(Campaign campaign) {
+    public JPanel getContractDifficultySkulls(Campaign campaign) {
         final int ERROR = -99;
-        int difficulty = Math.min(calculateContractDifficulty(campaign), 8);
+        int difficulty = calculateContractDifficulty(campaign);
 
         // Create a new JFrame
         JFrame frame = new JFrame();
@@ -1730,27 +1729,31 @@ public class AtBContract extends Contract {
         // Create a pane with FlowLayout
         JPanel panel = new JPanel(new FlowLayout());
 
-        // Load and scale the image
-        ImageIcon imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_orange.png");
-        if (difficulty < 1 && difficulty != ERROR) {
-            imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_green.png");
-        } else if (difficulty > 0) {
-            imageIcon = new ImageIcon("data/images/universe/factions/logo_star_league_red.png");
-        }
-
-        Image scaledImage = imageIcon.getImage().getScaledInstance(40, 40, Image.SCALE_FAST);
-        imageIcon = new ImageIcon(scaledImage);
+        // Load and scale the images
+        ImageIcon skullFull = new ImageIcon("data/images/misc/challenge_estimate_full.png");
+        ImageIcon skullHalf = new ImageIcon("data/images/misc/challenge_estimate_half.png");
 
         int iterations = difficulty;
 
         if (difficulty == ERROR) {
-            iterations = 1;
-        } else if (difficulty < 1) {
-            iterations = -difficulty + 1;
+            iterations = 5;
         }
 
-        for (int i = 0; i < iterations; i++) {
-            panel.add(new JLabel(imageIcon));
+        if (iterations % 2 == 1) {
+            iterations--;
+            iterations /= 2;
+
+            for (int i = 0; i < iterations; i++) {
+                panel.add(new JLabel(skullFull));
+            }
+
+            panel.add(new JLabel(skullHalf));
+        } else {
+            iterations /= 2;
+
+            for (int i = 0; i < iterations; i++) {
+                panel.add(new JLabel(skullFull));
+            }
         }
 
         return panel;
@@ -1789,8 +1792,8 @@ public class AtBContract extends Contract {
             case LIAISON        -> 0.4; // single allied heavy/assault mek, pure guess for now
             case HOUSE          -> 1; // allies with same (G)BV budget
             case INTEGRATED     -> 2; // allies with twice the player's (G)BV budget
-            default -> 0;
         };
+
         if (allyRatio > 0) {
             SkillLevel alliedSkill = modifySkillLevelBasedOnFaction(employerCode, allySkill);
             double allySkillMultiplier = getSkillMultiplier(alliedSkill);
@@ -1805,11 +1808,17 @@ public class AtBContract extends Contract {
         }
 
         // Calculate difficulty based on the percentage difference between the two forces.
-        // If the enemy force exceeds the player force, this will be a positive percentage, otherwise negative.
         double difference = enemyPower - playerPower;
         double percentDifference = (difference / playerPower) * 100;
 
-        return (int) round(percentDifference / 20);
+        int mappedValue = (int) Math.ceil(Math.abs(percentDifference) / 20);
+        if (percentDifference < 0) {
+            mappedValue = 5 - mappedValue;
+        } else {
+            mappedValue = 5 + mappedValue;
+        }
+
+        return Math.min(Math.max(mappedValue, 1), 10);
     }
 
     /**
@@ -1934,7 +1943,7 @@ public class AtBContract extends Contract {
             // getMekSummary(int index) is NULL for salvage.
             int genericBattleValue = unitTable.getMekSummary(i).loadEntity().getGenericBattleValue();
             int weight = unitTable.getEntryWeight(i); // NOT 0 for salvage
-            
+
             totalBattleValue += battleValue * weight;
             totalGBV += genericBattleValue * weight;
             rollingCount += weight;

@@ -40,6 +40,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ResourceBundle;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
+
 /**
  * Contract summary view for ContractMarketDialog
  *
@@ -167,11 +169,13 @@ public class ContractSummaryPanel extends JPanel {
         if (campaign.getCampaignOptions().isUseGenericBattleValue()) {
             if (contract instanceof AtBContract) {
                 JLabel lblChallenge = new JLabel(resourceMap.getString("lblChallenge.text"));
+                lblChallenge.setToolTipText(wordWrap(resourceMap.getString("lblChallenge.tooltip")));
                 lblChallenge.setName("lblChallenge");
                 gridBagConstraintsLabels.gridy = ++y;
                 mainPanel.add(lblChallenge, gridBagConstraintsLabels);
 
-                JPanel txtChallenge = ((AtBContract) contract).getContractDifficultyStars(campaign);
+                JPanel txtChallenge = ((AtBContract) contract).getContractDifficultySkulls(campaign);
+                txtChallenge.setToolTipText(wordWrap(resourceMap.getString("lblChallenge.tooltip")));
                 txtChallenge.setName("txtChallenge");
                 gridBagConstraintsText.gridy = y;
                 mainPanel.add(txtChallenge, gridBagConstraintsText);
