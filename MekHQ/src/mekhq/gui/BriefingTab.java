@@ -439,8 +439,6 @@ public final class BriefingTab extends CampaignGuiTab {
         if ((getCampaign().getCampaignOptions().isUseRandomRetirement())
                 && (getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement())) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(), mission, true);
-            rdd.setLocation(rdd.getLocation().x, 0);
-            rdd.setVisible(true);
 
             if (rdd.wasAborted()) {
                 /*
@@ -725,13 +723,11 @@ public final class BriefingTab extends CampaignGuiTab {
         resolveDialog.setVisible(true);
 
         if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-            RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
+            RetirementDefectionDialog dialog = new RetirementDefectionDialog(getCampaignGui(),
                     getCampaign().getMission(scenario.getMissionId()), false);
-            rdd.setLocation(rdd.getLocation().x, 0);
-            rdd.setVisible(true);
 
-            if (!rdd.wasAborted()) {
-                getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+            if (!dialog.wasAborted()) {
+                getCampaign().applyRetirement(dialog.totalPayout(), dialog.getUnitAssignments());
             }
         }
 
