@@ -68,7 +68,7 @@ public class StratconContractInitializer {
         // scenarios
         // when objective is allied/hostile facility, place those facilities
 
-        int numTracks = Math.max(1, contract.getRequiredLances() / NUM_LANCES_PER_TRACK);
+        int numTracks = contract.getRequiredLances() / NUM_LANCES_PER_TRACK;
         int planetaryTemperature = campaign.getLocation().getPlanet().getTemperature(campaign.getLocalDate());
 
         for (int x = 0; x < numTracks; x++) {
