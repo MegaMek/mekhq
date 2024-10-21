@@ -33,6 +33,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.ReportingUtilities;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
     private static final MMLogger logger = MMLogger.create(ForceRenderer.class);
@@ -51,37 +52,36 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         setOpaque(false);
 
         if (value instanceof Unit) {
-            String name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No Crew</font>";
+            String name = ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), "No Crew");
             if (((Unit) value).getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
             String c3network = "";
             StringBuilder transport = new StringBuilder();
-            Unit u = (Unit) value;
-            Person person = u.getCommander();
+            Unit unit = (Unit) value;
+            Person person = unit.getCommander();
             if (person != null) {
                 name = person.getFullTitle();
-                name += " (" + u.getEntity().getCrew().getGunnery() + '/'
-                        + u.getEntity().getCrew().getPiloting() + ')';
-                if (person.needsFixing() || (u.getEntity().getCrew().getHits() > 0)) {
-                    name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + name
-                            + "</font>";
+                name += " (" + unit.getEntity().getCrew().getGunnery() + '/'
+                        + unit.getEntity().getCrew().getPiloting() + ')';
+                if (person.needsFixing() || (unit.getEntity().getCrew().getHits() > 0)) {
+                    name = ReportingUtilities.messageSurroundedBySpanWithColor(
+                            MekHQ.getMHQOptions().getFontColorNegativeHexColor(), name);
                 }
             }
-            String uname = "<i>" + u.getName() + "</i>";
-            if (u.isDamaged()) {
-                uname = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + uname
-                        + "</font>";
+            String unitName = "<i>" + unit.getName() + "</i>";
+            if (unit.isDamaged()) {
+                unitName = ReportingUtilities.messageSurroundedBySpanWithColor(
+                    MekHQ.getMHQOptions().getFontColorNegativeHexColor(), unitName);
             }
 
-            Entity entity = u.getEntity();
+            Entity entity = unit.getEntity();
             if (entity.hasNavalC3()) {
                 if (entity.calculateFreeC3Nodes() >= 5) {
                     c3network += Messages.getString("ChatLounge.NC3None");
                 } else {
-                    c3network += Messages
-                            .getString("ChatLounge.NC3Network")
-                            + entity.getC3NetId();
+                    c3network += Messages.getString("ChatLounge.NC3Network") + entity.getC3NetId();
                     if (entity.calculateFreeC3Nodes() > 0) {
                         c3network += Messages.getString("ChatLounge.NC3Nodes",
                                 entity.calculateFreeC3Nodes());
@@ -91,8 +91,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 if (entity.calculateFreeC3Nodes() >= 5) {
                     c3network += Messages.getString("ChatLounge.C3iNone");
                 } else {
-                    c3network += Messages.getString("ChatLounge.C3iNetwork")
-                            + entity.getC3NetId();
+                    c3network += Messages.getString("ChatLounge.C3iNetwork") + entity.getC3NetId();
                     if (entity.calculateFreeC3Nodes() > 0) {
                         c3network += Messages.getString("ChatLounge.C3iNodes",
                                 entity.calculateFreeC3Nodes());
@@ -101,16 +100,14 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
             } else if (entity.hasC3()) {
                 if (entity.C3MasterIs(entity)) {
                     c3network += Messages.getString("ChatLounge.C3Master");
-                    c3network += Messages.getString("ChatLounge.C3MNodes",
-                            entity.calculateFreeC3MNodes());
+                    c3network += Messages.getString("ChatLounge.C3MNodes", entity.calculateFreeC3MNodes());
                     if (entity.hasC3MM()) {
                         c3network += Messages.getString("ChatLounge.C3SNodes",
                                 entity.calculateFreeC3Nodes());
                     }
                 } else if (!entity.hasC3S()) {
                     c3network += Messages.getString("ChatLounge.C3Master");
-                    c3network += Messages.getString("ChatLounge.C3SNodes",
-                            entity.calculateFreeC3Nodes());
+                    c3network += Messages.getString("ChatLounge.C3SNodes", entity.calculateFreeC3Nodes());
                     // an independent master might also be a slave to a company master
                     if (entity.getC3Master() != null) {
                         c3network += "<br>" + Messages.getString("ChatLounge.C3Slave")
@@ -128,22 +125,27 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 c3network = "<br><i>" + c3network + "</i>";
             }
 
-            if (u.hasTransportShipAssignment()) {
+            if (unit.hasTransportShipAssignment()) {
                 transport.append("<br>Transported by: ")
-                        .append(u.getTransportShipAssignment().getTransportShip().getName());
+                        .append(unit.getTransportShipAssignment().getTransportShip().getName());
             }
-            String text = name + ", " + uname + c3network + transport;
+            String text = name + ", " + unitName + c3network + transport;
+
+            Force force = unit.getCampaign().getForce(unit.getForceId());
+            if((null != person) && (null != force) && (person.getId() == force.getForceCommanderID())) {
+                text = "<b>" + text + "</b>";
+            }
             setText("<html>" + text + "</html>");
-            getAccessibleContext().setAccessibleName((u.isDeployed() ? "Deployed Unit: " : "Unit: ") + text);
-            if (!sel && u.isDeployed()) {
+            getAccessibleContext().setAccessibleName((unit.isDeployed() ? "Deployed Unit: " : "Unit: ") + text);
+            if (!sel && unit.isDeployed()) {
                 setForeground(MekHQ.getMHQOptions().getDeployedForeground());
                 setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 setOpaque(true);
             }
         } else if (value instanceof Force) {
             Force force = (Force) value;
-            getAccessibleContext()
-                    .setAccessibleName((force.isDeployed() ? "Deployed Force: " : "Force: ") + force.getFullName());
+            getAccessibleContext().setAccessibleName((
+                    force.isDeployed() ? "Deployed Force: " : "Force: ") + force.getFullName());
             if (!sel && force.isDeployed()) {
                 setForeground(MekHQ.getMHQOptions().getDeployedForeground());
                 setBackground(MekHQ.getMHQOptions().getDeployedBackground());
