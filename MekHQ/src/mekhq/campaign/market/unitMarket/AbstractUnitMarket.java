@@ -191,13 +191,13 @@ public abstract class AbstractUnitMarket {
     public String addSingleUnit(final Campaign campaign, final UnitMarketType market,
             final int unitType, final MekSummary mekSummary,
             final int percent) {
-        final LocalDate INVASION_WAVE_FIVE = LocalDate.of(3051, 11, 1);
+        final LocalDate BATTLE_OF_TUKAYYID = LocalDate.of(3052, 5, 21);
 
         Faction campaignFaction = campaign.getFaction();
         LocalDate currentDate = campaign.getLocalDate();
 
         if (!campaignFaction.isClan()) {
-            if (mekSummary.isClan() && currentDate.isBefore(INVASION_WAVE_FIVE)) {
+            if (mekSummary.isClan() && currentDate.isBefore(BATTLE_OF_TUKAYYID)) {
                 return null;
             }
         }
