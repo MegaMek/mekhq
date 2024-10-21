@@ -20,6 +20,8 @@ package mekhq.gui.dialog.nagDialogs;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,6 @@ import static org.mockito.Mockito.when;
 class UnableToAffordJumpNagDialogTest {
     // Mock objects for the tests
     private Campaign campaign;
-    private CampaignOptions options;
 
     /**
      * Test setup for each test, runs before each test.
@@ -48,10 +49,17 @@ class UnableToAffordJumpNagDialogTest {
     void init() {
         // Initialize the mock objects
         campaign = mock(Campaign.class);
-        options = mock(CampaignOptions.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        CurrentLocation location = mock(CurrentLocation.class);
+        JumpPath jumpPath = mock(JumpPath.class);
+
 
         // Stubs
         when(campaign.getCampaignOptions()).thenReturn(options);
+
+        jumpPath.addSystem(campaign.getSystemById("Terra"));
+        when(campaign.getLocation()).thenReturn(location);
+        when(location.getJumpPath()).thenReturn(jumpPath);
     }
 
     // In the following tests the canAffordNextJump() method is called, and its response is checked

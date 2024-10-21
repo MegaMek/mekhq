@@ -59,6 +59,10 @@ public class UnableToAffordJumpNagDialog extends AbstractMHQNagDialog {
      * @return the cost of the next jump for the campaign
      */
     static Money getNextJumpCost(Campaign campaign) {
+        if (campaign.getLocation().getJumpPath() == null) {
+            return Money.zero();
+        }
+
         boolean isContractPayBasedOnToeUnitsValue = campaign.getCampaignOptions().isEquipmentContractBase();
 
         return campaign.calculateCostPerJump(true, isContractPayBasedOnToeUnitsValue);
